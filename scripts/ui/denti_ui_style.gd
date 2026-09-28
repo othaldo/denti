@@ -78,6 +78,11 @@ static func style_button(button: Button, accent: bool = false, left_align: bool 
 	button.alignment = HORIZONTAL_ALIGNMENT_LEFT if left_align else HORIZONTAL_ALIGNMENT_CENTER
 
 
+static func style_check_button(button: CheckButton) -> void:
+	for state in ["font_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color", "font_focus_color", "font_disabled_color"]:
+		button.add_theme_color_override(state, INK)
+
+
 static func style_card(button: Button, rare: bool = false) -> void:
 	style_button(button)
 	var accent := VIOLET if rare else MINT.darkened(0.18)

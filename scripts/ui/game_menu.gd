@@ -171,7 +171,7 @@ func _fps_option() -> CheckButton:
 	var toggle := CheckButton.new()
 	toggle.text = "FPS anzeigen"
 	toggle.button_pressed = session.show_fps
-	toggle.add_theme_color_override("font_color", DentiUIStyle.INK)
+	DentiUIStyle.style_check_button(toggle)
 	panel.add_child(toggle)
 	toggle.toggled.connect(Callable(session, "set_show_fps"))
 	return toggle
