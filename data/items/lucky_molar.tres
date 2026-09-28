@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"lucky_molar"
+display_name = "Glücks-Molar"
+description = "+6 % Glanz und +3 Bisskraft. Lächelt zurück."
+rarity = "Selten"
+price = 7
+stat_changes = { &"crit_chance": 0.06, &"damage": 3.0 }

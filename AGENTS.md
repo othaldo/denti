@@ -349,6 +349,8 @@ Shop UI:
 
 Menus should work well with mouse input first.
 
+Keep HUD, cards, buttons and typography visually cohesive with Denti's warm cartoon artwork. When using third-party UI assets or fonts, verify that the license permits game use, keep required license notices, and credit the source in `CREDITS.md` and the in-game credits.
+
 Keyboard/controller support can be added later.
 
 ## Denti - Canonical Character Reference
@@ -357,7 +359,7 @@ Denti is the main character and mascot of the game.
 
 The canonical visual reference is:
 
-`assets/denti/reference/denti_reference.png`
+`assets/denti/reference/denti-upgraded.png`
 
 This image defines Denti's core visual identity.
 

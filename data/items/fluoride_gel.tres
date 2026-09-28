@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"fluoride_gel"
+display_name = "Fluoridgel"
+description = "+25 Schmelz und sofortige Heilung."
+rarity = "Gewöhnlich"
+price = 3
+stat_changes = { &"max_health": 25.0 }

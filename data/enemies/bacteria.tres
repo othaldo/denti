@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/enemies/bacteria.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+display_name = "Bakterium"
+max_health = 18.0
+move_speed = 135.0
+contact_damage = 6.0
+radius = 13.0
+xp_drop = 1
+coin_drop = 1
+sprite = ExtResource("2")
