@@ -7,8 +7,10 @@ Ein kleines Godot-4-Projekt über einen göttlichen Zahn im Kampf gegen Plaque.
 Projekt in Godot 4 öffnen und **F5** drücken. Alternativ im Projektordner:
 
 ```bash
-godot --path .
+./play.sh
 ```
+
+Der Starter verwendet auf diesem Linux-Rechner `/usr/local/bin/godot`, damit Godot die NVIDIA-Grafikkarte statt des Software-Renderers der Flathub-Version nutzt. `./play.sh --probe` misst im Fenster und im Vollbild die FPS eines frischen Spiels sowie einer Arena mit 100 Gegnern. Der Test nutzt einen eigenen temporären Spielstand und gibt Godot-Version und Anzeigetreiber in der Konsole aus.
 
 Im Hauptmenü ein neues Spiel beginnen oder einen gespeicherten Lauf fortsetzen. Bei vorhandenem Spielstand ist **Fortsetzen** vorausgewählt; **Neues Spiel** fragt vor dem Löschen des alten Laufs nach. Mit **WASD** oder den Pfeiltasten bewegen. Die Zahnbürste schießt automatisch auf den nächsten Gegner. XP und Münzen durch Berühren einsammeln. Bei einem Levelaufstieg einen von drei Boni wählen. **Escape** öffnet im Kampf ein Pausenmenü mit Stats, Optionen und Rückkehr zum Hauptmenü.
 
