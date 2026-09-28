@@ -185,7 +185,6 @@ Systems should communicate using clear interfaces and Godot signals where approp
 
 Avoid tightly coupling UI code to gameplay logic.
 
-
 ## Data-Driven Design
 
 Items, weapons and enemies should be data-driven wherever practical.
@@ -351,6 +350,70 @@ Shop UI:
 Menus should work well with mouse input first.
 
 Keyboard/controller support can be added later.
+
+## Denti - Canonical Character Reference
+
+Denti is the main character and mascot of the game.
+
+The canonical visual reference is:
+
+`assets/denti/reference/denti_reference.png`
+
+This image defines Denti's core visual identity.
+
+When creating or integrating new Denti artwork, sprites, animations,
+portraits, icons or promotional material, preserve the recognizable
+design of the reference character.
+
+### Core visual traits
+
+Denti is:
+
+- a small anthropomorphic tooth
+- cute and friendly rather than realistic
+- primarily white / ivory
+- wearing a small golden crown
+- expressive and cheerful
+- associated with divine / holy imagery in a humorous way
+- visually simple enough to remain recognizable at small sprite sizes
+
+Denti should feel like a tiny dental god and mascot.
+
+Do not redesign Denti into a generic human character or realistic tooth.
+Do not significantly change his proportions, crown, face or overall
+silhouette without an explicit design decision.
+
+### Gameplay Artwork
+
+Gameplay sprites may simplify the reference design for readability.
+
+It is acceptable to:
+- exaggerate facial expressions
+- simplify details
+- change poses
+- add weapons and equipment
+- temporarily display equipped items such as crowns or dental tools
+
+However, Denti should always remain immediately recognizable as the same
+character.
+
+Generated Denti assets should be stored beneath:
+
+`assets/denti/`
+
+The original reference image must never be overwritten.
+
+### Equipment Representation
+
+Denti's golden crown is part of his canonical character design and does
+not represent an equipped gameplay item.
+
+Gameplay items such as "Metallkrone" are independent from Denti's
+default crown.
+
+Equipped items do not necessarily need to appear literally on the
+character. Visual equipment representation is optional and should favor
+readability and humor over realism.
 
 
 ## Art Direction
