@@ -16,6 +16,22 @@ func _run() -> void:
 	if session.has_run() or menu.overlay:
 		_fail("main menu started with an unexpected save")
 		return
+	if menu.menu_music.current_cue != &"main_menu" or menu.menu_music.bus != &"Music" or menu.menu_music.stream != MusicController.MAIN_MENU or not menu.menu_music.playing:
+		_fail("main menu theme did not start")
+		return
+	menu.menu_music._process(MusicController.FADE_DURATION)
+	menu.menu_music.seek(menu.menu_music.stream.get_length() - MusicController.FADE_DURATION * 0.5)
+	menu.menu_music._process(0.01)
+	if menu.menu_music.fade_state != MusicController.FadeState.FADING_OUT or menu.menu_music.queued_cue != &"main_menu":
+		_fail("main menu theme did not prepare its next loop")
+		return
+	menu.menu_music._process(MusicController.FADE_DURATION)
+	if menu.menu_music.current_cue != &"main_menu" or menu.menu_music.fade_state != MusicController.FadeState.FADING_IN:
+		_fail("main menu theme did not restart with a fade")
+		return
+	if (menu.rows.get_child(3) as Button).text != "Neues Spiel" or not (menu.rows.get_child(3) as Button).has_focus():
+		_fail("new game was not selected when no save exists")
+		return
 	menu._new_game()
 	await process_frame
 	await process_frame
@@ -76,6 +92,17 @@ func _run() -> void:
 	menu = current_scene as GameMenu
 	if menu == null or not session.has_run():
 		_fail("main menu lost the run")
+		return
+	if (menu.rows.get_child(3) as Button).text != "Fortsetzen" or not (menu.rows.get_child(3) as Button).has_focus():
+		_fail("continue was not the default action with a save")
+		return
+	menu._new_game()
+	if menu.page != &"confirm_new_game" or not session.has_run() or (menu.rows.get_child(3) as Button).text != "Abbrechen" or not (menu.rows.get_child(3) as Button).has_focus():
+		_fail("new game did not ask before deleting the save")
+		return
+	(menu.rows.get_child(3) as Button).pressed.emit()
+	if menu.page != &"home" or not session.has_run():
+		_fail("cancelling a new game did not preserve the save")
 		return
 	menu._continue_game()
 	await process_frame
@@ -143,6 +170,18 @@ func _run() -> void:
 	game = current_scene
 	if not paused or not game.in_shop or not game.shop_panel.visible or game.shop.offers.size() != 3:
 		_fail("continue did not restore the shop")
+		return
+	game.game_menu._to_main_menu()
+	await process_frame
+	await process_frame
+	menu = current_scene as GameMenu
+	menu._new_game()
+	(menu.rows.get_child(4) as Button).pressed.emit()
+	await process_frame
+	await process_frame
+	game = current_scene
+	if paused or game.wave.current_wave != 1 or game.coins != 0 or game.in_shop or not session.has_run():
+		_fail("confirmed new game did not replace the previous run")
 		return
 	session.clear_run()
 	paused = false

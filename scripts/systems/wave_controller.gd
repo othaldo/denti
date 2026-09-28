@@ -7,7 +7,8 @@ signal horde_requested(data: EnemyData, count: int)
 signal wave_finished(wave_number: int)
 
 const DURATION := 45.0
-const MAX_WAVES := 10
+const MAX_WAVES := 20
+const MINI_BOSS_INTERVAL := 5
 const SPAWN_INTERVAL_START := 1.6
 const SPAWN_INTERVAL_WAVE_STEP := 0.065
 const SPAWN_INTERVAL_ACCELERATION := 0.012
@@ -17,6 +18,7 @@ const BACTERIA: EnemyData = preload("res://data/enemies/bacteria.tres")
 const SUGAR: EnemyData = preload("res://data/enemies/sugar.tres")
 const ACID_SPITTER: EnemyData = preload("res://data/enemies/acid_spitter.tres")
 const BOSS: EnemyData = preload("res://data/enemies/cavity_king.tres")
+const FINAL_BOSS: EnemyData = preload("res://data/enemies/cavity_emperor.tres")
 
 var remaining: float = DURATION
 var spawn_cooldown: float = 0.0
@@ -27,7 +29,11 @@ var horde_spawned: bool = false
 
 
 func plan_hordes() -> void:
-	horde_waves = [randi_range(4, 5), randi_range(7, 8)]
+	horde_waves = [4, randi_range(7, 8), randi_range(11, 13), randi_range(16, 18)]
+
+
+static func is_boss_wave(wave_number: int) -> bool:
+	return wave_number > 0 and wave_number % MINI_BOSS_INTERVAL == 0
 
 
 func next_wave_preview() -> String:
@@ -39,8 +45,10 @@ func next_wave_preview() -> String:
 		details.append("Zuckerstück")
 	elif next_wave == 4:
 		details.append("Säurespucker")
-	elif next_wave == MAX_WAVES:
-		details.append("Karies-König")
+	if next_wave == MAX_WAVES:
+		details.append(FINAL_BOSS.display_name)
+	elif is_boss_wave(next_wave):
+		details.append(BOSS.display_name)
 	if horde_waves.has(next_wave):
 		details.append("%s-Horde" % _horde_data(next_wave).display_name)
 	return "Welle %d: %s" % [next_wave, " · ".join(details)] if not details.is_empty() else "Nächste Welle: %d" % next_wave
@@ -54,8 +62,8 @@ func start_next_wave() -> void:
 	spawn_cooldown = 0.0
 	horde_spawned = false
 	active = true
-	if current_wave == MAX_WAVES:
-		boss_requested.emit(BOSS)
+	if is_boss_wave(current_wave):
+		boss_requested.emit(FINAL_BOSS if current_wave == MAX_WAVES else BOSS)
 
 
 func _process(delta: float) -> void:

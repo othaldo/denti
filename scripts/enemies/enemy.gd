@@ -2,6 +2,8 @@ class_name Enemy
 extends Node2D
 
 signal defeated(position: Vector2, data: EnemyData)
+signal damaged(position: Vector2, amount: float)
+signal attack_performed(kind: StringName)
 
 enum SpecialPhase { COOLDOWN, WARNING, ACTIVE }
 
@@ -41,6 +43,7 @@ func configure(enemy_data: EnemyData, player: Player, wave_number: int = 1) -> v
 func _ready() -> void:
 	add_to_group("enemies")
 	sprite.texture = data.sprite
+	sprite.modulate = data.sprite_tint
 	var side := maxf(float(data.sprite.get_width()), float(data.sprite.get_height()))
 	sprite.scale = Vector2.ONE * (data.radius * 2.35 / side)
 	animation_time = randf_range(0.0, TAU)
@@ -116,6 +119,7 @@ func _activate_special() -> void:
 			projectile_root = get_parent()
 		projectile_root.add_child(projectile)
 		projectile.launch(global_position, special_direction, data.attack_speed, attack_damage, target)
+		attack_performed.emit(&"acid")
 		_reset_special()
 	else:
 		if global_position.distance_to(target.global_position) <= data.attack_radius:
@@ -135,6 +139,7 @@ func take_damage(amount: float) -> void:
 	if health <= 0.0:
 		return
 	health -= amount
+	damaged.emit(global_position + Vector2(0.0, -data.radius), amount)
 	if health <= 0.0:
 		health = 0.0
 		remove_from_group("enemies")

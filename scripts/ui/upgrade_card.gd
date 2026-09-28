@@ -4,7 +4,7 @@ extends Button
 const ICONS: Script = preload("res://scripts/ui/denti_ui_icons.gd")
 
 var content: VBoxContainer
-var icon: TextureRect
+var icon_rect: TextureRect
 var name_label: Label
 var effect_label: Label
 var hover_tween: Tween
@@ -24,7 +24,7 @@ func show_upgrade(upgrade: UpgradeData) -> void:
 	custom_minimum_size.y = 186.0
 	text = ""
 	content.visible = true
-	icon.texture = ICONS.item(upgrade.icon_index)
+	icon_rect.texture = ICONS.item(upgrade.icon_index)
 	name_label.text = upgrade.display_name.to_upper()
 	effect_label.text = upgrade.description
 	disabled = false
@@ -54,12 +54,12 @@ func _build_content() -> void:
 	content.add_theme_constant_override("separation", 7)
 	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	margin.add_child(content)
-	icon = TextureRect.new()
-	icon.custom_minimum_size = Vector2(0, 70)
-	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	content.add_child(icon)
+	icon_rect = TextureRect.new()
+	icon_rect.custom_minimum_size = Vector2(0, 70)
+	icon_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	content.add_child(icon_rect)
 	name_label = Label.new()
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_label.add_theme_color_override("font_color", DentiUIStyle.INK)

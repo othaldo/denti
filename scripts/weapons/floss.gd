@@ -24,7 +24,7 @@ func _physics_process(delta: float) -> void:
 		return
 	for enemy in targets:
 		enemy.take_damage(player.stats.roll_damage(0.8))
-	player.play_attack_animation(Vector2.UP)
+	player.play_attack_animation(Vector2.UP, &"floss")
 	cooldown = INTERVAL
 	ring_time = 0.22
 	queue_redraw()

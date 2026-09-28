@@ -16,6 +16,8 @@ static func make_theme() -> Theme:
 	var theme := Theme.new()
 	theme.default_font = FONT
 	theme.default_font_size = 18
+	theme.set_stylebox("panel", "TooltipPanel", _box(PANEL, GOLD, 10, 2))
+	theme.set_color("font_color", "TooltipLabel", INK)
 	return theme
 
 
@@ -79,7 +81,7 @@ static func style_button(button: Button, accent: bool = false, left_align: bool 
 static func style_card(button: Button, rare: bool = false) -> void:
 	style_button(button)
 	var accent := VIOLET if rare else MINT.darkened(0.18)
-	var normal := _box(Color(1.0, 0.995, 0.96), Color(0.58, 0.45, 0.45), 16, 2)
+	var normal := _box(Color(1.0, 0.995, 0.96), accent if rare else Color(0.58, 0.45, 0.45), 16, 2)
 	normal.shadow_color = Color(0.18, 0.10, 0.14, 0.22)
 	normal.shadow_size = 5
 	normal.shadow_offset = Vector2(0, 3)
@@ -104,6 +106,20 @@ static func style_progress(bar: ProgressBar, fill_color: Color) -> void:
 		style.content_margin_bottom = 0.0
 	bar.add_theme_stylebox_override("background", background)
 	bar.add_theme_stylebox_override("fill", fill)
+
+
+static func style_slider(slider: HSlider) -> void:
+	var track := _box(Color(0.53, 0.42, 0.44), INK, 6, 1)
+	var filled := _box(MINT.darkened(0.12), MINT.darkened(0.44), 6, 1)
+	var highlighted := _box(GOLD, GOLD.darkened(0.35), 6, 1)
+	for style in [track, filled, highlighted]:
+		style.content_margin_left = 0.0
+		style.content_margin_right = 0.0
+		style.content_margin_top = 5.0
+		style.content_margin_bottom = 5.0
+	slider.add_theme_stylebox_override("slider", track)
+	slider.add_theme_stylebox_override("grabber_area", filled)
+	slider.add_theme_stylebox_override("grabber_area_highlight", highlighted)
 
 
 static func _box(fill: Color, border: Color, radius: int, border_width: int) -> StyleBoxFlat:

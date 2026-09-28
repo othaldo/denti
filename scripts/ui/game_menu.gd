@@ -7,8 +7,12 @@ var page: StringName = &"home"
 var root_control: Control
 var rows: VBoxContainer
 var game: Node2D
+var menu_music: MusicController
 var fullscreen_button: Button
-var volume_button: Button
+var fps_toggle: CheckButton
+var master_slider: HSlider
+var music_slider: HSlider
+var sfx_slider: HSlider
 @onready var session: Node = get_node("/root/GameSession")
 
 
@@ -17,6 +21,9 @@ func _ready() -> void:
 	_build_ui()
 	visible = not overlay
 	if not overlay:
+		menu_music = MusicController.new()
+		add_child(menu_music)
+		menu_music.play_menu()
 		_show_home()
 
 
@@ -76,7 +83,10 @@ func _clear_rows() -> void:
 		rows.remove_child(child)
 		child.queue_free()
 	fullscreen_button = null
-	volume_button = null
+	fps_toggle = null
+	master_slider = null
+	music_slider = null
+	sfx_slider = null
 
 
 func _title(text_value: String) -> void:
@@ -116,6 +126,57 @@ func _button(text_value: String, callback: Callable, accent: bool = false, disab
 	return button
 
 
+func _volume_slider(title: String, value: int, setter: Callable) -> HSlider:
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size.y = 50.0
+	DentiUIStyle.style_chip(panel, Color(0.96, 0.92, 0.83))
+	rows.add_child(panel)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 12)
+	panel.add_child(row)
+	var label := Label.new()
+	label.text = title
+	label.custom_minimum_size.x = 85.0
+	label.add_theme_color_override("font_color", DentiUIStyle.INK)
+	row.add_child(label)
+	var slider := HSlider.new()
+	slider.min_value = 0.0
+	slider.max_value = 100.0
+	slider.step = 1.0
+	slider.value = value
+	slider.custom_minimum_size = Vector2(160, 32)
+	slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	slider.tooltip_text = "%s-Lautstärke" % title
+	DentiUIStyle.style_slider(slider)
+	row.add_child(slider)
+	var value_label := Label.new()
+	value_label.text = "%d%%" % value
+	value_label.custom_minimum_size.x = 54.0
+	value_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	value_label.add_theme_color_override("font_color", DentiUIStyle.INK)
+	row.add_child(value_label)
+	slider.value_changed.connect(func(new_value: float) -> void:
+		var percent := roundi(new_value)
+		value_label.text = "%d%%" % percent
+		setter.call(percent)
+	)
+	return slider
+
+
+func _fps_option() -> CheckButton:
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size.y = 46.0
+	DentiUIStyle.style_chip(panel, Color(0.96, 0.92, 0.83))
+	rows.add_child(panel)
+	var toggle := CheckButton.new()
+	toggle.text = "FPS anzeigen"
+	toggle.button_pressed = session.show_fps
+	toggle.add_theme_color_override("font_color", DentiUIStyle.INK)
+	panel.add_child(toggle)
+	toggle.toggled.connect(Callable(session, "set_show_fps"))
+	return toggle
+
+
 func _show_home() -> void:
 	page = &"home"
 	_clear_rows()
@@ -128,8 +189,12 @@ func _show_home() -> void:
 		_button("Hauptmenü", _to_main_menu)
 	else:
 		_text("Ein göttlicher Zahn gegen die Karies.")
-		_button("Neues Spiel", _new_game, true)
-		_button("Fortsetzen", _continue_game, false, not session.has_run())
+		if session.has_run():
+			_button("Fortsetzen", _continue_game, true)
+			_button("Neues Spiel", _new_game)
+		else:
+			_button("Neues Spiel", _new_game, true)
+			_button("Fortsetzen", _continue_game, false, true)
 		_button("Optionen", _show_options)
 		_button("Credits", _show_credits)
 		_button("Beenden", func() -> void: get_tree().quit())
@@ -155,21 +220,23 @@ func _show_options() -> void:
 	_title("Optionen")
 	_text("Anzeige und Lautstärke")
 	fullscreen_button = _button("", _toggle_fullscreen)
-	volume_button = _button("", _cycle_volume)
+	fps_toggle = _fps_option()
+	master_slider = _volume_slider("Gesamt", session.master_volume_percent, Callable(session, "set_master_volume"))
+	music_slider = _volume_slider("Musik", session.music_volume_percent, Callable(session, "set_music_volume"))
+	sfx_slider = _volume_slider("SFX", session.sfx_volume_percent, Callable(session, "set_sfx_volume"))
 	_refresh_option_buttons()
 	_button("Zurück", _show_home, true)
 
 
 func _refresh_option_buttons() -> void:
 	fullscreen_button.text = "Vollbild: %s" % ("An" if session.is_fullscreen() else "Aus")
-	volume_button.text = "Lautstärke: %d%%" % session.volume_percent
 
 
 func _show_credits() -> void:
 	page = &"credits"
 	_clear_rows()
 	_title("Credits")
-	_text("Denti basiert auf der Projektvorlage.\nGegner-Sprites: OpenAI ImageGen\nSchrift: Fredoka · SIL Open Font License 1.1\nUI: eigenes Godot-Design")
+	_text("Denti basiert auf der Projektvorlage.\nGrafiken und Icons: OpenAI ImageGen\nMusik: othaldo · erstellt mit Suno\nSoundeffekte: eigens synthetisiert\nSchrift: Fredoka · SIL Open Font License 1.1\nUI: eigenes Godot-Design")
 	_button("Zurück", _show_home, true)
 
 
@@ -178,12 +245,23 @@ func _toggle_fullscreen() -> void:
 	_refresh_option_buttons()
 
 
-func _cycle_volume() -> void:
-	session.set_volume((session.volume_percent - 25 + 125) % 125)
-	_refresh_option_buttons()
-
-
 func _new_game() -> void:
+	if session.has_run():
+		_show_new_game_confirmation()
+		return
+	_start_new_game()
+
+
+func _show_new_game_confirmation() -> void:
+	page = &"confirm_new_game"
+	_clear_rows()
+	_title("Neues Spiel?")
+	_text("Dein aktueller Spielstand wird gelöscht.")
+	_button("Abbrechen", _show_home, true)
+	_button("Spielstand löschen und neu starten", _start_new_game)
+
+
+func _start_new_game() -> void:
 	session.clear_run()
 	session.resume_requested = false
 	get_tree().paused = false

@@ -4,7 +4,7 @@ extends Button
 const ICONS: Script = preload("res://scripts/ui/denti_ui_icons.gd")
 
 var content: HBoxContainer
-var icon: TextureRect
+var icon_rect: TextureRect
 var name_label: Label
 var rarity_label: Label
 var effect_label: Label
@@ -30,7 +30,7 @@ func show_offer(offer: ShopOfferData, coins: int) -> void:
 		return
 	content.visible = true
 	text = ""
-	icon.texture = ICONS.item(offer.icon_index)
+	icon_rect.texture = ICONS.item(offer.icon_index)
 	name_label.text = offer.display_name.to_upper()
 	rarity_label.text = offer.rarity
 	rarity_label.add_theme_color_override("font_color", DentiUIStyle.VIOLET if offer.rarity == "Selten" else DentiUIStyle.MINT.darkened(0.52))
@@ -54,12 +54,12 @@ func _build_content() -> void:
 	content.add_theme_constant_override("separation", 12)
 	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	margin.add_child(content)
-	icon = TextureRect.new()
-	icon.custom_minimum_size = Vector2(78, 78)
-	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	content.add_child(icon)
+	icon_rect = TextureRect.new()
+	icon_rect.custom_minimum_size = Vector2(78, 78)
+	icon_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	content.add_child(icon_rect)
 	var details := VBoxContainer.new()
 	details.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	details.alignment = BoxContainer.ALIGNMENT_CENTER

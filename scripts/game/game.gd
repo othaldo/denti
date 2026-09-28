@@ -2,6 +2,7 @@ extends Node2D
 
 const ENEMY_SCENE: PackedScene = preload("res://scenes/enemies/enemy.tscn")
 const LOOT_SCENE: PackedScene = preload("res://scenes/game/loot.tscn")
+const DAMAGE_NUMBER_SCENE: PackedScene = preload("res://scenes/ui/damage_number.tscn")
 const RUN_SNAPSHOT: Script = preload("res://scripts/systems/run_snapshot.gd")
 const SPAWN_PADDING := 32.0
 const UPGRADES: Array[UpgradeData] = [
@@ -18,6 +19,8 @@ const UPGRADES: Array[UpgradeData] = [
 @onready var arena: DentiArena = $Arena
 @onready var wave: WaveController = $WaveController
 @onready var shop: ShopController = $ShopController
+@onready var music: MusicController = $Music
+@onready var sound: SoundController = $Sound
 @onready var hud: GameHUD = $HUD
 @onready var choice_panel: ChoicePanel = $ChoicePanel
 @onready var shop_panel: ShopPanel = $ShopPanel
@@ -44,6 +47,8 @@ func _ready() -> void:
 	wave.horde_requested.connect(_spawn_horde)
 	wave.wave_finished.connect(_on_wave_finished)
 	player.stats.died.connect(_on_player_died)
+	player.attack_performed.connect(sound.play_attack)
+	player.damaged.connect(_on_player_damaged)
 	choice_panel.upgrade_chosen.connect(_on_upgrade_chosen)
 	choice_panel.restart_requested.connect(_restart)
 	choice_panel.main_menu_requested.connect(_on_end_main_menu)
@@ -58,12 +63,13 @@ func _ready() -> void:
 			return
 	player.global_position = arena.arena_size / 2.0
 	wave.start_next_wave()
+	_sync_music()
 	_save_run()
 
 
 func _process(delta: float) -> void:
 	_refresh_hud()
-	if not ended and wave.active:
+	if not ended and (wave.active or boss_pending):
 		autosave_timer += delta
 		if autosave_timer >= 8.0:
 			autosave_timer = 0.0
@@ -124,16 +130,19 @@ func _create_enemy(data: EnemyData, at: Vector2) -> void:
 	enemy.position = at
 	enemy.configure(data, player, wave.current_wave)
 	enemy.defeated.connect(_on_enemy_defeated)
+	enemy.damaged.connect(_on_enemy_damaged)
+	enemy.attack_performed.connect(sound.play_cue)
 	$Enemies.add_child(enemy)
 	if data.is_boss:
 		boss = enemy
 
 
 func _on_enemy_defeated(at: Vector2, data: EnemyData) -> void:
+	sound.play_cue(&"down")
 	if data.is_boss:
 		boss = null
 		if boss_pending:
-			call_deferred("_finish_run")
+			call_deferred("_resolve_boss_wave")
 		return
 	if not wave.active:
 		return
@@ -151,11 +160,28 @@ func _spawn_loot(at: Vector2, kind: StringName, amount: int) -> void:
 
 
 func _on_loot_collected(kind: StringName, amount: int) -> void:
+	sound.play_cue(&"pickup")
 	if kind == &"coin":
 		coins += amount
 	else:
 		xp += amount
 		_check_level_up()
+
+
+func _on_enemy_damaged(at: Vector2, amount: float) -> void:
+	_show_damage_number(at, amount)
+	sound.play_cue(&"hit")
+
+
+func _on_player_damaged(at: Vector2, amount: float) -> void:
+	_show_damage_number(at, amount, true)
+	sound.play_cue(&"hurt")
+
+
+func _show_damage_number(at: Vector2, amount: float, player_hit: bool = false) -> void:
+	var number: DamageNumber = DAMAGE_NUMBER_SCENE.instantiate()
+	$DamageNumbers.add_child(number)
+	number.show_amount(at, amount, player_hit)
 
 
 func _check_level_up() -> bool:
@@ -186,16 +212,36 @@ func _on_upgrade_chosen(upgrade: UpgradeData) -> void:
 func _on_wave_finished(wave_number: int) -> void:
 	if ended:
 		return
-	if wave_number >= WaveController.MAX_WAVES:
+	if WaveController.is_boss_wave(wave_number):
 		if is_instance_valid(boss):
 			boss_pending = true
 			_clear_arena(true, true)
-		else:
+			_sync_music()
+			_refresh_hud()
+			_save_run()
+			return
+		if wave_number >= WaveController.MAX_WAVES:
 			_finish_run()
-		_refresh_hud()
+			_refresh_hud()
+			return
+	_clear_arena(true)
+	intermission_pending = true
+	_sync_music()
+	if _check_level_up():
+		return
+	_open_shop()
+
+
+func _resolve_boss_wave() -> void:
+	if ended or not boss_pending:
+		return
+	boss_pending = false
+	if wave.current_wave >= WaveController.MAX_WAVES:
+		_finish_run()
 		return
 	_clear_arena(true)
 	intermission_pending = true
+	_sync_music()
 	if _check_level_up():
 		return
 	_open_shop()
@@ -226,6 +272,7 @@ func _finish_run() -> void:
 		return
 	ended = true
 	boss_pending = false
+	_sync_music()
 	_clear_arena(true)
 	choice_panel.show_end(true, coins)
 	session.clear_run()
@@ -236,6 +283,7 @@ func _finish_run() -> void:
 func _open_shop() -> void:
 	in_shop = true
 	intermission_pending = false
+	_sync_music()
 	shop.open_shop(owned_weapons)
 	_update_shop_panel()
 	get_tree().paused = true
@@ -283,6 +331,7 @@ func _on_shop_continue() -> void:
 	_clear_arena(false)
 	player.global_position = arena.arena_size / 2.0
 	wave.start_next_wave()
+	_sync_music()
 	get_tree().paused = false
 	_refresh_hud()
 	_save_run()
@@ -292,6 +341,7 @@ func _on_player_died() -> void:
 	if ended:
 		return
 	ended = true
+	_sync_music()
 	_clear_arena(false)
 	shop_panel.visible = false
 	choice_panel.show_end(false, coins)
@@ -318,3 +368,13 @@ func _save_run() -> void:
 
 func _restore_run(saved: Dictionary) -> void:
 	RUN_SNAPSHOT.restore(self, saved)
+	_sync_music()
+
+
+func _sync_music() -> void:
+	if ended:
+		music.fade_out_and_stop()
+	elif boss_pending:
+		music.play_boss_overtime(wave.current_wave)
+	else:
+		music.play_wave(wave.current_wave)

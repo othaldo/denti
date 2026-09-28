@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://scripts/game/game.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/game/arena.gd" id="2"]
@@ -9,6 +9,8 @@
 [ext_resource type="Script" path="res://scripts/systems/shop_controller.gd" id="7"]
 [ext_resource type="PackedScene" path="res://scenes/ui/shop_panel.tscn" id="8"]
 [ext_resource type="PackedScene" path="res://scenes/ui/game_menu.tscn" id="9"]
+[ext_resource type="Script" path="res://scripts/systems/music_controller.gd" id="10"]
+[ext_resource type="Script" path="res://scripts/systems/sound_controller.gd" id="11"]
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1")
@@ -24,6 +26,10 @@ script = ExtResource("2")
 
 [node name="Loot" type="Node2D" parent="."]
 
+[node name="DamageNumbers" type="Node2D" parent="."]
+process_mode = 3
+z_index = 20
+
 [node name="Player" parent="." instance=ExtResource("3")]
 position = Vector2(640, 360)
 
@@ -32,6 +38,14 @@ script = ExtResource("4")
 
 [node name="ShopController" type="Node" parent="."]
 script = ExtResource("7")
+
+[node name="Music" type="AudioStreamPlayer" parent="."]
+process_mode = 3
+script = ExtResource("10")
+
+[node name="Sound" type="Node" parent="."]
+process_mode = 3
+script = ExtResource("11")
 
 [node name="HUD" parent="." instance=ExtResource("5")]
 

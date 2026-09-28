@@ -117,7 +117,7 @@ static func restore(game, saved: Dictionary) -> void:
 
 
 static func _enemy_from_path(path: String) -> EnemyData:
-	for candidate in [WaveController.PLAQUE, WaveController.BACTERIA, WaveController.SUGAR, WaveController.ACID_SPITTER, WaveController.BOSS]:
+	for candidate in [WaveController.PLAQUE, WaveController.BACTERIA, WaveController.SUGAR, WaveController.ACID_SPITTER, WaveController.BOSS, WaveController.FINAL_BOSS]:
 		if candidate.resource_path == path:
 			return candidate
 	return null

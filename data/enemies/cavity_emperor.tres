@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/enemies/cavity_king.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+display_name = "Karies-Imperator"
+max_health = 650.0
+move_speed = 62.0
+contact_damage = 27.0
+radius = 56.0
+xp_drop = 0
+coin_drop = 0
+sprite = ExtResource("2")
+sprite_tint = Color(0.78, 0.62, 1.0, 1.0)
+is_boss = true

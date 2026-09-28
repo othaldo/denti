@@ -1,12 +1,14 @@
 class_name ShopPanel
 extends CanvasLayer
 
+const ICONS: Script = preload("res://scripts/ui/denti_ui_icons.gd")
+
 signal buy_requested(index: int)
 signal reroll_requested
 signal continue_requested
 
 @onready var title_label: Label = $Root/Center/Panel/Margin/Rows/Title
-@onready var coins_label: Label = $Root/Center/Panel/Margin/Rows/Wallet/Coins
+@onready var coins_label: Label = $Root/Center/Panel/Margin/Rows/Wallet/WalletRow/Coins
 @onready var preview_label: Label = $Root/Center/Panel/Margin/Rows/Preview
 @onready var offer_buttons: Array[Button] = [
 	$Root/Center/Panel/Margin/Rows/Offer1,
@@ -29,7 +31,7 @@ func _ready() -> void:
 	preview_label.add_theme_color_override("font_color", DentiUIStyle.MUTED)
 	preview_label.add_theme_font_size_override("font_size", 16)
 	DentiUIStyle.style_chip($Root/Center/Panel/Margin/Rows/Wallet)
-	$Root/Center/Panel/Margin/Rows/Wallet/WalletRow/CoinIcon.texture = DentiUIIcons.hud(2)
+	$Root/Center/Panel/Margin/Rows/Wallet/WalletRow/CoinIcon.texture = ICONS.hud(2)
 	for index in offer_buttons.size():
 		offer_buttons[index].pressed.connect(_on_offer_pressed.bind(index))
 	DentiUIStyle.style_button(reroll_button)

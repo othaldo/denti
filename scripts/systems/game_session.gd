@@ -1,20 +1,29 @@
 extends Node
 
+signal fps_display_changed(enabled: bool)
+
 const SAVE_VERSION := 1
 
 var save_path: String = "user://run_save.json"
 var settings_path: String = "user://settings.cfg"
 var resume_requested: bool = false
-var volume_percent: int = 100
+var master_volume_percent: int = 100
+var music_volume_percent: int = 100
+var sfx_volume_percent: int = 100
+var show_fps: bool = false
 
 
 func _ready() -> void:
 	var config := ConfigFile.new()
 	if config.load(settings_path) == OK:
-		volume_percent = clampi(int(config.get_value("audio", "volume", 100)), 0, 100)
+		master_volume_percent = clampi(int(config.get_value("audio", "master", config.get_value("audio", "volume", 100))), 0, 100)
+		music_volume_percent = clampi(int(config.get_value("audio", "music", 100)), 0, 100)
+		sfx_volume_percent = clampi(int(config.get_value("audio", "sfx", 100)), 0, 100)
+		show_fps = bool(config.get_value("display", "show_fps", false))
 		if bool(config.get_value("display", "fullscreen", false)):
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	apply_volume()
+	fps_display_changed.emit(show_fps)
 
 
 func has_run() -> bool:
@@ -47,16 +56,31 @@ func clear_run() -> void:
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(save_path))
 
 
-func set_volume(value: int) -> void:
-	volume_percent = clampi(value, 0, 100)
+func set_master_volume(value: int) -> void:
+	master_volume_percent = clampi(value, 0, 100)
+	apply_volume()
+	_save_settings()
+
+
+func set_music_volume(value: int) -> void:
+	music_volume_percent = clampi(value, 0, 100)
+	apply_volume()
+	_save_settings()
+
+
+func set_sfx_volume(value: int) -> void:
+	sfx_volume_percent = clampi(value, 0, 100)
 	apply_volume()
 	_save_settings()
 
 
 func apply_volume() -> void:
-	var master := AudioServer.get_bus_index("Master")
-	if master >= 0:
-		AudioServer.set_bus_volume_linear(master, float(volume_percent) / 100.0)
+	for bus_name in [&"Master", &"Music", &"SFX"]:
+		var bus_index := AudioServer.get_bus_index(bus_name)
+		if bus_index < 0:
+			continue
+		var percent := master_volume_percent if bus_name == &"Master" else music_volume_percent if bus_name == &"Music" else sfx_volume_percent
+		AudioServer.set_bus_volume_linear(bus_index, float(percent) / 100.0)
 
 
 func set_fullscreen(enabled: bool) -> void:
@@ -68,8 +92,19 @@ func is_fullscreen() -> bool:
 	return DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN
 
 
+func set_show_fps(enabled: bool) -> void:
+	if show_fps == enabled:
+		return
+	show_fps = enabled
+	fps_display_changed.emit(enabled)
+	_save_settings()
+
+
 func _save_settings() -> void:
 	var config := ConfigFile.new()
-	config.set_value("audio", "volume", volume_percent)
+	config.set_value("audio", "master", master_volume_percent)
+	config.set_value("audio", "music", music_volume_percent)
+	config.set_value("audio", "sfx", sfx_volume_percent)
 	config.set_value("display", "fullscreen", is_fullscreen())
+	config.set_value("display", "show_fps", show_fps)
 	config.save(settings_path)

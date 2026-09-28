@@ -30,7 +30,7 @@ func _physics_process(delta: float) -> void:
 		return
 	hit_point = to_local(nearest.global_position)
 	nearest.take_damage(player.stats.roll_damage(1.8))
-	player.play_attack_animation(player.global_position.direction_to(nearest.global_position))
+	player.play_attack_animation(player.global_position.direction_to(nearest.global_position), &"drill")
 	cooldown = INTERVAL
 	flash_time = 0.16
 	queue_redraw()

@@ -11,6 +11,10 @@ config/features=PackedStringArray("4.4", "GL Compatibility")
 
 GameSession="*res://scripts/systems/game_session.gd"
 
+[audio]
+
+buses/default_bus_layout="res://assets/audio/audio_buses.tres"
+
 [display]
 
 window/size/viewport_width=1280

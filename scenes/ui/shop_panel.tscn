@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/shop_panel.gd" id="1"]
 [ext_resource type="Texture2D" path="res://assets/denti/denti_gameplay.png" id="2"]
+[ext_resource type="Script" path="res://scripts/ui/offer_card.gd" id="3"]
 
 [node name="ShopPanel" type="CanvasLayer"]
 process_mode = 3
@@ -21,7 +22,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.09, 0.12, 0.14, 0.78)
+color = Color(0.09, 0.06, 0.12, 0.78)
 
 [node name="Center" type="CenterContainer" parent="Root"]
 anchors_preset = 15
@@ -31,22 +32,22 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Panel" type="PanelContainer" parent="Root/Center"]
-custom_minimum_size = Vector2(730, 560)
+custom_minimum_size = Vector2(850, 620)
 layout_mode = 2
 
 [node name="Margin" type="MarginContainer" parent="Root/Center/Panel"]
 layout_mode = 2
-theme_override_constants/margin_left = 24
-theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 24
+theme_override_constants/margin_left = 26
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 26
 theme_override_constants/margin_bottom = 20
 
 [node name="Rows" type="VBoxContainer" parent="Root/Center/Panel/Margin"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 8
 
 [node name="Portrait" type="TextureRect" parent="Root/Center/Panel/Margin/Rows"]
-custom_minimum_size = Vector2(0, 64)
+custom_minimum_size = Vector2(0, 78)
 layout_mode = 2
 mouse_filter = 2
 texture = ExtResource("2")
@@ -55,42 +56,65 @@ stretch_mode = 5
 
 [node name="Title" type="Label" parent="Root/Center/Panel/Margin/Rows"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 27
 horizontal_alignment = 1
 text = "Zahnklinik"
 
-[node name="Coins" type="Label" parent="Root/Center/Panel/Margin/Rows"]
+[node name="Wallet" type="PanelContainer" parent="Root/Center/Panel/Margin/Rows"]
 layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+
+[node name="WalletRow" type="HBoxContainer" parent="Root/Center/Panel/Margin/Rows/Wallet"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="CoinIcon" type="TextureRect" parent="Root/Center/Panel/Margin/Rows/Wallet/WalletRow"]
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Coins" type="Label" parent="Root/Center/Panel/Margin/Rows/Wallet/WalletRow"]
+layout_mode = 2
+mouse_filter = 2
+text = "0 Münzen"
+
+[node name="Preview" type="Label" parent="Root/Center/Panel/Margin/Rows"]
+custom_minimum_size = Vector2(0, 25)
+layout_mode = 2
+mouse_filter = 2
 horizontal_alignment = 1
-text = "Münzen: 0"
+vertical_alignment = 1
+text = "Nächste Welle"
 
 [node name="Offer1" type="Button" parent="Root/Center/Panel/Margin/Rows"]
+custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
-custom_minimum_size = Vector2(0, 76)
-text = "Angebot 1"
+script = ExtResource("3")
 
 [node name="Offer2" type="Button" parent="Root/Center/Panel/Margin/Rows"]
+custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
-custom_minimum_size = Vector2(0, 76)
-text = "Angebot 2"
+script = ExtResource("3")
 
 [node name="Offer3" type="Button" parent="Root/Center/Panel/Margin/Rows"]
+custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
-custom_minimum_size = Vector2(0, 76)
-text = "Angebot 3"
+script = ExtResource("3")
 
 [node name="Actions" type="HBoxContainer" parent="Root/Center/Panel/Margin/Rows"]
 layout_mode = 2
 theme_override_constants/separation = 12
 
 [node name="Reroll" type="Button" parent="Root/Center/Panel/Margin/Rows/Actions"]
+custom_minimum_size = Vector2(242, 52)
 layout_mode = 2
-size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 52)
 text = "Neu würfeln"
 
 [node name="Continue" type="Button" parent="Root/Center/Panel/Margin/Rows/Actions"]
+custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 52)
 text = "Weiter"

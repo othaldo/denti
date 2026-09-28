@@ -1,0 +1,76 @@
+extends SceneTree
+
+
+func _initialize() -> void:
+	call_deferred("_run")
+
+
+func _run() -> void:
+	root.size = Vector2i(1280, 720)
+	await process_frame
+	root.get_node("GameSession").save_path = "user://test_ui_layout_run.json"
+	var game: Node2D = load("res://scenes/game/game.tscn").instantiate()
+	root.add_child(game)
+	current_scene = game
+	game.wave.active = false
+	game._on_loot_collected(&"xp", game.xp_goal)
+	await process_frame
+	if not paused or not game.choice_panel.visible:
+		_fail("level-up overlay did not appear")
+		return
+	var choice_panel: PanelContainer = game.choice_panel.dialog_panel
+	if not _inside(choice_panel.get_global_rect(), Vector2(1280, 720)):
+		_fail("level-up dialog exceeds 1280x720")
+		return
+	var previous_right := -1.0
+	for button: Button in game.choice_panel.buttons:
+		if not _inside(button.get_global_rect(), Vector2(1280, 720)) or button.position.x < previous_right:
+			_fail("upgrade cards overlap or exceed viewport")
+			return
+		previous_right = button.position.x + button.size.x
+		if button.get("icon_rect").texture == null or button.get("effect_label").text.is_empty():
+			_fail("upgrade card is missing icon or effect")
+			return
+	game.choice_panel.buttons[0].pressed.emit()
+	if paused or game.choice_panel.visible:
+		_fail("choosing a level-up card did not resume the game")
+		return
+	game._open_shop()
+	await process_frame
+	if not paused or not game.shop_panel.visible:
+		_fail("shop overlay did not appear")
+		return
+	var shop_panel: PanelContainer = game.shop_panel.get_node("Root/Center/Panel")
+	if not _inside(shop_panel.get_global_rect(), Vector2(1280, 720)):
+		_fail("shop dialog exceeds 1280x720")
+		return
+	for button: Button in game.shop_panel.offer_buttons:
+		if not _inside(button.get_global_rect(), Vector2(1280, 720)):
+			_fail("shop card exceeds viewport")
+			return
+		if button.get("icon_rect").texture == null or button.get("name_label").text.is_empty() or button.get("price_label").text.is_empty():
+			_fail("shop card is missing item information")
+			return
+	game.coins = 100
+	game._update_shop_panel()
+	var offer: ShopOfferData = game.shop.offers[0]
+	var coins_before_purchase: int = game.coins
+	game.shop_panel.offer_buttons[0].pressed.emit()
+	if game.coins != coins_before_purchase - offer.price or game.shop.offers[0] != null or not game.shop_panel.offer_buttons[0].disabled:
+		_fail("shop card did not complete a purchase and update")
+		return
+	paused = false
+	root.get_node("GameSession").clear_run()
+	print("Denti UI layout test passed")
+	quit(0)
+
+
+func _inside(rect: Rect2, viewport_size: Vector2) -> bool:
+	return rect.position.x >= 0.0 and rect.position.y >= 0.0 and rect.end.x <= viewport_size.x and rect.end.y <= viewport_size.y
+
+
+func _fail(message: String) -> void:
+	paused = false
+	root.get_node("GameSession").clear_run()
+	push_error(message)
+	quit(1)

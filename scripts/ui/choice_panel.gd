@@ -86,7 +86,7 @@ func _show_credits() -> void:
 	mode = &"credits"
 	dialog_panel.custom_minimum_size = Vector2(800, 420)
 	title_label.text = "Credits"
-	subtitle_label.text = "Schrift: Fredoka · The Fredoka Project Authors\nSIL Open Font License 1.1\n\nDenti-, Gegner- und Item-Grafiken: OpenAI ImageGen\nUI-Elemente: eigenes Godot-Design"
+	subtitle_label.text = "Schrift: Fredoka · The Fredoka Project Authors\nSIL Open Font License 1.1\n\nDenti-, Gegner-, Arena- und Icon-Grafiken: OpenAI ImageGen\nMusik: othaldo · erstellt mit Suno\nSoundeffekte: eigens synthetisiert\nUI-Elemente: eigenes Godot-Design"
 	subtitle_label.custom_minimum_size.y = 120.0
 	buttons[0].call("show_action", "Zurück", true)
 	buttons[1].visible = false

@@ -12,6 +12,7 @@ enum SpecialAttack { NONE, DASH, PULSE, SHOOT }
 @export var coin_drop: int = 1
 @export_range(0.0, 1.0, 0.01) var coin_drop_chance: float = 1.0
 @export var sprite: Texture2D
+@export var sprite_tint: Color = Color.WHITE
 @export var is_boss: bool = false
 @export_group("Special attack")
 @export var special_attack: SpecialAttack = SpecialAttack.NONE

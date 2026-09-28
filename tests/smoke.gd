@@ -165,7 +165,7 @@ func _run() -> void:
 	if paused or game.wave.current_wave != 2 or not game.wave.active or game.get_node("ShopPanel").visible:
 		_fail("shop continue did not start wave two")
 		return
-	if game.get_node("HUD").wave_label.text != "Welle 2 / 10" or game.get_node("HUD").timer_label.text != "0:45":
+	if game.get_node("HUD").wave_label.text != "WELLE 2 / 20" or game.get_node("HUD").timer_label.text != "00:45":
 		_fail("HUD did not show wave number and countdown")
 		return
 	if game.get_node("Enemies").get_child_count() != 0:
@@ -196,11 +196,22 @@ func _run() -> void:
 		if game.wave.current_wave != expected_wave or paused:
 			_fail("next wave did not start")
 			return
-		if expected_wave == WaveController.MAX_WAVES:
+		if WaveController.is_boss_wave(expected_wave):
 			if not is_instance_valid(game.boss) or not game.get_node("HUD").boss_bar.visible:
-				_fail("final wave did not spawn a visible boss")
+				_fail("boss wave did not spawn a visible boss")
+				return
+			var expected_boss: EnemyData = WaveController.FINAL_BOSS if expected_wave == WaveController.MAX_WAVES else WaveController.BOSS
+			if game.boss.data != expected_boss:
+				_fail("boss wave spawned the wrong boss")
 				return
 		game.wave._process(45.0)
+		if WaveController.is_boss_wave(expected_wave) and expected_wave < WaveController.MAX_WAVES:
+			if not game.boss_pending or game.get_node("ShopPanel").visible:
+				_fail("mini-boss wave ended before the boss was defeated")
+				return
+			game.boss.take_damage(99999.0)
+			for frame in 3:
+				await process_frame
 		if expected_wave < WaveController.MAX_WAVES and not game.get_node("ShopPanel").visible:
 			_fail("shop missing between waves")
 			return

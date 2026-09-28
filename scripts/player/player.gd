@@ -1,6 +1,9 @@
 class_name Player
 extends CharacterBody2D
 
+signal attack_performed(kind: StringName)
+signal damaged(position: Vector2, amount: float)
+
 const ARENA_MARGIN := 28.0
 const HURT_COOLDOWN := 0.65
 const ATTACK_ANIMATION_DURATION := 0.18
@@ -39,13 +42,16 @@ func _animate_sprite(direction: Vector2, delta: float) -> void:
 	sprite.rotation = lerp_angle(sprite.rotation, target_rotation, minf(delta * 14.0, 1.0))
 
 
-func play_attack_animation(aim: Vector2) -> void:
+func play_attack_animation(aim: Vector2, kind: StringName = &"brush") -> void:
 	attack_time = ATTACK_ANIMATION_DURATION
 	attack_direction = aim
+	attack_performed.emit(kind)
 
 
 func take_hit(amount: float) -> void:
 	if hurt_time > 0.0 or stats.health <= 0.0:
 		return
 	hurt_time = HURT_COOLDOWN
+	var health_before := stats.health
 	stats.take_damage(amount)
+	damaged.emit(global_position + Vector2(0.0, -28.0), health_before - stats.health)

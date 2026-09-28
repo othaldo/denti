@@ -15,12 +15,18 @@ const ICONS: Script = preload("res://scripts/ui/denti_ui_icons.gd")
 @onready var boss_area: Control = $Root/WaveInfo/BossArea
 @onready var boss_label: Label = $Root/WaveInfo/BossArea/BossName
 @onready var boss_bar: ProgressBar = $Root/WaveInfo/BossArea/BossHealth
+@onready var fps_panel: Panel = $Root/FPSPanel
+@onready var fps_label: Label = $Root/FPSPanel/FPS
+@onready var session: Node = get_node("/root/GameSession")
+
+var fps_refresh_time: float = 0.0
 
 
 func _ready() -> void:
 	$Root.theme = DentiUIStyle.make_theme()
 	DentiUIStyle.style_hud_panel($Root/VitalsFrame)
 	DentiUIStyle.style_hud_panel(wave_frame)
+	DentiUIStyle.style_hud_panel(fps_panel)
 	var light_outline := DentiUIStyle.CREAM
 	DentiUIStyle.style_hud_text(health_label, DentiUIStyle.INK, 15, 3, light_outline)
 	DentiUIStyle.style_hud_text(xp_label, DentiUIStyle.INK, 14, 3, light_outline)
@@ -29,6 +35,7 @@ func _ready() -> void:
 	DentiUIStyle.style_hud_text(wave_label, DentiUIStyle.INK, 18, 3, light_outline)
 	DentiUIStyle.style_hud_text(timer_label, DentiUIStyle.INK, 35, 4, light_outline)
 	DentiUIStyle.style_hud_text(boss_label, DentiUIStyle.INK, 15, 3, light_outline)
+	DentiUIStyle.style_hud_text(fps_label, DentiUIStyle.INK, 15, 2, light_outline)
 	DentiUIStyle.style_progress(health_bar, DentiUIStyle.CORAL)
 	DentiUIStyle.style_progress(xp_bar, DentiUIStyle.MINT)
 	DentiUIStyle.style_progress(boss_bar, DentiUIStyle.CORAL)
@@ -38,6 +45,23 @@ func _ready() -> void:
 	$Root/Vitals/CoinArea/LevelIcon.texture = ICONS.hud(3)
 	$Root/WaveInfo/Wave/WaveIcon.texture = ICONS.hud(4)
 	$Root/WaveInfo/Timer/ClockIcon.texture = ICONS.hud(5)
+	session.fps_display_changed.connect(_set_fps_visible)
+	_set_fps_visible(session.show_fps)
+
+
+func _process(delta: float) -> void:
+	if not fps_panel.visible:
+		return
+	fps_refresh_time -= delta
+	if fps_refresh_time > 0.0:
+		return
+	fps_refresh_time = 0.25
+	fps_label.text = "FPS %d" % Engine.get_frames_per_second()
+
+
+func _set_fps_visible(enabled: bool) -> void:
+	fps_panel.visible = enabled
+	fps_refresh_time = 0.0
 
 
 func update_status(stats: PlayerStats, xp: int, xp_goal: int, level: int, coins: int, wave_number: int, remaining: float, in_shop: bool, boss: Enemy, boss_pending: bool) -> void:
