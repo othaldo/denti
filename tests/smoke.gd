@@ -18,6 +18,13 @@ func _run() -> void:
 	if player == null or player.stats.health != 100.0:
 		_fail("player did not initialize")
 		return
+	if not paused or game.choice_panel.mode != &"starter" or not player.loadout.equipped().is_empty():
+		_fail("new run did not start with an unarmed weapon choice")
+		return
+	game.choice_panel._on_choice_pressed(0)
+	if paused or player.loadout.equipped().size() != 1 or player.loadout.equipped()[0].data.id != &"magic_toothbrush":
+		_fail("starter weapon selection did not equip the toothbrush")
+		return
 	game._refresh_hud()
 	for button: Button in [game.choice_panel.buttons[0], game.shop_panel.offer_buttons[0], game.shop_panel.continue_button]:
 		if button.get_theme_color("font_focus_color") != DentiUIStyle.INK or button.get_theme_color("font_hover_pressed_color") != DentiUIStyle.INK or button.get_theme_color("font_disabled_color") != DentiUIStyle.INK:
@@ -107,7 +114,7 @@ func _run() -> void:
 
 	game._spawn_enemy(load("res://data/enemies/plaque.tres"))
 	game._spawn_loot(player.position + Vector2(50.0, 0.0), &"coin", 2)
-	var projectile: Node2D = load("res://scenes/game/toothpaste_projectile.tscn").instantiate()
+	var projectile: Node2D = load("res://scenes/game/weapon_projectile.tscn").instantiate()
 	game.get_node("Projectiles").add_child(projectile)
 	var coins_before_wave_end: int = game.coins
 	game.get_node("WaveController").active = true
@@ -123,10 +130,10 @@ func _run() -> void:
 		return
 
 	game.coins = 100
-	game.shop.offers[0] = load("res://data/weapons/floss.tres")
+	game.shop.offers[0] = load("res://data/weapons/shop_floss_whip.tres")
 	game._on_shop_buy(0)
-	if not player.has_node("Floss") or not game.owned_weapons.has(&"floss") or game.coins != 93:
-		_fail("buying floss did not equip it exactly once")
+	if player.loadout.equipped().size() != 2 or player.loadout.equipped()[1].data.id != &"floss_whip" or game.coins != 93:
+		_fail("buying floss did not equip it")
 		return
 	game.shop.offers[1] = load("res://data/items/metal_crown.tres")
 	var armor_before: float = player.stats.armor
@@ -135,10 +142,15 @@ func _run() -> void:
 	if player.stats.armor != armor_before + 3.0 or player.stats.move_speed != speed_before - 18.0:
 		_fail("shop item did not apply both stat changes")
 		return
-	game.shop.offers[2] = load("res://data/weapons/drill.tres")
+	game.shop.offers[2] = load("res://data/weapons/shop_turbo_drill.tres")
 	game._on_shop_buy(2)
-	if not player.has_node("Drill") or not game.owned_weapons.has(&"drill"):
+	if player.loadout.equipped().size() != 3 or player.loadout.equipped()[2].data.id != &"turbo_drill":
 		_fail("buying drill did not equip the third weapon")
+		return
+	game.shop.offers[2] = load("res://data/weapons/shop_magic_toothbrush.tres")
+	game._on_shop_buy(2)
+	if player.loadout.equipped().size() != 3 or player.loadout.equipped()[0].tier != 2:
+		_fail("buying a matching weapon did not merge its tier")
 		return
 	player.stats.apply_upgrade(&"regen", 1.0)
 	player.stats.health = 80.0
@@ -156,10 +168,9 @@ func _run() -> void:
 	if game.coins != coins_before_reroll - 2 or game.shop.reroll_cost != 3:
 		_fail("reroll cost was not charged")
 		return
-	for offer in game.shop.offers:
-		if offer.id == &"floss" or offer.id == &"drill":
-			_fail("owned weapon reappeared in the shop")
-			return
+	if game.shop.offers.size() != 3:
+		_fail("reroll did not produce three offers")
+		return
 
 	game._on_shop_continue()
 	if paused or game.wave.current_wave != 2 or not game.wave.active or game.get_node("ShopPanel").visible:

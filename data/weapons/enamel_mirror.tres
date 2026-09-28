@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/weapons/enamel_mirror.png" id="2"]
+[resource]
+script = ExtResource("1")
+id = &"enamel_mirror"
+display_name = "Schmelzspiegel"
+description = "Einhand · Lichtstrahl · sofortiger Treffer"
+hands = 1
+attack_mode = &"beam"
+damage_type = "Licht"
+base_damage = 20.0
+interval = 1.1
+attack_range = 380.0
+sprite = ExtResource("2")
+grip_anchor = Vector2(0.16, 0.9)
+projectile_color = Color(1, 0.9, 0.42, 1)
+visual_angle_degrees = 40.0
+price = 11
+rarity = "Selten"

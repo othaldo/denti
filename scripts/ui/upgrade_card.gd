@@ -31,6 +31,17 @@ func show_upgrade(upgrade: UpgradeData) -> void:
 	DentiUIStyle.style_card(self)
 
 
+func show_weapon(weapon: WeaponData) -> void:
+	custom_minimum_size.y = 186.0
+	text = ""
+	content.visible = true
+	icon_rect.texture = weapon.sprite
+	name_label.text = weapon.display_name.to_upper()
+	effect_label.text = weapon.description
+	disabled = false
+	DentiUIStyle.style_card(self, weapon.rarity == "Selten")
+
+
 func show_action(action_name: String, accent: bool = false) -> void:
 	custom_minimum_size.y = 60.0
 	content.visible = false

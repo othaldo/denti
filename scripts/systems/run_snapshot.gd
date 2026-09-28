@@ -31,7 +31,7 @@ static func capture(game) -> Dictionary:
 		"horde_waves": game.wave.horde_waves, "horde_spawned": game.wave.horde_spawned,
 		"player": {"position": _vector_data(game.player.position), "stats": game.player.stats.to_save_data(), "hurt_time": game.player.hurt_time},
 		"xp": game.xp, "xp_goal": game.xp_goal, "level": game.level, "coins": game.coins,
-		"owned_weapons": Array(game.owned_weapons).map(func(id: StringName) -> String: return str(id)),
+		"weapons": game.player.loadout.save_data(), "starter_pending": game.starter_pending,
 		"enemies": enemies_data, "loot": loot_data, "acid": acid_data,
 		"shop": game.in_shop, "intermission_pending": game.intermission_pending,
 		"offers": offer_ids, "reroll_cost": game.shop.reroll_cost,
@@ -61,12 +61,16 @@ static func restore(game, saved: Dictionary) -> void:
 	game.xp_goal = maxi(int(saved.get("xp_goal", 5)), 1)
 	game.level = maxi(int(saved.get("level", 1)), 1)
 	game.coins = maxi(int(saved.get("coins", 0)), 0)
-	for id_value in saved.get("owned_weapons", []):
-		var id := StringName(str(id_value))
-		for offer in ShopController.CATALOG:
-			if offer.id == id and offer.weapon_scene != null and not game.owned_weapons.has(id):
-				player.add_child(offer.weapon_scene.instantiate())
-				game.owned_weapons.append(id)
+	if saved.has("weapons"):
+		player.loadout.restore(saved.get("weapons", []))
+	else:
+		player.loadout.acquire(WeaponCatalog.by_id(&"magic_toothbrush"))
+		for id_value in saved.get("owned_weapons", []):
+			var old_id := StringName(str(id_value))
+			var mapped_id := &"floss_whip" if old_id == &"floss" else (&"turbo_drill" if old_id == &"drill" else old_id)
+			var old_weapon := WeaponCatalog.by_id(mapped_id)
+			if old_weapon != null:
+				player.loadout.acquire(old_weapon)
 	for entry in saved.get("enemies", []):
 		var enemy_data := _enemy_from_path(str(entry.get("type", "")))
 		if enemy_data == null:
@@ -89,15 +93,26 @@ static func restore(game, saved: Dictionary) -> void:
 	shop.reroll_cost = maxi(int(saved.get("reroll_cost", 2)), 2)
 	shop.offers.clear()
 	for id_value in saved.get("offers", []):
+		var offer_id := str(id_value)
+		if offer_id == "floss":
+			offer_id = "floss_whip"
+		elif offer_id == "drill":
+			offer_id = "turbo_drill"
 		var found: ShopOfferData = null
 		for offer in ShopController.CATALOG:
-			if str(offer.id) == str(id_value):
+			if str(offer.id) == offer_id:
 				found = offer
 				break
 		shop.offers.append(found)
 	game.in_shop = bool(saved.get("shop", false))
 	game.intermission_pending = bool(saved.get("intermission_pending", false))
 	game.boss_pending = bool(saved.get("boss_pending", false))
+	game.starter_pending = bool(saved.get("starter_pending", false))
+	if game.starter_pending:
+		game.choice_panel.show_starters(WeaponCatalog.STARTERS)
+		game.get_tree().paused = true
+		game._refresh_hud()
+		return
 	var upgrade_paths: Array = saved.get("upgrades", [])
 	if upgrade_paths.size() == 3:
 		var options: Array[UpgradeData] = []
@@ -110,7 +125,7 @@ static func restore(game, saved: Dictionary) -> void:
 			game.get_tree().paused = true
 	elif game.in_shop:
 		if shop.offers.size() != 3:
-			shop.open_shop(game.owned_weapons)
+			shop.open_shop()
 		game._update_shop_panel()
 		game.get_tree().paused = true
 	game._refresh_hud()

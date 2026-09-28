@@ -39,6 +39,13 @@ func _run() -> void:
 	if game == null or game.name != "Game" or not session.has_run():
 		_fail("new game did not start and save")
 		return
+	if not paused or game.choice_panel.mode != &"starter":
+		_fail("new game did not offer starter weapons")
+		return
+	if not bool(session.load_run().get("starter_pending", false)):
+		_fail("starter choice was not saved for continue")
+		return
+	game.choice_panel._on_choice_pressed(0)
 	game.wave.active = false
 	game.game_menu.open_pause()
 	if not paused or not game.game_menu.visible:
@@ -180,7 +187,7 @@ func _run() -> void:
 	await process_frame
 	await process_frame
 	game = current_scene
-	if paused or game.wave.current_wave != 1 or game.coins != 0 or game.in_shop or not session.has_run():
+	if not paused or game.choice_panel.mode != &"starter" or game.coins != 0 or game.in_shop or not session.has_run():
 		_fail("confirmed new game did not replace the previous run")
 		return
 	session.clear_run()

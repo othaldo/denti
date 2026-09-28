@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/weapons/plaque_scaler.png" id="2"]
+[resource]
+script = ExtResource("1")
+id = &"plaque_scaler"
+display_name = "Zahnsteinkratzer"
+description = "Einhand · Nahkampf · schnell, erster Schnitt stärker"
+hands = 1
+attack_mode = &"melee"
+damage_type = "Schnitt"
+base_damage = 14.0
+interval = 0.48
+attack_range = 125.0
+sprite = ExtResource("2")
+grip_anchor = Vector2(0.14, 0.89)
+visual_angle_degrees = 40.0
+price = 7

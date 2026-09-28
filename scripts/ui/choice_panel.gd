@@ -2,6 +2,7 @@ class_name ChoicePanel
 extends CanvasLayer
 
 signal upgrade_chosen(upgrade: UpgradeData)
+signal starter_chosen(weapon: WeaponData)
 signal restart_requested
 signal main_menu_requested
 
@@ -15,6 +16,7 @@ signal main_menu_requested
 ]
 
 var current_upgrades: Array[UpgradeData] = []
+var starter_options: Array[WeaponData] = []
 var mode: StringName = &"upgrade"
 var end_won: bool = false
 var end_coins: int = 0
@@ -46,6 +48,20 @@ func show_upgrades(options: Array[UpgradeData]) -> void:
 	buttons[0].grab_focus()
 
 
+func show_starters(options: Array[WeaponData]) -> void:
+	mode = &"starter"
+	starter_options = options
+	dialog_panel.custom_minimum_size = Vector2(900, 440)
+	title_label.text = "Dentis erste Waffe"
+	subtitle_label.text = "Wähle eine Waffe. Weitere findest du später in der Zahnklinik."
+	subtitle_label.custom_minimum_size.y = 40.0
+	for index in buttons.size():
+		buttons[index].visible = true
+		buttons[index].call("show_weapon", options[index])
+	visible = true
+	buttons[0].grab_focus()
+
+
 func show_end(won: bool, coins: int) -> void:
 	mode = &"end"
 	end_won = won
@@ -67,6 +83,9 @@ func show_end(won: bool, coins: int) -> void:
 
 func _on_choice_pressed(index: int) -> void:
 	match mode:
+		&"starter":
+			visible = false
+			starter_chosen.emit(starter_options[index])
 		&"upgrade":
 			visible = false
 			upgrade_chosen.emit(current_upgrades[index])
@@ -86,7 +105,7 @@ func _show_credits() -> void:
 	mode = &"credits"
 	dialog_panel.custom_minimum_size = Vector2(800, 420)
 	title_label.text = "Credits"
-	subtitle_label.text = "Schrift: Fredoka · The Fredoka Project Authors\nSIL Open Font License 1.1\n\nDenti-, Gegner-, Arena- und Icon-Grafiken: OpenAI ImageGen\nMusik: othaldo · erstellt mit Suno\nSoundeffekte: eigens synthetisiert\nUI-Elemente: eigenes Godot-Design"
+	subtitle_label.text = "Schrift: Fredoka · The Fredoka Project Authors\nSIL Open Font License 1.1\n\nDenti-, Waffen-, Gegner-, Arena- und Icon-Grafiken: OpenAI ImageGen\nMusik: othaldo · erstellt mit Suno\nSoundeffekte: eigens synthetisiert\nUI-Elemente: eigenes Godot-Design"
 	subtitle_label.custom_minimum_size.y = 120.0
 	buttons[0].call("show_action", "Zurück", true)
 	buttons[1].visible = false

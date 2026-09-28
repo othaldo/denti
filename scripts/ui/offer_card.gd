@@ -21,7 +21,7 @@ func _ready() -> void:
 	mouse_exited.connect(_on_hover.bind(false))
 
 
-func show_offer(offer: ShopOfferData, coins: int) -> void:
+func show_offer(offer: ShopOfferData, coins: int, available: bool = true) -> void:
 	if offer == null:
 		content.visible = false
 		text = "Ausverkauft"
@@ -30,14 +30,14 @@ func show_offer(offer: ShopOfferData, coins: int) -> void:
 		return
 	content.visible = true
 	text = ""
-	icon_rect.texture = ICONS.item(offer.icon_index)
+	icon_rect.texture = offer.icon_texture if offer.icon_texture != null else ICONS.item(offer.icon_index)
 	name_label.text = offer.display_name.to_upper()
 	rarity_label.text = offer.rarity
 	rarity_label.add_theme_color_override("font_color", DentiUIStyle.VIOLET if offer.rarity == "Selten" else DentiUIStyle.MINT.darkened(0.52))
 	effect_label.text = offer.description
 	price_label.text = "%d" % offer.price
-	disabled = coins < offer.price
-	tooltip_text = offer.description
+	disabled = coins < offer.price or not available
+	tooltip_text = "Ausrüstung voll: erst eine Waffe verkaufen" if not available else offer.description
 	DentiUIStyle.style_card(self, offer.rarity == "Selten")
 
 

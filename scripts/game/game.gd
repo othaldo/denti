@@ -34,7 +34,7 @@ var coins: int = 0
 var ended: bool = false
 var in_shop: bool = false
 var intermission_pending: bool = false
-var owned_weapons: Array[StringName] = []
+var starter_pending: bool = false
 var boss: Enemy
 var boss_pending: bool = false
 var autosave_timer: float = 0.0
@@ -50,9 +50,11 @@ func _ready() -> void:
 	player.attack_performed.connect(sound.play_attack)
 	player.damaged.connect(_on_player_damaged)
 	choice_panel.upgrade_chosen.connect(_on_upgrade_chosen)
+	choice_panel.starter_chosen.connect(_on_starter_chosen)
 	choice_panel.restart_requested.connect(_restart)
 	choice_panel.main_menu_requested.connect(_on_end_main_menu)
 	shop_panel.buy_requested.connect(_on_shop_buy)
+	shop_panel.sell_requested.connect(_on_shop_sell)
 	shop_panel.reroll_requested.connect(_on_shop_reroll)
 	shop_panel.continue_requested.connect(_on_shop_continue)
 	if session.resume_requested:
@@ -62,8 +64,20 @@ func _ready() -> void:
 			_restore_run(saved)
 			return
 	player.global_position = arena.arena_size / 2.0
+	starter_pending = true
+	choice_panel.show_starters(WeaponCatalog.STARTERS)
+	get_tree().paused = true
+	_save_run()
+
+
+func _on_starter_chosen(weapon: WeaponData) -> void:
+	if not starter_pending:
+		return
+	player.loadout.acquire(weapon)
+	starter_pending = false
 	wave.start_next_wave()
 	_sync_music()
+	get_tree().paused = false
 	_save_run()
 
 
@@ -284,14 +298,22 @@ func _open_shop() -> void:
 	in_shop = true
 	intermission_pending = false
 	_sync_music()
-	shop.open_shop(owned_weapons)
+	shop.open_shop()
 	_update_shop_panel()
 	get_tree().paused = true
 	_save_run()
 
 
 func _update_shop_panel() -> void:
-	shop_panel.show_shop(wave.current_wave, coins, shop.reroll_cost, shop.offers, wave.next_wave_preview())
+	var equipment: Array[Dictionary] = []
+	var weapons := player.loadout.equipped()
+	for index in weapons.size():
+		var weapon := weapons[index]
+		equipment.append({"name": weapon.data.display_name, "tier": weapon.tier, "refund": player.loadout.refund_for(index)})
+	var buyable: Array[bool] = []
+	for offer in shop.offers:
+		buyable.append(offer == null or offer.weapon_data == null or player.loadout.can_acquire(offer.weapon_data))
+	shop_panel.show_shop(wave.current_wave, coins, shop.reroll_cost, shop.offers, wave.next_wave_preview(), equipment, player.loadout.used_slots(), WeaponLoadout.CAPACITY, buyable)
 	_refresh_hud()
 
 
@@ -301,10 +323,11 @@ func _on_shop_buy(index: int) -> void:
 	var offer := shop.offers[index]
 	if offer == null or coins < offer.price:
 		return
+	if offer.weapon_data != null and not player.loadout.can_acquire(offer.weapon_data):
+		return
 	coins -= offer.price
-	if offer.weapon_scene != null:
-		player.add_child(offer.weapon_scene.instantiate())
-		owned_weapons.append(offer.id)
+	if offer.weapon_data != null:
+		player.loadout.acquire(offer.weapon_data)
 	else:
 		for stat in offer.stat_changes:
 			player.stats.apply_upgrade(StringName(stat), float(offer.stat_changes[stat]))
@@ -313,17 +336,27 @@ func _on_shop_buy(index: int) -> void:
 	_save_run()
 
 
+func _on_shop_sell(index: int) -> void:
+	if not in_shop:
+		return
+	coins += player.loadout.sell(index)
+	_update_shop_panel()
+	_save_run()
+
+
 func _on_shop_reroll() -> void:
 	if not in_shop or coins < shop.reroll_cost:
 		return
 	coins -= shop.reroll_cost
-	shop.reroll(owned_weapons)
+	shop.reroll()
 	_update_shop_panel()
 	_save_run()
 
 
 func _on_shop_continue() -> void:
 	if not in_shop:
+		return
+	if player.loadout.equipped().is_empty():
 		return
 	shop_panel.visible = false
 	in_shop = false
@@ -372,7 +405,7 @@ func _restore_run(saved: Dictionary) -> void:
 
 
 func _sync_music() -> void:
-	if ended:
+	if ended or starter_pending:
 		music.fade_out_and_stop()
 	elif boss_pending:
 		music.play_boss_overtime(wave.current_wave)

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=4 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/weapons/enamel_mirror.tres" id="2"]
+[ext_resource type="Texture2D" path="res://assets/weapons/enamel_mirror.png" id="3"]
+[resource]
+script = ExtResource("1")
+id = &"enamel_mirror"
+display_name = "Schmelzspiegel"
+description = "Einhand · Lichtstrahl · sofortiger Treffer"
+price = 11
+rarity = "Selten"
+weapon_data = ExtResource("2")
+icon_texture = ExtResource("3")

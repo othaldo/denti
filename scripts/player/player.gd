@@ -9,6 +9,7 @@ const HURT_COOLDOWN := 0.65
 const ATTACK_ANIMATION_DURATION := 0.18
 
 @onready var stats: PlayerStats = $Stats
+@onready var loadout: WeaponLoadout = $Weapons
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var sprite_base_scale: Vector2 = sprite.scale
 

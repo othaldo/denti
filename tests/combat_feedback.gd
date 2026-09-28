@@ -11,6 +11,7 @@ func _run() -> void:
 	var game: Node2D = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(game)
 	current_scene = game
+	game.choice_panel._on_choice_pressed(0)
 	game.wave.active = false
 	var enemy_data: EnemyData = WaveController.PLAQUE.duplicate()
 	enemy_data.max_health = 500.0
@@ -45,12 +46,12 @@ func _run() -> void:
 	if not hurt_number.text.begins_with("-") or not _has_sound(game.sound, SoundController.HURT):
 		_fail("player hit has no red number or sound")
 		return
-	game.player.add_child(load("res://scenes/player/floss.tscn").instantiate())
+	game.player.loadout.acquire(WeaponCatalog.by_id(&"floss_whip"))
 	await physics_frame
 	if not _has_sound(game.sound, SoundController.FLOSS):
 		_fail("floss attack has no sound")
 		return
-	game.player.add_child(load("res://scenes/player/drill.tscn").instantiate())
+	game.player.loadout.acquire(WeaponCatalog.by_id(&"turbo_drill"))
 	await physics_frame
 	if not _has_sound(game.sound, SoundController.DRILL):
 		_fail("drill attack has no sound")

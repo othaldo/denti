@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/weapons/floss_whip.png" id="2"]
+[resource]
+script = ExtResource("1")
+id = &"floss_whip"
+display_name = "Zahnseidenpeitsche"
+description = "Einhand · Rundumschnitt · erster Treffer stärker"
+hands = 1
+attack_mode = &"area"
+damage_type = "Schnitt"
+base_damage = 15.0
+interval = 1.8
+attack_range = 108.0
+sprite = ExtResource("2")
+grip_anchor = Vector2(0.13, 0.88)
+visual_angle_degrees = 40.0
+price = 7

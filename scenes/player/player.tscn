@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" path="res://scripts/player/player.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/player/player_stats.gd" id="2"]
-[ext_resource type="Texture2D" path="res://assets/denti/denti_gameplay.png" id="3"]
-[ext_resource type="Script" path="res://scripts/weapons/auto_toothbrush.gd" id="4"]
+[ext_resource type="Texture2D" path="res://assets/denti/denti_unarmed.png" id="3"]
+[ext_resource type="Script" path="res://scripts/weapons/weapon_loadout.gd" id="4"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 23.0
@@ -23,5 +23,5 @@ shape = SubResource("CircleShape2D_1")
 [node name="Stats" type="Node" parent="."]
 script = ExtResource("2")
 
-[node name="Toothbrush" type="Node" parent="."]
+[node name="Weapons" type="Node2D" parent="."]
 script = ExtResource("4")

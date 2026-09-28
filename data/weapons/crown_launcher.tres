@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/weapons/crown_launcher.png" id="2"]
+[resource]
+script = ExtResource("1")
+id = &"crown_launcher"
+display_name = "Kronenwerfer"
+description = "Zweihand · Fernkampf · schwere Kronen durchdringen 2 Gegner"
+hands = 2
+attack_mode = &"projectile"
+damage_type = "Metall"
+base_damage = 28.0
+interval = 1.5
+attack_range = 500.0
+projectile_speed = 480.0
+pierce = 2
+sprite = ExtResource("2")
+grip_anchor = Vector2(0.24, 0.82)
+projectile_color = Color(1, 0.76, 0.27, 1)
+visual_angle_degrees = 40.0
+price = 13
+rarity = "Selten"

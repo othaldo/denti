@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/weapons/mouthwash_mortar.png" id="2"]
+[resource]
+script = ExtResource("1")
+id = &"mouthwash_mortar"
+display_name = "Mundspülungs-Mörser"
+description = "Zweihand · Fernkampf · platzende Minzbombe"
+hands = 2
+attack_mode = &"projectile"
+damage_type = "Minze"
+base_damage = 24.0
+interval = 1.85
+attack_range = 470.0
+projectile_speed = 400.0
+splash_radius = 75.0
+sprite = ExtResource("2")
+grip_anchor = Vector2(0.16, 0.88)
+projectile_color = Color(0.27, 0.9, 0.67, 1)
+visual_angle_degrees = 40.0
+price = 14
+rarity = "Selten"

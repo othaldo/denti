@@ -12,6 +12,7 @@ func _run() -> void:
 	var game: Node2D = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(game)
 	current_scene = game
+	game.choice_panel._on_choice_pressed(0)
 	var music: MusicController = game.music
 	if music.current_cue != &"wave_1" or not music.playing or music.stream.loop or music.fade_state != MusicController.FadeState.FADING_IN:
 		_fail("first wave did not start with a fade-in")

@@ -12,21 +12,27 @@ const CATALOG: Array[ShopOfferData] = [
 	preload("res://data/items/ceramic_shell.tres"),
 	preload("res://data/items/mint_essence.tres"),
 	preload("res://data/items/lucky_molar.tres"),
-	preload("res://data/weapons/floss.tres"),
-	preload("res://data/weapons/drill.tres"),
+	preload("res://data/weapons/shop_magic_toothbrush.tres"),
+	preload("res://data/weapons/shop_turbo_drill.tres"),
+	preload("res://data/weapons/shop_floss_whip.tres"),
+	preload("res://data/weapons/shop_water_jet.tres"),
+	preload("res://data/weapons/shop_crown_launcher.tres"),
+	preload("res://data/weapons/shop_enamel_mirror.tres"),
+	preload("res://data/weapons/shop_plaque_scaler.tres"),
+	preload("res://data/weapons/shop_mouthwash_mortar.tres"),
 ]
 
 var offers: Array[ShopOfferData] = []
 var reroll_cost: int = 2
 
 
-func open_shop(owned_weapon_ids: Array[StringName]) -> void:
+func open_shop() -> void:
 	reroll_cost = 2
-	_roll_offers(owned_weapon_ids)
+	_roll_offers()
 
 
-func reroll(owned_weapon_ids: Array[StringName]) -> void:
-	_roll_offers(owned_weapon_ids)
+func reroll() -> void:
+	_roll_offers()
 	reroll_cost += 1
 
 
@@ -36,11 +42,8 @@ func take_offer(index: int) -> ShopOfferData:
 	return offer
 
 
-func _roll_offers(owned_weapon_ids: Array[StringName]) -> void:
-	var pool: Array[ShopOfferData] = []
-	for offer in CATALOG:
-		if offer.weapon_scene == null or not owned_weapon_ids.has(offer.id):
-			pool.append(offer)
+func _roll_offers() -> void:
+	var pool: Array[ShopOfferData] = CATALOG.duplicate()
 	pool.shuffle()
 	offers.clear()
 	for index in mini(3, pool.size()):

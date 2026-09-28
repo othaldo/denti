@@ -12,6 +12,11 @@ func _run() -> void:
 	var game: Node2D = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(game)
 	current_scene = game
+	await process_frame
+	if not paused or game.choice_panel.mode != &"starter":
+		_fail("starter choice did not fit on screen")
+		return
+	game.choice_panel.buttons[0].pressed.emit()
 	game.wave.active = false
 	game._on_loot_collected(&"xp", game.xp_goal)
 	await process_frame
@@ -59,6 +64,14 @@ func _run() -> void:
 	if game.coins != coins_before_purchase - offer.price or game.shop.offers[0] != null or not game.shop_panel.offer_buttons[0].disabled:
 		_fail("shop card did not complete a purchase and update")
 		return
+	for id in [&"turbo_drill", &"floss_whip", &"water_jet", &"enamel_mirror"]:
+		game.player.loadout.acquire(WeaponCatalog.by_id(id))
+	game._update_shop_panel()
+	await process_frame
+	for weapon_button: Button in game.shop_panel.inventory_row.get_children():
+		if not _inside(weapon_button.get_global_rect(), Vector2(1280, 720)):
+			_fail("equipped weapon row exceeds viewport")
+			return
 	paused = false
 	root.get_node("GameSession").clear_run()
 	print("Denti UI layout test passed")
