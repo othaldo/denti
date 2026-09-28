@@ -4,6 +4,7 @@
 [resource]
 script = ExtResource("1")
 id = &"drill"
+icon_index = 11
 display_name = "Bohrer"
 description = "Kurzer, kräftiger Stich auf den nächsten Gegner."
 rarity = "Selten"

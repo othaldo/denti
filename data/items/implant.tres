@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 id = &"implant"
+icon_index = 4
 display_name = "Implantat"
 description = "+8 Bisskraft, aber etwas langsamerer Angriff."
 rarity = "Selten"

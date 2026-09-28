@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 display_name = "Bewegung"
+icon_index = 8
 description = "+25 Lauftempo"
 stat = &"move_speed"
 amount = 25.0

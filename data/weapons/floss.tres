@@ -4,6 +4,7 @@
 [resource]
 script = ExtResource("1")
 id = &"floss"
+icon_index = 10
 display_name = "Zahnseide"
 description = "Trifft regelmäßig alle Gegner in Denti-Nähe."
 rarity = "Selten"

@@ -19,7 +19,7 @@ func _physics_process(delta: float) -> void:
 	var direction := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	velocity = direction * stats.move_speed
 	move_and_slide()
-	global_position = global_position.clamp(Vector2.ONE * ARENA_MARGIN, DentiArena.SIZE - Vector2.ONE * ARENA_MARGIN)
+	global_position = global_position.clamp(Vector2.ONE * ARENA_MARGIN, get_viewport_rect().size - Vector2.ONE * ARENA_MARGIN)
 	_animate_sprite(direction, delta)
 	if hurt_time > 0.0:
 		hurt_time -= delta

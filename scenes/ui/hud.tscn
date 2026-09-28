@@ -13,16 +13,23 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
+[node name="VitalsFrame" type="Panel" parent="Root"]
+offset_left = 14.0
+offset_top = 14.0
+offset_right = 276.0
+offset_bottom = 126.0
+mouse_filter = 2
+
 [node name="Vitals" type="VBoxContainer" parent="Root"]
-offset_left = 18.0
-offset_top = 16.0
-offset_right = 258.0
-offset_bottom = 112.0
+offset_left = 24.0
+offset_top = 21.0
+offset_right = 266.0
+offset_bottom = 119.0
 mouse_filter = 2
 theme_override_constants/separation = 5
 
 [node name="HealthArea" type="Control" parent="Root/Vitals"]
-custom_minimum_size = Vector2(240, 30)
+custom_minimum_size = Vector2(242, 31)
 layout_mode = 2
 mouse_filter = 2
 
@@ -30,6 +37,7 @@ mouse_filter = 2
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 29.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -39,6 +47,7 @@ show_percentage = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 29.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -46,8 +55,16 @@ horizontal_alignment = 1
 vertical_alignment = 1
 text = "100 / 100"
 
+[node name="HealthIcon" type="TextureRect" parent="Root/Vitals/HealthArea"]
+offset_top = 2.0
+offset_right = 25.0
+offset_bottom = 27.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
 [node name="XPArea" type="Control" parent="Root/Vitals"]
-custom_minimum_size = Vector2(240, 23)
+custom_minimum_size = Vector2(242, 22)
 layout_mode = 2
 mouse_filter = 2
 
@@ -55,6 +72,7 @@ mouse_filter = 2
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 29.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -65,40 +83,110 @@ show_percentage = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 29.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 horizontal_alignment = 1
 vertical_alignment = 1
-text = "XP 0 / 5  ·  Lv. 1"
+text = "XP 0 / 5"
 
-[node name="Coins" type="Label" parent="Root/Vitals"]
+[node name="XPIcon" type="TextureRect" parent="Root/Vitals/XPArea"]
+offset_right = 24.0
+offset_bottom = 24.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CoinArea" type="HBoxContainer" parent="Root/Vitals"]
+custom_minimum_size = Vector2(242, 25)
 layout_mode = 2
 mouse_filter = 2
-text = "Münzen 0"
+theme_override_constants/separation = 4
+
+[node name="CoinIcon" type="TextureRect" parent="Root/Vitals/CoinArea"]
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Coins" type="Label" parent="Root/Vitals/CoinArea"]
+layout_mode = 2
+mouse_filter = 2
+text = "0"
+
+[node name="Spacer" type="Control" parent="Root/Vitals/CoinArea"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="LevelIcon" type="TextureRect" parent="Root/Vitals/CoinArea"]
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Level" type="Label" parent="Root/Vitals/CoinArea"]
+layout_mode = 2
+mouse_filter = 2
+text = "Lv. 1"
+
+[node name="WaveFrame" type="Panel" parent="Root"]
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -127.0
+offset_top = 14.0
+offset_right = 127.0
+offset_bottom = 103.0
+grow_horizontal = 2
+mouse_filter = 2
 
 [node name="WaveInfo" type="VBoxContainer" parent="Root"]
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -185.0
-offset_top = 16.0
-offset_right = 185.0
-offset_bottom = 144.0
+offset_left = -115.0
+offset_top = 19.0
+offset_right = 115.0
+offset_bottom = 99.0
 grow_horizontal = 2
 mouse_filter = 2
-theme_override_constants/separation = 1
+theme_override_constants/separation = 0
 
 [node name="Wave" type="Label" parent="Root/WaveInfo"]
+custom_minimum_size = Vector2(0, 28)
 layout_mode = 2
 mouse_filter = 2
 horizontal_alignment = 1
-text = "Welle 1 / 10"
+vertical_alignment = 1
+text = "WELLE 1 / 10"
+
+[node name="WaveIcon" type="TextureRect" parent="Root/WaveInfo/Wave"]
+offset_left = 17.0
+offset_top = 2.0
+offset_right = 41.0
+offset_bottom = 26.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
 
 [node name="Timer" type="Label" parent="Root/WaveInfo"]
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 mouse_filter = 2
 horizontal_alignment = 1
-text = "0:45"
+vertical_alignment = 1
+text = "00:45"
+
+[node name="ClockIcon" type="TextureRect" parent="Root/WaveInfo/Timer"]
+offset_left = 28.0
+offset_top = 10.0
+offset_right = 55.0
+offset_bottom = 37.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
 
 [node name="BossArea" type="Control" parent="Root/WaveInfo"]
 visible = false

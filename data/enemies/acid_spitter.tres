@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/enemies/acid_spitter.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+display_name = "Säurespucker"
+max_health = 26.0
+move_speed = 92.0
+contact_damage = 5.0
+radius = 18.0
+xp_drop = 1
+coin_drop = 1
+coin_drop_chance = 0.32
+sprite = ExtResource("2")
+special_attack = 3
+special_interval = 2.8
+warning_time = 0.55
+trigger_range = 400.0
+preferred_range = 220.0
+attack_speed = 290.0
+attack_damage = 8.0

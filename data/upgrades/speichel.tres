@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 display_name = "Speichel"
+icon_index = 6
 description = "+0,5 Leben pro Sekunde"
 stat = &"regen"
 amount = 0.5

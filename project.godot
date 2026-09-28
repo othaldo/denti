@@ -4,14 +4,19 @@ config_version=5
 [application]
 
 config/name="Denti: Divine Dentistry"
-run/main_scene="res://scenes/game/game.tscn"
+run/main_scene="res://scenes/ui/game_menu.tscn"
 config/features=PackedStringArray("4.4", "GL Compatibility")
+
+[autoload]
+
+GameSession="*res://scripts/systems/game_session.gd"
 
 [display]
 
 window/size/viewport_width=1280
 window/size/viewport_height=720
 window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
 
 [rendering]
 

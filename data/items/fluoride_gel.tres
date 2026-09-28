@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 id = &"fluoride_gel"
+icon_index = 1
 display_name = "Fluoridgel"
 description = "+25 Schmelz und sofortige Heilung."
 rarity = "Gewöhnlich"

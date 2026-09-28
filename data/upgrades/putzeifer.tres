@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 display_name = "Putzeifer"
+icon_index = 10
 description = "Schneller angreifen"
 stat = &"attack_interval"
 amount = 0.08

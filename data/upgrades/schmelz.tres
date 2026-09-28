@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 display_name = "Schmelz"
+icon_index = 7
 description = "+20 maximales Leben und Heilung"
 stat = &"max_health"
 amount = 20.0

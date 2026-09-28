@@ -12,4 +12,5 @@ contact_damage = 9.0
 radius = 18.0
 xp_drop = 1
 coin_drop = 1
+coin_drop_chance = 0.22
 sprite = ExtResource("2")

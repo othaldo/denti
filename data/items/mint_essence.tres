@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 id = &"mint_essence"
+icon_index = 8
 display_name = "Minz-Essenz"
 description = "+22 Bewegung, etwas langsamerer Angriff."
 rarity = "Gewöhnlich"

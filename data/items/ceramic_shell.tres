@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 id = &"ceramic_shell"
+icon_index = 7
 display_name = "Keramikschale"
 description = "+35 Schmelz, -3 Bisskraft. Hübsch, aber spröde."
 rarity = "Gewöhnlich"

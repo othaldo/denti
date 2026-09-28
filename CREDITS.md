@@ -7,5 +7,6 @@
 ## Grafiken und UI
 
 - Denti basiert auf den vorhandenen Referenzbildern unter `assets/denti/reference/`.
-- Der transparente Denti-Spiel-Sprite und die vier Gegner-Sprites wurden mit OpenAI ImageGen erstellt.
+- Der transparente Denti-Spiel-Sprite und die fünf Gegner-Sprites wurden mit OpenAI ImageGen erstellt.
+- Der Arena-Hintergrund unter `assets/environment/dental_arena_floor.png` wurde mit OpenAI ImageGen erstellt.
 - HUD, Karten, Buttons und Fortschrittsbalken sind eigene Godot-UI-Elemente. Es werden keine externen UI-Packs verwendet.

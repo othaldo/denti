@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 id = &"gold_filling"
+icon_index = 2
 display_name = "Goldfüllung"
 description = "+5 Bisskraft, +1 Härte. Glänzt beim Zubeißen."
 rarity = "Selten"

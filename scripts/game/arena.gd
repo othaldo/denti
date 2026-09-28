@@ -2,13 +2,24 @@ class_name DentiArena
 extends Node2D
 
 const SIZE := Vector2(1280.0, 720.0)
-const GRID_SPACING := 64
+const FLOOR: Texture2D = preload("res://assets/environment/dental_arena_floor.png")
+
+var arena_size: Vector2 = SIZE
+
+
+func _ready() -> void:
+	_resize()
+	get_viewport().size_changed.connect(_resize)
+
+
+func _resize() -> void:
+	arena_size = get_viewport_rect().size
+	queue_redraw()
 
 
 func _draw() -> void:
-	draw_rect(Rect2(Vector2.ZERO, SIZE), Color(0.94, 0.91, 0.82))
-	for x in range(0, int(SIZE.x) + 1, GRID_SPACING):
-		draw_line(Vector2(x, 0), Vector2(x, SIZE.y), Color(0.86, 0.82, 0.72, 0.32), 1.0)
-	for y in range(0, int(SIZE.y) + 1, GRID_SPACING):
-		draw_line(Vector2(0, y), Vector2(SIZE.x, y), Color(0.86, 0.82, 0.72, 0.32), 1.0)
-	draw_rect(Rect2(Vector2(14, 14), SIZE - Vector2(28, 28)), Color(0.55, 0.43, 0.44), false, 4.0)
+	var texture_size := FLOOR.get_size()
+	var cover_scale := maxf(arena_size.x / texture_size.x, arena_size.y / texture_size.y)
+	var source_size := arena_size / cover_scale
+	var source_rect := Rect2((texture_size - source_size) / 2.0, source_size)
+	draw_texture_rect_region(FLOOR, Rect2(Vector2.ZERO, arena_size), source_rect)

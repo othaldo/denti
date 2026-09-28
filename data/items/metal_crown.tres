@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 id = &"metal_crown"
+icon_index = 0
 display_name = "Metallkrone"
 description = "+3 Härte, -18 Bewegung. Karamell bleibt gefährlich."
 rarity = "Gewöhnlich"

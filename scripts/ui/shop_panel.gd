@@ -6,7 +6,8 @@ signal reroll_requested
 signal continue_requested
 
 @onready var title_label: Label = $Root/Center/Panel/Margin/Rows/Title
-@onready var coins_label: Label = $Root/Center/Panel/Margin/Rows/Coins
+@onready var coins_label: Label = $Root/Center/Panel/Margin/Rows/Wallet/Coins
+@onready var preview_label: Label = $Root/Center/Panel/Margin/Rows/Preview
 @onready var offer_buttons: Array[Button] = [
 	$Root/Center/Panel/Margin/Rows/Offer1,
 	$Root/Center/Panel/Margin/Rows/Offer2,
@@ -23,9 +24,13 @@ func _ready() -> void:
 	DentiUIStyle.style_dialog($Root/Center/Panel)
 	title_label.add_theme_color_override("font_color", DentiUIStyle.INK)
 	title_label.add_theme_font_size_override("font_size", 31)
-	coins_label.add_theme_color_override("font_color", DentiUIStyle.MUTED)
+	coins_label.add_theme_color_override("font_color", DentiUIStyle.INK)
+	coins_label.add_theme_font_size_override("font_size", 19)
+	preview_label.add_theme_color_override("font_color", DentiUIStyle.MUTED)
+	preview_label.add_theme_font_size_override("font_size", 16)
+	DentiUIStyle.style_chip($Root/Center/Panel/Margin/Rows/Wallet)
+	$Root/Center/Panel/Margin/Rows/Wallet/WalletRow/CoinIcon.texture = DentiUIIcons.hud(2)
 	for index in offer_buttons.size():
-		DentiUIStyle.style_button(offer_buttons[index], false, true)
 		offer_buttons[index].pressed.connect(_on_offer_pressed.bind(index))
 	DentiUIStyle.style_button(reroll_button)
 	DentiUIStyle.style_button(continue_button, true)
@@ -33,23 +38,20 @@ func _ready() -> void:
 	continue_button.pressed.connect(func() -> void: continue_requested.emit())
 
 
-func show_shop(wave_number: int, coins: int, reroll_cost: int, offers: Array[ShopOfferData]) -> void:
+func show_shop(wave_number: int, coins: int, reroll_cost: int, offers: Array[ShopOfferData], preview: String = "") -> void:
+	var first_open := not visible
 	title_label.text = "Zahnklinik · Nach Welle %d" % wave_number
-	coins_label.text = "Münzen: %d" % coins
+	coins_label.text = "%d Münzen" % coins
+	preview_label.text = preview
 	for index in offer_buttons.size():
 		var button := offer_buttons[index]
-		var offer := offers[index]
-		if offer == null:
-			button.text = "Gekauft"
-			button.disabled = true
-		else:
-			button.text = "%s · %s · %d Münzen\n%s" % [offer.display_name, offer.rarity, offer.price, offer.description]
-			button.disabled = coins < offer.price
+		button.call("show_offer", offers[index], coins)
 	reroll_button.text = "Neu würfeln · %d Münzen" % reroll_cost
 	reroll_button.disabled = coins < reroll_cost
 	continue_button.text = "Welle %d starten" % (wave_number + 1)
 	visible = true
-	continue_button.grab_focus()
+	if first_open:
+		continue_button.grab_focus()
 
 
 func _on_offer_pressed(index: int) -> void:

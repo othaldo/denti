@@ -2,6 +2,7 @@ extends Node2D
 
 const ENEMY_SCENE: PackedScene = preload("res://scenes/enemies/enemy.tscn")
 const LOOT_SCENE: PackedScene = preload("res://scenes/game/loot.tscn")
+const RUN_SNAPSHOT: Script = preload("res://scripts/systems/run_snapshot.gd")
 const SPAWN_PADDING := 32.0
 const UPGRADES: Array[UpgradeData] = [
 	preload("res://data/upgrades/bisskraft.tres"),
@@ -14,11 +15,14 @@ const UPGRADES: Array[UpgradeData] = [
 ]
 
 @onready var player: Player = $Player
+@onready var arena: DentiArena = $Arena
 @onready var wave: WaveController = $WaveController
 @onready var shop: ShopController = $ShopController
 @onready var hud: GameHUD = $HUD
 @onready var choice_panel: ChoicePanel = $ChoicePanel
 @onready var shop_panel: ShopPanel = $ShopPanel
+@onready var game_menu: GameMenu = $GameMenu
+@onready var session: Node = get_node("/root/GameSession")
 
 var xp: int = 0
 var xp_goal: int = 5
@@ -30,24 +34,51 @@ var intermission_pending: bool = false
 var owned_weapons: Array[StringName] = []
 var boss: Enemy
 var boss_pending: bool = false
+var autosave_timer: float = 0.0
 
 
 func _ready() -> void:
 	randomize()
 	wave.enemy_requested.connect(_spawn_enemy)
 	wave.boss_requested.connect(_spawn_enemy)
+	wave.horde_requested.connect(_spawn_horde)
 	wave.wave_finished.connect(_on_wave_finished)
 	player.stats.died.connect(_on_player_died)
 	choice_panel.upgrade_chosen.connect(_on_upgrade_chosen)
 	choice_panel.restart_requested.connect(_restart)
+	choice_panel.main_menu_requested.connect(_on_end_main_menu)
 	shop_panel.buy_requested.connect(_on_shop_buy)
 	shop_panel.reroll_requested.connect(_on_shop_reroll)
 	shop_panel.continue_requested.connect(_on_shop_continue)
+	if session.resume_requested:
+		session.resume_requested = false
+		var saved: Dictionary = session.load_run()
+		if not saved.is_empty():
+			_restore_run(saved)
+			return
+	player.global_position = arena.arena_size / 2.0
 	wave.start_next_wave()
+	_save_run()
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	_refresh_hud()
+	if not ended and wave.active:
+		autosave_timer += delta
+		if autosave_timer >= 8.0:
+			autosave_timer = 0.0
+			_save_run()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_cancel") and not ended and not choice_panel.visible and not shop_panel.visible and not game_menu.visible:
+		get_viewport().set_input_as_handled()
+		game_menu.open_pause()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST and is_node_ready() and not ended:
+		_save_run()
 
 
 func _refresh_hud() -> void:
@@ -55,17 +86,42 @@ func _refresh_hud() -> void:
 
 
 func _spawn_enemy(data: EnemyData) -> void:
-	var enemy: Enemy = ENEMY_SCENE.instantiate()
 	var edge := randi_range(0, 3)
+	var at := Vector2.ZERO
+	var size := arena.arena_size
 	match edge:
 		0:
-			enemy.position = Vector2(randf_range(0.0, DentiArena.SIZE.x), -SPAWN_PADDING)
+			at = Vector2(randf_range(0.0, size.x), -SPAWN_PADDING)
 		1:
-			enemy.position = Vector2(DentiArena.SIZE.x + SPAWN_PADDING, randf_range(0.0, DentiArena.SIZE.y))
+			at = Vector2(size.x + SPAWN_PADDING, randf_range(0.0, size.y))
 		2:
-			enemy.position = Vector2(randf_range(0.0, DentiArena.SIZE.x), DentiArena.SIZE.y + SPAWN_PADDING)
+			at = Vector2(randf_range(0.0, size.x), size.y + SPAWN_PADDING)
 		3:
-			enemy.position = Vector2(-SPAWN_PADDING, randf_range(0.0, DentiArena.SIZE.y))
+			at = Vector2(-SPAWN_PADDING, randf_range(0.0, size.y))
+	_create_enemy(data, at)
+
+
+func _spawn_horde(data: EnemyData, count: int) -> void:
+	var edge := randi_range(0, 3)
+	var center := Vector2.ZERO
+	var size := arena.arena_size
+	match edge:
+		0:
+			center = Vector2(randf_range(200.0, size.x - 200.0), -SPAWN_PADDING)
+		1:
+			center = Vector2(size.x + SPAWN_PADDING, randf_range(200.0, size.y - 200.0))
+		2:
+			center = Vector2(randf_range(200.0, size.x - 200.0), size.y + SPAWN_PADDING)
+		3:
+			center = Vector2(-SPAWN_PADDING, randf_range(200.0, size.y - 200.0))
+	for index in count:
+		var offset := (float(index) - float(count - 1) / 2.0) * (data.radius * 2.5)
+		_create_enemy(data, center + (Vector2(offset, 0.0) if edge % 2 == 0 else Vector2(0.0, offset)))
+
+
+func _create_enemy(data: EnemyData, at: Vector2) -> void:
+	var enemy: Enemy = ENEMY_SCENE.instantiate()
+	enemy.position = at
 	enemy.configure(data, player, wave.current_wave)
 	enemy.defeated.connect(_on_enemy_defeated)
 	$Enemies.add_child(enemy)
@@ -82,7 +138,8 @@ func _on_enemy_defeated(at: Vector2, data: EnemyData) -> void:
 	if not wave.active:
 		return
 	_spawn_loot(at + Vector2(-11.0, 0.0), &"xp", data.xp_drop)
-	_spawn_loot(at + Vector2(11.0, 0.0), &"coin", data.coin_drop)
+	if data.coin_drop > 0 and randf() < data.coin_drop_chance:
+		_spawn_loot(at + Vector2(11.0, 0.0), &"coin", data.coin_drop)
 
 
 func _spawn_loot(at: Vector2, kind: StringName, amount: int) -> void:
@@ -111,6 +168,7 @@ func _check_level_up() -> bool:
 	pool.shuffle()
 	choice_panel.show_upgrades([pool[0], pool[1], pool[2]])
 	get_tree().paused = true
+	_save_run()
 	return true
 
 
@@ -122,6 +180,7 @@ func _on_upgrade_chosen(upgrade: UpgradeData) -> void:
 		_open_shop()
 	else:
 		get_tree().paused = false
+		_save_run()
 
 
 func _on_wave_finished(wave_number: int) -> void:
@@ -158,6 +217,8 @@ func _clear_arena(collect_drops: bool, keep_boss: bool = false) -> void:
 		boss = null
 	for projectile in $Projectiles.get_children():
 		projectile.free()
+	for projectile in $EnemyProjectiles.get_children():
+		projectile.free()
 
 
 func _finish_run() -> void:
@@ -167,6 +228,7 @@ func _finish_run() -> void:
 	boss_pending = false
 	_clear_arena(true)
 	choice_panel.show_end(true, coins)
+	session.clear_run()
 	_refresh_hud()
 	get_tree().paused = true
 
@@ -177,10 +239,11 @@ func _open_shop() -> void:
 	shop.open_shop(owned_weapons)
 	_update_shop_panel()
 	get_tree().paused = true
+	_save_run()
 
 
 func _update_shop_panel() -> void:
-	shop_panel.show_shop(wave.current_wave, coins, shop.reroll_cost, shop.offers)
+	shop_panel.show_shop(wave.current_wave, coins, shop.reroll_cost, shop.offers, wave.next_wave_preview())
 	_refresh_hud()
 
 
@@ -199,6 +262,7 @@ func _on_shop_buy(index: int) -> void:
 			player.stats.apply_upgrade(StringName(stat), float(offer.stat_changes[stat]))
 	shop.take_offer(index)
 	_update_shop_panel()
+	_save_run()
 
 
 func _on_shop_reroll() -> void:
@@ -207,6 +271,7 @@ func _on_shop_reroll() -> void:
 	coins -= shop.reroll_cost
 	shop.reroll(owned_weapons)
 	_update_shop_panel()
+	_save_run()
 
 
 func _on_shop_continue() -> void:
@@ -216,10 +281,11 @@ func _on_shop_continue() -> void:
 	in_shop = false
 	boss_pending = false
 	_clear_arena(false)
-	player.global_position = DentiArena.SIZE / 2.0
+	player.global_position = arena.arena_size / 2.0
 	wave.start_next_wave()
 	get_tree().paused = false
 	_refresh_hud()
+	_save_run()
 
 
 func _on_player_died() -> void:
@@ -229,9 +295,26 @@ func _on_player_died() -> void:
 	_clear_arena(false)
 	shop_panel.visible = false
 	choice_panel.show_end(false, coins)
+	session.clear_run()
 	get_tree().paused = true
 
 
 func _restart() -> void:
+	session.clear_run()
 	get_tree().paused = false
 	get_tree().reload_current_scene()
+
+
+func _on_end_main_menu() -> void:
+	get_tree().paused = false
+	get_tree().change_scene_to_file("res://scenes/ui/game_menu.tscn")
+
+
+func _save_run() -> void:
+	if ended or not is_node_ready():
+		return
+	session.save_run(RUN_SNAPSHOT.capture(self))
+
+
+func _restore_run(saved: Dictionary) -> void:
+	RUN_SNAPSHOT.restore(self, saved)

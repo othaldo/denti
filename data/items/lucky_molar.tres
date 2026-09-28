@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 id = &"lucky_molar"
+icon_index = 9
 display_name = "Glücks-Molar"
 description = "+6 % Glanz und +3 Bisskraft. Lächelt zurück."
 rarity = "Selten"

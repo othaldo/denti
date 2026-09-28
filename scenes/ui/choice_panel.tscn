@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/choice_panel.gd" id="1"]
 [ext_resource type="Texture2D" path="res://assets/denti/denti_gameplay.png" id="2"]
+[ext_resource type="Script" path="res://scripts/ui/upgrade_card.gd" id="3"]
 
 [node name="ChoicePanel" type="CanvasLayer"]
 process_mode = 3
@@ -21,7 +22,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.09, 0.12, 0.14, 0.78)
+color = Color(0.09, 0.06, 0.12, 0.78)
 
 [node name="Center" type="CenterContainer" parent="Root"]
 anchors_preset = 15
@@ -31,22 +32,22 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Panel" type="PanelContainer" parent="Root/Center"]
-custom_minimum_size = Vector2(660, 420)
+custom_minimum_size = Vector2(900, 440)
 layout_mode = 2
 
 [node name="Margin" type="MarginContainer" parent="Root/Center/Panel"]
 layout_mode = 2
-theme_override_constants/margin_left = 24
-theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 20
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 24
 
 [node name="Rows" type="VBoxContainer" parent="Root/Center/Panel/Margin"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 9
 
 [node name="Portrait" type="TextureRect" parent="Root/Center/Panel/Margin/Rows"]
-custom_minimum_size = Vector2(0, 72)
+custom_minimum_size = Vector2(0, 108)
 layout_mode = 2
 mouse_filter = 2
 texture = ExtResource("2")
@@ -55,29 +56,35 @@ stretch_mode = 5
 
 [node name="Title" type="Label" parent="Root/Center/Panel/Margin/Rows"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
 horizontal_alignment = 1
 text = "Denti steigt auf!"
 
 [node name="Subtitle" type="Label" parent="Root/Center/Panel/Margin/Rows"]
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
-custom_minimum_size = Vector2(0, 76)
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
-text = "Wähle einen Segen für deinen Schmelz."
+text = "Ein göttlicher Segen wurde gewährt."
 
-[node name="Choice1" type="Button" parent="Root/Center/Panel/Margin/Rows"]
+[node name="Cards" type="HBoxContainer" parent="Root/Center/Panel/Margin/Rows"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 52)
-text = "Bisskraft"
+theme_override_constants/separation = 16
 
-[node name="Choice2" type="Button" parent="Root/Center/Panel/Margin/Rows"]
+[node name="Choice1" type="Button" parent="Root/Center/Panel/Margin/Rows/Cards"]
+custom_minimum_size = Vector2(235, 186)
 layout_mode = 2
-custom_minimum_size = Vector2(0, 52)
-text = "Härte"
+size_flags_horizontal = 3
+script = ExtResource("3")
 
-[node name="Choice3" type="Button" parent="Root/Center/Panel/Margin/Rows"]
+[node name="Choice2" type="Button" parent="Root/Center/Panel/Margin/Rows/Cards"]
+custom_minimum_size = Vector2(235, 186)
 layout_mode = 2
-custom_minimum_size = Vector2(0, 52)
-text = "Schmelz"
+size_flags_horizontal = 3
+script = ExtResource("3")
+
+[node name="Choice3" type="Button" parent="Root/Center/Panel/Margin/Rows/Cards"]
+custom_minimum_size = Vector2(235, 186)
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("3")

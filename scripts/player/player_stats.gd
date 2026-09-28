@@ -14,6 +14,26 @@ var regen: float = 0.0
 var crit_chance: float = 0.05
 
 
+func to_save_data() -> Dictionary:
+	return {
+		"max_health": max_health, "health": health, "damage": damage,
+		"armor": armor, "move_speed": move_speed, "attack_interval": attack_interval,
+		"regen": regen, "crit_chance": crit_chance,
+	}
+
+
+func load_save_data(saved: Dictionary) -> void:
+	max_health = maxf(float(saved.get("max_health", max_health)), 1.0)
+	health = clampf(float(saved.get("health", health)), 1.0, max_health)
+	damage = maxf(float(saved.get("damage", damage)), 1.0)
+	armor = float(saved.get("armor", armor))
+	move_speed = maxf(float(saved.get("move_speed", move_speed)), 80.0)
+	attack_interval = maxf(float(saved.get("attack_interval", attack_interval)), 0.18)
+	regen = maxf(float(saved.get("regen", regen)), 0.0)
+	crit_chance = clampf(float(saved.get("crit_chance", crit_chance)), 0.0, 0.65)
+	changed.emit()
+
+
 func _process(delta: float) -> void:
 	if regen > 0.0 and health > 0.0 and health < max_health:
 		health = minf(health + regen * delta, max_health)

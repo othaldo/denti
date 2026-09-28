@@ -6,6 +6,7 @@ func _initialize() -> void:
 
 
 func _run() -> void:
+	root.get_node("GameSession").save_path = "user://test_smoke_run.json"
 	var scene: PackedScene = load("res://scenes/game/game.tscn")
 	var game: Node2D = scene.instantiate()
 	root.add_child(game)
@@ -64,7 +65,9 @@ func _run() -> void:
 	game.wave.active = true
 	game.wave.spawn_cooldown = 999.0
 
-	game._spawn_enemy(load("res://data/enemies/plaque.tres"))
+	var guaranteed_coin_enemy: EnemyData = load("res://data/enemies/plaque.tres").duplicate()
+	guaranteed_coin_enemy.coin_drop_chance = 1.0
+	game._spawn_enemy(guaranteed_coin_enemy)
 	var enemy: Enemy = game.get_node("Enemies").get_child(-1)
 	enemy.position = player.position + Vector2(95.0, 0.0)
 	var enemy_position := enemy.position

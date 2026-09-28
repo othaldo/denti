@@ -3,25 +3,56 @@ extends Node
 
 signal enemy_requested(data: EnemyData)
 signal boss_requested(data: EnemyData)
+signal horde_requested(data: EnemyData, count: int)
 signal wave_finished(wave_number: int)
 
 const DURATION := 45.0
 const MAX_WAVES := 10
+const SPAWN_INTERVAL_START := 1.6
+const SPAWN_INTERVAL_WAVE_STEP := 0.065
+const SPAWN_INTERVAL_ACCELERATION := 0.012
+const SPAWN_INTERVAL_MIN := 0.4
 const PLAQUE: EnemyData = preload("res://data/enemies/plaque.tres")
 const BACTERIA: EnemyData = preload("res://data/enemies/bacteria.tres")
 const SUGAR: EnemyData = preload("res://data/enemies/sugar.tres")
+const ACID_SPITTER: EnemyData = preload("res://data/enemies/acid_spitter.tres")
 const BOSS: EnemyData = preload("res://data/enemies/cavity_king.tres")
 
 var remaining: float = DURATION
 var spawn_cooldown: float = 0.0
 var active: bool = false
 var current_wave: int = 0
+var horde_waves: Array[int] = []
+var horde_spawned: bool = false
+
+
+func plan_hordes() -> void:
+	horde_waves = [randi_range(4, 5), randi_range(7, 8)]
+
+
+func next_wave_preview() -> String:
+	var next_wave := current_wave + 1
+	var details: Array[String] = []
+	if next_wave == 2:
+		details.append("Bakterium")
+	elif next_wave == 3:
+		details.append("Zuckerstück")
+	elif next_wave == 4:
+		details.append("Säurespucker")
+	elif next_wave == MAX_WAVES:
+		details.append("Karies-König")
+	if horde_waves.has(next_wave):
+		details.append("%s-Horde" % _horde_data(next_wave).display_name)
+	return "Welle %d: %s" % [next_wave, " · ".join(details)] if not details.is_empty() else "Nächste Welle: %d" % next_wave
 
 
 func start_next_wave() -> void:
+	if horde_waves.is_empty():
+		plan_hordes()
 	current_wave += 1
 	remaining = DURATION
 	spawn_cooldown = 0.0
+	horde_spawned = false
 	active = true
 	if current_wave == MAX_WAVES:
 		boss_requested.emit(BOSS)
@@ -35,18 +66,39 @@ func _process(delta: float) -> void:
 		active = false
 		wave_finished.emit(current_wave)
 		return
+	if not horde_spawned and horde_waves.has(current_wave) and remaining <= DURATION - 18.0:
+		horde_spawned = true
+		horde_requested.emit(_horde_data(current_wave), 5 + current_wave)
 	spawn_cooldown -= delta
 	if spawn_cooldown <= 0.0:
 		enemy_requested.emit(_choose_enemy())
 		var elapsed := DURATION - remaining
-		spawn_cooldown = maxf(1.25 - elapsed * 0.017 - (current_wave - 1) * 0.055, 0.32)
+		spawn_cooldown = maxf(SPAWN_INTERVAL_START - elapsed * SPAWN_INTERVAL_ACCELERATION - (current_wave - 1) * SPAWN_INTERVAL_WAVE_STEP, SPAWN_INTERVAL_MIN)
 
 
 func _choose_enemy() -> EnemyData:
 	var elapsed := DURATION - remaining
-	var roll := randf()
-	if elapsed > 28.0 and roll < 0.22 + (current_wave - 1) * 0.025:
-		return SUGAR
-	if elapsed > 12.0 and roll < 0.48 + (current_wave - 1) * 0.015:
-		return BACTERIA
+	var choices: Array[EnemyData] = [PLAQUE]
+	var weights: Array[float] = [5.0]
+	if current_wave >= 2 and elapsed >= 8.0:
+		choices.append(BACTERIA)
+		weights.append(2.0 + (current_wave - 2) * 0.12)
+	if current_wave >= 3 and elapsed >= 12.0:
+		choices.append(SUGAR)
+		weights.append(1.3 + (current_wave - 3) * 0.08)
+	if current_wave >= 4 and elapsed >= 15.0:
+		choices.append(ACID_SPITTER)
+		weights.append(1.0 + (current_wave - 4) * 0.12)
+	var total_weight := 0.0
+	for weight in weights:
+		total_weight += weight
+	var roll := randf() * total_weight
+	for index in choices.size():
+		roll -= weights[index]
+		if roll < 0.0:
+			return choices[index]
 	return PLAQUE
+
+
+func _horde_data(wave_number: int) -> EnemyData:
+	return PLAQUE if wave_number <= 5 else BACTERIA

@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 id = &"saliva_fountain"
+icon_index = 6
 display_name = "Speichelquelle"
 description = "+0,8 Leben/s, -8 Bewegung. Etwas rutschig."
 rarity = "Gewöhnlich"
