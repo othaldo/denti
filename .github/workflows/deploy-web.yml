@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   build:
-    name: Export Godot Web build
+    name: Test and export Godot Web build
     runs-on: ubuntu-24.04
     container:
       image: barichello/godot-ci:4.4
@@ -42,6 +42,13 @@ jobs:
 
       - name: Import project assets
         run: godot --headless --path . --editor --quit
+
+      - name: Run test suite
+        run: |
+          for test in tests/*.gd; do
+            echo "Running $test"
+            godot --headless --fixed-fps 60 --path . --script "res://$test"
+          done
 
       - name: Export Web
         run: |
