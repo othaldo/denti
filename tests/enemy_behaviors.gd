@@ -110,12 +110,12 @@ func _run() -> void:
 	spitter.special_direction = Vector2.LEFT
 	spitter._activate_special()
 	var projectiles: Node2D = game.get_node("EnemyProjectiles")
-	if projectiles.get_child_count() != 5 or spitter.special_timer >= spitter.data.special_interval:
-		_fail("late ranged enemy did not fire a faster five-shot fan before its advanced pattern")
+	if projectiles.get_child_count() != 3 or spitter.special_timer >= spitter.data.special_interval:
+		_fail("late ranged enemy did not fire its faster three-shot fan before the lane upgrade")
 		return
 	var first: AcidProjectile = projectiles.get_child(0)
-	var last: AcidProjectile = projectiles.get_child(4)
-	if first.direction.distance_to(last.direction) < 0.5 or first.projectile_color.g < 0.8:
+	var last: AcidProjectile = projectiles.get_child(2)
+	if first.direction.distance_to(last.direction) < 0.25 or first.projectile_color.g < 0.8:
 		_fail("late fan lacks spread or visible enemy projectile color")
 		return
 	for projectile in projectiles.get_children():
