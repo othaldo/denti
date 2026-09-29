@@ -20,7 +20,18 @@ extends Resource
 @export var projectile_color: Color = Color(0.75, 0.96, 1.0)
 @export var visual_angle_degrees: float = 45.0
 @export var price: int = 8
-@export var rarity: String = "Gewöhnlich"
+
+
+func damage_at_tier(tier: int) -> float:
+	return base_damage * pow(1.38, clampi(tier, 1, 4) - 1)
+
+
+func interval_at_tier(tier: int) -> float:
+	return interval * pow(0.94, clampi(tier, 1, 4) - 1)
+
+
+func stats_text(tier: int) -> String:
+	return "%d Basis-Schaden · %.2f s · %d Reichweite" % [roundi(damage_at_tier(tier)), interval_at_tier(tier), roundi(attack_range)]
 
 
 func damage_against(enemy: Node2D, attack_damage: float) -> float:

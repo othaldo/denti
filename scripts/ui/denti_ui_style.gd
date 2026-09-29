@@ -83,22 +83,34 @@ static func style_check_button(button: CheckButton) -> void:
 		button.add_theme_color_override(state, INK)
 
 
-static func style_card(button: Button, rare: bool = false) -> void:
+static func style_rarity_label(label: Label, tier: int) -> void:
+	var badge := _box(DentiRarity.color_for(tier), DentiRarity.color_for(tier).darkened(0.22), 6, 1)
+	badge.content_margin_left = 7.0
+	badge.content_margin_right = 7.0
+	badge.content_margin_top = 2.0
+	badge.content_margin_bottom = 2.0
+	label.add_theme_stylebox_override("normal", badge)
+	label.add_theme_color_override("font_color", Color.WHITE)
+	label.add_theme_font_size_override("font_size", 13)
+
+
+static func style_card(button: Button, tier: int = 1) -> void:
 	style_button(button)
-	var accent := VIOLET if rare else MINT.darkened(0.18)
-	var normal := _box(Color(1.0, 0.995, 0.96), accent if rare else Color(0.58, 0.45, 0.45), 16, 2)
+	var accent := DentiRarity.color_for(tier)
+	var fill := accent.lerp(Color.WHITE, 0.93)
+	var normal := _box(fill, accent, 16, 3)
 	normal.shadow_color = Color(0.18, 0.10, 0.14, 0.22)
 	normal.shadow_size = 5
 	normal.shadow_offset = Vector2(0, 3)
 	button.add_theme_stylebox_override("normal", normal)
-	var hover := _box(Color(1.0, 0.98, 0.89), GOLD, 16, 3)
+	var hover := _box(fill.lightened(0.02), accent.lightened(0.15), 16, 4)
 	hover.shadow_color = Color(0.73, 0.49, 0.15, 0.35)
 	hover.shadow_size = 10
 	hover.shadow_offset = Vector2(0, 5)
 	button.add_theme_stylebox_override("hover", hover)
-	button.add_theme_stylebox_override("pressed", _box(Color(1.0, 0.93, 0.75), accent, 16, 3))
-	button.add_theme_stylebox_override("focus", _box(Color(1.0, 0.96, 0.82, 0.20), GOLD, 16, 3))
-	button.add_theme_stylebox_override("disabled", _box(Color(0.85, 0.83, 0.80), Color(0.59, 0.55, 0.55), 16, 2))
+	button.add_theme_stylebox_override("pressed", _box(fill.darkened(0.06), accent, 16, 3))
+	button.add_theme_stylebox_override("focus", _box(Color(accent, 0.16), accent, 16, 3))
+	button.add_theme_stylebox_override("disabled", _box(fill.darkened(0.08), accent.darkened(0.2), 16, 2))
 
 
 static func style_progress(bar: ProgressBar, fill_color: Color) -> void:

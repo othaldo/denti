@@ -55,7 +55,7 @@ func _physics_process(delta: float) -> void:
 	var nearest := targets[0]
 	aim = player.global_position.direction_to(nearest.global_position)
 	hit_point = to_local(nearest.global_position)
-	var attack_damage := player.stats.roll_damage(data.base_damage / 18.0 * pow(1.38, tier - 1))
+	var attack_damage := player.stats.roll_damage(data.damage_at_tier(tier) / 18.0)
 	match data.attack_mode:
 		&"projectile":
 			var projectile: WeaponProjectile = PROJECTILE_SCENE.instantiate()
@@ -67,7 +67,7 @@ func _physics_process(delta: float) -> void:
 			for enemy in targets:
 				enemy.take_damage(data.damage_against(enemy, attack_damage))
 	attack_time = 0.2
-	cooldown = data.interval * player.stats.attack_interval / 0.65 * pow(0.94, tier - 1)
+	cooldown = data.interval_at_tier(tier) * player.stats.attack_interval / 0.65
 	var sound_kind: StringName = &"brush"
 	if data.attack_mode == &"area":
 		sound_kind = &"floss"

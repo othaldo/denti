@@ -7,3 +7,4 @@ icon_index = 10
 description = "Schneller angreifen"
 stat = &"attack_interval"
 amount = 0.08
+tier_amounts = Array[float]([0.08, 0.12, 0.17, 0.22])

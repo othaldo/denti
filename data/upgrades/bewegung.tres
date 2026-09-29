@@ -7,3 +7,4 @@ icon_index = 8
 description = "+25 Lauftempo"
 stat = &"move_speed"
 amount = 25.0
+tier_amounts = Array[float]([25.0, 40.0, 60.0, 80.0])

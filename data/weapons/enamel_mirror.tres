@@ -17,4 +17,3 @@ grip_anchor = Vector2(0.16, 0.9)
 projectile_color = Color(1, 0.9, 0.42, 1)
 visual_angle_degrees = 40.0
 price = 11
-rarity = "Selten"

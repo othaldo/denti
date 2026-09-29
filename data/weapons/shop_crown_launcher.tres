@@ -8,6 +8,5 @@ id = &"crown_launcher"
 display_name = "Kronenwerfer"
 description = "Zweihand · Fernkampf · durchdringt Gegner"
 price = 13
-rarity = "Selten"
 weapon_data = ExtResource("2")
 icon_texture = ExtResource("3")

@@ -8,6 +8,5 @@ id = &"enamel_mirror"
 display_name = "Schmelzspiegel"
 description = "Einhand · Lichtstrahl · sofortiger Treffer"
 price = 11
-rarity = "Selten"
 weapon_data = ExtResource("2")
 icon_texture = ExtResource("3")

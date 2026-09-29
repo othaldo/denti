@@ -12,13 +12,14 @@ var move_speed: float = 230.0
 var attack_interval: float = 0.65
 var regen: float = 0.0
 var crit_chance: float = 0.05
+var luck: float = 0.0
 
 
 func to_save_data() -> Dictionary:
 	return {
 		"max_health": max_health, "health": health, "damage": damage,
 		"armor": armor, "move_speed": move_speed, "attack_interval": attack_interval,
-		"regen": regen, "crit_chance": crit_chance,
+		"regen": regen, "crit_chance": crit_chance, "luck": luck,
 	}
 
 
@@ -31,6 +32,7 @@ func load_save_data(saved: Dictionary) -> void:
 	attack_interval = maxf(float(saved.get("attack_interval", attack_interval)), 0.18)
 	regen = maxf(float(saved.get("regen", regen)), 0.0)
 	crit_chance = clampf(float(saved.get("crit_chance", crit_chance)), 0.0, 0.65)
+	luck = maxf(float(saved.get("luck", 0.0)), 0.0)
 	changed.emit()
 
 
@@ -69,4 +71,6 @@ func apply_upgrade(stat: StringName, amount: float) -> void:
 			regen = maxf(regen + amount, 0.0)
 		&"crit_chance":
 			crit_chance = clampf(crit_chance + amount, 0.0, 0.65)
+		&"luck":
+			luck = maxf(luck + amount, 0.0)
 	changed.emit()

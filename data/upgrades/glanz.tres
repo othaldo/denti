@@ -7,3 +7,4 @@ icon_index = 9
 description = "+5 % kritische Chance"
 stat = &"crit_chance"
 amount = 0.05
+tier_amounts = Array[float]([0.05, 0.08, 0.12, 0.16])

@@ -6,6 +6,5 @@ id = &"mint_essence"
 icon_index = 8
 display_name = "Minz-Essenz"
 description = "+22 Bewegung, etwas langsamerer Angriff."
-rarity = "Gewöhnlich"
 price = 4
 stat_changes = { &"move_speed": 22.0, &"attack_interval": -0.03 }

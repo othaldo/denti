@@ -7,3 +7,4 @@ icon_index = 6
 description = "+0,5 Leben pro Sekunde"
 stat = &"regen"
 amount = 0.5
+tier_amounts = Array[float]([0.5, 1.0, 1.5, 2.2])

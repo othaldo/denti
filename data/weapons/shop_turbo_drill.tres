@@ -8,6 +8,5 @@ id = &"turbo_drill"
 display_name = "Turbo-Bohrer"
 description = "Einhand · Nahkampf · kräftiger Stich, +25 % gegen Bosse"
 price = 9
-rarity = "Selten"
 weapon_data = ExtResource("2")
 icon_texture = ExtResource("3")

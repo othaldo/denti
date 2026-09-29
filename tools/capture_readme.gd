@@ -30,6 +30,7 @@ func _run() -> void:
 	var game: Node2D = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(game)
 	current_scene = game
+	await _capture("startwaffe.png")
 	game.choice_panel._on_choice_pressed(0)
 	game.wave.active = false
 	game.wave.current_wave = 4
@@ -73,7 +74,7 @@ func _run() -> void:
 	await _capture("bosskampf.png")
 
 	game.level = 5
-	var upgrades: Array[UpgradeData] = [game.UPGRADES[0] as UpgradeData, game.UPGRADES[2] as UpgradeData, game.UPGRADES[3] as UpgradeData]
+	var upgrades: Array[UpgradeData] = [game.UPGRADES[0].with_tier(1), game.UPGRADES[2].with_tier(2), game.UPGRADES[3].with_tier(3)]
 	game.choice_panel.show_upgrades(upgrades)
 	game._refresh_hud()
 	await _capture("levelaufstieg.png")
@@ -84,8 +85,9 @@ func _run() -> void:
 	game.coins = 45
 	game._open_shop()
 	game.shop.offers.clear()
-	for offer_index in [11, 0, 13]:
-		game.shop.offers.append(ShopController.CATALOG[offer_index])
+	game.shop.offers.append(ShopController.weapon_offer(ShopController.CATALOG[11], 2))
+	game.shop.offers.append(ShopController.CATALOG[2])
+	game.shop.offers.append(ShopController.weapon_offer(ShopController.CATALOG[13], 3))
 	game._update_shop_panel()
 	await _capture("shop.png")
 

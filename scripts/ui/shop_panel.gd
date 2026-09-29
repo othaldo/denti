@@ -43,7 +43,7 @@ func _ready() -> void:
 	$Root/Center/Panel/Margin/Rows/Portrait.custom_minimum_size.y = 55.0
 	$Root/Center/Panel.custom_minimum_size.y = 665.0
 	for button in offer_buttons:
-		button.custom_minimum_size.y = 88.0
+		button.custom_minimum_size.y = 100.0
 	_build_inventory()
 	DentiUIStyle.style_button(reroll_button)
 	DentiUIStyle.style_button(continue_button, true)
@@ -51,11 +51,12 @@ func _ready() -> void:
 	continue_button.pressed.connect(func() -> void: continue_requested.emit())
 
 
-func show_shop(wave_number: int, coins: int, reroll_cost: int, offers: Array[ShopOfferData], preview: String = "", equipment: Array[Dictionary] = [], used_slots: int = 0, capacity: int = 6, buyable: Array[bool] = []) -> void:
+func show_shop(wave_number: int, coins: int, reroll_cost: int, offers: Array[ShopOfferData], preview: String = "", equipment: Array[Dictionary] = [], used_slots: int = 0, capacity: int = 6, buyable: Array[bool] = [], luck: float = 0.0) -> void:
 	var first_open := not visible
 	armed_sell_index = -1
 	title_label.text = "Zahnklinik · Nach Welle %d" % wave_number
-	coins_label.text = "%d Münzen" % coins
+	coins_label.text = "%d Münzen · %d Glück" % [coins, roundi(luck)]
+	$Root/Center/Panel/Margin/Rows/Wallet.tooltip_text = "Glück erhöht die Chance auf seltene Angebote und Levelaufstiege."
 	preview_label.text = preview
 	for index in offer_buttons.size():
 		var button := offer_buttons[index]
@@ -104,8 +105,8 @@ func _show_inventory(equipment: Array[Dictionary], used_slots: int, capacity: in
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.clip_text = true
 		button.add_theme_font_size_override("font_size", 13)
-		button.text = "%s %s\nVerkaufen +%d" % [entry["name"], ["I", "II", "III", "IV"][int(entry["tier"]) - 1], entry["refund"]]
-		button.tooltip_text = "Zum Verkaufen zweimal klicken"
+		button.text = "%s Mk %s\nVerkaufen +%d" % [entry["name"], ["I", "II", "III", "IV"][int(entry["tier"]) - 1], entry["refund"]]
+		button.tooltip_text = "%s\nZum Verkaufen zweimal klicken" % str(entry.get("stats", ""))
 		DentiUIStyle.style_button(button)
 		button.pressed.connect(_on_inventory_pressed.bind(index, button))
 		inventory_row.add_child(button)

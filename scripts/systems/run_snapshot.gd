@@ -18,13 +18,13 @@ static func capture(game) -> Dictionary:
 	var acid_data: Array[Dictionary] = []
 	for projectile: AcidProjectile in game.get_node("EnemyProjectiles").get_children():
 		acid_data.append({"position": _vector_data(projectile.position), "direction": _vector_data(projectile.direction), "speed": projectile.speed, "damage": projectile.damage, "lifetime": projectile.lifetime})
-	var offer_ids: Array[String] = []
+	var offer_data: Array[Dictionary] = []
 	for offer in game.shop.offers:
-		offer_ids.append(str(offer.id) if offer != null else "")
-	var upgrades: Array[String] = []
+		offer_data.append({"id": str(offer.id), "tier": offer.weapon_tier, "price": offer.price} if offer != null else {})
+	var upgrades: Array[Dictionary] = []
 	if game.choice_panel.visible and game.choice_panel.mode == &"upgrade":
 		for upgrade in game.choice_panel.current_upgrades:
-			upgrades.append(upgrade.resource_path)
+			upgrades.append({"stat": str(upgrade.stat), "tier": upgrade.tier})
 	return {
 		"wave": game.wave.current_wave, "remaining": game.wave.remaining,
 		"spawn_cooldown": game.wave.spawn_cooldown, "active": game.wave.active,
@@ -34,7 +34,7 @@ static func capture(game) -> Dictionary:
 		"weapons": game.player.loadout.save_data(), "starter_pending": game.starter_pending,
 		"enemies": enemies_data, "loot": loot_data, "acid": acid_data,
 		"shop": game.in_shop, "intermission_pending": game.intermission_pending,
-		"offers": offer_ids, "reroll_cost": game.shop.reroll_cost,
+		"offers": offer_data, "reroll_cost": game.shop.reroll_cost,
 		"upgrades": upgrades, "boss_pending": game.boss_pending,
 	}
 
@@ -92,17 +92,21 @@ static func restore(game, saved: Dictionary) -> void:
 		projectile.lifetime = float(entry.get("lifetime", 2.2))
 	shop.reroll_cost = maxi(int(saved.get("reroll_cost", 2)), 2)
 	shop.offers.clear()
-	for id_value in saved.get("offers", []):
-		var offer_id := str(id_value)
+	for value in saved.get("offers", []):
+		var offer_id := str(value.get("id", "")) if value is Dictionary else str(value)
 		if offer_id == "floss":
 			offer_id = "floss_whip"
 		elif offer_id == "drill":
 			offer_id = "turbo_drill"
+		var template := ShopController.by_id(StringName(offer_id))
 		var found: ShopOfferData = null
-		for offer in ShopController.CATALOG:
-			if str(offer.id) == offer_id:
-				found = offer
-				break
+		if template != null:
+			if template.weapon_data != null and value is Dictionary:
+				found = ShopController.weapon_offer(template, int(value.get("tier", 1)))
+			else:
+				found = template.duplicate() as ShopOfferData
+			if value is Dictionary:
+				found.price = maxi(int(value.get("price", found.price)), 1)
 		shop.offers.append(found)
 	game.in_shop = bool(saved.get("shop", false))
 	game.intermission_pending = bool(saved.get("intermission_pending", false))
@@ -113,19 +117,23 @@ static func restore(game, saved: Dictionary) -> void:
 		game.get_tree().paused = true
 		game._refresh_hud()
 		return
-	var upgrade_paths: Array = saved.get("upgrades", [])
-	if upgrade_paths.size() == 3:
+	var upgrade_data: Array = saved.get("upgrades", [])
+	if upgrade_data.size() == 3:
 		var options: Array[UpgradeData] = []
-		for path in upgrade_paths:
+		for value in upgrade_data:
 			for upgrade in game.UPGRADES:
-				if upgrade.resource_path == str(path):
-					options.append(upgrade)
+				if value is Dictionary and str(upgrade.stat) == str(value.get("stat", "")):
+					options.append(upgrade.with_tier(int(value.get("tier", 1))))
+					break
+				if value is String and upgrade.resource_path == value:
+					options.append(upgrade.with_tier(1))
+					break
 		if options.size() == 3:
 			game.choice_panel.show_upgrades(options)
 			game.get_tree().paused = true
 	elif game.in_shop:
 		if shop.offers.size() != 3:
-			shop.open_shop()
+			shop.open_shop(wave.current_wave, player.stats.luck, player.loadout)
 		game._update_shop_panel()
 		game.get_tree().paused = true
 	game._refresh_hud()

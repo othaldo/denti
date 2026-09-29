@@ -20,19 +20,19 @@ func used_slots() -> int:
 	return total
 
 
-func can_acquire(data: WeaponData) -> bool:
-	return _find_tier_one(data.id) != null or used_slots() + data.hands <= CAPACITY
+func can_acquire(data: WeaponData, tier: int = 1) -> bool:
+	return (tier < MAX_TIER and _find_tier(data.id, tier) != null) or used_slots() + data.hands <= CAPACITY
 
 
-func acquire(data: WeaponData) -> bool:
-	if not can_acquire(data):
+func acquire(data: WeaponData, tier: int = 1) -> bool:
+	if not can_acquire(data, tier):
 		return false
-	var matching := _find_tier_one(data.id)
+	var matching := _find_tier(data.id, tier) if tier < MAX_TIER else null
 	if matching != null:
 		matching.tier += 1
 		_merge_pairs(data.id)
 	else:
-		_add(data, 1)
+		_add(data, tier)
 	_refresh_positions()
 	return true
 
@@ -81,9 +81,9 @@ func _add(data: WeaponData, tier: int) -> void:
 	add_child(weapon)
 
 
-func _find_tier_one(id: StringName) -> WeaponInstance:
+func _find_tier(id: StringName, tier: int) -> WeaponInstance:
 	for weapon in equipped():
-		if weapon.data.id == id and weapon.tier == 1:
+		if weapon.data.id == id and weapon.tier == tier:
 			return weapon
 	return null
 

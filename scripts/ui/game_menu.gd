@@ -206,7 +206,7 @@ func _show_stats() -> void:
 	_title("Dentis Stats")
 	var stats: PlayerStats = game.player.stats
 	_text("Leben  %.0f / %.0f     Level  %d     XP  %d / %d\nMünzen  %d     Welle  %d / %d" % [stats.health, stats.max_health, game.level, game.xp, game.xp_goal, game.coins, game.wave.current_wave, WaveController.MAX_WAVES])
-	_text("Bisskraft  %.0f     Härte  %.0f\nPutzeifer  %.2f Angriffe/s     Glanz  %.0f%%\nSpeichel  %.1f Leben/s     Bewegung  %.0f" % [stats.damage, stats.armor, 1.0 / stats.attack_interval, stats.crit_chance * 100.0, stats.regen, stats.move_speed])
+	_text("Bisskraft  %.0f     Härte  %.0f\nPutzeifer  %.2f Angriffe/s     Glanz  %.0f%%\nSpeichel  %.1f Leben/s     Bewegung  %.0f     Glück  %.0f" % [stats.damage, stats.armor, 1.0 / stats.attack_interval, stats.crit_chance * 100.0, stats.regen, stats.move_speed, stats.luck])
 	var weapons: Array[String] = []
 	for weapon in game.player.loadout.equipped():
 		weapons.append("%s %s" % [weapon.data.display_name, ["I", "II", "III", "IV"][weapon.tier - 1]])

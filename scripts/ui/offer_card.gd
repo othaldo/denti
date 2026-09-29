@@ -31,14 +31,14 @@ func show_offer(offer: ShopOfferData, coins: int, available: bool = true) -> voi
 	content.visible = true
 	text = ""
 	icon_rect.texture = offer.icon_texture if offer.icon_texture != null else ICONS.item(offer.icon_index)
-	name_label.text = offer.display_name.to_upper()
-	rarity_label.text = offer.rarity
-	rarity_label.add_theme_color_override("font_color", DentiUIStyle.VIOLET if offer.rarity == "Selten" else DentiUIStyle.MINT.darkened(0.52))
-	effect_label.text = offer.description
+	name_label.text = "%s MK %s" % [offer.display_name.to_upper(), ["I", "II", "III", "IV"][offer.weapon_tier - 1]] if offer.weapon_data != null else offer.display_name.to_upper()
+	rarity_label.text = "STUFE %d · %s" % [offer.rarity_tier, DentiRarity.name_for(offer.rarity_tier).to_upper()]
+	DentiUIStyle.style_rarity_label(rarity_label, offer.rarity_tier)
+	effect_label.text = offer.weapon_data.stats_text(offer.weapon_tier) if offer.weapon_data != null else offer.description
 	price_label.text = "%d" % offer.price
 	disabled = coins < offer.price or not available
-	tooltip_text = "Ausrüstung voll: erst eine Waffe verkaufen" if not available else offer.description
-	DentiUIStyle.style_card(self, offer.rarity == "Selten")
+	tooltip_text = "Ausrüstung voll: erst eine Waffe verkaufen" if not available else ("%s\n%s" % [offer.description, effect_label.text] if offer.weapon_data != null else effect_label.text)
+	DentiUIStyle.style_card(self, offer.rarity_tier)
 
 
 func _build_content() -> void:
@@ -72,13 +72,14 @@ func _build_content() -> void:
 	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	details.add_child(name_label)
 	rarity_label = Label.new()
-	rarity_label.add_theme_font_size_override("font_size", 15)
+	rarity_label.add_theme_font_size_override("font_size", 13)
+	rarity_label.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	rarity_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	details.add_child(rarity_label)
 	effect_label = Label.new()
 	effect_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	effect_label.add_theme_color_override("font_color", DentiUIStyle.MUTED)
-	effect_label.add_theme_font_size_override("font_size", 15)
+	effect_label.add_theme_font_size_override("font_size", 16)
 	effect_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	details.add_child(effect_label)
 	var price_chip := PanelContainer.new()

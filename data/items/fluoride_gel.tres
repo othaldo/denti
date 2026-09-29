@@ -6,6 +6,5 @@ id = &"fluoride_gel"
 icon_index = 1
 display_name = "Fluoridgel"
 description = "+25 Schmelz und sofortige Heilung."
-rarity = "Gewöhnlich"
 price = 3
 stat_changes = { &"max_health": 25.0 }

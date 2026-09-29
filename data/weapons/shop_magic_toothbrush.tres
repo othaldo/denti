@@ -8,6 +8,5 @@ id = &"magic_toothbrush"
 display_name = "Zauberbürste"
 description = "Zweihand · Fernkampf · heilige Paste"
 price = 9
-rarity = "Gewöhnlich"
 weapon_data = ExtResource("2")
 icon_texture = ExtResource("3")

@@ -8,6 +8,5 @@ id = &"floss_whip"
 display_name = "Zahnseidenpeitsche"
 description = "Einhand · Rundumschnitt · erster Treffer stärker"
 price = 7
-rarity = "Gewöhnlich"
 weapon_data = ExtResource("2")
 icon_texture = ExtResource("3")

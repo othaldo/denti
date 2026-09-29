@@ -16,6 +16,17 @@ func _run() -> void:
 	if not paused or game.choice_panel.mode != &"starter":
 		_fail("starter choice did not fit on screen")
 		return
+	if not _starter_fits(game.choice_panel):
+		_fail("starter card content exceeds its card or the 1280x720 viewport")
+		return
+	root.size = Vector2i(1024, 600)
+	await process_frame
+	await process_frame
+	if not _starter_fits(game.choice_panel):
+		_fail("starter choice exceeds the 1024x600 viewport")
+		return
+	root.size = Vector2i(1280, 720)
+	await process_frame
 	game.choice_panel.buttons[0].pressed.emit()
 	game.wave.active = false
 	game._on_loot_collected(&"xp", game.xp_goal)
@@ -80,6 +91,18 @@ func _run() -> void:
 
 func _inside(rect: Rect2, viewport_size: Vector2) -> bool:
 	return rect.position.x >= 0.0 and rect.position.y >= 0.0 and rect.end.x <= viewport_size.x and rect.end.y <= viewport_size.y
+
+
+func _starter_fits(panel: ChoicePanel) -> bool:
+	var viewport_size: Vector2 = panel.get_node("Root").size
+	if not _inside(panel.dialog_panel.get_global_rect(), viewport_size):
+		return false
+	for button: UpgradeCard in panel.buttons:
+		var card_rect := button.get_global_rect()
+		var effect_rect := button.effect_label.get_global_rect()
+		if not _inside(card_rect, viewport_size) or effect_rect.position.y < card_rect.position.y or effect_rect.end.y > card_rect.end.y:
+			return false
+	return true
 
 
 func _fail(message: String) -> void:

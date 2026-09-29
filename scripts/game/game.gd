@@ -14,6 +14,7 @@ const UPGRADES: Array[UpgradeData] = [
 	preload("res://data/upgrades/bewegung.tres"),
 	preload("res://data/upgrades/speichel.tres"),
 	preload("res://data/upgrades/glanz.tres"),
+	preload("res://data/upgrades/zahnglueck.tres"),
 ]
 
 @onready var player: Player = $Player
@@ -224,7 +225,10 @@ func _check_level_up() -> bool:
 	xp_goal = 5 + (level - 1) * 3
 	var pool: Array[UpgradeData] = UPGRADES.duplicate()
 	pool.shuffle()
-	choice_panel.show_upgrades([pool[0], pool[1], pool[2]])
+	var choices: Array[UpgradeData] = []
+	for index in 3:
+		choices.append(pool[index].with_tier(DentiRarity.upgrade_tier(level, player.stats.luck)))
+	choice_panel.show_upgrades(choices)
 	get_tree().paused = true
 	_save_run()
 	return true
@@ -316,7 +320,7 @@ func _open_shop() -> void:
 	in_shop = true
 	intermission_pending = false
 	_sync_music()
-	shop.open_shop()
+	shop.open_shop(wave.current_wave, player.stats.luck, player.loadout)
 	_update_shop_panel()
 	get_tree().paused = true
 	_save_run()
@@ -327,11 +331,11 @@ func _update_shop_panel() -> void:
 	var weapons := player.loadout.equipped()
 	for index in weapons.size():
 		var weapon := weapons[index]
-		equipment.append({"name": weapon.data.display_name, "tier": weapon.tier, "refund": player.loadout.refund_for(index)})
+		equipment.append({"name": weapon.data.display_name, "tier": weapon.tier, "refund": player.loadout.refund_for(index), "stats": weapon.data.stats_text(weapon.tier)})
 	var buyable: Array[bool] = []
 	for offer in shop.offers:
-		buyable.append(offer == null or offer.weapon_data == null or player.loadout.can_acquire(offer.weapon_data))
-	shop_panel.show_shop(wave.current_wave, coins, shop.reroll_cost, shop.offers, wave.next_wave_preview(), equipment, player.loadout.used_slots(), WeaponLoadout.CAPACITY, buyable)
+		buyable.append(offer == null or offer.weapon_data == null or player.loadout.can_acquire(offer.weapon_data, offer.weapon_tier))
+	shop_panel.show_shop(wave.current_wave, coins, shop.reroll_cost, shop.offers, wave.next_wave_preview(), equipment, player.loadout.used_slots(), WeaponLoadout.CAPACITY, buyable, player.stats.luck)
 	_refresh_hud()
 
 
@@ -341,11 +345,11 @@ func _on_shop_buy(index: int) -> void:
 	var offer := shop.offers[index]
 	if offer == null or coins < offer.price:
 		return
-	if offer.weapon_data != null and not player.loadout.can_acquire(offer.weapon_data):
+	if offer.weapon_data != null and not player.loadout.can_acquire(offer.weapon_data, offer.weapon_tier):
 		return
 	coins -= offer.price
 	if offer.weapon_data != null:
-		player.loadout.acquire(offer.weapon_data)
+		player.loadout.acquire(offer.weapon_data, offer.weapon_tier)
 	else:
 		for stat in offer.stat_changes:
 			player.stats.apply_upgrade(StringName(stat), float(offer.stat_changes[stat]))
@@ -366,7 +370,7 @@ func _on_shop_reroll() -> void:
 	if not in_shop or coins < shop.reroll_cost:
 		return
 	coins -= shop.reroll_cost
-	shop.reroll()
+	shop.reroll(wave.current_wave, player.stats.luck, player.loadout)
 	_update_shop_panel()
 	_save_run()
 

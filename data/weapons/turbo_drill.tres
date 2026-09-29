@@ -16,4 +16,3 @@ sprite = ExtResource("2")
 grip_anchor = Vector2(0.19, 0.82)
 visual_angle_degrees = 40.0
 price = 9
-rarity = "Selten"

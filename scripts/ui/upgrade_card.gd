@@ -6,6 +6,7 @@ const ICONS: Script = preload("res://scripts/ui/denti_ui_icons.gd")
 var content: VBoxContainer
 var icon_rect: TextureRect
 var name_label: Label
+var rarity_label: Label
 var effect_label: Label
 var hover_tween: Tween
 
@@ -26,20 +27,24 @@ func show_upgrade(upgrade: UpgradeData) -> void:
 	content.visible = true
 	icon_rect.texture = ICONS.item(upgrade.icon_index)
 	name_label.text = upgrade.display_name.to_upper()
+	rarity_label.text = "STUFE %d · %s" % [upgrade.tier, DentiRarity.name_for(upgrade.tier).to_upper()]
+	DentiUIStyle.style_rarity_label(rarity_label, upgrade.tier)
 	effect_label.text = upgrade.description
 	disabled = false
-	DentiUIStyle.style_card(self)
+	DentiUIStyle.style_card(self, upgrade.tier)
 
 
 func show_weapon(weapon: WeaponData) -> void:
-	custom_minimum_size.y = 186.0
+	custom_minimum_size.y = 230.0
 	text = ""
 	content.visible = true
 	icon_rect.texture = weapon.sprite
 	name_label.text = weapon.display_name.to_upper()
-	effect_label.text = weapon.description
+	rarity_label.text = "STUFE I · GEWÖHNLICH"
+	DentiUIStyle.style_rarity_label(rarity_label, 1)
+	effect_label.text = "%s\n%d Schaden · %.2f s\n%d Reichweite" % [weapon.description, roundi(weapon.damage_at_tier(1)), weapon.interval_at_tier(1), roundi(weapon.attack_range)]
 	disabled = false
-	DentiUIStyle.style_card(self, weapon.rarity == "Selten")
+	DentiUIStyle.style_card(self)
 
 
 func show_action(action_name: String, accent: bool = false) -> void:
@@ -62,11 +67,11 @@ func _build_content() -> void:
 	add_child(margin)
 	content = VBoxContainer.new()
 	content.alignment = BoxContainer.ALIGNMENT_CENTER
-	content.add_theme_constant_override("separation", 7)
+	content.add_theme_constant_override("separation", 5)
 	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	margin.add_child(content)
 	icon_rect = TextureRect.new()
-	icon_rect.custom_minimum_size = Vector2(0, 70)
+	icon_rect.custom_minimum_size = Vector2(0, 56)
 	icon_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -77,11 +82,16 @@ func _build_content() -> void:
 	name_label.add_theme_font_size_override("font_size", 21)
 	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	content.add_child(name_label)
+	rarity_label = Label.new()
+	rarity_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	rarity_label.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	rarity_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	content.add_child(rarity_label)
 	effect_label = Label.new()
 	effect_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	effect_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	effect_label.add_theme_color_override("font_color", DentiUIStyle.MUTED)
-	effect_label.add_theme_font_size_override("font_size", 16)
+	effect_label.add_theme_font_size_override("font_size", 14)
 	effect_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	content.add_child(effect_label)
 

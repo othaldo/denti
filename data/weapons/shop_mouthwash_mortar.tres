@@ -8,6 +8,5 @@ id = &"mouthwash_mortar"
 display_name = "Mundspülungs-Mörser"
 description = "Zweihand · Fernkampf · Minzbombe"
 price = 14
-rarity = "Selten"
 weapon_data = ExtResource("2")
 icon_texture = ExtResource("3")
