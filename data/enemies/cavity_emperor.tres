@@ -1,34 +1,33 @@
 [gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/enemies/cavity_king.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/enemies/cavity_emperor.png" id="2"]
 
 [resource]
 script = ExtResource("1")
 display_name = "Karies-Imperator"
 max_health = 2500.0
 damage_reduction = 0.22
-knockback_resistance = 0.85
+knockback_resistance = 0.88
 move_speed = 112.0
 contact_damage = 27.0
-radius = 56.0
+radius = 58.0
 xp_drop = 0
 coin_drop = 0
 sprite = ExtResource("2")
-sprite_tint = Color(0.78, 0.62, 1.0, 1.0)
 is_boss = true
 special_attack = 4
-special_interval = 2.35
-warning_time = 0.68
-trigger_range = 760.0
-attack_radius = 155.0
-attack_speed = 670.0
-attack_duration = 0.68
+special_interval = 2.15
+warning_time = 0.60
+trigger_range = 800.0
+attack_radius = 165.0
+attack_speed = 700.0
+attack_duration = 0.70
 attack_damage = 34.0
 boss_guard_recharge_seconds = 52.0
 boss_guard_burst_fraction = 0.10
 boss_phase_duration = 2.2
-boss_radial_count = 18
-boss_fan_count = 5
-boss_projectile_speed = 275.0
-boss_phase_adds = 6
+boss_radial_count = 22
+boss_fan_count = 9
+boss_projectile_speed = 330.0
+boss_phase_adds = 8

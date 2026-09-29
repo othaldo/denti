@@ -8,7 +8,7 @@ Ein kleiner 2D-Arena-Survivor über einen göttlichen Zahn, der Plaque, Zucker u
 
 | Bosskampf am Arenarand | Levelaufstieg |
 | --- | --- |
-| [![Denti und der Karies-König an der oberen Arenamauer](docs/screenshots/bosskampf.png)](docs/screenshots/bosskampf.png) | [![Drei wählbare Boni beim Levelaufstieg](docs/screenshots/levelaufstieg.png)](docs/screenshots/levelaufstieg.png) |
+| [![Denti und der Karies-Graf an der oberen Arenamauer](docs/screenshots/bosskampf.png)](docs/screenshots/bosskampf.png) | [![Drei wählbare Boni beim Levelaufstieg](docs/screenshots/levelaufstieg.png)](docs/screenshots/levelaufstieg.png) |
 
 | Shop zwischen den Wellen | Hauptmenü |
 | --- | --- |
@@ -37,7 +37,7 @@ Zu Beginn wählst du eine Startwaffe. Im Kampf sammelst du XP und Münzen. Errei
 
 ## Was schon spielbar ist
 
-- **20 Wellen à 45 Sekunden** mit zunehmender Gegnerzahl und Stärke. In den Wellen 5, 10 und 15 wartet der Karies-König; Welle 20 endet mit dem Karies-Imperator. Bosse haben zwei kurze Schutzphasen mit angekündigten Projektilringen und Verstärkung. Sie kündigen außerdem Anstürme an, feuern danach Fächerschüsse, setzen Flächenpulse ein und werden bei halbem Leben schneller.
+- **20 Wellen à 45 Sekunden** mit zunehmender Gegnerzahl und Stärke. Die Boss-Dynastie steigert sich in Welle 5 vom **Karies-Grafen** über den **Karies-Prinzen** in Welle 10 und den **Karies-König** in Welle 15 bis zum **Karies-Imperator** in Welle 20. Jeder Rang hat ein eigenes Sprite und zunehmend dichtere Fächerschüsse, Projektilringe, schnellere Attacken und mehr Verstärkung. Bosse haben zwei kurze Schutzphasen, kündigen Anstürme an, setzen Flächenpulse ein und werden bei halbem Leben schneller.
 - **Vier normale Gegnertypen**, die schrittweise hinzukommen, darunter ein Säurespucker mit angekündigtem Fernangriff. Das zähe Zuckerstück kündigt ab Welle 7 einen langen Ansturm mit markiertem Einschlagbereich an. Jede Welle enthält mehrere zeitlich variierende Gegnergruppen; ab Welle 6 kommen zum Schluss zusätzliche Säurespucker. In späteren Wellen schießen sie dichtere Fächer. Einzelne Wellen bringen außerdem größere Themenhorden. Mehr Kills bedeuten in späten Wellen nicht mehr garantiert mehr XP und Münzen.
 - **Acht Waffen und 22 Shop-Items** für unterschiedliche Builds. Items können sich innerhalb ihrer Stapellimits ergänzen; der Shop bevorzugt gelegentlich Angebote mit passenden Eigenschaften zu deinem Build. Levelaufstiege verbessern acht Grundwerte. Waffenkarten zeigen Schaden, Angriffszeit und Reichweite der jeweiligen Stufe.
 - **Seltene Zahnfee-Kisten** mit höchstens einem normalen Zufallsfund pro Welle. Ihr Item und der Zerlegewert stehen beim Drop fest; die Entscheidung fällt nach der Welle.

@@ -59,7 +59,10 @@ func _run() -> void:
 		"res://data/enemies/plaque.tres",
 		"res://data/enemies/bacteria.tres",
 		"res://data/enemies/sugar.tres",
+		"res://data/enemies/cavity_count.tres",
+		"res://data/enemies/cavity_prince.tres",
 		"res://data/enemies/cavity_king.tres",
+		"res://data/enemies/cavity_emperor.tres",
 	]:
 		var enemy_data: EnemyData = load(path)
 		var sprite_enemy: Enemy = enemy_scene.instantiate()
@@ -215,7 +218,7 @@ func _run() -> void:
 			if not is_instance_valid(game.boss) or not game.get_node("HUD").boss_bar.visible:
 				_fail("boss wave did not spawn a visible boss")
 				return
-			var expected_boss: EnemyData = WaveController.FINAL_BOSS if expected_wave == WaveController.MAX_WAVES else WaveController.BOSS
+			var expected_boss: EnemyData = WaveController.boss_for_wave(expected_wave)
 			if game.boss.data != expected_boss:
 				_fail("boss wave spawned the wrong boss")
 				return

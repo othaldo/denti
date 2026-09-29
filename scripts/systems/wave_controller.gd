@@ -29,8 +29,13 @@ const PLAQUE: EnemyData = preload("res://data/enemies/plaque.tres")
 const BACTERIA: EnemyData = preload("res://data/enemies/bacteria.tres")
 const SUGAR: EnemyData = preload("res://data/enemies/sugar.tres")
 const ACID_SPITTER: EnemyData = preload("res://data/enemies/acid_spitter.tres")
-const BOSS: EnemyData = preload("res://data/enemies/cavity_king.tres")
-const FINAL_BOSS: EnemyData = preload("res://data/enemies/cavity_emperor.tres")
+const CAVITY_COUNT: EnemyData = preload("res://data/enemies/cavity_count.tres")
+const CAVITY_PRINCE: EnemyData = preload("res://data/enemies/cavity_prince.tres")
+const CAVITY_KING: EnemyData = preload("res://data/enemies/cavity_king.tres")
+const CAVITY_EMPEROR: EnemyData = preload("res://data/enemies/cavity_emperor.tres")
+# Compatibility aliases for older tests/tools that refer to the first and final boss.
+const BOSS: EnemyData = CAVITY_COUNT
+const FINAL_BOSS: EnemyData = CAVITY_EMPEROR
 
 var remaining: float = DURATION
 var spawn_cooldown: float = 0.0
@@ -48,6 +53,16 @@ func plan_hordes() -> void:
 
 static func is_boss_wave(wave_number: int) -> bool:
 	return wave_number > 0 and wave_number % MINI_BOSS_INTERVAL == 0
+
+
+static func boss_for_wave(wave_number: int) -> EnemyData:
+	if wave_number >= MAX_WAVES:
+		return CAVITY_EMPEROR
+	if wave_number >= 15:
+		return CAVITY_KING
+	if wave_number >= 10:
+		return CAVITY_PRINCE
+	return CAVITY_COUNT
 
 
 static func health_multiplier(data: EnemyData, wave_number: int) -> float:
@@ -81,10 +96,8 @@ func next_wave_preview() -> String:
 		details.append("Zuckerstück")
 	elif next_wave == 4:
 		details.append("Säurespucker")
-	if next_wave == MAX_WAVES:
-		details.append(FINAL_BOSS.display_name)
-	elif is_boss_wave(next_wave):
-		details.append(BOSS.display_name)
+	if is_boss_wave(next_wave):
+		details.append(boss_for_wave(next_wave).display_name)
 	if horde_waves.has(next_wave):
 		details.append("%s-Horde" % _horde_data(next_wave).display_name)
 	return "Welle %d: %s" % [next_wave, " · ".join(details)] if not details.is_empty() else "Nächste Welle: %d" % next_wave
@@ -100,7 +113,7 @@ func start_next_wave() -> void:
 	plan_bursts()
 	active = true
 	if is_boss_wave(current_wave):
-		boss_requested.emit(FINAL_BOSS if current_wave == MAX_WAVES else BOSS)
+		boss_requested.emit(boss_for_wave(current_wave))
 
 
 func _process(delta: float) -> void:
