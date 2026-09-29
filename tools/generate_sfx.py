@@ -63,6 +63,20 @@ def generate(name: str, duration: float, seed: int) -> None:
         elif name == "enemy_down":
             sound = 0.32 * chirp(time, 340.0, 105.0, duration) * math.exp(-20.0 * time)
             sound += 0.14 * ping(time, 0.025, 980.0, 31.0)
+        elif name == "boss_warning":
+            sound = 0.25 * chirp(time, 95.0, 250.0, duration) * math.exp(-1.2 * time)
+            sound += 0.11 * low_noise * math.sin(math.pi * time / duration)
+        elif name == "boss_charge":
+            sound = 0.36 * chirp(time, 440.0, 75.0, duration) * math.exp(-3.0 * time)
+            sound += 0.18 * airy_noise * math.exp(-8.0 * time)
+        elif name == "boss_pulse":
+            sound = 0.42 * chirp(time, 155.0, 48.0, duration) * math.exp(-5.0 * time)
+            sound += 0.13 * low_noise * math.exp(-12.0 * time)
+        elif name == "boss_break":
+            sound = 0.45 * chirp(time, 185.0, 42.0, duration) * math.exp(-4.5 * time)
+            sound += 0.27 * airy_noise * math.exp(-14.0 * time)
+            sound += 0.15 * ping(time, 0.08, 830.0, 8.0)
+            sound += 0.10 * ping(time, 0.22, 1240.0, 10.0)
         elif name == "pickup":
             sound = 0.29 * ping(time, 0.0, 890.0, 29.0)
             sound += 0.25 * ping(time, 0.068, 1320.0, 25.0)
@@ -90,6 +104,10 @@ if __name__ == "__main__":
         "drill_strike": 0.24,
         "acid_shot": 0.20,
         "enemy_down": 0.19,
+        "boss_warning": 0.52,
+        "boss_charge": 0.32,
+        "boss_pulse": 0.35,
+        "boss_break": 0.78,
         "pickup": 0.23,
     }.items():
         generate(cue, length, sum(ord(character) for character in cue))

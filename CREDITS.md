@@ -17,4 +17,4 @@
 
 Die sieben Stücke unter `assets/audio/` wurden von **othaldo** mit **Suno** erstellt: `main-manu.mp3`, `wave-1.mp3`, `wave-2.mp3`, `mini-boss-1.mp3`, `mini-boss-2.mp3`, `final-boss-1.mp3` und `final-boss-2.mp3`.
 
-Die kurzen Kampf- und Sammelgeräusche unter `assets/audio/sfx/` wurden für dieses Projekt synthetisiert. Der Generator liegt unter `tools/generate_sfx.py`; es werden dafür keine externen Soundeffekte verwendet.
+Die kurzen Kampf-, Boss- und Sammelgeräusche unter `assets/audio/sfx/` wurden für dieses Projekt synthetisiert. Der Generator liegt unter `tools/generate_sfx.py`; es werden dafür keine externen Soundeffekte verwendet.

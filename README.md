@@ -32,11 +32,11 @@ Das Projekt mit **Godot 4.4 oder neuer** öffnen und mit **F5** starten. Unter L
 | Escape | Pause, Stats und Optionen öffnen |
 | Maus | Waffen, Boni und Shopangebote wählen |
 
-Zu Beginn wählst du eine Startwaffe. Im Kampf sammelst du XP für einen von drei Stat-Boni und Münzen für den Shop. Dort kannst du Waffen und Items kaufen oder die drei Angebote neu würfeln. Waffen und Boni haben vier farblich markierte Stufen. Zwei gleiche Waffen derselben Stufe verschmelzen automatisch bis Stufe IV. Höheres Glück erhöht die Chance auf seltene Angebote und Boni; Waffen, die du schon trägst, erscheinen häufiger. Items können sich stapeln und bilden Kombinationen aus Blutung, Flächenschaden, Schild, Heilung und Münzgewinn. Unter **Escape → Items** siehst du den aktuellen Build. Alle Effekte stehen in der [Item-Übersicht](docs/items.md).
+Zu Beginn wählst du eine Startwaffe. Im Kampf sammelst du XP für einen von drei Stat-Boni und Münzen für den Shop. Am Wellenende fliegt verbliebene Beute erst zu Denti; danach folgen Levelaufstiege und Shop. Dort kannst du Waffen und Items kaufen oder die drei Angebote neu würfeln. Waffen und Boni haben vier farblich markierte Stufen. Zwei gleiche Waffen derselben Stufe verschmelzen automatisch bis Stufe IV. Höheres Glück erhöht die Chance auf seltene Angebote und Boni; Waffen, die du schon trägst, erscheinen häufiger. Items können sich stapeln und bilden Kombinationen aus Blutung, Flächenschaden, Schild, Heilung und Münzgewinn. Unter **Escape → Items** siehst du den aktuellen Build. Alle Effekte stehen in der [Item-Übersicht](docs/items.md).
 
 ## Was schon spielbar ist
 
-- **20 Wellen à 45 Sekunden** mit zunehmender Gegnerzahl und Stärke. In den Wellen 5, 10 und 15 wartet der Karies-König; Welle 20 endet mit dem Karies-Imperator.
+- **20 Wellen à 45 Sekunden** mit zunehmender Gegnerzahl und Stärke. In den Wellen 5, 10 und 15 wartet der Karies-König; Welle 20 endet mit dem Karies-Imperator. Die Bosse kündigen Anstürme auf dem Arenaboden an, setzen Flächenpulse ein und werden bei halbem Leben schneller.
 - **Vier normale Gegnertypen**, die schrittweise hinzukommen, darunter ein Säurespucker mit angekündigtem Fernangriff. Einzelne Wellen bringen zusätzlich Horden eines Typs.
 - **Acht Waffen und 18 Shop-Items** für unterschiedliche Builds. Items können sich innerhalb ihrer Stapellimits ergänzen; der Shop bevorzugt gelegentlich Angebote mit passenden Eigenschaften zu deinem Build. Levelaufstiege verbessern acht Grundwerte. Waffenkarten zeigen Schaden, Angriffszeit und Reichweite der jeweiligen Stufe.
 - Eine **scrollende Arena**, größer als der Bildschirm, mit Mauer und dunklem Außenbereich. Das kompakte HUD zeigt Leben, XP, Münzen, Welle und verbleibende Sekunden.

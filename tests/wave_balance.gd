@@ -55,12 +55,16 @@ func _run() -> void:
 	boss.special_timer = 0.0
 	var player_health: float = game.player.stats.health
 	boss._physics_process(0.01)
-	if boss.special_phase != Enemy.SpecialPhase.WARNING or game.player.stats.health != player_health:
+	if boss.special_phase != Enemy.SpecialPhase.WARNING or boss.boss_move != Enemy.BossMove.CHARGE or game.player.stats.health != player_health:
 		_fail("boss attack was not announced")
 		return
 	boss._physics_process(boss.data.warning_time)
+	if game.player.stats.health != player_health or boss.special_phase != Enemy.SpecialPhase.ACTIVE:
+		_fail("boss charge hit before its announced path became active")
+		return
+	boss._physics_process(boss.data.attack_duration)
 	if game.player.stats.health >= player_health:
-		_fail("announced boss attack did not hit")
+		_fail("announced boss charge did not hit")
 		return
 	game.player.stats.max_health = 10000.0
 	game.player.stats.health = 10000.0

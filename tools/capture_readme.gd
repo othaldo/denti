@@ -69,6 +69,8 @@ func _run() -> void:
 	paused = false
 	for frame in 6:
 		await physics_frame
+	game.boss.special_timer = 0.0
+	game.boss._physics_process(0.01)
 	paused = true
 	game._refresh_hud()
 	await _capture("bosskampf.png")

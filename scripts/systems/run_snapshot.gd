@@ -11,11 +11,16 @@ static func capture(game) -> Dictionary:
 			"type": enemy.data.resource_path, "position": _vector_data(enemy.position),
 			"health": enemy.health, "phase": enemy.special_phase,
 			"timer": enemy.special_timer, "direction": _vector_data(enemy.special_direction),
+			"boss_move": enemy.boss_move, "boss_charge_next": enemy.boss_charge_next,
+			"boss_dash_end": _vector_data(enemy.boss_dash_end), "boss_dash_origin": _vector_data(enemy.boss_dash_origin),
+			"dying": enemy.dying, "death_elapsed": enemy.death_elapsed, "enraged": enemy.is_enraged,
 			"bleed_stacks": enemy.bleed_stacks, "bleed_dps": enemy.bleed_dps,
 			"bleed_time": enemy.bleed_time, "bleed_tick": enemy.bleed_tick,
 		})
 	var loot_data: Array[Dictionary] = []
 	for drop: Loot in game.get_node("Loot").get_children():
+		if drop.is_queued_for_deletion():
+			continue
 		loot_data.append({"position": _vector_data(drop.position), "kind": str(drop.kind), "amount": drop.amount})
 	var acid_data: Array[Dictionary] = []
 	for projectile: AcidProjectile in game.get_node("EnemyProjectiles").get_children():
@@ -37,6 +42,7 @@ static func capture(game) -> Dictionary:
 		"items": game.items.save_data(),
 		"enemies": enemies_data, "loot": loot_data, "acid": acid_data,
 		"shop": game.in_shop, "intermission_pending": game.intermission_pending,
+		"collecting_wave_loot": game.collecting_wave_loot,
 		"offers": offer_data, "reroll_cost": game.shop.reroll_cost,
 		"upgrades": upgrades, "boss_pending": game.boss_pending,
 	}
@@ -81,14 +87,24 @@ static func restore(game, saved: Dictionary) -> void:
 			continue
 		game._create_enemy(enemy_data, _read_vector(entry.get("position", [0.0, 0.0])))
 		var enemy: Enemy = game.get_node("Enemies").get_child(-1)
-		enemy.health = clampf(float(entry.get("health", enemy.max_health)), 1.0, enemy.max_health)
+		enemy.dying = bool(entry.get("dying", false))
+		enemy.health = 0.0 if enemy.dying else clampf(float(entry.get("health", enemy.max_health)), 1.0, enemy.max_health)
 		enemy.special_phase = clampi(int(entry.get("phase", 0)), 0, 2) as Enemy.SpecialPhase
 		enemy.special_timer = maxf(float(entry.get("timer", 0.0)), 0.0)
 		enemy.special_direction = _read_vector(entry.get("direction", [0.0, 0.0]))
+		enemy.boss_move = clampi(int(entry.get("boss_move", Enemy.BossMove.PULSE)), 0, 1) as Enemy.BossMove
+		enemy.boss_charge_next = bool(entry.get("boss_charge_next", true))
+		enemy.boss_dash_end = _read_vector(entry.get("boss_dash_end", [0.0, 0.0]))
+		enemy.boss_dash_origin = _read_vector(entry.get("boss_dash_origin", [0.0, 0.0]))
+		enemy.death_elapsed = clampf(float(entry.get("death_elapsed", 0.0)), 0.0, Enemy.BOSS_DEATH_DURATION)
+		enemy.is_enraged = bool(entry.get("enraged", enemy.health <= enemy.max_health * 0.5 and enemy.data.is_boss))
+		if enemy.dying:
+			enemy.remove_from_group("enemies")
 		enemy.bleed_stacks = clampi(int(entry.get("bleed_stacks", 0)), 0, 3)
 		enemy.bleed_dps = maxf(float(entry.get("bleed_dps", 0.0)), 0.0)
 		enemy.bleed_time = maxf(float(entry.get("bleed_time", 0.0)), 0.0)
 		enemy.bleed_tick = clampf(float(entry.get("bleed_tick", 1.0)), 0.0, 1.0)
+		enemy.queue_redraw()
 	for entry in saved.get("loot", []):
 		var kind := StringName(str(entry.get("kind", "xp")))
 		if kind == &"xp" or kind == &"coin":
@@ -120,6 +136,9 @@ static func restore(game, saved: Dictionary) -> void:
 	game.intermission_pending = bool(saved.get("intermission_pending", false))
 	game.boss_pending = bool(saved.get("boss_pending", false))
 	game.starter_pending = bool(saved.get("starter_pending", false))
+	if bool(saved.get("collecting_wave_loot", false)):
+		game._begin_loot_collection()
+		return
 	if game.starter_pending:
 		game.choice_panel.show_starters(WeaponCatalog.STARTERS)
 		game.get_tree().paused = true

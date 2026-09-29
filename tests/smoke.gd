@@ -119,8 +119,15 @@ func _run() -> void:
 	var coins_before_wave_end: int = game.coins
 	game.get_node("WaveController").active = true
 	game.get_node("WaveController")._process(45.0)
+	if not game.collecting_wave_loot or game.get_node("ShopPanel").visible or game.coins != coins_before_wave_end:
+		_fail("wave end skipped the visible loot collection")
+		return
+	for frame in 120:
+		if game.get_node("ShopPanel").visible:
+			break
+		await physics_frame
 	if not paused or not game.get_node("ShopPanel").visible or game.coins != coins_before_wave_end + 2:
-		_fail("wave end did not open shop and collect remaining loot")
+		_fail("shop did not open after collecting remaining loot")
 		return
 	if game.get_node("Enemies").get_child_count() != 0 or game.get_node("Loot").get_child_count() != 0 or game.get_node("Projectiles").get_child_count() != 0:
 		_fail("wave transition did not clear the arena")
@@ -194,6 +201,10 @@ func _run() -> void:
 		return
 	game._spawn_loot(player.position + Vector2(50.0, 0.0), &"xp", 2)
 	game.wave._process(45.0)
+	for frame in 120:
+		if game.get_node("ChoicePanel").visible:
+			break
+		await physics_frame
 	if not paused or game.get_node("Enemies").get_child_count() != 0 or not game.get_node("ChoicePanel").visible:
 		_fail("wave two did not clear remaining enemies")
 		return
@@ -221,7 +232,9 @@ func _run() -> void:
 				_fail("mini-boss wave ended before the boss was defeated")
 				return
 			game.boss.take_damage(99999.0)
-			for frame in 3:
+			for frame in 120:
+				if game.get_node("ShopPanel").visible:
+					break
 				await process_frame
 		if expected_wave < WaveController.MAX_WAVES and not game.get_node("ShopPanel").visible:
 			_fail("shop missing between waves")
@@ -231,7 +244,9 @@ func _run() -> void:
 		return
 	var boss: Enemy = game.boss
 	boss.take_damage(99999.0)
-	for frame in 3:
+	for frame in 120:
+		if game.ended:
+			break
 		await process_frame
 	if not game.ended or not game.get_node("ChoicePanel").visible or game.get_node("ShopPanel").visible:
 		_fail("defeating the boss did not end in victory")

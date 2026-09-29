@@ -1,7 +1,7 @@
 class_name EnemyData
 extends Resource
 
-enum SpecialAttack { NONE, DASH, PULSE, SHOOT }
+enum SpecialAttack { NONE, DASH, PULSE, SHOOT, BOSS }
 
 @export var display_name: String
 @export var max_health: float = 25.0

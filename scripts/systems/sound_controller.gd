@@ -8,6 +8,10 @@ const FLOSS: AudioStreamWAV = preload("res://assets/audio/sfx/floss_swish.wav")
 const DRILL: AudioStreamWAV = preload("res://assets/audio/sfx/drill_strike.wav")
 const ACID: AudioStreamWAV = preload("res://assets/audio/sfx/acid_shot.wav")
 const DOWN: AudioStreamWAV = preload("res://assets/audio/sfx/enemy_down.wav")
+const BOSS_WARNING: AudioStreamWAV = preload("res://assets/audio/sfx/boss_warning.wav")
+const BOSS_CHARGE: AudioStreamWAV = preload("res://assets/audio/sfx/boss_charge.wav")
+const BOSS_PULSE: AudioStreamWAV = preload("res://assets/audio/sfx/boss_pulse.wav")
+const BOSS_BREAK: AudioStreamWAV = preload("res://assets/audio/sfx/boss_break.wav")
 const PICKUP: AudioStreamWAV = preload("res://assets/audio/sfx/pickup.wav")
 const VOICE_COUNT := 12
 
@@ -68,6 +72,10 @@ func _stream_for(cue: StringName) -> AudioStreamWAV:
 		&"drill": return DRILL
 		&"acid": return ACID
 		&"down": return DOWN
+		&"boss_warning": return BOSS_WARNING
+		&"boss_charge": return BOSS_CHARGE
+		&"boss_pulse": return BOSS_PULSE
+		&"boss_break": return BOSS_BREAK
 		&"pickup": return PICKUP
 	return null
 
@@ -77,4 +85,7 @@ func _volume_for(cue: StringName) -> float:
 		&"drill", &"acid", &"pickup": return -8.0
 		&"floss", &"down": return -6.0
 		&"hit": return -5.0
+		&"boss_warning": return -5.0
+		&"boss_charge", &"boss_pulse": return -3.0
+		&"boss_break": return -1.0
 	return -3.0

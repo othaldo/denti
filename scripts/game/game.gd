@@ -40,7 +40,10 @@ var intermission_pending: bool = false
 var starter_pending: bool = false
 var boss: Enemy
 var boss_pending: bool = false
+var collecting_wave_loot: bool = false
+var wave_loot_remaining: int = 0
 var autosave_timer: float = 0.0
+var camera_shake_time: float = 0.0
 
 
 func _ready() -> void:
@@ -90,6 +93,13 @@ func _on_starter_chosen(weapon: WeaponData) -> void:
 
 func _process(delta: float) -> void:
 	_refresh_hud()
+	var camera: Camera2D = player.get_node("Camera2D")
+	if camera_shake_time > 0.0:
+		camera_shake_time = maxf(camera_shake_time - delta, 0.0)
+		var strength := 13.0 * camera_shake_time / 0.45
+		camera.offset = Vector2(randf_range(-strength, strength), randf_range(-strength, strength))
+	else:
+		camera.offset = Vector2.ZERO
 	if not ended and (wave.active or boss_pending):
 		autosave_timer += delta
 		if autosave_timer >= 8.0:
@@ -98,7 +108,7 @@ func _process(delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel") and not ended and not choice_panel.visible and not shop_panel.visible and not game_menu.visible:
+	if event.is_action_pressed("ui_cancel") and not ended and not collecting_wave_loot and not choice_panel.visible and not shop_panel.visible and not game_menu.visible:
 		get_viewport().set_input_as_handled()
 		game_menu.open_pause()
 
@@ -110,7 +120,7 @@ func _notification(what: int) -> void:
 
 func _refresh_hud() -> void:
 	var visible_boss: Enemy = boss if is_instance_valid(boss) else null
-	hud.update_status(player.stats, xp, xp_goal, level, coins, wave.current_wave, wave.remaining, in_shop, visible_boss, boss_pending)
+	hud.update_status(player.stats, xp, xp_goal, level, coins, wave.current_wave, wave.remaining, in_shop, visible_boss, boss_pending, collecting_wave_loot)
 
 
 func _spawn_enemy(data: EnemyData) -> void:
@@ -171,13 +181,17 @@ func _create_enemy(data: EnemyData, at: Vector2) -> void:
 	enemy.damaged.connect(_on_enemy_damaged)
 	enemy.weapon_hit.connect(items.on_weapon_hit)
 	enemy.attack_performed.connect(sound.play_cue)
+	if data.is_boss:
+		enemy.death_started.connect(_on_boss_death_started)
+		enemy.enraged.connect(_on_boss_enraged)
 	$Enemies.add_child(enemy)
 	if data.is_boss:
 		boss = enemy
 
 
 func _on_enemy_defeated(at: Vector2, data: EnemyData) -> void:
-	sound.play_cue(&"down")
+	if not data.is_boss:
+		sound.play_cue(&"down")
 	coins += items.on_kill(at, data.is_boss)
 	if data.is_boss:
 		boss = null
@@ -189,6 +203,17 @@ func _on_enemy_defeated(at: Vector2, data: EnemyData) -> void:
 	_spawn_loot(at + Vector2(-11.0, 0.0), &"xp", data.xp_drop)
 	if data.coin_drop > 0 and randf() < data.coin_drop_chance:
 		_spawn_loot(at + Vector2(11.0, 0.0), &"coin", data.coin_drop)
+
+
+func _on_boss_death_started(_at: Vector2) -> void:
+	sound.play_cue(&"boss_break")
+	camera_shake_time = 0.45
+
+
+func _on_boss_enraged(at: Vector2) -> void:
+	sound.play_cue(&"boss_warning")
+	_show_item_feedback("KÖNIG IN RAGE!", at, Color(1.0, 0.39, 0.27))
+	camera_shake_time = 0.25
 
 
 func _spawn_loot(at: Vector2, kind: StringName, amount: int) -> void:
@@ -206,7 +231,12 @@ func _on_loot_collected(kind: StringName, amount: int) -> void:
 		coins += amount + bonus
 	else:
 		xp += amount + bonus
-		_check_level_up()
+		if not collecting_wave_loot:
+			_check_level_up()
+	if collecting_wave_loot:
+		wave_loot_remaining = maxi(wave_loot_remaining - 1, 0)
+		if wave_loot_remaining == 0:
+			call_deferred("_finish_loot_collection")
 
 
 func _on_enemy_damaged(at: Vector2, amount: float) -> void:
@@ -265,33 +295,52 @@ func _on_wave_finished(wave_number: int) -> void:
 	if WaveController.is_boss_wave(wave_number):
 		if is_instance_valid(boss):
 			boss_pending = true
-			_clear_arena(true, true)
+			_clear_combat(true)
 			_sync_music()
 			_refresh_hud()
 			_save_run()
 			return
-		if wave_number >= WaveController.MAX_WAVES:
-			_finish_run()
-			_refresh_hud()
-			return
-	_clear_arena(true)
-	intermission_pending = true
+	_clear_combat()
 	_sync_music()
-	if _check_level_up():
-		return
-	_open_shop()
+	_begin_loot_collection()
 
 
 func _resolve_boss_wave() -> void:
 	if ended or not boss_pending:
 		return
 	boss_pending = false
+	_clear_combat()
+	_sync_music()
+	_begin_loot_collection()
+
+
+func _begin_loot_collection() -> void:
+	if collecting_wave_loot or ended:
+		return
+	collecting_wave_loot = true
+	player.velocity = Vector2.ZERO
+	player.set_physics_process(false)
+	wave_loot_remaining = 0
+	for drop: Loot in $Loot.get_children():
+		if drop.is_queued_for_deletion():
+			continue
+		wave_loot_remaining += 1
+		drop.begin_wave_collection()
+	_refresh_hud()
+	_save_run()
+	if wave_loot_remaining == 0:
+		_finish_loot_collection()
+
+
+func _finish_loot_collection() -> void:
+	if not collecting_wave_loot or wave_loot_remaining > 0 or ended:
+		return
+	collecting_wave_loot = false
+	player.set_physics_process(true)
 	if wave.current_wave >= WaveController.MAX_WAVES:
 		_finish_run()
 		return
-	_clear_arena(true)
 	intermission_pending = true
-	_sync_music()
 	if _check_level_up():
 		return
 	_open_shop()
@@ -299,6 +348,8 @@ func _resolve_boss_wave() -> void:
 
 func _clear_arena(collect_drops: bool, keep_boss: bool = false) -> void:
 	for drop in $Loot.get_children():
+		if drop.is_queued_for_deletion():
+			continue
 		if collect_drops:
 			var bonus := items.on_pickup(drop.kind, drop.amount)
 			if drop.kind == &"coin":
@@ -306,6 +357,10 @@ func _clear_arena(collect_drops: bool, keep_boss: bool = false) -> void:
 			else:
 				xp += drop.amount + bonus
 		drop.free()
+	_clear_combat(keep_boss)
+
+
+func _clear_combat(keep_boss: bool = false) -> void:
 	for enemy in $Enemies.get_children():
 		if keep_boss and enemy == boss:
 			continue
