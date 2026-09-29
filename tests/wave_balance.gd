@@ -1,6 +1,8 @@
 extends SceneTree
 
 var spawn_count: int = 0
+var burst_count: int = 0
+var burst_types: Array[String] = []
 var attack_counts: Dictionary = {}
 
 
@@ -12,21 +14,32 @@ func _run() -> void:
 	root.size = Vector2i(1280, 720)
 	var wave := WaveController.new()
 	wave.enemy_requested.connect(_count_spawn)
-	wave.current_wave = 1
-	wave.remaining = WaveController.DURATION
-	wave.active = true
+	wave.horde_requested.connect(_count_horde)
+	wave.start_next_wave()
 	for frame in 2700:
 		wave._process(1.0 / 60.0)
 	var early_count := spawn_count
+	var early_bursts := burst_count
 	spawn_count = 0
-	wave.current_wave = 10
-	wave.remaining = WaveController.DURATION
-	wave.spawn_cooldown = 0.0
-	wave.active = true
+	burst_count = 0
+	burst_types.clear()
+	wave.current_wave = 9
+	wave.start_next_wave()
 	for frame in 2700:
 		wave._process(1.0 / 60.0)
-	if early_count < 35 or spawn_count < early_count * 1.5:
-		_fail("enemy density does not grow across waves")
+	var middle_count := spawn_count
+	if early_count < 55 or middle_count < 125 or middle_count < early_count * 2 or early_bursts != 2 or burst_count != 3 or not burst_types.has("Säurespucker"):
+		_fail("early and middle waves lack frequent mixed pressure: %d / %d enemies, %d / %d bursts" % [early_count, middle_count, early_bursts, burst_count])
+		return
+	spawn_count = 0
+	burst_count = 0
+	wave.current_wave = 19
+	wave.start_next_wave()
+	for frame in 2700:
+		wave._process(1.0 / 60.0)
+	var late_count := spawn_count
+	if late_count < 175 or late_count < middle_count * 1.3:
+		_fail("late waves do not grow beyond middle-wave pressure: %d / %d" % [middle_count, late_count])
 		return
 	var session: Node = root.get_node("GameSession")
 	session.save_path = "user://test_wave_balance_run.json"
@@ -85,17 +98,23 @@ func _run() -> void:
 	game.boss = null
 	for index in 130:
 		game._spawn_enemy(WaveController.PLAQUE)
-	if game.get_node("Enemies").get_child_count() != game.MAX_ACTIVE_ENEMIES:
+	if game.get_node("Enemies").get_child_count() != game.MAX_ACTIVE_ENEMIES or game.telemetry.wave_spawns_blocked < 20:
 		_fail("active enemy cap did not protect late-wave performance")
 		return
 	wave.free()
 	session.clear_run()
-	print("Denti wave balance test passed; wave 1: %d, wave 10: %d, mini-boss: %.1fs" % [early_count, spawn_count, float(frames) / 60.0])
+	print("Denti wave balance test passed; wave 1: %d, wave 10: %d, wave 20: %d, mini-boss: %.1fs" % [early_count, middle_count, late_count, float(frames) / 60.0])
 	quit(0)
 
 
 func _count_spawn(_data: EnemyData) -> void:
 	spawn_count += 1
+
+
+func _count_horde(data: EnemyData, count: int) -> void:
+	spawn_count += count
+	burst_count += 1
+	burst_types.append(data.display_name)
 
 
 func _record_attack(kind: StringName) -> void:

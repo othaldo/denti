@@ -30,15 +30,17 @@ Das Projekt mit **Godot 4.4 oder neuer** öffnen und mit **F5** starten. Unter L
 | --- | --- |
 | WASD oder Pfeiltasten | Denti bewegen |
 | Escape | Pause, Stats und Optionen öffnen |
+| F3 (Debug-Build) | Kampf-Telemetrie ein- und ausblenden |
 | Maus | Waffen, Boni und Shopangebote wählen |
 
-Zu Beginn wählst du eine Startwaffe. Im Kampf sammelst du XP für einen von drei Stat-Boni und Münzen für den Shop. Am Wellenende fliegt verbliebene Beute erst zu Denti; danach folgen Levelaufstiege und Shop. Dort kannst du Waffen und Items kaufen oder die drei Angebote neu würfeln. Waffen und Boni haben vier farblich markierte Stufen. Zwei gleiche Waffen derselben Stufe verschmelzen automatisch bis Stufe IV. Höheres Glück erhöht die Chance auf seltene Angebote und Boni; Waffen, die du schon trägst, erscheinen häufiger. Items können sich stapeln und bilden Kombinationen aus Blutung, Flächenschaden, Schild, Heilung und Münzgewinn. Unter **Escape → Items** siehst du den aktuellen Build. Alle Effekte stehen in der [Item-Übersicht](docs/items.md).
+Zu Beginn wählst du eine Startwaffe. Im Kampf sammelst du XP und Münzen. Erreichte Level werden vorgemerkt, ohne die Welle anzuhalten. Selten kann eine Zahnfee-Kiste fallen; auch ihr Einsammeln unterbricht den Kampf nicht. Am Wellenende fliegt verbliebene Beute erst zu Denti. Danach wählst du für jedes erreichte Level einen von drei Stat-Boni und entscheidest bei jeder Kiste, ob du das Item behältst oder für Münzen zerlegst. Erst dann öffnet der Shop. Dort kannst du Waffen und Items kaufen oder die drei Angebote neu würfeln. Waffen und Boni haben vier farblich markierte Stufen. Zwei gleiche Waffen derselben Stufe verschmelzen automatisch bis Stufe IV. Höheres Glück erhöht innerhalb fester Grenzen die Chance auf Kisten, seltene Angebote und Boni; Waffen, die du schon trägst, erscheinen häufiger. Items können sich stapeln und bilden Kombinationen aus Blutung, Flächenschaden, Schild, Heilung und Münzgewinn. Unter **Escape → Items** siehst du den aktuellen Build. Alle Effekte stehen in der [Item-Übersicht](docs/items.md).
 
 ## Was schon spielbar ist
 
-- **20 Wellen à 45 Sekunden** mit zunehmender Gegnerzahl und Stärke. In den Wellen 5, 10 und 15 wartet der Karies-König; Welle 20 endet mit dem Karies-Imperator. Die Bosse kündigen Anstürme auf dem Arenaboden an, setzen Flächenpulse ein und werden bei halbem Leben schneller.
-- **Vier normale Gegnertypen**, die schrittweise hinzukommen, darunter ein Säurespucker mit angekündigtem Fernangriff. Einzelne Wellen bringen zusätzlich Horden eines Typs.
-- **Acht Waffen und 18 Shop-Items** für unterschiedliche Builds. Items können sich innerhalb ihrer Stapellimits ergänzen; der Shop bevorzugt gelegentlich Angebote mit passenden Eigenschaften zu deinem Build. Levelaufstiege verbessern acht Grundwerte. Waffenkarten zeigen Schaden, Angriffszeit und Reichweite der jeweiligen Stufe.
+- **20 Wellen à 45 Sekunden** mit zunehmender Gegnerzahl und Stärke. In den Wellen 5, 10 und 15 wartet der Karies-König; Welle 20 endet mit dem Karies-Imperator. Bosse haben zwei kurze Schutzphasen mit angekündigten Projektilringen und Verstärkung. Sie kündigen außerdem Anstürme an, feuern danach Fächerschüsse, setzen Flächenpulse ein und werden bei halbem Leben schneller.
+- **Vier normale Gegnertypen**, die schrittweise hinzukommen, darunter ein Säurespucker mit angekündigtem Fernangriff. Das zähe Zuckerstück kündigt ab Welle 7 einen langen Ansturm mit markiertem Einschlagbereich an. Jede Welle enthält mehrere zeitlich variierende Gegnergruppen; ab Welle 6 kommen zum Schluss zusätzliche Säurespucker. In späteren Wellen schießen sie dichtere Fächer. Einzelne Wellen bringen außerdem größere Themenhorden. Mehr Kills bedeuten in späten Wellen nicht mehr garantiert mehr XP und Münzen.
+- **Acht Waffen und 22 Shop-Items** für unterschiedliche Builds. Items können sich innerhalb ihrer Stapellimits ergänzen; der Shop bevorzugt gelegentlich Angebote mit passenden Eigenschaften zu deinem Build. Levelaufstiege verbessern acht Grundwerte. Waffenkarten zeigen Schaden, Angriffszeit und Reichweite der jeweiligen Stufe.
+- **Seltene Zahnfee-Kisten** mit höchstens einem normalen Zufallsfund pro Welle. Ihr Item und der Zerlegewert stehen beim Drop fest; die Entscheidung fällt nach der Welle.
 - Eine **scrollende Arena**, größer als der Bildschirm, mit Mauer und dunklem Außenbereich. Das kompakte HUD zeigt Leben, XP, Münzen, Welle und verbleibende Sekunden.
 - Automatisches Speichern während des Laufs. **Fortsetzen** lädt ihn auch nach einem Neustart; ein neues Spiel fragt vor dem Überschreiben nach.
 - Musik für Menü, Wellen und Bosse, Kampfgeräusche sowie Regler für Gesamt-, Musik- und SFX-Lautstärke. Eine FPS-Anzeige lässt sich einschalten.
@@ -48,6 +50,8 @@ Das Spiel ist ein **spielbarer Prototyp**. Balancing, Effekte und weitere Inhalt
 Die aktuelle Entwicklungsrichtung für v0.2 ist **Pressure + Build Depth**: mehr Gegnerdruck, häufigere Horden, Bullet-Hell-Muster, besseres Boss-Balancing, seltene Item-Kisten mit Behalten/Scrappen und deutlich mehr Synergien. Details stehen in der [v0.2-Roadmap](docs/ROADMAP.md).
 
 ## Entwicklung
+
+Mit **F3** zeigt ein Debug-Build rollenden DPS, Kills pro Sekunde, Gegnerdichte, Spawns, durch das Gegnerlimit blockierte Spawns, erlittenen Schaden, Boss-Kampfzeit und Wellenbeute. Die zugrunde liegenden Run-Werte einschließlich Waffen- und Item-Schadensquellen bleiben beim Fortsetzen erhalten und bilden die Grundlage für die spätere Abschlussübersicht. Nach Sieg oder Tod wird zusätzlich ein JSON-Bericht mit Werten pro Welle unter `user://run_reports/` gespeichert. Jeder Wellenwert enthält auch die mittlere und höchste Zahl gleichzeitig lebender Gegner, das Maximum feindlicher Projektile und die Kistenentscheidungen.
 
 Nach dem ersten Godot-Import lassen sich die Tests so ausführen:
 

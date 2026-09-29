@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/items/conductive_varnish.png" id="2"]
+[resource]
+script = ExtResource("1")
+id = &"conductive_varnish"
+icon_index = 3
+icon_texture = ExtResource("2")
+display_name = "Leitlack"
+description = "Wasser macht nass: +18 % Wasser/Licht, längere Ketten. -8 Tempo."
+rarity_tier = 2
+price = 9
+stat_changes = { &"move_speed": -8.0 }
+effect_kind = &"conductive_wet"
+effect_value = 0.18
+max_stacks = 2
+tags = Array[StringName]([&"ranged", &"area"])

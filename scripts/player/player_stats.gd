@@ -4,6 +4,8 @@ extends Node
 signal changed
 signal died
 signal shield_blocked
+signal damage_taken(amount: float)
+signal healed(amount: float, overheal: float)
 
 var max_health: float = 100.0
 var health: float = 100.0
@@ -61,6 +63,7 @@ func take_damage(amount: float) -> float:
 	var before := health
 	health = maxf(health - maxf(amount - armor, 1.0), 0.0)
 	changed.emit()
+	damage_taken.emit(before - health)
 	if health <= 0.0:
 		died.emit()
 	return before - health
@@ -68,9 +71,12 @@ func take_damage(amount: float) -> float:
 
 func heal(amount: float) -> float:
 	var before := health
-	health = minf(health + maxf(amount, 0.0), max_health)
+	var requested := maxf(amount, 0.0)
+	health = minf(health + requested, max_health)
 	if health > before:
 		changed.emit()
+	if requested > 0.0:
+		healed.emit(health - before, maxf(requested - (health - before), 0.0))
 	return health - before
 
 

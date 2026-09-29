@@ -14,6 +14,10 @@ var pierces_left: int = 0
 var hit_ids: Array[int] = []
 var items: ItemInventory
 var critical: bool = false
+var return_factor: float = 0.0
+var returning: bool = false
+var return_rearmed: bool = false
+var return_hits_left: int = 0
 
 
 func launch(start: Vector2, aim: Vector2, attack_damage: float, weapon: WeaponData, inventory: ItemInventory = null, is_critical: bool = false) -> void:
@@ -24,6 +28,7 @@ func launch(start: Vector2, aim: Vector2, attack_damage: float, weapon: WeaponDa
 	items = inventory
 	critical = is_critical
 	pierces_left = weapon.pierce
+	return_factor = inventory.projectile_return_factor() if inventory != null and weapon.splash_radius <= 0.0 else 0.0
 
 
 func _physics_process(delta: float) -> void:
@@ -34,12 +39,23 @@ func _physics_process(delta: float) -> void:
 			queue_free()
 		return
 	animation_time += delta
+	if returning:
+		if items == null or global_position.distance_to(items.player.global_position) <= 24.0:
+			queue_free()
+			return
+		direction = global_position.direction_to(items.player.global_position)
 	var step := direction * data.projectile_speed * delta
 	global_position += step
 	traveled += step.length()
 	if traveled >= data.attack_range + 40.0:
-		queue_free()
+		if return_factor > 0.0 and not returning:
+			_start_return()
+		else:
+			queue_free()
 		return
+	if returning and not return_rearmed and traveled >= 32.0:
+		hit_ids.clear()
+		return_rearmed = true
 	for node in get_tree().get_nodes_in_group("enemies"):
 		var enemy := node as Enemy
 		if enemy == null or hit_ids.has(enemy.get_instance_id()):
@@ -53,10 +69,28 @@ func _physics_process(delta: float) -> void:
 		if data.knockback > 0.0:
 			enemy.global_position += direction * data.knockback * (1.0 - enemy.data.knockback_resistance)
 		enemy.take_damage(data.damage_against(enemy, items.modify_damage(enemy, data, damage) if items != null else damage), data, critical)
+		if returning:
+			return_hits_left -= 1
+			if return_hits_left <= 0:
+				impact_time = IMPACT_DURATION
+				break
+			continue
 		if pierces_left <= 0:
-			impact_time = IMPACT_DURATION
+			if return_factor > 0.0:
+				_start_return()
+			else:
+				impact_time = IMPACT_DURATION
 			break
 		pierces_left -= 1
+	queue_redraw()
+
+
+func _start_return() -> void:
+	returning = true
+	traveled = 0.0
+	damage *= return_factor
+	critical = false
+	return_hits_left = maxi(roundi(return_factor / 0.35), 1)
 	queue_redraw()
 
 

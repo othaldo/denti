@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"bleeding_hourglass"
+icon_index = 20
+display_name = "Blutungsuhr"
+description = "Blutung hält +1 s und stapelt einmal mehr. -4 Schaden."
+rarity_tier = 2
+price = 9
+stat_changes = { &"damage": -4.0 }
+effect_kind = &"bleed_clock"
+effect_value = 1.0
+max_stacks = 2
+tags = Array[StringName]([&"bleed", &"melee"])

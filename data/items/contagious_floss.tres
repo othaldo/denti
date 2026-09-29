@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/items/contagious_floss.png" id="2"]
+[resource]
+script = ExtResource("1")
+id = &"contagious_floss"
+icon_index = 10
+icon_texture = ExtResource("2")
+display_name = "Ansteckende Zahnseide"
+description = "Kill auf blutendem Ziel: Blutung springt über. -3 Schaden."
+rarity_tier = 2
+price = 8
+stat_changes = { &"damage": -3.0 }
+effect_kind = &"bleed_spread"
+effect_value = 55.0
+max_stacks = 2
+tags = Array[StringName]([&"melee", &"bleed", &"area"])

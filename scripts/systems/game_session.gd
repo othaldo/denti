@@ -5,6 +5,7 @@ signal fps_display_changed(enabled: bool)
 const SAVE_VERSION := 1
 
 var save_path: String = "user://run_save.json"
+var report_dir: String = "user://run_reports"
 var settings_path: String = "user://settings.cfg"
 var resume_requested: bool = false
 var master_volume_percent: int = 100
@@ -54,6 +55,20 @@ func save_run(data: Dictionary) -> void:
 func clear_run() -> void:
 	if FileAccess.file_exists(save_path):
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(save_path))
+
+
+func save_run_report(report: Dictionary) -> String:
+	var directory := ProjectSettings.globalize_path(report_dir)
+	if DirAccess.make_dir_recursive_absolute(directory) != OK:
+		push_warning("Run-Bericht konnte nicht gespeichert werden: %s" % directory)
+		return ""
+	var path := "%s/run_%d_%d.json" % [report_dir, int(Time.get_unix_time_from_system()), Time.get_ticks_usec()]
+	var file := FileAccess.open(path, FileAccess.WRITE)
+	if file == null:
+		push_warning("Run-Bericht konnte nicht gespeichert werden: %s" % path)
+		return ""
+	file.store_string(JSON.stringify(report, "\t"))
+	return path
 
 
 func set_master_volume(value: int) -> void:

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"sugar_shock"
+icon_index = 27
+display_name = "Zuckerschock"
+description = "Alle 12 Kills: 4 s schneller, dann 3 s langsamer. -10 Leben."
+rarity_tier = 3
+price = 13
+stat_changes = { &"max_health": -10.0 }
+effect_kind = &"sugar_rush"
+effect_value = 0.30
+max_stacks = 2
+tags = Array[StringName]([&"mobility", &"risk", &"crit"])

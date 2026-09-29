@@ -18,6 +18,8 @@ const ICONS: Script = preload("res://scripts/ui/denti_ui_icons.gd")
 @onready var boss_bar: ProgressBar = $Root/WaveInfo/BossArea/BossHealth
 @onready var fps_panel: Panel = $Root/FPSPanel
 @onready var fps_label: Label = $Root/FPSPanel/FPS
+@onready var telemetry_panel: Panel = $Root/TelemetryPanel
+@onready var telemetry_label: Label = $Root/TelemetryPanel/Telemetry
 @onready var session: Node = get_node("/root/GameSession")
 
 var fps_refresh_time: float = 0.0
@@ -28,6 +30,7 @@ func _ready() -> void:
 	DentiUIStyle.style_hud_panel($Root/VitalsFrame)
 	DentiUIStyle.style_hud_panel(wave_frame)
 	DentiUIStyle.style_hud_panel(fps_panel)
+	DentiUIStyle.style_hud_panel(telemetry_panel)
 	var light_outline := DentiUIStyle.CREAM
 	DentiUIStyle.style_hud_text(health_label, DentiUIStyle.INK, 15, 3, light_outline)
 	DentiUIStyle.style_hud_text(xp_label, DentiUIStyle.INK, 14, 3, light_outline)
@@ -37,6 +40,7 @@ func _ready() -> void:
 	DentiUIStyle.style_hud_text(timer_label, DentiUIStyle.INK, 30, 4, light_outline)
 	DentiUIStyle.style_hud_text(boss_label, DentiUIStyle.INK, 15, 3, light_outline)
 	DentiUIStyle.style_hud_text(fps_label, DentiUIStyle.INK, 15, 2, light_outline)
+	DentiUIStyle.style_hud_text(telemetry_label, DentiUIStyle.INK, 14, 1, light_outline)
 	DentiUIStyle.style_progress(health_bar, DentiUIStyle.CORAL)
 	DentiUIStyle.style_progress(xp_bar, DentiUIStyle.MINT)
 	DentiUIStyle.style_progress(boss_bar, DentiUIStyle.CORAL)
@@ -65,13 +69,28 @@ func _set_fps_visible(enabled: bool) -> void:
 	fps_refresh_time = 0.0
 
 
-func update_status(stats: PlayerStats, xp: int, xp_goal: int, level: int, coins: int, wave_number: int, remaining: float, in_shop: bool, boss: Enemy, boss_pending: bool, collecting_loot: bool = false) -> void:
+func toggle_telemetry() -> void:
+	telemetry_panel.visible = not telemetry_panel.visible
+
+
+func update_telemetry(stats: RunTelemetry, enemies_alive: int, projectiles_alive: int) -> void:
+	if not telemetry_panel.visible:
+		return
+	telemetry_label.text = "DEBUG · WELLE %d\nDPS 10 s: %.1f  ·  Peak: %.1f\nKills/s: %.1f  ·  Kills: %d\nGegner: %d  ·  Spawns: %d (%.0f/min)\nAm Limit geblockt: %d\nProjektile: %d\nSchaden/min: %.1f  ·  Total: %.0f\nBoss-TTK: %.1f s\nMünzen/XP: %d / %d\nRun-Schaden: %.0f" % [
+		stats.current_wave, stats.recent_dps(), stats.peak_dps,
+		stats.recent_kps(), stats.kills, enemies_alive, stats.wave_spawns, stats.spawns_per_minute(),
+		stats.wave_spawns_blocked, projectiles_alive, stats.taken_per_minute(), stats.damage_taken,
+		stats.last_boss_ttk, stats.wave_coins, stats.wave_xp, stats.total_damage,
+	]
+
+
+func update_status(stats: PlayerStats, xp: int, xp_goal: int, level: int, coins: int, wave_number: int, remaining: float, in_shop: bool, boss: Enemy, boss_pending: bool, collecting_loot: bool = false, pending_levels: int = 0) -> void:
 	health_label.text = "%d / %d · Schild %d" % [ceili(stats.health), ceili(stats.max_health), stats.shield_charges] if stats.shield_charges > 0 else "%d / %d" % [ceili(stats.health), ceili(stats.max_health)]
 	health_bar.max_value = stats.max_health
 	health_bar.value = stats.health
 	xp_label.text = "%d / %d" % [xp, xp_goal]
 	coins_label.text = "%d" % coins
-	level_label.text = "Lv. %d" % level
+	level_label.text = "Lv. %d (+%d)" % [level, pending_levels] if pending_levels > 0 else "Lv. %d" % level
 	wave_label.text = "WELLE %d" % wave_number
 	var seconds := ceili(remaining)
 	if boss_pending:

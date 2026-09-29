@@ -18,13 +18,16 @@ var hurt_time: float = 0.0
 var animation_time: float = 0.0
 var attack_time: float = 0.0
 var attack_direction: Vector2 = Vector2.RIGHT
+var is_moving: bool = false
 
 
 func _physics_process(delta: float) -> void:
 	var direction := Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	var before_move := global_position
 	velocity = direction * stats.move_speed
 	move_and_slide()
 	global_position = global_position.clamp(Vector2.ONE * DentiArena.PLAYER_MARGIN, arena.arena_size - Vector2.ONE * DentiArena.PLAYER_MARGIN)
+	is_moving = global_position.distance_squared_to(before_move) > 0.01
 	_animate_sprite(direction, delta)
 	if hurt_time > 0.0:
 		hurt_time -= delta

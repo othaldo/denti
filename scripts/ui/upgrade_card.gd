@@ -47,6 +47,19 @@ func show_weapon(weapon: WeaponData) -> void:
 	DentiUIStyle.style_card(self)
 
 
+func show_item(item: ShopOfferData) -> void:
+	custom_minimum_size.y = 210.0
+	text = ""
+	content.visible = true
+	icon_rect.texture = item.icon_texture if item.icon_texture != null else ICONS.item(item.icon_index)
+	name_label.text = item.display_name.to_upper()
+	rarity_label.text = "STUFE %d · %s" % [item.rarity_tier, DentiRarity.name_for(item.rarity_tier).to_upper()]
+	DentiUIStyle.style_rarity_label(rarity_label, item.rarity_tier)
+	effect_label.text = "BEHALTEN\n%s" % item.description
+	disabled = false
+	DentiUIStyle.style_card(self, item.rarity_tier)
+
+
 func show_action(action_name: String, accent: bool = false) -> void:
 	custom_minimum_size.y = 60.0
 	content.visible = false

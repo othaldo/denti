@@ -9,16 +9,22 @@ signal wave_finished(wave_number: int)
 const DURATION := 45.0
 const MAX_WAVES := 20
 const MINI_BOSS_INTERVAL := 5
-const SPAWN_INTERVAL_START := 1.4
-const SPAWN_INTERVAL_WAVE_STEP := 0.055
+const SPAWN_INTERVAL_START := 1.25
+const SPAWN_INTERVAL_WAVE_STEP := 0.06
 const SPAWN_INTERVAL_ACCELERATION := 0.012
-const SPAWN_INTERVAL_MIN := 0.35
+const SPAWN_INTERVAL_MIN := 0.30
 const MOB_HEALTH_WAVE_STEP := 0.17
 const BOSS_HEALTH_WAVE_STEP := 0.27
 const MOB_DEFENSE_WAVE_STEP := 0.01
 const BOSS_DEFENSE_WAVE_STEP := 0.006
 const MAX_DAMAGE_REDUCTION := 0.42
 const ENEMY_DAMAGE_WAVE_STEP := 0.06
+const LOOT_CHANCE_WAVE_STEP := 0.035
+const LOOT_CHANCE_MIN := 0.45
+const ACID_VOLLEY_WAVE_3 := 7
+const ACID_VOLLEY_WAVE_5 := 14
+const RANGED_INTERVAL_WAVE_STEP := 0.025
+const RANGED_INTERVAL_MIN := 0.65
 const PLAQUE: EnemyData = preload("res://data/enemies/plaque.tres")
 const BACTERIA: EnemyData = preload("res://data/enemies/bacteria.tres")
 const SUGAR: EnemyData = preload("res://data/enemies/sugar.tres")
@@ -32,6 +38,8 @@ var active: bool = false
 var current_wave: int = 0
 var horde_waves: Array[int] = []
 var horde_spawned: bool = false
+var burst_times: Array[float] = []
+var burst_index: int = 0
 
 
 func plan_hordes() -> void:
@@ -50,6 +58,18 @@ static func health_multiplier(data: EnemyData, wave_number: int) -> float:
 static func damage_reduction(data: EnemyData, wave_number: int) -> float:
 	var step := BOSS_DEFENSE_WAVE_STEP if data.is_boss else MOB_DEFENSE_WAVE_STEP
 	return clampf(data.damage_reduction + maxi(wave_number - 1, 0) * step, 0.0, MAX_DAMAGE_REDUCTION)
+
+
+static func loot_chance(wave_number: int) -> float:
+	return maxf(1.0 - maxi(wave_number - 1, 0) * LOOT_CHANCE_WAVE_STEP, LOOT_CHANCE_MIN)
+
+
+static func acid_volley_count(wave_number: int) -> int:
+	return 5 if wave_number >= ACID_VOLLEY_WAVE_5 else (3 if wave_number >= ACID_VOLLEY_WAVE_3 else 1)
+
+
+static func ranged_interval_multiplier(wave_number: int) -> float:
+	return maxf(1.0 - maxi(wave_number - 1, 0) * RANGED_INTERVAL_WAVE_STEP, RANGED_INTERVAL_MIN)
 
 
 func next_wave_preview() -> String:
@@ -77,6 +97,7 @@ func start_next_wave() -> void:
 	remaining = DURATION
 	spawn_cooldown = 0.0
 	horde_spawned = false
+	plan_bursts()
 	active = true
 	if is_boss_wave(current_wave):
 		boss_requested.emit(FINAL_BOSS if current_wave == MAX_WAVES else BOSS)
@@ -93,11 +114,44 @@ func _process(delta: float) -> void:
 	if not horde_spawned and horde_waves.has(current_wave) and remaining <= DURATION - 18.0:
 		horde_spawned = true
 		horde_requested.emit(_horde_data(current_wave), 5 + current_wave)
+	var elapsed := DURATION - remaining
+	while burst_index < burst_times.size() and elapsed >= burst_times[burst_index]:
+		var index := burst_index
+		burst_index += 1
+		horde_requested.emit(_burst_data(index), _burst_count(index))
 	spawn_cooldown -= delta
 	if spawn_cooldown <= 0.0:
 		enemy_requested.emit(_choose_enemy())
-		var elapsed := DURATION - remaining
 		spawn_cooldown = maxf(SPAWN_INTERVAL_START - elapsed * SPAWN_INTERVAL_ACCELERATION - (current_wave - 1) * SPAWN_INTERVAL_WAVE_STEP, SPAWN_INTERVAL_MIN)
+
+
+func plan_bursts() -> void:
+	burst_times.clear()
+	burst_times.append(randf_range(10.0, 14.0))
+	burst_times.append(randf_range(26.0, 30.0))
+	if current_wave >= 6:
+		burst_times.append(randf_range(37.0, 40.0))
+	burst_index = 0
+
+
+func _burst_data(index: int) -> EnemyData:
+	match index:
+		0:
+			return BACTERIA if current_wave >= 7 else PLAQUE
+		1:
+			return SUGAR if current_wave >= 6 else (BACTERIA if current_wave >= 2 else PLAQUE)
+		_:
+			return ACID_SPITTER
+
+
+func _burst_count(index: int) -> int:
+	match index:
+		0:
+			return 4 + current_wave / 2
+		1:
+			return 5 + current_wave
+		_:
+			return 2 + current_wave / 5
 
 
 func _choose_enemy() -> EnemyData:

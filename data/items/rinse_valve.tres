@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"rinse_valve"
+icon_index = 21
+display_name = "Spülventil"
+description = "Wassertreffer legen Pfützen: nass und Schaden. -8 Tempo."
+rarity_tier = 2
+price = 9
+stat_changes = { &"move_speed": -8.0 }
+effect_kind = &"water_puddle"
+effect_value = 4.0
+max_stacks = 2
+tags = Array[StringName]([&"ranged", &"area"])

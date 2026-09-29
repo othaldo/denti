@@ -2,6 +2,7 @@ class_name ChoicePanel
 extends CanvasLayer
 
 signal upgrade_chosen(upgrade: UpgradeData)
+signal chest_resolved(keep: bool)
 signal starter_chosen(weapon: WeaponData)
 signal restart_requested
 signal main_menu_requested
@@ -20,6 +21,7 @@ var starter_options: Array[WeaponData] = []
 var mode: StringName = &"upgrade"
 var end_won: bool = false
 var end_coins: int = 0
+var chest_item: ShopOfferData
 
 
 func _ready() -> void:
@@ -62,6 +64,22 @@ func show_starters(options: Array[WeaponData]) -> void:
 	buttons[0].grab_focus()
 
 
+func show_chest(item: ShopOfferData, scrap_coins: int) -> void:
+	mode = &"chest"
+	chest_item = item
+	dialog_panel.custom_minimum_size = Vector2(760, 420)
+	title_label.text = "Zahnfee-Kiste!"
+	subtitle_label.text = "Behalte das Fundstück oder tausche es gegen Münzen."
+	subtitle_label.custom_minimum_size.y = 40.0
+	buttons[0].call("show_item", item)
+	buttons[0].visible = true
+	buttons[1].call("show_action", "Für %d Münzen zerlegen" % scrap_coins)
+	buttons[1].visible = true
+	buttons[2].visible = false
+	visible = true
+	buttons[0].grab_focus()
+
+
 func show_end(won: bool, coins: int) -> void:
 	mode = &"end"
 	end_won = won
@@ -89,6 +107,11 @@ func _on_choice_pressed(index: int) -> void:
 		&"upgrade":
 			visible = false
 			upgrade_chosen.emit(current_upgrades[index])
+		&"chest":
+			if index > 1:
+				return
+			visible = false
+			chest_resolved.emit(index == 0)
 		&"end":
 			if index == 0:
 				visible = false

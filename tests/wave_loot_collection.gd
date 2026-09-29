@@ -73,6 +73,8 @@ func _run() -> void:
 	if not game.boss_pending or game.collecting_wave_loot or game.get_node("Loot").get_child_count() != 1:
 		_fail("boss overtime started collection before the boss was defeated")
 		return
+	game.boss.boss_phase = 2
+	game.boss.boss_damage_budget = game.boss.health
 	game.boss.take_damage(99999.0)
 	for frame in 120:
 		if game.collecting_wave_loot:
@@ -92,7 +94,11 @@ func _run() -> void:
 	game.wave.current_wave = WaveController.MAX_WAVES
 	game._create_enemy(WaveController.FINAL_BOSS, game.player.global_position + Vector2(400.0, 0.0))
 	game._spawn_loot(game.player.global_position + Vector2(650.0, 0.0), &"coin", 1)
+	game._spawn_loot(game.player.global_position + Vector2(600.0, 0.0), &"xp", game.xp_goal - game.xp)
+	game._spawn_loot(game.player.global_position + Vector2(700.0, 0.0), &"chest", 3, &"metal_crown")
 	game.wave._process(WaveController.DURATION)
+	game.boss.boss_phase = 2
+	game.boss.boss_damage_budget = game.boss.health
 	game.boss.take_damage(99999.0)
 	for frame in 120:
 		if game.collecting_wave_loot:
@@ -102,11 +108,19 @@ func _run() -> void:
 		_fail("final victory appeared before loot collection")
 		return
 	for frame in 180:
-		if game.ended:
+		if game.choice_panel.visible:
 			break
 		await physics_frame
-	if not game.ended or game.coins != 7 or not game.choice_panel.visible:
-		_fail("final drop was lost or counted twice before victory")
+	if game.ended or game.coins != 7 or game.rewards.pending_levels != 1 or game.rewards.pending_chests.size() != 1 or game.choice_panel.mode != &"upgrade":
+		_fail("final rewards did not wait for all drops before victory")
+		return
+	game.choice_panel._on_choice_pressed(0)
+	if game.ended or game.choice_panel.mode != &"chest":
+		_fail("final chest choice did not follow the level-up")
+		return
+	game.choice_panel._on_choice_pressed(1)
+	if not game.ended or game.coins != 10 or game.choice_panel.mode != &"end":
+		_fail("final chest scrap did not finish before victory")
 		return
 	paused = false
 	session.clear_run()

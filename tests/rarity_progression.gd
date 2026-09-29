@@ -75,9 +75,16 @@ func _run() -> void:
 	resumed.player.stats.apply_upgrade(&"luck", 20.0)
 	resumed.level = 4
 	resumed.xp_goal = 5
-	resumed.xp = 5
-	if not resumed._check_level_up():
-		_fail("level-up did not open")
+	resumed.xp = 0
+	resumed._award_xp(5)
+	if resumed.choice_panel.visible or resumed.rewards.pending_levels != 1:
+		_fail("level-up did not queue during combat")
+		return
+	resumed.rewards.begin_collection()
+	resumed.rewards.finish_collection(false)
+	resumed._advance_post_wave_rewards()
+	if not resumed.choice_panel.visible:
+		_fail("queued level-up did not open after the wave")
 		return
 	for choice in resumed.choice_panel.current_upgrades:
 		if choice.tier != 2:

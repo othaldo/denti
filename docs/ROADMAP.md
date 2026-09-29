@@ -2,6 +2,17 @@
 
 This roadmap captures the current player feedback and the intended next development loop for Denti: Divine Dentistry.
 
+## Current progress
+
+- Per-wave telemetry and completed-run JSON reports are available for balance review.
+- Timed bursts, denser late waves and wider ranged volleys add pressure without universal health inflation.
+- Bosses have damage pacing, telegraphed projectile phases and reinforcements. Playtesting reports that their mechanics are now more noticeable.
+- Sugar enemies gain a telegraphed long charge with a marked landing area from wave 7, addressing their inability to reach a strong build.
+- Post-wave rewards now queue all level-ups and rare chest choices after the loot sweep. Chest items are rolled when dropped, luck is bounded, and the queue survives save/resume.
+- The item pool has grown from 18 to 22 with bleed spread, wet conductivity, movement-based sugar damage and chest scrap economy. The new effects and enemy status survive save/resume.
+- Player feedback to revisit after the roadmap slice: by wave 12 a strong build can stand still without enemies reaching Denti. More mobile enemy roles and new attacks remain needed.
+- Next: keep expanding the item pool toward 30-35 meaningful choices, then revisit late-wave pressure with the per-wave reports.
+
 ## Why v0.2 exists
 
 The prototype loop works, but current playtesting shows a clear balance problem:

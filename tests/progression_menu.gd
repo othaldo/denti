@@ -145,11 +145,10 @@ func _run() -> void:
 	if not game.wave.horde_spawned or game.get_node("Enemies").get_child_count() < enemies_before + 9:
 		_fail("single-type horde did not spawn")
 		return
-	game.wave.active = false
 	game._clear_arena(false)
 	game._on_loot_collected(&"xp", game.xp_goal)
-	if not paused or not game.choice_panel.visible:
-		_fail("level-up did not pause before saving")
+	if paused or game.choice_panel.visible or game.rewards.pending_levels != 1:
+		_fail("XP interrupted active combat instead of queuing a level-up")
 		return
 	game.game_menu._to_main_menu()
 	await process_frame
@@ -159,11 +158,25 @@ func _run() -> void:
 	await process_frame
 	await process_frame
 	game = current_scene
+	if paused or game.choice_panel.visible or game.rewards.pending_levels != 1:
+		_fail("continue lost the level-up earned during combat")
+		return
+	game.wave._process(WaveController.DURATION)
 	if not paused or not game.choice_panel.visible or game.choice_panel.current_upgrades.size() != 3:
-		_fail("continue did not restore level-up choices")
+		_fail("post-wave level-up choices did not open after loot collection")
+		return
+	game.game_menu._to_main_menu()
+	await process_frame
+	await process_frame
+	menu = current_scene as GameMenu
+	menu._continue_game()
+	await process_frame
+	await process_frame
+	game = current_scene
+	if not paused or game.rewards.pending_levels != 1 or not game.choice_panel.visible or game.choice_panel.current_upgrades.size() != 3:
+		_fail("continue lost a post-wave level-up choice")
 		return
 	game.choice_panel._on_choice_pressed(0)
-	game._open_shop()
 	if not paused or not game.shop_panel.visible:
 		_fail("shop did not open before saving")
 		return

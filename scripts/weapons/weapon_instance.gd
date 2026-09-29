@@ -68,7 +68,7 @@ func _physics_process(delta: float) -> void:
 			for enemy in targets:
 				enemy.take_damage(data.damage_against(enemy, player.items.modify_damage(enemy, data, attack_damage)), data, critical)
 	attack_time = 0.2
-	cooldown = data.interval_at_tier(tier) * player.stats.attack_interval / 0.65
+	cooldown = data.interval_at_tier(tier) * player.stats.attack_interval / 0.65 * player.items.attack_interval_factor()
 	var sound_kind: StringName = &"brush"
 	if data.attack_mode == &"area":
 		sound_kind = &"floss"

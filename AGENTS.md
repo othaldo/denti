@@ -18,7 +18,7 @@ Current playable state includes roughly:
 - minibosses every 5 waves and a final boss on wave 20
 - 4 normal enemy types plus bosses
 - 8 weapons with hand-slot costs and weapon fusion up to tier IV
-- 18 shop items with stack limits and real synergies
+- 22 shop items with stack limits and real synergies
 - 8 level-up stats
 - rarity and luck systems
 - shop rerolls, weapon selling and build-aware item weighting
@@ -290,6 +290,8 @@ Never overwrite original reference images.
 ## Art direction and humor
 
 Colorful, readable, playful 2D art. Dental terminology and short jokes are encouraged.
+
+Item icon workflow: `assets/items/item_icons_atlas.png` and `assets/items/item_icons_expansion.png` are the established painted icon atlases. `scripts/ui/denti_ui_icons.gd` selects their cells, and item resources use `icon_index` unless a dedicated `icon_texture` is set. For future batches of items, generate the new painted icons together as one transparent atlas using the existing atlases as visual references, then extend the atlas/index mapping. Check every cell at shop-card size and preserve the glossy cartoon dental style. The four v0.2 items added after the first 18 currently use individual generated PNGs; keep their approved artwork unless there is a reason to repack it. Do not substitute hand-drawn flat SVGs for this item art.
 
 Humor should stay concise enough not to block gameplay. "Alle huldigen dem Denti" remains a valid achievement/joke direction.
 

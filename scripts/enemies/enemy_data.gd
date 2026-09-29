@@ -18,6 +18,9 @@ enum SpecialAttack { NONE, DASH, PULSE, SHOOT, BOSS }
 @export var is_boss: bool = false
 @export_group("Special attack")
 @export var special_attack: SpecialAttack = SpecialAttack.NONE
+@export var advanced_special_wave: int = 0
+@export var advanced_special_attack: SpecialAttack = SpecialAttack.NONE
+@export var advanced_trigger_range: float = 0.0
 @export var special_interval: float = 0.0
 @export var warning_time: float = 0.0
 @export var trigger_range: float = 0.0
@@ -26,3 +29,12 @@ enum SpecialAttack { NONE, DASH, PULSE, SHOOT, BOSS }
 @export var attack_speed: float = 0.0
 @export var attack_duration: float = 0.0
 @export var attack_damage: float = 0.0
+@export var dash_impact_radius: float = 0.0
+@export_group("Boss pressure")
+@export var boss_guard_recharge_seconds: float = 0.0
+@export_range(0.0, 1.0, 0.01) var boss_guard_burst_fraction: float = 0.0
+@export var boss_phase_duration: float = 0.0
+@export var boss_radial_count: int = 0
+@export var boss_fan_count: int = 0
+@export var boss_projectile_speed: float = 0.0
+@export var boss_phase_adds: int = 0

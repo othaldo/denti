@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/items/tooth_fairy_deposit.png" id="2"]
+[resource]
+script = ExtResource("1")
+id = &"tooth_fairy_deposit"
+icon_index = 17
+icon_texture = ExtResource("2")
+display_name = "Zahnfee-Pfand"
+description = "+10 Glück, +50 % Kisten-Zerlegewert. -10 Leben."
+rarity_tier = 2
+price = 9
+stat_changes = { &"luck": 10.0, &"max_health": -10.0 }
+effect_kind = &"scrap_bonus"
+effect_value = 0.50
+max_stacks = 2
+tags = Array[StringName]([&"luck", &"economy", &"risk"])

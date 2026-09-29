@@ -82,6 +82,7 @@ func _run() -> void:
 	if boss == null or boss.special_phase != Enemy.SpecialPhase.WARNING or boss.boss_move != Enemy.BossMove.CHARGE or boss.boss_dash_end.distance_to(announced_end) > 1.0:
 		_fail("continue lost the boss's announced charge path")
 		return
+	boss.boss_phase = 1
 	boss.health = boss.max_health * 0.51
 	boss.take_damage(30.0)
 	if not boss.is_enraged or game.camera_shake_time <= 0.0:
@@ -89,6 +90,9 @@ func _run() -> void:
 		return
 	game.wave.active = false
 	game.boss_pending = true
+	boss.boss_phase = 2
+	boss.boss_phase_timer = 0.0
+	boss.boss_damage_budget = boss.health
 	boss.take_damage(99999.0)
 	if not boss.dying or game.boss == null or game.camera_shake_time <= 0.0 or boss.is_in_group("enemies"):
 		_fail("lethal hit did not start the boss death sequence")

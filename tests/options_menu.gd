@@ -76,7 +76,7 @@ func _run() -> void:
 	var back_button: Button = menu.rows.get_child(8)
 	back_button.pressed.emit()
 	await process_frame
-	if menu.page != &"home" or menu.rows.get_child_count() != 8:
+	if menu.page != &"home" or menu.rows.get_child_count() != 9:
 		_fail("options back button failed")
 		return
 	var options_button: Button = menu.rows.get_child(5)

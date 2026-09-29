@@ -103,13 +103,9 @@ func _run() -> void:
 		_fail("player did not collect both drop types")
 		return
 
-	game._on_loot_collected(&"xp", 10)
-	if not paused or not game.get_node("ChoicePanel").visible:
-		_fail("level-up did not pause and show choices")
-		return
-	game.get_node("ChoicePanel")._on_choice_pressed(0)
-	if paused:
-		_fail("choosing an upgrade did not resume play")
+	game._on_loot_collected(&"xp", game.xp_goal - game.xp)
+	if paused or game.get_node("ChoicePanel").visible or game.rewards.pending_levels != 1:
+		_fail("XP interrupted combat instead of queuing a level-up")
 		return
 
 	game._spawn_enemy(load("res://data/enemies/plaque.tres"))
@@ -122,10 +118,9 @@ func _run() -> void:
 	if not game.collecting_wave_loot or game.get_node("ShopPanel").visible or game.coins != coins_before_wave_end:
 		_fail("wave end skipped the visible loot collection")
 		return
-	for frame in 120:
-		if game.get_node("ShopPanel").visible:
-			break
-		await physics_frame
+	if not await _complete_intermission(game):
+		_fail("post-wave reward queue did not finish")
+		return
 	if not paused or not game.get_node("ShopPanel").visible or game.coins != coins_before_wave_end + 2:
 		_fail("shop did not open after collecting remaining loot")
 		return
@@ -199,16 +194,14 @@ func _run() -> void:
 	if wave_two_enemy.health <= wave_two_enemy.data.max_health:
 		_fail("enemy health did not scale in wave two")
 		return
-	game._spawn_loot(player.position + Vector2(50.0, 0.0), &"xp", 2)
+	game._spawn_loot(player.position + Vector2(50.0, 0.0), &"xp", game.xp_goal)
 	game.wave._process(45.0)
-	for frame in 120:
-		if game.get_node("ChoicePanel").visible:
-			break
-		await physics_frame
-	if not paused or game.get_node("Enemies").get_child_count() != 0 or not game.get_node("ChoicePanel").visible:
+	if not await _complete_intermission(game):
+		_fail("wave two rewards did not finish")
+		return
+	if not paused or game.get_node("Enemies").get_child_count() != 0:
 		_fail("wave two did not clear remaining enemies")
 		return
-	game.get_node("ChoicePanel")._on_choice_pressed(0)
 	if not game.get_node("ShopPanel").visible or not paused:
 		_fail("shop did not open after end-of-wave level-up")
 		return
@@ -231,11 +224,13 @@ func _run() -> void:
 			if not game.boss_pending or game.get_node("ShopPanel").visible:
 				_fail("mini-boss wave ended before the boss was defeated")
 				return
+			game.boss.boss_phase = 2
+			game.boss.boss_phase_timer = 0.0
+			game.boss.boss_damage_budget = game.boss.health
 			game.boss.take_damage(99999.0)
-			for frame in 120:
-				if game.get_node("ShopPanel").visible:
-					break
-				await process_frame
+			if not await _complete_intermission(game):
+				_fail("boss rewards did not finish")
+				return
 		if expected_wave < WaveController.MAX_WAVES and not game.get_node("ShopPanel").visible:
 			_fail("shop missing between waves")
 			return
@@ -243,11 +238,13 @@ func _run() -> void:
 		_fail("final timer ended the run before the boss was defeated")
 		return
 	var boss: Enemy = game.boss
+	boss.boss_phase = 2
+	boss.boss_phase_timer = 0.0
+	boss.boss_damage_budget = boss.health
 	boss.take_damage(99999.0)
-	for frame in 120:
-		if game.ended:
-			break
-		await process_frame
+	if not await _complete_intermission(game):
+		_fail("final rewards did not finish")
+		return
 	if not game.ended or not game.get_node("ChoicePanel").visible or game.get_node("ShopPanel").visible:
 		_fail("defeating the boss did not end in victory")
 		return
@@ -263,6 +260,16 @@ func _run() -> void:
 	paused = false
 	print("Denti smoke test passed")
 	quit(0)
+
+
+func _complete_intermission(game: Node2D) -> bool:
+	for frame in 180:
+		if game.choice_panel.visible and (game.choice_panel.mode == &"upgrade" or game.choice_panel.mode == &"chest"):
+			game.choice_panel._on_choice_pressed(0)
+		if game.shop_panel.visible or game.ended:
+			return true
+		await physics_frame
+	return false
 
 
 func _fail(message: String) -> void:

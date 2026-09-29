@@ -16,15 +16,20 @@ static func capture(game) -> Dictionary:
 			"dying": enemy.dying, "death_elapsed": enemy.death_elapsed, "enraged": enemy.is_enraged,
 			"bleed_stacks": enemy.bleed_stacks, "bleed_dps": enemy.bleed_dps,
 			"bleed_time": enemy.bleed_time, "bleed_tick": enemy.bleed_tick,
+			"wet_time": enemy.wet_time,
+			"boss_damage_budget": enemy.boss_damage_budget, "boss_phase": enemy.boss_phase,
+			"boss_phase_timer": enemy.boss_phase_timer,
+			"boss_phase_burst_fired": enemy.boss_phase_burst_fired,
+			"boss_phase_gap_angle": enemy.boss_phase_gap_angle,
 		})
 	var loot_data: Array[Dictionary] = []
 	for drop: Loot in game.get_node("Loot").get_children():
 		if drop.is_queued_for_deletion():
 			continue
-		loot_data.append({"position": _vector_data(drop.position), "kind": str(drop.kind), "amount": drop.amount})
+		loot_data.append({"position": _vector_data(drop.position), "kind": str(drop.kind), "amount": drop.amount, "reward_id": str(drop.reward_id)})
 	var acid_data: Array[Dictionary] = []
 	for projectile: AcidProjectile in game.get_node("EnemyProjectiles").get_children():
-		acid_data.append({"position": _vector_data(projectile.position), "direction": _vector_data(projectile.direction), "speed": projectile.speed, "damage": projectile.damage, "lifetime": projectile.lifetime})
+		acid_data.append({"position": _vector_data(projectile.position), "direction": _vector_data(projectile.direction), "speed": projectile.speed, "damage": projectile.damage, "lifetime": projectile.lifetime, "color": projectile.projectile_color.to_html()})
 	var offer_data: Array[Dictionary] = []
 	for offer in game.shop.offers:
 		offer_data.append({"id": str(offer.id), "tier": offer.weapon_tier, "price": offer.price} if offer != null else {})
@@ -36,12 +41,15 @@ static func capture(game) -> Dictionary:
 		"wave": game.wave.current_wave, "remaining": game.wave.remaining,
 		"spawn_cooldown": game.wave.spawn_cooldown, "active": game.wave.active,
 		"horde_waves": game.wave.horde_waves, "horde_spawned": game.wave.horde_spawned,
+		"burst_times": game.wave.burst_times, "burst_index": game.wave.burst_index,
 		"player": {"position": _vector_data(game.player.position), "stats": game.player.stats.to_save_data(), "hurt_time": game.player.hurt_time},
 		"xp": game.xp, "xp_goal": game.xp_goal, "level": game.level, "coins": game.coins,
 		"weapons": game.player.loadout.save_data(), "starter_pending": game.starter_pending,
 		"items": game.items.save_data(),
+		"telemetry": game.telemetry.save_data(),
+		"rewards": game.rewards.save_data(),
 		"enemies": enemies_data, "loot": loot_data, "acid": acid_data,
-		"shop": game.in_shop, "intermission_pending": game.intermission_pending,
+		"shop": game.in_shop,
 		"collecting_wave_loot": game.collecting_wave_loot,
 		"offers": offer_data, "reroll_cost": game.shop.reroll_cost,
 		"upgrades": upgrades, "boss_pending": game.boss_pending,
@@ -62,6 +70,15 @@ static func restore(game, saved: Dictionary) -> void:
 	if wave.horde_waves.is_empty():
 		wave.plan_hordes()
 	wave.horde_spawned = bool(saved.get("horde_spawned", false))
+	if saved.has("burst_times"):
+		wave.burst_times.clear()
+		for value in saved.get("burst_times", []):
+			wave.burst_times.append(float(value))
+		wave.burst_index = clampi(int(saved.get("burst_index", 0)), 0, wave.burst_times.size())
+	else:
+		wave.plan_bursts()
+		while wave.burst_index < wave.burst_times.size() and wave.burst_times[wave.burst_index] <= WaveController.DURATION - wave.remaining:
+			wave.burst_index += 1
 	var player_data: Dictionary = saved.get("player", {})
 	player.position = _read_vector(player_data.get("position", [640.0, 360.0]))
 	player.stats.load_save_data(player_data.get("stats", {}))
@@ -81,6 +98,7 @@ static func restore(game, saved: Dictionary) -> void:
 			if old_weapon != null:
 				player.loadout.acquire(old_weapon)
 	game.items.restore(saved.get("items", {}))
+	game.rewards.restore(saved.get("rewards", {}))
 	for entry in saved.get("enemies", []):
 		var enemy_data := _enemy_from_path(str(entry.get("type", "")))
 		if enemy_data == null:
@@ -100,19 +118,26 @@ static func restore(game, saved: Dictionary) -> void:
 		enemy.is_enraged = bool(entry.get("enraged", enemy.health <= enemy.max_health * 0.5 and enemy.data.is_boss))
 		if enemy.dying:
 			enemy.remove_from_group("enemies")
-		enemy.bleed_stacks = clampi(int(entry.get("bleed_stacks", 0)), 0, 3)
+		enemy.bleed_stacks = clampi(int(entry.get("bleed_stacks", 0)), 0, 5)
 		enemy.bleed_dps = maxf(float(entry.get("bleed_dps", 0.0)), 0.0)
 		enemy.bleed_time = maxf(float(entry.get("bleed_time", 0.0)), 0.0)
 		enemy.bleed_tick = clampf(float(entry.get("bleed_tick", 1.0)), 0.0, 1.0)
+		enemy.wet_time = maxf(float(entry.get("wet_time", 0.0)), 0.0)
+		if enemy.data.is_boss:
+			enemy.boss_phase = clampi(int(entry.get("boss_phase", 2 if enemy.health <= enemy.max_health / 3.0 else (1 if enemy.health <= enemy.max_health * 2.0 / 3.0 else 0))), 0, 2)
+			enemy.boss_damage_budget = clampf(float(entry.get("boss_damage_budget", enemy.boss_damage_budget)), 0.0, enemy.max_health * enemy.data.boss_guard_burst_fraction)
+			enemy.boss_phase_timer = clampf(float(entry.get("boss_phase_timer", 0.0)), 0.0, enemy.data.boss_phase_duration)
+			enemy.boss_phase_burst_fired = bool(entry.get("boss_phase_burst_fired", false))
+			enemy.boss_phase_gap_angle = float(entry.get("boss_phase_gap_angle", 0.0))
 		enemy.queue_redraw()
 	for entry in saved.get("loot", []):
 		var kind := StringName(str(entry.get("kind", "xp")))
-		if kind == &"xp" or kind == &"coin":
-			game._spawn_loot(_read_vector(entry.get("position", [0.0, 0.0])), kind, maxi(int(entry.get("amount", 1)), 1))
+		if kind == &"xp" or kind == &"coin" or kind == &"chest" and ShopController.by_id(StringName(str(entry.get("reward_id", "")))) != null:
+			game._spawn_loot(_read_vector(entry.get("position", [0.0, 0.0])), kind, maxi(int(entry.get("amount", 1)), 1), StringName(str(entry.get("reward_id", ""))))
 	for entry in saved.get("acid", []):
 		var projectile: AcidProjectile = ACID_PROJECTILE.instantiate()
 		game.get_node("EnemyProjectiles").add_child(projectile)
-		projectile.launch(_read_vector(entry.get("position", [0.0, 0.0])), _read_vector(entry.get("direction", [1.0, 0.0])), float(entry.get("speed", 290.0)), float(entry.get("damage", 8.0)), player)
+		projectile.launch(_read_vector(entry.get("position", [0.0, 0.0])), _read_vector(entry.get("direction", [1.0, 0.0])), float(entry.get("speed", 290.0)), float(entry.get("damage", 8.0)), player, Color(str(entry.get("color", "87e021"))))
 		projectile.lifetime = float(entry.get("lifetime", 2.2))
 	shop.reroll_cost = maxi(int(saved.get("reroll_cost", 2)), 2)
 	shop.offers.clear()
@@ -133,9 +158,18 @@ static func restore(game, saved: Dictionary) -> void:
 				found.price = maxi(int(value.get("price", found.price)), 1)
 		shop.offers.append(found)
 	game.in_shop = bool(saved.get("shop", false))
-	game.intermission_pending = bool(saved.get("intermission_pending", false))
 	game.boss_pending = bool(saved.get("boss_pending", false))
 	game.starter_pending = bool(saved.get("starter_pending", false))
+	game.telemetry.restore(saved.get("telemetry", {}), wave.current_wave)
+	var upgrade_data: Array = saved.get("upgrades", [])
+	if not saved.has("rewards"):
+		if game.in_shop:
+			game.rewards.step = PostWaveRewards.Step.SHOP
+		elif upgrade_data.size() == 3:
+			game.rewards.pending_levels = 1
+			game.rewards.step = PostWaveRewards.Step.COMBAT if wave.active or game.boss_pending else PostWaveRewards.Step.LEVELS
+		elif bool(saved.get("intermission_pending", false)):
+			game.rewards.step = PostWaveRewards.Step.SHOP
 	if bool(saved.get("collecting_wave_loot", false)):
 		game._begin_loot_collection()
 		return
@@ -144,8 +178,7 @@ static func restore(game, saved: Dictionary) -> void:
 		game.get_tree().paused = true
 		game._refresh_hud()
 		return
-	var upgrade_data: Array = saved.get("upgrades", [])
-	if upgrade_data.size() == 3:
+	if game.rewards.step == PostWaveRewards.Step.LEVELS and upgrade_data.size() == 3:
 		var options: Array[UpgradeData] = []
 		for value in upgrade_data:
 			for upgrade in game.UPGRADES:
@@ -158,9 +191,16 @@ static func restore(game, saved: Dictionary) -> void:
 		if options.size() == 3:
 			game.choice_panel.show_upgrades(options)
 			game.get_tree().paused = true
-	elif game.in_shop:
+		else:
+			game._advance_post_wave_rewards()
+	elif game.rewards.step == PostWaveRewards.Step.CHESTS:
+		game._advance_post_wave_rewards()
+	elif game.rewards.step == PostWaveRewards.Step.LEVELS:
+		game._advance_post_wave_rewards()
+	elif game.in_shop or game.rewards.step == PostWaveRewards.Step.SHOP:
 		if shop.offers.size() != 3:
 			shop.open_shop(wave.current_wave, player.stats.luck, player.loadout, game.items)
+		game.in_shop = true
 		game._update_shop_panel()
 		game.get_tree().paused = true
 	game._refresh_hud()

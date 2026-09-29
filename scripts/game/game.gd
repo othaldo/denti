@@ -36,7 +36,6 @@ var level: int = 1
 var coins: int = 0
 var ended: bool = false
 var in_shop: bool = false
-var intermission_pending: bool = false
 var starter_pending: bool = false
 var boss: Enemy
 var boss_pending: bool = false
@@ -44,6 +43,8 @@ var collecting_wave_loot: bool = false
 var wave_loot_remaining: int = 0
 var autosave_timer: float = 0.0
 var camera_shake_time: float = 0.0
+var telemetry := RunTelemetry.new()
+var rewards := PostWaveRewards.new()
 
 
 func _ready() -> void:
@@ -53,12 +54,15 @@ func _ready() -> void:
 	wave.horde_requested.connect(_spawn_horde)
 	wave.wave_finished.connect(_on_wave_finished)
 	player.stats.died.connect(_on_player_died)
+	player.stats.damage_taken.connect(telemetry.record_taken)
 	player.stats.shield_blocked.connect(items.on_shield_blocked)
+	player.stats.healed.connect(items.on_healed)
 	player.attack_performed.connect(sound.play_attack)
 	player.damaged.connect(_on_player_damaged)
 	player.damaged.connect(items.on_player_hurt)
 	items.feedback.connect(_show_item_feedback)
 	choice_panel.upgrade_chosen.connect(_on_upgrade_chosen)
+	choice_panel.chest_resolved.connect(_on_chest_resolved)
 	choice_panel.starter_chosen.connect(_on_starter_chosen)
 	choice_panel.restart_requested.connect(_restart)
 	choice_panel.main_menu_requested.connect(_on_end_main_menu)
@@ -84,6 +88,8 @@ func _on_starter_chosen(weapon: WeaponData) -> void:
 		return
 	player.loadout.acquire(weapon)
 	starter_pending = false
+	rewards.begin_wave()
+	telemetry.begin_wave(wave.current_wave + 1)
 	wave.start_next_wave()
 	items.on_wave_start()
 	_sync_music()
@@ -92,6 +98,8 @@ func _on_starter_chosen(weapon: WeaponData) -> void:
 
 
 func _process(delta: float) -> void:
+	if not ended and (wave.active or boss_pending):
+		telemetry.tick(delta, $Enemies.get_child_count(), $EnemyProjectiles.get_child_count())
 	_refresh_hud()
 	var camera: Camera2D = player.get_node("Camera2D")
 	if camera_shake_time > 0.0:
@@ -108,6 +116,10 @@ func _process(delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if OS.is_debug_build() and event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F3:
+		hud.toggle_telemetry()
+		get_viewport().set_input_as_handled()
+		return
 	if event.is_action_pressed("ui_cancel") and not ended and not collecting_wave_loot and not choice_panel.visible and not shop_panel.visible and not game_menu.visible:
 		get_viewport().set_input_as_handled()
 		game_menu.open_pause()
@@ -120,11 +132,13 @@ func _notification(what: int) -> void:
 
 func _refresh_hud() -> void:
 	var visible_boss: Enemy = boss if is_instance_valid(boss) else null
-	hud.update_status(player.stats, xp, xp_goal, level, coins, wave.current_wave, wave.remaining, in_shop, visible_boss, boss_pending, collecting_wave_loot)
+	hud.update_status(player.stats, xp, xp_goal, level, coins, wave.current_wave, wave.remaining, in_shop, visible_boss, boss_pending, collecting_wave_loot, rewards.pending_levels)
+	hud.update_telemetry(telemetry, $Enemies.get_child_count(), $Projectiles.get_child_count() + $EnemyProjectiles.get_child_count())
 
 
 func _spawn_enemy(data: EnemyData) -> void:
 	if $Enemies.get_child_count() >= MAX_ACTIVE_ENEMIES:
+		telemetry.record_spawn_blocked()
 		return
 	_create_enemy(data, _spawn_position(_spawn_edge()))
 
@@ -136,6 +150,7 @@ func _spawn_horde(data: EnemyData, count: int) -> void:
 	var upper := arena.arena_size - lower
 	for index in count:
 		if $Enemies.get_child_count() >= MAX_ACTIVE_ENEMIES:
+			telemetry.record_spawn_blocked(count - index)
 			break
 		var offset := (float(index) - float(count - 1) / 2.0) * (data.radius * 2.5)
 		var at := center + (Vector2(offset, 0.0) if edge % 2 == 0 else Vector2(0.0, offset))
@@ -179,26 +194,40 @@ func _create_enemy(data: EnemyData, at: Vector2) -> void:
 	enemy.configure(data, player, wave.current_wave)
 	enemy.defeated.connect(_on_enemy_defeated)
 	enemy.damaged.connect(_on_enemy_damaged)
+	enemy.damage_recorded.connect(telemetry.record_damage)
 	enemy.weapon_hit.connect(items.on_weapon_hit)
 	enemy.attack_performed.connect(sound.play_cue)
 	if data.is_boss:
 		enemy.death_started.connect(_on_boss_death_started)
 		enemy.enraged.connect(_on_boss_enraged)
+		enemy.boss_phase_started.connect(_on_boss_phase_started)
+		enemy.boss_guarded.connect(_on_boss_guarded)
+		enemy.reinforcements_requested.connect(_on_boss_reinforcements)
 	$Enemies.add_child(enemy)
+	telemetry.record_spawn(data.is_boss)
 	if data.is_boss:
 		boss = enemy
 
 
 func _on_enemy_defeated(at: Vector2, data: EnemyData) -> void:
+	telemetry.record_kill(data.is_boss)
 	if not data.is_boss:
 		sound.play_cue(&"down")
-	coins += items.on_kill(at, data.is_boss)
+	var reward_drop := wave.active and randf() < WaveController.loot_chance(wave.current_wave)
+	var bonus_coins := items.on_kill(at, data.is_boss)
+	coins += bonus_coins
+	telemetry.record_loot(&"coin", bonus_coins)
 	if data.is_boss:
 		boss = null
 		if boss_pending:
 			call_deferred("_resolve_boss_wave")
 		return
-	if not wave.active:
+	if wave.active and not rewards.chest_spawned and randf() < ChestRewards.drop_chance(player.stats.luck):
+		var chest := ChestRewards.roll_item(wave.current_wave, player.stats.luck, items)
+		if not chest.is_empty():
+			rewards.mark_chest_spawned()
+			_spawn_loot(at, &"chest", int(chest["scrap_coins"]), StringName(str(chest["item_id"])))
+	if not reward_drop:
 		return
 	_spawn_loot(at + Vector2(-11.0, 0.0), &"xp", data.xp_drop)
 	if data.coin_drop > 0 and randf() < data.coin_drop_chance:
@@ -206,6 +235,7 @@ func _on_enemy_defeated(at: Vector2, data: EnemyData) -> void:
 
 
 func _on_boss_death_started(_at: Vector2) -> void:
+	telemetry.record_boss_death()
 	sound.play_cue(&"boss_break")
 	camera_shake_time = 0.45
 
@@ -216,23 +246,40 @@ func _on_boss_enraged(at: Vector2) -> void:
 	camera_shake_time = 0.25
 
 
-func _spawn_loot(at: Vector2, kind: StringName, amount: int) -> void:
+func _on_boss_phase_started(at: Vector2, _phase: int) -> void:
+	sound.play_cue(&"boss_warning")
+	_show_item_feedback("ZAHNSCHILD!", at, Color(0.95, 0.32, 0.63))
+	camera_shake_time = 0.18
+
+
+func _on_boss_guarded(at: Vector2) -> void:
+	_show_item_feedback("VERSIEGELT", at, Color(0.43, 0.84, 0.94))
+
+
+func _on_boss_reinforcements(count: int) -> void:
+	_spawn_horde(WaveController.ACID_SPITTER if wave.current_wave == WaveController.MAX_WAVES else WaveController.BACTERIA, count)
+
+
+func _spawn_loot(at: Vector2, kind: StringName, amount: int, reward_id: StringName = &"") -> void:
 	var loot: Loot = LOOT_SCENE.instantiate()
 	loot.position = at
-	loot.configure(kind, amount, player)
+	loot.configure(kind, amount, player, reward_id)
 	loot.collected.connect(_on_loot_collected)
 	$Loot.add_child(loot)
 
 
-func _on_loot_collected(kind: StringName, amount: int) -> void:
+func _on_loot_collected(kind: StringName, amount: int, reward_id: StringName = &"") -> void:
 	sound.play_cue(&"pickup")
-	var bonus := items.on_pickup(kind, amount)
-	if kind == &"coin":
-		coins += amount + bonus
+	if kind == &"chest":
+		rewards.queue_chest(reward_id, amount)
+		telemetry.record_chest_found()
 	else:
-		xp += amount + bonus
-		if not collecting_wave_loot:
-			_check_level_up()
+		var bonus := items.on_pickup(kind, amount)
+		telemetry.record_loot(kind, amount + bonus)
+		if kind == &"coin":
+			coins += amount + bonus
+		else:
+			_award_xp(amount + bonus)
 	if collecting_wave_loot:
 		wave_loot_remaining = maxi(wave_loot_remaining - 1, 0)
 		if wave_loot_remaining == 0:
@@ -261,12 +308,16 @@ func _show_damage_number(at: Vector2, amount: float, player_hit: bool = false) -
 	number.show_amount(at, amount, player_hit)
 
 
-func _check_level_up() -> bool:
-	if xp < xp_goal or ended:
-		return false
-	xp -= xp_goal
-	level += 1
-	xp_goal = 5 + (level - 1) * 3
+func _award_xp(amount: int) -> void:
+	xp += amount
+	while xp >= xp_goal:
+		xp -= xp_goal
+		level += 1
+		xp_goal = 5 + (level - 1) * 3
+		rewards.earn_level()
+
+
+func _show_level_choice() -> void:
 	var pool: Array[UpgradeData] = UPGRADES.duplicate()
 	pool.shuffle()
 	var choices: Array[UpgradeData] = []
@@ -275,18 +326,28 @@ func _check_level_up() -> bool:
 	choice_panel.show_upgrades(choices)
 	get_tree().paused = true
 	_save_run()
-	return true
 
 
 func _on_upgrade_chosen(upgrade: UpgradeData) -> void:
 	player.stats.apply_upgrade(upgrade.stat, upgrade.amount)
-	if _check_level_up():
+	rewards.resolve_level()
+	_advance_post_wave_rewards()
+
+
+func _on_chest_resolved(keep: bool) -> void:
+	var chest := rewards.current_chest()
+	if chest.is_empty():
 		return
-	if intermission_pending:
-		_open_shop()
+	var item := ShopController.by_id(StringName(str(chest["item_id"])))
+	if keep and item != null and items.acquire(item):
+		telemetry.record_chest_kept()
 	else:
-		get_tree().paused = false
-		_save_run()
+		var scrap_coins := items.scrap_value(int(chest["scrap_coins"]))
+		coins += scrap_coins
+		telemetry.record_loot(&"coin", scrap_coins)
+		telemetry.record_chest_scrapped()
+	rewards.resolve_chest()
+	_advance_post_wave_rewards()
 
 
 func _on_wave_finished(wave_number: int) -> void:
@@ -318,6 +379,7 @@ func _begin_loot_collection() -> void:
 	if collecting_wave_loot or ended:
 		return
 	collecting_wave_loot = true
+	rewards.begin_collection()
 	player.velocity = Vector2.ZERO
 	player.set_physics_process(false)
 	wave_loot_remaining = 0
@@ -337,13 +399,31 @@ func _finish_loot_collection() -> void:
 		return
 	collecting_wave_loot = false
 	player.set_physics_process(true)
-	if wave.current_wave >= WaveController.MAX_WAVES:
-		_finish_run()
-		return
-	intermission_pending = true
-	if _check_level_up():
-		return
-	_open_shop()
+	var interest := items.on_wave_end(coins)
+	coins += interest
+	telemetry.record_loot(&"coin", interest)
+	rewards.finish_collection(wave.current_wave >= WaveController.MAX_WAVES)
+	_advance_post_wave_rewards()
+
+
+func _advance_post_wave_rewards() -> void:
+	match rewards.step:
+		PostWaveRewards.Step.LEVELS:
+			_show_level_choice()
+		PostWaveRewards.Step.CHESTS:
+			var chest := rewards.current_chest()
+			var item := ShopController.by_id(StringName(str(chest.get("item_id", ""))))
+			if item == null:
+				rewards.resolve_chest()
+				_advance_post_wave_rewards()
+				return
+			choice_panel.show_chest(item, items.scrap_value(int(chest["scrap_coins"])))
+			get_tree().paused = true
+			_save_run()
+		PostWaveRewards.Step.SHOP:
+			_open_shop()
+		PostWaveRewards.Step.END:
+			_finish_run()
 
 
 func _clear_arena(collect_drops: bool, keep_boss: bool = false) -> void:
@@ -351,11 +431,16 @@ func _clear_arena(collect_drops: bool, keep_boss: bool = false) -> void:
 		if drop.is_queued_for_deletion():
 			continue
 		if collect_drops:
-			var bonus := items.on_pickup(drop.kind, drop.amount)
-			if drop.kind == &"coin":
-				coins += drop.amount + bonus
+			if drop.kind == &"chest":
+				rewards.queue_chest(drop.reward_id, drop.amount)
+				telemetry.record_chest_found()
 			else:
-				xp += drop.amount + bonus
+				var bonus := items.on_pickup(drop.kind, drop.amount)
+				telemetry.record_loot(drop.kind, drop.amount + bonus)
+				if drop.kind == &"coin":
+					coins += drop.amount + bonus
+				else:
+					_award_xp(drop.amount + bonus)
 		drop.free()
 	_clear_combat(keep_boss)
 
@@ -376,19 +461,21 @@ func _clear_combat(keep_boss: bool = false) -> void:
 func _finish_run() -> void:
 	if ended:
 		return
+	rewards.step = PostWaveRewards.Step.END
 	ended = true
 	boss_pending = false
 	_sync_music()
 	_clear_arena(true)
 	choice_panel.show_end(true, coins)
+	_save_completed_report(true)
 	session.clear_run()
 	_refresh_hud()
 	get_tree().paused = true
 
 
 func _open_shop() -> void:
+	rewards.step = PostWaveRewards.Step.SHOP
 	in_shop = true
-	intermission_pending = false
 	_sync_music()
 	shop.open_shop(wave.current_wave, player.stats.luck, player.loadout, items)
 	_update_shop_panel()
@@ -456,6 +543,8 @@ func _on_shop_continue() -> void:
 	boss_pending = false
 	_clear_arena(false)
 	player.global_position = arena.arena_size / 2.0
+	rewards.begin_wave()
+	telemetry.begin_wave(wave.current_wave + 1)
 	wave.start_next_wave()
 	items.on_wave_start()
 	_sync_music()
@@ -472,8 +561,22 @@ func _on_player_died() -> void:
 	_clear_arena(false)
 	shop_panel.visible = false
 	choice_panel.show_end(false, coins)
+	_save_completed_report(false)
 	session.clear_run()
 	get_tree().paused = true
+
+
+func _save_completed_report(won: bool) -> void:
+	session.save_run_report({
+		"outcome": "victory" if won else "death",
+		"wave_reached": wave.current_wave,
+		"final_level": level,
+		"coins_left": coins,
+		"weapons": player.loadout.save_data(),
+		"items": items.owned.duplicate(),
+		"telemetry": telemetry.save_data(),
+		"waves": telemetry.wave_summaries(),
+	})
 
 
 func _restart() -> void:

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/items/forbidden_lollipop.png" id="2"]
+[resource]
+script = ExtResource("1")
+id = &"forbidden_lollipop"
+icon_index = 14
+icon_texture = ExtResource("2")
+display_name = "Verbotener Lolli"
+description = "Laufen: +20 % Waffenschaden. -15 Leben, -2 Härte."
+rarity_tier = 3
+price = 13
+stat_changes = { &"max_health": -15.0, &"armor": -2.0 }
+effect_kind = &"moving_damage"
+effect_value = 0.20
+max_stacks = 2
+tags = Array[StringName]([&"mobility", &"risk"])

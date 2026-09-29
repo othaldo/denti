@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"shine_prism"
+icon_index = 22
+display_name = "Glanzprisma"
+description = "Krits strahlen 30 % Schaden weiter, Licht stärker. -1 Härte."
+rarity_tier = 3
+price = 13
+stat_changes = { &"armor": -1.0 }
+effect_kind = &"crit_beam"
+effect_value = 0.30
+max_stacks = 2
+tags = Array[StringName]([&"crit", &"ranged", &"area"])

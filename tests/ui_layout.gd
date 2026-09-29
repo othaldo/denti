@@ -28,8 +28,11 @@ func _run() -> void:
 	root.size = Vector2i(1280, 720)
 	await process_frame
 	game.choice_panel.buttons[0].pressed.emit()
-	game.wave.active = false
 	game._on_loot_collected(&"xp", game.xp_goal)
+	if paused or game.choice_panel.visible:
+		_fail("XP opened the level-up overlay during combat")
+		return
+	game.wave._process(WaveController.DURATION)
 	await process_frame
 	if not paused or not game.choice_panel.visible:
 		_fail("level-up overlay did not appear")
@@ -48,10 +51,9 @@ func _run() -> void:
 			_fail("upgrade card is missing icon or effect")
 			return
 	game.choice_panel.buttons[0].pressed.emit()
-	if paused or game.choice_panel.visible:
-		_fail("choosing a level-up card did not resume the game")
+	if not paused or game.choice_panel.visible or not game.shop_panel.visible:
+		_fail("choosing a level-up card did not open the shop")
 		return
-	game._open_shop()
 	await process_frame
 	if not paused or not game.shop_panel.visible:
 		_fail("shop overlay did not appear")
@@ -93,6 +95,14 @@ func _run() -> void:
 		if not _inside(weapon_button.get_global_rect(), Vector2(1280, 720)):
 			_fail("equipped weapon row exceeds viewport")
 			return
+	game.choice_panel.show_chest(ShopController.by_id(&"metal_crown"), 3)
+	root.size = Vector2i(1024, 600)
+	await process_frame
+	await process_frame
+	var layout_size: Vector2 = game.choice_panel.get_node("Root").size
+	if not _inside(game.choice_panel.dialog_panel.get_global_rect(), layout_size) or not _inside(game.choice_panel.buttons[0].get_global_rect(), layout_size) or not _inside(game.choice_panel.buttons[1].get_global_rect(), layout_size):
+		_fail("chest decision exceeds the scaled 1024x600 viewport")
+		return
 	paused = false
 	root.get_node("GameSession").clear_run()
 	print("Denti UI layout test passed")
