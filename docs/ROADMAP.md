@@ -43,6 +43,61 @@ Purpose:
 
 Do not expose all of this in normal gameplay.
 
+### Telemetry must also power the end-of-run recap
+
+Do not build combat telemetry as a disposable debug-only system. The same underlying run statistics should later feed a player-facing **"So war dein Run"** summary after victory or death.
+
+Damage events should carry enough attribution to distinguish at least:
+
+- direct weapon damage, identified by weapon type / stable weapon id
+- item/proc damage, e.g. bleed, chain lightning, holy flash, retaliation
+- other damage sources if they become relevant later
+
+A water-flosser hit that triggers chain lightning should count the direct hit toward the weapon and the chained damage toward the proc. Avoid double-counting proc damage as weapon damage unless a design decision explicitly says otherwise.
+
+Accumulate total damage per source over the full run. The first player-facing recap should be able to show something like:
+
+- wave reached / run completed
+- total play time
+- final level
+- enemies killed
+- total damage dealt
+- damage taken
+- coins collected
+- XP collected
+- bosses defeated
+- chests found
+- chest items kept vs. scrapped
+- accumulated damage per weapon
+- percentage of total weapon damage per weapon
+- optional separate synergy/proc damage section
+- strongest weapon of the run
+
+Example weapon breakdown:
+
+```text
+Zahnseidenpeitsche IV   162,884   38%
+Wasserflosser III       101,337   24%
+Turbo-Bohrer II          72,441   17%
+```
+
+Example proc breakdown:
+
+```text
+Blutung                  58,220
+Kettenblitz              41,992
+Zahnblitz                18,770
+```
+
+The debug overlay and the run recap are different presentations of the same measurement layer:
+
+- debug view = rolling/technical numbers for balancing
+- run recap = accumulated, understandable numbers for the player
+
+Run statistics should survive save/resume so quitting to the menu and continuing does not reset the eventual recap. Keep the measurement API centralized enough that future achievements can consume the same data without every weapon/item inventing its own counters.
+
+Do not turn the recap into an unreadable spreadsheet. Prefer a concise summary plus the weapon damage breakdown, with deeper proc details only where they remain useful and fun to inspect.
+
 ---
 
 ## Phase 2 — Increase enemy pressure
