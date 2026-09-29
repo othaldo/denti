@@ -11,10 +11,26 @@ The prototype loop works, but current playtesting shows a clear balance problem:
 - Bosses can die in roughly 2-5 seconds.
 - Once the build comes online, movement and positioning become too unimportant.
 - Waves need more bodies, more bursts/hordes and more projectile pressure.
+- Mid-wave modal interruptions should be reduced: level-ups and chest choices belong in the intermission after combat.
 
 The goal is not to make Denti feel weak. The goal is to let the player become absurdly powerful while the arena remains dangerous enough that they still have to move, read attacks and make build decisions.
 
 Think: **power fantasy under pressure**, not HP-sponges.
+
+A wave should feel like one uninterrupted combat segment. The reward-processing rhythm should happen afterwards:
+
+```text
+WAVE COMBAT
+-> timer ends
+-> collect all remaining XP / coins / chest drops
+-> resolve earned level-ups
+-> resolve chest loot (KEEP / SCRAP)
+-> later: resolve boss relic / special reward if applicable
+-> shop
+-> next wave
+```
+
+This post-wave reward pipeline is a core design decision for v0.2.
 
 ---
 
@@ -191,24 +207,71 @@ A strong build should kill bosses noticeably faster than a weak build, but not d
 
 ---
 
-## Phase 5 — Zahnfee chests
+## Phase 5 — Post-wave rewards and Zahnfee chests
 
-Add rare random in-wave item chests.
+The important design change: **do not interrupt active combat with level-up or chest-choice screens.**
 
-### Core interaction
+The current wave should be allowed to build pressure continuously. Level-ups and chest rewards are earned during combat but resolved only after the wave ends.
 
-A chest reveals one item and pauses or safely presents a quick choice:
+### Post-wave reward pipeline
+
+When the wave timer reaches zero:
+
+1. stop spawning / finish the combat segment
+2. run the existing loot-collection phase
+3. pull all remaining XP, coins and chest drops to Denti
+4. update XP and determine how many level-ups were earned
+5. resolve all pending level-up choices
+6. resolve all pending Zahnfee chest rewards
+7. later, insert milestone rewards such as boss relics into this same intermission pipeline
+8. open the shop
+9. continue to the next wave
+
+The flow should feel like a deliberate **"time to loot and level up"** break after the action, not a chain of interruptions during it.
+
+### Deferred level-ups
+
+Crossing an XP threshold during active combat must no longer pause the game.
+
+Instead:
+
+- XP keeps accumulating normally
+- each crossed threshold increments a pending level-up count
+- multiple levels may be earned in one wave
+- after the end-of-wave loot sweep, present one three-choice level-up selection per pending level
+- preserve overflow XP and threshold progression correctly
+
+This is especially important once waves become denser and more bullet-hell-like. A modal popping up in the middle of a dodge sequence would destroy combat rhythm.
+
+### Chest drops during combat
+
+A Zahnfee chest may still physically drop during the wave. It can be exciting to see and collect, but **picking it up must not open a choice screen immediately**.
+
+Preferred behavior:
+
+- chest appears as a visible rare drop
+- touching/collecting it queues a pending chest reward
+- if it remains on the ground when the wave ends, the end-of-wave loot sweep collects it automatically like XP/coins
+- the item reveal happens only in the post-wave reward phase
+
+To avoid ordering exploits, the chest reward/rarity should preferably be rolled using the relevant luck state when the chest is generated/collected, or otherwise use a clearly defined luck snapshot. Do not let the player change luck during post-wave level-ups and thereby reroll already-earned chest quality accidentally.
+
+### Core chest interaction
+
+When a queued chest is resolved, reveal one item:
 
 - **KEEP**: gain the item for free
 - **SCRAP**: convert the item into coins
 
 This ensures even a poor build-match is still useful.
 
+If multiple chests are ever possible, resolve them sequentially or through one compact reward screen. Do not create a separate combat interruption per chest.
+
 ### Luck interaction
 
 Luck may influence:
 
-- chance for a random chest to appear
+- chance for a random chest to drop during the wave
 - item rarity inside the chest
 
 Keep this bounded to avoid runaway snowballing. A good starting rule is at most one ordinary random chest per wave.
@@ -220,9 +283,36 @@ Possible later rules:
 - scrap value scales with rarity
 - dedicated item can improve scrap value
 
+### Architecture / save-state requirement
+
+Treat this as a generic **post-wave reward queue**, not as several unrelated systems each calling `get_tree().paused`.
+
+The game should know which intermission state it is in, for example conceptually:
+
+```text
+COLLECTING_LOOT
+-> LEVEL_UP_REWARDS
+-> CHEST_REWARDS
+-> BOSS_REWARD (optional/later)
+-> SHOP
+```
+
+Save/resume should preserve:
+
+- pending level-up count / unresolved choices
+- pending chest rewards
+- which reward is currently being resolved
+- completion state before the shop
+
+This makes later boss relics and special rewards much easier to add without turning the game flow into nested pause logic.
+
 ### Why this helps
 
-Chests add build decisions during the run rather than only in the shop and make luck/economy builds more interesting.
+- combat remains uninterrupted and can become much denser
+- the end of a wave gets a satisfying payoff rhythm
+- all XP and coins are known before making post-wave decisions
+- chest loot and level-ups feel like rewards for surviving the wave
+- the shop stays the final build-planning step before the next fight
 
 ---
 
@@ -350,7 +440,7 @@ Elites are good candidates for better chest-drop chances.
 
 After milestone bosses (for example waves 5, 10 and 15), offer one of three rare rule-changing relics.
 
-These are not normal shop items.
+These are not normal shop items. Resolve them inside the post-wave reward pipeline, after loot collection and before the shop.
 
 Examples:
 
@@ -463,6 +553,7 @@ Visual tint, spawn profile, hazards and music can change without requiring four 
 8. Use cooldowns/limits to prevent proc chains from creating infinite or unreadable cascades.
 9. Measure before and after tuning.
 10. Keep the game readable at maximum intended enemy/projectile density.
+11. Do not use modal reward screens to relieve combat pressure; let the wave breathe only after it actually ends.
 
 ## Definition of a healthier run
 
@@ -471,6 +562,8 @@ A successful v0.2 run should feel approximately like this:
 - early: Denti is vulnerable and building identity
 - mid: synergies begin to come online; hordes become satisfying but dangerous
 - late: Denti destroys huge amounts of trash, but must still dodge patterns and respect elites
+- each active wave: uninterrupted movement/combat with no level-up or chest modal stopping a dodge sequence
+- wave end: everything flies in, then there is a satisfying loot/level-up/chest reward break
 - bosses: strong builds shorten the fight, but do not erase the encounter in a few seconds
 - shops/chests/relics create recognizable build goals and difficult decisions
 - replaying immediately suggests another build to try
