@@ -47,7 +47,7 @@ func _physics_process(delta: float) -> void:
 			return
 		hit_ids.append(enemy.get_instance_id())
 		if data.knockback > 0.0:
-			enemy.global_position += direction * data.knockback
+			enemy.global_position += direction * data.knockback * (1.0 - enemy.data.knockback_resistance)
 		enemy.take_damage(data.damage_against(enemy, damage))
 		if pierces_left <= 0:
 			impact_time = IMPACT_DURATION

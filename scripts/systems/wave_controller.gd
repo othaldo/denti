@@ -9,10 +9,16 @@ signal wave_finished(wave_number: int)
 const DURATION := 45.0
 const MAX_WAVES := 20
 const MINI_BOSS_INTERVAL := 5
-const SPAWN_INTERVAL_START := 1.6
-const SPAWN_INTERVAL_WAVE_STEP := 0.065
+const SPAWN_INTERVAL_START := 1.4
+const SPAWN_INTERVAL_WAVE_STEP := 0.055
 const SPAWN_INTERVAL_ACCELERATION := 0.012
-const SPAWN_INTERVAL_MIN := 0.4
+const SPAWN_INTERVAL_MIN := 0.35
+const MOB_HEALTH_WAVE_STEP := 0.17
+const BOSS_HEALTH_WAVE_STEP := 0.27
+const MOB_DEFENSE_WAVE_STEP := 0.01
+const BOSS_DEFENSE_WAVE_STEP := 0.006
+const MAX_DAMAGE_REDUCTION := 0.42
+const ENEMY_DAMAGE_WAVE_STEP := 0.06
 const PLAQUE: EnemyData = preload("res://data/enemies/plaque.tres")
 const BACTERIA: EnemyData = preload("res://data/enemies/bacteria.tres")
 const SUGAR: EnemyData = preload("res://data/enemies/sugar.tres")
@@ -34,6 +40,16 @@ func plan_hordes() -> void:
 
 static func is_boss_wave(wave_number: int) -> bool:
 	return wave_number > 0 and wave_number % MINI_BOSS_INTERVAL == 0
+
+
+static func health_multiplier(data: EnemyData, wave_number: int) -> float:
+	var step := BOSS_HEALTH_WAVE_STEP if data.is_boss else MOB_HEALTH_WAVE_STEP
+	return 1.0 + maxi(wave_number - 1, 0) * step
+
+
+static func damage_reduction(data: EnemyData, wave_number: int) -> float:
+	var step := BOSS_DEFENSE_WAVE_STEP if data.is_boss else MOB_DEFENSE_WAVE_STEP
+	return clampf(data.damage_reduction + maxi(wave_number - 1, 0) * step, 0.0, MAX_DAMAGE_REDUCTION)
 
 
 func next_wave_preview() -> String:

@@ -12,6 +12,7 @@ const ICONS: Script = preload("res://scripts/ui/denti_ui_icons.gd")
 @onready var wave_label: Label = $Root/WaveInfo/Wave
 @onready var timer_label: Label = $Root/WaveInfo/Timer
 @onready var wave_frame: Panel = $Root/WaveFrame
+@onready var wave_info: VBoxContainer = $Root/WaveInfo
 @onready var boss_area: Control = $Root/WaveInfo/BossArea
 @onready var boss_label: Label = $Root/WaveInfo/BossArea/BossName
 @onready var boss_bar: ProgressBar = $Root/WaveInfo/BossArea/BossHealth
@@ -32,8 +33,8 @@ func _ready() -> void:
 	DentiUIStyle.style_hud_text(xp_label, DentiUIStyle.INK, 14, 3, light_outline)
 	DentiUIStyle.style_hud_text(coins_label, DentiUIStyle.INK, 20, 2, light_outline)
 	DentiUIStyle.style_hud_text(level_label, DentiUIStyle.INK, 17, 2, light_outline)
-	DentiUIStyle.style_hud_text(wave_label, DentiUIStyle.INK, 18, 3, light_outline)
-	DentiUIStyle.style_hud_text(timer_label, DentiUIStyle.INK, 35, 4, light_outline)
+	DentiUIStyle.style_hud_text(wave_label, DentiUIStyle.INK, 16, 3, light_outline)
+	DentiUIStyle.style_hud_text(timer_label, DentiUIStyle.INK, 30, 4, light_outline)
 	DentiUIStyle.style_hud_text(boss_label, DentiUIStyle.INK, 15, 3, light_outline)
 	DentiUIStyle.style_hud_text(fps_label, DentiUIStyle.INK, 15, 2, light_outline)
 	DentiUIStyle.style_progress(health_bar, DentiUIStyle.CORAL)
@@ -71,13 +72,13 @@ func update_status(stats: PlayerStats, xp: int, xp_goal: int, level: int, coins:
 	xp_label.text = "%d / %d" % [xp, xp_goal]
 	coins_label.text = "%d" % coins
 	level_label.text = "Lv. %d" % level
-	wave_label.text = "WELLE %d / %d" % [wave_number, WaveController.MAX_WAVES]
+	wave_label.text = "WELLE %d" % wave_number
 	var seconds := ceili(remaining)
 	if boss_pending:
 		timer_label.text = "Boss besiegen!"
 	else:
-		timer_label.text = "Shop-Pause" if in_shop else "%02d:%02d" % [seconds / 60, seconds % 60]
-	var timer_font_size := 25 if in_shop or boss_pending else 35
+		timer_label.text = "Shop-Pause" if in_shop else "%d" % seconds
+	var timer_font_size := 20 if in_shop or boss_pending else 30
 	if timer_label.get_theme_font_size("font_size") != timer_font_size:
 		timer_label.add_theme_font_size_override("font_size", timer_font_size)
 	timer_label.add_theme_color_override("font_color", DentiUIStyle.GOLD.darkened(0.35) if remaining <= 15.0 and not in_shop and not boss_pending else DentiUIStyle.INK)
@@ -89,7 +90,11 @@ func update_status(stats: PlayerStats, xp: int, xp_goal: int, level: int, coins:
 	boss_area.visible = boss_visible
 	boss_label.visible = boss_visible
 	boss_bar.visible = boss_visible
-	wave_frame.offset_bottom = 136.0 if boss_visible else 103.0
+	wave_frame.offset_left = -130.0 if boss_visible else -82.0
+	wave_frame.offset_right = 130.0 if boss_visible else 82.0
+	wave_frame.offset_bottom = 116.0 if boss_visible else 86.0
+	wave_info.offset_left = -118.0 if boss_visible else -74.0
+	wave_info.offset_right = 118.0 if boss_visible else 74.0
 	if boss_visible:
 		boss_label.text = "%s · %d / %d" % [boss.data.display_name, ceili(boss.health), ceili(boss.max_health)]
 		boss_bar.max_value = boss.max_health

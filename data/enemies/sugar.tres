@@ -6,7 +6,8 @@
 [resource]
 script = ExtResource("1")
 display_name = "Zuckerstück"
-max_health = 55.0
+max_health = 72.0
+damage_reduction = 0.12
 move_speed = 62.0
 contact_damage = 15.0
 radius = 24.0

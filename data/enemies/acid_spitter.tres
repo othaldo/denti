@@ -6,7 +6,8 @@
 [resource]
 script = ExtResource("1")
 display_name = "Säurespucker"
-max_health = 26.0
+max_health = 40.0
+damage_reduction = 0.08
 move_speed = 92.0
 contact_damage = 5.0
 radius = 18.0

@@ -20,6 +20,8 @@ scale = Vector2(0.067, 0.067)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_1")
 
+[node name="Camera2D" type="Camera2D" parent="."]
+
 [node name="Stats" type="Node" parent="."]
 script = ExtResource("2")
 

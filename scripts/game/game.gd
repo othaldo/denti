@@ -5,6 +5,7 @@ const LOOT_SCENE: PackedScene = preload("res://scenes/game/loot.tscn")
 const DAMAGE_NUMBER_SCENE: PackedScene = preload("res://scenes/ui/damage_number.tscn")
 const RUN_SNAPSHOT: Script = preload("res://scripts/systems/run_snapshot.gd")
 const SPAWN_PADDING := 32.0
+const MAX_ACTIVE_ENEMIES := 110
 const UPGRADES: Array[UpgradeData] = [
 	preload("res://data/upgrades/bisskraft.tres"),
 	preload("res://data/upgrades/haerte.tres"),
@@ -102,41 +103,58 @@ func _notification(what: int) -> void:
 
 
 func _refresh_hud() -> void:
-	hud.update_status(player.stats, xp, xp_goal, level, coins, wave.current_wave, wave.remaining, in_shop, boss, boss_pending)
+	var visible_boss: Enemy = boss if is_instance_valid(boss) else null
+	hud.update_status(player.stats, xp, xp_goal, level, coins, wave.current_wave, wave.remaining, in_shop, visible_boss, boss_pending)
 
 
 func _spawn_enemy(data: EnemyData) -> void:
-	var edge := randi_range(0, 3)
-	var at := Vector2.ZERO
-	var size := arena.arena_size
-	match edge:
-		0:
-			at = Vector2(randf_range(0.0, size.x), -SPAWN_PADDING)
-		1:
-			at = Vector2(size.x + SPAWN_PADDING, randf_range(0.0, size.y))
-		2:
-			at = Vector2(randf_range(0.0, size.x), size.y + SPAWN_PADDING)
-		3:
-			at = Vector2(-SPAWN_PADDING, randf_range(0.0, size.y))
-	_create_enemy(data, at)
+	if $Enemies.get_child_count() >= MAX_ACTIVE_ENEMIES:
+		return
+	_create_enemy(data, _spawn_position(_spawn_edge()))
 
 
 func _spawn_horde(data: EnemyData, count: int) -> void:
-	var edge := randi_range(0, 3)
-	var center := Vector2.ZERO
-	var size := arena.arena_size
+	var edge := _spawn_edge()
+	var center := _spawn_position(edge)
+	var lower := Vector2.ONE * (DentiArena.WALL_WIDTH + 8.0)
+	var upper := arena.arena_size - lower
+	for index in count:
+		if $Enemies.get_child_count() >= MAX_ACTIVE_ENEMIES:
+			break
+		var offset := (float(index) - float(count - 1) / 2.0) * (data.radius * 2.5)
+		var at := center + (Vector2(offset, 0.0) if edge % 2 == 0 else Vector2(0.0, offset))
+		_create_enemy(data, at.clamp(lower, upper))
+
+
+func _spawn_edge() -> int:
+	var half_view := get_viewport_rect().size * 0.5
+	var lower := DentiArena.WALL_WIDTH + 8.0
+	var edges: Array[int] = []
+	if player.global_position.y - half_view.y - SPAWN_PADDING >= lower:
+		edges.append(0)
+	if player.global_position.x + half_view.x + SPAWN_PADDING <= arena.arena_size.x - lower:
+		edges.append(1)
+	if player.global_position.y + half_view.y + SPAWN_PADDING <= arena.arena_size.y - lower:
+		edges.append(2)
+	if player.global_position.x - half_view.x - SPAWN_PADDING >= lower:
+		edges.append(3)
+	return edges.pick_random()
+
+
+func _spawn_position(edge: int) -> Vector2:
+	var half_view := get_viewport_rect().size * 0.5
+	var lower := Vector2.ONE * (DentiArena.WALL_WIDTH + 8.0)
+	var upper := arena.arena_size - lower
+	var center := player.global_position
 	match edge:
 		0:
-			center = Vector2(randf_range(200.0, size.x - 200.0), -SPAWN_PADDING)
+			return Vector2(randf_range(maxf(lower.x, center.x - half_view.x), minf(upper.x, center.x + half_view.x)), center.y - half_view.y - SPAWN_PADDING)
 		1:
-			center = Vector2(size.x + SPAWN_PADDING, randf_range(200.0, size.y - 200.0))
+			return Vector2(center.x + half_view.x + SPAWN_PADDING, randf_range(maxf(lower.y, center.y - half_view.y), minf(upper.y, center.y + half_view.y)))
 		2:
-			center = Vector2(randf_range(200.0, size.x - 200.0), size.y + SPAWN_PADDING)
-		3:
-			center = Vector2(-SPAWN_PADDING, randf_range(200.0, size.y - 200.0))
-	for index in count:
-		var offset := (float(index) - float(count - 1) / 2.0) * (data.radius * 2.5)
-		_create_enemy(data, center + (Vector2(offset, 0.0) if edge % 2 == 0 else Vector2(0.0, offset)))
+			return Vector2(randf_range(maxf(lower.x, center.x - half_view.x), minf(upper.x, center.x + half_view.x)), center.y + half_view.y + SPAWN_PADDING)
+		_:
+			return Vector2(center.x - half_view.x - SPAWN_PADDING, randf_range(maxf(lower.y, center.y - half_view.y), minf(upper.y, center.y + half_view.y)))
 
 
 func _create_enemy(data: EnemyData, at: Vector2) -> void:

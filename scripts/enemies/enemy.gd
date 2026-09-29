@@ -16,6 +16,7 @@ var data: EnemyData
 var target: Player
 var health: float
 var max_health: float
+var damage_reduction: float
 var contact_damage: float
 var attack_damage: float
 var move_speed: float
@@ -30,10 +31,11 @@ var pulse_flash_time: float = 0.0
 func configure(enemy_data: EnemyData, player: Player, wave_number: int = 1) -> void:
 	data = enemy_data
 	target = player
-	max_health = data.max_health * (1.0 + (wave_number - 1) * 0.14)
+	max_health = data.max_health * WaveController.health_multiplier(data, wave_number)
 	health = max_health
-	contact_damage = data.contact_damage * (1.0 + (wave_number - 1) * 0.09)
-	attack_damage = data.attack_damage * (1.0 + (wave_number - 1) * 0.09)
+	damage_reduction = WaveController.damage_reduction(data, wave_number)
+	contact_damage = data.contact_damage * (1.0 + (wave_number - 1) * WaveController.ENEMY_DAMAGE_WAVE_STEP)
+	attack_damage = data.attack_damage * (1.0 + (wave_number - 1) * WaveController.ENEMY_DAMAGE_WAVE_STEP)
 	move_speed = data.move_speed * (1.0 + (wave_number - 1) * 0.025)
 	special_phase = SpecialPhase.COOLDOWN
 	special_timer = data.special_interval * randf_range(0.65, 1.0)
@@ -138,8 +140,9 @@ func _reset_special() -> void:
 func take_damage(amount: float) -> void:
 	if health <= 0.0:
 		return
-	health -= amount
-	damaged.emit(global_position + Vector2(0.0, -data.radius), amount)
+	var applied := maxf(amount * (1.0 - damage_reduction), 1.0)
+	health -= applied
+	damaged.emit(global_position + Vector2(0.0, -data.radius), applied)
 	if health <= 0.0:
 		health = 0.0
 		remove_from_group("enemies")

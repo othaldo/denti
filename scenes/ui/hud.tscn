@@ -137,54 +137,54 @@ text = "Lv. 1"
 [node name="WaveFrame" type="Panel" parent="Root"]
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -127.0
+offset_left = -82.0
 offset_top = 14.0
-offset_right = 127.0
-offset_bottom = 103.0
+offset_right = 82.0
+offset_bottom = 86.0
 grow_horizontal = 2
 mouse_filter = 2
 
 [node name="WaveInfo" type="VBoxContainer" parent="Root"]
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -115.0
+offset_left = -74.0
 offset_top = 19.0
-offset_right = 115.0
-offset_bottom = 99.0
+offset_right = 74.0
+offset_bottom = 82.0
 grow_horizontal = 2
 mouse_filter = 2
 theme_override_constants/separation = 0
 
 [node name="Wave" type="Label" parent="Root/WaveInfo"]
-custom_minimum_size = Vector2(0, 28)
+custom_minimum_size = Vector2(0, 25)
 layout_mode = 2
 mouse_filter = 2
 horizontal_alignment = 1
 vertical_alignment = 1
-text = "WELLE 1 / 10"
+text = "WELLE 1"
 
 [node name="WaveIcon" type="TextureRect" parent="Root/WaveInfo/Wave"]
-offset_left = 17.0
+offset_left = 3.0
 offset_top = 2.0
-offset_right = 41.0
-offset_bottom = 26.0
+offset_right = 24.0
+offset_bottom = 23.0
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
 [node name="Timer" type="Label" parent="Root/WaveInfo"]
-custom_minimum_size = Vector2(0, 48)
+custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 mouse_filter = 2
 horizontal_alignment = 1
 vertical_alignment = 1
-text = "00:45"
+text = "45"
 
 [node name="ClockIcon" type="TextureRect" parent="Root/WaveInfo/Timer"]
-offset_left = 28.0
-offset_top = 10.0
-offset_right = 55.0
-offset_bottom = 37.0
+offset_left = 14.0
+offset_top = 6.0
+offset_right = 38.0
+offset_bottom = 30.0
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5

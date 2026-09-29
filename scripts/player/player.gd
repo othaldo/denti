@@ -4,7 +4,6 @@ extends CharacterBody2D
 signal attack_performed(kind: StringName)
 signal damaged(position: Vector2, amount: float)
 
-const ARENA_MARGIN := 28.0
 const HURT_COOLDOWN := 0.65
 const ATTACK_ANIMATION_DURATION := 0.18
 
@@ -12,6 +11,7 @@ const ATTACK_ANIMATION_DURATION := 0.18
 @onready var loadout: WeaponLoadout = $Weapons
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var sprite_base_scale: Vector2 = sprite.scale
+@onready var arena: DentiArena = get_node("../Arena")
 
 var hurt_time: float = 0.0
 var animation_time: float = 0.0
@@ -23,7 +23,7 @@ func _physics_process(delta: float) -> void:
 	var direction := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	velocity = direction * stats.move_speed
 	move_and_slide()
-	global_position = global_position.clamp(Vector2.ONE * ARENA_MARGIN, get_viewport_rect().size - Vector2.ONE * ARENA_MARGIN)
+	global_position = global_position.clamp(Vector2.ONE * DentiArena.PLAYER_MARGIN, arena.arena_size - Vector2.ONE * DentiArena.PLAYER_MARGIN)
 	_animate_sprite(direction, delta)
 	if hurt_time > 0.0:
 		hurt_time -= delta

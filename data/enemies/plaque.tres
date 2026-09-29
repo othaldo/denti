@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("1")
 display_name = "Plaque"
-max_health = 30.0
+max_health = 36.0
 move_speed = 82.0
 contact_damage = 9.0
 radius = 18.0

@@ -6,7 +6,9 @@
 [resource]
 script = ExtResource("1")
 display_name = "Karies-Imperator"
-max_health = 650.0
+max_health = 2500.0
+damage_reduction = 0.22
+knockback_resistance = 0.85
 move_speed = 62.0
 contact_damage = 27.0
 radius = 56.0
@@ -15,3 +17,9 @@ coin_drop = 0
 sprite = ExtResource("2")
 sprite_tint = Color(0.78, 0.62, 1.0, 1.0)
 is_boss = true
+special_attack = 2
+special_interval = 3.8
+warning_time = 0.9
+trigger_range = 200.0
+attack_radius = 155.0
+attack_damage = 25.0

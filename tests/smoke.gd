@@ -33,7 +33,7 @@ func _run() -> void:
 	var hud: GameHUD = game.get_node("HUD")
 	var vitals: Control = hud.get_node("Root/Vitals")
 	var wave_info: Control = hud.get_node("Root/WaveInfo")
-	if vitals.size.x > 270.0 or vitals.size.y > 120.0 or wave_info.size.x > 380.0:
+	if vitals.size.x > 270.0 or vitals.size.y > 120.0 or wave_info.size.x > 160.0 or hud.wave_frame.size.x > 180.0:
 		_fail("wave HUD takes too much arena space")
 		return
 	if hud.health_label.get_theme_constant("outline_size") < 3 or hud.timer_label.get_theme_constant("outline_size") < 4:
@@ -176,7 +176,7 @@ func _run() -> void:
 	if paused or game.wave.current_wave != 2 or not game.wave.active or game.get_node("ShopPanel").visible:
 		_fail("shop continue did not start wave two")
 		return
-	if game.get_node("HUD").wave_label.text != "WELLE 2 / 20" or game.get_node("HUD").timer_label.text != "00:45":
+	if game.get_node("HUD").wave_label.text != "WELLE 2" or game.get_node("HUD").timer_label.text != "45":
 		_fail("HUD did not show wave number and countdown")
 		return
 	if game.get_node("Enemies").get_child_count() != 0:
