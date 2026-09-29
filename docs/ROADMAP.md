@@ -20,7 +20,8 @@ This roadmap captures the current player feedback and the intended next developm
 - Phase 3 now adds two reusable telegraphed projectile patterns: Säurespucker fire a parallel lane from wave 13, and Säurekrone launches a slow, large space-denial orb from wave 15. Both use the common projectile scene, and the orb’s size and collision radius survive save/resume.
 - Relic card names now wrap to two centered lines so long German names stay inside their cards.
 - Phase 4 now gives the Prince a trailing fan, the King a charge-aligned projectile lane and the Emperor a slow space orb. At each health threshold, radial bursts add projectiles; the final phase combines that burst with the boss's signature pattern and telegraphs the added danger.
-- Next: playtest the three boss signatures and their final-phase combinations. Check that their warning shapes are readable and dodgeable, then compare boss time-to-kill and damage taken before adding more mechanics.
+- Boss radial attacks now arrive as staggered volleys: one for the Graf, then two, three and five on later milestone bosses. Each volley shifts the safe gap slightly, and the sequence plus its timing survives save/resume.
+- Next: playtest the boss volley sequences and signature combinations. Check that their moving safe gaps remain readable and dodgeable, then compare boss time-to-kill and damage taken before adding more mechanics.
 
 ## Why v0.2 exists
 

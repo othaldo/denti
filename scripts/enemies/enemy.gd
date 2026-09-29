@@ -59,6 +59,9 @@ var boss_phase: int = 0
 var boss_phase_timer: float = 0.0
 var boss_phase_burst_fired: bool = false
 var boss_phase_gap_angle: float = 0.0
+var boss_radial_volleys_remaining: int = 0
+var boss_radial_volley_timer: float = 0.0
+var boss_radial_volley_index: int = 0
 var boss_guard_feedback_time: float = 0.0
 var spawn_wave: int = 1
 var active_special_attack: int = EnemyData.SpecialAttack.NONE
@@ -142,6 +145,11 @@ func _physics_process(delta: float) -> void:
 			if not boss_phase_burst_fired and boss_phase_timer <= data.boss_phase_duration * 0.5:
 				boss_phase_burst_fired = true
 				_fire_phase_burst()
+		if boss_radial_volleys_remaining > 0:
+			boss_radial_volley_timer -= delta
+			if boss_radial_volley_timer <= 0.0:
+				_fire_next_boss_radial_volley()
+		if boss_phase_timer > 0.0 or boss_radial_volleys_remaining > 0:
 			queue_redraw()
 	if data.is_elite and data.elite_guard_recharge_seconds > 0.0 and health > 0.0:
 		elite_damage_budget = minf(elite_damage_budget + max_health * data.elite_guard_fraction * delta / data.elite_guard_recharge_seconds, max_health * data.elite_guard_fraction)
@@ -323,11 +331,23 @@ func _dash_impact() -> void:
 
 
 func _fire_phase_burst() -> void:
+	boss_radial_volleys_remaining = maxi(data.boss_radial_volley_count, 1)
+	boss_radial_volley_timer = 0.0
+	boss_radial_volley_index = 0
+	_fire_next_boss_radial_volley()
+
+
+func _fire_next_boss_radial_volley() -> void:
 	var root := _projectile_root()
+	var volley_angle := boss_phase_gap_angle + deg_to_rad(data.boss_radial_angle_step_degrees * float(boss_radial_volley_index))
 	if root != null:
-		EnemyProjectilePatterns.fire_radial(root, global_position, data.boss_radial_count + boss_phase * 2, boss_phase_gap_angle, data.boss_projectile_speed, attack_damage * 0.55, target)
-		if boss_phase >= 2:
-			_fire_boss_signature(Vector2.RIGHT.rotated(boss_phase_gap_angle))
+		EnemyProjectilePatterns.fire_radial(root, global_position, data.boss_radial_count + boss_phase * 2, volley_angle, data.boss_projectile_speed, attack_damage * 0.55, target)
+	boss_radial_volley_index += 1
+	boss_radial_volleys_remaining -= 1
+	if boss_radial_volleys_remaining > 0:
+		boss_radial_volley_timer = data.boss_radial_volley_interval
+	elif boss_phase >= 2:
+		_fire_boss_signature(Vector2.RIGHT.rotated(boss_phase_gap_angle))
 
 
 func _fire_boss_fan() -> void:
@@ -423,6 +443,9 @@ func _start_boss_phase() -> void:
 	boss_phase += 1
 	boss_phase_timer = data.boss_phase_duration
 	boss_phase_burst_fired = false
+	boss_radial_volleys_remaining = 0
+	boss_radial_volley_timer = 0.0
+	boss_radial_volley_index = 0
 	boss_phase_gap_angle = global_position.angle_to_point(target.global_position)
 	special_direction = Vector2.RIGHT.rotated(boss_phase_gap_angle)
 	special_phase = SpecialPhase.COOLDOWN
@@ -462,9 +485,16 @@ func _draw() -> void:
 	if data.is_boss and data.boss_guard_recharge_seconds > 0.0:
 		if boss_phase_timer > 0.0:
 			draw_arc(Vector2.ZERO, data.radius + 19.0, 0.0, TAU, 48, Color(0.95, 0.32, 0.63, 0.9), 7.0)
-			if not boss_phase_burst_fired:
-				for ray in EnemyProjectilePatterns.radial_directions(data.boss_radial_count + boss_phase * 2, boss_phase_gap_angle):
+			if not boss_phase_burst_fired or boss_radial_volleys_remaining > 0:
+				var first_preview_index := boss_radial_volley_index if boss_phase_burst_fired else 0
+				var preview_count := boss_radial_volleys_remaining if boss_phase_burst_fired else data.boss_radial_volley_count
+				var current_gap_angle := boss_phase_gap_angle + deg_to_rad(data.boss_radial_angle_step_degrees * float(first_preview_index))
+				for ray in EnemyProjectilePatterns.radial_directions(data.boss_radial_count + boss_phase * 2, current_gap_angle):
 					draw_line(ray * data.radius, ray * 290.0, Color(0.95, 0.25, 0.42, 0.3), 3.0)
+				for volley_offset in preview_count:
+					var preview_angle := boss_phase_gap_angle + deg_to_rad(data.boss_radial_angle_step_degrees * float(first_preview_index + volley_offset))
+					var gap_marker := Vector2.RIGHT.rotated(preview_angle) * 290.0
+					draw_arc(gap_marker, 10.0, 0.0, TAU, 20, Color(1.0, 0.78, 0.3, 0.88), 3.0)
 				if boss_phase >= 2:
 					var phase_aim := Vector2.RIGHT.rotated(boss_phase_gap_angle)
 					match data.boss_signature:

@@ -24,6 +24,9 @@ static func capture(game) -> Dictionary:
 			"boss_phase_timer": enemy.boss_phase_timer,
 			"boss_phase_burst_fired": enemy.boss_phase_burst_fired,
 			"boss_phase_gap_angle": enemy.boss_phase_gap_angle,
+			"boss_radial_volleys_remaining": enemy.boss_radial_volleys_remaining,
+			"boss_radial_volley_timer": enemy.boss_radial_volley_timer,
+			"boss_radial_volley_index": enemy.boss_radial_volley_index,
 		})
 	var loot_data: Array[Dictionary] = []
 	for drop: Loot in game.get_node("Loot").get_children():
@@ -146,6 +149,9 @@ static func restore(game, saved: Dictionary) -> void:
 			enemy.boss_phase_timer = clampf(float(entry.get("boss_phase_timer", 0.0)), 0.0, enemy.data.boss_phase_duration)
 			enemy.boss_phase_burst_fired = bool(entry.get("boss_phase_burst_fired", false))
 			enemy.boss_phase_gap_angle = float(entry.get("boss_phase_gap_angle", 0.0))
+			enemy.boss_radial_volleys_remaining = clampi(int(entry.get("boss_radial_volleys_remaining", 0)), 0, enemy.data.boss_radial_volley_count)
+			enemy.boss_radial_volley_timer = clampf(float(entry.get("boss_radial_volley_timer", 0.0)), 0.0, enemy.data.boss_radial_volley_interval)
+			enemy.boss_radial_volley_index = clampi(int(entry.get("boss_radial_volley_index", 0)), 0, enemy.data.boss_radial_volley_count)
 		enemy.queue_redraw()
 	for entry in saved.get("loot", []):
 		var kind := StringName(str(entry.get("kind", "xp")))

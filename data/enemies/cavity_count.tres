@@ -28,6 +28,7 @@ boss_guard_recharge_seconds = 20.0
 boss_guard_burst_fraction = 0.10
 boss_phase_duration = 1.8
 boss_radial_count = 12
+boss_radial_volley_count = 1
 boss_fan_count = 3
 boss_projectile_speed = 240.0
 boss_phase_adds = 5

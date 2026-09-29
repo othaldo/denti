@@ -50,6 +50,9 @@ enum BossSignature { AIMED_FAN, TRAIL_FAN, LANE, SPACE_ORB }
 @export var boss_signature_projectile_count: int = 3
 @export var boss_signature_projectile_spacing: float = 54.0
 @export var boss_signature_orb_radius: float = 42.0
+@export_range(1, 5, 1) var boss_radial_volley_count: int = 1
+@export var boss_radial_volley_interval: float = 0.22
+@export var boss_radial_angle_step_degrees: float = 8.0
 @export var boss_guard_recharge_seconds: float = 0.0
 @export_range(0.0, 1.0, 0.01) var boss_guard_burst_fraction: float = 0.0
 @export var boss_phase_duration: float = 0.0
