@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"tooth_fairy_pact"
+icon_index = 15
+display_name = "Zahnfee-Pakt"
+description = "XP heilt 0,35 Leben je Punkt. -8 maximales Leben."
+rarity_tier = 2
+price = 9
+stat_changes = { &"max_health": -8.0 }
+effect_kind = &"xp_heal"
+effect_value = 0.35
+max_stacks = 2
+tags = Array[StringName]([&"sustain", &"economy"])

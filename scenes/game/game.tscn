@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://scripts/game/game.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/game/arena.gd" id="2"]
@@ -11,6 +11,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/game_menu.tscn" id="9"]
 [ext_resource type="Script" path="res://scripts/systems/music_controller.gd" id="10"]
 [ext_resource type="Script" path="res://scripts/systems/sound_controller.gd" id="11"]
+[ext_resource type="Script" path="res://scripts/systems/item_inventory.gd" id="12"]
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1")
@@ -32,6 +33,10 @@ z_index = 20
 
 [node name="Player" parent="." instance=ExtResource("3")]
 position = Vector2(640, 360)
+
+[node name="Items" type="Node2D" parent="."]
+z_index = 12
+script = ExtResource("12")
 
 [node name="WaveController" type="Node" parent="."]
 script = ExtResource("4")

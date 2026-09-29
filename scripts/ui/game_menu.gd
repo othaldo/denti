@@ -185,6 +185,7 @@ func _show_home() -> void:
 		_text("Welle %d · Level %d" % [game.wave.current_wave, game.level])
 		_button("Fortsetzen", close_pause, true)
 		_button("Stats", _show_stats)
+		_button("Items", _show_items)
 		_button("Optionen", _show_options)
 		_button("Hauptmenü", _to_main_menu)
 	else:
@@ -205,12 +206,37 @@ func _show_stats() -> void:
 	_clear_rows()
 	_title("Dentis Stats")
 	var stats: PlayerStats = game.player.stats
-	_text("Leben  %.0f / %.0f     Level  %d     XP  %d / %d\nMünzen  %d     Welle  %d / %d" % [stats.health, stats.max_health, game.level, game.xp, game.xp_goal, game.coins, game.wave.current_wave, WaveController.MAX_WAVES])
+	_text("Leben  %.0f / %.0f     Schild  %d     Level  %d     XP  %d / %d\nMünzen  %d     Welle  %d / %d" % [stats.health, stats.max_health, stats.shield_charges, game.level, game.xp, game.xp_goal, game.coins, game.wave.current_wave, WaveController.MAX_WAVES])
 	_text("Bisskraft  %.0f     Härte  %.0f\nPutzeifer  %.2f Angriffe/s     Glanz  %.0f%%\nSpeichel  %.1f Leben/s     Bewegung  %.0f     Glück  %.0f" % [stats.damage, stats.armor, 1.0 / stats.attack_interval, stats.crit_chance * 100.0, stats.regen, stats.move_speed, stats.luck])
 	var weapons: Array[String] = []
 	for weapon in game.player.loadout.equipped():
 		weapons.append("%s %s" % [weapon.data.display_name, ["I", "II", "III", "IV"][weapon.tier - 1]])
 	_text("Waffen: " + (", ".join(weapons) if not weapons.is_empty() else "noch keine"))
+	_button("Zurück", _show_home, true)
+
+
+func _show_items() -> void:
+	page = &"items"
+	_clear_rows()
+	_title("Dentis Items")
+	var owned: Array[Dictionary] = game.items.all_items()
+	if owned.is_empty():
+		_text("Noch keine Items. In der Zahnklinik warten welche auf dich.")
+	else:
+		var scrolling := ScrollContainer.new()
+		scrolling.custom_minimum_size = Vector2(450, 300)
+		scrolling.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		rows.add_child(scrolling)
+		var list := VBoxContainer.new()
+		list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		list.add_theme_constant_override("separation", 6)
+		scrolling.add_child(list)
+		for entry in owned:
+			var line := Label.new()
+			line.text = "%s ×%d\n%s" % [entry["name"], entry["count"], entry["description"]]
+			line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			line.add_theme_color_override("font_color", DentiUIStyle.INK)
+			list.add_child(line)
 	_button("Zurück", _show_home, true)
 
 

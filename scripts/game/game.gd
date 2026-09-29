@@ -21,6 +21,7 @@ const UPGRADES: Array[UpgradeData] = [
 @onready var arena: DentiArena = $Arena
 @onready var wave: WaveController = $WaveController
 @onready var shop: ShopController = $ShopController
+@onready var items: ItemInventory = $Items
 @onready var music: MusicController = $Music
 @onready var sound: SoundController = $Sound
 @onready var hud: GameHUD = $HUD
@@ -49,8 +50,11 @@ func _ready() -> void:
 	wave.horde_requested.connect(_spawn_horde)
 	wave.wave_finished.connect(_on_wave_finished)
 	player.stats.died.connect(_on_player_died)
+	player.stats.shield_blocked.connect(items.on_shield_blocked)
 	player.attack_performed.connect(sound.play_attack)
 	player.damaged.connect(_on_player_damaged)
+	player.damaged.connect(items.on_player_hurt)
+	items.feedback.connect(_show_item_feedback)
 	choice_panel.upgrade_chosen.connect(_on_upgrade_chosen)
 	choice_panel.starter_chosen.connect(_on_starter_chosen)
 	choice_panel.restart_requested.connect(_restart)
@@ -78,6 +82,7 @@ func _on_starter_chosen(weapon: WeaponData) -> void:
 	player.loadout.acquire(weapon)
 	starter_pending = false
 	wave.start_next_wave()
+	items.on_wave_start()
 	_sync_music()
 	get_tree().paused = false
 	_save_run()
@@ -164,6 +169,7 @@ func _create_enemy(data: EnemyData, at: Vector2) -> void:
 	enemy.configure(data, player, wave.current_wave)
 	enemy.defeated.connect(_on_enemy_defeated)
 	enemy.damaged.connect(_on_enemy_damaged)
+	enemy.weapon_hit.connect(items.on_weapon_hit)
 	enemy.attack_performed.connect(sound.play_cue)
 	$Enemies.add_child(enemy)
 	if data.is_boss:
@@ -172,6 +178,7 @@ func _create_enemy(data: EnemyData, at: Vector2) -> void:
 
 func _on_enemy_defeated(at: Vector2, data: EnemyData) -> void:
 	sound.play_cue(&"down")
+	coins += items.on_kill(at, data.is_boss)
 	if data.is_boss:
 		boss = null
 		if boss_pending:
@@ -194,10 +201,11 @@ func _spawn_loot(at: Vector2, kind: StringName, amount: int) -> void:
 
 func _on_loot_collected(kind: StringName, amount: int) -> void:
 	sound.play_cue(&"pickup")
+	var bonus := items.on_pickup(kind, amount)
 	if kind == &"coin":
-		coins += amount
+		coins += amount + bonus
 	else:
-		xp += amount
+		xp += amount + bonus
 		_check_level_up()
 
 
@@ -209,6 +217,12 @@ func _on_enemy_damaged(at: Vector2, amount: float) -> void:
 func _on_player_damaged(at: Vector2, amount: float) -> void:
 	_show_damage_number(at, amount, true)
 	sound.play_cue(&"hurt")
+
+
+func _show_item_feedback(message: String, at: Vector2, color: Color) -> void:
+	var number: DamageNumber = DAMAGE_NUMBER_SCENE.instantiate()
+	$DamageNumbers.add_child(number)
+	number.show_message(at, message, color)
 
 
 func _show_damage_number(at: Vector2, amount: float, player_hit: bool = false) -> void:
@@ -286,10 +300,11 @@ func _resolve_boss_wave() -> void:
 func _clear_arena(collect_drops: bool, keep_boss: bool = false) -> void:
 	for drop in $Loot.get_children():
 		if collect_drops:
+			var bonus := items.on_pickup(drop.kind, drop.amount)
 			if drop.kind == &"coin":
-				coins += drop.amount
+				coins += drop.amount + bonus
 			else:
-				xp += drop.amount
+				xp += drop.amount + bonus
 		drop.free()
 	for enemy in $Enemies.get_children():
 		if keep_boss and enemy == boss:
@@ -320,7 +335,7 @@ func _open_shop() -> void:
 	in_shop = true
 	intermission_pending = false
 	_sync_music()
-	shop.open_shop(wave.current_wave, player.stats.luck, player.loadout)
+	shop.open_shop(wave.current_wave, player.stats.luck, player.loadout, items)
 	_update_shop_panel()
 	get_tree().paused = true
 	_save_run()
@@ -334,8 +349,8 @@ func _update_shop_panel() -> void:
 		equipment.append({"name": weapon.data.display_name, "tier": weapon.tier, "refund": player.loadout.refund_for(index), "stats": weapon.data.stats_text(weapon.tier)})
 	var buyable: Array[bool] = []
 	for offer in shop.offers:
-		buyable.append(offer == null or offer.weapon_data == null or player.loadout.can_acquire(offer.weapon_data, offer.weapon_tier))
-	shop_panel.show_shop(wave.current_wave, coins, shop.reroll_cost, shop.offers, wave.next_wave_preview(), equipment, player.loadout.used_slots(), WeaponLoadout.CAPACITY, buyable, player.stats.luck)
+		buyable.append(offer == null or (player.loadout.can_acquire(offer.weapon_data, offer.weapon_tier) if offer.weapon_data != null else items.can_acquire(offer)))
+	shop_panel.show_shop(wave.current_wave, coins, shop.reroll_cost, shop.offers, wave.next_wave_preview(), equipment, player.loadout.used_slots(), WeaponLoadout.CAPACITY, buyable, player.stats.luck, items.all_items(), items.owned)
 	_refresh_hud()
 
 
@@ -347,12 +362,13 @@ func _on_shop_buy(index: int) -> void:
 		return
 	if offer.weapon_data != null and not player.loadout.can_acquire(offer.weapon_data, offer.weapon_tier):
 		return
+	if offer.weapon_data == null and not items.can_acquire(offer):
+		return
 	coins -= offer.price
 	if offer.weapon_data != null:
 		player.loadout.acquire(offer.weapon_data, offer.weapon_tier)
 	else:
-		for stat in offer.stat_changes:
-			player.stats.apply_upgrade(StringName(stat), float(offer.stat_changes[stat]))
+		items.acquire(offer)
 	shop.take_offer(index)
 	_update_shop_panel()
 	_save_run()
@@ -370,7 +386,7 @@ func _on_shop_reroll() -> void:
 	if not in_shop or coins < shop.reroll_cost:
 		return
 	coins -= shop.reroll_cost
-	shop.reroll(wave.current_wave, player.stats.luck, player.loadout)
+	shop.reroll(wave.current_wave, player.stats.luck, player.loadout, items)
 	_update_shop_panel()
 	_save_run()
 
@@ -386,6 +402,7 @@ func _on_shop_continue() -> void:
 	_clear_arena(false)
 	player.global_position = arena.arena_size / 2.0
 	wave.start_next_wave()
+	items.on_wave_start()
 	_sync_music()
 	get_tree().paused = false
 	_refresh_hud()

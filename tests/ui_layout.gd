@@ -67,6 +67,16 @@ func _run() -> void:
 		if button.get("icon_rect").texture == null or button.get("name_label").text.is_empty() or button.get("price_label").text.is_empty():
 			_fail("shop card is missing item information")
 			return
+	var first_offer := game.shop_panel.offer_buttons[0] as OfferCard
+	for template in ShopController.CATALOG:
+		if template.weapon_data != null:
+			continue
+		first_offer.show_offer(template, 100)
+		await process_frame
+		if not _within(first_offer.effect_label.get_global_rect(), first_offer.get_global_rect()):
+			_fail("item description exceeds shop card: " + str(template.id))
+			return
+	game._update_shop_panel()
 	game.coins = 100
 	game._update_shop_panel()
 	var offer: ShopOfferData = game.shop.offers[0]
@@ -91,6 +101,10 @@ func _run() -> void:
 
 func _inside(rect: Rect2, viewport_size: Vector2) -> bool:
 	return rect.position.x >= 0.0 and rect.position.y >= 0.0 and rect.end.x <= viewport_size.x and rect.end.y <= viewport_size.y
+
+
+func _within(inner: Rect2, outer: Rect2) -> bool:
+	return inner.position.x >= outer.position.x and inner.position.y >= outer.position.y and inner.end.x <= outer.end.x and inner.end.y <= outer.end.y
 
 
 func _starter_fits(panel: ChoicePanel) -> bool:

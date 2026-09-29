@@ -8,3 +8,4 @@ display_name = "Metallkrone"
 description = "+3 Härte, -18 Bewegung. Karamell bleibt gefährlich."
 price = 4
 stat_changes = { &"armor": 3.0, &"move_speed": -18.0 }
+tags = Array[StringName]([&"defense"])

@@ -25,7 +25,7 @@ func _physics_process(delta: float) -> void:
 	if distance <= PICKUP_DISTANCE:
 		collected.emit(kind, amount)
 		queue_free()
-	elif distance <= MAGNET_DISTANCE:
+	elif distance <= target.items.pickup_range():
 		global_position = global_position.move_toward(target.global_position, 200.0 * delta)
 
 

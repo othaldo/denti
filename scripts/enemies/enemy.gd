@@ -3,6 +3,7 @@ extends Node2D
 
 signal defeated(position: Vector2, data: EnemyData)
 signal damaged(position: Vector2, amount: float)
+signal weapon_hit(enemy: Enemy, amount: float, weapon: WeaponData, critical: bool)
 signal attack_performed(kind: StringName)
 
 enum SpecialPhase { COOLDOWN, WARNING, ACTIVE }
@@ -26,6 +27,10 @@ var special_phase: SpecialPhase = SpecialPhase.COOLDOWN
 var special_timer: float = 0.0
 var special_direction: Vector2 = Vector2.ZERO
 var pulse_flash_time: float = 0.0
+var bleed_stacks: int = 0
+var bleed_dps: float = 0.0
+var bleed_time: float = 0.0
+var bleed_tick: float = 1.0
 
 
 func configure(enemy_data: EnemyData, player: Player, wave_number: int = 1) -> void:
@@ -63,6 +68,18 @@ func _process(delta: float) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if bleed_time > 0.0 and health > 0.0:
+		bleed_time = maxf(bleed_time - delta, 0.0)
+		bleed_tick -= delta
+		if bleed_tick <= 0.0:
+			bleed_tick += 1.0
+			take_damage(bleed_dps * float(bleed_stacks))
+		if bleed_time <= 0.0:
+			bleed_stacks = 0
+			bleed_dps = 0.0
+			queue_redraw()
+	if health <= 0.0:
+		return
 	if target == null or target.stats.health <= 0.0:
 		return
 	var direction := global_position.direction_to(target.global_position)
@@ -137,12 +154,21 @@ func _reset_special() -> void:
 	queue_redraw()
 
 
-func take_damage(amount: float) -> void:
+func apply_bleed(dps: float, duration: float) -> void:
+	bleed_stacks = mini(bleed_stacks + 1, 3)
+	bleed_dps = maxf(bleed_dps, dps)
+	bleed_time = maxf(bleed_time, duration)
+	queue_redraw()
+
+
+func take_damage(amount: float, weapon: WeaponData = null, critical: bool = false) -> void:
 	if health <= 0.0:
 		return
 	var applied := maxf(amount * (1.0 - damage_reduction), 1.0)
 	health -= applied
 	damaged.emit(global_position + Vector2(0.0, -data.radius), applied)
+	if weapon != null:
+		weapon_hit.emit(self, applied, weapon, critical)
 	if health <= 0.0:
 		health = 0.0
 		remove_from_group("enemies")
@@ -177,6 +203,8 @@ func _draw() -> void:
 		draw_line(-special_direction * data.radius, Vector2.ZERO, Color(1.0, 0.72, 0.27, 0.7), 7.0)
 	if pulse_flash_time > 0.0:
 		draw_arc(Vector2.ZERO, data.attack_radius, 0.0, TAU, 64, Color(1.0, 0.72, 0.27, pulse_flash_time / PULSE_FLASH_DURATION), 8.0)
+	if bleed_stacks > 0:
+		draw_arc(Vector2.ZERO, data.radius + 4.0, 0.0, TAU, 24, Color(0.78, 0.25, 0.48, 0.85), 2.5 + bleed_stacks)
 	draw_circle(Vector2(0.0, data.radius * 0.7), data.radius * 0.7, Color(0.17, 0.13, 0.17, 0.17))
 	if data.is_boss:
 		draw_rect(Rect2(Vector2(-data.radius, data.radius + 11.0), Vector2(data.radius * 2.0, 8.0)), Color(0.18, 0.13, 0.2))

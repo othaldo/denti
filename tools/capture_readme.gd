@@ -83,11 +83,14 @@ func _run() -> void:
 	game._clear_arena(false)
 	game.wave.current_wave = 4
 	game.coins = 45
+	game.items.acquire(ShopController.by_id(&"fluoride_gel"))
+	game.items.acquire(ShopController.by_id(&"floss_reel"))
+	game.items.acquire(ShopController.by_id(&"gold_filling"))
 	game._open_shop()
 	game.shop.offers.clear()
-	game.shop.offers.append(ShopController.weapon_offer(ShopController.CATALOG[11], 2))
-	game.shop.offers.append(ShopController.CATALOG[2])
-	game.shop.offers.append(ShopController.weapon_offer(ShopController.CATALOG[13], 3))
+	game.shop.offers.append(ShopController.weapon_offer(ShopController.by_id(&"turbo_drill"), 2))
+	game.shop.offers.append(ShopController.by_id(&"radiant_filling"))
+	game.shop.offers.append(ShopController.by_id(&"holy_flash"))
 	game._update_shop_panel()
 	await _capture("shop.png")
 

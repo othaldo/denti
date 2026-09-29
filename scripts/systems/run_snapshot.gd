@@ -11,6 +11,8 @@ static func capture(game) -> Dictionary:
 			"type": enemy.data.resource_path, "position": _vector_data(enemy.position),
 			"health": enemy.health, "phase": enemy.special_phase,
 			"timer": enemy.special_timer, "direction": _vector_data(enemy.special_direction),
+			"bleed_stacks": enemy.bleed_stacks, "bleed_dps": enemy.bleed_dps,
+			"bleed_time": enemy.bleed_time, "bleed_tick": enemy.bleed_tick,
 		})
 	var loot_data: Array[Dictionary] = []
 	for drop: Loot in game.get_node("Loot").get_children():
@@ -32,6 +34,7 @@ static func capture(game) -> Dictionary:
 		"player": {"position": _vector_data(game.player.position), "stats": game.player.stats.to_save_data(), "hurt_time": game.player.hurt_time},
 		"xp": game.xp, "xp_goal": game.xp_goal, "level": game.level, "coins": game.coins,
 		"weapons": game.player.loadout.save_data(), "starter_pending": game.starter_pending,
+		"items": game.items.save_data(),
 		"enemies": enemies_data, "loot": loot_data, "acid": acid_data,
 		"shop": game.in_shop, "intermission_pending": game.intermission_pending,
 		"offers": offer_data, "reroll_cost": game.shop.reroll_cost,
@@ -71,6 +74,7 @@ static func restore(game, saved: Dictionary) -> void:
 			var old_weapon := WeaponCatalog.by_id(mapped_id)
 			if old_weapon != null:
 				player.loadout.acquire(old_weapon)
+	game.items.restore(saved.get("items", {}))
 	for entry in saved.get("enemies", []):
 		var enemy_data := _enemy_from_path(str(entry.get("type", "")))
 		if enemy_data == null:
@@ -81,6 +85,10 @@ static func restore(game, saved: Dictionary) -> void:
 		enemy.special_phase = clampi(int(entry.get("phase", 0)), 0, 2) as Enemy.SpecialPhase
 		enemy.special_timer = maxf(float(entry.get("timer", 0.0)), 0.0)
 		enemy.special_direction = _read_vector(entry.get("direction", [0.0, 0.0]))
+		enemy.bleed_stacks = clampi(int(entry.get("bleed_stacks", 0)), 0, 3)
+		enemy.bleed_dps = maxf(float(entry.get("bleed_dps", 0.0)), 0.0)
+		enemy.bleed_time = maxf(float(entry.get("bleed_time", 0.0)), 0.0)
+		enemy.bleed_tick = clampf(float(entry.get("bleed_tick", 1.0)), 0.0, 1.0)
 	for entry in saved.get("loot", []):
 		var kind := StringName(str(entry.get("kind", "xp")))
 		if kind == &"xp" or kind == &"coin":
@@ -133,7 +141,7 @@ static func restore(game, saved: Dictionary) -> void:
 			game.get_tree().paused = true
 	elif game.in_shop:
 		if shop.offers.size() != 3:
-			shop.open_shop(wave.current_wave, player.stats.luck, player.loadout)
+			shop.open_shop(wave.current_wave, player.stats.luck, player.loadout, game.items)
 		game._update_shop_panel()
 		game.get_tree().paused = true
 	game._refresh_hud()

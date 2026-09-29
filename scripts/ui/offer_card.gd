@@ -21,7 +21,7 @@ func _ready() -> void:
 	mouse_exited.connect(_on_hover.bind(false))
 
 
-func show_offer(offer: ShopOfferData, coins: int, available: bool = true) -> void:
+func show_offer(offer: ShopOfferData, coins: int, available: bool = true, owned_count: int = 0) -> void:
 	if offer == null:
 		content.visible = false
 		text = "Ausverkauft"
@@ -31,13 +31,13 @@ func show_offer(offer: ShopOfferData, coins: int, available: bool = true) -> voi
 	content.visible = true
 	text = ""
 	icon_rect.texture = offer.icon_texture if offer.icon_texture != null else ICONS.item(offer.icon_index)
-	name_label.text = "%s MK %s" % [offer.display_name.to_upper(), ["I", "II", "III", "IV"][offer.weapon_tier - 1]] if offer.weapon_data != null else offer.display_name.to_upper()
+	name_label.text = "%s MK %s" % [offer.display_name.to_upper(), ["I", "II", "III", "IV"][offer.weapon_tier - 1]] if offer.weapon_data != null else offer.display_name.to_upper() + (" · ×%d" % owned_count if owned_count > 0 else "")
 	rarity_label.text = "STUFE %d · %s" % [offer.rarity_tier, DentiRarity.name_for(offer.rarity_tier).to_upper()]
 	DentiUIStyle.style_rarity_label(rarity_label, offer.rarity_tier)
 	effect_label.text = offer.weapon_data.stats_text(offer.weapon_tier) if offer.weapon_data != null else offer.description
 	price_label.text = "%d" % offer.price
 	disabled = coins < offer.price or not available
-	tooltip_text = "Ausrüstung voll: erst eine Waffe verkaufen" if not available else ("%s\n%s" % [offer.description, effect_label.text] if offer.weapon_data != null else effect_label.text)
+	tooltip_text = "Ausrüstung voll: erst eine Waffe verkaufen" if not available and offer.weapon_data != null else ("Limit erreicht: %d Stück" % offer.max_stacks if not available else ("%s\n%s" % [offer.description, effect_label.text] if offer.weapon_data != null else effect_label.text))
 	DentiUIStyle.style_card(self, offer.rarity_tier)
 
 

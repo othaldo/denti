@@ -2,13 +2,13 @@
 [ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
 [resource]
 script = ExtResource("1")
-id = &"fluoride_gel"
-icon_index = 1
-display_name = "Fluoridgel"
-description = "+25 Leben und Heilung. Zu Wellenbeginn +1 Schild."
-price = 5
-stat_changes = { &"max_health": 25.0 }
+id = &"divine_seal"
+icon_index = 19
+display_name = "Göttliches Siegel"
+description = "Zu jeder Welle +2 Schild. Einmalig. Alle huldigen Denti."
+rarity_tier = 4
+price = 22
 effect_kind = &"wave_shield"
-effect_value = 1.0
-max_stacks = 3
+effect_value = 2.0
+max_stacks = 1
 tags = Array[StringName]([&"defense", &"sustain"])

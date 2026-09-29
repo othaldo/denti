@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"floss_reel"
+icon_index = 12
+display_name = "Zahnseide-Spule"
+description = "+2 Schaden. Schnitt-Treffer: 3 Blutungsschaden/s."
+price = 5
+stat_changes = { &"damage": 2.0 }
+effect_kind = &"bleed"
+effect_value = 3.0
+max_stacks = 3
+tags = Array[StringName]([&"melee", &"bleed"])

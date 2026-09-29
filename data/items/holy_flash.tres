@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"holy_flash"
+icon_index = 18
+display_name = "Heiliges Elixier"
+description = "Alle 10 Kills: ein Zahnblitz mit 25 Flächenschaden."
+rarity_tier = 3
+price = 14
+effect_kind = &"kill_burst"
+effect_value = 25.0
+max_stacks = 2
+tags = Array[StringName]([&"area", &"crit"])

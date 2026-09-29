@@ -12,6 +12,14 @@ const CATALOG: Array[ShopOfferData] = [
 	preload("res://data/items/ceramic_shell.tres"),
 	preload("res://data/items/mint_essence.tres"),
 	preload("res://data/items/lucky_molar.tres"),
+	preload("res://data/items/floss_reel.tres"),
+	preload("res://data/items/cavity_bounty.tres"),
+	preload("res://data/items/radiant_filling.tres"),
+	preload("res://data/items/tooth_fairy_pact.tres"),
+	preload("res://data/items/amalgam_core.tres"),
+	preload("res://data/items/scalpel_wax.tres"),
+	preload("res://data/items/holy_flash.tres"),
+	preload("res://data/items/divine_seal.tres"),
 	preload("res://data/weapons/shop_magic_toothbrush.tres"),
 	preload("res://data/weapons/shop_turbo_drill.tres"),
 	preload("res://data/weapons/shop_floss_whip.tres"),
@@ -24,6 +32,7 @@ const CATALOG: Array[ShopOfferData] = [
 const WEAPON_CHANCE := 0.35
 const SAME_WEAPON_CHANCE := 0.30
 const SAME_MODE_CHANCE := 0.15
+const ITEM_TAG_CHANCE := 0.28
 const WEAPON_PRICE_MULTIPLIERS := [1.0, 1.65, 2.4, 3.3]
 
 var offers: Array[ShopOfferData] = []
@@ -35,13 +44,13 @@ func _ready() -> void:
 	rng.randomize()
 
 
-func open_shop(wave_number: int, luck: float, loadout: WeaponLoadout) -> void:
+func open_shop(wave_number: int, luck: float, loadout: WeaponLoadout, items: ItemInventory = null) -> void:
 	reroll_cost = 2
-	_roll_offers(wave_number, luck, loadout)
+	_roll_offers(wave_number, luck, loadout, items)
 
 
-func reroll(wave_number: int, luck: float, loadout: WeaponLoadout) -> void:
-	_roll_offers(wave_number, luck, loadout)
+func reroll(wave_number: int, luck: float, loadout: WeaponLoadout, items: ItemInventory = null) -> void:
+	_roll_offers(wave_number, luck, loadout, items)
 	reroll_cost += 1
 
 
@@ -66,28 +75,35 @@ static func weapon_offer(template: ShopOfferData, tier: int) -> ShopOfferData:
 	return offer
 
 
-func _roll_offers(wave_number: int, luck: float, loadout: WeaponLoadout) -> void:
+func _roll_offers(wave_number: int, luck: float, loadout: WeaponLoadout, items: ItemInventory) -> void:
 	offers.clear()
 	for index in 3:
 		var tier := DentiRarity.roll(wave_number, luck, rng)
 		var wants_weapon := index < (2 if wave_number <= 2 else 1) or rng.randf() < WEAPON_CHANCE
 		var offer: ShopOfferData = _pick_weapon(tier, loadout) if wants_weapon else null
 		if offer == null:
-			offer = _pick_item(tier)
+			offer = _pick_item(tier, items, loadout)
 		if offer == null:
 			offer = _pick_weapon(tier, loadout)
 		offers.append(offer)
 	offers.shuffle()
 
 
-func _pick_item(tier: int) -> ShopOfferData:
+func _pick_item(tier: int, items: ItemInventory, loadout: WeaponLoadout) -> ShopOfferData:
+	var wanted_tags: Array[StringName] = items.preferred_tags(loadout) if items != null else []
 	for candidate_tier in range(tier, 0, -1):
 		var pool: Array[ShopOfferData] = []
+		var tagged: Array[ShopOfferData] = []
 		for template in CATALOG:
-			if template.weapon_data == null and template.rarity_tier == candidate_tier and not _already_offered(template.id, 0):
+			if template.weapon_data == null and template.rarity_tier == candidate_tier and not _already_offered(template.id, 0) and (items == null or items.can_acquire(template)):
 				pool.append(template)
+				for tag in template.tags:
+					if wanted_tags.has(tag):
+						tagged.append(template)
+						break
 		if not pool.is_empty():
-			return pool[rng.randi_range(0, pool.size() - 1)]
+			var selected := tagged if not tagged.is_empty() and rng.randf() < ITEM_TAG_CHANCE else pool
+			return selected[rng.randi_range(0, selected.size() - 1)]
 	return null
 
 

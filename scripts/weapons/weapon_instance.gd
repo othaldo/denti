@@ -56,16 +56,17 @@ func _physics_process(delta: float) -> void:
 	aim = player.global_position.direction_to(nearest.global_position)
 	hit_point = to_local(nearest.global_position)
 	var attack_damage := player.stats.roll_damage(data.damage_at_tier(tier) / 18.0)
+	var critical := player.stats.last_roll_critical
 	match data.attack_mode:
 		&"projectile":
 			var projectile: WeaponProjectile = PROJECTILE_SCENE.instantiate()
 			get_tree().current_scene.get_node("Projectiles").add_child(projectile)
-			projectile.launch(player.global_position + aim * 20.0, aim, attack_damage, data)
+			projectile.launch(player.global_position + aim * 20.0, aim, attack_damage, data, player.items, critical)
 		&"melee", &"beam":
-			nearest.take_damage(data.damage_against(nearest, attack_damage))
+			nearest.take_damage(data.damage_against(nearest, player.items.modify_damage(nearest, data, attack_damage)), data, critical)
 		&"area":
 			for enemy in targets:
-				enemy.take_damage(data.damage_against(enemy, attack_damage))
+				enemy.take_damage(data.damage_against(enemy, player.items.modify_damage(enemy, data, attack_damage)), data, critical)
 	attack_time = 0.2
 	cooldown = data.interval_at_tier(tier) * player.stats.attack_interval / 0.65
 	var sound_kind: StringName = &"brush"

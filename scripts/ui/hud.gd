@@ -66,7 +66,7 @@ func _set_fps_visible(enabled: bool) -> void:
 
 
 func update_status(stats: PlayerStats, xp: int, xp_goal: int, level: int, coins: int, wave_number: int, remaining: float, in_shop: bool, boss: Enemy, boss_pending: bool) -> void:
-	health_label.text = "%d / %d" % [ceili(stats.health), ceili(stats.max_health)]
+	health_label.text = "%d / %d · Schild %d" % [ceili(stats.health), ceili(stats.max_health), stats.shield_charges] if stats.shield_charges > 0 else "%d / %d" % [ceili(stats.health), ceili(stats.max_health)]
 	health_bar.max_value = stats.max_health
 	health_bar.value = stats.health
 	xp_label.text = "%d / %d" % [xp, xp_goal]

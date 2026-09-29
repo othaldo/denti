@@ -3,6 +3,7 @@ extends Node
 
 signal changed
 signal died
+signal shield_blocked
 
 var max_health: float = 100.0
 var health: float = 100.0
@@ -13,13 +14,15 @@ var attack_interval: float = 0.65
 var regen: float = 0.0
 var crit_chance: float = 0.05
 var luck: float = 0.0
+var shield_charges: int = 0
+var last_roll_critical: bool = false
 
 
 func to_save_data() -> Dictionary:
 	return {
 		"max_health": max_health, "health": health, "damage": damage,
 		"armor": armor, "move_speed": move_speed, "attack_interval": attack_interval,
-		"regen": regen, "crit_chance": crit_chance, "luck": luck,
+		"regen": regen, "crit_chance": crit_chance, "luck": luck, "shield_charges": shield_charges,
 	}
 
 
@@ -33,6 +36,7 @@ func load_save_data(saved: Dictionary) -> void:
 	regen = maxf(float(saved.get("regen", regen)), 0.0)
 	crit_chance = clampf(float(saved.get("crit_chance", crit_chance)), 0.0, 0.65)
 	luck = maxf(float(saved.get("luck", 0.0)), 0.0)
+	shield_charges = clampi(int(saved.get("shield_charges", 0)), 0, 5)
 	changed.emit()
 
 
@@ -44,14 +48,35 @@ func _process(delta: float) -> void:
 
 func roll_damage(multiplier: float = 1.0) -> float:
 	var result := damage * multiplier
-	return result * 1.5 if randf() < crit_chance else result
+	last_roll_critical = randf() < crit_chance
+	return result * 1.5 if last_roll_critical else result
 
 
-func take_damage(amount: float) -> void:
+func take_damage(amount: float) -> float:
+	if shield_charges > 0:
+		shield_charges -= 1
+		changed.emit()
+		shield_blocked.emit()
+		return 0.0
+	var before := health
 	health = maxf(health - maxf(amount - armor, 1.0), 0.0)
 	changed.emit()
 	if health <= 0.0:
 		died.emit()
+	return before - health
+
+
+func heal(amount: float) -> float:
+	var before := health
+	health = minf(health + maxf(amount, 0.0), max_health)
+	if health > before:
+		changed.emit()
+	return health - before
+
+
+func grant_shield(charges: int, cap: int = 5) -> void:
+	shield_charges = mini(shield_charges + maxi(charges, 0), cap)
+	changed.emit()
 
 
 func apply_upgrade(stat: StringName, amount: float) -> void:

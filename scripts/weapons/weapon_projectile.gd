@@ -12,13 +12,17 @@ var animation_time: float = 0.0
 var impact_time: float = 0.0
 var pierces_left: int = 0
 var hit_ids: Array[int] = []
+var items: ItemInventory
+var critical: bool = false
 
 
-func launch(start: Vector2, aim: Vector2, attack_damage: float, weapon: WeaponData) -> void:
+func launch(start: Vector2, aim: Vector2, attack_damage: float, weapon: WeaponData, inventory: ItemInventory = null, is_critical: bool = false) -> void:
 	global_position = start
 	direction = aim.normalized()
 	damage = attack_damage
 	data = weapon
+	items = inventory
+	critical = is_critical
 	pierces_left = weapon.pierce
 
 
@@ -48,7 +52,7 @@ func _physics_process(delta: float) -> void:
 		hit_ids.append(enemy.get_instance_id())
 		if data.knockback > 0.0:
 			enemy.global_position += direction * data.knockback * (1.0 - enemy.data.knockback_resistance)
-		enemy.take_damage(data.damage_against(enemy, damage))
+		enemy.take_damage(data.damage_against(enemy, items.modify_damage(enemy, data, damage) if items != null else damage), data, critical)
 		if pierces_left <= 0:
 			impact_time = IMPACT_DURATION
 			break
@@ -60,7 +64,7 @@ func _explode() -> void:
 	for node in get_tree().get_nodes_in_group("enemies"):
 		var enemy := node as Enemy
 		if enemy != null and global_position.distance_to(enemy.global_position) <= data.splash_radius + enemy.data.radius:
-			enemy.take_damage(data.damage_against(enemy, damage))
+			enemy.take_damage(data.damage_against(enemy, items.modify_damage(enemy, data, damage) if items != null else damage), data, critical)
 	impact_time = IMPACT_DURATION
 	queue_redraw()
 

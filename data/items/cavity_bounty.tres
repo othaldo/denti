@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"cavity_bounty"
+icon_index = 13
+display_name = "Karies-Kopfgeld"
+description = "Alle 12 Kills +1 Münze. Jeder Belag hat seinen Preis."
+price = 6
+effect_kind = &"kill_coin"
+effect_value = 1.0
+max_stacks = 2
+tags = Array[StringName]([&"economy"])

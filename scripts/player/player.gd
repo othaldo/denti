@@ -9,6 +9,7 @@ const ATTACK_ANIMATION_DURATION := 0.18
 
 @onready var stats: PlayerStats = $Stats
 @onready var loadout: WeaponLoadout = $Weapons
+@onready var items: ItemInventory = get_node("../Items")
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var sprite_base_scale: Vector2 = sprite.scale
 @onready var arena: DentiArena = get_node("../Arena")
@@ -53,6 +54,6 @@ func take_hit(amount: float) -> void:
 	if hurt_time > 0.0 or stats.health <= 0.0:
 		return
 	hurt_time = HURT_COOLDOWN
-	var health_before := stats.health
-	stats.take_damage(amount)
-	damaged.emit(global_position + Vector2(0.0, -28.0), health_before - stats.health)
+	var actual := stats.take_damage(amount)
+	if actual > 0.0:
+		damaged.emit(global_position + Vector2(0.0, -28.0), actual)
