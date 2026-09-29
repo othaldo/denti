@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://cg66v2rbuesal"]
 
-[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/enemies/cavity_prince.png" id="2"]
+[ext_resource type="Script" uid="uid://b17lxqmiqu3h8" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://bsymo2ujwr11r" path="res://assets/enemies/cavity_prince.png" id="2"]
 
 [resource]
 script = ExtResource("1")
@@ -11,7 +11,7 @@ damage_reduction = 0.15
 knockback_resistance = 0.79
 move_speed = 102.0
 contact_damage = 21.0
-radius = 50.0
+radius = 60.0
 xp_drop = 0
 coin_drop = 0
 sprite = ExtResource("2")
@@ -25,7 +25,7 @@ attack_speed = 600.0
 attack_duration = 0.64
 attack_damage = 27.0
 boss_guard_recharge_seconds = 26.0
-boss_guard_burst_fraction = 0.10
+boss_guard_burst_fraction = 0.1
 boss_phase_duration = 1.9
 boss_radial_count = 14
 boss_fan_count = 5

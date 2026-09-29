@@ -1,12 +1,12 @@
-[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://cyde0oqhi4jhv"]
 
-[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/enemies/sugar.png" id="2"]
+[ext_resource type="Script" uid="uid://b17lxqmiqu3h8" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://chs7oxf4h805f" path="res://assets/enemies/sugar.png" id="2"]
 
 [resource]
 script = ExtResource("1")
 display_name = "Zuckerstück"
-max_health = 72.0
+max_health = 100.0
 damage_reduction = 0.12
 move_speed = 100.0
 contact_damage = 15.0

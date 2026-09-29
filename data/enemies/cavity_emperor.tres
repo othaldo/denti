@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://cr5l0h3sd1j32"]
 
-[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/enemies/cavity_emperor.png" id="2"]
+[ext_resource type="Script" uid="uid://b17lxqmiqu3h8" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://dd8gxpyd4gr7i" path="res://assets/enemies/cavity_emperor.png" id="2"]
 
 [resource]
 script = ExtResource("1")
@@ -11,21 +11,21 @@ damage_reduction = 0.22
 knockback_resistance = 0.88
 move_speed = 112.0
 contact_damage = 27.0
-radius = 58.0
+radius = 100.0
 xp_drop = 0
 coin_drop = 0
 sprite = ExtResource("2")
 is_boss = true
 special_attack = 4
 special_interval = 2.15
-warning_time = 0.60
+warning_time = 0.6
 trigger_range = 800.0
 attack_radius = 165.0
 attack_speed = 700.0
-attack_duration = 0.70
+attack_duration = 0.7
 attack_damage = 34.0
 boss_guard_recharge_seconds = 52.0
-boss_guard_burst_fraction = 0.10
+boss_guard_burst_fraction = 0.1
 boss_phase_duration = 2.2
 boss_radial_count = 22
 boss_fan_count = 9
