@@ -25,6 +25,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Prepare Godot export templates
+        run: |
+          mkdir -p "$HOME/.local/share/godot/export_templates"
+          cp -R /root/.local/share/godot/export_templates/4.4.stable \
+            "$HOME/.local/share/godot/export_templates/4.4.stable"
+
       - name: Show Godot version
         run: godot --version
 
