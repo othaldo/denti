@@ -34,6 +34,12 @@ jobs:
       - name: Show Godot version
         run: godot --version
 
+      - name: Stamp build metadata
+        run: |
+          SHORT_SHA="$(printf '%s' "$GITHUB_SHA" | cut -c1-7)"
+          sed -i "s/^build=\"dev\"$/build=\"$SHORT_SHA\"/" project.godot
+          echo "Denti build: $SHORT_SHA"
+
       - name: Export Web
         run: |
           mkdir -p build/web

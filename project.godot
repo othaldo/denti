@@ -4,6 +4,7 @@ config_version=5
 [application]
 
 config/name="Denti: Divine Dentistry"
+config/version="0.1.0"
 run/main_scene="res://scenes/ui/game_menu.tscn"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 
@@ -14,6 +15,10 @@ GameSession="*res://scripts/systems/game_session.gd"
 [audio]
 
 buses/default_bus_layout="res://assets/audio/audio_buses.tres"
+
+[denti]
+
+build="dev"
 
 [display]
 

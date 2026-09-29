@@ -113,6 +113,18 @@ func _text(text_value: String) -> void:
 	rows.add_child(label)
 
 
+func _version_info() -> void:
+	var version := str(ProjectSettings.get_setting("application/config/version", "0.0.0"))
+	var build := str(ProjectSettings.get_setting("denti/build", "dev"))
+	var build_text := "dev" if build == "dev" else "build %s" % build
+	var label := Label.new()
+	label.text = "v%s · %s" % [version, build_text]
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.add_theme_color_override("font_color", DentiUIStyle.MUTED)
+	label.add_theme_font_size_override("font_size", 13)
+	rows.add_child(label)
+
+
 func _button(text_value: String, callback: Callable, accent: bool = false, disabled: bool = false) -> Button:
 	var button := Button.new()
 	button.text = text_value
@@ -199,6 +211,7 @@ func _show_home() -> void:
 		_button("Optionen", _show_options)
 		_button("Credits", _show_credits)
 		_button("Beenden", func() -> void: get_tree().quit())
+		_version_info()
 
 
 func _show_stats() -> void:
