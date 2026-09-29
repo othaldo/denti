@@ -1,54 +1,64 @@
 # Denti: Divine Dentistry
 
-Ein kleines Godot-4-Projekt über einen göttlichen Zahn im Kampf gegen Plaque.
+Ein kleiner 2D-Arena-Survivor über einen göttlichen Zahn, der Plaque, Zucker und Karies den Kampf ansagt. Denti bewegt sich von Hand; seine Waffen greifen automatisch an. Zwischen den Wellen entscheiden Levelaufstiege und Einkäufe, wie der nächste Kampf läuft.
 
-## Starten
+![Denti kämpft in Welle 4 gegen Plaque, Bakterien, Zucker und Säurespucker](docs/screenshots/kampf.png)
 
-Projekt in Godot 4 öffnen und **F5** drücken. Alternativ im Projektordner:
+## Ein Blick ins Spiel
+
+| Bosskampf am Arenarand | Levelaufstieg |
+| --- | --- |
+| [![Denti und der Karies-König an der oberen Arenamauer](docs/screenshots/bosskampf.png)](docs/screenshots/bosskampf.png) | [![Drei wählbare Boni beim Levelaufstieg](docs/screenshots/levelaufstieg.png)](docs/screenshots/levelaufstieg.png) |
+
+| Shop zwischen den Wellen | Hauptmenü |
+| --- | --- |
+| [![Waffen und Items in der Zahnklinik](docs/screenshots/shop.png)](docs/screenshots/shop.png) | [![Das Hauptmenü von Denti: Divine Dentistry](docs/screenshots/hauptmenue.png)](docs/screenshots/hauptmenue.png) |
+
+Die Bilder sind direkt aus Godot aufgenommen. Für die Kampfbilder wurden Gegner und Beute in einem separaten Testlauf arrangiert.
+
+## Spielen
+
+Das Projekt mit **Godot 4.4 oder neuer** öffnen und mit **F5** starten. Unter Linux geht es auch im Projektordner:
 
 ```bash
 ./play.sh
 ```
 
-Der Starter verwendet auf diesem Linux-Rechner `/usr/local/bin/godot`, damit Godot die NVIDIA-Grafikkarte statt des Software-Renderers der Flathub-Version nutzt. `./play.sh --probe` misst im Fenster und im Vollbild die FPS eines frischen Spiels sowie einer Arena mit 100 Gegnern. Der Test nutzt einen eigenen temporären Spielstand und gibt Godot-Version und Anzeigetreiber in der Konsole aus.
+`play.sh` nutzt `/usr/local/bin/godot`, falls vorhanden, sonst `godot` aus dem `PATH`. Mit `DENTI_GODOT_BIN=/pfad/zu/godot ./play.sh` lässt sich eine andere Installation wählen. `./play.sh --probe` misst die Bildrate im Fenster, im Vollbild und mit 100 Gegnern.
 
-Im Hauptmenü ein neues Spiel beginnen oder einen gespeicherten Lauf fortsetzen. Bei vorhandenem Spielstand ist **Fortsetzen** vorausgewählt; **Neues Spiel** fragt vor dem Löschen des alten Laufs nach. Mit **WASD** oder den Pfeiltasten bewegen. Die Zahnbürste schießt automatisch auf den nächsten Gegner. XP und Münzen durch Berühren einsammeln. Bei einem Levelaufstieg einen von drei Boni wählen. **Escape** öffnet im Kampf ein Pausenmenü mit Stats, Optionen und Rückkehr zum Hauptmenü.
+| Eingabe | Aktion |
+| --- | --- |
+| WASD oder Pfeiltasten | Denti bewegen |
+| Escape | Pause, Stats und Optionen öffnen |
+| Maus | Waffen, Boni und Shopangebote wählen |
 
-## Stand
+Zu Beginn wählst du eine Startwaffe. Im Kampf sammelst du XP für einen von drei Stat-Boni und Münzen für den Shop. Dort kannst du Waffen und Items kaufen oder die drei Angebote neu würfeln. Zwei gleiche Waffen derselben Stufe verschmelzen automatisch.
 
-Der Prototyp enthält zwanzig 45-Sekunden-Wellen mit steigender Schwierigkeit, vier normale Gegnertypen, den Karies-König als Zwischenboss in Welle 5, 10 und 15 sowie den Karies-Imperator als Endboss in Welle 20. Denti hat drei automatische Waffen, zehn Shop-Items und sieben Stats. Beute, Levelaufstiege, Shop, Sieg, Niederlage und Neustart sind spielbar. Das kompakte HUD zeigt Leben, XP und Münzen links oben sowie Welle und Countdown mittig. Der Countdown pausiert im Shop. Vor jeder neuen Welle werden übrige Gegner und Geschosse entfernt; liegengebliebene Beute wird am Wellenende gutgeschrieben.
+## Was schon spielbar ist
 
-Die Arena nutzt einen generierten, ruhigen Fliesenboden mit Zahnornamenten am Rand. Bei anderen Fensterformaten wird das Bild proportional zugeschnitten; die spielbare Fläche, Gegner-Spawns und Dentis Bewegungsgrenze passen sich an das sichtbare Format an.
+- **20 Wellen à 45 Sekunden** mit zunehmender Gegnerzahl und Stärke. In den Wellen 5, 10 und 15 wartet der Karies-König; Welle 20 endet mit dem Karies-Imperator.
+- **Vier normale Gegnertypen**, die schrittweise hinzukommen, darunter ein Säurespucker mit angekündigtem Fernangriff. Einzelne Wellen bringen zusätzlich Horden eines Typs.
+- **Acht Waffen und zehn Shop-Items** für unterschiedliche Builds. Levelaufstiege verbessern sieben Grundwerte.
+- Eine **scrollende Arena**, größer als der Bildschirm, mit Mauer und dunklem Außenbereich. Das kompakte HUD zeigt Leben, XP, Münzen, Welle und verbleibende Sekunden.
+- Automatisches Speichern während des Laufs. **Fortsetzen** lädt ihn auch nach einem Neustart; ein neues Spiel fragt vor dem Überschreiben nach.
+- Musik für Menü, Wellen und Bosse, Kampfgeräusche sowie Regler für Gesamt-, Musik- und SFX-Lautstärke. Eine FPS-Anzeige lässt sich einschalten.
 
-HUD, Level-up und Shop verwenden ein gemeinsames UI-System aus elfenbeinfarbenen Panels, Gold- und Mint-Akzenten und dentalen Icons. Das HUD fasst die wichtigsten Werte kompakt zusammen. Level-up-Boni und Shopangebote erscheinen als Karten; Item-Icons und Seltenheit helfen beim schnellen Erfassen.
+Das Spiel ist ein **spielbarer Prototyp**. Balancing, Effekte und weitere Inhalte sind noch in Arbeit.
 
-Die Gegnertypen werden schrittweise eingeführt: Plaque ab Welle 1, Bakterien ab Welle 2, Zuckerstücke ab Welle 3 und Säurespucker ab Welle 4. In vier späteren Wellen erscheint jeweils eine Horde nur eines Gegnertyps. Der Shop kündigt neue Gegnertypen, Horden und Bosse der nächsten Welle an. Der Säurespucker hält Abstand, markiert seine Schussrichtung und feuert ein ausweichbares Säureprojektil.
+## Entwicklung
 
-Im Hauptmenü spielt ein eigenes Theme. Die Musik läuft durch Levelaufstiege, Shop und normale Wellenwechsel weiter. Die beiden Wellenstücke wechseln erst am Songende; vor jedem neuen Durchlauf wird ausgeblendet und der nächste Titel eingeblendet. In den Bosswellen 5, 10 und 15 wechseln sich die beiden Mini-Boss-Stücke mit einem Fade ab. Der finale Boss in Welle 20 hat ein eigenes Stück und ein zweites für die Zeit nach Ablauf des Wellentimers. Nach dem Spiel blendet die Musik aus; die Lautstärke folgt der Einstellung unter **Optionen**.
-
-Die Staffelung orientiert sich an den in der Community dokumentierten Brotato-Mechaniken für [Wellen](https://brotato.wiki.spellsandguns.com/Waves), [Gegnereinführungen](https://brotato.wiki.spellsandguns.com/Enemies) und [Horden](https://brotato.wiki.spellsandguns.com/Horde_Wave). Die konkreten Zahlen sind für Dentis zwanzig Wellen gewählt.
-
-Ein Lauf wird nach dem Start, beim Wellenwechsel, bei Entscheidungen und während eines laufenden Kampfes regelmäßig unter Godots `user://run_save.json` gespeichert. **Fortsetzen** lädt den aktuellen Lauf auch nach einem Neustart der Anwendung. Nach Sieg oder Niederlage wird der Spielstand entfernt. Unter **Optionen** lassen sich Vollbild, eine kleine FPS-Anzeige rechts oben sowie Gesamt-, Musik- und SFX-Lautstärke einstellen. Die Werte bleiben nach einem App-Neustart erhalten.
-
-Im Shop gibt es drei zufällige Angebote. Items verändern Denti-Stats, Zahnseide ergänzt einen Flächenangriff und der Bohrer trifft einen nahen Gegner hart. Angebote lassen sich mit Münzen neu würfeln. Normale Gegner lassen immer XP und gelegentlich Münzen fallen. In einer Bosswelle bleibt der Boss nach Ablauf des Timers aktiv; erst nach seinem Sieg öffnet der Shop oder endet in Welle 20 der Lauf.
-
-Plaque, Bakterium, Zuckerstück, Säurespucker und Karies-König haben transparente Sprites unter `assets/enemies/`. Der Karies-Imperator nutzt derzeit eine größer und violett eingefärbte Variante des König-Sprites. Das Bakterium kündigt einen Sprint an; das Zuckerstück markiert vor einem Flächenangriff den gefährlichen Bereich. Denti wippt im Leerlauf, neigt sich beim Laufen und reagiert sichtbar beim Angriff. Zahnpasta-Projektile pulsieren im Flug, ziehen eine Spur und platzen beim Treffer auf.
-
-Treffer zeigen aufsteigende Schadenszahlen direkt über Gegnern und Denti. Kurze eigene Soundeffekte begleiten Zahnpasta-Schüsse, Zahnseide, Bohrer, Säureprojektile, Treffer, besiegte Gegner und eingesammelte Beute. Die WAV-Dateien unter `assets/audio/sfx/` lassen sich mit `python3 tools/generate_sfx.py` neu erzeugen.
-
-Ein kurzer Integrationstest läuft nach dem ersten Import des Projekts mit:
+Nach dem ersten Godot-Import lassen sich die Tests so ausführen:
 
 ```bash
-godot --headless --path . --script res://tests/smoke.gd
-godot --headless --path . --script res://tests/enemy_behaviors.gd
-godot --headless --path . --script res://tests/progression_menu.gd
-godot --headless --path . --script res://tests/arena_background.gd
-godot --headless --path . --script res://tests/options_menu.gd
-godot --headless --path . --script res://tests/ui_layout.gd
-godot --headless --path . --script res://tests/music_flow.gd
-godot --headless --path . --script res://tests/combat_feedback.gd
+for test in tests/*.gd; do
+  godot --headless --fixed-fps 60 --path . --script "res://$test" || exit 1
+done
 ```
 
-Die ursprünglichen Referenzbilder liegen unverändert unter `assets/denti/reference/`. `assets/denti/denti_gameplay.png` ist ein daraus abgeleiteter transparenter Spielsprite.
+Die README-Screenshots lassen sich mit einem separaten temporären Spielstand neu aufnehmen:
 
-HUD, Levelaufstieg und Shop verwenden eine gemeinsame Creme-, Gold- und Mint-Palette mit Denti-Porträts. Die Schrift Fredoka und ihre Lizenz stehen in [CREDITS.md](CREDITS.md). Die Credits sind auch nach einem Spielende im Menü erreichbar.
+```bash
+godot --path . --script res://tools/capture_readme.gd
+```
+
+Das Aufnahmeskript schreibt nach `docs/screenshots/` und verändert den normalen Spielstand nicht. Hinweise zu Grafiken, Musik, Sound und Schrift stehen in [CREDITS.md](CREDITS.md).
