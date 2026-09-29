@@ -35,7 +35,9 @@ func show_upgrade(upgrade: UpgradeData) -> void:
 
 
 func show_weapon(weapon: WeaponData) -> void:
-	custom_minimum_size.y = 230.0
+	# Weapon cards carry a description plus three stat lines. Godot 4.7's
+	# Fredoka metrics need a little more room than the compact upgrade cards.
+	custom_minimum_size.y = 250.0
 	text = ""
 	content.visible = true
 	icon_rect.texture = weapon.sprite
