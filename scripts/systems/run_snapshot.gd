@@ -32,7 +32,7 @@ static func capture(game) -> Dictionary:
 		loot_data.append({"position": _vector_data(drop.position), "kind": str(drop.kind), "amount": drop.amount, "reward_id": str(drop.reward_id)})
 	var acid_data: Array[Dictionary] = []
 	for projectile: AcidProjectile in game.get_node("EnemyProjectiles").get_children():
-		acid_data.append({"position": _vector_data(projectile.position), "direction": _vector_data(projectile.direction), "speed": projectile.speed, "damage": projectile.damage, "lifetime": projectile.lifetime, "color": projectile.projectile_color.to_html()})
+		acid_data.append({"position": _vector_data(projectile.position), "direction": _vector_data(projectile.direction), "speed": projectile.speed, "damage": projectile.damage, "lifetime": projectile.lifetime, "color": projectile.projectile_color.to_html(), "hit_radius": projectile.hit_radius, "visual_radius": projectile.visual_radius})
 	var offer_data: Array[Dictionary] = []
 	for offer in game.shop.offers:
 		offer_data.append({"id": str(offer.id), "tier": offer.weapon_tier, "price": offer.price} if offer != null else {})
@@ -46,6 +46,7 @@ static func capture(game) -> Dictionary:
 		"horde_waves": game.wave.horde_waves, "horde_spawned": game.wave.horde_spawned,
 		"burst_times": game.wave.burst_times, "burst_index": game.wave.burst_index,
 		"elite_time": game.wave.elite_time, "elite_spawned": game.wave.elite_spawned,
+		"current_profile_id": str(game.wave.current_profile_id), "next_profile_id": str(game.wave.next_profile_id),
 		"player": {"position": _vector_data(game.player.position), "stats": game.player.stats.to_save_data(), "hurt_time": game.player.hurt_time},
 		"xp": game.xp, "xp_goal": game.xp_goal, "level": game.level, "coins": game.coins,
 		"weapons": game.player.loadout.save_data(), "starter_pending": game.starter_pending,
@@ -87,6 +88,8 @@ static func restore(game, saved: Dictionary) -> void:
 			wave.burst_index += 1
 	wave.elite_time = clampf(float(saved.get("elite_time", -1.0)), -1.0, wave.duration)
 	wave.elite_spawned = bool(saved.get("elite_spawned", false))
+	wave.current_profile_id = StringName(str(saved.get("current_profile_id", "")))
+	wave.next_profile_id = StringName(str(saved.get("next_profile_id", "")))
 	var player_data: Dictionary = saved.get("player", {})
 	player.position = _read_vector(player_data.get("position", [640.0, 360.0]))
 	player.stats.load_save_data(player_data.get("stats", {}))
@@ -151,7 +154,7 @@ static func restore(game, saved: Dictionary) -> void:
 	for entry in saved.get("acid", []):
 		var projectile: AcidProjectile = ACID_PROJECTILE.instantiate()
 		game.get_node("EnemyProjectiles").add_child(projectile)
-		projectile.launch(_read_vector(entry.get("position", [0.0, 0.0])), _read_vector(entry.get("direction", [1.0, 0.0])), float(entry.get("speed", 290.0)), float(entry.get("damage", 8.0)), player, Color(str(entry.get("color", "87e021"))))
+		projectile.launch(_read_vector(entry.get("position", [0.0, 0.0])), _read_vector(entry.get("direction", [1.0, 0.0])), float(entry.get("speed", 290.0)), float(entry.get("damage", 8.0)), player, Color(str(entry.get("color", "87e021"))), float(entry.get("hit_radius", 21.0)), float(entry.get("visual_radius", 9.0)))
 		projectile.lifetime = float(entry.get("lifetime", 2.2))
 	shop.reroll_cost = maxi(int(saved.get("reroll_cost", 2)), 2)
 	shop.offers.clear()
@@ -175,6 +178,8 @@ static func restore(game, saved: Dictionary) -> void:
 	game.boss_pending = bool(saved.get("boss_pending", false))
 	game.starter_pending = bool(saved.get("starter_pending", false))
 	game.telemetry.restore(saved.get("telemetry", {}), wave.current_wave)
+	if game.telemetry.current_profile_id == &"":
+		game.telemetry.current_profile_id = wave.current_profile_id
 	var upgrade_data: Array = saved.get("upgrades", [])
 	if not saved.has("rewards"):
 		if game.in_shop:

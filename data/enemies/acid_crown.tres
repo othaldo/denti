@@ -26,3 +26,6 @@ trigger_range = 720.0
 attack_speed = 270.0
 attack_damage = 11.0
 radial_count = 10
+advanced_special_wave = 15
+advanced_special_attack = 6
+space_orb_radius = 34.0

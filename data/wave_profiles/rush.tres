@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="WaveProfileData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/wave_profile_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"rush"
+display_name = "Ansturm"
+description = "Bakterien und Zuckerstücke kommen häufiger im Spawnmix vor."
+first_wave = 3
+enemy_weight_multipliers = {"Plaque": 0.8, "Bakterium": 1.65, "Zuckerstück": 1.35, "Säurespucker": 0.85}

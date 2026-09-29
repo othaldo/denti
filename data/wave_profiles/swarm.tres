@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="WaveProfileData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/wave_profile_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"swarm"
+display_name = "Schwarm"
+description = "Mehr Plaque und Bakterien im normalen Spawnmix."
+first_wave = 1
+enemy_weight_multipliers = {"Plaque": 1.8, "Bakterium": 1.45, "Zuckerstück": 0.8, "Säurespucker": 0.8}

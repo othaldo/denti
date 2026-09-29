@@ -94,7 +94,8 @@ func _on_starter_chosen(weapon: WeaponData) -> void:
 	player.loadout.acquire(weapon)
 	starter_pending = false
 	rewards.begin_wave()
-	telemetry.begin_wave(wave.current_wave + 1)
+	var profile_id := wave.prepare_next_wave_profile()
+	telemetry.begin_wave(wave.current_wave + 1, profile_id)
 	wave.start_next_wave()
 	items.on_wave_start()
 	relics.on_wave_start()
@@ -521,7 +522,7 @@ func _finish_run() -> void:
 	boss_pending = false
 	_sync_music()
 	_clear_arena(true)
-	choice_panel.show_end(true, coins)
+	choice_panel.show_end(true, coins, _run_recap_data())
 	_save_completed_report(true)
 	session.clear_run()
 	_refresh_hud()
@@ -604,7 +605,8 @@ func _on_shop_continue() -> void:
 	_clear_arena(false)
 	player.global_position = arena.arena_size / 2.0
 	rewards.begin_wave()
-	telemetry.begin_wave(wave.current_wave + 1)
+	var profile_id := wave.prepare_next_wave_profile()
+	telemetry.begin_wave(wave.current_wave + 1, profile_id)
 	wave.start_next_wave()
 	items.on_wave_start()
 	relics.on_wave_start()
@@ -621,15 +623,20 @@ func _on_player_died() -> void:
 	_sync_music()
 	_clear_arena(false)
 	shop_panel.visible = false
-	choice_panel.show_end(false, coins)
+	choice_panel.show_end(false, coins, _run_recap_data())
 	_save_completed_report(false)
 	session.clear_run()
 	get_tree().paused = true
 
 
 func _save_completed_report(won: bool) -> void:
-	session.save_run_report({
-		"outcome": "victory" if won else "death",
+	var report := _run_recap_data()
+	report["outcome"] = "victory" if won else "death"
+	session.save_run_report(report)
+
+
+func _run_recap_data() -> Dictionary:
+	return {
 		"wave_reached": wave.current_wave,
 		"final_level": level,
 		"coins_left": coins,
@@ -638,7 +645,7 @@ func _save_completed_report(won: bool) -> void:
 		"relics": relics.owned.duplicate(),
 		"telemetry": telemetry.save_data(),
 		"waves": telemetry.wave_summaries(),
-	})
+	}
 
 
 func _restart() -> void:

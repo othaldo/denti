@@ -1,7 +1,8 @@
 class_name EnemyData
 extends Resource
 
-enum SpecialAttack { NONE, DASH, PULSE, SHOOT, BOSS, RADIAL }
+enum SpecialAttack { NONE, DASH, PULSE, SHOOT, BOSS, RADIAL, SPACE_ORB, LANE }
+enum BossSignature { AIMED_FAN, TRAIL_FAN, LANE, SPACE_ORB }
 
 @export var display_name: String
 @export var max_health: float = 25.0
@@ -40,8 +41,15 @@ enum SpecialAttack { NONE, DASH, PULSE, SHOOT, BOSS, RADIAL }
 @export var attack_duration: float = 0.0
 @export var attack_damage: float = 0.0
 @export var radial_count: int = 0
+@export_range(1, 7, 1) var lane_projectile_count: int = 3
+@export var lane_projectile_spacing: float = 48.0
+@export var space_orb_radius: float = 31.0
 @export var dash_impact_radius: float = 0.0
 @export_group("Boss pressure")
+@export var boss_signature: BossSignature = BossSignature.AIMED_FAN
+@export var boss_signature_projectile_count: int = 3
+@export var boss_signature_projectile_spacing: float = 54.0
+@export var boss_signature_orb_radius: float = 42.0
 @export var boss_guard_recharge_seconds: float = 0.0
 @export_range(0.0, 1.0, 0.01) var boss_guard_burst_fraction: float = 0.0
 @export var boss_phase_duration: float = 0.0

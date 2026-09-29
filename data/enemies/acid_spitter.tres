@@ -21,3 +21,7 @@ trigger_range = 530.0
 preferred_range = 220.0
 attack_speed = 290.0
 attack_damage = 8.0
+advanced_special_wave = 13
+advanced_special_attack = 7
+lane_projectile_count = 3
+lane_projectile_spacing = 52.0

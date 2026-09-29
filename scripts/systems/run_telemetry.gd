@@ -18,6 +18,7 @@ var proc_damage: Dictionary = {}
 var other_damage: float = 0.0
 var peak_dps: float = 0.0
 var current_wave: int = 0
+var current_profile_id: StringName = &""
 var wave_started_at: float = 0.0
 var wave_history: Array[Dictionary] = []
 var wave_spawns: int = 0
@@ -44,10 +45,11 @@ var kill_events: Array[float] = []
 var taken_events: Array[Dictionary] = []
 
 
-func begin_wave(number: int) -> void:
+func begin_wave(number: int, profile_id: StringName = &"") -> void:
 	if current_wave > 0:
 		wave_history.append(current_wave_summary())
 	current_wave = number
+	current_profile_id = profile_id
 	wave_started_at = elapsed
 	wave_spawns = 0
 	wave_spawns_blocked = 0
@@ -185,7 +187,7 @@ func taken_per_minute() -> float:
 func current_wave_summary() -> Dictionary:
 	var duration := maxf(elapsed - wave_started_at, 0.0)
 	return {
-		"wave": current_wave, "combat_seconds": duration,
+		"wave": current_wave, "profile_id": str(current_profile_id), "combat_seconds": duration,
 		"spawns": wave_spawns, "spawns_blocked": wave_spawns_blocked, "kills": wave_kills,
 		"elites_spawned": wave_elites_spawned, "elites_killed": wave_elites_killed,
 		"peak_enemies_alive": wave_peak_enemies, "average_enemies_alive": wave_enemy_seconds / maxf(duration, 1.0),
@@ -213,7 +215,7 @@ func save_data() -> Dictionary:
 		"chests_found": chests_found, "chests_kept": chests_kept, "chests_scrapped": chests_scrapped,
 		"weapon_damage": weapon_damage.duplicate(), "proc_damage": proc_damage.duplicate(),
 		"other_damage": other_damage, "peak_dps": peak_dps,
-		"current_wave": current_wave, "wave_started_at": wave_started_at,
+		"current_wave": current_wave, "current_profile_id": str(current_profile_id), "wave_started_at": wave_started_at,
 		"wave_history": wave_history.duplicate(true),
 		"wave_spawns": wave_spawns, "wave_spawns_blocked": wave_spawns_blocked,
 		"wave_kills": wave_kills, "wave_elites_spawned": wave_elites_spawned,
@@ -247,6 +249,7 @@ func restore(saved: Dictionary, wave_number: int) -> void:
 	other_damage = maxf(float(saved.get("other_damage", 0.0)), 0.0)
 	peak_dps = maxf(float(saved.get("peak_dps", 0.0)), 0.0)
 	current_wave = maxi(int(saved.get("current_wave", wave_number)), 0)
+	current_profile_id = StringName(str(saved.get("current_profile_id", "")))
 	wave_started_at = clampf(float(saved.get("wave_started_at", elapsed)), 0.0, elapsed)
 	wave_history.assign(saved.get("wave_history", []))
 	wave_spawns = maxi(int(saved.get("wave_spawns", 0)), 0)

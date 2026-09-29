@@ -16,6 +16,7 @@ xp_drop = 0
 coin_drop = 0
 sprite = ExtResource("2")
 is_boss = true
+boss_signature = 1
 special_attack = 4
 special_interval = 2.6
 warning_time = 0.74

@@ -15,7 +15,12 @@ This roadmap captures the current player feedback and the intended next developm
 - Brotato balance research now guides a further normal-enemy pass: Plaque stays disposable, while Zuckerstück and Säurespucker use their own steeper health curves. Late non-boss waves shift toward those roles, gain an extra burst and a faster spawn floor; loot chance falls modestly to limit the added economy. Boss stats and boss-wave spawn pacing stay unchanged.
 - Wave length now ramps from 35 to 44 seconds in waves 1-4, is 42 seconds in waves 6-9, 46 seconds in waves 11-14 and 50 seconds in waves 16-19. Boss waves stay at 45 seconds. Bursts, hordes and elites use relative timing, and save/resume preserves the current wave's duration, including legacy 45-second saves.
 - Boss relics now appear after the defeated milestone bosses in waves 5, 10 and 15, after level-ups and chests but before the shop. Five distinct relics alter bleed kills, water hits, shield blocks, crits and moving attacks. Choices, ownership and active effects survive save/resume; relics use a new painted icon atlas.
-- Next: playtest the shorter early and longer late waves, compare per-wave damage taken, average enemy density, projectile count, XP and coins. Confirm relic impact and normal-enemy pressure before considering weapon evolutions or a new enemy role.
+- The run-end screen now summarizes run length, wave, level, kills, bosses, damage, loot and chest decisions, with the top three weapons and top two synergy sources. Completed-run JSON reports and the in-game summary use the same telemetry snapshot.
+- Normal waves now preview a randomized spawn profile and vary the role mix across Swarm, Crossfire, Rush and Sugar Flood. Profiles only reweight the existing normal spawn choices, leave spawn cadence and enemy stats unchanged, skip boss waves and persist through save/resume.
+- Phase 3 now adds two reusable telegraphed projectile patterns: Säurespucker fire a parallel lane from wave 13, and Säurekrone launches a slow, large space-denial orb from wave 15. Both use the common projectile scene, and the orb’s size and collision radius survive save/resume.
+- Relic card names now wrap to two centered lines so long German names stay inside their cards.
+- Phase 4 now gives the Prince a trailing fan, the King a charge-aligned projectile lane and the Emperor a slow space orb. At each health threshold, radial bursts add projectiles; the final phase combines that burst with the boss's signature pattern and telegraphs the added danger.
+- Next: playtest the three boss signatures and their final-phase combinations. Check that their warning shapes are readable and dodgeable, then compare boss time-to-kill and damage taken before adding more mechanics.
 
 ## Why v0.2 exists
 
@@ -217,6 +222,12 @@ Use more than HP:
 - movement changes
 - arena hazards
 - phase transitions
+
+Bosses should each have a recognizable signature mechanic, then escalate it during the encounter. Later milestone bosses should introduce additional patterns or combine earlier ones, so the threat visibly grows as the run progresses. Health thresholds should change the fight: add a new attack, layer a pattern, increase pressure, or alter safe space instead of only raising damage or projectile count.
+
+Escalation must remain readable and dodgeable. Telegraph changes before each new danger, preserve escape routes, and avoid combining attacks in ways that leave no viable response. The final boss can test mastery of earlier patterns, but should still have its own identity and phase changes.
+
+Suggested progression: the first boss teaches one signature attack; the next adds a second pattern; later bosses combine patterns with adds or temporary arena hazards; the final boss escalates those combinations across distinct phases. Exact mechanics should stay data-driven so each boss can be tuned independently.
 
 A strong build should kill bosses noticeably faster than a weak build, but not delete them before they can execute their kit.
 

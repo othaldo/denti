@@ -63,6 +63,8 @@ var burst_times: Array[float] = []
 var burst_index: int = 0
 var elite_time: float = -1.0
 var elite_spawned: bool = false
+var current_profile_id: StringName = &""
+var next_profile_id: StringName = &""
 
 
 func plan_hordes() -> void:
@@ -158,6 +160,9 @@ func next_wave_preview() -> String:
 		details.append("Säurespucker")
 	if is_boss_wave(next_wave):
 		details.append(boss_for_wave(next_wave).display_name)
+	var profile := WaveProfileCatalog.by_id(next_profile_id)
+	if profile != null:
+		details.append("Muster: %s" % profile.display_name)
 	if horde_waves.has(next_wave):
 		details.append("%s-Horde" % _horde_data(next_wave).display_name)
 	if next_wave >= 8 and not is_boss_wave(next_wave):
@@ -165,10 +170,18 @@ func next_wave_preview() -> String:
 	return "Welle %d: %s" % [next_wave, " · ".join(details)] if not details.is_empty() else "Nächste Welle: %d" % next_wave
 
 
+func prepare_next_wave_profile() -> StringName:
+	if next_profile_id == &"" and current_wave + 1 <= MAX_WAVES and not is_boss_wave(current_wave + 1):
+		next_profile_id = _roll_profile(current_wave + 1, current_profile_id)
+	return next_profile_id
+
+
 func start_next_wave() -> void:
 	if horde_waves.is_empty():
 		plan_hordes()
 	current_wave += 1
+	current_profile_id = &"" if is_boss_wave(current_wave) else (prepare_next_wave_profile() if next_profile_id == &"" else next_profile_id)
+	next_profile_id = _roll_profile(current_wave + 1, current_profile_id)
 	duration = duration_for_wave(current_wave)
 	remaining = duration
 	spawn_cooldown = 0.0
@@ -253,8 +266,11 @@ func _choose_enemy() -> EnemyData:
 		choices.append(ACID_SPITTER)
 		weights.append(1.0 + (current_wave - 4) * 0.12 + late_role_shift * 0.25)
 	var total_weight := 0.0
-	for weight in weights:
-		total_weight += weight
+	var profile := WaveProfileCatalog.by_id(current_profile_id)
+	for index in weights.size():
+		var adjusted := weights[index] * profile.multiplier_for(choices[index]) if profile != null else weights[index]
+		weights[index] = adjusted
+		total_weight += adjusted
 	var roll := randf() * total_weight
 	for index in choices.size():
 		roll -= weights[index]
@@ -265,3 +281,9 @@ func _choose_enemy() -> EnemyData:
 
 func _horde_data(wave_number: int) -> EnemyData:
 	return PLAQUE if wave_number <= 5 else BACTERIA
+
+
+func _roll_profile(wave_number: int, avoid_id: StringName = &"") -> StringName:
+	if wave_number > MAX_WAVES or is_boss_wave(wave_number):
+		return &""
+	return WaveProfileCatalog.roll_for_wave(wave_number, avoid_id)

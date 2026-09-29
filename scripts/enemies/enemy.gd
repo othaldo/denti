@@ -289,6 +289,18 @@ func _activate_special() -> void:
 			EnemyProjectilePatterns.fire_radial(root, global_position, data.radial_count, special_direction.angle() + PI, data.attack_speed, attack_damage, target, Color(1.0, 0.52, 0.22))
 		attack_performed.emit(&"acid")
 		_reset_special()
+	elif active_special_attack == EnemyData.SpecialAttack.LANE:
+		var root := _projectile_root()
+		if root != null:
+			EnemyProjectilePatterns.fire_lane(root, global_position, special_direction, data.lane_projectile_count, data.lane_projectile_spacing, data.attack_speed, attack_damage, target)
+		attack_performed.emit(&"acid")
+		_reset_special()
+	elif active_special_attack == EnemyData.SpecialAttack.SPACE_ORB:
+		var root := _projectile_root()
+		if root != null:
+			EnemyProjectilePatterns.fire_space_orb(root, global_position, special_direction, data.attack_speed, attack_damage, data.space_orb_radius, target)
+		attack_performed.emit(&"acid")
+		_reset_special()
 	else:
 		if global_position.distance_to(target.global_position) <= data.attack_radius:
 			target.take_hit(attack_damage)
@@ -313,13 +325,28 @@ func _dash_impact() -> void:
 func _fire_phase_burst() -> void:
 	var root := _projectile_root()
 	if root != null:
-		EnemyProjectilePatterns.fire_radial(root, global_position, data.boss_radial_count, boss_phase_gap_angle, data.boss_projectile_speed, attack_damage * 0.55, target)
+		EnemyProjectilePatterns.fire_radial(root, global_position, data.boss_radial_count + boss_phase * 2, boss_phase_gap_angle, data.boss_projectile_speed, attack_damage * 0.55, target)
+		if boss_phase >= 2:
+			_fire_boss_signature(Vector2.RIGHT.rotated(boss_phase_gap_angle))
 
 
 func _fire_boss_fan() -> void:
+	_fire_boss_signature(special_direction)
+
+
+func _fire_boss_signature(charge_direction: Vector2) -> void:
 	var root := _projectile_root()
-	if root != null:
-		EnemyProjectilePatterns.fire_aimed_fan(root, global_position, target.global_position - global_position, data.boss_fan_count, data.boss_projectile_speed, attack_damage * 0.45, target)
+	if root == null:
+		return
+	match data.boss_signature:
+		EnemyData.BossSignature.AIMED_FAN:
+			EnemyProjectilePatterns.fire_aimed_fan(root, global_position, target.global_position - global_position, data.boss_fan_count, data.boss_projectile_speed, attack_damage * 0.45, target)
+		EnemyData.BossSignature.TRAIL_FAN:
+			EnemyProjectilePatterns.fire_aimed_fan(root, global_position, -charge_direction, data.boss_fan_count, data.boss_projectile_speed, attack_damage * 0.45, target)
+		EnemyData.BossSignature.LANE:
+			EnemyProjectilePatterns.fire_lane(root, global_position, charge_direction, data.boss_signature_projectile_count, data.boss_signature_projectile_spacing, data.boss_projectile_speed, attack_damage * 0.45, target, EnemyProjectilePatterns.BOSS_COLOR)
+		EnemyData.BossSignature.SPACE_ORB:
+			EnemyProjectilePatterns.fire_space_orb(root, global_position, charge_direction, data.boss_projectile_speed, attack_damage * 0.5, data.boss_signature_orb_radius, target)
 
 
 func _projectile_root() -> Node2D:
@@ -397,6 +424,7 @@ func _start_boss_phase() -> void:
 	boss_phase_timer = data.boss_phase_duration
 	boss_phase_burst_fired = false
 	boss_phase_gap_angle = global_position.angle_to_point(target.global_position)
+	special_direction = Vector2.RIGHT.rotated(boss_phase_gap_angle)
 	special_phase = SpecialPhase.COOLDOWN
 	special_timer = data.special_interval * (0.72 if is_enraged else 1.0)
 	boss_phase_started.emit(global_position, boss_phase)
@@ -435,8 +463,27 @@ func _draw() -> void:
 		if boss_phase_timer > 0.0:
 			draw_arc(Vector2.ZERO, data.radius + 19.0, 0.0, TAU, 48, Color(0.95, 0.32, 0.63, 0.9), 7.0)
 			if not boss_phase_burst_fired:
-				for ray in EnemyProjectilePatterns.radial_directions(data.boss_radial_count, boss_phase_gap_angle):
+				for ray in EnemyProjectilePatterns.radial_directions(data.boss_radial_count + boss_phase * 2, boss_phase_gap_angle):
 					draw_line(ray * data.radius, ray * 290.0, Color(0.95, 0.25, 0.42, 0.3), 3.0)
+				if boss_phase >= 2:
+					var phase_aim := Vector2.RIGHT.rotated(boss_phase_gap_angle)
+					match data.boss_signature:
+						EnemyData.BossSignature.AIMED_FAN:
+							for ray in EnemyProjectilePatterns.fan_directions(phase_aim, data.boss_fan_count):
+								draw_line(ray * data.radius, ray * 320.0, Color(1.0, 0.78, 0.3, 0.42), 4.0)
+						EnemyData.BossSignature.TRAIL_FAN:
+							for ray in EnemyProjectilePatterns.fan_directions(-phase_aim, data.boss_fan_count):
+								draw_line(ray * data.radius, ray * 320.0, Color(1.0, 0.78, 0.3, 0.42), 4.0)
+						EnemyData.BossSignature.LANE:
+							var lane_side := phase_aim.orthogonal() * (data.boss_signature_projectile_spacing * float(data.boss_signature_projectile_count - 1) * 0.5 + 21.0)
+							var lane_end := phase_aim * 520.0
+							draw_colored_polygon(PackedVector2Array([-lane_side, lane_end - lane_side, lane_end + lane_side, lane_side]), Color(0.95, 0.32, 0.63, 0.13))
+							draw_line(-lane_side, lane_end - lane_side, Color(1.0, 0.78, 0.3, 0.6), 3.0)
+							draw_line(lane_side, lane_end + lane_side, Color(1.0, 0.78, 0.3, 0.6), 3.0)
+						EnemyData.BossSignature.SPACE_ORB:
+							var orb_end := phase_aim * 520.0
+							draw_line(Vector2.ZERO, orb_end, Color(0.95, 0.32, 0.63, 0.24), data.boss_signature_orb_radius * 1.4)
+							draw_arc(orb_end, data.boss_signature_orb_radius, 0.0, TAU, 40, Color(1.0, 0.78, 0.3, 0.75), 4.0)
 		elif boss_damage_budget <= max_health * 0.01:
 			draw_arc(Vector2.ZERO, data.radius + 19.0, 0.0, TAU, 48, Color(0.43, 0.84, 0.94, 0.8), 5.0)
 	if data.is_elite and data.elite_guard_fraction > 0.0:
@@ -473,6 +520,22 @@ func _draw() -> void:
 			for ray in EnemyProjectilePatterns.radial_directions(data.radial_count, special_direction.angle() + PI):
 				draw_line(ray * data.radius, ray * 235.0, Color(shot_color, 0.3 + warning_progress * 0.35), 3.0)
 			draw_arc(Vector2.ZERO, data.radius + 9.0, -PI / 2.0, -PI / 2.0 + TAU * warning_progress, 32, shot_color, 5.0)
+		elif active_special_attack == EnemyData.SpecialAttack.LANE:
+			var lane_color := Color(0.50, 0.88, 0.14, 0.9)
+			var lane_direction := special_direction.normalized()
+			var lane_side := lane_direction.orthogonal() * (data.lane_projectile_spacing * float(data.lane_projectile_count - 1) * 0.5 + 21.0)
+			var lane_end := lane_direction * 550.0
+			draw_colored_polygon(PackedVector2Array([-lane_side, lane_end - lane_side, lane_end + lane_side, lane_side]), Color(lane_color, 0.10 + warning_progress * 0.12))
+			draw_line(-lane_side, lane_end - lane_side, lane_color, 3.0)
+			draw_line(lane_side, lane_end + lane_side, lane_color, 3.0)
+			draw_arc(Vector2.ZERO, data.radius + 8.0, -PI / 2.0, -PI / 2.0 + TAU * warning_progress, 32, lane_color, 4.0)
+		elif active_special_attack == EnemyData.SpecialAttack.SPACE_ORB:
+			var orb_color := Color(1.0, 0.43, 0.25, 0.88)
+			var orb_direction := special_direction.normalized()
+			var orb_end := orb_direction * 550.0
+			draw_line(Vector2.ZERO, orb_end, Color(orb_color, 0.42), data.space_orb_radius * 1.4)
+			draw_arc(orb_end, data.space_orb_radius, 0.0, TAU, 40, orb_color, 4.0)
+			draw_arc(Vector2.ZERO, data.radius + 8.0, -PI / 2.0, -PI / 2.0 + TAU * warning_progress, 32, orb_color, 4.0)
 		else:
 			draw_circle(Vector2.ZERO, data.attack_radius, Color(0.95, 0.36, 0.28, 0.13))
 			draw_arc(Vector2.ZERO, data.attack_radius, 0.0, TAU, 64, warning_color, 4.0)

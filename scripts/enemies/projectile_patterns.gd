@@ -39,6 +39,21 @@ static func fire_aimed_fan(parent: Node2D, at: Vector2, aim: Vector2, count: int
 		_spawn(parent, at, direction, speed, damage, target, tint, lifetime)
 
 
+static func fire_lane(parent: Node2D, at: Vector2, aim: Vector2, count: int, spacing: float, speed: float, damage: float, target: Player, tint: Color = ACID_COLOR) -> void:
+	var center := aim.normalized() if aim.length_squared() > 0.01 else Vector2.RIGHT
+	var side := center.orthogonal()
+	for index in count:
+		var offset := (float(index) - float(count - 1) * 0.5) * spacing
+		_spawn(parent, at + side * offset, center, speed, damage, target, tint, 2.8)
+
+
+static func fire_space_orb(parent: Node2D, at: Vector2, aim: Vector2, speed: float, damage: float, radius: float, target: Player) -> void:
+	var projectile: AcidProjectile = PROJECTILE.instantiate()
+	parent.add_child(projectile)
+	projectile.launch(at, aim, speed * 0.55, damage, target, Color(1.0, 0.43, 0.25), radius, radius * 0.7)
+	projectile.lifetime = 3.8
+
+
 static func _spawn(parent: Node2D, at: Vector2, direction: Vector2, speed: float, damage: float, target: Player, tint: Color, lifetime: float) -> void:
 	var projectile: AcidProjectile = PROJECTILE.instantiate()
 	parent.add_child(projectile)

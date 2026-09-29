@@ -76,12 +76,19 @@ func toggle_telemetry() -> void:
 func update_telemetry(stats: RunTelemetry, enemies_alive: int, projectiles_alive: int) -> void:
 	if not telemetry_panel.visible:
 		return
-	telemetry_label.text = "DEBUG · WELLE %d\nDPS 10 s: %.1f  ·  Peak: %.1f\nKills/s: %.1f  ·  Kills: %d\nGegner: %d  ·  Spawns: %d (%.0f/min)\nAm Limit geblockt: %d\nProjektile: %d\nSchaden/min: %.1f  ·  Total: %.0f\nBoss-TTK: %.1f s\nMünzen/XP: %d / %d\nRun-Schaden: %.0f" % [
-		stats.current_wave, stats.recent_dps(), stats.peak_dps,
+	telemetry_label.text = "DEBUG · WELLE %d · %s\nDPS 10 s: %.1f  ·  Peak: %.1f\nKills/s: %.1f  ·  Kills: %d\nGegner: %d  ·  Spawns: %d (%.0f/min)\nAm Limit geblockt: %d\nProjektile: %d\nSchaden/min: %.1f  ·  Total: %.0f\nBoss-TTK: %.1f s\nMünzen/XP: %d / %d\nRun-Schaden: %.0f" % [
+		stats.current_wave, _profile_label(stats.current_profile_id, stats.current_wave), stats.recent_dps(), stats.peak_dps,
 		stats.recent_kps(), stats.kills, enemies_alive, stats.wave_spawns, stats.spawns_per_minute(),
 		stats.wave_spawns_blocked, projectiles_alive, stats.taken_per_minute(), stats.damage_taken,
 		stats.last_boss_ttk, stats.wave_coins, stats.wave_xp, stats.total_damage,
 	]
+
+
+func _profile_label(id: StringName, wave_number: int) -> String:
+	var profile := WaveProfileCatalog.by_id(id)
+	if profile != null:
+		return profile.display_name
+	return "Bosswelle" if WaveController.is_boss_wave(wave_number) else "Standard"
 
 
 func update_status(stats: PlayerStats, xp: int, xp_goal: int, level: int, coins: int, wave_number: int, remaining: float, in_shop: bool, boss: Enemy, boss_pending: bool, collecting_loot: bool = false, pending_levels: int = 0) -> void:

@@ -24,6 +24,7 @@ var end_won: bool = false
 var end_coins: int = 0
 var chest_item: ShopOfferData
 var relic_options: Array[RelicData] = []
+var end_recap: Dictionary = {}
 
 
 func _ready() -> void:
@@ -97,15 +98,18 @@ func show_relics(options: Array[RelicData]) -> void:
 	buttons[0].grab_focus()
 
 
-func show_end(won: bool, coins: int) -> void:
+func show_end(won: bool, coins: int, recap: Dictionary = {}) -> void:
 	mode = &"end"
 	end_won = won
 	end_coins = coins
+	end_recap = recap.duplicate(true)
 	current_upgrades.clear()
-	dialog_panel.custom_minimum_size = Vector2(800, 330)
+	dialog_panel.custom_minimum_size = Vector2(900, 560)
+	$Root/Center/Panel/Margin/Rows/Portrait.custom_minimum_size.y = 80.0
 	title_label.text = "Alle huldigen Denti!" if won else "Denti ist ausgefallen!"
-	subtitle_label.text = "Gesammelte Münzen: %d" % coins
-	subtitle_label.custom_minimum_size.y = 45.0
+	subtitle_label.add_theme_font_size_override("font_size", 17)
+	subtitle_label.text = _end_summary(won, coins, end_recap)
+	subtitle_label.custom_minimum_size.y = 270.0
 	buttons[0].call("show_action", "Noch einmal spielen", true)
 	buttons[0].visible = true
 	buttons[1].call("show_action", "Credits")
@@ -143,7 +147,71 @@ func _on_choice_pressed(index: int) -> void:
 			elif index == 2:
 				main_menu_requested.emit()
 		&"credits":
-			show_end(end_won, end_coins)
+			show_end(end_won, end_coins, end_recap)
+
+
+func _end_summary(won: bool, coins: int, recap: Dictionary) -> String:
+	var run: Dictionary = recap.get("telemetry", {})
+	if run.is_empty():
+		return "Run beendet · %d Münzen übrig" % coins
+	var elapsed := maxi(roundi(float(run.get("elapsed", 0.0))), 0)
+	var minutes := floori(float(elapsed) / 60.0)
+	var seconds := elapsed % 60
+	var outcome := "Sieg" if won else "Niederlage"
+	var lines: PackedStringArray = [
+		"%s · Welle %d · Level %d · %02d:%02d Minuten" % [outcome, int(recap.get("wave_reached", 0)), int(recap.get("final_level", 1)), minutes, seconds],
+		"%s Gegner besiegt · %s Bosse · %s Gesamtschaden" % [
+			_format_number(int(run.get("kills", 0))), _format_number(int(run.get("bosses_defeated", 0))), _format_number(roundi(float(run.get("total_damage", 0.0))))],
+		"%s Schaden erlitten · %s XP · %s Münzen gesammelt (%s übrig)" % [
+			_format_number(roundi(float(run.get("damage_taken", 0.0)))), _format_number(int(run.get("xp_collected", 0))),
+			_format_number(int(run.get("coins_collected", 0))), _format_number(coins)],
+		"Kisten: %d gefunden · %d behalten · %d zerlegt" % [
+			int(run.get("chests_found", 0)), int(run.get("chests_kept", 0)), int(run.get("chests_scrapped", 0))],
+	]
+	var weapon_damage: Dictionary = run.get("weapon_damage", {})
+	var weapon_total := 0.0
+	for amount in weapon_damage.values():
+		weapon_total += float(amount)
+	var weapon_ids: Array = weapon_damage.keys()
+	weapon_ids.sort_custom(func(a: Variant, b: Variant) -> bool: return float(weapon_damage[a]) > float(weapon_damage[b]))
+	if not weapon_ids.is_empty():
+		lines.append("Waffenschaden")
+		for id in weapon_ids.slice(0, mini(3, weapon_ids.size())):
+			var weapon := WeaponCatalog.by_id(StringName(str(id)))
+			var weapon_name := weapon.display_name if weapon != null else str(id).replace("_", " ").capitalize()
+			var amount := float(weapon_damage[id])
+			var share := roundi(amount * 100.0 / maxf(weapon_total, 1.0))
+			lines.append("%s · %s Schaden · %d%%" % [weapon_name, _format_number(roundi(amount)), share])
+	var proc_damage: Dictionary = run.get("proc_damage", {})
+	var proc_ids: Array = proc_damage.keys()
+	proc_ids.sort_custom(func(a: Variant, b: Variant) -> bool: return float(proc_damage[a]) > float(proc_damage[b]))
+	if not proc_ids.is_empty():
+		var proc_lines := PackedStringArray()
+		for id in proc_ids.slice(0, mini(2, proc_ids.size())):
+			proc_lines.append("%s %s" % [_proc_name(StringName(str(id))), _format_number(roundi(float(proc_damage[id])))])
+		lines.append("Synergien · " + " · ".join(proc_lines))
+	return "\n".join(lines)
+
+
+func _proc_name(id: StringName) -> String:
+	var labels := {
+		"bleed": "Blutung", "chain": "Kettenblitz", "water_puddle": "Spülpfützen",
+		"splash": "Spritzer", "crit_burst": "Krit-Blitz", "crit_beam": "Glanzstrahl",
+		"thorns": "Keramiksplitter", "shield_shards": "Schildsplitter", "kill_burst": "Zahnblitz",
+		"blood_moon_tooth": "Blutmond", "tidal_seal": "Gezeitenwelle", "sun_mark": "Sonnenmal",
+		"pilgrim_compass": "Kompasssprung",
+	}
+	return str(labels.get(str(id), str(id).replace("_", " ").capitalize()))
+
+
+func _format_number(value: int) -> String:
+	var digits := str(absi(value))
+	var grouped := ""
+	for index in digits.length():
+		if index > 0 and (digits.length() - index) % 3 == 0:
+			grouped += "."
+		grouped += digits.substr(index, 1)
+	return "-" + grouped if value < 0 else grouped
 
 
 func _show_credits() -> void:

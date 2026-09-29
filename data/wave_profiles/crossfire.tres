@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="WaveProfileData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/wave_profile_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"crossfire"
+display_name = "Kreuzfeuer"
+description = "Säurespucker tauchen häufiger im normalen Spawnmix auf."
+first_wave = 4
+enemy_weight_multipliers = {"Plaque": 0.75, "Bakterium": 0.9, "Zuckerstück": 0.9, "Säurespucker": 2.0}
