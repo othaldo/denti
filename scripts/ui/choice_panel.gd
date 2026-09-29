@@ -3,6 +3,7 @@ extends CanvasLayer
 
 signal upgrade_chosen(upgrade: UpgradeData)
 signal chest_resolved(keep: bool)
+signal relic_chosen(id: StringName)
 signal starter_chosen(weapon: WeaponData)
 signal restart_requested
 signal main_menu_requested
@@ -22,6 +23,7 @@ var mode: StringName = &"upgrade"
 var end_won: bool = false
 var end_coins: int = 0
 var chest_item: ShopOfferData
+var relic_options: Array[RelicData] = []
 
 
 func _ready() -> void:
@@ -80,6 +82,21 @@ func show_chest(item: ShopOfferData, scrap_coins: int) -> void:
 	buttons[0].grab_focus()
 
 
+func show_relics(options: Array[RelicData]) -> void:
+	mode = &"relic"
+	relic_options = options
+	dialog_panel.custom_minimum_size = Vector2(900, 465)
+	title_label.text = "Göttliche Zahnreliquie!"
+	subtitle_label.text = "Der Boss ist besiegt. Wähle ein Relikt für diesen Lauf."
+	subtitle_label.custom_minimum_size.y = 40.0
+	for index in buttons.size():
+		buttons[index].visible = index < options.size()
+		if index < options.size():
+			buttons[index].call("show_relic", options[index])
+	visible = true
+	buttons[0].grab_focus()
+
+
 func show_end(won: bool, coins: int) -> void:
 	mode = &"end"
 	end_won = won
@@ -112,6 +129,11 @@ func _on_choice_pressed(index: int) -> void:
 				return
 			visible = false
 			chest_resolved.emit(index == 0)
+		&"relic":
+			if index >= relic_options.size():
+				return
+			visible = false
+			relic_chosen.emit(relic_options[index].id)
 		&"end":
 			if index == 0:
 				visible = false

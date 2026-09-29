@@ -117,7 +117,7 @@ func _run() -> void:
 	game.get_node("Projectiles").add_child(projectile)
 	var coins_before_wave_end: int = game.coins
 	game.get_node("WaveController").active = true
-	game.get_node("WaveController")._process(45.0)
+	game.wave._process(game.wave.remaining)
 	if not game.collecting_wave_loot or game.get_node("ShopPanel").visible or game.coins != coins_before_wave_end:
 		_fail("wave end skipped the visible loot collection")
 		return
@@ -181,7 +181,7 @@ func _run() -> void:
 	if paused or game.wave.current_wave != 2 or not game.wave.active or game.get_node("ShopPanel").visible:
 		_fail("shop continue did not start wave two")
 		return
-	if game.get_node("HUD").wave_label.text != "WELLE 2" or game.get_node("HUD").timer_label.text != "45":
+	if game.get_node("HUD").wave_label.text != "WELLE 2" or game.get_node("HUD").timer_label.text != str(ceili(game.wave.duration)):
 		_fail("HUD did not show wave number and countdown")
 		return
 	if game.get_node("Enemies").get_child_count() != 0:
@@ -198,7 +198,7 @@ func _run() -> void:
 		_fail("enemy health did not scale in wave two")
 		return
 	game._spawn_loot(player.position + Vector2(50.0, 0.0), &"xp", game.xp_goal)
-	game.wave._process(45.0)
+	game.wave._process(game.wave.remaining)
 	if not await _complete_intermission(game):
 		_fail("wave two rewards did not finish")
 		return
@@ -222,7 +222,7 @@ func _run() -> void:
 			if game.boss.data != expected_boss:
 				_fail("boss wave spawned the wrong boss")
 				return
-		game.wave._process(45.0)
+		game.wave._process(game.wave.remaining)
 		if WaveController.is_boss_wave(expected_wave) and expected_wave < WaveController.MAX_WAVES:
 			if not game.boss_pending or game.get_node("ShopPanel").visible:
 				_fail("mini-boss wave ended before the boss was defeated")
@@ -267,7 +267,7 @@ func _run() -> void:
 
 func _complete_intermission(game: Node2D) -> bool:
 	for frame in 180:
-		if game.choice_panel.visible and (game.choice_panel.mode == &"upgrade" or game.choice_panel.mode == &"chest"):
+		if game.choice_panel.visible and (game.choice_panel.mode == &"upgrade" or game.choice_panel.mode == &"chest" or game.choice_panel.mode == &"relic"):
 			game.choice_panel._on_choice_pressed(0)
 		if game.shop_panel.visible or game.ended:
 			return true

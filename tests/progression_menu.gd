@@ -65,6 +65,7 @@ func _run() -> void:
 	game.wave.remaining = 23.0
 	game.wave.active = true
 	game.wave.current_wave = 4
+	game.wave.duration = WaveController.duration_for_wave(4)
 	game.wave.horde_waves.clear()
 	game.wave.horde_waves.append(4)
 	game.wave.horde_waves.append(8)
@@ -115,7 +116,7 @@ func _run() -> void:
 	await process_frame
 	await process_frame
 	game = current_scene
-	if game.coins != 17 or game.xp != 3 or game.wave.current_wave != 4 or absf(game.wave.remaining - 23.0) > 0.2 or game.player.stats.damage != 42.0:
+	if game.coins != 17 or game.xp != 3 or game.wave.current_wave != 4 or not is_equal_approx(game.wave.duration, WaveController.duration_for_wave(4)) or absf(game.wave.remaining - 23.0) > 0.2 or game.player.stats.damage != 42.0:
 		_fail("continue did not restore progression")
 		return
 	var restored_acid := false
@@ -139,7 +140,7 @@ func _run() -> void:
 	game.wave.horde_waves.append(4)
 	game.wave.horde_waves.append(8)
 	game.wave.horde_spawned = false
-	game.wave.remaining = 27.1
+	game.wave.remaining = game.wave.duration * (1.0 - WaveController.HORDE_TIME_FRACTION) + 0.1
 	var enemies_before: int = game.get_node("Enemies").get_child_count()
 	game.wave._process(0.2)
 	if not game.wave.horde_spawned or game.get_node("Enemies").get_child_count() < enemies_before + 9:
@@ -161,7 +162,7 @@ func _run() -> void:
 	if paused or game.choice_panel.visible or game.rewards.pending_levels != 1:
 		_fail("continue lost the level-up earned during combat")
 		return
-	game.wave._process(WaveController.DURATION)
+	game.wave._process(game.wave.remaining)
 	if not paused or not game.choice_panel.visible or game.choice_panel.current_upgrades.size() != 3:
 		_fail("post-wave level-up choices did not open after loot collection")
 		return

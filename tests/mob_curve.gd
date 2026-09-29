@@ -7,12 +7,25 @@ func _initialize() -> void:
 
 func _run() -> void:
 	var plaque := WaveController.PLAQUE
+	var bacteria := WaveController.BACTERIA
+	var sugar := WaveController.SUGAR
+	var spitter := WaveController.ACID_SPITTER
 	var boss := WaveController.CAVITY_KING
-	if not is_equal_approx(WaveController.health_multiplier(plaque, 6), 1.0 + 5.0 * WaveController.MOB_HEALTH_WAVE_STEP):
-		_fail("early-wave mob health changed")
+	for normal in [plaque, bacteria, sugar, spitter]:
+		if normal.health_per_wave <= 0.0 or normal.late_health_acceleration <= 0.0:
+			_fail("normal enemy lacks its own health curve: %s" % normal.display_name)
+			return
+	if not is_equal_approx(plaque.max_health * WaveController.health_multiplier(plaque, 6), plaque.max_health + 5.0 * plaque.health_per_wave):
+		_fail("early-wave plaque health does not use its own curve")
 		return
-	if WaveController.health_multiplier(plaque, 12) < 3.5 or WaveController.health_multiplier(plaque, 20) < 7.5:
-		_fail("late-wave mob health curve is too flat")
+	var plaque_20 := plaque.max_health * WaveController.health_multiplier(plaque, 20)
+	var sugar_20 := sugar.max_health * WaveController.health_multiplier(sugar, 20)
+	var spitter_20 := spitter.max_health * WaveController.health_multiplier(spitter, 20)
+	if plaque_20 > 230.0 or sugar_20 < 1500.0 or spitter_20 < 600.0 or sugar_20 < plaque_20 * 6.0:
+		_fail("normal enemy roles do not diverge in late waves: %.0f / %.0f / %.0f" % [plaque_20, sugar_20, spitter_20])
+		return
+	if spitter.trigger_range < 500.0:
+		_fail("ranged enemy cannot create pressure before reaching short range")
 		return
 	if WaveController.enemy_speed_multiplier(plaque, 12) < 1.35 or WaveController.enemy_damage_multiplier(plaque, 12) < 1.8:
 		_fail("mid-run mobs still cannot create movement or damage pressure")
@@ -22,6 +35,9 @@ func _run() -> void:
 		return
 	if not is_equal_approx(WaveController.health_multiplier(boss, 15), 1.0 + 14.0 * WaveController.BOSS_HEALTH_WAVE_STEP) or not is_equal_approx(WaveController.enemy_speed_multiplier(boss, 15), 1.0 + 14.0 * WaveController.ENEMY_SPEED_WAVE_STEP):
 		_fail("mob curve changed boss scaling")
+		return
+	if WaveController.loot_chance(19) > 0.4 or not is_equal_approx(WaveController.loot_chance(20), WaveController.BOSS_WAVE_LOOT_CHANCE_MIN):
+		_fail("denser late waves create excessive loot chances")
 		return
 	var session: Node = root.get_node("GameSession")
 	session.save_path = "user://test_mob_curve_run.json"

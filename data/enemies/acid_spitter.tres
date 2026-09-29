@@ -7,6 +7,8 @@
 script = ExtResource("1")
 display_name = "Säurespucker"
 max_health = 40.0
+health_per_wave = 8.0
+late_health_acceleration = 2.2
 damage_reduction = 0.08
 move_speed = 92.0
 contact_damage = 5.0
@@ -15,7 +17,7 @@ sprite = ExtResource("2")
 special_attack = 3
 special_interval = 2.8
 warning_time = 0.55
-trigger_range = 400.0
+trigger_range = 530.0
 preferred_range = 220.0
 attack_speed = 290.0
 attack_damage = 8.0

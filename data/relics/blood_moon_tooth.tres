@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/relic_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"blood_moon_tooth"
+display_name = "Blutmond-Zahn"
+description = "Stirbt ein blutender Gegner durch eine Waffe, explodiert er und verteilt Blutung auf Gegner in der Nähe."
+icon_index = 0

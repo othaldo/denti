@@ -5,6 +5,8 @@ enum SpecialAttack { NONE, DASH, PULSE, SHOOT, BOSS, RADIAL }
 
 @export var display_name: String
 @export var max_health: float = 25.0
+@export var health_per_wave: float = 0.0
+@export var late_health_acceleration: float = 0.0
 @export_range(0.0, 0.6, 0.01) var damage_reduction: float = 0.0
 @export_range(0.0, 1.0, 0.01) var knockback_resistance: float = 0.0
 @export var move_speed: float = 90.0

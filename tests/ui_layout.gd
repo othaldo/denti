@@ -32,7 +32,7 @@ func _run() -> void:
 	if paused or game.choice_panel.visible:
 		_fail("XP opened the level-up overlay during combat")
 		return
-	game.wave._process(WaveController.DURATION)
+	game.wave._process(game.wave.remaining)
 	await process_frame
 	if not paused or not game.choice_panel.visible:
 		_fail("level-up overlay did not appear")

@@ -16,7 +16,7 @@ func _run() -> void:
 	wave.enemy_requested.connect(_count_spawn)
 	wave.horde_requested.connect(_count_horde)
 	wave.start_next_wave()
-	for frame in 2700:
+	for frame in ceili(wave.duration * 60.0):
 		wave._process(1.0 / 60.0)
 	var early_count := spawn_count
 	var early_bursts := burst_count
@@ -25,21 +25,42 @@ func _run() -> void:
 	burst_types.clear()
 	wave.current_wave = 9
 	wave.start_next_wave()
-	for frame in 2700:
+	for frame in ceili(wave.duration * 60.0):
 		wave._process(1.0 / 60.0)
 	var middle_count := spawn_count
-	if early_count < 55 or middle_count < 125 or middle_count < early_count * 2 or early_bursts != 2 or burst_count != 3 or not burst_types.has("Säurespucker"):
+	if early_count < 40 or middle_count < 125 or middle_count < early_count * 2 or early_bursts != 2 or burst_count != 3 or not burst_types.has("Säurespucker"):
 		_fail("early and middle waves lack frequent mixed pressure: %d / %d enemies, %d / %d bursts" % [early_count, middle_count, early_bursts, burst_count])
 		return
 	spawn_count = 0
 	burst_count = 0
-	wave.current_wave = 19
+	wave.current_wave = 18
 	wave.start_next_wave()
-	for frame in 2700:
+	for frame in ceili(wave.duration * 60.0):
 		wave._process(1.0 / 60.0)
 	var late_count := spawn_count
-	if late_count < 175 or late_count < middle_count * 1.3:
+	if late_count < 230 or late_count < middle_count * 1.5 or burst_count != 4:
 		_fail("late waves do not grow beyond middle-wave pressure: %d / %d" % [middle_count, late_count])
+		return
+	seed(12345)
+	var plaque_choices := 0
+	var threat_choices := 0
+	for index in 1000:
+		var choice: EnemyData = wave._choose_enemy()
+		if choice == WaveController.PLAQUE:
+			plaque_choices += 1
+		elif choice == WaveController.SUGAR or choice == WaveController.ACID_SPITTER:
+			threat_choices += 1
+	if plaque_choices > 220 or threat_choices < 500:
+		_fail("late wave composition still favors fodder: %d Plaque / %d threats" % [plaque_choices, threat_choices])
+		return
+	spawn_count = 0
+	burst_count = 0
+	wave.start_next_wave()
+	for frame in ceili(wave.duration * 60.0):
+		wave._process(1.0 / 60.0)
+	var boss_wave_count := spawn_count
+	if burst_count != 3 or boss_wave_count >= late_count:
+		_fail("boss wave inherited the new normal-wave pressure: %d / %d spawns, %d bursts" % [boss_wave_count, late_count, burst_count])
 		return
 	var session: Node = root.get_node("GameSession")
 	session.save_path = "user://test_wave_balance_run.json"
@@ -107,7 +128,7 @@ func _run() -> void:
 		return
 	wave.free()
 	session.clear_run()
-	print("Denti wave balance test passed; wave 1: %d, wave 10: %d, wave 20: %d, mini-boss: %.1fs" % [early_count, middle_count, late_count, float(frames) / 60.0])
+	print("Denti wave balance test passed; wave 1: %d, wave 10: %d, wave 19: %d, boss wave 20: %d, mini-boss: %.1fs" % [early_count, middle_count, late_count, boss_wave_count, float(frames) / 60.0])
 	quit(0)
 
 

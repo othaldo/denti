@@ -1,11 +1,13 @@
 class_name PostWaveRewards
 extends RefCounted
 
-enum Step { COMBAT, COLLECTING, LEVELS, CHESTS, SHOP, END }
+# Keep old numeric values stable because saved runs store this enum as an integer.
+enum Step { COMBAT, COLLECTING, LEVELS, CHESTS, SHOP, END, RELICS }
 
 var step: Step = Step.COMBAT
 var pending_levels: int = 0
 var pending_chests: Array[Dictionary] = []
+var pending_relics: Array[String] = []
 var chest_spawned: bool = false
 var final_wave: bool = false
 
@@ -14,6 +16,7 @@ func begin_wave() -> void:
 	step = Step.COMBAT
 	pending_levels = 0
 	pending_chests.clear()
+	pending_relics.clear()
 	chest_spawned = false
 	final_wave = false
 
@@ -31,6 +34,13 @@ func queue_chest(item_id: StringName, scrap_coins: int) -> void:
 	if item == null or item.weapon_data != null:
 		return
 	pending_chests.append({"item_id": str(item_id), "scrap_coins": maxi(scrap_coins, 1)})
+
+
+func queue_relics(options: Array[String]) -> void:
+	pending_relics.clear()
+	for id in options:
+		if RelicCatalog.by_id(StringName(id)) != null and not pending_relics.has(id):
+			pending_relics.append(id)
 
 
 func begin_collection() -> void:
@@ -56,17 +66,24 @@ func resolve_chest() -> void:
 	_advance()
 
 
+func resolve_relic() -> void:
+	if step != Step.RELICS or pending_relics.is_empty():
+		return
+	pending_relics.clear()
+	_advance()
+
+
 func current_chest() -> Dictionary:
 	return pending_chests[0] if not pending_chests.is_empty() else {}
 
 
 func save_data() -> Dictionary:
 	return {"step": step, "pending_levels": pending_levels, "pending_chests": pending_chests.duplicate(true),
-		"chest_spawned": chest_spawned, "final_wave": final_wave}
+		"pending_relics": pending_relics.duplicate(), "chest_spawned": chest_spawned, "final_wave": final_wave}
 
 
 func restore(saved: Dictionary) -> void:
-	step = clampi(int(saved.get("step", Step.COMBAT)), Step.COMBAT, Step.END) as Step
+	step = clampi(int(saved.get("step", Step.COMBAT)), Step.COMBAT, Step.RELICS) as Step
 	pending_levels = maxi(int(saved.get("pending_levels", 0)), 0)
 	pending_chests.clear()
 	for entry in saved.get("pending_chests", []):
@@ -75,9 +92,14 @@ func restore(saved: Dictionary) -> void:
 		var item := ShopController.by_id(StringName(str(entry.get("item_id", ""))))
 		if item != null and item.weapon_data == null:
 			pending_chests.append({"item_id": str(item.id), "scrap_coins": maxi(int(entry.get("scrap_coins", 1)), 1)})
+	pending_relics.clear()
+	for value in saved.get("pending_relics", []):
+		var id := str(value)
+		if RelicCatalog.by_id(StringName(id)) != null and not pending_relics.has(id):
+			pending_relics.append(id)
 	chest_spawned = bool(saved.get("chest_spawned", false))
 	final_wave = bool(saved.get("final_wave", false))
-	if step == Step.LEVELS and pending_levels == 0 or step == Step.CHESTS and pending_chests.is_empty():
+	if step == Step.LEVELS and pending_levels == 0 or step == Step.CHESTS and pending_chests.is_empty() or step == Step.RELICS and pending_relics.is_empty():
 		_advance()
 
 
@@ -86,5 +108,7 @@ func _advance() -> void:
 		step = Step.LEVELS
 	elif not pending_chests.is_empty():
 		step = Step.CHESTS
+	elif not pending_relics.is_empty():
+		step = Step.RELICS
 	else:
 		step = Step.END if final_wave else Step.SHOP

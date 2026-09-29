@@ -60,6 +60,19 @@ func show_item(item: ShopOfferData) -> void:
 	DentiUIStyle.style_card(self, item.rarity_tier)
 
 
+func show_relic(relic: RelicData) -> void:
+	custom_minimum_size.y = 230.0
+	text = ""
+	content.visible = true
+	icon_rect.texture = ICONS.relic(relic.icon_index)
+	name_label.text = relic.display_name.to_upper()
+	rarity_label.text = "GÖTTLICHES RELIKT"
+	DentiUIStyle.style_rarity_label(rarity_label, 4)
+	effect_label.text = relic.description
+	disabled = false
+	DentiUIStyle.style_card(self, 4)
+
+
 func show_action(action_name: String, accent: bool = false) -> void:
 	custom_minimum_size.y = 60.0
 	content.visible = false

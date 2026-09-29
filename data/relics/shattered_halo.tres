@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/relic_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"shattered_halo"
+display_name = "Splitter-Heiligenschein"
+description = "Blockt ein Schild Schaden, verursachen deine Waffen vier Sekunden lang 30 % mehr Schaden."
+icon_index = 2

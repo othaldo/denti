@@ -41,7 +41,7 @@ static func capture(game) -> Dictionary:
 		for upgrade in game.choice_panel.current_upgrades:
 			upgrades.append({"stat": str(upgrade.stat), "tier": upgrade.tier})
 	return {
-		"wave": game.wave.current_wave, "remaining": game.wave.remaining,
+		"wave": game.wave.current_wave, "duration": game.wave.duration, "remaining": game.wave.remaining,
 		"spawn_cooldown": game.wave.spawn_cooldown, "active": game.wave.active,
 		"horde_waves": game.wave.horde_waves, "horde_spawned": game.wave.horde_spawned,
 		"burst_times": game.wave.burst_times, "burst_index": game.wave.burst_index,
@@ -50,6 +50,7 @@ static func capture(game) -> Dictionary:
 		"xp": game.xp, "xp_goal": game.xp_goal, "level": game.level, "coins": game.coins,
 		"weapons": game.player.loadout.save_data(), "starter_pending": game.starter_pending,
 		"items": game.items.save_data(),
+		"relics": game.relics.save_data(),
 		"telemetry": game.telemetry.save_data(),
 		"rewards": game.rewards.save_data(),
 		"enemies": enemies_data, "loot": loot_data, "acid": acid_data,
@@ -65,7 +66,8 @@ static func restore(game, saved: Dictionary) -> void:
 	var player: Player = game.player
 	var shop: ShopController = game.shop
 	wave.current_wave = clampi(int(saved.get("wave", 1)), 1, WaveController.MAX_WAVES)
-	wave.remaining = clampf(float(saved.get("remaining", WaveController.DURATION)), 0.0, WaveController.DURATION)
+	wave.duration = clampf(float(saved.get("duration", WaveController.DURATION)), 1.0, 120.0)
+	wave.remaining = clampf(float(saved.get("remaining", wave.duration)), 0.0, wave.duration)
 	wave.spawn_cooldown = maxf(float(saved.get("spawn_cooldown", 0.0)), 0.0)
 	wave.active = bool(saved.get("active", true))
 	wave.horde_waves.clear()
@@ -81,9 +83,9 @@ static func restore(game, saved: Dictionary) -> void:
 		wave.burst_index = clampi(int(saved.get("burst_index", 0)), 0, wave.burst_times.size())
 	else:
 		wave.plan_bursts()
-		while wave.burst_index < wave.burst_times.size() and wave.burst_times[wave.burst_index] <= WaveController.DURATION - wave.remaining:
+		while wave.burst_index < wave.burst_times.size() and wave.burst_times[wave.burst_index] <= wave.duration - wave.remaining:
 			wave.burst_index += 1
-	wave.elite_time = clampf(float(saved.get("elite_time", -1.0)), -1.0, WaveController.DURATION)
+	wave.elite_time = clampf(float(saved.get("elite_time", -1.0)), -1.0, wave.duration)
 	wave.elite_spawned = bool(saved.get("elite_spawned", false))
 	var player_data: Dictionary = saved.get("player", {})
 	player.position = _read_vector(player_data.get("position", [640.0, 360.0]))
@@ -104,6 +106,7 @@ static func restore(game, saved: Dictionary) -> void:
 			if old_weapon != null:
 				player.loadout.acquire(old_weapon)
 	game.items.restore(saved.get("items", {}))
+	game.relics.restore(saved.get("relics", {}))
 	game.rewards.restore(saved.get("rewards", {}))
 	for entry in saved.get("enemies", []):
 		var enemy_data := _enemy_from_path(str(entry.get("type", "")))
@@ -204,7 +207,7 @@ static func restore(game, saved: Dictionary) -> void:
 			game.get_tree().paused = true
 		else:
 			game._advance_post_wave_rewards()
-	elif game.rewards.step == PostWaveRewards.Step.CHESTS:
+	elif game.rewards.step == PostWaveRewards.Step.CHESTS or game.rewards.step == PostWaveRewards.Step.RELICS:
 		game._advance_post_wave_rewards()
 	elif game.rewards.step == PostWaveRewards.Step.LEVELS:
 		game._advance_post_wave_rewards()

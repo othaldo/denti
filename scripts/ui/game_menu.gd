@@ -231,10 +231,14 @@ func _show_stats() -> void:
 func _show_items() -> void:
 	page = &"items"
 	_clear_rows()
-	_title("Dentis Items")
+	_title("Dentis Items & Relikte")
 	var owned: Array[Dictionary] = game.items.all_items()
+	for id in game.relics.owned:
+		var relic := RelicCatalog.by_id(StringName(id))
+		if relic != null:
+			owned.append({"name": "Relikt: " + relic.display_name, "count": 1, "description": relic.description})
 	if owned.is_empty():
-		_text("Noch keine Items. In der Zahnklinik warten welche auf dich.")
+		_text("Noch keine Items oder Relikte. In der Zahnklinik warten Items auf dich.")
 	else:
 		var scrolling := ScrollContainer.new()
 		scrolling.custom_minimum_size = Vector2(450, 300)

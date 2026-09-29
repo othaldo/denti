@@ -32,7 +32,7 @@ func _run() -> void:
 	if paused or game.rewards.pending_levels != 3 or game.rewards.pending_chests.size() != 1 or not game.rewards.chest_spawned or game.get_node("Loot").get_child_count() != 3:
 		_fail("continue lost pending combat rewards or the chest on the ground")
 		return
-	game.wave._process(WaveController.DURATION)
+	game.wave._process(game.wave.remaining)
 	if not game.collecting_wave_loot or game.choice_panel.visible or game.rewards.step != PostWaveRewards.Step.COLLECTING:
 		_fail("reward choices opened before the loot sweep")
 		return

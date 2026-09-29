@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/relic_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"sun_mark"
+display_name = "Sonnenmal"
+description = "Jeder dritte kritische Treffer zündet eine heilige Explosion um das Ziel."
+icon_index = 3

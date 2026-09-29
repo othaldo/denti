@@ -6,6 +6,8 @@
 [resource]
 script = ExtResource("1")
 display_name = "Bakterium"
+health_per_wave = 4.5
+late_health_acceleration = 0.6
 damage_reduction = 0.05
 move_speed = 150.0
 contact_damage = 6.0

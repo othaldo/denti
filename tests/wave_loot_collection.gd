@@ -16,7 +16,7 @@ func _run() -> void:
 	var start: Vector2 = game.player.global_position
 	game._spawn_loot(start + Vector2(300.0, 0.0), &"xp", 5)
 	game._spawn_loot(start + Vector2(650.0, 0.0), &"coin", 2)
-	game.wave._process(WaveController.DURATION)
+	game.wave._process(game.wave.remaining)
 	if not game.collecting_wave_loot or game.shop_panel.visible or game.choice_panel.visible or game.xp != 0 or game.coins != 0:
 		_fail("wave end credited loot or opened a menu before the pickup animation")
 		return
@@ -44,7 +44,7 @@ func _run() -> void:
 
 	game._on_shop_continue()
 	game._spawn_loot(game.player.global_position + Vector2(700.0, 0.0), &"coin", 3)
-	game.wave._process(WaveController.DURATION)
+	game.wave._process(game.wave.remaining)
 	if not game.collecting_wave_loot or not bool(session.load_run().get("collecting_wave_loot", false)):
 		_fail("collection phase was not saved")
 		return
@@ -69,7 +69,7 @@ func _run() -> void:
 	game.wave.current_wave = 5
 	game._create_enemy(WaveController.BOSS, game.player.global_position + Vector2(400.0, 0.0))
 	game._spawn_loot(game.player.global_position + Vector2(650.0, 0.0), &"coin", 1)
-	game.wave._process(WaveController.DURATION)
+	game.wave._process(game.wave.remaining)
 	if not game.boss_pending or game.collecting_wave_loot or game.get_node("Loot").get_child_count() != 1:
 		_fail("boss overtime started collection before the boss was defeated")
 		return
@@ -84,11 +84,15 @@ func _run() -> void:
 		_fail("boss defeat did not start the loot collection")
 		return
 	for frame in 180:
-		if game.shop_panel.visible:
+		if game.choice_panel.visible:
 			break
 		await physics_frame
-	if not paused or game.coins != 6 or not game.shop_panel.visible:
-		_fail("boss wave shop did not wait for the final drop")
+	if not paused or game.coins != 6 or game.choice_panel.mode != &"relic" or game.shop_panel.visible:
+		_fail("boss relic did not wait for the final drop")
+		return
+	game.choice_panel._on_choice_pressed(0)
+	if not game.shop_panel.visible:
+		_fail("boss wave shop did not follow the relic choice")
 		return
 	game._on_shop_continue()
 	game.wave.current_wave = WaveController.MAX_WAVES
@@ -96,7 +100,7 @@ func _run() -> void:
 	game._spawn_loot(game.player.global_position + Vector2(650.0, 0.0), &"coin", 1)
 	game._spawn_loot(game.player.global_position + Vector2(600.0, 0.0), &"xp", game.xp_goal - game.xp)
 	game._spawn_loot(game.player.global_position + Vector2(700.0, 0.0), &"chest", 3, &"metal_crown")
-	game.wave._process(WaveController.DURATION)
+	game.wave._process(game.wave.remaining)
 	game.boss.boss_phase = 2
 	game.boss.boss_damage_budget = game.boss.health
 	game.boss.take_damage(99999.0)

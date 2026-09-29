@@ -18,13 +18,13 @@ func _run() -> void:
 	game.wave.current_wave = 7
 	game.wave.start_next_wave()
 	game.telemetry.begin_wave(8)
-	if game.wave.elite_time < 18.0 or game.wave.elite_time > 25.0:
+	if game.wave.elite_time < game.wave.duration * WaveController.ELITE_TIME_START_FRACTION or game.wave.elite_time > game.wave.duration * WaveController.ELITE_TIME_END_FRACTION:
 		_fail("wave 8 did not schedule an elite")
 		return
 	game.wave.spawn_cooldown = 100.0
 	game.wave.burst_index = game.wave.burst_times.size()
 	game.wave.horde_spawned = true
-	game.wave.remaining = WaveController.DURATION - game.wave.elite_time + 0.01
+	game.wave.remaining = game.wave.duration - game.wave.elite_time + 0.01
 	game.wave._process(0.02)
 	if game.get_node("Enemies").get_child_count() != 1 or not game.wave.elite_spawned or game.telemetry.wave_elites_spawned != 1:
 		_fail("scheduled elite did not spawn exactly once")

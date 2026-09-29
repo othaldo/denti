@@ -12,6 +12,7 @@ const PUDDLE_DURATION := 2.0
 const OVERHEAL_SHIELD_THRESHOLD := 20.0
 
 @onready var player: Player = get_node("../Player")
+@onready var relics: RelicInventory = get_node("../Relics")
 
 var owned: Dictionary = {}
 var powers: Dictionary = {}
@@ -218,6 +219,7 @@ func on_kill(at: Vector2, is_boss: bool) -> int:
 
 func modify_damage(enemy: Enemy, weapon: WeaponData, base: float) -> float:
 	var value := base
+	value *= relics.damage_factor()
 	if enemy.data.is_boss:
 		value *= 1.0 + _power(&"boss_bonus")
 	if enemy.bleed_stacks > 0:

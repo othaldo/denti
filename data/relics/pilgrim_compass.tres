@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/relic_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"pilgrim_compass"
+display_name = "Pilger-Kompass"
+description = "Während du dich bewegst, springt jeder sechste Waffentreffer auf einen weiteren Gegner über."
+icon_index = 4

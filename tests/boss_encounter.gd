@@ -109,11 +109,15 @@ func _run() -> void:
 		_fail("continue lost the boss death animation")
 		return
 	for frame in 120:
-		if game.shop_panel.visible:
+		if game.choice_panel.visible:
 			break
 		await process_frame
-	if game.boss != null or not game.shop_panel.visible or not paused:
-		_fail("shop opened before the boss death sequence finished")
+	if game.boss != null or game.choice_panel.mode != &"relic" or not paused or game.shop_panel.visible:
+		_fail("relic choice did not follow the boss death sequence")
+		return
+	game.choice_panel._on_choice_pressed(0)
+	if not game.shop_panel.visible:
+		_fail("shop did not follow the boss relic choice")
 		return
 	paused = false
 	session.clear_run()

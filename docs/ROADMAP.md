@@ -12,7 +12,10 @@ This roadmap captures the current player feedback and the intended next developm
 - The item pool has grown from 18 to 30 with bleed duration, wet puddles, crit beams, shield retaliation, capped savings interest, returning projectiles, overheal shields and sugar rush alongside earlier synergies. The effects survive save/resume.
 - Two elite roles now alternate in late non-boss waves: Säurekrone fires a telegraphed radial attack, while Jagdkeim arrives with three bacteria and speeds up nearby ordinary enemies from wave 12. Both have limited bonus chest chances; elite spawns and kills appear in per-wave telemetry.
 - A current save showed about 445 average DPS, 148 kills from 158 spawns and only 61 damage taken in wave 12; elites were still dying in one hit. From wave 7 onward, normal enemies and elites now gain additional health, speed, damage and modest capped defense. Elites have a visible, recharging burst-damage guard so their attacks can occur before they die.
-- Next: playtest waves 12-20 with the new curve, compare per-wave damage taken and enemy density, then decide whether another mobile threat or a boss reward is the next useful slice.
+- Brotato balance research now guides a further normal-enemy pass: Plaque stays disposable, while Zuckerstück and Säurespucker use their own steeper health curves. Late non-boss waves shift toward those roles, gain an extra burst and a faster spawn floor; loot chance falls modestly to limit the added economy. Boss stats and boss-wave spawn pacing stay unchanged.
+- Wave length now ramps from 35 to 44 seconds in waves 1-4, is 42 seconds in waves 6-9, 46 seconds in waves 11-14 and 50 seconds in waves 16-19. Boss waves stay at 45 seconds. Bursts, hordes and elites use relative timing, and save/resume preserves the current wave's duration, including legacy 45-second saves.
+- Boss relics now appear after the defeated milestone bosses in waves 5, 10 and 15, after level-ups and chests but before the shop. Five distinct relics alter bleed kills, water hits, shield blocks, crits and moving attacks. Choices, ownership and active effects survive save/resume; relics use a new painted icon atlas.
+- Next: playtest the shorter early and longer late waves, compare per-wave damage taken, average enemy density, projectile count, XP and coins. Confirm relic impact and normal-enemy pressure before considering weapon evolutions or a new enemy role.
 
 ## Why v0.2 exists
 
@@ -37,7 +40,7 @@ WAVE COMBAT
 -> collect all remaining XP / coins / chest drops
 -> resolve earned level-ups
 -> resolve chest loot (KEEP / SCRAP)
--> later: resolve boss relic / special reward if applicable
+-> resolve boss relic if a milestone boss was defeated
 -> shop
 -> next wave
 ```
@@ -140,7 +143,7 @@ Avoid only increasing HP.
 
 Hordes should become a normal part of wave rhythm instead of a rare surprise.
 
-Possible 45-second wave structure:
+Example 45-second wave rhythm (timings scale with wave length):
 
 - 0s: baseline spawns
 - 8s: small horde

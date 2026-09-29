@@ -10,10 +10,14 @@ signal wave_finished(wave_number: int)
 const DURATION := 45.0
 const MAX_WAVES := 20
 const MINI_BOSS_INTERVAL := 5
+const HORDE_TIME_FRACTION := 0.40
+const ELITE_TIME_START_FRACTION := 0.40
+const ELITE_TIME_END_FRACTION := 0.56
 const SPAWN_INTERVAL_START := 1.25
 const SPAWN_INTERVAL_WAVE_STEP := 0.06
 const SPAWN_INTERVAL_ACCELERATION := 0.012
-const SPAWN_INTERVAL_MIN := 0.30
+const SPAWN_INTERVAL_MIN := 0.24
+const BOSS_WAVE_SPAWN_INTERVAL_MIN := 0.30
 const MOB_HEALTH_WAVE_STEP := 0.17
 const MOB_HEALTH_LATE_ACCELERATION := 0.018
 const BOSS_HEALTH_WAVE_STEP := 0.27
@@ -26,8 +30,10 @@ const MOB_DAMAGE_LATE_STEP := 0.03
 const ENEMY_SPEED_WAVE_STEP := 0.025
 const MOB_SPEED_LATE_STEP := 0.018
 const MOB_LATE_START_WAVE := 6
-const LOOT_CHANCE_WAVE_STEP := 0.035
-const LOOT_CHANCE_MIN := 0.45
+const LOOT_CHANCE_WAVE_STEP := 0.04
+const LOOT_CHANCE_MIN := 0.38
+const BOSS_WAVE_LOOT_CHANCE_STEP := 0.035
+const BOSS_WAVE_LOOT_CHANCE_MIN := 0.45
 const ACID_VOLLEY_WAVE_3 := 7
 const ACID_VOLLEY_WAVE_5 := 14
 const RANGED_INTERVAL_WAVE_STEP := 0.025
@@ -46,6 +52,7 @@ const CAVITY_EMPEROR: EnemyData = preload("res://data/enemies/cavity_emperor.tre
 const BOSS: EnemyData = CAVITY_COUNT
 const FINAL_BOSS: EnemyData = CAVITY_EMPEROR
 
+var duration: float = DURATION
 var remaining: float = DURATION
 var spawn_cooldown: float = 0.0
 var active: bool = false
@@ -66,6 +73,18 @@ static func is_boss_wave(wave_number: int) -> bool:
 	return wave_number > 0 and wave_number % MINI_BOSS_INTERVAL == 0
 
 
+static func duration_for_wave(wave_number: int) -> float:
+	if wave_number <= 0 or is_boss_wave(wave_number):
+		return DURATION
+	if wave_number <= 4:
+		return 32.0 + wave_number * 3.0
+	if wave_number <= 9:
+		return 42.0
+	if wave_number <= 14:
+		return 46.0
+	return 50.0
+
+
 static func boss_for_wave(wave_number: int) -> EnemyData:
 	if wave_number >= MAX_WAVES:
 		return CAVITY_EMPEROR
@@ -81,6 +100,9 @@ static func elite_for_wave(wave_number: int) -> EnemyData:
 
 
 static func health_multiplier(data: EnemyData, wave_number: int) -> float:
+	if not data.is_boss and data.health_per_wave > 0.0:
+		var late_waves := maxi(wave_number - MOB_LATE_START_WAVE, 0)
+		return 1.0 + (maxi(wave_number - 1, 0) * data.health_per_wave + late_waves * late_waves * data.late_health_acceleration) / maxf(data.max_health, 1.0)
 	var step := BOSS_HEALTH_WAVE_STEP if data.is_boss else MOB_HEALTH_WAVE_STEP
 	var multiplier := 1.0 + maxi(wave_number - 1, 0) * step
 	if not data.is_boss:
@@ -112,6 +134,8 @@ static func enemy_speed_multiplier(data: EnemyData, wave_number: int) -> float:
 
 
 static func loot_chance(wave_number: int) -> float:
+	if is_boss_wave(wave_number):
+		return maxf(1.0 - maxi(wave_number - 1, 0) * BOSS_WAVE_LOOT_CHANCE_STEP, BOSS_WAVE_LOOT_CHANCE_MIN)
 	return maxf(1.0 - maxi(wave_number - 1, 0) * LOOT_CHANCE_WAVE_STEP, LOOT_CHANCE_MIN)
 
 
@@ -145,11 +169,12 @@ func start_next_wave() -> void:
 	if horde_waves.is_empty():
 		plan_hordes()
 	current_wave += 1
-	remaining = DURATION
+	duration = duration_for_wave(current_wave)
+	remaining = duration
 	spawn_cooldown = 0.0
 	horde_spawned = false
 	plan_bursts()
-	elite_time = randf_range(18.0, 25.0) if current_wave >= 8 and not is_boss_wave(current_wave) else -1.0
+	elite_time = randf_range(duration * ELITE_TIME_START_FRACTION, duration * ELITE_TIME_END_FRACTION) if current_wave >= 8 and not is_boss_wave(current_wave) else -1.0
 	elite_spawned = false
 	active = true
 	if is_boss_wave(current_wave):
@@ -164,10 +189,10 @@ func _process(delta: float) -> void:
 		active = false
 		wave_finished.emit(current_wave)
 		return
-	if not horde_spawned and horde_waves.has(current_wave) and remaining <= DURATION - 18.0:
+	if not horde_spawned and horde_waves.has(current_wave) and remaining <= duration * (1.0 - HORDE_TIME_FRACTION):
 		horde_spawned = true
 		horde_requested.emit(_horde_data(current_wave), 5 + current_wave)
-	var elapsed := DURATION - remaining
+	var elapsed := duration - remaining
 	if elite_time >= 0.0 and not elite_spawned and elapsed >= elite_time:
 		elite_spawned = true
 		elite_requested.emit(elite_for_wave(current_wave))
@@ -178,15 +203,18 @@ func _process(delta: float) -> void:
 	spawn_cooldown -= delta
 	if spawn_cooldown <= 0.0:
 		enemy_requested.emit(_choose_enemy())
-		spawn_cooldown = maxf(SPAWN_INTERVAL_START - elapsed * SPAWN_INTERVAL_ACCELERATION - (current_wave - 1) * SPAWN_INTERVAL_WAVE_STEP, SPAWN_INTERVAL_MIN)
+		var spawn_floor := BOSS_WAVE_SPAWN_INTERVAL_MIN if is_boss_wave(current_wave) else SPAWN_INTERVAL_MIN
+		spawn_cooldown = maxf(SPAWN_INTERVAL_START - elapsed * SPAWN_INTERVAL_ACCELERATION - (current_wave - 1) * SPAWN_INTERVAL_WAVE_STEP, spawn_floor)
 
 
 func plan_bursts() -> void:
 	burst_times.clear()
-	burst_times.append(randf_range(10.0, 14.0))
-	burst_times.append(randf_range(26.0, 30.0))
+	burst_times.append(randf_range(duration * 0.22, duration * 0.31))
+	if current_wave >= 12 and not is_boss_wave(current_wave):
+		burst_times.append(randf_range(duration * 0.40, duration * 0.47))
+	burst_times.append(randf_range(duration * 0.58, duration * 0.67))
 	if current_wave >= 6:
-		burst_times.append(randf_range(37.0, 40.0))
+		burst_times.append(randf_range(duration * 0.82, duration * 0.89))
 	burst_index = 0
 
 
@@ -207,22 +235,23 @@ func _burst_count(index: int) -> int:
 		1:
 			return 5 + current_wave
 		_:
-			return 2 + current_wave / 5
+			return 2 + current_wave / 5 if is_boss_wave(current_wave) else 3 + current_wave / 3
 
 
 func _choose_enemy() -> EnemyData:
-	var elapsed := DURATION - remaining
+	var elapsed := duration - remaining
 	var choices: Array[EnemyData] = [PLAQUE]
-	var weights: Array[float] = [5.0]
+	var late_role_shift := 0 if is_boss_wave(current_wave) else maxi(current_wave - 10, 0)
+	var weights: Array[float] = [maxf(5.0 - late_role_shift * 0.3, 2.0)]
 	if current_wave >= 2 and elapsed >= 8.0:
 		choices.append(BACTERIA)
 		weights.append(2.0 + (current_wave - 2) * 0.12)
 	if current_wave >= 3 and elapsed >= 12.0:
 		choices.append(SUGAR)
-		weights.append(1.3 + (current_wave - 3) * 0.08)
+		weights.append(1.3 + (current_wave - 3) * 0.08 + late_role_shift * 0.18)
 	if current_wave >= 4 and elapsed >= 15.0:
 		choices.append(ACID_SPITTER)
-		weights.append(1.0 + (current_wave - 4) * 0.12)
+		weights.append(1.0 + (current_wave - 4) * 0.12 + late_role_shift * 0.25)
 	var total_weight := 0.0
 	for weight in weights:
 		total_weight += weight

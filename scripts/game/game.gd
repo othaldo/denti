@@ -22,6 +22,7 @@ const UPGRADES: Array[UpgradeData] = [
 @onready var wave: WaveController = $WaveController
 @onready var shop: ShopController = $ShopController
 @onready var items: ItemInventory = $Items
+@onready var relics: RelicInventory = $Relics
 @onready var music: MusicController = $Music
 @onready var sound: SoundController = $Sound
 @onready var hud: GameHUD = $HUD
@@ -57,13 +58,16 @@ func _ready() -> void:
 	player.stats.died.connect(_on_player_died)
 	player.stats.damage_taken.connect(telemetry.record_taken)
 	player.stats.shield_blocked.connect(items.on_shield_blocked)
+	player.stats.shield_blocked.connect(relics.on_shield_blocked)
 	player.stats.healed.connect(items.on_healed)
 	player.attack_performed.connect(sound.play_attack)
 	player.damaged.connect(_on_player_damaged)
 	player.damaged.connect(items.on_player_hurt)
 	items.feedback.connect(_show_item_feedback)
+	relics.feedback.connect(_show_item_feedback)
 	choice_panel.upgrade_chosen.connect(_on_upgrade_chosen)
 	choice_panel.chest_resolved.connect(_on_chest_resolved)
+	choice_panel.relic_chosen.connect(_on_relic_chosen)
 	choice_panel.starter_chosen.connect(_on_starter_chosen)
 	choice_panel.restart_requested.connect(_restart)
 	choice_panel.main_menu_requested.connect(_on_end_main_menu)
@@ -93,6 +97,7 @@ func _on_starter_chosen(weapon: WeaponData) -> void:
 	telemetry.begin_wave(wave.current_wave + 1)
 	wave.start_next_wave()
 	items.on_wave_start()
+	relics.on_wave_start()
 	_sync_music()
 	get_tree().paused = false
 	_save_run()
@@ -216,6 +221,7 @@ func _create_enemy(data: EnemyData, at: Vector2) -> void:
 	enemy.damaged.connect(_on_enemy_damaged)
 	enemy.damage_recorded.connect(telemetry.record_damage)
 	enemy.weapon_hit.connect(items.on_weapon_hit)
+	enemy.weapon_hit.connect(relics.on_weapon_hit)
 	enemy.attack_performed.connect(sound.play_cue)
 	if data.is_boss:
 		enemy.death_started.connect(_on_boss_death_started)
@@ -376,6 +382,14 @@ func _on_chest_resolved(keep: bool) -> void:
 	_advance_post_wave_rewards()
 
 
+func _on_relic_chosen(id: StringName) -> void:
+	if rewards.step != PostWaveRewards.Step.RELICS or not rewards.pending_relics.has(str(id)):
+		return
+	if relics.acquire(id):
+		rewards.resolve_relic()
+		_advance_post_wave_rewards()
+
+
 func _on_wave_finished(wave_number: int) -> void:
 	if ended:
 		return
@@ -428,6 +442,8 @@ func _finish_loot_collection() -> void:
 	var interest := items.on_wave_end(coins)
 	coins += interest
 	telemetry.record_loot(&"coin", interest)
+	if wave.current_wave < WaveController.MAX_WAVES and WaveController.is_boss_wave(wave.current_wave) and rewards.pending_relics.is_empty():
+		rewards.queue_relics(RelicCatalog.choices(relics.owned))
 	rewards.finish_collection(wave.current_wave >= WaveController.MAX_WAVES)
 	_advance_post_wave_rewards()
 
@@ -444,6 +460,19 @@ func _advance_post_wave_rewards() -> void:
 				_advance_post_wave_rewards()
 				return
 			choice_panel.show_chest(item, items.scrap_value(int(chest["scrap_coins"])))
+			get_tree().paused = true
+			_save_run()
+		PostWaveRewards.Step.RELICS:
+			var options: Array[RelicData] = []
+			for id in rewards.pending_relics:
+				var relic := RelicCatalog.by_id(StringName(id))
+				if relic != null:
+					options.append(relic)
+			if options.is_empty():
+				rewards.resolve_relic()
+				_advance_post_wave_rewards()
+				return
+			choice_panel.show_relics(options)
 			get_tree().paused = true
 			_save_run()
 		PostWaveRewards.Step.SHOP:
@@ -518,7 +547,12 @@ func _update_shop_panel() -> void:
 	var buyable: Array[bool] = []
 	for offer in shop.offers:
 		buyable.append(offer == null or (player.loadout.can_acquire(offer.weapon_data, offer.weapon_tier) if offer.weapon_data != null else items.can_acquire(offer)))
-	shop_panel.show_shop(wave.current_wave, coins, shop.reroll_cost, shop.offers, wave.next_wave_preview(), equipment, player.loadout.used_slots(), WeaponLoadout.CAPACITY, buyable, player.stats.luck, items.all_items(), items.owned)
+	var owned_display := items.all_items()
+	for id in relics.owned:
+		var relic := RelicCatalog.by_id(StringName(id))
+		if relic != null:
+			owned_display.append({"name": "Relikt: " + relic.display_name, "count": 1, "description": relic.description, "tier": 4})
+	shop_panel.show_shop(wave.current_wave, coins, shop.reroll_cost, shop.offers, wave.next_wave_preview(), equipment, player.loadout.used_slots(), WeaponLoadout.CAPACITY, buyable, player.stats.luck, owned_display, items.owned)
 	_refresh_hud()
 
 
@@ -573,6 +607,7 @@ func _on_shop_continue() -> void:
 	telemetry.begin_wave(wave.current_wave + 1)
 	wave.start_next_wave()
 	items.on_wave_start()
+	relics.on_wave_start()
 	_sync_music()
 	get_tree().paused = false
 	_refresh_hud()
@@ -600,6 +635,7 @@ func _save_completed_report(won: bool) -> void:
 		"coins_left": coins,
 		"weapons": player.loadout.save_data(),
 		"items": items.owned.duplicate(),
+		"relics": relics.owned.duplicate(),
 		"telemetry": telemetry.save_data(),
 		"waves": telemetry.wave_summaries(),
 	})

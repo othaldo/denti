@@ -24,7 +24,7 @@ func _run() -> void:
 	game.wave.spawn_cooldown = 100.0
 	game.wave.burst_index = game.wave.burst_times.size()
 	game.wave.horde_spawned = true
-	game.wave.remaining = WaveController.DURATION - game.wave.elite_time + 0.01
+	game.wave.remaining = game.wave.duration - game.wave.elite_time + 0.01
 	game.wave._process(0.02)
 	if game.get_node("Enemies").get_child_count() != 4:
 		_fail("wave 12 did not spawn the elite and its escort")
