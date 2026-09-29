@@ -104,19 +104,37 @@ func _run() -> void:
 		return
 
 	var spitter: Enemy = enemy_scene.instantiate()
-	spitter.configure(WaveController.ACID_SPITTER, player, 14)
+	spitter.configure(WaveController.ACID_SPITTER, player, 12)
 	enemies.add_child(spitter)
 	spitter.global_position = player.global_position + Vector2(200.0, 0.0)
 	spitter.special_direction = Vector2.LEFT
 	spitter._activate_special()
 	var projectiles: Node2D = game.get_node("EnemyProjectiles")
 	if projectiles.get_child_count() != 5 or spitter.special_timer >= spitter.data.special_interval:
-		_fail("late ranged enemy did not fire a faster five-shot fan")
+		_fail("late ranged enemy did not fire a faster five-shot fan before its advanced pattern")
 		return
 	var first: AcidProjectile = projectiles.get_child(0)
 	var last: AcidProjectile = projectiles.get_child(4)
 	if first.direction.distance_to(last.direction) < 0.5 or first.projectile_color.g < 0.8:
 		_fail("late fan lacks spread or visible enemy projectile color")
+		return
+	for projectile in projectiles.get_children():
+		projectile.queue_free()
+	await process_frame
+
+	var advanced_spitter: Enemy = enemy_scene.instantiate()
+	advanced_spitter.configure(WaveController.ACID_SPITTER, player, 14)
+	enemies.add_child(advanced_spitter)
+	advanced_spitter.global_position = player.global_position + Vector2(200.0, 0.0)
+	advanced_spitter.special_direction = Vector2.LEFT
+	advanced_spitter._activate_special()
+	if advanced_spitter.active_special_attack != EnemyData.SpecialAttack.LANE or projectiles.get_child_count() != advanced_spitter.data.lane_projectile_count:
+		_fail("wave 14 ranged enemy did not switch to its three-shot lane pattern")
+		return
+	first = projectiles.get_child(0)
+	last = projectiles.get_child(projectiles.get_child_count() - 1)
+	if first.direction.distance_to(last.direction) > 0.01 or first.global_position.distance_to(last.global_position) < advanced_spitter.data.lane_projectile_spacing:
+		_fail("advanced lane pattern lacks parallel spacing")
 		return
 
 	paused = false
