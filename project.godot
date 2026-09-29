@@ -26,7 +26,6 @@ buses/default_bus_layout="res://assets/audio/audio_buses.tres"
 [autoload]
 
 GameSession="*res://scripts/systems/game_session.gd"
-MCPRuntimeServer="*res://addons/godot_mcp_toolkit/runtime/mcp_runtime_server.gd"
 
 [denti]
 
@@ -38,10 +37,6 @@ window/size/viewport_width=1280
 window/size/viewport_height=720
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
-
-[editor_plugins]
-
-enabled=PackedStringArray("res://addons/godot_mcp_toolkit/plugin.cfg")
 
 [input]
 

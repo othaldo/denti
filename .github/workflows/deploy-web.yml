@@ -19,7 +19,7 @@ jobs:
     name: Test and export Godot Web build
     runs-on: ubuntu-24.04
     container:
-      image: barichello/godot-ci:4.4
+      image: barichello/godot-ci:4.7.2
 
     steps:
       - name: Checkout
@@ -28,8 +28,8 @@ jobs:
       - name: Prepare Godot export templates
         run: |
           mkdir -p "$HOME/.local/share/godot/export_templates"
-          cp -R /root/.local/share/godot/export_templates/4.4.stable \
-            "$HOME/.local/share/godot/export_templates/4.4.stable"
+          cp -R /root/.local/share/godot/export_templates/4.7.2.stable \
+            "$HOME/.local/share/godot/export_templates/4.7.2.stable"
 
       - name: Show Godot version
         run: godot --version
