@@ -17,7 +17,10 @@ static func capture(game) -> Dictionary:
 			"bleed_stacks": enemy.bleed_stacks, "bleed_dps": enemy.bleed_dps,
 			"bleed_time": enemy.bleed_time, "bleed_tick": enemy.bleed_tick,
 			"wet_time": enemy.wet_time,
+			"haste_time": enemy.haste_time, "haste_bonus": enemy.haste_bonus,
+			"aura_timer": enemy.aura_timer,
 			"boss_damage_budget": enemy.boss_damage_budget, "boss_phase": enemy.boss_phase,
+			"elite_damage_budget": enemy.elite_damage_budget,
 			"boss_phase_timer": enemy.boss_phase_timer,
 			"boss_phase_burst_fired": enemy.boss_phase_burst_fired,
 			"boss_phase_gap_angle": enemy.boss_phase_gap_angle,
@@ -42,6 +45,7 @@ static func capture(game) -> Dictionary:
 		"spawn_cooldown": game.wave.spawn_cooldown, "active": game.wave.active,
 		"horde_waves": game.wave.horde_waves, "horde_spawned": game.wave.horde_spawned,
 		"burst_times": game.wave.burst_times, "burst_index": game.wave.burst_index,
+		"elite_time": game.wave.elite_time, "elite_spawned": game.wave.elite_spawned,
 		"player": {"position": _vector_data(game.player.position), "stats": game.player.stats.to_save_data(), "hurt_time": game.player.hurt_time},
 		"xp": game.xp, "xp_goal": game.xp_goal, "level": game.level, "coins": game.coins,
 		"weapons": game.player.loadout.save_data(), "starter_pending": game.starter_pending,
@@ -79,6 +83,8 @@ static func restore(game, saved: Dictionary) -> void:
 		wave.plan_bursts()
 		while wave.burst_index < wave.burst_times.size() and wave.burst_times[wave.burst_index] <= WaveController.DURATION - wave.remaining:
 			wave.burst_index += 1
+	wave.elite_time = clampf(float(saved.get("elite_time", -1.0)), -1.0, WaveController.DURATION)
+	wave.elite_spawned = bool(saved.get("elite_spawned", false))
 	var player_data: Dictionary = saved.get("player", {})
 	player.position = _read_vector(player_data.get("position", [640.0, 360.0]))
 	player.stats.load_save_data(player_data.get("stats", {}))
@@ -123,6 +129,11 @@ static func restore(game, saved: Dictionary) -> void:
 		enemy.bleed_time = maxf(float(entry.get("bleed_time", 0.0)), 0.0)
 		enemy.bleed_tick = clampf(float(entry.get("bleed_tick", 1.0)), 0.0, 1.0)
 		enemy.wet_time = maxf(float(entry.get("wet_time", 0.0)), 0.0)
+		enemy.haste_time = clampf(float(entry.get("haste_time", 0.0)), 0.0, Enemy.AURA_HASTE_DURATION)
+		enemy.haste_bonus = clampf(float(entry.get("haste_bonus", 0.0)), 0.0, 1.0)
+		enemy.aura_timer = clampf(float(entry.get("aura_timer", 0.0)), 0.0, Enemy.AURA_PULSE_INTERVAL)
+		if enemy.data.is_elite:
+			enemy.elite_damage_budget = clampf(float(entry.get("elite_damage_budget", enemy.elite_damage_budget)), 0.0, enemy.max_health * enemy.data.elite_guard_fraction)
 		if enemy.data.is_boss:
 			enemy.boss_phase = clampi(int(entry.get("boss_phase", 2 if enemy.health <= enemy.max_health / 3.0 else (1 if enemy.health <= enemy.max_health * 2.0 / 3.0 else 0))), 0, 2)
 			enemy.boss_damage_budget = clampf(float(entry.get("boss_damage_budget", enemy.boss_damage_budget)), 0.0, enemy.max_health * enemy.data.boss_guard_burst_fraction)
@@ -212,6 +223,8 @@ static func _enemy_from_path(path: String) -> EnemyData:
 		WaveController.BACTERIA,
 		WaveController.SUGAR,
 		WaveController.ACID_SPITTER,
+		WaveController.ACID_CROWN,
+		WaveController.HUNT_GERM,
 		WaveController.CAVITY_COUNT,
 		WaveController.CAVITY_PRINCE,
 		WaveController.CAVITY_KING,

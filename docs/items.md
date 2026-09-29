@@ -1,6 +1,6 @@
 # Items und Builds
 
-In der Zahnklinik gibt es 22 Items in vier Seltenheitsstufen. Ein Kauf gewährt den beschriebenen Effekt sofort; mehrere Exemplare verstärken ihn bis zum Stapellimit. Im Shop werden maximale Stapel nicht mehr angeboten. Die Pausenseite **Items** zeigt den Besitz, die Shopzeile eine kompakte Zusammenfassung.
+In der Zahnklinik gibt es 30 Items in vier Seltenheitsstufen. Ein Kauf gewährt den beschriebenen Effekt sofort; mehrere Exemplare verstärken ihn bis zum Stapellimit. Im Shop werden maximale Stapel nicht mehr angeboten. Die Pausenseite **Items** zeigt den Besitz, die Shopzeile eine kompakte Zusammenfassung.
 
 Glück beeinflusst wie bisher die Stufe der Angebote. Zusätzlich hat ein Item-Angebot eine Chance von 28 %, aus den Items mit passenden Eigenschaften gewählt zu werden, sofern solche Items in der gewürfelten Stufe verfügbar sind. Dabei zählen die Eigenschaften bereits gekaufter Items und der ausgerüsteten Waffen. Seltenheit und Preis bleiben von dieser Vorliebe unberührt.
 
@@ -28,13 +28,21 @@ Glück beeinflusst wie bisher die Stufe der Angebote. Zusätzlich hat ein Item-A
 | Leitlack | Wassertreffer machen Ziele 3 Sekunden nass; nasse Gegner erleiden 18 % mehr Wasser- und Lichtschaden pro Exemplar, und Kettenblitze von ihnen reichen weiter; weniger Bewegung | 2 |
 | Verbotener Lolli | Während Denti sich tatsächlich bewegt, verursachen Waffen 20 % mehr Schaden pro Exemplar; weniger maximales Leben und Härte | 2 |
 | Zahnfee-Pfand | 50 % mehr Münzen beim Zerlegen von Kisten pro Exemplar und mehr Glück; weniger maximales Leben | 2 |
+| Blutungsuhr | Blutungen halten pro Exemplar 1 Sekunde länger und können einen zusätzlichen Stapel tragen; weniger Bisskraft | 2 |
+| Spülventil | Wassertreffer erzeugen kurzlebige Pfützen, die Gegner nass machen und regelmäßig schädigen; weniger Bewegung | 2 |
+| Glanzprisma | Kritische Treffer schicken einen Lichtstrahl zum nächsten Gegner; Lichtwaffen verstärken ihn; weniger Härte | 2 |
+| Splitterkrone | Ein geblockter Treffer schädigt nahe Gegner mit Splittern; weniger Bewegung | 2 |
+| Zinszahn | Am Wellenende 8 % Zins auf verbleibende Münzen pro Exemplar, höchstens 6 Münzen pro Exemplar; weniger maximales Leben | 2 |
+| Rücklaufbohrer | Direkte Projektile fliegen nach dem Treffer oder Reichweitenende zu Denti zurück und können erneut treffen; weniger Bisskraft | 2 |
+| Speichelkelch | Überheilung sammelt sich zu 50 % pro Exemplar und erzeugt bei 20 gesammelten Punkten einen Schild; weniger maximales Leben | 2 |
+| Zuckerschock | Alle zwölf normalen Kills folgen vier Sekunden schnellerer Waffenangriffe und drei Sekunden verlangsamter Angriffe; weniger maximales Leben | 2 |
 
-Blutung stapelt sich auf Gegnern bis zu dreimal und läuft nach 2,5 Sekunden ohne erneuten Schnitt aus. Der Leitlack-Effekt auf Gegnern läuft nach 3 Sekunden ab. Schilde fangen jeweils einen Treffer ab und sind insgesamt auf fünf Ladungen begrenzt. Kettenblitze, Blutungsübertragung, Spritzer, kritische Blitze und Keramiksplitter haben kurze interne Abklingzeiten, damit dichte Gegnergruppen das Spiel nicht mit Effekten überfluten. Laufende Effekte, Schildladungen, Stapel und Fortschritte zu Kill-Boni werden mit dem Spielstand gespeichert. Bei Kisten steht der normale Zerlegewert schon beim Drop fest; das Zahnfee-Pfand erhöht den angezeigten und ausgezahlten Wert bei der Entscheidung.
+Blutung stapelt sich normalerweise auf Gegnern bis zu dreimal und läuft nach 2,5 Sekunden ohne erneuten Schnitt aus; die Blutungsuhr erhöht Dauer und Stapelgrenze. Der Leitlack-Effekt auf Gegnern läuft nach 3 Sekunden ab. Schilde fangen jeweils einen Treffer ab und sind insgesamt auf fünf Ladungen begrenzt. Kettenblitze, Blutungsübertragung, Spritzer, kritische Blitze, Lichtstrahlen und Keramiksplitter haben kurze interne Abklingzeiten, damit dichte Gegnergruppen das Spiel nicht mit Effekten überfluten. Laufende Effekte, Schildladungen, Stapel und Fortschritte zu Kill-Boni werden mit dem Spielstand gespeichert. Bei Kisten steht der normale Zerlegewert schon beim Drop fest; das Zahnfee-Pfand erhöht den angezeigten und ausgezahlten Wert bei der Entscheidung.
 
 Beispiel-Builds:
 
-- **Schnittpraxis:** Zahnseide-Peitsche oder Plaque-Schaber, Zahnseide-Spule, Skalpellwachs und Ansteckende Zahnseide. Blutende Ziele fördern Flächendruck beim Kill.
-- **Wasserwerk:** Wasserflosser oder Mundspülungs-Mörser mit Funkensonde, Leitlack und Mundspülung. Nasse Ziele nehmen mehr Schaden; Ketten erreichen weitere Gegner.
-- **Unzerstörbarer Molar:** Metallkrone, Fluoridgel, Göttliches Siegel, Amalgamkern und Keramikschale. Härte wird zugleich zu Schaden.
-- **Zahnfee-Ökonomie:** Glücks-Molar, Goldfüllung, Karies-Kopfgeld und Zahnfee-Pfand. Gesammelte Beute und zerlegte Kisten bringen mehr Münzen, aber Denti wird fragiler.
-- **Zuckerrausch:** Verbotener Lolli mit Bewegungs-Upgrades und Heil- oder Schilditems. Wer stehen bleibt, verliert den Schadensbonus.
+- **Schnittpraxis:** Zahnseide-Peitsche oder Plaque-Schaber, Zahnseide-Spule, Skalpellwachs, Ansteckende Zahnseide und Blutungsuhr. Blutende Ziele fördern Flächendruck beim Kill.
+- **Wasserwerk:** Wasserflosser oder Mundspülungs-Mörser mit Funkensonde, Leitlack, Spülventil und Mundspülung. Pfützen halten Ziele nass; Ketten erreichen weitere Gegner.
+- **Unzerstörbarer Molar:** Metallkrone, Fluoridgel, Göttliches Siegel, Amalgamkern, Keramikschale und Splitterkrone. Geblockte Treffer geben Flächendruck zurück.
+- **Zahnfee-Ökonomie:** Glücks-Molar, Goldfüllung, Karies-Kopfgeld, Zahnfee-Pfand und Zinszahn. Beute, Zerlegen und gesparte Münzen zahlen sich aus, aber Denti wird fragiler.
+- **Zuckerrausch:** Verbotener Lolli, Zuckerschock und Heil- oder Schilditems. Tempo nach Killserien kostet Leben und führt anschließend ins Zuckertief.

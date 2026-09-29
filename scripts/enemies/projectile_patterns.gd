@@ -18,9 +18,9 @@ static func radial_directions(count: int, gap_angle: float) -> Array[Vector2]:
 	return directions
 
 
-static func fire_radial(parent: Node2D, at: Vector2, count: int, gap_angle: float, speed: float, damage: float, target: Player) -> void:
+static func fire_radial(parent: Node2D, at: Vector2, count: int, gap_angle: float, speed: float, damage: float, target: Player, tint: Color = BOSS_COLOR) -> void:
 	for direction in radial_directions(count, gap_angle):
-		_spawn(parent, at, direction, speed, damage, target, BOSS_COLOR, 3.0)
+		_spawn(parent, at, direction, speed, damage, target, tint, 3.0)
 
 
 static func fan_directions(aim: Vector2, count: int) -> Array[Vector2]:

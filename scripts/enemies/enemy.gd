@@ -10,6 +10,7 @@ signal death_started(position: Vector2)
 signal enraged(position: Vector2)
 signal boss_phase_started(position: Vector2, phase: int)
 signal boss_guarded(position: Vector2)
+signal elite_guarded(position: Vector2)
 signal reinforcements_requested(count: int)
 
 enum SpecialPhase { COOLDOWN, WARNING, ACTIVE }
@@ -17,6 +18,8 @@ enum BossMove { CHARGE, PULSE }
 
 const PULSE_FLASH_DURATION := 0.18
 const BOSS_DEATH_DURATION := 0.9
+const AURA_PULSE_INTERVAL := 0.4
+const AURA_HASTE_DURATION := 0.65
 
 @onready var sprite: Sprite2D = $Sprite2D
 
@@ -47,7 +50,11 @@ var bleed_dps: float = 0.0
 var bleed_time: float = 0.0
 var bleed_tick: float = 1.0
 var wet_time: float = 0.0
+var haste_time: float = 0.0
+var haste_bonus: float = 0.0
+var aura_timer: float = 0.0
 var boss_damage_budget: float = 0.0
+var elite_damage_budget: float = 0.0
 var boss_phase: int = 0
 var boss_phase_timer: float = 0.0
 var boss_phase_burst_fired: bool = false
@@ -68,14 +75,19 @@ func configure(enemy_data: EnemyData, player: Player, wave_number: int = 1) -> v
 	max_health = data.max_health * WaveController.health_multiplier(data, wave_number)
 	health = max_health
 	damage_reduction = WaveController.damage_reduction(data, wave_number)
-	contact_damage = data.contact_damage * (1.0 + (wave_number - 1) * WaveController.ENEMY_DAMAGE_WAVE_STEP)
-	attack_damage = data.attack_damage * (1.0 + (wave_number - 1) * WaveController.ENEMY_DAMAGE_WAVE_STEP)
-	move_speed = data.move_speed * (1.0 + (wave_number - 1) * 0.025)
+	contact_damage = data.contact_damage * WaveController.enemy_damage_multiplier(data, wave_number)
+	attack_damage = data.attack_damage * WaveController.enemy_damage_multiplier(data, wave_number)
+	move_speed = data.move_speed * WaveController.enemy_speed_multiplier(data, wave_number)
 	special_phase = SpecialPhase.COOLDOWN
 	var interval := data.special_interval * (WaveController.ranged_interval_multiplier(wave_number) if active_special_attack == EnemyData.SpecialAttack.SHOOT else 1.0)
-	special_timer = interval * randf_range(0.35, 0.5) if active_special_attack == EnemyData.SpecialAttack.BOSS else interval * randf_range(0.65, 1.0)
+	if data.is_elite:
+		special_timer = randf_range(0.35, 0.55)
+	else:
+		special_timer = interval * randf_range(0.35, 0.5) if active_special_attack == EnemyData.SpecialAttack.BOSS else interval * randf_range(0.65, 1.0)
 	if data.is_boss:
 		boss_damage_budget = max_health * data.boss_guard_burst_fraction
+	if data.is_elite:
+		elite_damage_budget = max_health * data.elite_guard_fraction
 	queue_redraw()
 
 
@@ -114,6 +126,11 @@ func _process(delta: float) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if haste_time > 0.0:
+		haste_time = maxf(haste_time - delta, 0.0)
+		if haste_time <= 0.0:
+			haste_bonus = 0.0
+			queue_redraw()
 	if wet_time > 0.0:
 		wet_time = maxf(wet_time - delta, 0.0)
 		if wet_time <= 0.0:
@@ -126,6 +143,9 @@ func _physics_process(delta: float) -> void:
 				boss_phase_burst_fired = true
 				_fire_phase_burst()
 			queue_redraw()
+	if data.is_elite and data.elite_guard_recharge_seconds > 0.0 and health > 0.0:
+		elite_damage_budget = minf(elite_damage_budget + max_health * data.elite_guard_fraction * delta / data.elite_guard_recharge_seconds, max_health * data.elite_guard_fraction)
+		queue_redraw()
 	if bleed_time > 0.0 and health > 0.0:
 		bleed_time = maxf(bleed_time - delta, 0.0)
 		bleed_tick -= delta
@@ -140,12 +160,17 @@ func _physics_process(delta: float) -> void:
 		return
 	if target == null or target.stats.health <= 0.0:
 		return
+	if data.aura_radius > 0.0:
+		aura_timer -= delta
+		if aura_timer <= 0.0:
+			aura_timer = AURA_PULSE_INTERVAL
+			_pulse_aura()
 	var direction := global_position.direction_to(target.global_position)
 	var before_move := global_position
 	var charging := special_phase == SpecialPhase.ACTIVE and (active_special_attack == EnemyData.SpecialAttack.DASH or active_special_attack == EnemyData.SpecialAttack.BOSS and boss_move == BossMove.CHARGE)
 	contact_timer = maxf(contact_timer - delta, 0.0)
 	if active_special_attack == EnemyData.SpecialAttack.NONE:
-		global_position += direction * move_speed * delta
+		global_position += direction * _movement_speed() * delta
 	else:
 		_process_special(delta, direction)
 	var closest := Geometry2D.get_closest_point_to_segment(target.global_position, before_move, global_position)
@@ -158,6 +183,7 @@ func _physics_process(delta: float) -> void:
 func _process_special(delta: float, direction: Vector2) -> void:
 	if data.is_boss and boss_phase_timer > 0.0:
 		return
+	var chase_speed := _movement_speed()
 	match special_phase:
 		SpecialPhase.COOLDOWN:
 			special_timer = maxf(special_timer - delta, 0.0)
@@ -176,13 +202,13 @@ func _process_special(delta: float, direction: Vector2) -> void:
 			else:
 				if active_special_attack == EnemyData.SpecialAttack.SHOOT:
 					if distance > data.preferred_range + 30.0:
-						global_position += direction * move_speed * delta
+						global_position += direction * chase_speed * delta
 					elif distance < data.preferred_range - 50.0:
-						global_position -= direction * move_speed * 0.7 * delta
+						global_position -= direction * chase_speed * 0.7 * delta
 					else:
-						global_position += direction.orthogonal() * move_speed * 0.4 * delta
+						global_position += direction.orthogonal() * chase_speed * 0.4 * delta
 				else:
-					global_position += direction * move_speed * (1.25 if is_enraged else 1.0) * delta
+					global_position += direction * chase_speed * (1.25 if is_enraged else 1.0) * delta
 		SpecialPhase.WARNING:
 			special_timer -= delta
 			queue_redraw()
@@ -203,6 +229,30 @@ func _process_special(delta: float, direction: Vector2) -> void:
 				elif active_special_attack == EnemyData.SpecialAttack.DASH and data.dash_impact_radius > 0.0:
 					_dash_impact()
 				_reset_special()
+
+
+func _movement_speed() -> float:
+	return move_speed * (1.0 + haste_bonus if haste_time > 0.0 else 1.0)
+
+
+func apply_haste(bonus: float, duration: float) -> void:
+	if health <= 0.0 or bonus <= 0.0:
+		return
+	var was_hasted := haste_time > 0.0
+	haste_time = maxf(haste_time, duration)
+	haste_bonus = maxf(haste_bonus, bonus)
+	if not was_hasted:
+		queue_redraw()
+
+
+func _pulse_aura() -> void:
+	var radius_squared := data.aura_radius * data.aura_radius
+	for node in get_tree().get_nodes_in_group("enemies"):
+		var ally := node as Enemy
+		if ally == null or ally == self or ally.data.is_boss or ally.data.is_elite:
+			continue
+		if global_position.distance_squared_to(ally.global_position) <= radius_squared:
+			ally.apply_haste(data.aura_move_bonus, AURA_HASTE_DURATION)
 
 
 func _boss_dash_target(direction: Vector2) -> Vector2:
@@ -231,6 +281,12 @@ func _activate_special() -> void:
 		var root := _projectile_root()
 		if root != null:
 			EnemyProjectilePatterns.fire_aimed_fan(root, global_position, special_direction, WaveController.acid_volley_count(spawn_wave), data.attack_speed, attack_damage, target, EnemyProjectilePatterns.ACID_COLOR, 2.2)
+		attack_performed.emit(&"acid")
+		_reset_special()
+	elif active_special_attack == EnemyData.SpecialAttack.RADIAL:
+		var root := _projectile_root()
+		if root != null:
+			EnemyProjectilePatterns.fire_radial(root, global_position, data.radial_count, special_direction.angle() + PI, data.attack_speed, attack_damage, target, Color(1.0, 0.52, 0.22))
 		attack_performed.emit(&"acid")
 		_reset_special()
 	else:
@@ -298,6 +354,12 @@ func take_damage(amount: float, weapon: WeaponData = null, critical: bool = fals
 			_guard_boss_hit()
 			return
 		boss_damage_budget = maxf(boss_damage_budget - applied, 0.0)
+	elif data.is_elite and data.elite_guard_recharge_seconds > 0.0:
+		applied = minf(applied, elite_damage_budget)
+		if applied <= 0.0:
+			_guard_elite_hit()
+			return
+		elite_damage_budget = maxf(elite_damage_budget - applied, 0.0)
 	var counted := minf(applied, health)
 	health -= applied
 	damaged.emit(global_position + Vector2(0.0, -data.radius), applied)
@@ -349,6 +411,13 @@ func _guard_boss_hit() -> void:
 	queue_redraw()
 
 
+func _guard_elite_hit() -> void:
+	if boss_guard_feedback_time <= 0.0:
+		elite_guarded.emit(global_position)
+		boss_guard_feedback_time = 0.8
+	queue_redraw()
+
+
 func _draw() -> void:
 	if data == null:
 		return
@@ -370,6 +439,11 @@ func _draw() -> void:
 					draw_line(ray * data.radius, ray * 290.0, Color(0.95, 0.25, 0.42, 0.3), 3.0)
 		elif boss_damage_budget <= max_health * 0.01:
 			draw_arc(Vector2.ZERO, data.radius + 19.0, 0.0, TAU, 48, Color(0.43, 0.84, 0.94, 0.8), 5.0)
+	if data.is_elite and data.elite_guard_fraction > 0.0:
+		var guard_ratio := clampf(elite_damage_budget / (max_health * data.elite_guard_fraction), 0.0, 1.0)
+		draw_arc(Vector2.ZERO, data.radius + 18.0, 0.0, TAU, 40, Color(0.43, 0.84, 0.94, 0.22), 4.0)
+		if guard_ratio > 0.0:
+			draw_arc(Vector2.ZERO, data.radius + 18.0, -PI / 2.0, -PI / 2.0 + TAU * guard_ratio, 40, Color(0.43, 0.84, 0.94, 0.85), 4.0)
 	if special_phase == SpecialPhase.WARNING:
 		var warning_color := Color(0.73, 0.20, 0.19, 0.85)
 		var warning_progress := 1.0 - clampf(special_timer / maxf(data.warning_time, 0.01), 0.0, 1.0)
@@ -394,6 +468,11 @@ func _draw() -> void:
 			for ray in EnemyProjectilePatterns.fan_directions(special_direction, WaveController.acid_volley_count(spawn_wave)):
 				draw_line(Vector2.ZERO, ray * 150.0, shot_color, 3.0)
 			draw_arc(Vector2.ZERO, data.radius + 8.0, -PI / 2.0, -PI / 2.0 + TAU * warning_progress, 32, shot_color, 4.0)
+		elif active_special_attack == EnemyData.SpecialAttack.RADIAL:
+			var shot_color := Color(1.0, 0.48, 0.19, 0.9)
+			for ray in EnemyProjectilePatterns.radial_directions(data.radial_count, special_direction.angle() + PI):
+				draw_line(ray * data.radius, ray * 235.0, Color(shot_color, 0.3 + warning_progress * 0.35), 3.0)
+			draw_arc(Vector2.ZERO, data.radius + 9.0, -PI / 2.0, -PI / 2.0 + TAU * warning_progress, 32, shot_color, 5.0)
 		else:
 			draw_circle(Vector2.ZERO, data.attack_radius, Color(0.95, 0.36, 0.28, 0.13))
 			draw_arc(Vector2.ZERO, data.attack_radius, 0.0, TAU, 64, warning_color, 4.0)
@@ -407,6 +486,12 @@ func _draw() -> void:
 		draw_arc(Vector2.ZERO, data.radius + 4.0, 0.0, TAU, 24, Color(0.78, 0.25, 0.48, 0.85), 2.5 + bleed_stacks)
 	if wet_time > 0.0:
 		draw_arc(Vector2.ZERO, data.radius + 8.0, 0.0, TAU, 24, Color(0.36, 0.86, 1.0, 0.88), 3.0)
+	if haste_time > 0.0:
+		draw_arc(Vector2.ZERO, data.radius + 8.0, 0.0, TAU, 24, Color(1.0, 0.46, 0.73, 0.9), 3.0)
+	if data.is_elite:
+		draw_arc(Vector2.ZERO, data.radius + 12.0, 0.0, TAU, 40, Color(1.0, 0.73, 0.24, 0.95), 4.0)
+	if data.aura_radius > 0.0:
+		draw_arc(Vector2.ZERO, data.aura_radius, 0.0, TAU, 48, Color(1.0, 0.46, 0.73, 0.45), 2.0)
 	if is_enraged:
 		draw_arc(Vector2.ZERO, data.radius + 12.0, 0.0, TAU, 40, Color(1.0, 0.26, 0.23, 0.85), 4.0)
 	draw_circle(Vector2(0.0, data.radius * 0.7), data.radius * 0.7, Color(0.17, 0.13, 0.17, 0.17))

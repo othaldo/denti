@@ -23,6 +23,8 @@ var wave_history: Array[Dictionary] = []
 var wave_spawns: int = 0
 var wave_spawns_blocked: int = 0
 var wave_kills: int = 0
+var wave_elites_spawned: int = 0
+var wave_elites_killed: int = 0
 var wave_coins: int = 0
 var wave_xp: int = 0
 var wave_chests_found: int = 0
@@ -50,6 +52,8 @@ func begin_wave(number: int) -> void:
 	wave_spawns = 0
 	wave_spawns_blocked = 0
 	wave_kills = 0
+	wave_elites_spawned = 0
+	wave_elites_killed = 0
 	wave_coins = 0
 	wave_xp = 0
 	wave_chests_found = 0
@@ -77,8 +81,10 @@ func tick(delta: float, enemies_alive: int = 0, enemy_projectiles: int = 0) -> v
 	wave_peak_dps = maxf(wave_peak_dps, recent_dps())
 
 
-func record_spawn(is_boss: bool) -> void:
+func record_spawn(is_boss: bool, is_elite: bool = false) -> void:
 	wave_spawns += 1
+	if is_elite:
+		wave_elites_spawned += 1
 	if is_boss:
 		boss_started_at = elapsed
 
@@ -105,9 +111,11 @@ func record_damage(amount: float, weapon_id: StringName = &"", proc_id: StringNa
 	wave_peak_dps = maxf(wave_peak_dps, recent_dps())
 
 
-func record_kill(is_boss: bool) -> void:
+func record_kill(is_boss: bool, is_elite: bool = false) -> void:
 	kills += 1
 	wave_kills += 1
+	if is_elite:
+		wave_elites_killed += 1
 	kill_events.append(elapsed)
 	if is_boss:
 		bosses_defeated += 1
@@ -179,6 +187,7 @@ func current_wave_summary() -> Dictionary:
 	return {
 		"wave": current_wave, "combat_seconds": duration,
 		"spawns": wave_spawns, "spawns_blocked": wave_spawns_blocked, "kills": wave_kills,
+		"elites_spawned": wave_elites_spawned, "elites_killed": wave_elites_killed,
 		"peak_enemies_alive": wave_peak_enemies, "average_enemies_alive": wave_enemy_seconds / maxf(duration, 1.0),
 		"peak_enemy_projectiles": wave_peak_enemy_projectiles,
 		"damage_dealt": wave_damage, "average_dps": wave_damage / maxf(duration, 1.0),
@@ -207,7 +216,8 @@ func save_data() -> Dictionary:
 		"current_wave": current_wave, "wave_started_at": wave_started_at,
 		"wave_history": wave_history.duplicate(true),
 		"wave_spawns": wave_spawns, "wave_spawns_blocked": wave_spawns_blocked,
-		"wave_kills": wave_kills,
+		"wave_kills": wave_kills, "wave_elites_spawned": wave_elites_spawned,
+		"wave_elites_killed": wave_elites_killed,
 		"wave_coins": wave_coins, "wave_xp": wave_xp,
 		"wave_chests_found": wave_chests_found, "wave_chests_kept": wave_chests_kept,
 		"wave_chests_scrapped": wave_chests_scrapped,
@@ -242,6 +252,8 @@ func restore(saved: Dictionary, wave_number: int) -> void:
 	wave_spawns = maxi(int(saved.get("wave_spawns", 0)), 0)
 	wave_spawns_blocked = maxi(int(saved.get("wave_spawns_blocked", 0)), 0)
 	wave_kills = maxi(int(saved.get("wave_kills", 0)), 0)
+	wave_elites_spawned = maxi(int(saved.get("wave_elites_spawned", 0)), 0)
+	wave_elites_killed = maxi(int(saved.get("wave_elites_killed", 0)), 0)
 	wave_coins = maxi(int(saved.get("wave_coins", 0)), 0)
 	wave_xp = maxi(int(saved.get("wave_xp", 0)), 0)
 	wave_chests_found = maxi(int(saved.get("wave_chests_found", 0)), 0)

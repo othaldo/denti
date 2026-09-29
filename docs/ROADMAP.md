@@ -9,9 +9,10 @@ This roadmap captures the current player feedback and the intended next developm
 - Bosses have damage pacing, telegraphed projectile phases and reinforcements. Playtesting reports that their mechanics are now more noticeable.
 - Sugar enemies gain a telegraphed long charge with a marked landing area from wave 7, addressing their inability to reach a strong build.
 - Post-wave rewards now queue all level-ups and rare chest choices after the loot sweep. Chest items are rolled when dropped, luck is bounded, and the queue survives save/resume.
-- The item pool has grown from 18 to 22 with bleed spread, wet conductivity, movement-based sugar damage and chest scrap economy. The new effects and enemy status survive save/resume.
-- Player feedback to revisit after the roadmap slice: by wave 12 a strong build can stand still without enemies reaching Denti. More mobile enemy roles and new attacks remain needed.
-- Next: keep expanding the item pool toward 30-35 meaningful choices, then revisit late-wave pressure with the per-wave reports.
+- The item pool has grown from 18 to 30 with bleed duration, wet puddles, crit beams, shield retaliation, capped savings interest, returning projectiles, overheal shields and sugar rush alongside earlier synergies. The effects survive save/resume.
+- Two elite roles now alternate in late non-boss waves: Säurekrone fires a telegraphed radial attack, while Jagdkeim arrives with three bacteria and speeds up nearby ordinary enemies from wave 12. Both have limited bonus chest chances; elite spawns and kills appear in per-wave telemetry.
+- A current save showed about 445 average DPS, 148 kills from 158 spawns and only 61 damage taken in wave 12; elites were still dying in one hit. From wave 7 onward, normal enemies and elites now gain additional health, speed, damage and modest capped defense. Elites have a visible, recharging burst-damage guard so their attacks can occur before they die.
+- Next: playtest waves 12-20 with the new curve, compare per-wave damage taken and enemy density, then decide whether another mobile threat or a boss reward is the next useful slice.
 
 ## Why v0.2 exists
 

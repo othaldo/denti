@@ -17,7 +17,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 config/name="Denti: Divine Dentistry"
 config/version="0.1.0"
 run/main_scene="res://scenes/ui/game_menu.tscn"
-config/features=PackedStringArray("4.6", "GL Compatibility")
+config/features=PackedStringArray("4.7", "GL Compatibility")
 
 [audio]
 
@@ -26,6 +26,7 @@ buses/default_bus_layout="res://assets/audio/audio_buses.tres"
 [autoload]
 
 GameSession="*res://scripts/systems/game_session.gd"
+MCPRuntimeServer="*res://addons/godot_mcp_toolkit/runtime/mcp_runtime_server.gd"
 
 [denti]
 
@@ -37,6 +38,10 @@ window/size/viewport_width=1280
 window/size/viewport_height=720
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/godot_mcp_toolkit/plugin.cfg")
 
 [input]
 

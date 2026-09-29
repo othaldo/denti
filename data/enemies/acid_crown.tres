@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/enemies/acid_spitter.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+display_name = "Säurekrone"
+max_health = 160.0
+damage_reduction = 0.12
+knockback_resistance = 0.45
+move_speed = 135.0
+contact_damage = 11.0
+radius = 23.0
+xp_drop = 5
+coin_drop = 4
+sprite = ExtResource("2")
+sprite_tint = Color(1.0, 0.74, 0.43, 1.0)
+is_elite = true
+elite_guard_fraction = 0.34
+elite_guard_recharge_seconds = 1.6
+special_attack = 5
+special_interval = 4.2
+warning_time = 0.9
+trigger_range = 720.0
+attack_speed = 270.0
+attack_damage = 11.0
+radial_count = 10

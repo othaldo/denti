@@ -1,7 +1,7 @@
 class_name EnemyData
 extends Resource
 
-enum SpecialAttack { NONE, DASH, PULSE, SHOOT, BOSS }
+enum SpecialAttack { NONE, DASH, PULSE, SHOOT, BOSS, RADIAL }
 
 @export var display_name: String
 @export var max_health: float = 25.0
@@ -16,6 +16,14 @@ enum SpecialAttack { NONE, DASH, PULSE, SHOOT, BOSS }
 @export var sprite: Texture2D
 @export var sprite_tint: Color = Color.WHITE
 @export var is_boss: bool = false
+@export var is_elite: bool = false
+@export_group("Elite")
+@export var aura_radius: float = 0.0
+@export_range(0.0, 1.0, 0.01) var aura_move_bonus: float = 0.0
+@export var escort_data: EnemyData
+@export var escort_count: int = 0
+@export_range(0.0, 1.0, 0.01) var elite_guard_fraction: float = 0.0
+@export var elite_guard_recharge_seconds: float = 0.0
 @export_group("Special attack")
 @export var special_attack: SpecialAttack = SpecialAttack.NONE
 @export var advanced_special_wave: int = 0
@@ -29,6 +37,7 @@ enum SpecialAttack { NONE, DASH, PULSE, SHOOT, BOSS }
 @export var attack_speed: float = 0.0
 @export var attack_duration: float = 0.0
 @export var attack_damage: float = 0.0
+@export var radial_count: int = 0
 @export var dash_impact_radius: float = 0.0
 @export_group("Boss pressure")
 @export var boss_guard_recharge_seconds: float = 0.0

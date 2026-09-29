@@ -4,6 +4,7 @@ extends Node
 signal enemy_requested(data: EnemyData)
 signal boss_requested(data: EnemyData)
 signal horde_requested(data: EnemyData, count: int)
+signal elite_requested(data: EnemyData)
 signal wave_finished(wave_number: int)
 
 const DURATION := 45.0
@@ -14,11 +15,17 @@ const SPAWN_INTERVAL_WAVE_STEP := 0.06
 const SPAWN_INTERVAL_ACCELERATION := 0.012
 const SPAWN_INTERVAL_MIN := 0.30
 const MOB_HEALTH_WAVE_STEP := 0.17
+const MOB_HEALTH_LATE_ACCELERATION := 0.018
 const BOSS_HEALTH_WAVE_STEP := 0.27
 const MOB_DEFENSE_WAVE_STEP := 0.01
+const MOB_DEFENSE_LATE_STEP := 0.004
 const BOSS_DEFENSE_WAVE_STEP := 0.006
 const MAX_DAMAGE_REDUCTION := 0.42
 const ENEMY_DAMAGE_WAVE_STEP := 0.06
+const MOB_DAMAGE_LATE_STEP := 0.03
+const ENEMY_SPEED_WAVE_STEP := 0.025
+const MOB_SPEED_LATE_STEP := 0.018
+const MOB_LATE_START_WAVE := 6
 const LOOT_CHANCE_WAVE_STEP := 0.035
 const LOOT_CHANCE_MIN := 0.45
 const ACID_VOLLEY_WAVE_3 := 7
@@ -29,6 +36,8 @@ const PLAQUE: EnemyData = preload("res://data/enemies/plaque.tres")
 const BACTERIA: EnemyData = preload("res://data/enemies/bacteria.tres")
 const SUGAR: EnemyData = preload("res://data/enemies/sugar.tres")
 const ACID_SPITTER: EnemyData = preload("res://data/enemies/acid_spitter.tres")
+const ACID_CROWN: EnemyData = preload("res://data/enemies/acid_crown.tres")
+const HUNT_GERM: EnemyData = preload("res://data/enemies/hunt_germ.tres")
 const CAVITY_COUNT: EnemyData = preload("res://data/enemies/cavity_count.tres")
 const CAVITY_PRINCE: EnemyData = preload("res://data/enemies/cavity_prince.tres")
 const CAVITY_KING: EnemyData = preload("res://data/enemies/cavity_king.tres")
@@ -45,6 +54,8 @@ var horde_waves: Array[int] = []
 var horde_spawned: bool = false
 var burst_times: Array[float] = []
 var burst_index: int = 0
+var elite_time: float = -1.0
+var elite_spawned: bool = false
 
 
 func plan_hordes() -> void:
@@ -65,14 +76,39 @@ static func boss_for_wave(wave_number: int) -> EnemyData:
 	return CAVITY_COUNT
 
 
+static func elite_for_wave(wave_number: int) -> EnemyData:
+	return HUNT_GERM if wave_number >= 12 and wave_number % 2 == 0 else ACID_CROWN
+
+
 static func health_multiplier(data: EnemyData, wave_number: int) -> float:
 	var step := BOSS_HEALTH_WAVE_STEP if data.is_boss else MOB_HEALTH_WAVE_STEP
-	return 1.0 + maxi(wave_number - 1, 0) * step
+	var multiplier := 1.0 + maxi(wave_number - 1, 0) * step
+	if not data.is_boss:
+		var late_waves := maxi(wave_number - MOB_LATE_START_WAVE, 0)
+		multiplier += late_waves * late_waves * MOB_HEALTH_LATE_ACCELERATION
+	return multiplier
 
 
 static func damage_reduction(data: EnemyData, wave_number: int) -> float:
 	var step := BOSS_DEFENSE_WAVE_STEP if data.is_boss else MOB_DEFENSE_WAVE_STEP
-	return clampf(data.damage_reduction + maxi(wave_number - 1, 0) * step, 0.0, MAX_DAMAGE_REDUCTION)
+	var reduction := data.damage_reduction + maxi(wave_number - 1, 0) * step
+	if not data.is_boss:
+		reduction += maxi(wave_number - MOB_LATE_START_WAVE, 0) * MOB_DEFENSE_LATE_STEP
+	return clampf(reduction, 0.0, MAX_DAMAGE_REDUCTION)
+
+
+static func enemy_damage_multiplier(data: EnemyData, wave_number: int) -> float:
+	var multiplier := 1.0 + maxi(wave_number - 1, 0) * ENEMY_DAMAGE_WAVE_STEP
+	if not data.is_boss:
+		multiplier += maxi(wave_number - MOB_LATE_START_WAVE, 0) * MOB_DAMAGE_LATE_STEP
+	return multiplier
+
+
+static func enemy_speed_multiplier(data: EnemyData, wave_number: int) -> float:
+	var multiplier := 1.0 + maxi(wave_number - 1, 0) * ENEMY_SPEED_WAVE_STEP
+	if not data.is_boss:
+		multiplier += maxi(wave_number - MOB_LATE_START_WAVE, 0) * MOB_SPEED_LATE_STEP
+	return multiplier
 
 
 static func loot_chance(wave_number: int) -> float:
@@ -100,6 +136,8 @@ func next_wave_preview() -> String:
 		details.append(boss_for_wave(next_wave).display_name)
 	if horde_waves.has(next_wave):
 		details.append("%s-Horde" % _horde_data(next_wave).display_name)
+	if next_wave >= 8 and not is_boss_wave(next_wave):
+		details.append("Elite: %s" % elite_for_wave(next_wave).display_name)
 	return "Welle %d: %s" % [next_wave, " · ".join(details)] if not details.is_empty() else "Nächste Welle: %d" % next_wave
 
 
@@ -111,6 +149,8 @@ func start_next_wave() -> void:
 	spawn_cooldown = 0.0
 	horde_spawned = false
 	plan_bursts()
+	elite_time = randf_range(18.0, 25.0) if current_wave >= 8 and not is_boss_wave(current_wave) else -1.0
+	elite_spawned = false
 	active = true
 	if is_boss_wave(current_wave):
 		boss_requested.emit(boss_for_wave(current_wave))
@@ -128,6 +168,9 @@ func _process(delta: float) -> void:
 		horde_spawned = true
 		horde_requested.emit(_horde_data(current_wave), 5 + current_wave)
 	var elapsed := DURATION - remaining
+	if elite_time >= 0.0 and not elite_spawned and elapsed >= elite_time:
+		elite_spawned = true
+		elite_requested.emit(elite_for_wave(current_wave))
 	while burst_index < burst_times.size() and elapsed >= burst_times[burst_index]:
 		var index := burst_index
 		burst_index += 1

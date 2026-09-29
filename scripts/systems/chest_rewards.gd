@@ -2,12 +2,14 @@ class_name ChestRewards
 extends RefCounted
 
 const BASE_DROP_CHANCE := 0.0018
+const ELITE_DROP_CHANCE := 0.10
 const LUCK_BONUS_CAP := 1.0
 const SCRAP_FRACTION := 0.6
 
 
-static func drop_chance(luck: float) -> float:
-	return BASE_DROP_CHANCE * (1.0 + minf(maxf(luck, 0.0) / 100.0, LUCK_BONUS_CAP))
+static func drop_chance(luck: float, is_elite: bool = false) -> float:
+	var base := ELITE_DROP_CHANCE if is_elite else BASE_DROP_CHANCE
+	return base * (1.0 + minf(maxf(luck, 0.0) / 100.0, LUCK_BONUS_CAP))
 
 
 static func roll_item(wave_number: int, luck: float, inventory: ItemInventory, rng: RandomNumberGenerator = null) -> Dictionary:

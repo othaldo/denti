@@ -98,8 +98,12 @@ func _run() -> void:
 	game.boss = null
 	for index in 130:
 		game._spawn_enemy(WaveController.PLAQUE)
-	if game.get_node("Enemies").get_child_count() != game.MAX_ACTIVE_ENEMIES or game.telemetry.wave_spawns_blocked < 20:
-		_fail("active enemy cap did not protect late-wave performance")
+	if game.get_node("Enemies").get_child_count() != game.MAX_ACTIVE_ENEMIES - 1 or game.telemetry.wave_spawns_blocked < 20:
+		_fail("active enemy cap did not reserve a slot for elite pressure")
+		return
+	game._spawn_enemy(WaveController.ACID_CROWN)
+	if game.get_node("Enemies").get_child_count() != game.MAX_ACTIVE_ENEMIES:
+		_fail("reserved elite slot could not be used")
 		return
 	wave.free()
 	session.clear_run()

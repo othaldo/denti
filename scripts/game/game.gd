@@ -52,6 +52,7 @@ func _ready() -> void:
 	wave.enemy_requested.connect(_spawn_enemy)
 	wave.boss_requested.connect(_spawn_enemy)
 	wave.horde_requested.connect(_spawn_horde)
+	wave.elite_requested.connect(_spawn_elite)
 	wave.wave_finished.connect(_on_wave_finished)
 	player.stats.died.connect(_on_player_died)
 	player.stats.damage_taken.connect(telemetry.record_taken)
@@ -137,10 +138,29 @@ func _refresh_hud() -> void:
 
 
 func _spawn_enemy(data: EnemyData) -> void:
-	if $Enemies.get_child_count() >= MAX_ACTIVE_ENEMIES:
+	var limit := MAX_ACTIVE_ENEMIES if data.is_elite or data.is_boss else MAX_ACTIVE_ENEMIES - 1
+	if $Enemies.get_child_count() >= limit:
 		telemetry.record_spawn_blocked()
 		return
 	_create_enemy(data, _spawn_position(_spawn_edge()))
+
+
+func _spawn_elite(data: EnemyData) -> void:
+	if $Enemies.get_child_count() >= MAX_ACTIVE_ENEMIES:
+		telemetry.record_spawn_blocked(1 + data.escort_count)
+		return
+	var at := _spawn_position(_spawn_edge())
+	_create_enemy(data, at)
+	if data.escort_data == null or data.escort_count <= 0:
+		return
+	var lower := Vector2.ONE * (DentiArena.WALL_WIDTH + 8.0)
+	var upper := arena.arena_size - lower
+	for index in data.escort_count:
+		if $Enemies.get_child_count() >= MAX_ACTIVE_ENEMIES:
+			telemetry.record_spawn_blocked(data.escort_count - index)
+			break
+		var offset := Vector2.RIGHT.rotated(TAU * float(index) / float(data.escort_count)) * (data.radius + data.escort_data.radius + 12.0)
+		_create_enemy(data.escort_data, (at + offset).clamp(lower, upper))
 
 
 func _spawn_horde(data: EnemyData, count: int) -> void:
@@ -149,7 +169,7 @@ func _spawn_horde(data: EnemyData, count: int) -> void:
 	var lower := Vector2.ONE * (DentiArena.WALL_WIDTH + 8.0)
 	var upper := arena.arena_size - lower
 	for index in count:
-		if $Enemies.get_child_count() >= MAX_ACTIVE_ENEMIES:
+		if $Enemies.get_child_count() >= MAX_ACTIVE_ENEMIES - 1:
 			telemetry.record_spawn_blocked(count - index)
 			break
 		var offset := (float(index) - float(count - 1) / 2.0) * (data.radius * 2.5)
@@ -203,17 +223,19 @@ func _create_enemy(data: EnemyData, at: Vector2) -> void:
 		enemy.boss_phase_started.connect(_on_boss_phase_started)
 		enemy.boss_guarded.connect(_on_boss_guarded)
 		enemy.reinforcements_requested.connect(_on_boss_reinforcements)
+	if data.is_elite:
+		enemy.elite_guarded.connect(_on_elite_guarded)
 	$Enemies.add_child(enemy)
-	telemetry.record_spawn(data.is_boss)
+	telemetry.record_spawn(data.is_boss, data.is_elite)
 	if data.is_boss:
 		boss = enemy
 
 
 func _on_enemy_defeated(at: Vector2, data: EnemyData) -> void:
-	telemetry.record_kill(data.is_boss)
+	telemetry.record_kill(data.is_boss, data.is_elite)
 	if not data.is_boss:
 		sound.play_cue(&"down")
-	var reward_drop := wave.active and randf() < WaveController.loot_chance(wave.current_wave)
+	var reward_drop: bool = wave.active and (data.is_elite or randf() < WaveController.loot_chance(wave.current_wave))
 	var bonus_coins := items.on_kill(at, data.is_boss)
 	coins += bonus_coins
 	telemetry.record_loot(&"coin", bonus_coins)
@@ -222,7 +244,7 @@ func _on_enemy_defeated(at: Vector2, data: EnemyData) -> void:
 		if boss_pending:
 			call_deferred("_resolve_boss_wave")
 		return
-	if wave.active and not rewards.chest_spawned and randf() < ChestRewards.drop_chance(player.stats.luck):
+	if wave.active and not rewards.chest_spawned and randf() < ChestRewards.drop_chance(player.stats.luck, data.is_elite):
 		var chest := ChestRewards.roll_item(wave.current_wave, player.stats.luck, items)
 		if not chest.is_empty():
 			rewards.mark_chest_spawned()
@@ -254,6 +276,10 @@ func _on_boss_phase_started(at: Vector2, _phase: int) -> void:
 
 func _on_boss_guarded(at: Vector2) -> void:
 	_show_item_feedback("VERSIEGELT", at, Color(0.43, 0.84, 0.94))
+
+
+func _on_elite_guarded(at: Vector2) -> void:
+	_show_item_feedback("SCHMELZSCHILD!", at, Color(0.43, 0.84, 0.94))
 
 
 func _on_boss_reinforcements(count: int) -> void:

@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/enemies/bacteria.png" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/bacteria.tres" id="3"]
+
+[resource]
+script = ExtResource("1")
+display_name = "Jagdkeim"
+max_health = 170.0
+damage_reduction = 0.10
+knockback_resistance = 0.4
+move_speed = 185.0
+contact_damage = 12.0
+radius = 19.0
+xp_drop = 5
+coin_drop = 4
+sprite = ExtResource("2")
+sprite_tint = Color(1.0, 0.55, 0.78, 1.0)
+is_elite = true
+aura_radius = 235.0
+aura_move_bonus = 0.45
+escort_data = ExtResource("3")
+escort_count = 3
+elite_guard_fraction = 0.34
+elite_guard_recharge_seconds = 1.6
+special_attack = 1
+special_interval = 3.4
+warning_time = 0.6
+trigger_range = 260.0
+attack_speed = 530.0
+attack_duration = 0.42
+attack_damage = 12.0
