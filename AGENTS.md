@@ -41,6 +41,7 @@ The most important current player feedback is:
 - Balance needs instrumentation instead of only tuning by feel.
 - More items are wanted, but they should primarily deepen synergies instead of adding flat-stat filler.
 - Rare random chests should drop items during runs; the player may keep the item or scrap it for coins. Luck should influence chest/rarity chances without allowing unlimited snowballing.
+- Active combat should not be repeatedly interrupted by level-up or chest-choice modals. Rewards are resolved after the wave.
 
 Do not solve the difficulty problem only by multiplying all enemy HP. Trash enemies may still die quickly. The desired late-run feeling is that Denti is extremely powerful while the arena remains dangerous because of density, elites, projectiles, telegraphed attacks and boss mechanics.
 
@@ -73,10 +74,13 @@ Work in approximately this order unless a task explicitly says otherwise:
    - bosses must survive long enough for their mechanics to matter
    - prefer phases, damage reduction, attack patterns, adds and pressure over pure HP sponges
    - miniboss target encounter length is roughly tens of seconds, not 2-5 seconds
-5. Rare item chests
-   - rare in-wave drop
-   - item reveal
-   - choose KEEP or SCRAP FOR COINS
+5. Post-wave reward flow + rare item chests
+   - do not pause active combat when XP crosses a level threshold
+   - accumulate pending level-ups during the wave
+   - chest drops may appear/be collected during combat, but collecting a chest must not open a modal
+   - when the timer ends, first run the existing loot-collection phase and collect all remaining XP, coins and chest drops
+   - only after collection is complete, resolve pending level-up choices and chest KEEP / SCRAP choices
+   - then open the shop / next intermission step
    - luck may raise chest chance and/or rarity within bounded limits
    - consider at most one ordinary random chest per wave to avoid runaway luck snowballing
    - elite/boss rewards may use stronger or guaranteed chest rules later
@@ -93,22 +97,29 @@ The detailed rationale and ideas live in `docs/ROADMAP.md`.
 
 ## Core gameplay loop
 
+The intended flow should preserve uninterrupted combat during each wave:
+
 1. Control Denti inside the arena.
 2. Enemies spawn during a timed wave.
 3. Enemies chase, shoot at or otherwise pressure Denti.
 4. Weapons attack automatically.
-5. Defeated enemies drop XP and coins, with rare special drops possible.
-6. XP grants level-ups: pause and choose one of three stat upgrades.
-7. Coins fund the between-wave shop.
-8. Shop purchases define the build more strongly than level-up stats.
-9. Weapons can fuse into higher tiers.
-10. Start the next, harder wave.
-11. Boss milestones should increasingly create run-defining choices.
+5. Defeated enemies drop XP, coins and potentially rare chest drops.
+6. XP can cross one or more level thresholds during combat, but this only increments a pending level-up count; combat continues.
+7. When the wave timer ends, stop new combat and collect all remaining loot first.
+8. After the loot sweep is complete, resolve the post-wave reward queue:
+   - pending level-ups: choose one of three stat upgrades for each earned level
+   - pending chests: reveal item and choose KEEP or SCRAP FOR COINS
+   - later: boss relics / other milestone rewards can join the same queue
+9. Open the shop. Coins fund weapon/item purchases and rerolls.
+10. Weapons can fuse into higher tiers.
+11. Start the next, harder wave.
+
+The exact visual presentation of the post-wave queue may evolve, but the key rule is: **do not interrupt active combat with level-up or chest-choice screens**.
 
 The player should make meaningful decisions through:
 
-- movement and positioning
-- level-up choices
+- movement and positioning during uninterrupted waves
+- post-wave level-up choices
 - weapon selection and fusion
 - shop purchases and rerolls
 - item synergies
@@ -132,6 +143,8 @@ XP primarily improves basic stats:
 - Bewegung: movement speed
 - Zahnglück / Glück: luck
 
+Crossing an XP threshold during a wave earns a pending level-up instead of pausing the wave. Multiple level-ups can queue and are resolved after the end-of-wave loot collection.
+
 ### Coins
 
 Coins are used in the shop and should create stronger build identity than level-ups.
@@ -142,10 +155,10 @@ Items should create trade-offs and synergies rather than only flat increases.
 
 Keep these conceptually distinct:
 
-- stats = frequent incremental power
+- stats = frequent incremental power, chosen in the post-wave reward phase
 - shop items/weapons = build construction
-- chests = opportunistic in-run reward + keep/scrap decision
-- boss relics = rare rule-changing run modifiers
+- chests = opportunistic reward earned during combat but resolved after the wave via keep/scrap choice
+- boss relics = rare rule-changing run modifiers, preferably resolved in the same post-wave reward pipeline
 - weapon evolutions = explicit build goals / payoff
 - meta progression = mostly unlocks and difficulty options, not mandatory permanent stat inflation
 
@@ -178,6 +191,7 @@ Separate responsibilities such as:
 - enemy spawning and projectile patterns
 - wave progression and wave events
 - XP/loot
+- post-wave reward queue / pending level-ups
 - shop
 - item effects
 - chests/rewards
@@ -185,6 +199,8 @@ Separate responsibilities such as:
 - telemetry/debug tools
 
 Use signals and clear interfaces where practical. Avoid tightly coupling UI to gameplay logic.
+
+The post-wave flow should have one authoritative state machine / coordinator rather than each reward system pausing the tree independently. Save/resume must preserve pending level-ups, pending chest rewards and the current intermission step.
 
 ## Data-driven design
 
@@ -244,6 +260,8 @@ The shop already supports rarity progression, rerolls, item stacks, weapon purch
 
 New items should increase synergy density. Before adding a flat-stat item, ask whether it creates a new decision or connects existing mechanics.
 
+The shop should open only after end-of-wave loot collection and all queued mandatory reward choices for that wave have been resolved.
+
 See `docs/items.md` for current effects.
 
 ## UI
@@ -257,7 +275,7 @@ For bullet hell:
 - avoid VFX that obscure hazards
 - preserve performance with large enemy counts
 
-Keyboard/controller support can be added later unless a task specifically targets it.
+Post-wave reward screens should feel like one coherent intermission rather than a chain of unrelated interruptions. Keyboard/controller support can be added later unless a task specifically targets it.
 
 ## Denti - canonical character reference
 
@@ -279,7 +297,16 @@ Humor should stay concise enough not to block gameplay. "Alle huldigen dem Denti
 
 Use typed GDScript where practical. Prefer small testable systems.
 
-When changing combat scaling, waves, loot, shop, save state or item effects, update/add automated tests where reasonable.
+When changing combat scaling, waves, loot, shop, save state, post-wave rewards or item effects, update/add automated tests where reasonable.
+
+Important flow tests should cover:
+
+- XP threshold during active combat does not pause gameplay
+- multiple pending level-ups resolve correctly after end-of-wave loot collection
+- a chest pickup during combat does not open a modal
+- remaining XP/coins/chests are collected before reward choices begin
+- reward queue completes before shop opens
+- save/resume preserves pending reward state
 
 After the initial Godot import, the existing tests can be run with the command documented in `README.md`.
 
