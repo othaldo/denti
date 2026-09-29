@@ -2,468 +2,285 @@
 
 # Denti: Divine Dentistry
 
-Denti: Divine Dentistry is a small 2D arena-survivor / roguelite inspired by games such as Brotato and Vampire Survivors.
+Denti: Divine Dentistry is a small 2D arena-survivor / roguelite inspired by Brotato and Vampire Survivors.
 
-The player directly controls Denti, a small divine tooth character.
-Movement is manual, while attacks are mostly automatic.
+The player directly controls Denti, a small divine tooth. Movement is manual; attacks are mostly automatic. The tone is humorous, charming, slightly absurd, and strongly dentistry-themed.
 
-The tone should be humorous, charming, slightly absurd, and strongly themed around dentistry.
+The game should remain easy to understand and quick to play, but build choices should become deep enough to support repeat runs.
 
-Examples:
-- metal crowns provide armor
-- floss can become a weapon
-- fluoride can improve regeneration or defense
-- plaque, sugar and bacteria are enemies
-- dental terminology can be used for stats, items, enemies and achievements
+## Read this first
 
-The game should remain easy to understand and quick to play.
+The original prototype scope has already been exceeded. Do not treat this repository as a blank MVP anymore.
 
+Current playable state includes roughly:
 
-## Technology
+- 20 timed waves
+- minibosses every 5 waves and a final boss on wave 20
+- 4 normal enemy types plus bosses
+- 8 weapons with hand-slot costs and weapon fusion up to tier IV
+- 18 shop items with stack limits and real synergies
+- 8 level-up stats
+- rarity and luck systems
+- shop rerolls, weapon selling and build-aware item weighting
+- save/resume during combat, level-up and shop states
+- music, boss music, SFX, options and FPS display
+- automated tests
+- automatic Godot Web export and GitHub Pages deployment
 
-- Engine: Godot 4.x
-- Language: GDScript
-- Game type: 2D
-- Target platform initially: Desktop Linux
-- Keep the project portable to Windows where practical.
+See `README.md`, `docs/items.md`, `docs/waffen.md` and `docs/ROADMAP.md` for the current player-facing state and near-term plan.
 
-Prefer standard Godot functionality over unnecessary third-party dependencies.
+## Current development goal: Pressure + Build Depth
 
+The most important current player feedback is:
 
-## Core Gameplay
+- Denti outscales enemies too easily in the middle/late run.
+- Normal enemies eventually become universal one-shots.
+- Bosses can die in roughly 2-5 seconds.
+- The arena stops creating enough movement/positioning pressure.
+- Waves need more enemies, more frequent hordes and more projectile pressure / bullet-hell patterns.
+- Balance needs instrumentation instead of only tuning by feel.
+- More items are wanted, but they should primarily deepen synergies instead of adding flat-stat filler.
+- Rare random chests should drop items during runs; the player may keep the item or scrap it for coins. Luck should influence chest/rarity chances without allowing unlimited snowballing.
 
-The intended gameplay loop is:
+Do not solve the difficulty problem only by multiplying all enemy HP. Trash enemies may still die quickly. The desired late-run feeling is that Denti is extremely powerful while the arena remains dangerous because of density, elites, projectiles, telegraphed attacks and boss mechanics.
 
-1. The player controls Denti inside an arena.
-2. Enemies spawn continuously during a timed wave.
-3. Enemies move toward Denti and try to damage him.
-4. Denti's weapons attack automatically.
-5. Defeated enemies can drop:
-   - XP
-   - coins
-6. XP increases Denti's level.
-7. On level-up:
-   - pause gameplay
-   - offer 3 random stat upgrades
-   - player chooses exactly one
-8. Coins are accumulated during the wave.
-9. After the wave:
-   - pause combat
-   - open the shop
-   - offer random items and weapons
-   - allow rerolling shop contents
+### Immediate implementation priority
+
+Work in approximately this order unless a task explicitly says otherwise:
+
+1. Combat telemetry and balance visibility
+   - recent/rolling DPS
+   - peak DPS where useful
+   - kills per second
+   - enemies alive / spawn density
+   - damage taken
+   - boss time-to-kill
+   - useful run economy numbers
+   - keep this as debug/developer UI; do not clutter normal play
+2. Increase enemy pressure
+   - more enemies in later waves
+   - more frequent horde events
+   - wave sub-events / bursts rather than only a flat continuous spawn stream
+   - tune performance while increasing density
+3. Reusable bullet-hell / projectile-pattern system
+   - aimed volleys
+   - spreads/fans
+   - radial bursts
+   - slow space-denial projectiles
+   - lines / telegraphed lanes
+   - boss patterns and combinations
+4. Boss balance and phases
+   - bosses must survive long enough for their mechanics to matter
+   - prefer phases, damage reduction, attack patterns, adds and pressure over pure HP sponges
+   - miniboss target encounter length is roughly tens of seconds, not 2-5 seconds
+5. Rare item chests
+   - rare in-wave drop
+   - item reveal
+   - choose KEEP or SCRAP FOR COINS
+   - luck may raise chest chance and/or rarity within bounded limits
+   - consider at most one ordinary random chest per wave to avoid runaway luck snowballing
+   - elite/boss rewards may use stronger or guaranteed chest rules later
+6. Expand item pool from 18 toward about 30-35 meaningful items
+   - every new item should ideally connect to at least two weapons/items/stats
+   - favor interaction, trade-offs and build identity over flat `+damage` filler
+7. Elites / stronger enemy roles
+8. Boss relics / divine blessings after milestone bosses
+9. Weapon evolutions based on tier-IV weapon + compatible build pieces
+10. Risk/reward wave choices
+11. Meta unlocks, difficulty tiers and additional arenas
+
+The detailed rationale and ideas live in `docs/ROADMAP.md`.
+
+## Core gameplay loop
+
+1. Control Denti inside the arena.
+2. Enemies spawn during a timed wave.
+3. Enemies chase, shoot at or otherwise pressure Denti.
+4. Weapons attack automatically.
+5. Defeated enemies drop XP and coins, with rare special drops possible.
+6. XP grants level-ups: pause and choose one of three stat upgrades.
+7. Coins fund the between-wave shop.
+8. Shop purchases define the build more strongly than level-up stats.
+9. Weapons can fuse into higher tiers.
 10. Start the next, harder wave.
+11. Boss milestones should increasingly create run-defining choices.
 
-The player should mainly make decisions through:
+The player should make meaningful decisions through:
+
 - movement and positioning
 - level-up choices
-- weapons
-- shop purchases
+- weapon selection and fusion
+- shop purchases and rerolls
 - item synergies
+- chest keep/scrap choices
+- later: relics, evolutions and risk/reward wave decisions
 
-
-## Progression Philosophy
+## Progression philosophy
 
 XP and money serve different purposes.
 
 ### XP
 
-XP grants level-ups.
-
-Level-ups should primarily improve basic stats.
-
-Examples:
+XP primarily improves basic stats:
 
 - Bisskraft: damage
 - Härte: armor / damage reduction
 - Schmelz: maximum health
 - Putzeifer: attack speed
-- Glanz: critical chance / luck
+- Glanz: critical chance
 - Speichel: regeneration
 - Bewegung: movement speed
-
-Names may evolve, but dental-themed stat names are preferred.
+- Zahnglück / Glück: luck
 
 ### Coins
 
-Coins are used in the shop.
+Coins are used in the shop and should create stronger build identity than level-ups.
 
-Shop purchases should define the player's build more strongly than level-ups.
+Items should create trade-offs and synergies rather than only flat increases.
 
-Examples:
+### Future progression layers
 
-- Metallkrone
-- Goldkrone
-- Zahnseide
-- Fluoridgel
-- Implantat
-- Zahnbürste
-- Mundspülung
-- Bohrer
+Keep these conceptually distinct:
 
-Items should ideally create interesting trade-offs and synergies rather than only providing flat stat increases.
+- stats = frequent incremental power
+- shop items/weapons = build construction
+- chests = opportunistic in-run reward + keep/scrap decision
+- boss relics = rare rule-changing run modifiers
+- weapon evolutions = explicit build goals / payoff
+- meta progression = mostly unlocks and difficulty options, not mandatory permanent stat inflation
 
+## Build families to deepen
 
-## Initial Prototype Scope
+Current and future items should reinforce recognizable families such as:
 
-Do not overbuild the first version.
+- Cut / bleed
+- Water / electricity / chaining
+- Crit / shine / holy effects
+- Armor / shields / retaliation
+- Economy / luck / loot
+- Projectile / pierce / split
+- AoE / explosions
+- Healing / saliva / overheal
+- High-risk sugar / caries items with strong upside and real downside
 
-The first playable prototype should contain approximately:
-
-- 1 playable character: Denti
-- 1 arena
-- 3 enemy types
-- 3 weapons
-- 10–20 items
-- 6–8 player stats
-- 10 waves
-- 1 simple boss
-- level-up selection
-- shop between waves
-- basic game-over and restart flow
-
-Placeholder visuals are acceptable until proper assets exist.
-
-Prioritize a fun, working gameplay loop over polish.
-
-
-## Project Structure
-
-Use the following structure where possible:
-
-denti/
-├── project.godot
-├── AGENTS.md
-├── scenes/
-│   ├── game/
-│   ├── player/
-│   ├── enemies/
-│   └── ui/
-├── scripts/
-│   ├── player/
-│   ├── enemies/
-│   ├── systems/
-│   └── weapons/
-├── data/
-│   ├── items/
-│   ├── enemies/
-│   └── weapons/
-├── assets/
-│   ├── denti/
-│   ├── enemies/
-│   ├── items/
-│   ├── ui/
-│   └── environment/
-└── tests/
-
+A funny "bad dental hygiene" build is desirable: forbidden candy, sugar rush, cola-like effects, etc. These should be legitimate risk/reward mechanics rather than joke-only dead items.
 
 ## Architecture
 
-Keep gameplay systems modular.
-
-Prefer composition over deep inheritance hierarchies.
-
-Avoid large all-purpose scripts.
+Keep gameplay systems modular. Prefer composition over deep inheritance. Avoid large all-purpose scripts.
 
 Separate responsibilities such as:
 
-- player movement
-- health
-- stats
-- weapons
+- movement
+- health/stats
+- weapons and targeting
 - damage
-- enemy spawning
-- wave progression
-- XP
-- leveling
-- loot
+- enemy spawning and projectile patterns
+- wave progression and wave events
+- XP/loot
 - shop
 - item effects
+- chests/rewards
 - UI
+- telemetry/debug tools
 
-Systems should communicate using clear interfaces and Godot signals where appropriate.
+Use signals and clear interfaces where practical. Avoid tightly coupling UI to gameplay logic.
 
-Avoid tightly coupling UI code to gameplay logic.
+## Data-driven design
 
-## Data-Driven Design
+Items, weapons, enemies and upgrades should remain data-driven using Godot Resources where practical, e.g. `ItemData`, `WeaponData`, `EnemyData`, `UpgradeData`.
 
-Items, weapons and enemies should be data-driven wherever practical.
-
-Prefer custom Godot `Resource` types for structured gameplay data.
-
-Examples:
-
-- ItemData
-- WeaponData
-- EnemyData
-- UpgradeData
-
-Gameplay values should generally not be scattered as magic numbers throughout scripts.
-
-A weapon definition should be able to describe things such as:
-
-- display name
-- description
-- icon
-- damage
-- attack speed
-- range
-- projectile speed
-- number of projectiles
-- rarity
-
-An item definition should be able to describe things such as:
-
-- display name
-- description
-- rarity
-- price
-- stat changes
-- special effects
-- icon
-
+Do not scatter gameplay values as magic numbers. New systems such as chest tables, projectile patterns, elite modifiers or relics should also be data-driven where doing so keeps iteration simple.
 
 ## Stats
 
-Player stats should have one authoritative source.
+Player stats should have one authoritative source. Level-ups, items, buffs and debuffs should modify the same underlying stat model. Recalculate derived stats consistently.
 
-Avoid duplicating stat values across multiple nodes.
-
-Changes caused by:
-- level-ups
-- items
-- buffs
-- debuffs
-
-should modify the same underlying stat system.
-
-Derived stats should be recalculated consistently.
-
+When balancing scaling, watch for accidental multiplicative explosions across weapon tier, crit, boss multipliers, item multipliers and armor-to-damage effects.
 
 ## Weapons
 
-Weapons should normally attack automatically.
+Weapons normally attack automatically. Reuse targeting/attack components instead of making every weapon a completely unrelated special case.
 
-Possible targeting strategies include:
+Current weapon documentation is in `docs/waffen.md`.
 
-- nearest enemy
-- random nearby enemy
-- direction of movement
-- radial attack
-- orbiting weapon
-- area-of-effect around Denti
+Future weapon evolutions should require a meaningful combination, for example a tier-IV weapon plus one or more compatible items. Do not add evolutions until combat pressure and baseline balance are healthy.
 
-Weapon implementations should share reusable components where reasonable.
+## Enemies and waves
 
-Avoid implementing every weapon as a completely unrelated special case.
+Trash enemies are allowed to die fast. Difficulty should come from a mixture of:
 
+- density
+- varied movement speed and durability
+- ranged/projectile pressure
+- horde bursts
+- elites
+- telegraphed hazards
+- boss phases and adds
 
-## Enemies
+Prefer interesting pressure to universal HP inflation.
 
-Enemies should initially remain simple.
+Waves may contain sub-events, e.g. normal spawn -> small horde -> ranged pressure -> large horde -> elite -> final rush. Keep enough randomness that runs do not feel scripted identically.
 
-Basic enemy behavior:
+## Bosses
 
-- spawn outside or near the visible arena bounds
-- move toward Denti
-- deal contact damage
-- have health
-- die when health reaches zero
-- optionally drop XP and coins
+Bosses must live long enough for the player to interact with their mechanics. A 2-5 second boss kill is considered a balance failure for the current design direction.
 
-Different enemies should vary through combinations of:
+Use telegraphs. Bullet-hell attacks should be readable and dodgeable, not arbitrary unavoidable damage.
 
-- movement speed
-- health
-- size
-- damage
-- spawn frequency
-- special behavior
+Boss phases can add:
 
-Avoid complex AI unless required by gameplay.
+- radial projectile bursts
+- aimed volleys
+- arena lanes / floor warnings
+- adds
+- charge attacks
+- temporary damage reduction or vulnerability windows
+- faster/mixed patterns at health thresholds
 
+## Shop and items
 
-## Waves
+The shop already supports rarity progression, rerolls, item stacks, weapon purchases/fusion and selling.
 
-Wave difficulty should scale predictably.
+New items should increase synergy density. Before adding a flat-stat item, ask whether it creates a new decision or connects existing mechanics.
 
-Possible scaling values include:
-
-- enemy health
-- enemy damage
-- spawn rate
-- enemy variety
-- elite enemies
-
-Wave progression should be controlled by a dedicated system rather than being embedded in enemy scripts.
-
-
-## Shop
-
-The shop appears between waves.
-
-Initial shop functionality:
-
-- display several random offers
-- show price
-- buy item or weapon
-- reroll offers for coins
-- continue to next wave
-
-Future possibilities may include:
-
-- locking an offer
-- rarity progression
-- discounts
-- selling
-- combining items
-
-Do not implement these future systems until they are needed.
-
+See `docs/items.md` for current effects.
 
 ## UI
 
-UI should be functional before it is beautiful.
+Keep HUD/cards/buttons coherent with the warm cartoon dental style. Combat readability is more important than decorative complexity, especially as enemy/projectile density rises.
 
-Important HUD elements:
+For bullet hell:
 
-- health
-- XP
-- current level
-- coins
-- wave number
-- wave timer
+- enemy projectiles must remain visually distinct from player projectiles
+- telegraphs must be readable under heavy effects
+- avoid VFX that obscure hazards
+- preserve performance with large enemy counts
 
-Level-up UI:
+Keyboard/controller support can be added later unless a task specifically targets it.
 
-- pause gameplay
-- show 3 upgrade cards
-- clearly show what each upgrade changes
+## Denti - canonical character reference
 
-Shop UI:
+Denti is the mascot: a cute small anthropomorphic white/ivory tooth with a divine/holy visual joke.
 
-- clearly show item name
-- effect
-- price
-- rarity if relevant
+Important current design decision: base Denti begins visually unarmed / "naked". The base reference is `assets/denti/reference/denti-initial.png` / `assets/denti/denti_unarmed.png` where appropriate. The upgraded/crowned imagery is useful as upgraded, promotional or equipment-state art, but a golden crown is not required as permanent base equipment.
 
-Menus should work well with mouse input first.
+Preserve Dentis recognizable face, tooth silhouette, proportions and friendly tone. Equipment may be visually added for humor/readability, but gameplay equipment does not need literal representation if it hurts clarity.
 
-Keep HUD, cards, buttons and typography visually cohesive with Denti's warm cartoon artwork. When using third-party UI assets or fonts, verify that the license permits game use, keep required license notices, and credit the source in `CREDITS.md` and the in-game credits.
+Never overwrite original reference images.
 
-Keyboard/controller support can be added later.
+## Art direction and humor
 
-## Denti - Canonical Character Reference
+Colorful, readable, playful 2D art. Dental terminology and short jokes are encouraged.
 
-Denti is the main character and mascot of the game.
+Humor should stay concise enough not to block gameplay. "Alle huldigen dem Denti" remains a valid achievement/joke direction.
 
-The canonical visual reference is:
+## Testing and implementation style
 
-`assets/denti/reference/denti-upgraded.png`
+Use typed GDScript where practical. Prefer small testable systems.
 
-This image defines Denti's core visual identity.
+When changing combat scaling, waves, loot, shop, save state or item effects, update/add automated tests where reasonable.
 
-When creating or integrating new Denti artwork, sprites, animations,
-portraits, icons or promotional material, preserve the recognizable
-design of the reference character.
+After the initial Godot import, the existing tests can be run with the command documented in `README.md`.
 
-### Core visual traits
-
-Denti is:
-
-- a small anthropomorphic tooth
-- cute and friendly rather than realistic
-- primarily white / ivory
-- wearing a small golden crown
-- expressive and cheerful
-- associated with divine / holy imagery in a humorous way
-- visually simple enough to remain recognizable at small sprite sizes
-
-Denti should feel like a tiny dental god and mascot.
-
-Do not redesign Denti into a generic human character or realistic tooth.
-Do not significantly change his proportions, crown, face or overall
-silhouette without an explicit design decision.
-
-### Gameplay Artwork
-
-Gameplay sprites may simplify the reference design for readability.
-
-It is acceptable to:
-- exaggerate facial expressions
-- simplify details
-- change poses
-- add weapons and equipment
-- temporarily display equipped items such as crowns or dental tools
-
-However, Denti should always remain immediately recognizable as the same
-character.
-
-Generated Denti assets should be stored beneath:
-
-`assets/denti/`
-
-The original reference image must never be overwritten.
-
-### Equipment Representation
-
-Denti's golden crown is part of his canonical character design and does
-not represent an equipped gameplay item.
-
-Gameplay items such as "Metallkrone" are independent from Denti's
-default crown.
-
-Equipped items do not necessarily need to appear literally on the
-character. Visual equipment representation is optional and should favor
-readability and humor over realism.
-
-
-## Art Direction
-
-The intended visual style is colorful, readable and playful.
-
-The game may use:
-- pixel art
-- voxel-inspired pixel art
-- stylized 2D sprites
-
-Denti is a small divine tooth mascot.
-
-The dental theme should remain obvious.
-
-Do not generate temporary visual assets inside code if an existing placeholder asset can be reused.
-
-Keep asset paths organized beneath `assets/`.
-
-
-## Humor and Naming
-
-Humor is an important part of the project.
-
-Item names, descriptions and achievements may use dental jokes.
-
-Examples:
-
-Metallkrone
-
-+3 Härte
--3% Bewegung
-
-"Unzerstörbar. Außer bei Karamell."
-
-Possible achievement:
-
-"Alle huldigen dem Denti"
-
-Humor should be short and readable rather than filling the UI with large amounts of text.
-
-
-## GDScript Style
-
-Use typed GDScript where practical.
-
-Prefer:
-
-```gdscript
-var health: float = 100.0
-var level: int = 1
+Do not blindly implement every roadmap idea at once. Preserve a playable build and iterate in small vertical slices: implement -> test -> play -> measure -> rebalance.

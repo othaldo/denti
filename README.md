@@ -45,6 +45,8 @@ Zu Beginn wählst du eine Startwaffe. Im Kampf sammelst du XP für einen von dre
 
 Das Spiel ist ein **spielbarer Prototyp**. Balancing, Effekte und weitere Inhalte sind noch in Arbeit.
 
+Die aktuelle Entwicklungsrichtung für v0.2 ist **Pressure + Build Depth**: mehr Gegnerdruck, häufigere Horden, Bullet-Hell-Muster, besseres Boss-Balancing, seltene Item-Kisten mit Behalten/Scrappen und deutlich mehr Synergien. Details stehen in der [v0.2-Roadmap](docs/ROADMAP.md).
+
 ## Entwicklung
 
 Nach dem ersten Godot-Import lassen sich die Tests so ausführen:
