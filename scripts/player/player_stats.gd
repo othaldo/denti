@@ -48,10 +48,10 @@ func _process(delta: float) -> void:
 		changed.emit()
 
 
-func roll_damage(multiplier: float = 1.0) -> float:
+func roll_damage(multiplier: float = 1.0, bonus_crit: float = 0.0, critical_multiplier: float = 1.5, guaranteed_crit: bool = false) -> float:
 	var result := damage * multiplier
-	last_roll_critical = randf() < crit_chance
-	return result * 1.5 if last_roll_critical else result
+	last_roll_critical = guaranteed_crit or randf() < clampf(crit_chance + bonus_crit, 0.0, 1.0)
+	return result * critical_multiplier if last_roll_critical else result
 
 
 func take_damage(amount: float) -> float:

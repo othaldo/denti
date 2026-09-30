@@ -3,6 +3,7 @@ extends Resource
 
 @export var id: StringName
 @export var display_name: String
+@export var role: String
 @export_multiline var description: String
 @export var hands: int = 1
 @export var attack_mode: StringName = &"projectile"
@@ -30,6 +31,18 @@ extends Resource
 @export var splash_tiers: PackedFloat32Array
 @export var knockback_tiers: PackedFloat32Array
 @export var boss_bonus_tiers: PackedFloat32Array
+@export var attack_width: float = 18.0
+@export var arc_degrees: float = 60.0
+@export var crit_bonus: float = 0.0
+@export var crit_multiplier: float = 1.5
+@export var crit_cycle: int = 0
+@export var focus_step: float = 0.0
+@export var focus_cap: float = 0.0
+@export var trash_damage_factor: float = 1.0
+@export var elite_damage_bonus: float = 0.0
+@export var enamel_exposure: float = 0.0
+@export var exposure_duration: float = 0.0
+@export var projectile_shape: StringName = &"orb"
 
 
 func damage_at_tier(tier: int) -> float:
@@ -67,11 +80,11 @@ func stats_text(tier: int) -> String:
 	if projectile_count_tiers.size() > 0:
 		var count := projectile_count_at_tier(tier)
 		result += " · %d %s" % [count, "Geschoss" if count == 1 else "Geschosse"]
-	elif pierce_tiers.size() > 0:
+	if pierce_tiers.size() > 0:
 		result += " · %d Durchschlag" % pierce_at_tier(tier)
-	elif splash_tiers.size() > 0:
+	if splash_radius > 0.0 or splash_tiers.size() > 0:
 		result += " · %d Explosionsradius" % roundi(splash_at_tier(tier))
-	elif boss_bonus_tiers.size() > 0:
+	if boss_bonus_tiers.size() > 0:
 		result += " · +%d %% Boss" % roundi(boss_bonus_tiers[clampi(tier, 1, 4) - 1] * 100.0)
 	return result
 
@@ -82,20 +95,46 @@ func combat_text() -> String:
 		result += " · Blutung %.1f Schaden/s (%.1f s)" % [bleed_dps, bleed_duration]
 	if wet_duration > 0.0:
 		result += " · Nass %.1f s" % wet_duration
+	if crit_bonus > 0.0 or crit_multiplier > 1.5:
+		result += " · +%d %% Waffen-Crit · ×%.1f Crit" % [roundi(crit_bonus * 100.0), crit_multiplier]
+	if focus_cap > 0.0:
+		result += " · Ziel-Fokus bis +%d %%" % roundi(focus_cap * 100.0)
+	if crit_cycle > 0:
+		result += " · Jeder %d. Treffer auf dasselbe Ziel kritisch" % crit_cycle
+	if enamel_exposure > 0.0:
+		result += " · +%d %% Schmelzschaden für %.1f s (nicht stapelbar)" % [roundi(enamel_exposure * 100.0), exposure_duration]
+	if trash_damage_factor < 1.0:
+		result += " · %d %% Schaden gegen normale Gegner" % roundi(trash_damage_factor * 100.0)
+	if elite_damage_bonus > 0.0:
+		result += " · +%d %% gegen Eliten" % roundi(elite_damage_bonus * 100.0)
+	if attack_mode in [&"thrust", &"beam_line"]:
+		result += " · Durchgehende Trefferlinie"
+	if attack_mode in [&"cone", &"sweep"]:
+		result += " · %d° Frontbogen" % roundi(arc_degrees)
 	return result
 
 
 func estimated_dps(tier: int, player_damage: float, crit_chance: float, attack_interval: float, item_interval_factor: float) -> float:
-	var hit := player_damage * damage_at_tier(tier) / 18.0 * (1.0 + crit_chance * 0.5)
+	var chance := clampf(crit_chance + crit_bonus, 0.0, 1.0)
+	if crit_cycle > 0:
+		chance = 1.0 / float(crit_cycle) + (1.0 - 1.0 / float(crit_cycle)) * chance
+	var hit := player_damage * damage_at_tier(tier) / 18.0 * (1.0 + chance * (crit_multiplier - 1.0)) * trash_damage_factor
 	var cooldown := interval_at_tier(tier) * attack_interval / 0.65 * item_interval_factor
 	return hit * (1.0 + 0.55 * float(projectile_count_at_tier(tier) - 1)) / maxf(cooldown, 0.01)
 
 
 func damage_against(enemy: Node2D, attack_damage: float, tier: int = 1) -> float:
 	var enemy_data: EnemyData = enemy.get("data") as EnemyData
+	var result := attack_damage
+	if not enemy_data.is_boss and not enemy_data.is_elite:
+		result *= trash_damage_factor
+	if enemy_data.is_elite:
+		result *= 1.0 + elite_damage_bonus
+	if damage_type == "Schmelz" and float(enemy.get("exposure_time")) > 0.0:
+		result *= 1.0 + float(enemy.get("enamel_exposure"))
 	if damage_type == "Bohrung" and enemy_data.is_boss:
 		var bonus := boss_bonus_tiers[clampi(tier, 1, 4) - 1] if boss_bonus_tiers.size() >= clampi(tier, 1, 4) else 0.25
-		return attack_damage * (1.0 + bonus)
+		return result * (1.0 + bonus)
 	if damage_type == "Schnitt" and float(enemy.get("health")) >= float(enemy.get("max_health")) * 0.95:
-		return attack_damage * 1.15
-	return attack_damage
+		return result * 1.15
+	return result

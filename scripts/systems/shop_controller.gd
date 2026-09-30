@@ -40,6 +40,16 @@ const CATALOG: Array[ShopOfferData] = [
 	preload("res://data/weapons/shop_enamel_mirror.tres"),
 	preload("res://data/weapons/shop_plaque_scaler.tres"),
 	preload("res://data/weapons/shop_mouthwash_mortar.tres"),
+	preload("res://data/weapons/shop_toothpick_spear.tres"),
+	preload("res://data/weapons/shop_cavity_grinder.tres"),
+	preload("res://data/weapons/shop_interdental_brush.tres"),
+	preload("res://data/weapons/shop_fluoride_sprayer.tres"),
+	preload("res://data/weapons/shop_water_turbine.tres"),
+	preload("res://data/weapons/shop_uv_lamp.tres"),
+	preload("res://data/weapons/shop_amalgam_slingshot.tres"),
+	preload("res://data/weapons/shop_floss_garrote.tres"),
+	preload("res://data/weapons/shop_prophylaxis_polisher.tres"),
+	preload("res://data/weapons/shop_fluoride_rocket.tres"),
 ]
 const WEAPON_CHANCE := 0.35
 const SAME_WEAPON_CHANCE := 0.30

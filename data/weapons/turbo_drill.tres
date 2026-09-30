@@ -3,6 +3,7 @@
 [ext_resource type="Texture2D" path="res://assets/weapons/turbo_drill.png" id="2"]
 [resource]
 script = ExtResource("1")
+role = "Boss-Fokus im Nahkampf"
 id = &"turbo_drill"
 display_name = "Turbo-Bohrer"
 description = "Einhand · Nahkampf · Bossbonus wächst von 25 auf 40 %"

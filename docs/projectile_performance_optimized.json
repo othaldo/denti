@@ -1,0 +1,60 @@
+{
+	"adapter": "NVIDIA GeForce RTX 4070",
+	"display": "Windows",
+	"label": "optimized",
+	"renderer": "gl_compatibility",
+	"samples": [
+		{
+			"draw_calls": 32.0,
+			"fps": 1736.3020285782,
+			"frame_ms_max": 1.197,
+			"frame_ms_mean": 0.575821050207276,
+			"frame_ms_p95": 0.72,
+			"frames": 4342,
+			"peak_enemy_bullets": 0,
+			"scenario": "visible_bullets_0"
+		},
+		{
+			"draw_calls": 33.0,
+			"fps": 1573.0368528067,
+			"frame_ms_max": 1.399,
+			"frame_ms_mean": 0.635602694458566,
+			"frame_ms_p95": 0.842,
+			"frames": 3934,
+			"peak_enemy_bullets": 200,
+			"scenario": "visible_bullets_200"
+		},
+		{
+			"draw_calls": 33.1898954703833,
+			"fps": 1376.9814599282,
+			"frame_ms_max": 2.348,
+			"frame_ms_mean": 0.726116144018581,
+			"frame_ms_p95": 1.07,
+			"frames": 3444,
+			"peak_enemy_bullets": 599,
+			"scenario": "visible_bullets_600"
+		},
+		{
+			"draw_calls": 33.1820606868956,
+			"fps": 1199.2560533639,
+			"frame_ms_max": 3.184,
+			"frame_ms_mean": 0.833738912970991,
+			"frame_ms_p95": 1.285,
+			"frames": 2999,
+			"peak_enemy_bullets": 999,
+			"scenario": "visible_bullets_1000"
+		},
+		{
+			"draw_calls": 505.272626931567,
+			"fps": 402.476787062459,
+			"frame_ms_max": 12.461,
+			"frame_ms_mean": 2.48447792494481,
+			"frame_ms_p95": 3.389,
+			"frames": 1812,
+			"peak_enemy_bullets": 211,
+			"scenario": "emperor_9_volleys_200_enemies_6_weapons"
+		}
+	],
+	"viewport": "(1280, 720)",
+	"vsync": "disabled"
+}

@@ -3,6 +3,7 @@
 [ext_resource type="Texture2D" path="res://assets/weapons/plaque_scaler.png" id="2"]
 [resource]
 script = ExtResource("1")
+role = "Blutung schnell aufbauen"
 id = &"plaque_scaler"
 display_name = "Zahnsteinkratzer"
 description = "Einhand · Nahkampf · schnelle Schnitte bauen Blutung auf"

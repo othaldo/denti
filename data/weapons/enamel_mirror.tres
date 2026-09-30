@@ -3,6 +3,7 @@
 [ext_resource type="Texture2D" path="res://assets/weapons/enamel_mirror.png" id="2"]
 [resource]
 script = ExtResource("1")
+role = "Präziser Lichttreffer"
 id = &"enamel_mirror"
 display_name = "Schmelzspiegel"
 description = "Einhand · Lichtstrahl · sofortiger Treffer"

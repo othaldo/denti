@@ -84,6 +84,10 @@ func _run() -> void:
 	var offer: ShopOfferData = game.shop.offers[0]
 	var coins_before_purchase: int = game.coins
 	game.shop_panel.offer_buttons[0].pressed.emit()
+	if game.coins != coins_before_purchase:
+		_fail("selecting an offer bought it immediately")
+		return
+	game.shop_panel.offer_buttons[0].buy_button.pressed.emit()
 	if game.coins != coins_before_purchase - offer.price or game.shop.offers[0] != null or not game.shop_panel.offer_buttons[0].disabled:
 		_fail("shop card did not complete a purchase and update")
 		return

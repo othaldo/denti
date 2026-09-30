@@ -45,12 +45,17 @@ var pulse_flash_time: float = 0.0
 var dying: bool = false
 var death_elapsed: float = 0.0
 var is_enraged: bool = false
+var overtime_active: bool = false
+var overtime_seconds: int = 0
+var overtime_tick: float = 0.0
 var sprite_base_scale: Vector2 = Vector2.ONE
 var bleed_stacks: int = 0
 var bleed_dps: float = 0.0
 var bleed_time: float = 0.0
 var bleed_tick: float = 1.0
 var wet_time: float = 0.0
+var exposure_time: float = 0.0
+var enamel_exposure: float = 0.0
 var haste_time: float = 0.0
 var haste_bonus: float = 0.0
 var aura_timer: float = 0.0
@@ -131,6 +136,12 @@ func _process(delta: float) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	_tick_overtime(delta)
+	if exposure_time > 0.0:
+		exposure_time = maxf(exposure_time - delta, 0.0)
+		if exposure_time <= 0.0:
+			enamel_exposure = 0.0
+			queue_redraw()
 	if haste_time > 0.0:
 		haste_time = maxf(haste_time - delta, 0.0)
 		if haste_time <= 0.0:
@@ -148,7 +159,7 @@ func _physics_process(delta: float) -> void:
 				boss_phase_burst_fired = true
 				_fire_phase_burst()
 		if boss_radial_volleys_remaining > 0:
-			boss_radial_volley_timer -= delta
+			boss_radial_volley_timer -= delta * overtime_attack_factor()
 			while boss_radial_volleys_remaining > 0 and boss_radial_volley_timer <= 0.0:
 				_fire_next_boss_radial_volley()
 		if boss_phase_timer > 0.0 or boss_radial_volleys_remaining > 0:
@@ -186,7 +197,7 @@ func _physics_process(delta: float) -> void:
 	var closest := Geometry2D.get_closest_point_to_segment(target.global_position, before_move, global_position)
 	if closest.distance_to(target.global_position) < data.radius + 20.0 and contact_timer <= 0.0:
 		var damage := attack_damage if charging else contact_damage
-		contact_timer = 0.8
+		contact_timer = 0.8 / overtime_attack_factor()
 		target.take_hit(damage)
 
 
@@ -196,7 +207,7 @@ func _process_special(delta: float, direction: Vector2) -> void:
 	var chase_speed := _movement_speed()
 	match special_phase:
 		SpecialPhase.COOLDOWN:
-			special_timer = maxf(special_timer - delta, 0.0)
+			special_timer = maxf(special_timer - delta * overtime_attack_factor(), 0.0)
 			var distance := global_position.distance_to(target.global_position)
 			if special_timer <= 0.0 and distance <= active_trigger_range:
 				special_phase = SpecialPhase.WARNING
@@ -226,9 +237,9 @@ func _process_special(delta: float, direction: Vector2) -> void:
 				_activate_special()
 		SpecialPhase.ACTIVE:
 			if active_special_attack == EnemyData.SpecialAttack.BOSS:
-				global_position = global_position.move_toward(boss_dash_end, data.attack_speed * delta)
+				global_position = global_position.move_toward(boss_dash_end, data.attack_speed * overtime_speed_factor() * delta)
 			else:
-				global_position += special_direction * data.attack_speed * delta
+				global_position += special_direction * data.attack_speed * overtime_speed_factor() * delta
 				var margin := DentiArena.WALL_WIDTH + data.radius + 6.0
 				global_position = global_position.clamp(Vector2.ONE * margin, target.arena.arena_size - Vector2.ONE * margin)
 			special_timer -= delta
@@ -241,8 +252,55 @@ func _process_special(delta: float, direction: Vector2) -> void:
 				_reset_special()
 
 
+# Overtime is independent of the existing half-health rage phase.
+func start_overtime() -> void:
+	if not data.is_boss or overtime_active or dying or health <= 0.0:
+		return
+	overtime_active = true
+	is_enraged = true
+	enraged.emit(global_position)
+	queue_redraw()
+
+
+func _tick_overtime(delta: float) -> void:
+	if not overtime_active or dying or health <= 0.0 or target == null or target.stats.health <= 0.0:
+		return
+	overtime_tick += maxf(delta, 0.0)
+	var ticks := floori(overtime_tick + 0.000001)
+	if ticks > 0:
+		overtime_tick = maxf(overtime_tick - ticks, 0.0)
+		advance_overtime(ticks)
+
+
+func advance_overtime(seconds: int) -> void:
+	if not data.is_boss or seconds <= 0:
+		return
+	var next := overtime_seconds + seconds
+	var damage_factor := (1.0 + data.overtime_damage_per_second * next) / (1.0 + data.overtime_damage_per_second * overtime_seconds)
+	var health_factor := (1.0 + data.overtime_health_per_second * next) / (1.0 + data.overtime_health_per_second * overtime_seconds)
+	contact_damage *= damage_factor
+	attack_damage *= damage_factor
+	max_health *= health_factor
+	health *= health_factor
+	boss_damage_budget *= health_factor
+	overtime_seconds = next
+	queue_redraw()
+
+
+func overtime_speed_factor() -> float:
+	return 1.0 + data.overtime_speed_per_second * overtime_seconds
+
+
+func overtime_attack_factor() -> float:
+	return 1.0 + data.overtime_attack_rate_per_second * overtime_seconds
+
+
+func overtime_defense_factor() -> float:
+	return 1.0 + data.overtime_defense_per_second * overtime_seconds
+
+
 func _movement_speed() -> float:
-	return move_speed * (1.0 + haste_bonus if haste_time > 0.0 else 1.0)
+	return move_speed * overtime_speed_factor() * (1.0 + haste_bonus if haste_time > 0.0 else 1.0)
 
 
 func apply_haste(bonus: float, duration: float) -> void:
@@ -343,7 +401,7 @@ func _fire_next_boss_radial_volley() -> void:
 	var root := _projectile_root()
 	var volley_angle := boss_phase_gap_angle + deg_to_rad(data.boss_radial_angle_step_degrees * float(boss_radial_volley_index))
 	if root != null:
-		EnemyProjectilePatterns.fire_radial(root, global_position, data.boss_radial_count + boss_phase * 2, volley_angle, data.boss_projectile_speed, attack_damage * 0.55, target)
+		EnemyProjectilePatterns.fire_radial(root, global_position, data.boss_radial_count + boss_phase * 2, volley_angle, data.boss_projectile_speed * overtime_speed_factor(), attack_damage * 0.55, target)
 	boss_radial_volley_index += 1
 	boss_radial_volleys_remaining -= 1
 	if boss_radial_volleys_remaining > 0:
@@ -362,13 +420,13 @@ func _fire_boss_signature(charge_direction: Vector2) -> void:
 		return
 	match data.boss_signature:
 		EnemyData.BossSignature.AIMED_FAN:
-			EnemyProjectilePatterns.fire_aimed_fan(root, global_position, target.global_position - global_position, maxi(data.boss_fan_count + difficulty.boss_volley_bonus * 2, 1), data.boss_projectile_speed, attack_damage * 0.45, target)
+			EnemyProjectilePatterns.fire_aimed_fan(root, global_position, target.global_position - global_position, maxi(data.boss_fan_count + difficulty.boss_volley_bonus * 2, 1), data.boss_projectile_speed * overtime_speed_factor(), attack_damage * 0.45, target)
 		EnemyData.BossSignature.TRAIL_FAN:
-			EnemyProjectilePatterns.fire_aimed_fan(root, global_position, -charge_direction, maxi(data.boss_fan_count + difficulty.boss_volley_bonus * 2, 1), data.boss_projectile_speed, attack_damage * 0.45, target)
+			EnemyProjectilePatterns.fire_aimed_fan(root, global_position, -charge_direction, maxi(data.boss_fan_count + difficulty.boss_volley_bonus * 2, 1), data.boss_projectile_speed * overtime_speed_factor(), attack_damage * 0.45, target)
 		EnemyData.BossSignature.LANE:
-			EnemyProjectilePatterns.fire_lane(root, global_position, charge_direction, maxi(data.boss_signature_projectile_count + difficulty.boss_volley_bonus, 1), data.boss_signature_projectile_spacing, data.boss_projectile_speed, attack_damage * 0.45, target, EnemyProjectilePatterns.BOSS_COLOR)
+			EnemyProjectilePatterns.fire_lane(root, global_position, charge_direction, maxi(data.boss_signature_projectile_count + difficulty.boss_volley_bonus, 1), data.boss_signature_projectile_spacing, data.boss_projectile_speed * overtime_speed_factor(), attack_damage * 0.45, target, EnemyProjectilePatterns.BOSS_COLOR)
 		EnemyData.BossSignature.SPACE_ORB:
-			EnemyProjectilePatterns.fire_space_orb(root, global_position, charge_direction, data.boss_projectile_speed, attack_damage * 0.5, data.boss_signature_orb_radius, target)
+			EnemyProjectilePatterns.fire_space_orb(root, global_position, charge_direction, data.boss_projectile_speed * overtime_speed_factor(), attack_damage * 0.5, data.boss_signature_orb_radius, target)
 
 
 func _projectile_root() -> Node2D:
@@ -388,10 +446,16 @@ func apply_wet(duration: float) -> void:
 	queue_redraw()
 
 
+func apply_enamel_exposure(bonus: float, duration: float) -> void:
+	enamel_exposure = maxf(enamel_exposure, clampf(bonus, 0.0, 0.30))
+	exposure_time = maxf(exposure_time, duration)
+	queue_redraw()
+
+
 func take_damage(amount: float, weapon: WeaponData = null, critical: bool = false, proc_id: StringName = &"") -> void:
 	if health <= 0.0:
 		return
-	var applied := maxf(amount * (1.0 - damage_reduction), 1.0)
+	var applied := maxf(amount * (1.0 - damage_reduction) / overtime_defense_factor(), 1.0)
 	if data.is_boss and data.boss_guard_recharge_seconds > 0.0:
 		if boss_phase_timer > 0.0:
 			_guard_boss_hit()
@@ -581,6 +645,8 @@ func _draw() -> void:
 		draw_arc(Vector2.ZERO, data.radius + 4.0, 0.0, TAU, 24, Color(0.78, 0.25, 0.48, 0.85), 2.5 + bleed_stacks)
 	if wet_time > 0.0:
 		draw_arc(Vector2.ZERO, data.radius + 8.0, 0.0, TAU, 24, Color(0.36, 0.86, 1.0, 0.88), 3.0)
+	if exposure_time > 0.0:
+		draw_arc(Vector2.ZERO, data.radius + 6.0, 0.0, TAU, 24, Color(0.65, 1.0, 0.70, 0.8), 2.0)
 	if haste_time > 0.0:
 		draw_arc(Vector2.ZERO, data.radius + 8.0, 0.0, TAU, 24, Color(1.0, 0.46, 0.73, 0.9), 3.0)
 	if data.is_elite:

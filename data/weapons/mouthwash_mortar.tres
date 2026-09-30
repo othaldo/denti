@@ -3,6 +3,7 @@
 [ext_resource type="Texture2D" path="res://assets/weapons/mouthwash_mortar.png" id="2"]
 [resource]
 script = ExtResource("1")
+role = "Horden mit Minzexplosionen räumen"
 id = &"mouthwash_mortar"
 display_name = "Mundspülungs-Mörser"
 description = "Zweihand · Fernkampf · platzende Minzbombe"

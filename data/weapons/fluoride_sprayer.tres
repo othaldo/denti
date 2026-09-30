@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/weapons/weapon_icons_expansion.png" id="2"]
+
+[sub_resource type="AtlasTexture" id="Atlas_weapon"]
+atlas = ExtResource("2")
+region = Rect2(1190, 0, 396, 397)
+filter_clip = true
+
+[resource]
+script = ExtResource("1")
+role = "Gegner für Schmelztreffer vorbereiten"
+id = &"fluoride_sprayer"
+display_name = "Fluorid-Sprüher"
+description = "Zweihand · Sprühkegel macht Gegner 2 s anfällig für +20 % Schmelzschaden. Kombiniere mit Paste und Raketen."
+sprite = SubResource("Atlas_weapon")
+hands = 2
+attack_mode = &"cone"
+damage_type = "Minze"
+base_damage = 5
+interval = 0.25
+attack_range = 155
+price = 14
+visual_angle_degrees = 25
+arc_degrees = 65
+enamel_exposure = 0.2
+exposure_duration = 2
+range_tiers = PackedFloat32Array(155, 165, 175, 185)
+damage_tiers = PackedFloat32Array(1.0, 1.25, 1.55, 1.90)
+grip_anchor = Vector2(0.60, 0.70)
+projectile_color = Color(0.60, 1.0, 0.71, 1)

@@ -225,7 +225,7 @@ func _run() -> void:
 				return
 		game.wave._process(game.wave.remaining)
 		if WaveController.is_boss_wave(expected_wave) and expected_wave < WaveController.MAX_WAVES:
-			if not game.boss_pending or game.get_node("ShopPanel").visible:
+			if not game.boss_pending or not game.boss.overtime_active or game.get_node("ShopPanel").visible:
 				_fail("mini-boss wave ended before the boss was defeated")
 				return
 			game.boss.boss_phase = 2
@@ -238,7 +238,7 @@ func _run() -> void:
 		if expected_wave < WaveController.MAX_WAVES and not game.get_node("ShopPanel").visible:
 			_fail("shop missing between waves")
 			return
-	if game.ended or not game.boss_pending or game.get_node("HUD").timer_label.text != "Boss besiegen!":
+	if game.ended or not game.boss_pending or not game.boss.overtime_active or not game.get_node("HUD").timer_label.text.begins_with("ENRAGE +"):
 		_fail("final timer ended the run before the boss was defeated")
 		return
 	var boss: Enemy = game.boss

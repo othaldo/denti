@@ -113,7 +113,7 @@ func preferred_tags(loadout: WeaponLoadout) -> Array[StringName]:
 				if not result.has(tag):
 					result.append(tag)
 	for weapon in loadout.equipped():
-		var tag: StringName = &"ranged" if weapon.data.attack_mode == &"projectile" or weapon.data.attack_mode == &"beam" else &"melee"
+		var tag: StringName = &"ranged" if weapon.data.attack_mode in [&"projectile", &"beam", &"beam_line", &"cone"] else &"melee"
 		if not result.has(tag):
 			result.append(tag)
 		if weapon.data.damage_type == "Schnitt" and not result.has(&"bleed"):
@@ -219,7 +219,7 @@ func on_kill(at: Vector2, is_boss: bool) -> int:
 
 func modify_damage(enemy: Enemy, weapon: WeaponData, base: float) -> float:
 	var value := base
-	value *= relics.damage_factor()
+	value *= base_weapon_damage_factor()
 	if enemy.data.is_boss:
 		value *= 1.0 + _power(&"boss_bonus")
 	if enemy.bleed_stacks > 0:
@@ -228,11 +228,16 @@ func modify_damage(enemy: Enemy, weapon: WeaponData, base: float) -> float:
 		value *= 1.0 + minf(_power(&"conductive_wet"), 0.36)
 	if player.is_moving:
 		value *= 1.0 + minf(_power(&"moving_damage"), 0.40)
-	value *= 1.0 + minf(maxf(player.stats.armor, 0.0) * _power(&"armor_damage"), 0.60)
 	return value
 
 
+func base_weapon_damage_factor() -> float:
+	return relics.damage_factor() * (1.0 + minf(maxf(player.stats.armor, 0.0) * _power(&"armor_damage"), 0.60))
+
+
 func on_weapon_hit(enemy: Enemy, amount: float, weapon: WeaponData, critical: bool) -> void:
+	if enemy.health > 0.0 and weapon.enamel_exposure > 0.0:
+		enemy.apply_enamel_exposure(weapon.enamel_exposure, weapon.exposure_duration)
 	if enemy.health > 0.0 and weapon.bleed_dps > 0.0:
 		var extra_stacks := roundi(_power(&"bleed_clock"))
 		enemy.apply_bleed(weapon.bleed_dps + _power(&"bleed"), weapon.bleed_duration + _power(&"bleed_clock"), 3 + extra_stacks)

@@ -1,8 +1,6 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=2 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/shop_panel.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/denti/denti_unarmed.png" id="2"]
-[ext_resource type="Script" path="res://scripts/ui/offer_card.gd" id="3"]
 
 [node name="ShopPanel" type="CanvasLayer"]
 process_mode = 3
@@ -45,76 +43,3 @@ theme_override_constants/margin_bottom = 10
 [node name="Rows" type="VBoxContainer" parent="Root/Center/Panel/Margin"]
 layout_mode = 2
 theme_override_constants/separation = 8
-
-[node name="Portrait" type="TextureRect" parent="Root/Center/Panel/Margin/Rows"]
-custom_minimum_size = Vector2(0, 78)
-layout_mode = 2
-mouse_filter = 2
-texture = ExtResource("2")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Title" type="Label" parent="Root/Center/Panel/Margin/Rows"]
-layout_mode = 2
-horizontal_alignment = 1
-text = "Zahnklinik"
-
-[node name="Wallet" type="PanelContainer" parent="Root/Center/Panel/Margin/Rows"]
-layout_mode = 2
-size_flags_horizontal = 4
-mouse_filter = 2
-
-[node name="WalletRow" type="HBoxContainer" parent="Root/Center/Panel/Margin/Rows/Wallet"]
-layout_mode = 2
-mouse_filter = 2
-theme_override_constants/separation = 4
-
-[node name="CoinIcon" type="TextureRect" parent="Root/Center/Panel/Margin/Rows/Wallet/WalletRow"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Coins" type="Label" parent="Root/Center/Panel/Margin/Rows/Wallet/WalletRow"]
-layout_mode = 2
-mouse_filter = 2
-text = "0 Münzen"
-
-[node name="Preview" type="Label" parent="Root/Center/Panel/Margin/Rows"]
-custom_minimum_size = Vector2(0, 25)
-layout_mode = 2
-mouse_filter = 2
-horizontal_alignment = 1
-vertical_alignment = 1
-text = "Nächste Welle"
-
-[node name="Offer1" type="Button" parent="Root/Center/Panel/Margin/Rows"]
-custom_minimum_size = Vector2(0, 100)
-layout_mode = 2
-script = ExtResource("3")
-
-[node name="Offer2" type="Button" parent="Root/Center/Panel/Margin/Rows"]
-custom_minimum_size = Vector2(0, 100)
-layout_mode = 2
-script = ExtResource("3")
-
-[node name="Offer3" type="Button" parent="Root/Center/Panel/Margin/Rows"]
-custom_minimum_size = Vector2(0, 100)
-layout_mode = 2
-script = ExtResource("3")
-
-[node name="Actions" type="HBoxContainer" parent="Root/Center/Panel/Margin/Rows"]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="Reroll" type="Button" parent="Root/Center/Panel/Margin/Rows/Actions"]
-custom_minimum_size = Vector2(242, 52)
-layout_mode = 2
-text = "Neu würfeln"
-
-[node name="Continue" type="Button" parent="Root/Center/Panel/Margin/Rows/Actions"]
-custom_minimum_size = Vector2(0, 52)
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Weiter"

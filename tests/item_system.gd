@@ -28,7 +28,8 @@ func _run() -> void:
 		return
 	game.shop.offers[0] = fluoride
 	game._update_shop_panel()
-	if not game.shop_panel.offer_buttons[0].disabled:
+	game.shop_panel.offer_buttons[0].pressed.emit()
+	if game.shop_panel.offer_buttons[0].disabled or not game.shop_panel.offer_buttons[0].buy_button.disabled:
 		_fail("maxed item offer stayed purchasable")
 		return
 	var original_offers: Array[ShopOfferData] = game.shop.offers.duplicate()

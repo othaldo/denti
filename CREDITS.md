@@ -9,6 +9,7 @@
 - Denti basiert auf den vorhandenen Referenzbildern unter `assets/denti/reference/`.
 - Der transparente Denti-Spiel-Sprite, die waffenlose Variante und die fünf Gegner-Sprites wurden mit OpenAI ImageGen erstellt.
 - Die acht einzelnen Waffensprites unter `assets/weapons/` wurden mit OpenAI ImageGen erstellt.
+- Der transparente Waffen-Erweiterungsatlas `assets/weapons/weapon_icons_expansion.png` mit zehn Waffenideen wurde mit OpenAI ImageGen erstellt; Prompt und Zellzuordnung stehen in `docs/WEAPON_ATLAS_PROMPT.md`.
 - Der Arena-Hintergrund unter `assets/environment/dental_arena_floor.png` wurde mit OpenAI ImageGen erstellt.
 - Die Item- und HUD-Icon-Atlanten unter `assets/items/` und `assets/ui/`, einschließlich der acht neuen Item-Symbole, wurden mit OpenAI ImageGen erstellt.
 - HUD, Karten, Buttons und Fortschrittsbalken sind eigene Godot-UI-Elemente. Es werden keine externen UI-Packs verwendet.

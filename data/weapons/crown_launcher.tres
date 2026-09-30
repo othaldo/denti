@@ -3,6 +3,7 @@
 [ext_resource type="Texture2D" path="res://assets/weapons/crown_launcher.png" id="2"]
 [resource]
 script = ExtResource("1")
+role = "Schwere Gegnerlinien durchbohren"
 id = &"crown_launcher"
 display_name = "Kronenwerfer"
 description = "Zweihand · Fernkampf · Durchschlag wächst mit Stufe"

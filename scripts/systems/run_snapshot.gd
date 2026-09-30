@@ -6,7 +6,9 @@ const ACID_PROJECTILE: PackedScene = preload("res://scenes/enemies/acid_projecti
 
 static func capture(game) -> Dictionary:
 	var enemies_data: Array[Dictionary] = []
+	var enemy_indices: Dictionary = {}
 	for enemy: Enemy in game.get_node("Enemies").get_children():
+		enemy_indices[enemy.get_instance_id()] = enemies_data.size()
 		enemies_data.append({
 			"type": enemy.data.resource_path, "position": _vector_data(enemy.position),
 			"health": enemy.health, "phase": enemy.special_phase,
@@ -14,9 +16,11 @@ static func capture(game) -> Dictionary:
 			"boss_move": enemy.boss_move, "boss_charge_next": enemy.boss_charge_next,
 			"boss_dash_end": _vector_data(enemy.boss_dash_end), "boss_dash_origin": _vector_data(enemy.boss_dash_origin),
 			"dying": enemy.dying, "death_elapsed": enemy.death_elapsed, "enraged": enemy.is_enraged,
+			"overtime_active": enemy.overtime_active, "overtime_seconds": enemy.overtime_seconds, "overtime_tick": enemy.overtime_tick,
 			"bleed_stacks": enemy.bleed_stacks, "bleed_dps": enemy.bleed_dps,
 			"bleed_time": enemy.bleed_time, "bleed_tick": enemy.bleed_tick,
 			"wet_time": enemy.wet_time,
+			"exposure_time": enemy.exposure_time, "enamel_exposure": enemy.enamel_exposure,
 			"haste_time": enemy.haste_time, "haste_bonus": enemy.haste_bonus,
 			"aura_timer": enemy.aura_timer,
 			"boss_damage_budget": enemy.boss_damage_budget, "boss_phase": enemy.boss_phase,
@@ -28,6 +32,10 @@ static func capture(game) -> Dictionary:
 			"boss_radial_volley_timer": enemy.boss_radial_volley_timer,
 			"boss_radial_volley_index": enemy.boss_radial_volley_index,
 		})
+	var weapon_runtime: Array[Dictionary] = []
+	for weapon: WeaponInstance in game.player.loadout.equipped():
+		weapon_runtime.append({"cooldown": weapon.cooldown, "focus_hits": weapon.focus_hits,
+			"focus_time": weapon.focus_time, "focus_target": enemy_indices.get(weapon.focus_target_id, -1)})
 	var loot_data: Array[Dictionary] = []
 	for drop: Loot in game.get_node("Loot").get_children():
 		if drop.is_queued_for_deletion():
@@ -54,6 +62,7 @@ static func capture(game) -> Dictionary:
 		"player": {"position": _vector_data(game.player.position), "stats": game.player.stats.to_save_data(), "hurt_time": game.player.hurt_time},
 		"xp": game.xp, "xp_goal": game.xp_goal, "level": game.level, "coins": game.coins,
 		"weapons": game.player.loadout.save_data(), "starter_pending": game.starter_pending,
+		"weapon_runtime": weapon_runtime,
 		"items": game.items.save_data(),
 		"relics": game.relics.save_data(),
 		"telemetry": game.telemetry.save_data(),
@@ -135,6 +144,10 @@ static func restore(game, saved: Dictionary) -> void:
 			continue
 		game._create_enemy(enemy_data, _read_vector(entry.get("position", [0.0, 0.0])))
 		var enemy: Enemy = game.get_node("Enemies").get_child(-1)
+		enemy.overtime_active = bool(entry.get("overtime_active", saved.get("boss_pending", false))) and enemy.data.is_boss
+		if enemy.overtime_active:
+			enemy.advance_overtime(maxi(int(entry.get("overtime_seconds", 0)), 0))
+			enemy.overtime_tick = clampf(float(entry.get("overtime_tick", 0.0)), 0.0, 0.999999)
 		enemy.dying = bool(entry.get("dying", false))
 		enemy.health = 0.0 if enemy.dying else clampf(float(entry.get("health", enemy.max_health)), 1.0, enemy.max_health)
 		enemy.special_phase = clampi(int(entry.get("phase", 0)), 0, 2) as Enemy.SpecialPhase
@@ -145,7 +158,7 @@ static func restore(game, saved: Dictionary) -> void:
 		enemy.boss_dash_end = _read_vector(entry.get("boss_dash_end", [0.0, 0.0]))
 		enemy.boss_dash_origin = _read_vector(entry.get("boss_dash_origin", [0.0, 0.0]))
 		enemy.death_elapsed = clampf(float(entry.get("death_elapsed", 0.0)), 0.0, Enemy.BOSS_DEATH_DURATION)
-		enemy.is_enraged = bool(entry.get("enraged", enemy.health <= enemy.max_health * 0.5 and enemy.data.is_boss))
+		enemy.is_enraged = enemy.overtime_active or bool(entry.get("enraged", enemy.health <= enemy.max_health * 0.5 and enemy.data.is_boss))
 		if enemy.dying:
 			enemy.remove_from_group("enemies")
 		enemy.bleed_stacks = clampi(int(entry.get("bleed_stacks", 0)), 0, 5)
@@ -153,6 +166,8 @@ static func restore(game, saved: Dictionary) -> void:
 		enemy.bleed_time = maxf(float(entry.get("bleed_time", 0.0)), 0.0)
 		enemy.bleed_tick = clampf(float(entry.get("bleed_tick", 1.0)), 0.0, 1.0)
 		enemy.wet_time = maxf(float(entry.get("wet_time", 0.0)), 0.0)
+		enemy.exposure_time = maxf(float(entry.get("exposure_time", 0.0)), 0.0)
+		enemy.enamel_exposure = clampf(float(entry.get("enamel_exposure", 0.0)), 0.0, 0.30)
 		enemy.haste_time = clampf(float(entry.get("haste_time", 0.0)), 0.0, Enemy.AURA_HASTE_DURATION)
 		enemy.haste_bonus = clampf(float(entry.get("haste_bonus", 0.0)), 0.0, 1.0)
 		enemy.aura_timer = clampf(float(entry.get("aura_timer", 0.0)), 0.0, Enemy.AURA_PULSE_INTERVAL)
@@ -168,6 +183,20 @@ static func restore(game, saved: Dictionary) -> void:
 			enemy.boss_radial_volley_timer = clampf(float(entry.get("boss_radial_volley_timer", 0.0)), 0.0, enemy.data.boss_radial_volley_interval)
 			enemy.boss_radial_volley_index = clampi(int(entry.get("boss_radial_volley_index", 0)), 0, maxi(enemy.data.boss_radial_volley_count + enemy.difficulty.boss_volley_bonus, 1))
 		enemy.queue_redraw()
+	var runtime: Array = saved.get("weapon_runtime", [])
+	var weapons := player.loadout.equipped()
+	var restored_enemies: Array[Node] = game.get_node("Enemies").get_children()
+	for index in mini(runtime.size(), weapons.size()):
+		if not runtime[index] is Dictionary:
+			continue
+		var entry: Dictionary = runtime[index]
+		var weapon := weapons[index]
+		weapon.cooldown = clampf(float(entry.get("cooldown", 0.0)), 0.0, 30.0)
+		var target_index := int(entry.get("focus_target", -1))
+		if target_index >= 0 and target_index < restored_enemies.size():
+			weapon.focus_target_id = restored_enemies[target_index].get_instance_id()
+			weapon.focus_hits = clampi(int(entry.get("focus_hits", 0)), 0, 1000)
+			weapon.focus_time = clampf(float(entry.get("focus_time", 0.0)), 0.0, 30.0)
 	for entry in saved.get("loot", []):
 		var kind := StringName(str(entry.get("kind", "xp")))
 		if kind == &"xp" or kind == &"coin" or kind == &"chest" and ShopController.by_id(StringName(str(entry.get("reward_id", "")))) != null:

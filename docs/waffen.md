@@ -12,8 +12,49 @@ Denti beginnt ohne fest ins Charakterbild eingebaute Waffe. Vor Welle 1 wählt m
 | Schmelzspiegel | 1 | Sofortiger Lichtstrahl | Präziser Treffer ohne Flugzeit. |
 | Zahnsteinkratzer | 1 | Schneller Nahkampfschnitt | Sehr kurze Reichweite und hoher Angriffstakt bauen kleine Blutungen schnell auf. |
 | Mundspülungs-Mörser | 2 | Minzprojektil | Flächenschaden beim Einschlag; Explosionsradius wächst mit der Stufe. |
+| Zahnstocher-Speer | 1 | Stichlinie / Schnitt | Lange, schmale Nahkampflinie trifft mehrere hintereinander stehende Gegner. |
+| Karies-Fräse | 2 | Schneller Bohrungs-Nahkampf | Kurze Reichweite; Fokus wächst um 5 % pro Folgetreffer bis +50 %. Nur 55 % Schaden gegen normale Gegner, +40 % gegen Eliten, +35–50 % gegen Bosse. |
+| Interdental-Bürste | 1 | Winziger Rundumschnitt | Sehr schnelle Treffer mit 1,2 Blutungsschaden/s für 2,5 s; Radius wächst mit der Stufe. |
+| Fluorid-Sprüher | 2 | 65°-Minzkegel | Markiert Gegner für 2 s: +20 % Schaden durch Schmelzwaffen, etwa Zauberbürste und Fluorid-Rakete. Mehrere Sprüher stapeln den Bonus nicht. |
+| Mundduschen-Turbine | 2 | 48°-Wasserkegel | Macht Gruppen 3 s nass und stößt sie kräftig zurück; geringer Rohschaden. |
+| UV-Lampe | 2 | Breite Lichtlinie | Sofortstrahl trifft alle Gegner entlang einer 36 Pixel breiten Linie; +10 Prozentpunkte Waffen-Crit und ×2 Crit-Schaden. |
+| Amalgam-Schleuder | 1 | Schweres Metallprojektil | Langsame Kugel, kleiner Splash und hoher Rückstoß, auch bei Explosionen. |
+| Zahnseiden-Garotte | 2 | 150°-Frontschnitt | Langsamer schwerer Hieb mit 3,2 Blutungsschaden/s für 3,5 s; kein Treffer hinter Denti. |
+| Prophylaxe-Polierer | 1 | Schneller Licht-Nahkampf | +10 Prozentpunkte Waffen-Crit; jeder dritte fortlaufende Treffer auf dasselbe Ziel ist garantiert kritisch. |
+| Fluorid-Rakete | 2 | Schmelz-Rakete | Hoher Flächenschaden, große Explosion und lange Pause; explodiert auch am Reichweitenende. |
 
-Die Waffen haben eigene Sprites unter `assets/weapons/` und werden getrennt von Dentis Körper geschwenkt beziehungsweise beim Schuss zurückgestoßen. Projektilfarbe, Tempo, Reichweite und Trefferform liegen in den jeweiligen `WeaponData`-Ressourcen unter `data/weapons/`.
+Die Waffen haben eigene Sprites unter `assets/weapons/` und werden getrennt von Dentis Körper geschwenkt beziehungsweise beim Schuss zurückgestoßen. Die zehn neuen Waffen verwenden zugeschnittene Regionen des transparenten `weapon_icons_expansion.png`-Atlas; derselbe Ausschnitt dient als Shopbild. Projektilfarbe, Tempo, Reichweite und Trefferform liegen in den jeweiligen `WeaponData`-Ressourcen unter `data/weapons/`.
+
+## Grundwerte der Erweiterung
+
+Werte für Stufe I vor Spielerwerten, Items und kritischen Treffern. Schaden ist
+pro Treffer und Ziel, nicht der Gesamtschaden eines Kegels oder einer Explosion.
+
+| Waffe | Schaden | Pause | Reichweite | Preis |
+| --- | ---: | ---: | ---: | ---: |
+| Zahnstocher-Speer | 22 | 0,95 s | 205 | 10 |
+| Karies-Fräse | 8 | 0,20 s | 78 | 15 |
+| Interdental-Bürste | 4 | 0,24 s | 62 | 8 |
+| Fluorid-Sprüher | 5 | 0,25 s | 155 | 14 |
+| Mundduschen-Turbine | 4 | 0,40 s | 195 | 14 |
+| UV-Lampe | 34 | 1,65 s | 600 | 17 |
+| Amalgam-Schleuder | 24 | 1,30 s | 370 | 10 |
+| Zahnseiden-Garotte | 30 | 1,45 s | 145 | 15 |
+| Prophylaxe-Polierer | 7 | 0,32 s | 85 | 10 |
+| Fluorid-Rakete | 58 | 2,60 s | 550 | 18 |
+
+Alle zehn Waffen sind im normalen Shop erhältlich und unterstützen vier Stufen,
+Fusion, Verkauf und Fortsetzen. Die drei Startwaffen bleiben wie bisher.
+Die Erweiterung nutzt individuelle Schadenskurven; Speer, Bürste, Sprüher,
+Turbine, UV-Lampe und Garotte gewinnen Reichweite. Schleuder und Rakete
+gewinnen Explosionsradius, Turbine Rückstoß, Fräse Bossbonus.
+
+Blutung, Nass, Licht-Crits und Projektiltreffer verwenden dieselben Item- und
+Reliktsignale wie die bisherigen Waffen. Ziel-Fokus und Politur beginnen beim
+Zielwechsel oder einer Angriffslücke neu. Spielstände erhalten ihren Zielbezug,
+Zähler und Cooldown sowie aktive Fluorid-Markierungen. Angezeigte DPS schätzen
+ein normales Einzelziel inklusive Waffen-Crit; Flächentreffer, Blutung,
+voller Fokus und situative Itemeffekte sind zusätzliche Leistung.
 
 Die Ausrüstung fasst sechs Hand-Plätze. Einhandwaffen belegen einen, Zweihandwaffen zwei. Solange genug Plätze frei sind, fügt ein Kauf die Waffe einzeln hinzu. Ist die Ausrüstung voll, verschmilzt eine gekaufte Waffe mit einem gleichen Exemplar derselben Stufe (bis IV). Zwei bereits ausgerüstete gleiche Waffen derselben Stufe lassen sich per Rechtsklick auf eine der Waffen verschmelzen. Verkauf benötigt zwei Linksklicks und erstattet die Hälfte des Kaufwerts aller in dieser Waffe aufgegangenen Exemplare. Jede Stufe erhöht Schaden und Angriffstempo. Der Spielstand speichert Waffentypen, Stufen und investierte Münzen.
 

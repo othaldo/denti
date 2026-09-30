@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/weapons/weapon_icons_expansion.png" id="2"]
+
+[sub_resource type="AtlasTexture" id="Atlas_weapon"]
+atlas = ExtResource("2")
+region = Rect2(0, 0, 397, 397)
+filter_clip = true
+
+[resource]
+script = ExtResource("1")
+role = "Gegnerlinien im Nahkampf durchstoßen"
+id = &"toothpick_spear"
+display_name = "Zahnstocher-Speer"
+description = "Einhand · Langer Stich trifft Gegner auf einer schmalen Linie."
+sprite = SubResource("Atlas_weapon")
+hands = 1
+attack_mode = &"thrust"
+damage_type = "Schnitt"
+base_damage = 22
+interval = 0.95
+attack_range = 205
+price = 10
+visual_angle_degrees = 45
+attack_width = 14
+damage_tiers = PackedFloat32Array(1.0, 1.30, 1.68, 2.10)
+range_tiers = PackedFloat32Array(205, 215, 225, 240)
+grip_anchor = Vector2(0.24, 0.73)
+projectile_color = Color(1.0, 0.81, 0.40, 1)

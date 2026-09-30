@@ -277,7 +277,7 @@ func _on_boss_death_started(_at: Vector2) -> void:
 
 func _on_boss_enraged(at: Vector2) -> void:
 	sound.play_cue(&"boss_warning")
-	_show_item_feedback("KÖNIG IN RAGE!", at, Color(1.0, 0.39, 0.27))
+	_show_item_feedback("ENRAGE!" if is_instance_valid(boss) and boss.overtime_active else "BOSS IN RAGE!", at, Color(1.0, 0.39, 0.27))
 	camera_shake_time = 0.25
 
 
@@ -403,6 +403,7 @@ func _on_wave_finished(wave_number: int) -> void:
 	if WaveController.is_boss_wave(wave_number):
 		if is_instance_valid(boss):
 			boss_pending = true
+			boss.start_overtime()
 			_clear_combat(true)
 			_sync_music()
 			_refresh_hud()
@@ -552,7 +553,7 @@ func _update_shop_panel() -> void:
 	var weapons := player.loadout.equipped()
 	for index in weapons.size():
 		var weapon := weapons[index]
-		equipment.append({"name": weapon.data.display_name, "tier": weapon.tier, "refund": player.loadout.refund_for(index), "stats": weapon.data.stats_text(weapon.tier), "combat": weapon.data.combat_text(), "description": weapon.data.description, "dps": _weapon_dps(weapon.data, weapon.tier), "mergeable": player.loadout.can_merge(index)})
+		equipment.append({"data": weapon.data, "hands": weapon.data.hands, "icon": weapon.data.sprite, "uid": weapon.get_instance_id(), "name": weapon.data.display_name, "tier": weapon.tier, "refund": player.loadout.refund_for(index), "stats": weapon.data.stats_text(weapon.tier), "combat": weapon.data.combat_text(), "description": weapon.data.description, "dps": _weapon_dps(weapon.data, weapon.tier), "mergeable": player.loadout.can_merge(index)})
 	var buyable: Array[bool] = []
 	var offer_dps: Array[float] = []
 	for offer in shop.offers:
@@ -563,6 +564,7 @@ func _update_shop_panel() -> void:
 		var relic := RelicCatalog.by_id(StringName(id))
 		if relic != null:
 			owned_display.append({"name": "Relikt: " + relic.display_name, "count": 1, "description": relic.description, "tier": 4, "icon": DentiUIIcons.relic(relic.icon_index), "relic": true})
+	shop_panel.set_build_context(player)
 	shop_panel.show_shop(wave.current_wave, coins, shop.reroll_cost, shop.offers, wave.next_wave_preview(), equipment, player.loadout.used_slots(), WeaponLoadout.CAPACITY, buyable, player.stats.luck, owned_display, items.owned, offer_dps)
 	_refresh_hud()
 

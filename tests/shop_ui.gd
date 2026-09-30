@@ -36,6 +36,11 @@ func _run() -> void:
 			return
 	var weapon_button: Button = game.shop_panel.inventory_row.get_child(0).get_child(0)
 	var offer_card: OfferCard = game.shop_panel.offer_buttons[0]
+	var rarity_font := offer_card.rarity_label.get_theme_font("font")
+	var rarity_width := rarity_font.get_string_size(offer_card.rarity_label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, offer_card.rarity_label.get_theme_font_size("font_size")).x
+	if offer_card.rarity_label.size.x < rarity_width + 12.0:
+		_fail("rarity and damage type are visually clipped")
+		return
 	if not weapon_button.tooltip_text.contains("DPS") or not weapon_button.tooltip_text.contains("Basis-Schaden") or not offer_card.tooltip_text.contains("DPS") or not offer_card.tooltip_text.contains("Nahkampf"):
 		_fail("weapon hover lacks DPS or effect information")
 		return
@@ -46,8 +51,9 @@ func _run() -> void:
 	game.player.loadout.acquire(starter)
 	game._update_shop_panel()
 	await process_frame
-	var merge_button: Button = game.shop_panel.inventory_row.get_child(0).get_child(1)
-	if merge_button.text != "Fusion" or not _inside(panel.get_global_rect(), Vector2(1280, 720)):
+	game.shop_panel.inventory_row.get_child(0).get_child(0).pressed.emit()
+	var merge_button: Button = game.shop_panel.details.merge_button
+	if merge_button.disabled or not merge_button.visible or not _inside(panel.get_global_rect(), Vector2(1280, 720)):
 		_fail("touch merge button or shop layout missing: %s / %s" % [merge_button.text, panel.get_global_rect()])
 		return
 	merge_button.pressed.emit()

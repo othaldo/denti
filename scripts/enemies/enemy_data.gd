@@ -60,3 +60,10 @@ enum BossSignature { AIMED_FAN, TRAIL_FAN, LANE, SPACE_ORB }
 @export var boss_fan_count: int = 0
 @export var boss_projectile_speed: float = 0.0
 @export var boss_phase_adds: int = 0
+
+@export_group("Boss overtime enrage")
+@export_range(0.0, 1.0, 0.01) var overtime_damage_per_second: float = 0.05
+@export_range(0.0, 1.0, 0.01) var overtime_defense_per_second: float = 0.05
+@export_range(0.0, 1.0, 0.01) var overtime_speed_per_second: float = 0.03
+@export_range(0.0, 1.0, 0.01) var overtime_attack_rate_per_second: float = 0.04
+@export_range(0.0, 1.0, 0.01) var overtime_health_per_second: float = 0.02

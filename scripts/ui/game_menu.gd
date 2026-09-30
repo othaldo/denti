@@ -7,6 +7,10 @@ var page: StringName = &"home"
 var root_control: Control
 var rows: VBoxContainer
 var game: Node2D
+var build_panel: PanelContainer
+var build_scroll: ScrollContainer
+var build_grid: GridContainer
+var item_details: ShopDetails
 var menu_music: MusicController
 var fullscreen_button: Button
 var fps_toggle: CheckButton
@@ -64,6 +68,7 @@ func _build_ui() -> void:
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root_control.add_child(center)
 	var panel := PanelContainer.new()
+	build_panel = panel
 	panel.custom_minimum_size = Vector2(520, 0)
 	DentiUIStyle.style_dialog(panel)
 	center.add_child(panel)
@@ -76,12 +81,18 @@ func _build_ui() -> void:
 	rows = VBoxContainer.new()
 	rows.add_theme_constant_override("separation", 10)
 	margin.add_child(rows)
+	get_viewport().size_changed.connect(_update_build_layout)
 
 
 func _clear_rows() -> void:
 	for child in rows.get_children():
 		rows.remove_child(child)
 		child.queue_free()
+	build_scroll = null
+	build_grid = null
+	item_details = null
+	build_panel.custom_minimum_size = Vector2(520, 0)
+	rows.add_theme_constant_override("separation", 10)
 	fullscreen_button = null
 	fps_toggle = null
 	master_slider = null
@@ -214,47 +225,134 @@ func _show_home() -> void:
 		_version_info()
 
 
+func _compact_title(title: String) -> void:
+	ShopDetails._label(rows, title, 24)
+	rows.add_theme_constant_override("separation", 6)
+
+
+func _update_build_layout() -> void:
+	if page not in [&"stats", &"items"]:
+		return
+	var extent := root_control.size
+	build_panel.custom_minimum_size.x = minf(620, extent.x - 24)
+	if build_grid != null:
+		build_grid.columns = maxi(floori((build_panel.custom_minimum_size.x - 90) / 70), 3)
+		var lines := ceili(float(build_grid.get_child_count()) / build_grid.columns)
+		build_scroll.custom_minimum_size.y = minf(lines * 65.0, minf(200, extent.y * 0.28))
+
+
 func _show_stats() -> void:
 	page = &"stats"
 	_clear_rows()
-	_title("Dentis Stats")
+	_compact_title("Stats")
 	var stats: PlayerStats = game.player.stats
-	_text("Leben  %.0f / %.0f     Schild  %d     Level  %d     XP  %d / %d\nMünzen  %d     Welle  %d / %d" % [stats.health, stats.max_health, stats.shield_charges, game.level, game.xp, game.xp_goal, game.coins, game.wave.current_wave, WaveController.MAX_WAVES])
-	_text("Bisskraft  %.0f     Härte  %.0f\nPutzeifer  %.2f Angriffe/s     Glanz  %.0f%%\nSpeichel  %.1f Leben/s     Bewegung  %.0f     Glück  %.0f" % [stats.damage, stats.armor, 1.0 / stats.attack_interval, stats.crit_chance * 100.0, stats.regen, stats.move_speed, stats.luck])
-	var weapons: Array[String] = []
+	ShopDetails._label(rows, "Leben %.0f / %.0f · Schild %d · Level %d\nXP %d / %d · Welle %d / %d" % [stats.health, stats.max_health, stats.shield_charges, game.level, game.xp, game.xp_goal, game.wave.current_wave, WaveController.MAX_WAVES], 16)
+	var wallet := HBoxContainer.new()
+	rows.add_child(wallet)
+	ShopDetails._label(wallet, str(game.coins), 18).autowrap_mode = TextServer.AUTOWRAP_OFF
+	var coin := TextureRect.new()
+	coin.texture = DentiUIIcons.hud(2)
+	coin.custom_minimum_size = Vector2(24, 24)
+	coin.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	coin.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	wallet.add_child(coin)
+	var grid := GridContainer.new()
+	grid.columns = 4
+	grid.add_theme_constant_override("h_separation", 14)
+	grid.add_theme_constant_override("v_separation", 5)
+	rows.add_child(grid)
+	for pair in [["Bisskraft", "%.0f" % stats.damage], ["Härte", "%.0f" % stats.armor], ["Schmelz", "%.0f HP" % stats.max_health], ["Putzeifer", "%.2f/s" % (1.0 / stats.attack_interval)], ["Glanz", "%.0f %%" % (stats.crit_chance * 100)], ["Speichel", "%.1f HP/s" % stats.regen], ["Bewegung", "%.0f" % stats.move_speed], ["Glück", "%.0f" % stats.luck]]:
+		var key := ShopDetails._label(grid, pair[0], 16)
+		key.autowrap_mode = TextServer.AUTOWRAP_OFF
+		key.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var value := ShopDetails._label(grid, pair[1], 16)
+		value.autowrap_mode = TextServer.AUTOWRAP_OFF
+		value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	ShopDetails._label(rows, "Hände · %d/6" % game.player.loadout.used_slots(), 16)
+	var weapons := HBoxContainer.new()
+	weapons.add_theme_constant_override("separation", 4)
+	rows.add_child(weapons)
 	for weapon in game.player.loadout.equipped():
-		weapons.append("%s %s" % [weapon.data.display_name, ["I", "II", "III", "IV"][weapon.tier - 1]])
-	_text("Waffen: " + (", ".join(weapons) if not weapons.is_empty() else "noch keine"))
+		var chip := Button.new()
+		chip.text = ["I", "II", "III", "IV"][weapon.tier - 1]
+		chip.icon = weapon.data.sprite
+		chip.expand_icon = true
+		chip.add_theme_constant_override("icon_max_width", 32)
+		chip.custom_minimum_size = Vector2(0, 52)
+		chip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		chip.size_flags_stretch_ratio = float(weapon.data.hands)
+		chip.tooltip_text = "%s\n%s\n%s" % [weapon.data.display_name, weapon.data.stats_text(weapon.tier), weapon.data.combat_text()]
+		DentiUIStyle.style_button(chip)
+		weapons.add_child(chip)
+		chip.pressed.connect(_show_weapon_details.bind(weapon.data, weapon.tier))
 	_button("Zurück", _show_home, true)
+	_update_build_layout()
+
+
+func _show_weapon_details(data: WeaponData, tier: int) -> void:
+	page = &"stats"
+	_clear_rows()
+	item_details = ShopDetails.new()
+	rows.add_child(item_details)
+	item_details.show_weapon(data, tier, game.player, true, [])
+	_button("Zurück", _show_stats, true)
+	_update_build_layout()
 
 
 func _show_items() -> void:
 	page = &"items"
 	_clear_rows()
-	_title("Dentis Items & Relikte")
+	_compact_title("Items & Relikte")
 	var owned: Array[Dictionary] = game.items.all_items()
 	for id in game.relics.owned:
 		var relic := RelicCatalog.by_id(StringName(id))
 		if relic != null:
-			owned.append({"name": "Relikt: " + relic.display_name, "count": 1, "description": relic.description})
+			owned.append({"name": relic.display_name, "count": 1, "description": relic.description, "icon": DentiUIIcons.relic(relic.icon_index), "relic": true})
 	if owned.is_empty():
-		_text("Noch keine Items oder Relikte. In der Zahnklinik warten Items auf dich.")
+		ShopDetails._label(rows, "Keine Items oder Relikte", 16)
 	else:
-		var scrolling := ScrollContainer.new()
-		scrolling.custom_minimum_size = Vector2(450, 300)
-		scrolling.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-		rows.add_child(scrolling)
-		var list := VBoxContainer.new()
-		list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		list.add_theme_constant_override("separation", 6)
-		scrolling.add_child(list)
+		build_scroll = ScrollContainer.new()
+		build_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		rows.add_child(build_scroll)
+		build_grid = GridContainer.new()
+		build_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		build_grid.add_theme_constant_override("h_separation", 5)
+		build_grid.add_theme_constant_override("v_separation", 5)
+		build_scroll.add_child(build_grid)
+		item_details = ShopDetails.new()
+		rows.add_child(item_details)
 		for entry in owned:
-			var line := Label.new()
-			line.text = "%s ×%d\n%s" % [entry["name"], entry["count"], entry["description"]]
-			line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			line.add_theme_color_override("font_color", DentiUIStyle.INK)
-			list.add_child(line)
+			var chip := Button.new()
+			chip.custom_minimum_size = Vector2(64, 60)
+			chip.tooltip_text = "%s ×%d\n%s" % [entry.name, entry.count, entry.description]
+			DentiUIStyle.style_button(chip)
+			build_grid.add_child(chip)
+			var icon := TextureRect.new()
+			icon.texture = entry.icon
+			icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+			icon.offset_left = 6
+			icon.offset_right = -6
+			icon.offset_top = 4
+			icon.offset_bottom = -8
+			icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			chip.add_child(icon)
+			var count := Label.new()
+			count.text = "×%d" % int(entry.count)
+			count.add_theme_font_size_override("font_size", 14)
+			count.add_theme_color_override("font_color", DentiUIStyle.INK)
+			count.add_theme_color_override("font_outline_color", Color.WHITE)
+			count.add_theme_constant_override("outline_size", 4)
+			count.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			chip.add_child(count)
+			count.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+			count.offset_right = -4
+			count.offset_bottom = -2
+			chip.pressed.connect(item_details.show_item.bind(entry, true))
+		item_details.show_item(owned[0], true)
 	_button("Zurück", _show_home, true)
+	_update_build_layout()
 
 
 func _show_options() -> void:

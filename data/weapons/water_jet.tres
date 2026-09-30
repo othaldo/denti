@@ -3,6 +3,7 @@
 [ext_resource type="Texture2D" path="res://assets/weapons/water_jet.png" id="2"]
 [resource]
 script = ExtResource("1")
+role = "Schnelle Treffer und Nass"
 id = &"water_jet"
 display_name = "Wasserflosser"
 description = "Einhand · Fernkampf · macht nass und stößt zurück"

@@ -84,7 +84,8 @@ func _run() -> void:
 	if game.coins != coins_before:
 		_fail("first sell click removed a weapon")
 		return
-	button.pressed.emit()
+	game.shop_panel.details.sell_button.pressed.emit()
+	game.shop_panel.details.confirm_button.pressed.emit()
 	if game.coins != coins_before + expected_refund or expected_refund != WeaponCatalog.by_id(&"turbo_drill").price * 2 or game.player.loadout.used_slots() != 4 or not game.player.loadout.can_acquire(brush):
 		_fail("confirmed sale did not return half the combined weapon value")
 		return

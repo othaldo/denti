@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/weapons/water_turbine.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"water_turbine"
+display_name = "Mundduschen-Turbine"
+description = "Zweihand · Breiter Wasserfächer stößt Gruppen zurück und macht sie nass; Kontrolle statt Rohschaden."
+price = 14
+weapon_data = ExtResource("2")

@@ -3,6 +3,7 @@
 [ext_resource type="Texture2D" path="res://assets/weapons/floss_whip.png" id="2"]
 [resource]
 script = ExtResource("1")
+role = "Blutung im Rundumschnitt"
 id = &"floss_whip"
 display_name = "Zahnseidenpeitsche"
 description = "Einhand · Rundumschnitt · trifft viele und verursacht Blutung"

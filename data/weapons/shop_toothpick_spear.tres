@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/weapons/toothpick_spear.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"toothpick_spear"
+display_name = "Zahnstocher-Speer"
+description = "Einhand · Langer Stich trifft Gegner auf einer schmalen Linie."
+price = 10
+weapon_data = ExtResource("2")

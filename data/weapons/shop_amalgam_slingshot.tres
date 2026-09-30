@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/weapons/amalgam_slingshot.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"amalgam_slingshot"
+display_name = "Amalgam-Schleuder"
+description = "Einhand · Langsame Metallkugel mit Rückstoß und kleinem Flächenschaden."
+price = 10
+weapon_data = ExtResource("2")

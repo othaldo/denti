@@ -3,7 +3,11 @@ extends Button
 
 const ICONS: Script = preload("res://scripts/ui/denti_ui_icons.gd")
 
-var content: HBoxContainer
+signal purchase_requested
+
+var buy_button: Button
+var selection_only := false
+var content: BoxContainer
 var card_margin: MarginContainer
 var icon_rect: TextureRect
 var name_label: Label
@@ -12,12 +16,22 @@ var effect_label: Label
 var price_label: Label
 var hover_tween: Tween
 
+func set_catalog_layout(vertical: bool) -> void:
+	content.vertical = vertical
+	buy_button.custom_minimum_size.y = 48 if vertical else 64
+	custom_minimum_size.y = 210 if vertical else 96
+	icon_rect.custom_minimum_size = Vector2(48, 48)
+	name_label.add_theme_font_size_override("font_size", 18)
+	effect_label.add_theme_font_size_override("font_size", 14)
+
+
 
 func _ready() -> void:
 	custom_minimum_size.y = 100.0
 	_build_content()
 	DentiUIStyle.style_card(self)
 	resized.connect(func() -> void: pivot_offset = size / 2.0)
+	resized.connect(func() -> void: call_deferred("_fit_content"))
 	mouse_entered.connect(_on_hover.bind(true))
 	mouse_exited.connect(_on_hover.bind(false))
 
@@ -31,15 +45,18 @@ func show_offer(offer: ShopOfferData, coins: int, available: bool = true, owned_
 		return
 	content.visible = true
 	text = ""
-	icon_rect.texture = offer.icon_texture if offer.icon_texture != null else ICONS.item(offer.icon_index)
-	name_label.text = "%s MK %s" % [offer.display_name.to_upper(), ["I", "II", "III", "IV"][offer.weapon_tier - 1]] if offer.weapon_data != null else offer.display_name.to_upper() + (" · ×%d" % owned_count if owned_count > 0 else "")
-	rarity_label.text = "STUFE %d · %s" % [offer.rarity_tier, DentiRarity.name_for(offer.rarity_tier).to_upper()]
+	icon_rect.texture = offer.weapon_data.sprite if offer.weapon_data != null else (offer.icon_texture if offer.icon_texture != null else ICONS.item(offer.icon_index))
+	name_label.text = "%s MK %s" % [offer.display_name, ["I", "II", "III", "IV"][offer.weapon_tier - 1]] if offer.weapon_data != null else offer.display_name + (" · ×%d" % owned_count if owned_count > 0 else "")
+	rarity_label.text = "%s" % DentiRarity.name_for(offer.rarity_tier)
 	if offer.weapon_data != null:
 		rarity_label.text += " · %s" % offer.weapon_data.damage_type.to_upper()
 	DentiUIStyle.style_rarity_label(rarity_label, offer.rarity_tier)
 	effect_label.text = offer.weapon_data.stats_text(offer.weapon_tier) if offer.weapon_data != null else offer.description
 	price_label.text = "%d" % offer.price
-	disabled = coins < offer.price or not available
+	buy_button.disabled = coins < offer.price or not available
+	buy_button.get_child(0).modulate = Color(1, 1, 1, 0.45) if buy_button.disabled else Color.WHITE
+	buy_button.tooltip_text = "Zu wenig Münzen" if coins < offer.price else ("Nicht verfügbar" if not available else "Kaufen")
+	disabled = (coins < offer.price or not available) and not selection_only
 	if offer.weapon_data != null:
 		tooltip_text = "%s\n%s\n%s\n≈ %.1f DPS pro Ziel" % [offer.description, offer.weapon_data.combat_text(), effect_label.text, dps]
 		if not available:
@@ -47,6 +64,12 @@ func show_offer(offer: ShopOfferData, coins: int, available: bool = true, owned_
 	else:
 		tooltip_text = "Limit erreicht: %d Stück" % offer.max_stacks if not available else effect_label.text
 	DentiUIStyle.style_card(self, offer.rarity_tier)
+	call_deferred("_fit_content")
+
+
+func _fit_content() -> void:
+	if selection_only:
+		custom_minimum_size.y = maxf(96.0 if not content.vertical else 210.0, card_margin.get_combined_minimum_size().y)
 
 
 func set_compact(compact: bool) -> void:
@@ -61,12 +84,12 @@ func _build_content() -> void:
 	card_margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	card_margin.add_theme_constant_override("margin_left", 13)
 	card_margin.add_theme_constant_override("margin_right", 13)
-	card_margin.add_theme_constant_override("margin_top", 9)
-	card_margin.add_theme_constant_override("margin_bottom", 9)
+	card_margin.add_theme_constant_override("margin_top", 4)
+	card_margin.add_theme_constant_override("margin_bottom", 4)
 	card_margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(card_margin)
-	content = HBoxContainer.new()
-	content.add_theme_constant_override("separation", 12)
+	content = BoxContainer.new()
+	content.add_theme_constant_override("separation", 4)
 	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	card_margin.add_child(content)
 	icon_rect = TextureRect.new()
@@ -91,7 +114,7 @@ func _build_content() -> void:
 	rarity_label = Label.new()
 	rarity_label.add_theme_font_size_override("font_size", 13)
 	rarity_label.clip_text = true
-	rarity_label.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	rarity_label.size_flags_horizontal = Control.SIZE_FILL
 	rarity_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	details.add_child(rarity_label)
 	effect_label = Label.new()
@@ -100,17 +123,20 @@ func _build_content() -> void:
 	effect_label.add_theme_font_size_override("font_size", 16)
 	effect_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	details.add_child(effect_label)
-	var price_chip := PanelContainer.new()
+	var price_chip := Button.new()
+	buy_button = price_chip
+	buy_button.pressed.connect(func() -> void: purchase_requested.emit())
 	price_chip.custom_minimum_size.x = 76.0
 	price_chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	price_chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	DentiUIStyle.style_chip(price_chip)
+	price_chip.custom_minimum_size.y = 48
+	DentiUIStyle.style_button(price_chip, true)
 	content.add_child(price_chip)
 	var price_row := HBoxContainer.new()
 	price_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	price_row.add_theme_constant_override("separation", 3)
 	price_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	price_chip.add_child(price_row)
+	price_row.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var coin_icon := TextureRect.new()
 	coin_icon.custom_minimum_size = Vector2(22, 22)
 	coin_icon.texture = ICONS.hud(2)
@@ -123,6 +149,7 @@ func _build_content() -> void:
 	price_label.add_theme_font_size_override("font_size", 19)
 	price_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	price_row.add_child(price_label)
+	price_row.move_child(price_label, 0)
 
 
 func _on_hover(hovered: bool) -> void:

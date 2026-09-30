@@ -42,7 +42,7 @@ func _run() -> void:
 	game._update_shop_panel()
 	var offer: ShopOfferData = game.shop.offers[0]
 	var offer_card := game.shop_panel.offer_buttons[0] as OfferCard
-	if offer.rarity_tier != 2 or offer.price <= drill.price or not offer_card.effect_label.text.contains("Basis-Schaden"):
+	if offer.rarity_tier != 2 or offer.price <= drill.price or not offer_card.effect_label.text.contains("Treffer") or not offer_card.name_label.text.contains("MK II"):
 		_fail("tiered weapon offer did not show its rarity, price and stats")
 		return
 	game._save_run()
@@ -73,7 +73,7 @@ func _run() -> void:
 		_fail("continuing a run lost its tier-II shop offer")
 		return
 	var restored_card := resumed.shop_panel.offer_buttons[0] as OfferCard
-	if restored_card.rarity_label.text.find("UNGEWÖHNLICH") < 0:
+	if restored_card.rarity_label.text.to_upper().find("UNGEWÖHNLICH") < 0:
 		_fail("shop rarity badge was not restored")
 		return
 	resumed.in_shop = false

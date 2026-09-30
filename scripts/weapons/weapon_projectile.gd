@@ -46,31 +46,34 @@ func _physics_process(delta: float) -> void:
 			queue_free()
 			return
 		direction = global_position.direction_to(items.player.global_position)
-	var step := direction * data.projectile_speed * delta
+	var travel_left := maxf(data.range_at_tier(tier) + 40.0 - traveled, 0.0)
+	var step := direction * minf(data.projectile_speed * delta, travel_left)
+	var previous_position := global_position
 	global_position += step
 	traveled += step.length()
-	if traveled >= data.range_at_tier(tier) + 40.0:
-		if return_factor > 0.0 and not returning:
-			_start_return()
-		else:
-			queue_free()
-		return
 	if returning and not return_rearmed and traveled >= 32.0:
 		hit_ids.clear()
 		return_rearmed = true
+	var collisions: Array[Enemy] = []
 	for node in get_tree().get_nodes_in_group("enemies"):
 		var enemy := node as Enemy
 		if enemy == null or hit_ids.has(enemy.get_instance_id()):
 			continue
-		if global_position.distance_to(enemy.global_position) > enemy.data.radius + HIT_RADIUS:
+		var closest := Geometry2D.get_closest_point_to_segment(enemy.global_position, previous_position, global_position)
+		if closest.distance_to(enemy.global_position) > enemy.data.radius + HIT_RADIUS:
+			continue
+		collisions.append(enemy)
+	collisions.sort_custom(func(a: Enemy, b: Enemy) -> bool:
+		return (a.global_position - previous_position).dot(direction) < (b.global_position - previous_position).dot(direction))
+	for enemy in collisions:
+		if enemy.health <= 0.0:
 			continue
 		if data.splash_at_tier(tier) > 0.0:
+			global_position = Geometry2D.get_closest_point_to_segment(enemy.global_position, previous_position, global_position)
 			_explode()
 			return
 		hit_ids.append(enemy.get_instance_id())
-		if data.knockback_at_tier(tier) > 0.0:
-			enemy.global_position += direction * data.knockback_at_tier(tier) * (1.0 - enemy.data.knockback_resistance)
-		enemy.take_damage(data.damage_against(enemy, items.modify_damage(enemy, data, damage) if items != null else damage, tier), data, critical)
+		WeaponAttackShapes.hit(enemy, data, tier, damage, critical, items, direction)
 		if returning:
 			return_hits_left -= 1
 			if return_hits_left <= 0:
@@ -84,6 +87,13 @@ func _physics_process(delta: float) -> void:
 				impact_time = IMPACT_DURATION
 			break
 		pierces_left -= 1
+	if impact_time <= 0.0 and traveled >= data.range_at_tier(tier) + 40.0:
+		if data.splash_at_tier(tier) > 0.0:
+			_explode()
+		elif return_factor > 0.0 and not returning:
+			_start_return()
+		else:
+			queue_free()
 	queue_redraw()
 
 
@@ -100,7 +110,8 @@ func _explode() -> void:
 	for node in get_tree().get_nodes_in_group("enemies"):
 		var enemy := node as Enemy
 		if enemy != null and global_position.distance_to(enemy.global_position) <= data.splash_at_tier(tier) + enemy.data.radius:
-			enemy.take_damage(data.damage_against(enemy, items.modify_damage(enemy, data, damage) if items != null else damage, tier), data, critical)
+			var push_direction := global_position.direction_to(enemy.global_position)
+			WeaponAttackShapes.hit(enemy, data, tier, damage, critical, items, direction if push_direction.is_zero_approx() else push_direction)
 	impact_time = IMPACT_DURATION
 	queue_redraw()
 
@@ -114,6 +125,12 @@ func _draw() -> void:
 		draw_arc(Vector2.ZERO, radius * progress, 0.0, TAU, 40, Color(data.projectile_color, 1.0 - progress), 4.0)
 		return
 	var color := data.projectile_color
+	if data.projectile_shape == &"rocket":
+		var side := direction.orthogonal()
+		draw_line(-direction * 16.0, direction * 6.0, Color(0.98, 0.94, 0.82), 10.0)
+		draw_colored_polygon(PackedVector2Array([direction * 17.0, direction * 5.0 + side * 7.0, direction * 5.0 - side * 7.0]), color)
+		draw_line(-direction * 20.0, -direction * 34.0, Color(1.0, 0.78, 0.28, 0.65), 5.0)
+		return
 	var radius := 11.0 if data.splash_at_tier(tier) > 0.0 or data.pierce_at_tier(tier) > 0 else 7.0
 	for index in 3:
 		var tail := -direction * (float(index) + 1.0) * 8.0

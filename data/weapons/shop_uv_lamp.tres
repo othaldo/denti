@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/weapons/uv_lamp.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"uv_lamp"
+display_name = "UV-Lampe"
+description = "Zweihand · Breiter Sofortstrahl trifft die ganze Linie. +10 % Waffen-Crit; kritische Treffer verursachen ×2 Schaden."
+price = 17
+weapon_data = ExtResource("2")
