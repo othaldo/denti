@@ -4,7 +4,9 @@ extends CharacterBody2D
 signal attack_performed(kind: StringName)
 signal damaged(position: Vector2, amount: float)
 
-const HURT_COOLDOWN := 0.65
+const MIN_IFRAMES := 0.2
+const MAX_IFRAMES := 0.4
+const FULL_IFRAMES_DAMAGE_FRACTION := 0.15
 const ATTACK_ANIMATION_DURATION := 0.18
 
 @onready var stats: PlayerStats = $Stats
@@ -56,7 +58,7 @@ func play_attack_animation(aim: Vector2, kind: StringName = &"brush") -> void:
 func take_hit(amount: float) -> void:
 	if hurt_time > 0.0 or stats.health <= 0.0:
 		return
-	hurt_time = HURT_COOLDOWN
 	var actual := stats.take_damage(amount)
 	if actual > 0.0:
+		hurt_time = clampf(MAX_IFRAMES * actual / (stats.max_health * FULL_IFRAMES_DAMAGE_FRACTION), MIN_IFRAMES, MAX_IFRAMES)
 		damaged.emit(global_position + Vector2(0.0, -28.0), actual)
