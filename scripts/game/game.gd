@@ -50,6 +50,7 @@ var rewards := PostWaveRewards.new()
 
 func _ready() -> void:
 	randomize()
+	wave.difficulty_id = session.selected_difficulty_id
 	wave.enemy_requested.connect(_spawn_enemy)
 	wave.boss_requested.connect(_spawn_enemy)
 	wave.horde_requested.connect(_spawn_horde)
@@ -219,7 +220,7 @@ func _spawn_position(edge: int) -> Vector2:
 func _create_enemy(data: EnemyData, at: Vector2) -> void:
 	var enemy: Enemy = ENEMY_SCENE.instantiate()
 	enemy.position = at
-	enemy.configure(data, player, wave.current_wave)
+	enemy.configure(data, player, wave.current_wave, wave.difficulty_id)
 	enemy.defeated.connect(_on_enemy_defeated)
 	enemy.damaged.connect(_on_enemy_damaged)
 	enemy.damage_recorded.connect(telemetry.record_damage)
@@ -244,7 +245,7 @@ func _on_enemy_defeated(at: Vector2, data: EnemyData) -> void:
 	telemetry.record_kill(data.is_boss, data.is_elite)
 	if not data.is_boss:
 		sound.play_cue(&"down")
-	var reward_drop: bool = wave.active and (data.is_elite or randf() < WaveController.loot_chance(wave.current_wave))
+	var reward_drop: bool = wave.active and (data.is_elite or randf() < WaveController.loot_chance(wave.current_wave) * DifficultyCatalog.by_id(wave.difficulty_id).reward_chance_multiplier)
 	var bonus_coins := items.on_kill(at, data.is_boss)
 	coins += bonus_coins
 	telemetry.record_loot(&"coin", bonus_coins)
@@ -524,7 +525,9 @@ func _finish_run() -> void:
 	boss_pending = false
 	_sync_music()
 	_clear_arena(true)
-	choice_panel.show_end(true, coins, _run_recap_data())
+	var recap := _run_recap_data()
+	recap["hell_unlocked_now"] = wave.difficulty_id == &"hard" and session.unlock_hell()
+	choice_panel.show_end(true, coins, recap)
 	_save_completed_report(true)
 	session.clear_run()
 	_refresh_hud()
@@ -651,6 +654,7 @@ func _save_completed_report(won: bool) -> void:
 
 func _run_recap_data() -> Dictionary:
 	return {
+		"difficulty_id": str(wave.difficulty_id),
 		"wave_reached": wave.current_wave,
 		"final_level": level,
 		"coins_left": coins,
@@ -681,6 +685,7 @@ func _save_run() -> void:
 
 func _restore_run(saved: Dictionary) -> void:
 	RUN_SNAPSHOT.restore(self, saved)
+	session.selected_difficulty_id = wave.difficulty_id
 	_sync_music()
 
 

@@ -70,6 +70,7 @@ var elite_counts: Array[int] = []
 var elite_index: int = 0
 var current_profile_id: StringName = &""
 var next_profile_id: StringName = &""
+var difficulty_id: StringName = &"normal"
 
 
 func plan_hordes() -> void:
@@ -106,16 +107,23 @@ static func elite_for_wave(wave_number: int) -> EnemyData:
 	return HUNT_GERM if wave_number >= 12 and wave_number % 2 == 0 else ACID_CROWN
 
 
-static func elite_groups_for_wave(wave_number: int) -> Array[int]:
-	if wave_number < 8 or is_boss_wave(wave_number):
+static func elite_groups_for_wave(wave_number: int, selected_difficulty_id: StringName = &"normal") -> Array[int]:
+	var difficulty := DifficultyCatalog.by_id(selected_difficulty_id)
+	var stage_wave := wave_number + difficulty.elite_wave_offset
+	if stage_wave < 8 or is_boss_wave(wave_number):
 		return []
-	if wave_number < 11:
-		return [1]
-	if wave_number < 14:
-		return [1, 1]
-	if wave_number < 17:
-		return [2, 1]
-	return [3, 2, 1]
+	var groups: Array[int]
+	if stage_wave < 11:
+		groups = [1]
+	elif stage_wave < 14:
+		groups = [1, 1]
+	elif stage_wave < 17:
+		groups = [2, 1]
+	else:
+		groups = [3, 2, 1]
+	for index in groups.size():
+		groups[index] += difficulty.elite_group_bonus
+	return groups
 
 
 static func elite_for_event(wave_number: int, event_index: int, member: int) -> EnemyData:
@@ -195,7 +203,7 @@ func next_wave_preview() -> String:
 	if horde_waves.has(next_wave):
 		details.append("%s-Horde" % _horde_data(next_wave).display_name)
 	var elite_total := 0
-	for count in elite_groups_for_wave(next_wave):
+	for count in elite_groups_for_wave(next_wave, difficulty_id):
 		elite_total += count
 	if elite_total == 1:
 		details.append("Elite: %s" % elite_for_wave(next_wave).display_name)
@@ -237,7 +245,7 @@ func _process(delta: float) -> void:
 		return
 	if not horde_spawned and horde_waves.has(current_wave) and remaining <= duration * (1.0 - HORDE_TIME_FRACTION):
 		horde_spawned = true
-		horde_requested.emit(_horde_data(current_wave), 5 + current_wave)
+		horde_requested.emit(_horde_data(current_wave), maxi(roundi(float(5 + current_wave) * DifficultyCatalog.by_id(difficulty_id).horde_size_multiplier), 1))
 	var elapsed := duration - remaining
 	while elite_index < elite_times.size() and elapsed >= elite_times[elite_index]:
 		for member in elite_counts[elite_index]:
@@ -251,11 +259,14 @@ func _process(delta: float) -> void:
 	if spawn_cooldown <= 0.0:
 		enemy_requested.emit(_choose_enemy())
 		var spawn_floor := BOSS_WAVE_SPAWN_INTERVAL_MIN if is_boss_wave(current_wave) else SPAWN_INTERVAL_MIN
-		spawn_cooldown = maxf(SPAWN_INTERVAL_START - elapsed * SPAWN_INTERVAL_ACCELERATION - (current_wave - 1) * SPAWN_INTERVAL_WAVE_STEP, spawn_floor)
+		spawn_cooldown = maxf(SPAWN_INTERVAL_START - elapsed * SPAWN_INTERVAL_ACCELERATION - (current_wave - 1) * SPAWN_INTERVAL_WAVE_STEP, spawn_floor) * DifficultyCatalog.by_id(difficulty_id).spawn_interval_multiplier
 
 
 func plan_bursts() -> void:
 	burst_times.clear()
+	var difficulty := DifficultyCatalog.by_id(difficulty_id)
+	if difficulty.extra_burst_first_wave > 0 and current_wave >= difficulty.extra_burst_first_wave:
+		burst_times.append(randf_range(duration * 0.12, duration * 0.18))
 	burst_times.append(randf_range(duration * 0.22, duration * 0.31))
 	if current_wave >= 12 and not is_boss_wave(current_wave):
 		burst_times.append(randf_range(duration * 0.40, duration * 0.47))
@@ -267,7 +278,7 @@ func plan_bursts() -> void:
 
 func plan_elites() -> void:
 	elite_times.clear()
-	elite_counts = elite_groups_for_wave(current_wave)
+	elite_counts = elite_groups_for_wave(current_wave, difficulty_id)
 	elite_index = 0
 	if elite_counts.is_empty():
 		return
@@ -289,13 +300,15 @@ func _burst_data(index: int) -> EnemyData:
 
 
 func _burst_count(index: int) -> int:
+	var base_count: int
 	match index:
 		0:
-			return 4 + current_wave / 2
+			base_count = 4 + current_wave / 2
 		1:
-			return 5 + current_wave
+			base_count = 5 + current_wave
 		_:
-			return 2 + current_wave / 5 if is_boss_wave(current_wave) else 3 + current_wave / 3
+			base_count = 2 + current_wave / 5 if is_boss_wave(current_wave) else 3 + current_wave / 3
+	return maxi(roundi(float(base_count) * DifficultyCatalog.by_id(difficulty_id).horde_size_multiplier), 1)
 
 
 func _choose_enemy() -> EnemyData:

@@ -194,7 +194,7 @@ func _show_home() -> void:
 	_clear_rows()
 	_title("Denti: Divine Dentistry" if not overlay else "Zahnpause")
 	if overlay:
-		_text("Welle %d · Level %d" % [game.wave.current_wave, game.level])
+		_text("Welle %d · Level %d · %s" % [game.wave.current_wave, game.level, DifficultyCatalog.by_id(game.wave.difficulty_id).display_name])
 		_button("Fortsetzen", close_pause, true)
 		_button("Stats", _show_stats)
 		_button("Items", _show_items)
@@ -292,7 +292,7 @@ func _new_game() -> void:
 	if session.has_run():
 		_show_new_game_confirmation()
 		return
-	_start_new_game()
+	_show_difficulty()
 
 
 func _show_new_game_confirmation() -> void:
@@ -301,10 +301,30 @@ func _show_new_game_confirmation() -> void:
 	_title("Neues Spiel?")
 	_text("Dein aktueller Spielstand wird gelöscht.")
 	_button("Abbrechen", _show_home, true)
-	_button("Spielstand löschen und neu starten", _start_new_game)
+	_button("Weiter zur Schwierigkeitswahl", _show_difficulty)
 
 
-func _start_new_game() -> void:
+func _show_difficulty() -> void:
+	page = &"difficulty"
+	_clear_rows()
+	_title("Schwierigkeitsgrad")
+	_text("Wähle den Gegnerdruck für diesen Run.")
+	var default_button: Button
+	for difficulty in DifficultyCatalog.ALL:
+		var unlocked: bool = session.can_select_difficulty(difficulty.id)
+		var label := difficulty.display_name if unlocked else "%s · Nach Sieg auf Hard" % difficulty.display_name
+		var button := _button(label, _start_new_game.bind(difficulty.id), difficulty.id == &"normal", not unlocked)
+		button.tooltip_text = difficulty.description
+		if difficulty.id == &"normal":
+			default_button = button
+	_button("Zurück", _show_home)
+	if default_button != null:
+		default_button.grab_focus()
+
+
+func _start_new_game(difficulty_id: StringName) -> void:
+	if not session.select_difficulty(difficulty_id):
+		return
 	session.clear_run()
 	session.resume_requested = false
 	get_tree().paused = false

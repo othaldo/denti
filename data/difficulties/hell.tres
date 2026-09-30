@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="DifficultyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/difficulty_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"hell"
+display_name = "Hell"
+description = "Sehr dichter Gegnerdruck, viele parallele Eliten und besonders intensive Bossmuster."
+spawn_interval_multiplier = 0.76
+horde_size_multiplier = 1.25
+extra_burst_first_wave = 5
+elite_wave_offset = 4
+elite_group_bonus = 2
+enemy_damage_multiplier = 1.16
+ranged_interval_multiplier = 0.8
+boss_volley_bonus = 2
+reward_chance_multiplier = 0.8

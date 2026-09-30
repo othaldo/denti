@@ -159,7 +159,7 @@ func _end_summary(won: bool, coins: int, recap: Dictionary) -> String:
 	var seconds := elapsed % 60
 	var outcome := "Sieg" if won else "Niederlage"
 	var lines: PackedStringArray = [
-		"%s · Welle %d · Level %d · %02d:%02d Minuten" % [outcome, int(recap.get("wave_reached", 0)), int(recap.get("final_level", 1)), minutes, seconds],
+		"%s auf %s · Welle %d · Level %d · %02d:%02d Minuten" % [outcome, DifficultyCatalog.by_id(StringName(str(recap.get("difficulty_id", "normal")))).display_name, int(recap.get("wave_reached", 0)), int(recap.get("final_level", 1)), minutes, seconds],
 		"%s Gegner besiegt · %s Bosse · %s Gesamtschaden" % [
 			_format_number(int(run.get("kills", 0))), _format_number(int(run.get("bosses_defeated", 0))), _format_number(roundi(float(run.get("total_damage", 0.0))))],
 		"%s Schaden erlitten · %s XP · %s Münzen gesammelt (%s übrig)" % [
@@ -168,6 +168,8 @@ func _end_summary(won: bool, coins: int, recap: Dictionary) -> String:
 		"Kisten: %d gefunden · %d behalten · %d zerlegt" % [
 			int(run.get("chests_found", 0)), int(run.get("chests_kept", 0)), int(run.get("chests_scrapped", 0))],
 	]
+	if bool(recap.get("hell_unlocked_now", false)):
+		lines.append("Hell freigeschaltet!")
 	var weapon_damage: Dictionary = run.get("weapon_damage", {})
 	var weapon_total := 0.0
 	for amount in weapon_damage.values():

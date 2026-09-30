@@ -24,6 +24,7 @@ const AURA_HASTE_DURATION := 0.65
 @onready var sprite: Sprite2D = $Sprite2D
 
 var data: EnemyData
+var difficulty: DifficultyData
 var target: Player
 var health: float
 var max_health: float
@@ -68,8 +69,9 @@ var active_special_attack: int = EnemyData.SpecialAttack.NONE
 var active_trigger_range: float = 0.0
 
 
-func configure(enemy_data: EnemyData, player: Player, wave_number: int = 1) -> void:
+func configure(enemy_data: EnemyData, player: Player, wave_number: int = 1, difficulty_id: StringName = &"normal") -> void:
 	data = enemy_data
+	difficulty = DifficultyCatalog.by_id(difficulty_id)
 	target = player
 	spawn_wave = wave_number
 	var advanced := data.advanced_special_wave > 0 and wave_number >= data.advanced_special_wave
@@ -78,11 +80,11 @@ func configure(enemy_data: EnemyData, player: Player, wave_number: int = 1) -> v
 	max_health = data.max_health * WaveController.health_multiplier(data, wave_number)
 	health = max_health
 	damage_reduction = WaveController.damage_reduction(data, wave_number)
-	contact_damage = data.contact_damage * WaveController.enemy_damage_multiplier(data, wave_number)
-	attack_damage = data.attack_damage * WaveController.enemy_damage_multiplier(data, wave_number)
+	contact_damage = data.contact_damage * WaveController.enemy_damage_multiplier(data, wave_number) * difficulty.enemy_damage_multiplier
+	attack_damage = data.attack_damage * WaveController.enemy_damage_multiplier(data, wave_number) * difficulty.enemy_damage_multiplier
 	move_speed = data.move_speed * WaveController.enemy_speed_multiplier(data, wave_number)
 	special_phase = SpecialPhase.COOLDOWN
-	var interval := data.special_interval * (WaveController.ranged_interval_multiplier(wave_number) if active_special_attack == EnemyData.SpecialAttack.SHOOT else 1.0)
+	var interval := data.special_interval * (WaveController.ranged_interval_multiplier(wave_number) * difficulty.ranged_interval_multiplier if active_special_attack == EnemyData.SpecialAttack.SHOOT else 1.0)
 	if data.is_elite:
 		special_timer = randf_range(0.35, 0.55)
 	else:
@@ -319,7 +321,7 @@ func _activate_special() -> void:
 
 func _reset_special() -> void:
 	special_phase = SpecialPhase.COOLDOWN
-	special_timer = data.special_interval * (0.72 if is_enraged else (WaveController.ranged_interval_multiplier(spawn_wave) if active_special_attack == EnemyData.SpecialAttack.SHOOT else 1.0))
+	special_timer = data.special_interval * (0.72 if is_enraged else (WaveController.ranged_interval_multiplier(spawn_wave) * difficulty.ranged_interval_multiplier if active_special_attack == EnemyData.SpecialAttack.SHOOT else 1.0))
 	queue_redraw()
 
 
@@ -331,7 +333,7 @@ func _dash_impact() -> void:
 
 
 func _fire_phase_burst() -> void:
-	boss_radial_volleys_remaining = maxi(data.boss_radial_volley_count, 1)
+	boss_radial_volleys_remaining = maxi(data.boss_radial_volley_count + difficulty.boss_volley_bonus, 1)
 	boss_radial_volley_timer = 0.0
 	boss_radial_volley_index = 0
 	_fire_next_boss_radial_volley()
@@ -360,11 +362,11 @@ func _fire_boss_signature(charge_direction: Vector2) -> void:
 		return
 	match data.boss_signature:
 		EnemyData.BossSignature.AIMED_FAN:
-			EnemyProjectilePatterns.fire_aimed_fan(root, global_position, target.global_position - global_position, data.boss_fan_count, data.boss_projectile_speed, attack_damage * 0.45, target)
+			EnemyProjectilePatterns.fire_aimed_fan(root, global_position, target.global_position - global_position, maxi(data.boss_fan_count + difficulty.boss_volley_bonus * 2, 1), data.boss_projectile_speed, attack_damage * 0.45, target)
 		EnemyData.BossSignature.TRAIL_FAN:
-			EnemyProjectilePatterns.fire_aimed_fan(root, global_position, -charge_direction, data.boss_fan_count, data.boss_projectile_speed, attack_damage * 0.45, target)
+			EnemyProjectilePatterns.fire_aimed_fan(root, global_position, -charge_direction, maxi(data.boss_fan_count + difficulty.boss_volley_bonus * 2, 1), data.boss_projectile_speed, attack_damage * 0.45, target)
 		EnemyData.BossSignature.LANE:
-			EnemyProjectilePatterns.fire_lane(root, global_position, charge_direction, data.boss_signature_projectile_count, data.boss_signature_projectile_spacing, data.boss_projectile_speed, attack_damage * 0.45, target, EnemyProjectilePatterns.BOSS_COLOR)
+			EnemyProjectilePatterns.fire_lane(root, global_position, charge_direction, maxi(data.boss_signature_projectile_count + difficulty.boss_volley_bonus, 1), data.boss_signature_projectile_spacing, data.boss_projectile_speed, attack_damage * 0.45, target, EnemyProjectilePatterns.BOSS_COLOR)
 		EnemyData.BossSignature.SPACE_ORB:
 			EnemyProjectilePatterns.fire_space_orb(root, global_position, charge_direction, data.boss_projectile_speed, attack_damage * 0.5, data.boss_signature_orb_radius, target)
 

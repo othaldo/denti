@@ -7,7 +7,10 @@ const SAVE_VERSION := 1
 var save_path: String = "user://run_save.json"
 var report_dir: String = "user://run_reports"
 var settings_path: String = "user://settings.cfg"
+var progression_path: String = "user://progression.cfg"
 var resume_requested: bool = false
+var selected_difficulty_id: StringName = &"normal"
+var hell_unlocked: bool = false
 var master_volume_percent: int = 100
 var music_volume_percent: int = 100
 var sfx_volume_percent: int = 100
@@ -15,6 +18,7 @@ var show_fps: bool = false
 
 
 func _ready() -> void:
+	load_progression()
 	var config := ConfigFile.new()
 	if config.load(settings_path) == OK:
 		master_volume_percent = clampi(int(config.get_value("audio", "master", config.get_value("audio", "volume", 100))), 0, 100)
@@ -55,6 +59,33 @@ func save_run(data: Dictionary) -> void:
 func clear_run() -> void:
 	if FileAccess.file_exists(save_path):
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(save_path))
+
+
+func load_progression() -> void:
+	var config := ConfigFile.new()
+	hell_unlocked = config.load(progression_path) == OK and bool(config.get_value("difficulty", "hell_unlocked", false))
+
+
+func can_select_difficulty(id: StringName) -> bool:
+	return DifficultyCatalog.by_id(id).id == id and (id != &"hell" or hell_unlocked)
+
+
+func select_difficulty(id: StringName) -> bool:
+	if not can_select_difficulty(id):
+		return false
+	selected_difficulty_id = id
+	return true
+
+
+func unlock_hell() -> bool:
+	if hell_unlocked:
+		return false
+	hell_unlocked = true
+	var config := ConfigFile.new()
+	config.set_value("difficulty", "hell_unlocked", true)
+	if config.save(progression_path) != OK:
+		push_warning("Hell-Freischaltung konnte nicht gespeichert werden: %s" % progression_path)
+	return true
 
 
 func save_run_report(report: Dictionary) -> String:

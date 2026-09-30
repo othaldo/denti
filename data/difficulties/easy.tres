@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="DifficultyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/difficulty_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"easy"
+display_name = "Easy"
+description = "Weniger Gegnerdruck, spätere Eliten und schwächere Angriffe."
+spawn_interval_multiplier = 1.2
+horde_size_multiplier = 0.8
+elite_wave_offset = -2
+enemy_damage_multiplier = 0.8
+ranged_interval_multiplier = 1.15
+boss_volley_bonus = -1
+reward_chance_multiplier = 1.15

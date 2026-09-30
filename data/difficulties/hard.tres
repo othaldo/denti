@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="DifficultyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/difficulty_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"hard"
+display_name = "Hard"
+description = "Mehr Gegner, Horden und Eliten; dichtere Bossmuster. Ein Sieg schaltet Hell frei."
+spawn_interval_multiplier = 0.88
+horde_size_multiplier = 1.15
+extra_burst_first_wave = 8
+elite_wave_offset = 2
+elite_group_bonus = 1
+enemy_damage_multiplier = 1.08
+ranged_interval_multiplier = 0.9
+boss_volley_bonus = 1
+reward_chance_multiplier = 0.9

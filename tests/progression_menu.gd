@@ -33,6 +33,10 @@ func _run() -> void:
 		_fail("new game was not selected when no save exists")
 		return
 	menu._new_game()
+	if menu.page != &"difficulty" or (menu.rows.get_child(4) as Button).text != "Normal":
+		_fail("new game did not offer difficulty selection")
+		return
+	(menu.rows.get_child(4) as Button).pressed.emit()
 	await process_frame
 	await process_frame
 	var game: Node2D = current_scene
@@ -197,6 +201,10 @@ func _run() -> void:
 	await process_frame
 	menu = current_scene as GameMenu
 	menu._new_game()
+	(menu.rows.get_child(4) as Button).pressed.emit()
+	if menu.page != &"difficulty":
+		_fail("confirmed new game did not offer difficulty selection")
+		return
 	(menu.rows.get_child(4) as Button).pressed.emit()
 	await process_frame
 	await process_frame

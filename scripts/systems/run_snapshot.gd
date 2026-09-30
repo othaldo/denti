@@ -44,6 +44,7 @@ static func capture(game) -> Dictionary:
 		for upgrade in game.choice_panel.current_upgrades:
 			upgrades.append({"stat": str(upgrade.stat), "tier": upgrade.tier})
 	return {
+		"difficulty_id": str(game.wave.difficulty_id),
 		"wave": game.wave.current_wave, "duration": game.wave.duration, "remaining": game.wave.remaining,
 		"spawn_cooldown": game.wave.spawn_cooldown, "active": game.wave.active,
 		"horde_waves": game.wave.horde_waves, "horde_spawned": game.wave.horde_spawned,
@@ -67,6 +68,7 @@ static func capture(game) -> Dictionary:
 
 static func restore(game, saved: Dictionary) -> void:
 	var wave: WaveController = game.wave
+	wave.difficulty_id = DifficultyCatalog.by_id(StringName(str(saved.get("difficulty_id", "normal")))).id
 	var player: Player = game.player
 	var shop: ShopController = game.shop
 	wave.current_wave = clampi(int(saved.get("wave", 1)), 1, WaveController.MAX_WAVES)
@@ -162,9 +164,9 @@ static func restore(game, saved: Dictionary) -> void:
 			enemy.boss_phase_timer = clampf(float(entry.get("boss_phase_timer", 0.0)), 0.0, enemy.data.boss_phase_duration)
 			enemy.boss_phase_burst_fired = bool(entry.get("boss_phase_burst_fired", false))
 			enemy.boss_phase_gap_angle = float(entry.get("boss_phase_gap_angle", 0.0))
-			enemy.boss_radial_volleys_remaining = clampi(int(entry.get("boss_radial_volleys_remaining", 0)), 0, enemy.data.boss_radial_volley_count)
+			enemy.boss_radial_volleys_remaining = clampi(int(entry.get("boss_radial_volleys_remaining", 0)), 0, maxi(enemy.data.boss_radial_volley_count + enemy.difficulty.boss_volley_bonus, 1))
 			enemy.boss_radial_volley_timer = clampf(float(entry.get("boss_radial_volley_timer", 0.0)), 0.0, enemy.data.boss_radial_volley_interval)
-			enemy.boss_radial_volley_index = clampi(int(entry.get("boss_radial_volley_index", 0)), 0, enemy.data.boss_radial_volley_count)
+			enemy.boss_radial_volley_index = clampi(int(entry.get("boss_radial_volley_index", 0)), 0, maxi(enemy.data.boss_radial_volley_count + enemy.difficulty.boss_volley_bonus, 1))
 		enemy.queue_redraw()
 	for entry in saved.get("loot", []):
 		var kind := StringName(str(entry.get("kind", "xp")))
