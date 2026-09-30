@@ -118,8 +118,14 @@ func _legacy_value(data: WeaponData, tier: int) -> int:
 func _refresh_positions() -> void:
 	var weapons := equipped()
 	for index in weapons.size():
-		var angle := TAU * float(index) / float(maxi(weapons.size(), 1))
 		weapons[index].position = Vector2.ZERO
-		weapons[index].home_position = Vector2(cos(angle), sin(angle)) * 35.0
-		weapons[index].hold_position = weapons[index].home_position
+		weapons[index].home_position = WeaponLayout.home(index, weapons.size())
+		weapons[index].visual_density = WeaponLayout.density_scale(weapons.size())
+		weapons[index].attack_phase = WeaponLayout.phase(index, weapons.size())
+		if not WeaponMotion.is_contact(weapons[index].data):
+			if weapons[index].focus_target_id == 0 and weapons[index].attack_time <= 0.0:
+				weapons[index].aim = Vector2.RIGHT if weapons[index].home_position.x > 0.0 else Vector2.LEFT
+			weapons[index].hold_position = WeaponMotion.hand_position(weapons[index].home_position, weapons[index].aim)
+		else:
+			weapons[index].hold_position = weapons[index].home_position
 		weapons[index].update_visual()

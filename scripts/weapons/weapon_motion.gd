@@ -6,11 +6,11 @@ const ACTIVE_END := 0.72
 
 
 static func is_contact(data: WeaponData) -> bool:
-	return data.attack_mode in [&"melee", &"area", &"thrust", &"sweep"]
+	return WeaponLayout.is_contact(data)
 
 
-static func base_scale(data: WeaponData) -> float:
-	return data.visual_size / maxf(data.sprite.get_size().x, data.sprite.get_size().y)
+static func base_scale(data: WeaponData, density: float = 1.0) -> float:
+	return WeaponLayout.visual_size(data, density) / maxf(data.sprite.get_size().x, data.sprite.get_size().y)
 
 
 static func tip_local(data: WeaponData) -> Vector2:
@@ -18,13 +18,15 @@ static func tip_local(data: WeaponData) -> Vector2:
 
 
 static func hand_position(home: Vector2, direction: Vector2) -> Vector2:
-	return direction * 32.0 + direction.orthogonal() * (home.y * 0.7 + home.x * 0.4) + Vector2(0, 16)
+	# Keep distinct hands rather than collapsing the whole loadout toward its aim.
+	var lane := home.y * 0.55 + signf(home.x) * 30.0
+	return direction * 40.0 + direction.orthogonal() * lane
 
 
-static func pose(data: WeaponData, tier: int, home: Vector2, aim: Vector2, progress: float, idle_time: float, target_distance: float = INF) -> Dictionary:
+static func pose(data: WeaponData, tier: int, home: Vector2, aim: Vector2, progress: float, idle_time: float, target_distance: float = INF, density: float = 1.0) -> Dictionary:
 	var active := progress >= 0.0
 	var side := -1.0 if aim.x < -0.02 else 1.0
-	var factor := base_scale(data)
+	var factor := base_scale(data, density)
 	var rotation := 0.0
 	var scale := Vector2.ONE * factor
 	var grip := home + Vector2(0, sin(idle_time * 3.4) * 1.0)
@@ -33,18 +35,20 @@ static func pose(data: WeaponData, tier: int, home: Vector2, aim: Vector2, progr
 		scale.y *= side
 		rotation = aim.angle() + deg_to_rad(data.visual_angle_degrees) * side
 		if not is_contact(data):
-			var nozzle := aim * minf(48.0, maxf(target_distance - 12.0, 8.0))
+			var nozzle := home + aim * minf(24.0, maxf(target_distance - home.length() - 12.0, 8.0))
 			if data.attack_mode in [&"projectile", &"beam"]:
 				nozzle = home + aim * minf(42.0, maxf(target_distance - home.length() - 12.0, 8.0))
 			grip = nozzle - (tip_local(data) * scale).rotated(rotation)
 	elif data.held_style == "upright":
 		scale.x *= side
 	else:
-		scale.x *= side
+		scale.x *= -1.0 if home.x < 0.0 else 1.0
 	if is_contact(data) and active:
 		var rest_rotation := rotation
 		scale = Vector2.ONE * factor
-		var native_angle := tip_local(data).angle()
+		if data.held_style == "staff":
+			scale.x *= -1.0 if home.x < 0.0 else 1.0
+		var native_angle := (tip_local(data) * scale).angle()
 		var action := clampf((progress - ACTIVE_START) / (ACTIVE_END - ACTIVE_START), 0.0, 1.0)
 		var reach := data.range_at_tier(tier)
 		var length := tip_local(data).length() * factor

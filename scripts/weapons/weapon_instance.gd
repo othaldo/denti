@@ -13,6 +13,9 @@ var idle_time: float = 0.0
 var aim: Vector2 = Vector2.RIGHT
 var home_position: Vector2 = Vector2.ZERO
 var hold_position: Vector2 = Vector2.ZERO
+var visual_density: float = 1.0
+var attack_phase: float = 0.0
+var engagement_pending: bool = true
 var aim_distance: float = 1000.0
 var hit_point: Vector2 = Vector2.ZERO
 var sprite: Sprite2D
@@ -56,11 +59,12 @@ func update_visual() -> void:
 	if sprite == null:
 		return
 	var home := home_position if WeaponMotion.is_contact(data) else hold_position
-	var pose_data := WeaponMotion.pose(data, tier, home, aim, progress(), idle_time, aim_distance)
+	var pose_data := WeaponMotion.pose(data, tier, home, aim, progress(), idle_time, aim_distance, visual_density)
 	sprite.position = pose_data.position
 	sprite.rotation = pose_data.rotation
 	sprite.scale = pose_data.scale
-	z_index = -1 if sprite.position.y < -12.0 else 1
+	# Denti's face stays readable even when a rear hand thrusts across the body.
+	z_index = -1 if WeaponMotion.is_contact(data) or sprite.position.y < -12.0 else 1
 
 
 func _physics_process(delta: float) -> void:
@@ -79,17 +83,37 @@ func _physics_process(delta: float) -> void:
 	if cooldown > 0.0 or attack_time > 0.0:
 		return
 	var targets: Array[Enemy] = []
+	var reach := data.range_at_tier(tier)
 	for node in get_tree().get_nodes_in_group("enemies"):
 		var enemy := node as Enemy
-		if enemy != null and enemy.health > 0.0 and player.global_position.distance_squared_to(enemy.global_position) <= pow(data.range_at_tier(tier) + enemy.data.radius, 2):
+		if enemy != null and enemy.health > 0.0 and player.global_position.distance_squared_to(enemy.global_position) <= pow(reach + enemy.data.radius, 2):
 			targets.append(enemy)
 	if targets.is_empty():
 		focus_target_id = 0
 		focus_hits = 0
+		engagement_pending = true
 		return
-	targets.sort_custom(func(a: Enemy, b: Enemy) -> bool:
-		return player.global_position.distance_squared_to(a.global_position) < player.global_position.distance_squared_to(b.global_position))
+	if engagement_pending:
+		engagement_pending = false
+		cooldown = attack_interval() * attack_phase
+		if cooldown > 0.0:
+			return
+	var origin := player.global_position + home_position
+	var closest := 0
+	var distance := INF
+	for index in targets.size():
+		var candidate := origin.distance_squared_to(targets[index].global_position)
+		if candidate < distance:
+			distance = candidate
+			closest = index
+	var first := targets[0]
+	targets[0] = targets[closest]
+	targets[closest] = first
 	_begin_attack(targets)
+
+
+func attack_interval() -> float:
+	return data.interval_at_tier(tier) * player.stats.attack_interval / 0.65 * player.items.attack_interval_factor()
 
 
 func _begin_attack(targets: Array[Enemy]) -> void:
@@ -106,7 +130,7 @@ func _begin_attack(targets: Array[Enemy]) -> void:
 	var damage := player.stats.roll_damage(data.damage_at_tier(tier) / 18.0, data.crit_bonus, data.crit_multiplier, guaranteed)
 	damage *= 1.0 + minf(float(focus_hits) * data.focus_step, data.focus_cap)
 	focus_hits = mini(focus_hits + 1, 1000)
-	cooldown = data.interval_at_tier(tier) * player.stats.attack_interval / 0.65 * player.items.attack_interval_factor()
+	cooldown = attack_interval()
 	focus_time = maxf(cooldown * 1.5, 0.6)
 	attack_duration = maxf(minf(data.animation_duration, cooldown * 0.85), 0.035)
 	attack_time = attack_duration
@@ -158,7 +182,7 @@ func save_motion(enemy_indices: Dictionary) -> Dictionary:
 	return {"remaining": attack_time, "duration": attack_duration, "damage": strike.damage,
 		"critical": strike.critical, "target": enemy_indices.get(strike.target_id, -1), "hits": hit_enemies,
 		"aim": [aim.x, aim.y], "hit_point": [hit_point.x, hit_point.y], "idle_time": idle_time, "aim_distance": aim_distance,
-		"hold": [hold_position.x, hold_position.y]}
+		"hold": [hold_position.x, hold_position.y], "engagement_pending": engagement_pending}
 
 
 func restore_motion(saved: Dictionary, enemies: Array[Node]) -> void:
@@ -166,6 +190,7 @@ func restore_motion(saved: Dictionary, enemies: Array[Node]) -> void:
 	attack_time = clampf(float(saved.get("remaining", 0.0)), 0.0, attack_duration)
 	strike.damage = maxf(float(saved.get("damage", 0.0)), 0.0)
 	strike.critical = bool(saved.get("critical", false))
+	engagement_pending = bool(saved.get("engagement_pending", false))
 	strike.hit_ids.clear()
 	for index in saved.get("hits", []):
 		if int(index) >= 0 and int(index) < enemies.size():
@@ -197,12 +222,12 @@ func _draw() -> void:
 	if WeaponMotion.is_contact(data):
 		if fraction < WeaponMotion.ACTIVE_START:
 			return
-		var blade := WeaponMotion.segment(data, WeaponMotion.pose(data, tier, home_position, aim, fraction, idle_time))
+		var blade := WeaponMotion.segment(data, WeaponMotion.pose(data, tier, home_position, aim, fraction, idle_time, aim_distance, visual_density))
 		draw_line(blade[0], blade[1], Color(color, fade * 0.35), 3.0)
 		if data.attack_animation in ["drill", "polish"]:
 			draw_arc(muzzle, 7.0, idle_time * 25.0, idle_time * 25.0 + PI, 12, color, 2.0)
 		else:
-			var previous := WeaponMotion.segment(data, WeaponMotion.pose(data, tier, home_position, aim, maxf(fraction - 0.06, WeaponMotion.ACTIVE_START), idle_time))
+			var previous := WeaponMotion.segment(data, WeaponMotion.pose(data, tier, home_position, aim, maxf(fraction - 0.06, WeaponMotion.ACTIVE_START), idle_time, aim_distance, visual_density))
 			draw_line(previous[1], blade[1], Color(color, fade * 0.65), 4.0)
 		return
 	match data.attack_mode:

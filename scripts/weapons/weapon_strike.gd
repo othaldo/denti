@@ -34,7 +34,7 @@ func tick(weapon: WeaponInstance, from_progress: float, to_progress: float) -> v
 		return
 	for index in range(steps + 1):
 		var progress := lerpf(start, end, float(index) / float(steps))
-		var pose_data := WeaponMotion.pose(weapon.data, weapon.tier, weapon.home_position, weapon.aim, progress, weapon.idle_time)
+		var pose_data := WeaponMotion.pose(weapon.data, weapon.tier, weapon.home_position, weapon.aim, progress, weapon.idle_time, weapon.aim_distance, weapon.visual_density)
 		var blade := WeaponMotion.segment(weapon.data, pose_data)
 		var grip := weapon.player.global_position + blade[0]
 		var tip := weapon.player.global_position + blade[1]

@@ -47,12 +47,12 @@ func _run() -> void:
 		_fail("player hit has no red number or sound")
 		return
 	game.player.loadout.acquire(WeaponCatalog.by_id(&"floss_whip"))
-	await physics_frame
+	await _wait_for_attack(game.sound, SoundController.FLOSS)
 	if not _has_sound(game.sound, SoundController.FLOSS):
 		_fail("floss attack has no sound")
 		return
 	game.player.loadout.acquire(WeaponCatalog.by_id(&"turbo_drill"))
-	await physics_frame
+	await _wait_for_attack(game.sound, SoundController.DRILL)
 	if not _has_sound(game.sound, SoundController.DRILL):
 		_fail("drill attack has no sound")
 		return
@@ -75,6 +75,13 @@ func _run() -> void:
 	session.clear_run()
 	print("Denti combat feedback test passed")
 	quit(0)
+
+
+func _wait_for_attack(sound: SoundController, effect: AudioStreamWAV) -> void:
+	for frame in 90:
+		await physics_frame
+		if _has_sound(sound, effect):
+			return
 
 
 func _has_sound(sound: SoundController, effect: AudioStreamWAV) -> bool:

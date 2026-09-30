@@ -67,6 +67,23 @@ Kontaktpunkt. Fernkampfgeschosse starten am Waffenkopf. Laufwaffen zielen aus ei
 Handposition neben Denti und spiegeln beim Seitenwechsel; die Amalgam-Schleuder
 bleibt aufrecht. Ruhepositionen kreisen nicht automatisch um Denti.
 
+`WeaponLayout` setzt gemeinsame Größenlimits (100 px Nahkampf, 76 px Fernkampf),
+seitliche Haltepunkte und eine zusätzliche Verkleinerung bis 12 % bei sechs Waffen.
+Die Limits gelten unabhängig von der Atlasauflösung; einzelne Waffen benötigen
+dafür keine neue Konfiguration. Linke Nahkampfwaffen ruhen nach außen gespiegelt
+und werden hinter Denti gezeichnet, damit sein Gesicht sichtbar bleibt.
+Angriffsanimation und Kontaktprüfung verwenden dieselbe Skalierung. Kleine
+Waffen erreichen weiterhin ihre volle Reichweite durch die Angriffsbewegung.
+
+Jede Waffe bevorzugt den Gegner, der ihrem eigenen Haltepunkt am nächsten liegt,
+innerhalb ihrer bisherigen Reichweite um Denti. Es gibt keine feste Reservierung
+von Gegnern: mehrere Waffen können einen einzelnen Gegner gemeinsam fokussieren.
+Beim ersten Kontakt beziehungsweise nach einer Angriffslücke werden die Starts
+über bis zu 75 % eines Angriffsintervalls verteilt. Anschließend bleibt das
+ursprüngliche Intervall erhalten. Spielstände bewahren laufende Cooldowns und
+den Status dieses ersten Versatzes. Die Zielsuche bestimmt das nächste Ziel
+in einem linearen Durchlauf statt alle Gegner nach Entfernung zu sortieren.
+
 | Waffen | Bewegung |
 | --- | --- |
 | Zahnstocher-Speer | Ausholen, gerader Stich, Zurückziehen |
@@ -92,3 +109,7 @@ Eine [animierte Vorschau](screenshots/weapon_motion.gif) zeigt Stich, Schwung,
 aufrechte Schleuder und Seitenwechsel. Das Werkzeug
 `tools/preview_weapon_motion.gd` rendert die vier Beispiele in getrennten,
 manuell fortgeschalteten Testwelten unter `.godot/weapon_motion_frames/`.
+Mit `-- --loadouts` zeigt das Werkzeug sechs Speere gegen ein Ziel,
+sechs Kratzer und Wasserflosser gegen mehrere Ziele sowie einen gemischten Build
+unter `.godot/weapon_loadout_frames/`;
+die [Loadout-Vorschau](screenshots/weapon_loadouts.gif) zeigt diese Anordnung.

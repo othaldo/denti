@@ -24,6 +24,14 @@ func _run() -> void:
 		{"id": "water_jet", "title": "Wasserflosser · Seitenwechsel", "target": Vector2(-160, 0)}
 	]
 	var heads := OS.get_cmdline_user_args().has("--working-heads")
+	var loadouts := OS.get_cmdline_user_args().has("--loadouts")
+	if loadouts:
+		examples = [
+			{"id": "toothpick_spear", "title": "6 Speere · ein Ziel", "target": Vector2(145, 0)},
+			{"id": "plaque_scaler", "title": "6 Kratzer · mehrere Ziele", "target": Vector2(100, 0)},
+			{"id": "water_jet", "title": "6 Wasserflosser · mehrere Ziele", "target": Vector2(145, 0)},
+			{"id": "mixed", "title": "Gemischter Build", "target": Vector2(110, 0)},
+		]
 	if heads:
 		examples[0] = {"id": "cavity_grinder", "title": "Fräse · rotierender Kopf", "target": Vector2(70, 0)}
 		examples[1] = {"id": "prophylaxis_polisher", "title": "Polierer · rotierender Kopf", "target": Vector2(75, 0)}
@@ -40,7 +48,13 @@ func _run() -> void:
 		viewport.add_child(game)
 		game.choice_panel.buttons[0].pressed.emit()
 		game.wave.active = false
-		game.player.loadout.restore([{"id": examples[index].id, "tier": 1}])
+		var equipment: Array[Dictionary] = []
+		for slot in (6 if loadouts else 1):
+			var id: String = examples[index].id
+			if id == "mixed":
+				id = ["water_jet", "amalgam_slingshot", "plaque_scaler", "toothpick_spear", "interdental_brush", "enamel_mirror"][slot]
+			equipment.append({"id": id, "tier": 1})
+		game.player.loadout.restore(equipment)
 		game.hud.get_node("Root").visible = false
 		game.get_node("DamageNumbers").visible = false
 		game.mobile_controls.visible = false
@@ -50,6 +64,13 @@ func _run() -> void:
 		enemy.health = 10000
 		enemy.max_health = 10000
 		enemy.set_physics_process(false)
+		if loadouts and index > 0:
+			for direction in [Vector2.LEFT, Vector2.UP, Vector2.DOWN]:
+				game._create_enemy(WaveController.PLAQUE, game.player.global_position + direction * Vector2(examples[index].target).length())
+				var extra: Enemy = game.get_node("Enemies").get_child(-1)
+				extra.health = 10000
+				extra.max_health = 10000
+				extra.set_physics_process(false)
 		var camera: Camera2D = game.player.get_node("Camera2D")
 		camera.zoom = Vector2.ONE * 1.5
 		camera.offset = Vector2(-15 if index == 3 else 30, 0)
@@ -65,6 +86,8 @@ func _run() -> void:
 		board.add_child(title)
 	paused = true
 	var frame_directory := "res://.godot/weapon_motion_heads" if heads else "res://.godot/weapon_motion_frames"
+	if loadouts:
+		frame_directory = "res://.godot/weapon_loadout_frames"
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(frame_directory))
 	for frame in 48:
 		for index in games.size():
@@ -76,13 +99,15 @@ func _run() -> void:
 						enemy.remove_from_group("enemies")
 			for enemy: Enemy in game.get_node("Enemies").get_children():
 				enemy.add_to_group("enemies")
-			if index == 3 and frame == 24:
+			if not loadouts and index == 3 and frame == 24:
 				game.get_node("Enemies").get_child(0).global_position = game.player.global_position + Vector2(160, 0)
 				game.player.loadout.equipped()[0].cooldown = 0
 			game.player._animate_sprite(Vector2.ZERO, 1.0 / 30.0)
-			game.player.loadout.equipped()[0]._physics_process(1.0 / 30.0)
+			for weapon in game.player.loadout.equipped():
+				weapon._physics_process(1.0 / 30.0)
 			for enemy: Enemy in game.get_node("Enemies").get_children():
-				enemy._physics_process(1.0 / 30.0)
+				if not loadouts:
+					enemy._physics_process(1.0 / 30.0)
 				enemy._process(1.0 / 30.0)
 				enemy.modulate = Color.WHITE
 			for bullet: WeaponProjectile in game.get_node("Projectiles").get_children():

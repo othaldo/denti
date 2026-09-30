@@ -79,6 +79,10 @@ func _ready() -> void:
 	shop_panel.reroll_requested.connect(_on_shop_reroll)
 	shop_panel.continue_requested.connect(_on_shop_continue)
 	mobile_controls.pause_requested.connect(game_menu.open_pause)
+	if DebugRunControls.allowed():
+		var cheat_menu := DebugCheatMenu.new()
+		cheat_menu.name = "DebugCheatMenu"
+		add_child(cheat_menu)
 	if session.resume_requested:
 		session.resume_requested = false
 		var saved: Dictionary = session.load_run()
@@ -669,6 +673,46 @@ func _run_recap_data() -> Dictionary:
 		"telemetry": telemetry.save_data(),
 		"waves": telemetry.wave_summaries(),
 	}
+
+
+func debug_start_wave(number: int) -> void:
+	if not DebugRunControls.allowed() or player.loadout.equipped().is_empty():
+		return
+	wave.active = false
+	# Remove immediately while paused so old loot callbacks and attacks cannot
+	# leak into the freshly started wave.
+	for container in [$Enemies, $Projectiles, $EnemyProjectiles, $Loot]:
+		for child in container.get_children():
+			child.free()
+	boss = null
+	boss_pending = false
+	collecting_wave_loot = false
+	wave_loot_remaining = 0
+	ended = false
+	in_shop = false
+	starter_pending = false
+	choice_panel.visible = false
+	shop_panel.visible = false
+	game_menu.visible = false
+	player.set_physics_process(true)
+	player.velocity = Vector2.ZERO
+	player.global_position = arena.arena_size / 2.0
+	player.hurt_time = 0.0
+	player.sprite.modulate = Color.WHITE
+	player.stats.load_save_data({"health": player.stats.max_health, "luck": player.stats.luck, "shield_charges": 0})
+	# A pending strike may still retain a reference to a removed enemy.
+	player.loadout.restore(player.loadout.save_data())
+	rewards.begin_wave()
+	wave.current_wave = clampi(number, 1, WaveController.MAX_WAVES) - 1
+	wave.next_profile_id = &""
+	var profile_id := wave.prepare_next_wave_profile()
+	telemetry.begin_wave(wave.current_wave + 1, profile_id)
+	wave.start_next_wave()
+	items.on_wave_start()
+	relics.on_wave_start()
+	_sync_music()
+	_refresh_hud()
+	_save_run()
 
 
 func _restart() -> void:

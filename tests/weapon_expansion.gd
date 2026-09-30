@@ -138,6 +138,8 @@ func _run() -> void:
 		_fail("grinder focus did not cap at 50 percent")
 		return
 	var fresh := _enemy(Vector2(30, 0))
+	# Both remain in range; the fresh enemy is now nearer the weapon's own hand.
+	front.global_position = game.player.global_position + Vector2(-50, 0)
 	grinder.cooldown = 0.0
 	_attack(grinder)
 	if not is_equal_approx(10000.0 - fresh.health, first_hit):
