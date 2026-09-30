@@ -42,9 +42,10 @@ func show_weapon(weapon: WeaponData) -> void:
 	content.visible = true
 	icon_rect.texture = weapon.sprite
 	name_label.text = weapon.display_name.to_upper()
-	rarity_label.text = "STUFE I · GEWÖHNLICH"
+	rarity_label.text = "STUFE I · GEWÖHNLICH · %s" % weapon.damage_type.to_upper()
 	DentiUIStyle.style_rarity_label(rarity_label, 1)
 	effect_label.text = "%s\n%d Schaden · %.2f s\n%d Reichweite" % [weapon.description, roundi(weapon.damage_at_tier(1)), weapon.interval_at_tier(1), roundi(weapon.attack_range)]
+	tooltip_text = "%s\n%s" % [weapon.description, weapon.combat_text()]
 	disabled = false
 	DentiUIStyle.style_card(self)
 

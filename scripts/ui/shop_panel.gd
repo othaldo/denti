@@ -164,7 +164,7 @@ func _show_inventory(equipment: Array[Dictionary], used_slots: int, capacity: in
 		button.clip_text = true
 		button.add_theme_font_size_override("font_size", 13)
 		button.text = "%s Mk %s\nVerkaufen +%d" % [entry["name"], ["I", "II", "III", "IV"][int(entry["tier"]) - 1], entry["refund"]]
-		button.tooltip_text = "%s\n%s\n≈ %.1f DPS pro Ziel\nLinksklick 2×: verkaufen%s" % [entry["description"], entry["stats"], entry["dps"], "\nRechtsklick: verschmelzen" if entry["mergeable"] else ""]
+		button.tooltip_text = "%s\n%s\n%s\n≈ %.1f DPS pro Ziel\nLinksklick 2×: verkaufen%s" % [entry["description"], entry["combat"], entry["stats"], entry["dps"], "\nRechtsklick: verschmelzen" if entry["mergeable"] else ""]
 		DentiUIStyle.style_button(button)
 		button.pressed.connect(_on_inventory_pressed.bind(index, button))
 		button.gui_input.connect(_on_inventory_input.bind(index))

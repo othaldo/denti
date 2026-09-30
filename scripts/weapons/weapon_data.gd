@@ -76,6 +76,15 @@ func stats_text(tier: int) -> String:
 	return result
 
 
+func combat_text() -> String:
+	var result := "Schadensart: %s" % damage_type
+	if bleed_dps > 0.0:
+		result += " · Blutung %.1f Schaden/s (%.1f s)" % [bleed_dps, bleed_duration]
+	if wet_duration > 0.0:
+		result += " · Nass %.1f s" % wet_duration
+	return result
+
+
 func estimated_dps(tier: int, player_damage: float, crit_chance: float, attack_interval: float, item_interval_factor: float) -> float:
 	var hit := player_damage * damage_at_tier(tier) / 18.0 * (1.0 + crit_chance * 0.5)
 	var cooldown := interval_at_tier(tier) * attack_interval / 0.65 * item_interval_factor

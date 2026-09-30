@@ -39,6 +39,9 @@ func _run() -> void:
 	if not weapon_button.tooltip_text.contains("DPS") or not weapon_button.tooltip_text.contains("Basis-Schaden") or not offer_card.tooltip_text.contains("DPS") or not offer_card.tooltip_text.contains("Nahkampf"):
 		_fail("weapon hover lacks DPS or effect information")
 		return
+	if not weapon_button.tooltip_text.contains("Schadensart: Schmelz") or not offer_card.rarity_label.text.contains("BOHRUNG") or not offer_card.tooltip_text.contains("Schadensart: Bohrung"):
+		_fail("weapon damage types are missing from cards or tooltips")
+		return
 	var many_items: Array[Dictionary] = []
 	for template: ShopOfferData in ShopController.CATALOG:
 		if template.weapon_data == null:

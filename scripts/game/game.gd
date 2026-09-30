@@ -549,7 +549,7 @@ func _update_shop_panel() -> void:
 	var weapons := player.loadout.equipped()
 	for index in weapons.size():
 		var weapon := weapons[index]
-		equipment.append({"name": weapon.data.display_name, "tier": weapon.tier, "refund": player.loadout.refund_for(index), "stats": weapon.data.stats_text(weapon.tier), "description": weapon.data.description, "dps": _weapon_dps(weapon.data, weapon.tier), "mergeable": player.loadout.can_merge(index)})
+		equipment.append({"name": weapon.data.display_name, "tier": weapon.tier, "refund": player.loadout.refund_for(index), "stats": weapon.data.stats_text(weapon.tier), "combat": weapon.data.combat_text(), "description": weapon.data.description, "dps": _weapon_dps(weapon.data, weapon.tier), "mergeable": player.loadout.can_merge(index)})
 	var buyable: Array[bool] = []
 	var offer_dps: Array[float] = []
 	for offer in shop.offers:

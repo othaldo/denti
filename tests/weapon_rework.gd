@@ -22,6 +22,9 @@ func _run() -> void:
 	var mirror := WeaponCatalog.by_id(&"enamel_mirror")
 	var scaler := WeaponCatalog.by_id(&"plaque_scaler")
 	var mortar := WeaponCatalog.by_id(&"mouthwash_mortar")
+	if not whip.combat_text().contains("Blutung 1.8 Schaden/s") or not scaler.combat_text().contains("Blutung") or not water.combat_text().contains("Nass 2.5 s"):
+		_fail("weapon status effects are missing from combat information")
+		return
 	if brush.projectile_count_at_tier(1) != 1 or brush.projectile_count_at_tier(3) != 2 or brush.projectile_count_at_tier(4) != 3:
 		_fail("brush projectile tiers were not loaded")
 		return
