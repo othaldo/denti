@@ -47,7 +47,7 @@ func _physics_process(delta: float) -> void:
 	var targets: Array[Enemy] = []
 	for node in get_tree().get_nodes_in_group("enemies"):
 		var enemy := node as Enemy
-		if enemy != null and player.global_position.distance_to(enemy.global_position) <= data.attack_range + enemy.data.radius:
+		if enemy != null and player.global_position.distance_to(enemy.global_position) <= data.range_at_tier(tier) + enemy.data.radius:
 			targets.append(enemy)
 	if targets.is_empty():
 		return
@@ -60,14 +60,17 @@ func _physics_process(delta: float) -> void:
 	var critical := player.stats.last_roll_critical
 	match data.attack_mode:
 		&"projectile":
-			var projectile: WeaponProjectile = PROJECTILE_SCENE.instantiate()
-			get_tree().current_scene.get_node("Projectiles").add_child(projectile)
-			projectile.launch(player.global_position + aim * 20.0, aim, attack_damage, data, player.items, critical)
+			var count := data.projectile_count_at_tier(tier)
+			for index in count:
+				var angle := 0.0 if index == 0 else (-0.12 if index == 1 else 0.12)
+				var projectile: WeaponProjectile = PROJECTILE_SCENE.instantiate()
+				get_tree().current_scene.get_node("Projectiles").add_child(projectile)
+				projectile.launch(player.global_position + aim * 20.0, aim.rotated(angle), attack_damage if is_zero_approx(angle) else attack_damage * 0.55, data, player.items, critical, tier)
 		&"melee", &"beam":
-			nearest.take_damage(data.damage_against(nearest, player.items.modify_damage(nearest, data, attack_damage)), data, critical)
+			nearest.take_damage(data.damage_against(nearest, player.items.modify_damage(nearest, data, attack_damage), tier), data, critical)
 		&"area":
 			for enemy in targets:
-				enemy.take_damage(data.damage_against(enemy, player.items.modify_damage(enemy, data, attack_damage)), data, critical)
+				enemy.take_damage(data.damage_against(enemy, player.items.modify_damage(enemy, data, attack_damage), tier), data, critical)
 	attack_time = 0.2
 	cooldown = data.interval_at_tier(tier) * player.stats.attack_interval / 0.65 * player.items.attack_interval_factor()
 	var sound_kind: StringName = &"brush"
@@ -92,4 +95,4 @@ func _draw() -> void:
 			draw_line(Vector2.ZERO, hit_point, color, 4.0)
 			draw_circle(hit_point, 6.0, Color.WHITE * fade)
 		&"area":
-			draw_arc(Vector2.ZERO, data.attack_range, 0.0, TAU, 48, color, 4.0)
+			draw_arc(Vector2.ZERO, data.range_at_tier(tier), 0.0, TAU, 48, color, 4.0)

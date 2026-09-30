@@ -20,9 +20,18 @@ extends Resource
 @export var projectile_color: Color = Color(0.75, 0.96, 1.0)
 @export var visual_angle_degrees: float = 45.0
 @export var price: int = 8
+@export var damage_tiers: PackedFloat32Array
+@export var range_tiers: PackedFloat32Array
+@export var projectile_count_tiers: PackedInt32Array
+@export var pierce_tiers: PackedInt32Array
+@export var splash_tiers: PackedFloat32Array
+@export var knockback_tiers: PackedFloat32Array
+@export var boss_bonus_tiers: PackedFloat32Array
 
 
 func damage_at_tier(tier: int) -> float:
+	if damage_tiers.size() >= clampi(tier, 1, 4):
+		return base_damage * damage_tiers[clampi(tier, 1, 4) - 1]
 	return base_damage * pow(1.38, clampi(tier, 1, 4) - 1)
 
 
@@ -30,20 +39,51 @@ func interval_at_tier(tier: int) -> float:
 	return interval * pow(0.94, clampi(tier, 1, 4) - 1)
 
 
+func range_at_tier(tier: int) -> float:
+	return range_tiers[clampi(tier, 1, 4) - 1] if range_tiers.size() >= clampi(tier, 1, 4) else attack_range
+
+
+func projectile_count_at_tier(tier: int) -> int:
+	return projectile_count_tiers[clampi(tier, 1, 4) - 1] if projectile_count_tiers.size() >= clampi(tier, 1, 4) else projectile_count
+
+
+func pierce_at_tier(tier: int) -> int:
+	return pierce_tiers[clampi(tier, 1, 4) - 1] if pierce_tiers.size() >= clampi(tier, 1, 4) else pierce
+
+
+func splash_at_tier(tier: int) -> float:
+	return splash_tiers[clampi(tier, 1, 4) - 1] if splash_tiers.size() >= clampi(tier, 1, 4) else splash_radius
+
+
+func knockback_at_tier(tier: int) -> float:
+	return knockback_tiers[clampi(tier, 1, 4) - 1] if knockback_tiers.size() >= clampi(tier, 1, 4) else knockback
+
+
 func stats_text(tier: int) -> String:
-	return "%d Basis-Schaden · %.2f s · %d Reichweite" % [roundi(damage_at_tier(tier)), interval_at_tier(tier), roundi(attack_range)]
+	var result := "%d Basis-Schaden · %.2f s · %d Reichweite" % [roundi(damage_at_tier(tier)), interval_at_tier(tier), roundi(range_at_tier(tier))]
+	if projectile_count_tiers.size() > 0:
+		var count := projectile_count_at_tier(tier)
+		result += " · %d %s" % [count, "Geschoss" if count == 1 else "Geschosse"]
+	elif pierce_tiers.size() > 0:
+		result += " · %d Durchschlag" % pierce_at_tier(tier)
+	elif splash_tiers.size() > 0:
+		result += " · %d Explosionsradius" % roundi(splash_at_tier(tier))
+	elif boss_bonus_tiers.size() > 0:
+		result += " · +%d %% Boss" % roundi(boss_bonus_tiers[clampi(tier, 1, 4) - 1] * 100.0)
+	return result
 
 
 func estimated_dps(tier: int, player_damage: float, crit_chance: float, attack_interval: float, item_interval_factor: float) -> float:
 	var hit := player_damage * damage_at_tier(tier) / 18.0 * (1.0 + crit_chance * 0.5)
 	var cooldown := interval_at_tier(tier) * attack_interval / 0.65 * item_interval_factor
-	return hit / maxf(cooldown, 0.01)
+	return hit * (1.0 + 0.55 * float(projectile_count_at_tier(tier) - 1)) / maxf(cooldown, 0.01)
 
 
-func damage_against(enemy: Node2D, attack_damage: float) -> float:
+func damage_against(enemy: Node2D, attack_damage: float, tier: int = 1) -> float:
 	var enemy_data: EnemyData = enemy.get("data") as EnemyData
 	if damage_type == "Bohrung" and enemy_data.is_boss:
-		return attack_damage * 1.25
+		var bonus := boss_bonus_tiers[clampi(tier, 1, 4) - 1] if boss_bonus_tiers.size() >= clampi(tier, 1, 4) else 0.25
+		return attack_damage * (1.0 + bonus)
 	if damage_type == "Schnitt" and float(enemy.get("health")) >= float(enemy.get("max_health")) * 0.95:
 		return attack_damage * 1.15
 	return attack_damage
