@@ -41,6 +41,7 @@ func _run() -> void:
 	if late_count < 230 or late_count < middle_count * 1.5 or burst_count != 4:
 		_fail("late waves do not grow beyond middle-wave pressure: %d / %d" % [middle_count, late_count])
 		return
+	wave.current_profile_id = &""
 	seed(12345)
 	var plaque_choices := 0
 	var threat_choices := 0
