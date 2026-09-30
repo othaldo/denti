@@ -154,8 +154,8 @@ func _run() -> void:
 		return
 	game.shop.offers[2] = load("res://data/weapons/shop_magic_toothbrush.tres")
 	game._on_shop_buy(2)
-	if player.loadout.equipped().size() != 3 or player.loadout.equipped()[0].tier != 2:
-		_fail("buying a matching weapon did not merge its tier")
+	if player.loadout.equipped().size() != 4 or player.loadout.equipped()[0].tier != 1 or player.loadout.equipped()[-1].data.id != &"magic_toothbrush":
+		_fail("buying a matching weapon did not use the free slots")
 		return
 	player.stats.apply_upgrade(&"regen", 1.0)
 	player.stats.health = 80.0

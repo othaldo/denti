@@ -51,11 +51,17 @@ func _run() -> void:
 		_fail("shop offer tier was not saved")
 		return
 	game._on_shop_buy(0)
-	if game.player.loadout.equipped().size() != 1 or game.player.loadout.equipped()[0].tier != 3:
-		_fail("purchased tier-II weapon did not merge into tier III")
+	if game.player.loadout.equipped().size() != 2 or game.player.loadout.equipped()[0].tier != 2 or game.player.loadout.equipped()[1].tier != 2 or game.player.loadout.refund_for(1) != roundi(float(offer.price) * 0.5):
+		_fail("purchased tier-II weapon merged despite free slot")
 		return
-	if game.player.loadout.acquire(drill, 3) == false or game.player.loadout.equipped()[0].tier != 4:
-		_fail("tier-III weapon did not merge into tier IV")
+	if not game.player.loadout.merge(0) or game.player.loadout.equipped().size() != 1 or game.player.loadout.equipped()[0].tier != 3:
+		_fail("manual tier-II merge did not reach tier III")
+		return
+	if not game.player.loadout.acquire(drill, 3) or game.player.loadout.equipped().size() != 2 or game.player.loadout.equipped()[1].tier != 3:
+		_fail("tier-III weapon did not use free slot")
+		return
+	if not game.player.loadout.merge(0) or game.player.loadout.equipped()[0].tier != 4:
+		_fail("manual tier-III merge did not reach tier IV")
 		return
 
 	session.save_run(saved)

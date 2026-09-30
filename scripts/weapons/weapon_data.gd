@@ -34,6 +34,12 @@ func stats_text(tier: int) -> String:
 	return "%d Basis-Schaden · %.2f s · %d Reichweite" % [roundi(damage_at_tier(tier)), interval_at_tier(tier), roundi(attack_range)]
 
 
+func estimated_dps(tier: int, player_damage: float, crit_chance: float, attack_interval: float, item_interval_factor: float) -> float:
+	var hit := player_damage * damage_at_tier(tier) / 18.0 * (1.0 + crit_chance * 0.5)
+	var cooldown := interval_at_tier(tier) * attack_interval / 0.65 * item_interval_factor
+	return hit / maxf(cooldown, 0.01)
+
+
 func damage_against(enemy: Node2D, attack_damage: float) -> float:
 	var enemy_data: EnemyData = enemy.get("data") as EnemyData
 	if damage_type == "Bohrung" and enemy_data.is_boss:

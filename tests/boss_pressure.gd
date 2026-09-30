@@ -28,6 +28,9 @@ func _run() -> void:
 		_fail("one huge hit bypassed the visible boss guard")
 		return
 	var radial := EnemyProjectilePatterns.radial_directions(12, 0.0)
+	if WaveController.CAVITY_COUNT.boss_radial_volley_count != 1 or WaveController.CAVITY_PRINCE.boss_radial_volley_count != 3 or WaveController.CAVITY_KING.boss_radial_volley_count != 5 or WaveController.CAVITY_EMPEROR.boss_radial_volley_count != 9:
+		_fail("boss projectile salvos do not escalate 1/3/5/9")
+		return
 	if radial.size() < 8 or radial.size() >= 12:
 		_fail("radial pattern has no readable safe gap")
 		return
@@ -85,7 +88,7 @@ func _run() -> void:
 		seconds += 0.1
 		if boss.dying:
 			break
-	if not boss.dying or seconds < 44.0 or seconds > 62.0 or boss.boss_phase != 2:
+	if not boss.dying or seconds < 44.0 or seconds > 62.0 or boss.boss_phase != 2 or boss.boss_radial_volley_index != 9:
 		_fail("strong build skipped the final boss encounter: %.1fs, phase %d" % [seconds, boss.boss_phase])
 		return
 	session.clear_run()

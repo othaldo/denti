@@ -42,12 +42,24 @@ func _run() -> void:
 			projectile.free()
 	game.player.loadout.restore([])
 	var brush := WeaponCatalog.by_id(&"magic_toothbrush")
-	for count in 8:
+	for count in 3:
 		if not game.player.loadout.acquire(brush):
-			_fail("matching weapon could not merge")
+			_fail("matching weapon could not occupy a free slot")
 			return
-	if game.player.loadout.equipped().size() != 1 or game.player.loadout.equipped()[0].tier != 4 or game.player.loadout.used_slots() != 2:
-		_fail("eight matching weapons did not form tier IV")
+	if game.player.loadout.equipped().size() != 3 or game.player.loadout.equipped()[0].tier != 1 or game.player.loadout.used_slots() != 6:
+		_fail("matching weapons merged despite free slots")
+		return
+	if not game.player.loadout.acquire(brush) or game.player.loadout.equipped().size() != 3 or game.player.loadout.equipped()[0].tier != 2:
+		_fail("full loadout did not merge the purchased weapon")
+		return
+	if not game.player.loadout.merge(1) or game.player.loadout.equipped().size() != 2 or game.player.loadout.equipped()[1].tier != 2:
+		_fail("manual merge did not combine matching equipped weapons")
+		return
+	if not game.player.loadout.merge(0) or game.player.loadout.equipped().size() != 1 or game.player.loadout.equipped()[0].tier != 3 or game.player.loadout.used_slots() != 2:
+		_fail("manual tier-II merge did not reach tier III")
+		return
+	if game.player.loadout.merge(0):
+		_fail("manual merge worked without a matching partner")
 		return
 	var full: Array[Dictionary] = [
 		{"id": "turbo_drill", "tier": 1}, {"id": "turbo_drill", "tier": 2},
@@ -58,37 +70,52 @@ func _run() -> void:
 	if game.player.loadout.used_slots() != 6 or game.player.loadout.can_acquire(brush):
 		_fail("full loadout accepted a two-hand weapon")
 		return
-	if not game.player.loadout.acquire(WeaponCatalog.by_id(&"turbo_drill")) or game.player.loadout.used_slots() != 5:
-		_fail("merging did not free a slot")
+	if not game.player.loadout.acquire(WeaponCatalog.by_id(&"turbo_drill")) or game.player.loadout.used_slots() != 6 or game.player.loadout.equipped()[0].tier != 2:
+		_fail("full loadout did not upgrade matching drill")
+		return
+	if not game.player.loadout.merge(0) or game.player.loadout.used_slots() != 5:
+		_fail("manual merge did not free a slot")
 		return
 	game._open_shop()
 	var coins_before: int = game.coins
+	var expected_refund: int = game.player.loadout.refund_for(0)
 	var button: Button = game.shop_panel.inventory_row.get_child(0)
 	button.pressed.emit()
 	if game.coins != coins_before:
 		_fail("first sell click removed a weapon")
 		return
 	button.pressed.emit()
-	if game.coins <= coins_before or game.player.loadout.used_slots() != 4 or not game.player.loadout.can_acquire(brush):
-		_fail("confirmed sale did not free weapon space")
+	if game.coins != coins_before + expected_refund or expected_refund != WeaponCatalog.by_id(&"turbo_drill").price * 2 or game.player.loadout.used_slots() != 4 or not game.player.loadout.can_acquire(brush):
+		_fail("confirmed sale did not return half the combined weapon value")
 		return
-	game.player.loadout.restore([])
-	for count in 8:
-		if not game.player.loadout.acquire(brush):
-			_fail("tier-up weapon purchase was blocked")
-			return
+	game.shop.offers[0] = ShopController.by_id(&"turbo_drill")
+	game.coins = 100
+	game._on_shop_buy(0)
+	if game.coins != 100 - ShopController.by_id(&"turbo_drill").price or game.player.loadout.equipped().size() != 5 or game.player.loadout.equipped()[-1].data.id != &"turbo_drill" or game.player.loadout.equipped()[-1].tier != 1:
+		_fail("buying after selling upgraded an old weapon instead of adding the new one")
+		return
+	game.player.loadout.restore([{"id": "magic_toothbrush", "tier": 1}, {"id": "magic_toothbrush", "tier": 1}])
+	game._update_shop_panel()
+	var right_click := InputEventMouseButton.new()
+	right_click.button_index = MOUSE_BUTTON_RIGHT
+	right_click.pressed = true
+	(game.shop_panel.inventory_row.get_child(0) as Button).gui_input.emit(right_click)
+	if game.player.loadout.equipped().size() != 1 or game.player.loadout.equipped()[0].tier != 2:
+		_fail("shop right-click did not merge matching weapons")
+		return
+	game.player.loadout.restore([{"id": "magic_toothbrush", "tier": 4, "invested_coins": 72}])
 	game._save_run()
 	var saved: Dictionary = session.load_run()
-	if saved.get("weapons", []).size() != game.player.loadout.equipped().size():
-		_fail("weapon loadout was not saved")
+	if saved.get("weapons", []).size() != game.player.loadout.equipped().size() or int(saved["weapons"][0].get("invested_coins", 0)) != 72:
+		_fail("weapon loadout and sale value were not saved")
 		return
 	session.resume_requested = true
 	var resumed: Node2D = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(resumed)
 	current_scene = resumed
 	var resumed_weapons: Array[Dictionary] = resumed.player.loadout.save_data()
-	if resumed_weapons.size() != saved["weapons"].size():
-		_fail("continue changed the weapon count")
+	if resumed_weapons.size() != saved["weapons"].size() or resumed.player.loadout.refund_for(0) != 36:
+		_fail("continue changed the weapon count or sale value")
 		return
 	for index in resumed_weapons.size():
 		if str(resumed_weapons[index]["id"]) != str(saved["weapons"][index]["id"]) or int(resumed_weapons[index]["tier"]) != int(saved["weapons"][index]["tier"]):

@@ -5,6 +5,7 @@ const ICONS: Script = preload("res://scripts/ui/denti_ui_icons.gd")
 
 signal buy_requested(index: int)
 signal sell_requested(index: int)
+signal merge_requested(index: int)
 signal reroll_requested
 signal continue_requested
 
@@ -23,13 +24,15 @@ signal continue_requested
 var inventory_label: Label
 var inventory_row: HBoxContainer
 var items_label: Label
+var items_scroll: ScrollContainer
+var items_row: HBoxContainer
 var armed_sell_index: int = -1
 
 
 func _ready() -> void:
 	visible = false
 	$Root.theme = DentiUIStyle.make_theme()
-	rows.add_theme_constant_override("separation", 6)
+	rows.add_theme_constant_override("separation", 5)
 	$Root/Dim.color = Color(0.12, 0.06, 0.13, 0.78)
 	DentiUIStyle.style_dialog($Root/Center/Panel)
 	title_label.add_theme_color_override("font_color", DentiUIStyle.INK)
@@ -53,7 +56,7 @@ func _ready() -> void:
 	continue_button.pressed.connect(func() -> void: continue_requested.emit())
 
 
-func show_shop(wave_number: int, coins: int, reroll_cost: int, offers: Array[ShopOfferData], preview: String = "", equipment: Array[Dictionary] = [], used_slots: int = 0, capacity: int = 6, buyable: Array[bool] = [], luck: float = 0.0, owned_items: Array[Dictionary] = [], counts: Dictionary = {}) -> void:
+func show_shop(wave_number: int, coins: int, reroll_cost: int, offers: Array[ShopOfferData], preview: String = "", equipment: Array[Dictionary] = [], used_slots: int = 0, capacity: int = 6, buyable: Array[bool] = [], luck: float = 0.0, owned_items: Array[Dictionary] = [], counts: Dictionary = {}, offer_dps: Array[float] = []) -> void:
 	var first_open := not visible
 	armed_sell_index = -1
 	title_label.text = "Zahnklinik · Nach Welle %d" % wave_number
@@ -63,7 +66,7 @@ func show_shop(wave_number: int, coins: int, reroll_cost: int, offers: Array[Sho
 	for index in offer_buttons.size():
 		var button := offer_buttons[index]
 		var owned_count := int(counts.get(str(offers[index].id), 0)) if offers[index] != null and offers[index].weapon_data == null else 0
-		button.call("show_offer", offers[index], coins, buyable.is_empty() or buyable[index], owned_count)
+		button.call("show_offer", offers[index], coins, buyable.is_empty() or buyable[index], owned_count, offer_dps[index] if index < offer_dps.size() else 0.0)
 	_show_items(owned_items)
 	_show_inventory(equipment, used_slots, capacity)
 	reroll_button.text = "Neu würfeln · %d Münzen" % reroll_cost
@@ -86,6 +89,15 @@ func _build_inventory() -> void:
 	items_label.clip_text = true
 	rows.add_child(items_label)
 	rows.move_child(items_label, $Root/Center/Panel/Margin/Rows/Actions.get_index())
+	items_scroll = ScrollContainer.new()
+	items_scroll.custom_minimum_size.y = 46.0
+	items_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	items_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	rows.add_child(items_scroll)
+	rows.move_child(items_scroll, $Root/Center/Panel/Margin/Rows/Actions.get_index())
+	items_row = HBoxContainer.new()
+	items_row.add_theme_constant_override("separation", 5)
+	items_scroll.add_child(items_row)
 	inventory_label = Label.new()
 	inventory_label.add_theme_color_override("font_color", DentiUIStyle.INK)
 	inventory_label.add_theme_font_size_override("font_size", 17)
@@ -98,20 +110,43 @@ func _build_inventory() -> void:
 
 
 func _show_items(equipment: Array[Dictionary]) -> void:
-	var names: Array[String] = []
-	var details: Array[String] = []
 	var total := 0
+	for child in items_row.get_children():
+		items_row.remove_child(child)
+		child.queue_free()
 	for entry in equipment:
 		var copies := int(entry["count"])
 		total += copies
-		names.append("%s ×%d" % [entry["name"], copies])
-		details.append("%s ×%d — %s" % [entry["name"], copies, entry["description"]])
-	items_label.text = "Items %d · %s" % [total, ", ".join(names.slice(0, 3)) + (" · +%d weitere" % (names.size() - 3) if names.size() > 3 else "") if not names.is_empty() else "noch keine"]
-	items_label.tooltip_text = "\n".join(details)
+		var chip := PanelContainer.new()
+		chip.custom_minimum_size = Vector2(47, 43)
+		chip.tooltip_text = "%s ×%d\n%s" % [entry["name"], copies, entry["description"]]
+		DentiUIStyle.style_chip(chip, Color(0.91, 0.84, 0.97) if bool(entry.get("relic", false)) else Color(0.96, 0.91, 0.78))
+		items_row.add_child(chip)
+		var holder := Control.new()
+		holder.custom_minimum_size = Vector2(34, 34)
+		holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		chip.add_child(holder)
+		var icon := TextureRect.new()
+		icon.texture = entry["icon"]
+		icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		holder.add_child(icon)
+		if copies > 1:
+			var count_label := Label.new()
+			count_label.text = "×%d" % copies
+			count_label.add_theme_color_override("font_color", DentiUIStyle.INK)
+			count_label.add_theme_font_size_override("font_size", 12)
+			count_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			holder.add_child(count_label)
+			count_label.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	items_label.text = "Items & Relikte · %d" % total if total > 0 else "Items & Relikte · noch keine"
+	items_scroll.visible = total > 0
 
 
 func _show_inventory(equipment: Array[Dictionary], used_slots: int, capacity: int) -> void:
-	inventory_label.text = "Ausrüstung · %d/%d Plätze · 2 gleiche Stufen verschmelzen automatisch" % [used_slots, capacity]
+	inventory_label.text = "Ausrüstung · %d/%d Plätze · Rechtsklick: gleiche Waffen verschmelzen" % [used_slots, capacity]
 	for child in inventory_row.get_children():
 		inventory_row.remove_child(child)
 		child.queue_free()
@@ -129,9 +164,10 @@ func _show_inventory(equipment: Array[Dictionary], used_slots: int, capacity: in
 		button.clip_text = true
 		button.add_theme_font_size_override("font_size", 13)
 		button.text = "%s Mk %s\nVerkaufen +%d" % [entry["name"], ["I", "II", "III", "IV"][int(entry["tier"]) - 1], entry["refund"]]
-		button.tooltip_text = "%s\nZum Verkaufen zweimal klicken" % str(entry.get("stats", ""))
+		button.tooltip_text = "%s\n%s\n≈ %.1f DPS pro Ziel\nLinksklick 2×: verkaufen%s" % [entry["description"], entry["stats"], entry["dps"], "\nRechtsklick: verschmelzen" if entry["mergeable"] else ""]
 		DentiUIStyle.style_button(button)
 		button.pressed.connect(_on_inventory_pressed.bind(index, button))
+		button.gui_input.connect(_on_inventory_input.bind(index))
 		inventory_row.add_child(button)
 
 
@@ -141,3 +177,9 @@ func _on_inventory_pressed(index: int, button: Button) -> void:
 	else:
 		armed_sell_index = index
 		button.text = "Erneut klicken\nzum Verkaufen"
+
+
+func _on_inventory_input(event: InputEvent, index: int) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+		merge_requested.emit(index)
+		get_viewport().set_input_as_handled()

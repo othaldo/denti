@@ -118,6 +118,9 @@ func _run() -> void:
 	if first.direction.distance_to(last.direction) < 0.25 or first.projectile_color.g < 0.8:
 		_fail("late fan lacks spread or visible enemy projectile color")
 		return
+	if not is_equal_approx(first.damage, spitter.data.attack_damage * WaveController.enemy_damage_multiplier(spitter.data, 12)) or first.damage <= 8.0 * WaveController.enemy_damage_multiplier(spitter.data, 12):
+		_fail("normal ranged projectile damage did not increase")
+		return
 	for projectile in projectiles.get_children():
 		projectile.queue_free()
 	await process_frame

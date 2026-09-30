@@ -101,7 +101,7 @@ func all_items() -> Array[Dictionary]:
 	for template in ShopController.CATALOG:
 		var copies := count(template.id)
 		if template.weapon_data == null and copies > 0:
-			result.append({"name": template.display_name, "count": copies, "description": template.description, "tier": template.rarity_tier})
+			result.append({"name": template.display_name, "count": copies, "description": template.description, "tier": template.rarity_tier, "icon": template.icon_texture if template.icon_texture != null else DentiUIIcons.item(template.icon_index)})
 	return result
 
 

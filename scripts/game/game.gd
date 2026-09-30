@@ -73,6 +73,7 @@ func _ready() -> void:
 	choice_panel.main_menu_requested.connect(_on_end_main_menu)
 	shop_panel.buy_requested.connect(_on_shop_buy)
 	shop_panel.sell_requested.connect(_on_shop_sell)
+	shop_panel.merge_requested.connect(_on_shop_merge)
 	shop_panel.reroll_requested.connect(_on_shop_reroll)
 	shop_panel.continue_requested.connect(_on_shop_continue)
 	if session.resume_requested:
@@ -144,7 +145,7 @@ func _refresh_hud() -> void:
 
 
 func _spawn_enemy(data: EnemyData) -> void:
-	var limit := MAX_ACTIVE_ENEMIES if data.is_elite or data.is_boss else MAX_ACTIVE_ENEMIES - 1
+	var limit := MAX_ACTIVE_ENEMIES if data.is_elite or data.is_boss else MAX_ACTIVE_ENEMIES - maxi(wave.elite_reserved_slots(), 1)
 	if $Enemies.get_child_count() >= limit:
 		telemetry.record_spawn_blocked()
 		return
@@ -174,8 +175,9 @@ func _spawn_horde(data: EnemyData, count: int) -> void:
 	var center := _spawn_position(edge)
 	var lower := Vector2.ONE * (DentiArena.WALL_WIDTH + 8.0)
 	var upper := arena.arena_size - lower
+	var limit := MAX_ACTIVE_ENEMIES - maxi(wave.elite_reserved_slots(), 1)
 	for index in count:
-		if $Enemies.get_child_count() >= MAX_ACTIVE_ENEMIES - 1:
+		if $Enemies.get_child_count() >= limit:
 			telemetry.record_spawn_blocked(count - index)
 			break
 		var offset := (float(index) - float(count - 1) / 2.0) * (data.radius * 2.5)
@@ -544,17 +546,23 @@ func _update_shop_panel() -> void:
 	var weapons := player.loadout.equipped()
 	for index in weapons.size():
 		var weapon := weapons[index]
-		equipment.append({"name": weapon.data.display_name, "tier": weapon.tier, "refund": player.loadout.refund_for(index), "stats": weapon.data.stats_text(weapon.tier)})
+		equipment.append({"name": weapon.data.display_name, "tier": weapon.tier, "refund": player.loadout.refund_for(index), "stats": weapon.data.stats_text(weapon.tier), "description": weapon.data.description, "dps": _weapon_dps(weapon.data, weapon.tier), "mergeable": player.loadout.can_merge(index)})
 	var buyable: Array[bool] = []
+	var offer_dps: Array[float] = []
 	for offer in shop.offers:
 		buyable.append(offer == null or (player.loadout.can_acquire(offer.weapon_data, offer.weapon_tier) if offer.weapon_data != null else items.can_acquire(offer)))
+		offer_dps.append(_weapon_dps(offer.weapon_data, offer.weapon_tier) if offer != null and offer.weapon_data != null else 0.0)
 	var owned_display := items.all_items()
 	for id in relics.owned:
 		var relic := RelicCatalog.by_id(StringName(id))
 		if relic != null:
-			owned_display.append({"name": "Relikt: " + relic.display_name, "count": 1, "description": relic.description, "tier": 4})
-	shop_panel.show_shop(wave.current_wave, coins, shop.reroll_cost, shop.offers, wave.next_wave_preview(), equipment, player.loadout.used_slots(), WeaponLoadout.CAPACITY, buyable, player.stats.luck, owned_display, items.owned)
+			owned_display.append({"name": "Relikt: " + relic.display_name, "count": 1, "description": relic.description, "tier": 4, "icon": DentiUIIcons.relic(relic.icon_index), "relic": true})
+	shop_panel.show_shop(wave.current_wave, coins, shop.reroll_cost, shop.offers, wave.next_wave_preview(), equipment, player.loadout.used_slots(), WeaponLoadout.CAPACITY, buyable, player.stats.luck, owned_display, items.owned, offer_dps)
 	_refresh_hud()
+
+
+func _weapon_dps(data: WeaponData, tier: int) -> float:
+	return data.estimated_dps(tier, player.stats.damage, player.stats.crit_chance, player.stats.attack_interval, items.attack_interval_factor())
 
 
 func _on_shop_buy(index: int) -> void:
@@ -567,11 +575,10 @@ func _on_shop_buy(index: int) -> void:
 		return
 	if offer.weapon_data == null and not items.can_acquire(offer):
 		return
+	var acquired := player.loadout.acquire(offer.weapon_data, offer.weapon_tier, offer.price) if offer.weapon_data != null else items.acquire(offer)
+	if not acquired:
+		return
 	coins -= offer.price
-	if offer.weapon_data != null:
-		player.loadout.acquire(offer.weapon_data, offer.weapon_tier)
-	else:
-		items.acquire(offer)
 	shop.take_offer(index)
 	_update_shop_panel()
 	_save_run()
@@ -581,6 +588,13 @@ func _on_shop_sell(index: int) -> void:
 	if not in_shop:
 		return
 	coins += player.loadout.sell(index)
+	_update_shop_panel()
+	_save_run()
+
+
+func _on_shop_merge(index: int) -> void:
+	if not in_shop or not player.loadout.merge(index):
+		return
 	_update_shop_panel()
 	_save_run()
 

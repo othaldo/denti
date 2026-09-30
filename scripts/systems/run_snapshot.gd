@@ -48,7 +48,7 @@ static func capture(game) -> Dictionary:
 		"spawn_cooldown": game.wave.spawn_cooldown, "active": game.wave.active,
 		"horde_waves": game.wave.horde_waves, "horde_spawned": game.wave.horde_spawned,
 		"burst_times": game.wave.burst_times, "burst_index": game.wave.burst_index,
-		"elite_time": game.wave.elite_time, "elite_spawned": game.wave.elite_spawned,
+		"elite_times": game.wave.elite_times.duplicate(), "elite_counts": game.wave.elite_counts.duplicate(), "elite_index": game.wave.elite_index,
 		"current_profile_id": str(game.wave.current_profile_id), "next_profile_id": str(game.wave.next_profile_id),
 		"player": {"position": _vector_data(game.player.position), "stats": game.player.stats.to_save_data(), "hurt_time": game.player.hurt_time},
 		"xp": game.xp, "xp_goal": game.xp_goal, "level": game.level, "coins": game.coins,
@@ -89,8 +89,21 @@ static func restore(game, saved: Dictionary) -> void:
 		wave.plan_bursts()
 		while wave.burst_index < wave.burst_times.size() and wave.burst_times[wave.burst_index] <= wave.duration - wave.remaining:
 			wave.burst_index += 1
-	wave.elite_time = clampf(float(saved.get("elite_time", -1.0)), -1.0, wave.duration)
-	wave.elite_spawned = bool(saved.get("elite_spawned", false))
+	wave.elite_times.clear()
+	wave.elite_counts.clear()
+	if saved.has("elite_times"):
+		var saved_times: Array = saved.get("elite_times", [])
+		var saved_counts: Array = saved.get("elite_counts", [])
+		for index in mini(saved_times.size(), saved_counts.size()):
+			wave.elite_times.append(clampf(float(saved_times[index]), 0.0, wave.duration))
+			wave.elite_counts.append(clampi(int(saved_counts[index]), 1, 3))
+		wave.elite_index = clampi(int(saved.get("elite_index", 0)), 0, wave.elite_times.size())
+	else:
+		var old_elite_time := float(saved.get("elite_time", -1.0))
+		if old_elite_time >= 0.0:
+			wave.elite_times.append(clampf(old_elite_time, 0.0, wave.duration))
+			wave.elite_counts.append(1)
+		wave.elite_index = 1 if bool(saved.get("elite_spawned", false)) and not wave.elite_times.is_empty() else 0
 	wave.current_profile_id = StringName(str(saved.get("current_profile_id", "")))
 	wave.next_profile_id = StringName(str(saved.get("next_profile_id", "")))
 	var player_data: Dictionary = saved.get("player", {})

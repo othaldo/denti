@@ -5,6 +5,7 @@ const PROJECTILE_SCENE: PackedScene = preload("res://scenes/game/weapon_projecti
 
 var data: WeaponData
 var tier: int = 1
+var invested_coins: int = 0
 var cooldown: float = 0.0
 var attack_time: float = 0.0
 var idle_time: float = 0.0

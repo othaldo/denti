@@ -21,18 +21,39 @@ func used_slots() -> int:
 
 
 func can_acquire(data: WeaponData, tier: int = 1) -> bool:
-	return (tier < MAX_TIER and _find_tier(data.id, tier) != null) or used_slots() + data.hands <= CAPACITY
+	return used_slots() + data.hands <= CAPACITY or (tier < MAX_TIER and _find_tier(data.id, tier) != null)
 
 
-func acquire(data: WeaponData, tier: int = 1) -> bool:
+func acquire(data: WeaponData, tier: int = 1, paid_coins: int = -1) -> bool:
 	if not can_acquire(data, tier):
 		return false
-	var matching := _find_tier(data.id, tier) if tier < MAX_TIER else null
-	if matching != null:
-		matching.tier += 1
-		_merge_pairs(data.id)
+	var value := paid_coins if paid_coins >= 0 else _legacy_value(data, tier)
+	if used_slots() + data.hands <= CAPACITY:
+		_add(data, tier, value)
 	else:
-		_add(data, tier)
+		var matching := _find_tier(data.id, tier)
+		matching.tier += 1
+		matching.invested_coins += value
+	_refresh_positions()
+	return true
+
+
+func can_merge(index: int) -> bool:
+	var weapons := equipped()
+	if index < 0 or index >= weapons.size():
+		return false
+	var weapon := weapons[index]
+	return weapon.tier < MAX_TIER and _find_tier(weapon.data.id, weapon.tier, weapon) != null
+
+
+func merge(index: int) -> bool:
+	if not can_merge(index):
+		return false
+	var weapon := equipped()[index]
+	var partner := _find_tier(weapon.data.id, weapon.tier, weapon)
+	weapon.tier += 1
+	weapon.invested_coins += partner.invested_coins
+	partner.free()
 	_refresh_positions()
 	return true
 
@@ -45,14 +66,15 @@ func restore(saved: Array) -> void:
 			continue
 		var data := WeaponCatalog.by_id(StringName(str(entry.get("id", ""))))
 		if data != null and used_slots() + data.hands <= CAPACITY:
-			_add(data, clampi(int(entry.get("tier", 1)), 1, MAX_TIER))
+			var tier := clampi(int(entry.get("tier", 1)), 1, MAX_TIER)
+			_add(data, tier, maxi(int(entry.get("invested_coins", _legacy_value(data, tier))), 0))
 	_refresh_positions()
 
 
 func save_data() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for weapon in equipped():
-		result.append({"id": str(weapon.data.id), "tier": weapon.tier})
+		result.append({"id": str(weapon.data.id), "tier": weapon.tier, "invested_coins": weapon.invested_coins})
 	return result
 
 
@@ -72,34 +94,25 @@ func refund_for(index: int) -> int:
 	if index < 0 or index >= weapons.size():
 		return 0
 	var weapon := weapons[index]
-	return maxi(int(round(float(weapon.data.price) * pow(1.65, weapon.tier - 1) * 0.5)), 1)
+	return roundi(float(weapon.invested_coins) * 0.5)
 
 
-func _add(data: WeaponData, tier: int) -> void:
+func _add(data: WeaponData, tier: int, value: int) -> void:
 	var weapon := WeaponInstance.new()
 	weapon.configure(data, tier)
+	weapon.invested_coins = value
 	add_child(weapon)
 
 
-func _find_tier(id: StringName, tier: int) -> WeaponInstance:
+func _find_tier(id: StringName, tier: int, except: WeaponInstance = null) -> WeaponInstance:
 	for weapon in equipped():
-		if weapon.data.id == id and weapon.tier == tier:
+		if weapon != except and weapon.data.id == id and weapon.tier == tier:
 			return weapon
 	return null
 
 
-func _merge_pairs(id: StringName) -> void:
-	for tier in range(2, MAX_TIER):
-		var first: WeaponInstance
-		for weapon in equipped():
-			if weapon.data.id != id or weapon.tier != tier:
-				continue
-			if first == null:
-				first = weapon
-			else:
-				first.tier += 1
-				weapon.free()
-				break
+func _legacy_value(data: WeaponData, tier: int) -> int:
+	return data.price * (1 << (tier - 1))
 
 
 func _refresh_positions() -> void:

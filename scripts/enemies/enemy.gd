@@ -147,7 +147,7 @@ func _physics_process(delta: float) -> void:
 				_fire_phase_burst()
 		if boss_radial_volleys_remaining > 0:
 			boss_radial_volley_timer -= delta
-			if boss_radial_volley_timer <= 0.0:
+			while boss_radial_volleys_remaining > 0 and boss_radial_volley_timer <= 0.0:
 				_fire_next_boss_radial_volley()
 		if boss_phase_timer > 0.0 or boss_radial_volleys_remaining > 0:
 			queue_redraw()
@@ -345,7 +345,7 @@ func _fire_next_boss_radial_volley() -> void:
 	boss_radial_volley_index += 1
 	boss_radial_volleys_remaining -= 1
 	if boss_radial_volleys_remaining > 0:
-		boss_radial_volley_timer = data.boss_radial_volley_interval
+		boss_radial_volley_timer += data.boss_radial_volley_interval
 	elif boss_phase >= 2:
 		_fire_boss_signature(Vector2.RIGHT.rotated(boss_phase_gap_angle))
 
@@ -483,7 +483,7 @@ func _draw() -> void:
 			draw_line(shard_at, shard_at + ray * (16.0 + 26.0 * fade), Color(1.0, 0.76, 0.35, fade), 6.0 * fade + 1.0)
 		return
 	if data.is_boss and data.boss_guard_recharge_seconds > 0.0:
-		if boss_phase_timer > 0.0:
+		if boss_phase_timer > 0.0 or boss_radial_volleys_remaining > 0:
 			draw_arc(Vector2.ZERO, data.radius + 19.0, 0.0, TAU, 48, Color(0.95, 0.32, 0.63, 0.9), 7.0)
 			if not boss_phase_burst_fired or boss_radial_volleys_remaining > 0:
 				var first_preview_index := boss_radial_volley_index if boss_phase_burst_fired else 0

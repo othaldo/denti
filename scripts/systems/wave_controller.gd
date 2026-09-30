@@ -13,6 +13,10 @@ const MINI_BOSS_INTERVAL := 5
 const HORDE_TIME_FRACTION := 0.40
 const ELITE_TIME_START_FRACTION := 0.40
 const ELITE_TIME_END_FRACTION := 0.56
+const ELITE_SECOND_START_FRACTION := 0.62
+const ELITE_SECOND_END_FRACTION := 0.69
+const ELITE_THIRD_START_FRACTION := 0.78
+const ELITE_THIRD_END_FRACTION := 0.84
 const SPAWN_INTERVAL_START := 1.25
 const SPAWN_INTERVAL_WAVE_STEP := 0.06
 const SPAWN_INTERVAL_ACCELERATION := 0.012
@@ -61,8 +65,9 @@ var horde_waves: Array[int] = []
 var horde_spawned: bool = false
 var burst_times: Array[float] = []
 var burst_index: int = 0
-var elite_time: float = -1.0
-var elite_spawned: bool = false
+var elite_times: Array[float] = []
+var elite_counts: Array[int] = []
+var elite_index: int = 0
 var current_profile_id: StringName = &""
 var next_profile_id: StringName = &""
 
@@ -99,6 +104,30 @@ static func boss_for_wave(wave_number: int) -> EnemyData:
 
 static func elite_for_wave(wave_number: int) -> EnemyData:
 	return HUNT_GERM if wave_number >= 12 and wave_number % 2 == 0 else ACID_CROWN
+
+
+static func elite_groups_for_wave(wave_number: int) -> Array[int]:
+	if wave_number < 8 or is_boss_wave(wave_number):
+		return []
+	if wave_number < 11:
+		return [1]
+	if wave_number < 14:
+		return [1, 1]
+	if wave_number < 17:
+		return [2, 1]
+	return [3, 2, 1]
+
+
+static func elite_for_event(wave_number: int, event_index: int, member: int) -> EnemyData:
+	return elite_for_wave(wave_number + ((event_index + member) % 2 if wave_number >= 12 else 0))
+
+
+func elite_reserved_slots() -> int:
+	var slots := 0
+	for event_index in elite_counts.size():
+		for member in elite_counts[event_index]:
+			slots += 1 + elite_for_event(current_wave, event_index, member).escort_count
+	return slots
 
 
 static func health_multiplier(data: EnemyData, wave_number: int) -> float:
@@ -165,8 +194,13 @@ func next_wave_preview() -> String:
 		details.append("Muster: %s" % profile.display_name)
 	if horde_waves.has(next_wave):
 		details.append("%s-Horde" % _horde_data(next_wave).display_name)
-	if next_wave >= 8 and not is_boss_wave(next_wave):
+	var elite_total := 0
+	for count in elite_groups_for_wave(next_wave):
+		elite_total += count
+	if elite_total == 1:
 		details.append("Elite: %s" % elite_for_wave(next_wave).display_name)
+	elif elite_total > 1:
+		details.append("%d Eliten" % elite_total)
 	return "Welle %d: %s" % [next_wave, " · ".join(details)] if not details.is_empty() else "Nächste Welle: %d" % next_wave
 
 
@@ -187,8 +221,7 @@ func start_next_wave() -> void:
 	spawn_cooldown = 0.0
 	horde_spawned = false
 	plan_bursts()
-	elite_time = randf_range(duration * ELITE_TIME_START_FRACTION, duration * ELITE_TIME_END_FRACTION) if current_wave >= 8 and not is_boss_wave(current_wave) else -1.0
-	elite_spawned = false
+	plan_elites()
 	active = true
 	if is_boss_wave(current_wave):
 		boss_requested.emit(boss_for_wave(current_wave))
@@ -206,9 +239,10 @@ func _process(delta: float) -> void:
 		horde_spawned = true
 		horde_requested.emit(_horde_data(current_wave), 5 + current_wave)
 	var elapsed := duration - remaining
-	if elite_time >= 0.0 and not elite_spawned and elapsed >= elite_time:
-		elite_spawned = true
-		elite_requested.emit(elite_for_wave(current_wave))
+	while elite_index < elite_times.size() and elapsed >= elite_times[elite_index]:
+		for member in elite_counts[elite_index]:
+			elite_requested.emit(elite_for_event(current_wave, elite_index, member))
+		elite_index += 1
 	while burst_index < burst_times.size() and elapsed >= burst_times[burst_index]:
 		var index := burst_index
 		burst_index += 1
@@ -229,6 +263,19 @@ func plan_bursts() -> void:
 	if current_wave >= 6:
 		burst_times.append(randf_range(duration * 0.82, duration * 0.89))
 	burst_index = 0
+
+
+func plan_elites() -> void:
+	elite_times.clear()
+	elite_counts = elite_groups_for_wave(current_wave)
+	elite_index = 0
+	if elite_counts.is_empty():
+		return
+	elite_times.append(randf_range(duration * ELITE_TIME_START_FRACTION, duration * ELITE_TIME_END_FRACTION))
+	if elite_counts.size() >= 2:
+		elite_times.append(randf_range(duration * ELITE_SECOND_START_FRACTION, duration * ELITE_SECOND_END_FRACTION))
+	if elite_counts.size() >= 3:
+		elite_times.append(randf_range(duration * ELITE_THIRD_START_FRACTION, duration * ELITE_THIRD_END_FRACTION))
 
 
 func _burst_data(index: int) -> EnemyData:
