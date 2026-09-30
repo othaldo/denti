@@ -15,6 +15,7 @@ const ATTACK_ANIMATION_DURATION := 0.18
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var sprite_base_scale: Vector2 = sprite.scale
 @onready var arena: DentiArena = get_node("../Arena")
+@onready var mobile_controls: MobileControls = get_node("../MobileControls/Root")
 
 var hurt_time: float = 0.0
 var animation_time: float = 0.0
@@ -25,6 +26,8 @@ var is_moving: bool = false
 
 func _physics_process(delta: float) -> void:
 	var direction := Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	if mobile_controls.visible and mobile_controls.combat_active and mobile_controls.direction != Vector2.ZERO:
+		direction = mobile_controls.direction
 	var before_move := global_position
 	velocity = direction * stats.move_speed
 	move_and_slide()

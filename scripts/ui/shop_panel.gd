@@ -146,7 +146,7 @@ func _show_items(equipment: Array[Dictionary]) -> void:
 
 
 func _show_inventory(equipment: Array[Dictionary], used_slots: int, capacity: int) -> void:
-	inventory_label.text = "Ausrüstung · %d/%d Plätze · Rechtsklick: gleiche Waffen verschmelzen" % [used_slots, capacity]
+	inventory_label.text = "Ausrüstung · %d/%d Plätze · Gleiche Waffen verschmelzen" % [used_slots, capacity]
 	for child in inventory_row.get_children():
 		inventory_row.remove_child(child)
 		child.queue_free()
@@ -158,17 +158,30 @@ func _show_inventory(equipment: Array[Dictionary], used_slots: int, capacity: in
 		return
 	for index in equipment.size():
 		var entry := equipment[index]
+		var slot := HBoxContainer.new()
+		slot.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		slot.add_theme_constant_override("separation", 2)
+		inventory_row.add_child(slot)
 		var button := Button.new()
-		button.custom_minimum_size = Vector2(112, 54)
+		button.custom_minimum_size = Vector2(72, 54)
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.clip_text = true
 		button.add_theme_font_size_override("font_size", 13)
 		button.text = "%s Mk %s\nVerkaufen +%d" % [entry["name"], ["I", "II", "III", "IV"][int(entry["tier"]) - 1], entry["refund"]]
-		button.tooltip_text = "%s\n%s\n%s\n≈ %.1f DPS pro Ziel\nLinksklick 2×: verkaufen%s" % [entry["description"], entry["combat"], entry["stats"], entry["dps"], "\nRechtsklick: verschmelzen" if entry["mergeable"] else ""]
+		button.tooltip_text = "%s\n%s\n%s\n≈ %.1f DPS pro Ziel\n2× klicken: verkaufen%s" % [entry["description"], entry["combat"], entry["stats"], entry["dps"], "\nVerschmelzen mit gleicher Waffe" if entry["mergeable"] else ""]
 		DentiUIStyle.style_button(button)
 		button.pressed.connect(_on_inventory_pressed.bind(index, button))
 		button.gui_input.connect(_on_inventory_input.bind(index))
-		inventory_row.add_child(button)
+		slot.add_child(button)
+		if entry["mergeable"]:
+			var merge_button := Button.new()
+			merge_button.text = "Fusion"
+			merge_button.tooltip_text = "Mit gleicher Waffe verschmelzen"
+			merge_button.custom_minimum_size = Vector2(48, 54)
+			merge_button.add_theme_font_size_override("font_size", 12)
+			DentiUIStyle.style_button(merge_button)
+			merge_button.pressed.connect(func() -> void: merge_requested.emit(index))
+			slot.add_child(merge_button)
 
 
 func _on_inventory_pressed(index: int, button: Button) -> void:

@@ -26,6 +26,7 @@ const UPGRADES: Array[UpgradeData] = [
 @onready var music: MusicController = $Music
 @onready var sound: SoundController = $Sound
 @onready var hud: GameHUD = $HUD
+@onready var mobile_controls: MobileControls = $MobileControls/Root
 @onready var choice_panel: ChoicePanel = $ChoicePanel
 @onready var shop_panel: ShopPanel = $ShopPanel
 @onready var game_menu: GameMenu = $GameMenu
@@ -77,6 +78,7 @@ func _ready() -> void:
 	shop_panel.merge_requested.connect(_on_shop_merge)
 	shop_panel.reroll_requested.connect(_on_shop_reroll)
 	shop_panel.continue_requested.connect(_on_shop_continue)
+	mobile_controls.pause_requested.connect(game_menu.open_pause)
 	if session.resume_requested:
 		session.resume_requested = false
 		var saved: Dictionary = session.load_run()
@@ -107,6 +109,7 @@ func _on_starter_chosen(weapon: WeaponData) -> void:
 
 
 func _process(delta: float) -> void:
+	mobile_controls.set_combat_active(not ended and not in_shop and not starter_pending and not collecting_wave_loot and not choice_panel.visible and not shop_panel.visible and not game_menu.visible and (wave.active or boss_pending))
 	if not ended and (wave.active or boss_pending):
 		telemetry.tick(delta, $Enemies.get_child_count(), $EnemyProjectiles.get_child_count())
 	_refresh_hud()

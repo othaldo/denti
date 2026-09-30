@@ -34,13 +34,25 @@ func _run() -> void:
 		if icon.texture == null or chip.tooltip_text.is_empty():
 			_fail("shop item icon or tooltip missing")
 			return
-	var weapon_button: Button = game.shop_panel.inventory_row.get_child(0)
+	var weapon_button: Button = game.shop_panel.inventory_row.get_child(0).get_child(0)
 	var offer_card: OfferCard = game.shop_panel.offer_buttons[0]
 	if not weapon_button.tooltip_text.contains("DPS") or not weapon_button.tooltip_text.contains("Basis-Schaden") or not offer_card.tooltip_text.contains("DPS") or not offer_card.tooltip_text.contains("Nahkampf"):
 		_fail("weapon hover lacks DPS or effect information")
 		return
 	if not weapon_button.tooltip_text.contains("Schadensart: Schmelz") or not offer_card.rarity_label.text.contains("BOHRUNG") or not offer_card.tooltip_text.contains("Schadensart: Bohrung"):
 		_fail("weapon damage types are missing from cards or tooltips")
+		return
+	var starter: WeaponData = game.player.loadout.equipped()[0].data
+	game.player.loadout.acquire(starter)
+	game._update_shop_panel()
+	await process_frame
+	var merge_button: Button = game.shop_panel.inventory_row.get_child(0).get_child(1)
+	if merge_button.text != "Fusion" or not _inside(panel.get_global_rect(), Vector2(1280, 720)):
+		_fail("touch merge button or shop layout missing: %s / %s" % [merge_button.text, panel.get_global_rect()])
+		return
+	merge_button.pressed.emit()
+	if game.player.loadout.equipped().size() != 1 or game.player.loadout.equipped()[0].tier != 2:
+		_fail("touch merge button did not fuse matching weapons")
 		return
 	var many_items: Array[Dictionary] = []
 	for template: ShopOfferData in ShopController.CATALOG:
@@ -62,3 +74,7 @@ func _fail(message: String) -> void:
 	root.get_node("GameSession").clear_run()
 	push_error(message)
 	quit(1)
+
+
+func _inside(rect: Rect2, viewport_size: Vector2) -> bool:
+	return rect.position.x >= 0.0 and rect.position.y >= 0.0 and rect.end.x <= viewport_size.x and rect.end.y <= viewport_size.y

@@ -32,6 +32,7 @@ Das Projekt mit **Godot 4.4 oder neuer** öffnen und mit **F5** starten. Unter L
 | Escape | Pause, Stats und Optionen öffnen |
 | F3 (Debug-Build) | Kampf-Telemetrie ein- und ausblenden |
 | Maus | Waffen, Boni und Shopangebote wählen |
+| Touchscreen | Linken Joystick ziehen, Pause antippen; Menüs und Shop per Tippen bedienen |
 
 Vor einem neuen Run wählst du **Easy, Normal oder Hard**; **Hell** wird nach einem Sieg auf Hard freigeschaltet. Der Grad bleibt beim Fortsetzen erhalten. Normal entspricht der bisherigen Balance, während die anderen Grade vor allem Gegnerdichte, Horden, Eliten und Projektilmuster verändern.
 

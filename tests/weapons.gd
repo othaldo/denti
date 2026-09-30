@@ -79,7 +79,7 @@ func _run() -> void:
 	game._open_shop()
 	var coins_before: int = game.coins
 	var expected_refund: int = game.player.loadout.refund_for(0)
-	var button: Button = game.shop_panel.inventory_row.get_child(0)
+	var button: Button = game.shop_panel.inventory_row.get_child(0).get_child(0)
 	button.pressed.emit()
 	if game.coins != coins_before:
 		_fail("first sell click removed a weapon")
@@ -99,7 +99,7 @@ func _run() -> void:
 	var right_click := InputEventMouseButton.new()
 	right_click.button_index = MOUSE_BUTTON_RIGHT
 	right_click.pressed = true
-	(game.shop_panel.inventory_row.get_child(0) as Button).gui_input.emit(right_click)
+	(game.shop_panel.inventory_row.get_child(0).get_child(0) as Button).gui_input.emit(right_click)
 	if game.player.loadout.equipped().size() != 1 or game.player.loadout.equipped()[0].tier != 2:
 		_fail("shop right-click did not merge matching weapons")
 		return

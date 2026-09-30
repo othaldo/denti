@@ -91,8 +91,8 @@ func _run() -> void:
 		game.player.loadout.acquire(WeaponCatalog.by_id(id))
 	game._update_shop_panel()
 	await process_frame
-	for weapon_button: Button in game.shop_panel.inventory_row.get_children():
-		if not _inside(weapon_button.get_global_rect(), Vector2(1280, 720)):
+	for weapon_slot: HBoxContainer in game.shop_panel.inventory_row.get_children():
+		if not _inside(weapon_slot.get_global_rect(), Vector2(1280, 720)):
 			_fail("equipped weapon row exceeds viewport")
 			return
 	game.choice_panel.show_chest(ShopController.by_id(&"metal_crown"), 3)
