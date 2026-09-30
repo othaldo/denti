@@ -15,6 +15,7 @@ func _run() -> void:
 	game.choice_panel._on_choice_pressed(0)
 	game.wave.active = false
 	game._clear_combat()
+	await process_frame
 	game.wave.current_wave = 11
 	game.wave.start_next_wave()
 	game.telemetry.begin_wave(12)

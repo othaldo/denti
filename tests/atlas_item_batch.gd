@@ -90,6 +90,7 @@ func _run() -> void:
 		_fail("sugar shock crash did not expire")
 		return
 	game._clear_combat()
+	await process_frame
 	game.items.on_wave_start()
 	game.items.cooldowns["water_puddle"] = 99.0
 	game._create_enemy(WaveController.PLAQUE, game.player.position + Vector2(100.0, 0.0))
@@ -122,6 +123,7 @@ func _run() -> void:
 		_fail("returning projectile did not damage an enemy on the way back")
 		return
 	game._clear_combat()
+	await process_frame
 	game.items.cooldowns["water_puddle"] = 0.0
 	game._create_enemy(WaveController.PLAQUE, game.player.position + Vector2(100.0, 0.0))
 	var saved_enemy: Enemy = game.get_node("Enemies").get_child(0)

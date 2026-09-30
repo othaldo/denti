@@ -19,6 +19,7 @@ func _run() -> void:
 		game._on_enemy_defeated(game.player.global_position + Vector2(300.0, 0.0), WaveController.PLAQUE)
 	var early_xp := _xp_drops(game)
 	game._clear_arena(false)
+	await process_frame
 	game.wave.current_wave = 14
 	seed(31)
 	for index in 100:

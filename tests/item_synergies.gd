@@ -85,6 +85,7 @@ func _run() -> void:
 		_fail("tooth fairy deposit did not improve luck and chest scrap value")
 		return
 	game._clear_combat()
+	await process_frame
 	game._create_enemy(WaveController.PLAQUE, game.player.position + Vector2(100.0, 0.0))
 	var wet_enemy: Enemy = game.get_node("Enemies").get_child(0)
 	wet_enemy.apply_wet(2.0)

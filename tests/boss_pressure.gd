@@ -75,6 +75,7 @@ func _run() -> void:
 		return
 	var king_seconds := seconds
 	game._clear_combat()
+	await process_frame
 	game.wave.current_wave = 20
 	game.telemetry.begin_wave(20)
 	game._create_enemy(WaveController.FINAL_BOSS, game.player.global_position + Vector2(300.0, 0.0))
