@@ -50,7 +50,7 @@ func _run() -> void:
 	var side := _enemy(Vector2(0, 100))
 	var behind := _enemy(Vector2(-100, 0))
 	var spear := _equip(&"toothpick_spear")
-	spear._physics_process(0.01)
+	_attack(spear)
 	if front.health >= 10000.0 or along.health >= 10000.0 or side.health != 10000.0 or behind.health != 10000.0:
 		_fail("spear did not restrict hits to its forward line")
 		return
@@ -68,7 +68,7 @@ func _run() -> void:
 	side = _enemy(Vector2(55, 65))
 	behind = _enemy(Vector2(-80, 0))
 	var garrote := _equip(&"floss_garrote")
-	garrote._physics_process(0.01)
+	_attack(garrote)
 	if front.bleed_stacks != 1 or side.bleed_stacks != 1 or behind.health != 10000.0:
 		_fail("garrote front arc or bleed failed")
 		return
@@ -114,11 +114,11 @@ func _run() -> void:
 	front = _enemy(Vector2(50, 0))
 	var grinder := _equip(&"cavity_grinder")
 	var health_before := front.health
-	grinder._physics_process(0.01)
+	_attack(grinder)
 	var first_hit := health_before - front.health
 	for index in 15:
 		grinder.cooldown = 0.0
-		grinder._physics_process(0.01)
+		_attack(grinder)
 	snapshot = RunSnapshot.capture(game)
 	_clear()
 	RunSnapshot.restore(game, snapshot)
@@ -133,13 +133,13 @@ func _run() -> void:
 		return
 	health_before = front.health
 	grinder.cooldown = 0.0
-	grinder._physics_process(0.01)
+	_attack(grinder)
 	if not is_equal_approx((health_before - front.health) / first_hit, 1.5):
 		_fail("grinder focus did not cap at 50 percent")
 		return
 	var fresh := _enemy(Vector2(30, 0))
 	grinder.cooldown = 0.0
-	grinder._physics_process(0.01)
+	_attack(grinder)
 	if not is_equal_approx(10000.0 - fresh.health, first_hit):
 		_fail("grinder focus leaked to a new target")
 		return
@@ -148,14 +148,14 @@ func _run() -> void:
 	var polisher := _equip(&"prophylaxis_polisher")
 	for index in 3:
 		polisher.cooldown = 0.0
-		polisher._physics_process(0.01)
+		_attack(polisher)
 	if not game.player.stats.last_roll_critical:
 		_fail("third polishing hit was not guaranteed critical")
 		return
 	_clear()
 	front = _enemy(Vector2(40, 0))
 	var interdental := _equip(&"interdental_brush")
-	interdental._physics_process(0.01)
+	_attack(interdental)
 	if front.bleed_stacks != 1:
 		_fail("interdental brush did not apply bleed")
 		return
@@ -228,3 +228,9 @@ func _fail(message: String) -> void:
 	paused = false
 	push_error(message)
 	quit(1)
+
+
+func _attack(weapon: WeaponInstance) -> void:
+	weapon._physics_process(0.01)
+	if WeaponMotion.is_contact(weapon.data):
+		weapon._physics_process(weapon.attack_duration)

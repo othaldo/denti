@@ -59,3 +59,36 @@ voller Fokus und situative Itemeffekte sind zusätzliche Leistung.
 Die Ausrüstung fasst sechs Hand-Plätze. Einhandwaffen belegen einen, Zweihandwaffen zwei. Solange genug Plätze frei sind, fügt ein Kauf die Waffe einzeln hinzu. Ist die Ausrüstung voll, verschmilzt eine gekaufte Waffe mit einem gleichen Exemplar derselben Stufe (bis IV). Zwei bereits ausgerüstete gleiche Waffen derselben Stufe lassen sich per Rechtsklick auf eine der Waffen verschmelzen. Verkauf benötigt zwei Linksklicks und erstattet die Hälfte des Kaufwerts aller in dieser Waffe aufgegangenen Exemplare. Jede Stufe erhöht Schaden und Angriffstempo. Der Spielstand speichert Waffentypen, Stufen und investierte Münzen.
 
 Bohrung verursacht je nach Stufe 25–40 % mehr Schaden gegen Bosse. Schnitt verursacht 15 % mehr Schaden gegen nahezu unverletzte Gegner und baut Blutung auf. Wasserflosser-Treffer machen Gegner nass. Die anderen Schadensarten unterscheiden sich über Reichweite, Projektiltempo, Durchschlag, Rückstoß, Strahl oder Flächentreffer. Gegner haben derzeit keine elementaren Resistenzen. Die Waffen haben individuelle Schadensmultiplikatoren und ausgewählte Eigenschaften, die mit ihrer Stufe wachsen.
+
+## Haltung und Angriffe
+
+Alle 18 Waffen haben einen Griffpunkt und einen eigenen Abschuss- beziehungsweise
+Kontaktpunkt. Fernkampfgeschosse starten am Waffenkopf. Laufwaffen zielen aus einer
+Handposition neben Denti und spiegeln beim Seitenwechsel; die Amalgam-Schleuder
+bleibt aufrecht. Ruhepositionen kreisen nicht automatisch um Denti.
+
+| Waffen | Bewegung |
+| --- | --- |
+| Zahnstocher-Speer | Ausholen, gerader Stich, Zurückziehen |
+| Zahnsteinkratzer, Zahnseiden-Garotte | Ausholen, Frontschwung, Rückkehr |
+| Zahnseidenpeitsche, Interdentalbürste | Rundumschwung |
+| Turbo-Bohrer, Karies-Fräse | Vorstoß und vibrierender Arbeitskontakt; Fräskopf rotiert |
+| Prophylaxe-Polierer | Kurzer Arbeitskontakt mit rotierendem Polierkopf |
+| Zauberbürste, Wasserflosser, Kronenwerfer, Fluorid-Rakete | Zielen, Abschuss, Rückstoß |
+| Mundspül-Mörser | Stärkerer Rückstoß beim schweren Schuss |
+| Amalgam-Schleuder | Elastisches Spannen/Loslassen, Griff bleibt unten |
+| Fluorid-Sprüher, Wasserturbine | Sprühbewegung und Frontfächer ab der Düse |
+| Schmelzspiegel, UV-Lampe | Lichtstrahl ab Spiegel beziehungsweise Emitter |
+
+Nahkampfschaden entsteht erst beim Kontakt während der aktiven Bewegung,
+nicht beim Beginn des Ausholens. Geprüft wird die bewegte Strecke zwischen Griff
+und Spitze gegen den Gegnerkörper, innerhalb der Waffenreichweite und des
+Frontbogens. Jeder Gegner kann pro Angriff höchstens einmal getroffen werden;
+Einzelzielwaffen behalten ihr ausgewähltes Ziel. Zeitlich abgetastete Bewegungen
+verhindern ausgelassene Treffer bei schnellen Angriffen oder längeren Frames.
+Spielstände erhalten Angriffsphase, Richtung, Schaden und bereits getroffene Gegner.
+
+Eine [animierte Vorschau](screenshots/weapon_motion.gif) zeigt Stich, Schwung,
+aufrechte Schleuder und Seitenwechsel. Das Werkzeug
+`tools/preview_weapon_motion.gd` rendert die vier Beispiele in getrennten,
+manuell fortgeschalteten Testwelten unter `.godot/weapon_motion_frames/`.

@@ -42,7 +42,11 @@ func _run() -> void:
 	game.wave.active = true
 	game.wave.remaining = 1000
 	game.wave.set_process(false)
-	game.player.loadout.restore([{"id": "water_jet", "tier": 4}, {"id": "water_jet", "tier": 4}, {"id": "water_jet", "tier": 4}, {"id": "water_jet", "tier": 4}, {"id": "water_jet", "tier": 4}, {"id": "water_jet", "tier": 4}])
+	var contact_weapons := OS.get_cmdline_user_args().has("--contact-weapons")
+	var loadout: Array[Dictionary] = []
+	for id in (["toothpick_spear", "plaque_scaler", "floss_whip", "cavity_grinder", "prophylaxis_polisher", "interdental_brush"] if contact_weapons else ["water_jet", "water_jet", "water_jet", "water_jet", "water_jet", "water_jet"]):
+		loadout.append({"id": id, "tier": 4})
+	game.player.loadout.restore(loadout)
 	for index in 200:
 		game._create_enemy(WaveController.PLAQUE, center + Vector2.RIGHT.rotated(TAU * index / 200.0) * (250 + index % 5 * 30))
 		var enemy: Enemy = game.get_node("Enemies").get_child(-1)
@@ -53,7 +57,7 @@ func _run() -> void:
 	game.boss.max_health = 1e8
 	game.boss.boss_phase = 1
 	game.boss._start_boss_phase()
-	await _measure("emperor_9_volleys_200_enemies_6_weapons", 4500000)
+	await _measure("emperor_9_volleys_200_enemies_6_%sweapons" % ("contact_" if contact_weapons else ""), 4500000)
 	var label := "baseline"
 	for argument in OS.get_cmdline_user_args():
 		if argument.begins_with("--label="):

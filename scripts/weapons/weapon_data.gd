@@ -44,6 +44,15 @@ extends Resource
 @export var exposure_duration: float = 0.0
 @export var projectile_shape: StringName = &"orb"
 
+@export_group("Held animation")
+@export_enum("aimed", "upright", "staff") var held_style: String = "aimed"
+@export_enum("shoot", "lob", "pull", "thrust", "slash", "spin", "drill", "polish", "spray", "beam") var attack_animation: String = "shoot"
+@export var tip_anchor: Vector2 = Vector2(0.85, 0.15)
+@export var visual_size: float = 58.0
+@export_range(0.08, 0.8) var animation_duration: float = 0.32
+@export_range(0.0, 0.3) var working_head_radius: float = 0.0
+@export var head_turns_per_second: float = 5.0
+
 
 func damage_at_tier(tier: int) -> float:
 	if damage_tiers.size() >= clampi(tier, 1, 4):

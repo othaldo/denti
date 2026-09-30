@@ -35,6 +35,14 @@ Im Boss-Test erreichten beide Versionen **211 gleichzeitig aktive Gegnergeschoss
 Die langsamste gemessene Bildzeit sank von **36,22 auf 12,46 ms**. Bei 200 isolierten
 Geschossen sank die Gesamtzahl der Zeichenaufrufe von **1.032 auf 33**.
 
+Nach Einführung der Waffenanimationen: derselbe Fernkampf-Test erreicht 2,43 ms
+im Mittel und 3,37 ms P95. Ein zusätzlicher Test mit sechs Nahkampfwaffen IV
+erreicht 4,27 ms im Mittel und 8,65 ms P95; dort tritt weiterhin eine einzelne
+Spitze von 79,96 ms auf. Dieser Befund ist offen und wurde keinem einzelnen
+System zugeordnet. Rohdaten: [Fernkampf](projectile_performance_weapon_motion.json),
+[Nahkampf](projectile_performance_weapon_contact.json).
+Den Nahkampf-Test aktiviert zusätzlich `--contact-weapons`.
+
 Die extremen alten Werte bei 600/1.000 Geschossen zeigen den Einbruch unter
 Überlast; dort entstanden nur neun bzw. sechs Messbilder. Diese kurzen Stresstests
 sind keine Aussage über die typische FPS eines gesamten Runs. Die eigene

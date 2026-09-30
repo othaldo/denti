@@ -119,4 +119,7 @@ func _refresh_positions() -> void:
 	var weapons := equipped()
 	for index in weapons.size():
 		var angle := TAU * float(index) / float(maxi(weapons.size(), 1))
-		weapons[index].position = Vector2(cos(angle), sin(angle)) * 35.0
+		weapons[index].position = Vector2.ZERO
+		weapons[index].home_position = Vector2(cos(angle), sin(angle)) * 35.0
+		weapons[index].hold_position = weapons[index].home_position
+		weapons[index].update_visual()
