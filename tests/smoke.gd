@@ -115,6 +115,7 @@ func _run() -> void:
 	game._spawn_loot(player.position + Vector2(50.0, 0.0), &"coin", 2)
 	var projectile: Node2D = load("res://scenes/game/weapon_projectile.tscn").instantiate()
 	game.get_node("Projectiles").add_child(projectile)
+	projectile.set_physics_process(false)
 	var coins_before_wave_end: int = game.coins
 	game.get_node("WaveController").active = true
 	game.wave._process(game.wave.remaining)

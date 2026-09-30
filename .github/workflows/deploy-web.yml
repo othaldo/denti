@@ -25,6 +25,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Install fontconfig for headless Godot
+        run: |
+          apt-get update -qq
+          apt-get install -y -qq --no-install-recommends libfontconfig1
+
       - name: Prepare Godot export templates
         run: |
           mkdir -p "$HOME/.local/share/godot/export_templates"
@@ -47,7 +52,14 @@ jobs:
         run: |
           for test in tests/*.gd; do
             echo "Running $test"
-            godot --headless --fixed-fps 60 --path . --script "res://$test"
+            if ! godot --headless --fixed-fps 60 --path . --script "res://$test" > /tmp/denti-test.log 2>&1; then
+              cat /tmp/denti-test.log
+              exit 1
+            fi
+            cat /tmp/denti-test.log
+            if grep -q "SCRIPT ERROR:" /tmp/denti-test.log; then
+              exit 1
+            fi
           done
 
       - name: Export Web
