@@ -6,6 +6,10 @@ func _initialize() -> void:
 
 
 func _run() -> void:
+	var session: Node = root.get_node("GameSession")
+	if session.mobile_base_size(Vector2i(576, 1086)) != Vector2i(720, 1280) or session.mobile_base_size(Vector2i(1086, 576)) != Vector2i(1040, 600):
+		_fail("mobile scaling did not follow device orientation")
+		return
 	root.size = Vector2i(1280, 720)
 	var controls: MobileControls = load("res://scenes/ui/mobile_controls.tscn").instantiate().get_node("Root")
 	var layer := controls.get_parent()

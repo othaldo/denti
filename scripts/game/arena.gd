@@ -21,7 +21,7 @@ func _ready() -> void:
 
 func _resize() -> void:
 	var viewport_size := get_viewport_rect().size
-	arena_size = Vector2(maxf(SIZE.x, viewport_size.x + VIEWPORT_PADDING.x), maxf(SIZE.y, viewport_size.y + VIEWPORT_PADDING.y))
+	arena_size = arena_size.max(Vector2(maxf(SIZE.x, viewport_size.x + VIEWPORT_PADDING.x), maxf(SIZE.y, viewport_size.y + VIEWPORT_PADDING.y)))
 	queue_redraw()
 
 

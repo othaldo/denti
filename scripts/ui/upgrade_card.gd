@@ -85,6 +85,11 @@ func show_action(action_name: String, accent: bool = false) -> void:
 	DentiUIStyle.style_button(self, accent)
 
 
+func set_mobile_text(enabled: bool) -> void:
+	name_label.add_theme_font_size_override("font_size", 21 if enabled else 19)
+	effect_label.add_theme_font_size_override("font_size", 17 if enabled else 14)
+
+
 func _build_content() -> void:
 	var margin := MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)

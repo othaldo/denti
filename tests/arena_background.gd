@@ -58,6 +58,13 @@ func _run() -> void:
 	if arena.arena_size.x <= 1920.0 or arena.arena_size.y <= 720.0:
 		_fail("arena did not expand horizontally on ultrawide")
 		return
+	var expanded_size := arena.arena_size
+	root.size = Vector2i(1280, 720)
+	await process_frame
+	await process_frame
+	if arena.arena_size != expanded_size:
+		_fail("arena shrank after a viewport rotation")
+		return
 	session.clear_run()
 	print("Denti arena background test passed")
 	quit(0)

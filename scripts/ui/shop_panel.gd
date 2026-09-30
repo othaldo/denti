@@ -54,6 +54,20 @@ func _ready() -> void:
 	DentiUIStyle.style_button(continue_button, true)
 	reroll_button.pressed.connect(func() -> void: reroll_requested.emit())
 	continue_button.pressed.connect(func() -> void: continue_requested.emit())
+	get_viewport().size_changed.connect(_update_layout)
+	_update_layout()
+
+
+func _update_layout() -> void:
+	var viewport_size: Vector2 = $Root.size
+	var portrait := viewport_size.y > viewport_size.x and viewport_size.x < 800.0
+	var compact_landscape := not portrait and viewport_size.y <= 620.0
+	rows.add_theme_constant_override("separation", 3 if compact_landscape else 5)
+	$Root/Center/Panel/Margin/Rows/Portrait.custom_minimum_size.y = 0.0 if compact_landscape else 28.0
+	items_scroll.custom_minimum_size.y = 32.0 if compact_landscape else 46.0
+	$Root/Center/Panel.custom_minimum_size = Vector2(660.0 if portrait else 850.0, 590.0 if compact_landscape else 665.0)
+	for button in offer_buttons:
+		button.call("set_compact", compact_landscape)
 
 
 func show_shop(wave_number: int, coins: int, reroll_cost: int, offers: Array[ShopOfferData], preview: String = "", equipment: Array[Dictionary] = [], used_slots: int = 0, capacity: int = 6, buyable: Array[bool] = [], luck: float = 0.0, owned_items: Array[Dictionary] = [], counts: Dictionary = {}, offer_dps: Array[float] = []) -> void:

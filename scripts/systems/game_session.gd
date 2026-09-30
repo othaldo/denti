@@ -18,6 +18,9 @@ var show_fps: bool = false
 
 
 func _ready() -> void:
+	if DisplayServer.is_touchscreen_available():
+		_update_mobile_scale()
+		get_tree().root.size_changed.connect(_update_mobile_scale)
 	load_progression()
 	var config := ConfigFile.new()
 	if config.load(settings_path) == OK:
@@ -29,6 +32,16 @@ func _ready() -> void:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	apply_volume()
 	fps_display_changed.emit(show_fps)
+
+
+func _update_mobile_scale() -> void:
+	var target := mobile_base_size(DisplayServer.window_get_size())
+	if get_tree().root.content_scale_size != target:
+		get_tree().root.content_scale_size = target
+
+
+static func mobile_base_size(window_size: Vector2i) -> Vector2i:
+	return Vector2i(720, 1280) if window_size.y > window_size.x else Vector2i(1040, 600)
 
 
 func has_run() -> bool:

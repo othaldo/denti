@@ -67,9 +67,11 @@ vertical_alignment = 1
 autowrap_mode = 3
 text = "Ein göttlicher Segen wurde gewährt."
 
-[node name="Cards" type="HBoxContainer" parent="Root/Center/Panel/Margin/Rows"]
+[node name="Cards" type="GridContainer" parent="Root/Center/Panel/Margin/Rows"]
 layout_mode = 2
-theme_override_constants/separation = 16
+columns = 3
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 16
 
 [node name="Choice1" type="Button" parent="Root/Center/Panel/Margin/Rows/Cards"]
 custom_minimum_size = Vector2(235, 186)

@@ -11,6 +11,7 @@ signal main_menu_requested
 @onready var title_label: Label = $Root/Center/Panel/Margin/Rows/Title
 @onready var subtitle_label: Label = $Root/Center/Panel/Margin/Rows/Subtitle
 @onready var dialog_panel: PanelContainer = $Root/Center/Panel
+@onready var cards: GridContainer = $Root/Center/Panel/Margin/Rows/Cards
 @onready var buttons: Array[Button] = [
 	$Root/Center/Panel/Margin/Rows/Cards/Choice1,
 	$Root/Center/Panel/Margin/Rows/Cards/Choice2,
@@ -37,12 +38,27 @@ func _ready() -> void:
 	subtitle_label.add_theme_color_override("font_color", DentiUIStyle.MUTED)
 	for index in buttons.size():
 		buttons[index].pressed.connect(_on_choice_pressed.bind(index))
+	get_viewport().size_changed.connect(_update_layout)
+	_update_layout()
+
+
+func _update_layout() -> void:
+	var viewport_size: Vector2 = $Root.size
+	var portrait := viewport_size.y > viewport_size.x and viewport_size.x < 800.0
+	cards.columns = 1 if portrait else 3
+	var desktop_width := 760.0 if mode == &"chest" else (800.0 if mode == &"credits" else 900.0)
+	dialog_panel.custom_minimum_size.x = 660.0 if portrait else desktop_width
+	for button in buttons:
+		(button as UpgradeCard).set_mobile_text(portrait or viewport_size.y <= 620.0)
+		if mode == &"starter":
+			button.custom_minimum_size.y = 285.0 if portrait or viewport_size.y <= 620.0 else 250.0
 
 
 func show_upgrades(options: Array[UpgradeData]) -> void:
 	mode = &"upgrade"
 	current_upgrades = options
 	dialog_panel.custom_minimum_size = Vector2(900, 440)
+	_update_layout()
 	title_label.text = "Denti steigt auf!"
 	subtitle_label.text = "Ein göttlicher Segen wurde gewährt. Wähle einen für Denti."
 	subtitle_label.custom_minimum_size.y = 40.0
@@ -57,12 +73,14 @@ func show_starters(options: Array[WeaponData]) -> void:
 	mode = &"starter"
 	starter_options = options
 	dialog_panel.custom_minimum_size = Vector2(900, 440)
+	_update_layout()
 	title_label.text = "Dentis erste Waffe"
 	subtitle_label.text = "Wähle eine Waffe. Weitere findest du später in der Zahnklinik."
 	subtitle_label.custom_minimum_size.y = 40.0
 	for index in buttons.size():
 		buttons[index].visible = true
 		buttons[index].call("show_weapon", options[index])
+	_update_layout()
 	visible = true
 	buttons[0].grab_focus()
 
@@ -71,6 +89,7 @@ func show_chest(item: ShopOfferData, scrap_coins: int) -> void:
 	mode = &"chest"
 	chest_item = item
 	dialog_panel.custom_minimum_size = Vector2(760, 420)
+	_update_layout()
 	title_label.text = "Zahnfee-Kiste!"
 	subtitle_label.text = "Behalte das Fundstück oder tausche es gegen Münzen."
 	subtitle_label.custom_minimum_size.y = 40.0
@@ -87,6 +106,7 @@ func show_relics(options: Array[RelicData]) -> void:
 	mode = &"relic"
 	relic_options = options
 	dialog_panel.custom_minimum_size = Vector2(900, 465)
+	_update_layout()
 	title_label.text = "Göttliche Zahnreliquie!"
 	subtitle_label.text = "Der Boss ist besiegt. Wähle ein Relikt für diesen Lauf."
 	subtitle_label.custom_minimum_size.y = 40.0
@@ -105,6 +125,7 @@ func show_end(won: bool, coins: int, recap: Dictionary = {}) -> void:
 	end_recap = recap.duplicate(true)
 	current_upgrades.clear()
 	dialog_panel.custom_minimum_size = Vector2(900, 560)
+	_update_layout()
 	$Root/Center/Panel/Margin/Rows/Portrait.custom_minimum_size.y = 80.0
 	title_label.text = "Alle huldigen Denti!" if won else "Denti ist ausgefallen!"
 	subtitle_label.add_theme_font_size_override("font_size", 17)
@@ -219,6 +240,7 @@ func _format_number(value: int) -> String:
 func _show_credits() -> void:
 	mode = &"credits"
 	dialog_panel.custom_minimum_size = Vector2(800, 420)
+	_update_layout()
 	title_label.text = "Credits"
 	subtitle_label.text = "Schrift: Fredoka · The Fredoka Project Authors\nSIL Open Font License 1.1\n\nDenti-, Waffen-, Gegner-, Arena- und Icon-Grafiken: OpenAI ImageGen\nMusik: othaldo · erstellt mit Suno\nSoundeffekte: eigens synthetisiert\nUI-Elemente: eigenes Godot-Design"
 	subtitle_label.custom_minimum_size.y = 120.0

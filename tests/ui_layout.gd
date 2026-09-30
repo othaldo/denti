@@ -103,6 +103,95 @@ func _run() -> void:
 	if not _inside(game.choice_panel.dialog_panel.get_global_rect(), layout_size) or not _inside(game.choice_panel.buttons[0].get_global_rect(), layout_size) or not _inside(game.choice_panel.buttons[1].get_global_rect(), layout_size):
 		_fail("chest decision exceeds the scaled 1024x600 viewport")
 		return
+	root.content_scale_size = Vector2i(720, 1280)
+	root.size = Vector2i(720, 1280)
+	await process_frame
+	await process_frame
+	var upgrades: Array[UpgradeData] = [
+		load("res://data/upgrades/bisskraft.tres"),
+		load("res://data/upgrades/haerte.tres"),
+		load("res://data/upgrades/glanz.tres"),
+	]
+	game.choice_panel.show_upgrades(upgrades)
+	await process_frame
+	if game.choice_panel.cards.columns != 1 or not _inside(game.choice_panel.dialog_panel.get_global_rect(), Vector2(720, 1280)):
+		_fail("portrait upgrade dialog exceeds the phone viewport: %s, root %s, columns %d" % [game.choice_panel.dialog_panel.get_global_rect(), game.choice_panel.get_node("Root").size, game.choice_panel.cards.columns])
+		return
+	var previous_bottom := -1.0
+	for button: Button in game.choice_panel.buttons:
+		var rect := button.get_global_rect()
+		if not _inside(rect, Vector2(720, 1280)) or rect.position.y < previous_bottom:
+			_fail("portrait upgrade cards overlap or exceed the phone viewport")
+			return
+		previous_bottom = rect.end.y
+	game.choice_panel.visible = false
+	game.shop_panel.visible = true
+	await process_frame
+	if not _inside(game.shop_panel.get_node("Root/Center/Panel").get_global_rect(), Vector2(720, 1280)):
+		_fail("portrait shop exceeds the phone viewport")
+		return
+	game.shop_panel.visible = false
+	game.choice_panel.show_starters(WeaponCatalog.STARTERS)
+	await process_frame
+	if game.choice_panel.cards.columns != 1 or not _inside(game.choice_panel.dialog_panel.get_global_rect(), Vector2(720, 1280)):
+		_fail("portrait starter choice exceeds the phone viewport")
+		return
+	game.choice_panel.show_chest(ShopController.by_id(&"metal_crown"), 3)
+	await process_frame
+	if not _inside(game.choice_panel.dialog_panel.get_global_rect(), Vector2(720, 1280)):
+		_fail("portrait chest choice exceeds the phone viewport")
+		return
+	var relic_choices: Array[RelicData] = [RelicCatalog.CATALOG[0], RelicCatalog.CATALOG[1], RelicCatalog.CATALOG[2]]
+	game.choice_panel.show_relics(relic_choices)
+	await process_frame
+	if not _inside(game.choice_panel.dialog_panel.get_global_rect(), Vector2(720, 1280)):
+		_fail("portrait relic choice exceeds the phone viewport")
+		return
+	game.choice_panel.show_end(false, 0)
+	await process_frame
+	if not _inside(game.choice_panel.dialog_panel.get_global_rect(), Vector2(720, 1280)):
+		_fail("portrait end screen exceeds the phone viewport")
+		return
+	game.choice_panel._show_credits()
+	await process_frame
+	if not _inside(game.choice_panel.dialog_panel.get_global_rect(), Vector2(720, 1280)):
+		_fail("portrait credits exceed the phone viewport")
+		return
+	game.choice_panel.show_starters(WeaponCatalog.STARTERS)
+	root.content_scale_size = Vector2i(1040, 600)
+	root.size = Vector2i(896, 414)
+	await process_frame
+	await process_frame
+	var landscape_size: Vector2 = game.choice_panel.get_node("Root").size
+	if game.choice_panel.cards.columns != 3 or not _inside(game.choice_panel.dialog_panel.get_global_rect(), landscape_size):
+		_fail("landscape starter choice exceeds the phone viewport: %s / %s" % [game.choice_panel.dialog_panel.get_global_rect(), landscape_size])
+		return
+	for button: UpgradeCard in game.choice_panel.buttons:
+		if not _within(button.effect_label.get_global_rect(), button.get_global_rect()):
+			_fail("landscape starter text exceeds its card")
+			return
+	game.choice_panel.show_relics(relic_choices)
+	await process_frame
+	if not _inside(game.choice_panel.dialog_panel.get_global_rect(), landscape_size):
+		_fail("landscape relic choice exceeds the phone viewport")
+		return
+	game.choice_panel.show_end(false, 0)
+	await process_frame
+	if not _inside(game.choice_panel.dialog_panel.get_global_rect(), landscape_size):
+		_fail("landscape end screen exceeds the phone viewport")
+		return
+	game.choice_panel._show_credits()
+	await process_frame
+	if not _inside(game.choice_panel.dialog_panel.get_global_rect(), landscape_size):
+		_fail("landscape credits exceed the phone viewport")
+		return
+	game.choice_panel.visible = false
+	game.shop_panel.visible = true
+	await process_frame
+	await process_frame
+	if not _inside(game.shop_panel.get_node("Root/Center/Panel").get_global_rect(), landscape_size):
+		_fail("landscape shop exceeds the phone viewport: %s / %s" % [game.shop_panel.get_node("Root/Center/Panel").get_global_rect(), landscape_size])
+		return
 	paused = false
 	root.get_node("GameSession").clear_run()
 	print("Denti UI layout test passed")

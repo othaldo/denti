@@ -4,6 +4,7 @@ extends Button
 const ICONS: Script = preload("res://scripts/ui/denti_ui_icons.gd")
 
 var content: HBoxContainer
+var card_margin: MarginContainer
 var icon_rect: TextureRect
 var name_label: Label
 var rarity_label: Label
@@ -48,19 +49,26 @@ func show_offer(offer: ShopOfferData, coins: int, available: bool = true, owned_
 	DentiUIStyle.style_card(self, offer.rarity_tier)
 
 
+func set_compact(compact: bool) -> void:
+	custom_minimum_size.y = 80.0 if compact else 100.0
+	icon_rect.custom_minimum_size = Vector2(58, 58) if compact else Vector2(78, 78)
+	card_margin.add_theme_constant_override("margin_top", 6 if compact else 9)
+	card_margin.add_theme_constant_override("margin_bottom", 6 if compact else 9)
+
+
 func _build_content() -> void:
-	var margin := MarginContainer.new()
-	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	margin.add_theme_constant_override("margin_left", 13)
-	margin.add_theme_constant_override("margin_right", 13)
-	margin.add_theme_constant_override("margin_top", 9)
-	margin.add_theme_constant_override("margin_bottom", 9)
-	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(margin)
+	card_margin = MarginContainer.new()
+	card_margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	card_margin.add_theme_constant_override("margin_left", 13)
+	card_margin.add_theme_constant_override("margin_right", 13)
+	card_margin.add_theme_constant_override("margin_top", 9)
+	card_margin.add_theme_constant_override("margin_bottom", 9)
+	card_margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(card_margin)
 	content = HBoxContainer.new()
 	content.add_theme_constant_override("separation", 12)
 	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	margin.add_child(content)
+	card_margin.add_child(content)
 	icon_rect = TextureRect.new()
 	icon_rect.custom_minimum_size = Vector2(78, 78)
 	icon_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -76,10 +84,13 @@ func _build_content() -> void:
 	name_label = Label.new()
 	name_label.add_theme_color_override("font_color", DentiUIStyle.INK)
 	name_label.add_theme_font_size_override("font_size", 21)
+	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	name_label.max_lines_visible = 2
 	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	details.add_child(name_label)
 	rarity_label = Label.new()
 	rarity_label.add_theme_font_size_override("font_size", 13)
+	rarity_label.clip_text = true
 	rarity_label.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	rarity_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	details.add_child(rarity_label)
