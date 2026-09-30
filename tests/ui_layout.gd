@@ -189,8 +189,9 @@ func _run() -> void:
 	game.shop_panel.visible = true
 	await process_frame
 	await process_frame
-	if not _inside(game.shop_panel.get_node("Root/Center/Panel").get_global_rect(), landscape_size):
-		_fail("landscape shop exceeds the phone viewport: %s / %s" % [game.shop_panel.get_node("Root/Center/Panel").get_global_rect(), landscape_size])
+	var landscape_shop_rect: Rect2 = game.shop_panel.get_node("Root/Center/Panel").get_global_rect()
+	if not _inside(landscape_shop_rect, landscape_size) or landscape_shop_rect.position.y < 6.0 or landscape_shop_rect.end.y > landscape_size.y - 6.0:
+		_fail("landscape shop exceeds the phone viewport: %s / %s" % [landscape_shop_rect, landscape_size])
 		return
 	paused = false
 	root.get_node("GameSession").clear_run()

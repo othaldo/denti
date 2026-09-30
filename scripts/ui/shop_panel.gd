@@ -63,9 +63,11 @@ func _update_layout() -> void:
 	var portrait := viewport_size.y > viewport_size.x and viewport_size.x < 800.0
 	var compact_landscape := not portrait and viewport_size.y <= 620.0
 	rows.add_theme_constant_override("separation", 3 if compact_landscape else 5)
+	$Root/Center/Panel/Margin.add_theme_constant_override("margin_top", 0 if compact_landscape else 10)
+	$Root/Center/Panel/Margin.add_theme_constant_override("margin_bottom", 0 if compact_landscape else 10)
 	$Root/Center/Panel/Margin/Rows/Portrait.custom_minimum_size.y = 0.0 if compact_landscape else 28.0
 	items_scroll.custom_minimum_size.y = 32.0 if compact_landscape else 46.0
-	$Root/Center/Panel.custom_minimum_size = Vector2(660.0 if portrait else 850.0, 590.0 if compact_landscape else 665.0)
+	$Root/Center/Panel.custom_minimum_size = Vector2(660.0 if portrait else 850.0, 570.0 if compact_landscape else 665.0)
 	for button in offer_buttons:
 		button.call("set_compact", compact_landscape)
 
