@@ -500,7 +500,7 @@ func _clear_arena(collect_drops: bool, keep_boss: bool = false) -> void:
 					coins += drop.amount + bonus
 				else:
 					_award_xp(drop.amount + bonus)
-		drop.free()
+		drop.queue_free()
 	_clear_combat(keep_boss)
 
 
@@ -508,13 +508,13 @@ func _clear_combat(keep_boss: bool = false) -> void:
 	for enemy in $Enemies.get_children():
 		if keep_boss and enemy == boss:
 			continue
-		enemy.free()
+		enemy.queue_free()
 	if not keep_boss:
 		boss = null
 	for projectile in $Projectiles.get_children():
-		projectile.free()
+		projectile.queue_free()
 	for projectile in $EnemyProjectiles.get_children():
-		projectile.free()
+		projectile.queue_free()
 
 
 func _finish_run() -> void:
