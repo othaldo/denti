@@ -5,7 +5,7 @@
 script = ExtResource("1")
 id = &"water_jet"
 display_name = "Wasserflosser"
-description = "Einhand · Fernkampf · schneller Strahl mit Rückstoß"
+description = "Einhand · Fernkampf · macht nass und stößt zurück"
 hands = 1
 attack_mode = &"projectile"
 damage_type = "Wasser"
@@ -14,6 +14,7 @@ interval = 0.48
 attack_range = 310.0
 projectile_speed = 720.0
 knockback = 20.0
+wet_duration = 2.5
 damage_tiers = PackedFloat32Array(1.0, 1.25, 1.55, 1.9)
 knockback_tiers = PackedFloat32Array(20.0, 24.0, 27.0, 30.0)
 sprite = ExtResource("2")

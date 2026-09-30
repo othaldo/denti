@@ -15,6 +15,9 @@ extends Resource
 @export var pierce: int = 0
 @export var splash_radius: float = 0.0
 @export var knockback: float = 0.0
+@export var bleed_dps: float = 0.0
+@export var bleed_duration: float = 0.0
+@export var wet_duration: float = 0.0
 @export var sprite: Texture2D
 @export var grip_anchor: Vector2 = Vector2(0.25, 0.85)
 @export var projectile_color: Color = Color(0.75, 0.96, 1.0)

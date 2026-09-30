@@ -233,11 +233,11 @@ func modify_damage(enemy: Enemy, weapon: WeaponData, base: float) -> float:
 
 
 func on_weapon_hit(enemy: Enemy, amount: float, weapon: WeaponData, critical: bool) -> void:
-	if enemy.health > 0.0 and weapon.damage_type == "Schnitt" and _power(&"bleed") > 0.0:
+	if enemy.health > 0.0 and weapon.bleed_dps > 0.0:
 		var extra_stacks := roundi(_power(&"bleed_clock"))
-		enemy.apply_bleed(_power(&"bleed"), 2.5 + _power(&"bleed_clock"), 3 + extra_stacks)
-	if enemy.health > 0.0 and weapon.damage_type == "Wasser" and _power(&"conductive_wet") > 0.0:
-		enemy.apply_wet(3.0)
+		enemy.apply_bleed(weapon.bleed_dps + _power(&"bleed"), weapon.bleed_duration + _power(&"bleed_clock"), 3 + extra_stacks)
+	if enemy.health > 0.0 and weapon.wet_duration > 0.0:
+		enemy.apply_wet(weapon.wet_duration + (0.5 if _power(&"conductive_wet") > 0.0 else 0.0))
 	if weapon.damage_type == "Wasser" and _power(&"water_puddle") > 0.0 and _ready_proc(&"water_puddle", 1.5):
 		puddles.append({"at": enemy.global_position, "life": PUDDLE_DURATION, "tick": 0.0})
 		if puddles.size() > 4:

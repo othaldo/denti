@@ -16,7 +16,7 @@ Glück beeinflusst wie bisher die Stufe der Angebote. Zusätzlich hat ein Item-A
 | Keramikschale | Nach erlittenem Schaden 16 Schaden im Umkreis | 3 |
 | Minz-Essenz | Beute wird aus 55 zusätzlichen Pixeln Entfernung angezogen | 3 |
 | Glücks-Molar | 10 % mehr XP beim Einsammeln | 3 |
-| Zahnseide-Spule | Schnittwaffen verursachen Blutung: 3 Schaden pro Sekunde | 3 |
+| Zahnseide-Spule | Die Blutung von Schnittwaffen verursacht 3 zusätzlichen Schaden pro Sekunde | 3 |
 | Karies-Kopfgeld | Alle zwölf Kills eine zusätzliche Münze | 2 |
 | Funkensonde | Wasser- und Lichttreffer springen mit 40 % Trefferschaden auf einen nahen Gegner über | 3 |
 | Zahnfee-Pakt | Jeder gesammelte XP-Punkt heilt 0,35 Leben | 2 |
@@ -25,7 +25,7 @@ Glück beeinflusst wie bisher die Stufe der Angebote. Zusätzlich hat ein Item-A
 | Heiliges Elixier | Alle zehn Kills ein Zahnblitz mit 25 Flächenschaden | 2 |
 | Göttliches Siegel | Zwei zusätzliche Schilde zu Beginn jeder Welle | 1 |
 | Ansteckende Zahnseide | Tödliche Waffentreffer auf blutende Gegner übertragen deren Blutung auf einen nahen Gegner; größere Reichweite pro Exemplar, aber weniger Bisskraft | 2 |
-| Leitlack | Wassertreffer machen Ziele 3 Sekunden nass; nasse Gegner erleiden 18 % mehr Wasser- und Lichtschaden pro Exemplar, und Kettenblitze von ihnen reichen weiter; weniger Bewegung | 2 |
+| Leitlack | Wasser hält Ziele 0,5 Sekunden länger nass; nasse Gegner erleiden 18 % mehr Wasser- und Lichtschaden pro Exemplar, und Kettenblitze von ihnen reichen weiter; weniger Bewegung | 2 |
 | Verbotener Lolli | Während Denti sich tatsächlich bewegt, verursachen Waffen 20 % mehr Schaden pro Exemplar; weniger maximales Leben und Härte | 2 |
 | Zahnfee-Pfand | 50 % mehr Münzen beim Zerlegen von Kisten pro Exemplar und mehr Glück; weniger maximales Leben | 2 |
 | Blutungsuhr | Blutungen halten pro Exemplar 1 Sekunde länger und können einen zusätzlichen Stapel tragen; weniger Bisskraft | 2 |
@@ -37,7 +37,7 @@ Glück beeinflusst wie bisher die Stufe der Angebote. Zusätzlich hat ein Item-A
 | Speichelkelch | Überheilung sammelt sich zu 50 % pro Exemplar und erzeugt bei 20 gesammelten Punkten einen Schild; weniger maximales Leben | 2 |
 | Zuckerschock | Alle zwölf normalen Kills folgen vier Sekunden schnellerer Waffenangriffe und drei Sekunden verlangsamter Angriffe; weniger maximales Leben | 2 |
 
-Blutung stapelt sich normalerweise auf Gegnern bis zu dreimal und läuft nach 2,5 Sekunden ohne erneuten Schnitt aus; die Blutungsuhr erhöht Dauer und Stapelgrenze. Der Leitlack-Effekt auf Gegnern läuft nach 3 Sekunden ab. Schilde fangen jeweils einen Treffer ab und sind insgesamt auf fünf Ladungen begrenzt. Kettenblitze, Blutungsübertragung, Spritzer, kritische Blitze, Lichtstrahlen und Keramiksplitter haben kurze interne Abklingzeiten, damit dichte Gegnergruppen das Spiel nicht mit Effekten überfluten. Laufende Effekte, Schildladungen, Stapel und Fortschritte zu Kill-Boni werden mit dem Spielstand gespeichert. Bei Kisten steht der normale Zerlegewert schon beim Drop fest; das Zahnfee-Pfand erhöht den angezeigten und ausgezahlten Wert bei der Entscheidung.
+Peitsche und Kratzer verursachen auch ohne Items Blutung; der Wasserflosser macht Ziele auch ohne Leitlack nass. Blutung stapelt sich normalerweise auf Gegnern bis zu dreimal und läuft nach 2,5 Sekunden ohne erneuten Schnitt aus; die Blutungsuhr erhöht Dauer und Stapelgrenze. Wet läuft nach 2,5 Sekunden ab, mit Leitlack nach 3 Sekunden. Schilde fangen jeweils einen Treffer ab und sind insgesamt auf fünf Ladungen begrenzt. Kettenblitze, Blutungsübertragung, Spritzer, kritische Blitze, Lichtstrahlen und Keramiksplitter haben kurze interne Abklingzeiten, damit dichte Gegnergruppen das Spiel nicht mit Effekten überfluten. Laufende Effekte, Schildladungen, Stapel und Fortschritte zu Kill-Boni werden mit dem Spielstand gespeichert. Bei Kisten steht der normale Zerlegewert schon beim Drop fest; das Zahnfee-Pfand erhöht den angezeigten und ausgezahlten Wert bei der Entscheidung.
 
 Beispiel-Builds:
 

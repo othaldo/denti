@@ -45,7 +45,37 @@ func _run() -> void:
 	boss.free()
 	game._create_enemy(WaveController.PLAQUE, game.player.global_position + Vector2(180.0, 0.0))
 	var enemy: Enemy = game.get_node("Enemies").get_child(-1)
+	enemy.health = 1000.0
+	enemy.max_health = 1000.0
 	enemy.set_physics_process(false)
+	enemy.take_damage(5.0, whip)
+	if enemy.bleed_stacks != 1 or not is_equal_approx(enemy.bleed_dps, 1.8):
+		_fail("floss whip did not cause its own bleed")
+		return
+	var before_bleed: float = enemy.health
+	enemy._physics_process(1.01)
+	if enemy.health >= before_bleed:
+		_fail("weapon bleed did not deal damage over time")
+		return
+	enemy.take_damage(5.0, scaler)
+	if enemy.bleed_stacks != 2:
+		_fail("plaque scaler did not build bleed")
+		return
+	enemy.take_damage(5.0, water)
+	if enemy.wet_time < 2.5:
+		_fail("water jet did not wet without an item")
+		return
+	game.items.acquire(ShopController.by_id(&"floss_reel"))
+	enemy.take_damage(5.0, whip)
+	if enemy.bleed_stacks != 3 or enemy.bleed_dps < 4.79:
+		_fail("floss reel did not strengthen one bleed stack per hit")
+		return
+	game.items.acquire(ShopController.by_id(&"conductive_varnish"))
+	enemy.wet_time = 0.0
+	enemy.take_damage(5.0, water)
+	if enemy.wet_time < 3.0:
+		_fail("conductive varnish did not extend weapon wet")
+		return
 	game.player.loadout.restore([{"id": "magic_toothbrush", "tier": 3}])
 	game.player.loadout.equipped()[0]._physics_process(0.016)
 	if game.get_node("Projectiles").get_child_count() != 2:
