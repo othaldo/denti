@@ -161,6 +161,7 @@ static func restore(game, saved: Dictionary) -> void:
 		enemy.boss_dash_origin = _read_vector(entry.get("boss_dash_origin", [0.0, 0.0]))
 		enemy.death_elapsed = clampf(float(entry.get("death_elapsed", 0.0)), 0.0, Enemy.BOSS_DEATH_DURATION)
 		enemy.is_enraged = enemy.overtime_active or bool(entry.get("enraged", enemy.health <= enemy.max_health * 0.5 and enemy.data.is_boss))
+		enemy.sync_inflammation_aura(0.0, enemy.death_elapsed / Enemy.BOSS_DEATH_DURATION if enemy.dying else 0.0)
 		if enemy.dying:
 			enemy.remove_from_group("enemies")
 		enemy.bleed_stacks = clampi(int(entry.get("bleed_stacks", 0)), 0, 5)

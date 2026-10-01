@@ -26,9 +26,15 @@ func _run() -> void:
 	if boss.overtime_seconds != 0 or boss.attack_damage != base_damage:
 		_fail("boss grew before timeout")
 		return
+	if boss.inflammation_aura == null or boss.inflammation_aura.visible:
+		_fail("inflammation aura appeared before timeout or was not configured")
+		return
 	game._on_wave_finished(5)
 	if not boss.overtime_active or not boss.is_enraged or not game.boss_pending or paused or game.shop_panel.visible or game.choice_panel.visible:
 		_fail("timeout failed to start uninterrupted enrage")
+		return
+	if not boss.inflammation_aura.visible or not boss.inflammation_aura.is_playing():
+		_fail("timeout did not start the animated inflammation aura")
 		return
 	boss._tick_overtime(0.99)
 	if boss.overtime_seconds != 0:
@@ -61,7 +67,7 @@ func _run() -> void:
 		_fail("enrage shortened the readable warning")
 		return
 	game._refresh_hud()
-	if not game.hud.timer_label.text.contains("ENRAGE +10s"):
+	if not game.hud.timer_label.text.contains("ENTZÜNDET +10s"):
 		_fail("HUD does not show overtime escalation")
 		return
 	var damage_saved := boss.attack_damage
@@ -76,6 +82,9 @@ func _run() -> void:
 	boss.set_physics_process(false)
 	if not game.boss_pending or not boss.overtime_active or boss.overtime_seconds != 10 or not is_equal_approx(boss.attack_damage, damage_saved) or not is_equal_approx(boss.health, health_saved):
 		_fail("save/resume lost or doubled overtime bonuses")
+		return
+	if not boss.inflammation_aura.visible or not boss.inflammation_aura.is_playing() or boss.inflammation_aura.modulate.r != boss.data.inflammation_color.r:
+		_fail("save/resume lost the boss inflammation aura")
 		return
 	boss._tick_overtime(0.75)
 	if boss.overtime_seconds != 11:

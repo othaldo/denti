@@ -101,7 +101,7 @@ func update_status(stats: PlayerStats, xp: int, xp_goal: int, level: int, coins:
 	wave_label.text = "WELLE %d" % wave_number
 	var seconds := ceili(remaining)
 	if boss_pending:
-		timer_label.text = "ENRAGE +%ds" % boss.overtime_seconds if is_instance_valid(boss) and boss.overtime_active else "Boss besiegen!"
+		timer_label.text = "ENTZÜNDET +%ds" % boss.overtime_seconds if is_instance_valid(boss) and boss.overtime_active else "Boss besiegen!"
 	elif collecting_loot:
 		timer_label.text = "Beute sammeln"
 	else:

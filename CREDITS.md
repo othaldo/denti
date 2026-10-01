@@ -13,6 +13,7 @@
 - Der Arena-Hintergrund unter `assets/environment/dental_arena_floor.png` wurde mit OpenAI ImageGen erstellt.
 - Die Item- und HUD-Icon-Atlanten unter `assets/items/` und `assets/ui/`, einschließlich der acht neuen Item-Symbole, wurden mit OpenAI ImageGen erstellt.
 - Die zehn eigenen Stat-Icons in `assets/ui/stat_icons_atlas.png` wurden mit dem eingebauten OpenAI ImageGen-Werkzeug erstellt. Prompt, Zuordnung und Schutz vor abgeschnittenen Motiven stehen in `docs/STAT_ICONS.md`.
+- Die acht Animationsframes der Boss-Entzündungs-Aura in `assets/vfx/boss_inflammation_aura.png` wurden mit dem eingebauten OpenAI ImageGen-Werkzeug erstellt; Prompt und Farbstufen stehen in `docs/BOSS_INFLAMMATION.md`.
 - HUD, Karten, Buttons und Fortschrittsbalken sind eigene Godot-UI-Elemente. Es werden keine externen UI-Packs verwendet.
 
 ## Musik

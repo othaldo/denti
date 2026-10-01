@@ -283,7 +283,8 @@ func _on_boss_death_started(_at: Vector2) -> void:
 
 func _on_boss_enraged(at: Vector2) -> void:
 	sound.play_cue(&"boss_warning")
-	_show_item_feedback("ENRAGE!" if is_instance_valid(boss) and boss.overtime_active else "BOSS IN RAGE!", at, Color(1.0, 0.39, 0.27))
+	var inflamed := is_instance_valid(boss) and boss.overtime_active
+	_show_item_feedback("ENTZÜNDET!" if inflamed else "BOSS WIRD WÜTEND!", at, boss.data.inflammation_color if inflamed else Color(1.0, 0.39, 0.27))
 	camera_shake_time = 0.25
 
 

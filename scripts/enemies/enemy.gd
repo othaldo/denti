@@ -72,6 +72,7 @@ var boss_guard_feedback_time: float = 0.0
 var spawn_wave: int = 1
 var active_special_attack: int = EnemyData.SpecialAttack.NONE
 var active_trigger_range: float = 0.0
+var inflammation_aura: BossInflammationAura
 
 
 func configure(enemy_data: EnemyData, player: Player, wave_number: int = 1, difficulty_id: StringName = &"normal") -> void:
@@ -109,6 +110,10 @@ func _ready() -> void:
 	sprite.scale = Vector2.ONE * (data.radius * 2.35 / side)
 	sprite_base_scale = sprite.scale
 	animation_time = randf_range(0.0, TAU)
+	if data.is_boss:
+		inflammation_aura = BossInflammationAura.new()
+		inflammation_aura.configure(data)
+		add_child(inflammation_aura)
 
 
 func _process(delta: float) -> void:
@@ -120,6 +125,7 @@ func _process(delta: float) -> void:
 		sprite.rotation += delta * 2.2
 		sprite.scale = sprite_base_scale * (1.0 + 0.28 * sin(progress * PI) - 0.45 * progress)
 		sprite.modulate = Color(1.45, 1.27, 0.95, 1.0) if progress < 0.2 else data.sprite_tint.lerp(Color(0.50, 0.25, 0.57, 0.0), (progress - 0.2) / 0.8)
+		sync_inflammation_aura(delta, progress)
 		queue_redraw()
 		if death_elapsed >= BOSS_DEATH_DURATION:
 			defeated.emit(global_position, data)
@@ -128,6 +134,7 @@ func _process(delta: float) -> void:
 	animation_time += delta * (2.5 if data.is_boss else 5.0)
 	sprite.position.y = sin(animation_time) * (2.2 if data.is_boss else 1.2)
 	sprite.rotation = sin(animation_time * 0.7) * (0.025 if data.is_boss else 0.045)
+	sync_inflammation_aura(delta)
 	if active_special_attack == EnemyData.SpecialAttack.SHOOT and target != null:
 		sprite.flip_h = target.global_position.x < global_position.x
 	if pulse_flash_time > 0.0:
@@ -258,6 +265,7 @@ func start_overtime() -> void:
 		return
 	overtime_active = true
 	is_enraged = true
+	sync_inflammation_aura()
 	enraged.emit(global_position)
 	queue_redraw()
 
@@ -284,7 +292,13 @@ func advance_overtime(seconds: int) -> void:
 	health *= health_factor
 	boss_damage_budget *= health_factor
 	overtime_seconds = next
+	sync_inflammation_aura()
 	queue_redraw()
+
+
+func sync_inflammation_aura(delta: float = 0.0, death_progress: float = 0.0) -> void:
+	if inflammation_aura != null:
+		inflammation_aura.sync(overtime_active, overtime_seconds, sprite.position, delta, death_progress)
 
 
 func overtime_speed_factor() -> float:
@@ -653,7 +667,7 @@ func _draw() -> void:
 		draw_arc(Vector2.ZERO, data.radius + 12.0, 0.0, TAU, 40, Color(1.0, 0.73, 0.24, 0.95), 4.0)
 	if data.aura_radius > 0.0:
 		draw_arc(Vector2.ZERO, data.aura_radius, 0.0, TAU, 48, Color(1.0, 0.46, 0.73, 0.45), 2.0)
-	if is_enraged:
+	if is_enraged and not overtime_active:
 		draw_arc(Vector2.ZERO, data.radius + 12.0, 0.0, TAU, 40, Color(1.0, 0.26, 0.23, 0.85), 4.0)
 	draw_circle(Vector2(0.0, data.radius * 0.7), data.radius * 0.7, Color(0.17, 0.13, 0.17, 0.17))
 	if data.is_boss:

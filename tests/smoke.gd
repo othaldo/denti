@@ -238,7 +238,7 @@ func _run() -> void:
 		if expected_wave < WaveController.MAX_WAVES and not game.get_node("ShopPanel").visible:
 			_fail("shop missing between waves")
 			return
-	if game.ended or not game.boss_pending or not game.boss.overtime_active or not game.get_node("HUD").timer_label.text.begins_with("ENRAGE +"):
+	if game.ended or not game.boss_pending or not game.boss.overtime_active or not game.get_node("HUD").timer_label.text.begins_with("ENTZÜNDET +"):
 		_fail("final timer ended the run before the boss was defeated")
 		return
 	var boss: Enemy = game.boss

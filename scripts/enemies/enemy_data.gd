@@ -61,7 +61,10 @@ enum BossSignature { AIMED_FAN, TRAIL_FAN, LANE, SPACE_ORB }
 @export var boss_projectile_speed: float = 0.0
 @export var boss_phase_adds: int = 0
 
-@export_group("Boss overtime enrage")
+@export_group("Boss overtime inflammation")
+@export var inflammation_color: Color = Color(1.0, 0.32, 0.12)
+@export_range(0.2, 1.0, 0.05) var inflammation_intensity: float = 0.65
+@export_range(2.5, 4.5, 0.1) var inflammation_aura_size: float = 3.2
 @export_range(0.0, 1.0, 0.01) var overtime_damage_per_second: float = 0.05
 @export_range(0.0, 1.0, 0.01) var overtime_defense_per_second: float = 0.05
 @export_range(0.0, 1.0, 0.01) var overtime_speed_per_second: float = 0.03
