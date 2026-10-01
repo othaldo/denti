@@ -3,7 +3,7 @@
 [resource]
 script = ExtResource("1")
 display_name = "Zahnglück"
-icon_index = 9
+icon_index = 7
 description = "+10 Glück"
 stat = &"luck"
 amount = 10.0

@@ -5,7 +5,7 @@ extends Resource
 @export_multiline var description: String
 @export var stat: StringName
 @export var amount: float
-@export_range(0, 11) var icon_index: int = 0
+@export_range(0, 9) var icon_index: int = 0
 @export var tier_amounts: Array[float] = []
 
 var tier: int = 1

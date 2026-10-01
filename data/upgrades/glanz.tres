@@ -3,7 +3,7 @@
 [resource]
 script = ExtResource("1")
 display_name = "Glanz"
-icon_index = 9
+icon_index = 4
 description = "+5 % kritische Chance"
 stat = &"crit_chance"
 amount = 0.05

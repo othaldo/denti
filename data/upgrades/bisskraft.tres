@@ -3,7 +3,7 @@
 [resource]
 script = ExtResource("1")
 display_name = "Bisskraft"
-icon_index = 11
+icon_index = 0
 description = "+4 % Schaden"
 stat = &"damage_bonus"
 amount = 4.0

@@ -3,7 +3,7 @@
 [resource]
 script = ExtResource("1")
 display_name = "Härte"
-icon_index = 0
+icon_index = 1
 description = "+1 Rüstung"
 stat = &"armor"
 amount = 1.0

@@ -29,7 +29,7 @@ func show_upgrade(upgrade: UpgradeData) -> void:
 	custom_minimum_size.y = 186.0
 	text = ""
 	content.visible = true
-	icon_rect.texture = ICONS.item(upgrade.icon_index)
+	icon_rect.texture = ICONS.stat(upgrade.icon_index)
 	name_label.text = upgrade.display_name.to_upper()
 	rarity_label.text = "STUFE %d · %s" % [upgrade.tier, DentiRarity.name_for(upgrade.tier).to_upper()]
 	DentiUIStyle.style_rarity_label(rarity_label, upgrade.tier)
@@ -97,7 +97,7 @@ func set_mobile_text(enabled: bool) -> void:
 
 func set_upgrade_layout(narrow: bool, compact: bool) -> void:
 	custom_minimum_size = Vector2(0, 186 if narrow else (174 if compact else 186))
-	icon_rect.custom_minimum_size.y = 30 if compact else 48
+	icon_rect.custom_minimum_size.y = 40 if compact else 56
 	name_label.custom_minimum_size.y = 34 if narrow else 26
 	name_label.add_theme_font_size_override("font_size", 15 if narrow else 18)
 	effect_label.add_theme_font_size_override("font_size", 15 if narrow else 17)

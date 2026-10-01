@@ -3,7 +3,7 @@
 [resource]
 script = ExtResource("1")
 display_name = "Bewegung"
-icon_index = 8
+icon_index = 6
 description = "+3 % Bewegung"
 stat = &"speed_bonus"
 amount = 3.0

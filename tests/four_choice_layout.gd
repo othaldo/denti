@@ -60,6 +60,23 @@ func _run() -> void:
 					if not rect.encloses(control.get_global_rect()) or control.size.y + 1.0 < control.get_minimum_size().y:
 						_fail("upgrade text/icon clipped at %s: %s in %s" % [extent, control.get_global_rect(), rect])
 						return
+				var icon := card.icon_rect.texture as AtlasTexture
+				if icon == null or icon.atlas != DentiUIIcons.STAT_ATLAS or icon.get_size().x != icon.get_size().y or card.icon_rect.stretch_mode != TextureRect.STRETCH_KEEP_ASPECT_CENTERED:
+					_fail("upgrade icon does not preserve its own complete square stat motif")
+					return
+			if capture and extent in [Vector2i(320, 568), Vector2i(720, 1280), Vector2i(1280, 670), Vector2i(1280, 720)]:
+				await RenderingServer.frame_post_draw
+				root.get_texture().get_image().save_png(capture_path + "/levelup_%dx%d_group%d.png" % [extent.x, extent.y, start])
+		# Hover must keep the icon fully visible, including the first and last cards.
+		for card: UpgradeCard in game.choice_panel.buttons:
+			card.mouse_entered.emit()
+		await create_timer(0.15).timeout
+		for card: UpgradeCard in game.choice_panel.buttons:
+			if not bounds.encloses(card.get_global_rect()) or not card.get_global_rect().encloses(card.icon_rect.get_global_rect()):
+				_fail("hover clips a level-up icon/card at %s" % extent)
+				return
+			card.mouse_exited.emit()
+		await create_timer(0.15).timeout
 		if capture and extent in [Vector2i(320, 568), Vector2i(720, 1280), Vector2i(1280, 720)]:
 			await RenderingServer.frame_post_draw
 			root.get_texture().get_image().save_png(capture_path + "/levelup_%dx%d.png" % [extent.x, extent.y])

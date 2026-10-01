@@ -3,7 +3,7 @@
 [resource]
 script = ExtResource("1")
 display_name = "Nahschaden"
-icon_index = 7
+icon_index = 8
 description = "+2 Nahschaden (Waffenskalierung)"
 stat = &"melee_damage"
 amount = 2.0

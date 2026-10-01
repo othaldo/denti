@@ -3,7 +3,7 @@
 [resource]
 script = ExtResource("1")
 display_name = "Speichel"
-icon_index = 6
+icon_index = 5
 description = "+1 Regeneration"
 stat = &"regen"
 amount = 1.0
