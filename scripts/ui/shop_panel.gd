@@ -205,7 +205,7 @@ func show_shop(wave_number: int, coins: int, reroll_cost: int, new_offers: Array
 	_show_items(owned_items)
 	if player != null:
 		var s := player.stats
-		stats_label.text = "Bisskraft %.0f · Härte %.0f · Schmelz %.0f HP\nPutzeifer %.2f s · Glanz %d %% Crit · Speichel %.1f/s\nBewegung %.0f · Zahnglück %.0f" % [s.damage, s.armor, s.max_health, s.attack_interval, roundi(s.crit_chance * 100), s.regen, s.move_speed, s.luck]
+		stats_label.text = "Bisskraft %+.0f %% · Härte %s · Schmelz %.0f HP\nPutzeifer %+.0f %% · Glanz %d %% Crit · Speichel %s\nBewegung %+.0f %% · Zahnglück %.0f · Nah %+.0f · Fern %+.0f" % [s.damage_bonus, s.armor_text(), s.max_health, s.attack_speed, roundi(s.crit_chance * 100), s.regen_text(), s.speed_bonus, s.luck, s.melee_damage, s.ranged_damage]
 	reroll_button.text = "Neu würfeln · %d" % reroll_cost
 	reroll_button.disabled = coins < reroll_cost
 	continue_button.text = "Welle %d starten" % (wave_number + 1)

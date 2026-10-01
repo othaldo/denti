@@ -13,8 +13,8 @@ static func values(data: WeaponData, tier: int, player: Player) -> Dictionary:
 	var pause := data.interval_at_tier(tier)
 	var crit := 0.05
 	if player != null:
-		damage *= player.stats.damage / 18.0 * player.items.base_weapon_damage_factor()
-		pause *= player.stats.attack_interval / 0.65 * player.items.attack_interval_factor()
+		damage = data.damage_with_stats(tier, player.stats, player.items.base_weapon_damage_bonus())
+		pause = data.cooldown_at_tier(tier, player.stats.attack_interval, player.items.attack_interval_factor())
 		crit = player.stats.crit_chance
 	return {"damage": damage, "pause": pause, "range": data.range_at_tier(tier),
 		"crit": clampf(crit + data.crit_bonus, 0.0, 1.0), "multiplier": data.crit_multiplier}

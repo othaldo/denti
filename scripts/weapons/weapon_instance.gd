@@ -113,7 +113,7 @@ func _physics_process(delta: float) -> void:
 
 
 func attack_interval() -> float:
-	return data.interval_at_tier(tier) * player.stats.attack_interval / 0.65 * player.items.attack_interval_factor()
+	return data.cooldown_at_tier(tier, player.stats.attack_interval, player.items.attack_interval_factor())
 
 
 func _begin_attack(targets: Array[Enemy]) -> void:
@@ -127,7 +127,7 @@ func _begin_attack(targets: Array[Enemy]) -> void:
 		focus_target_id = nearest.get_instance_id()
 		focus_hits = 0
 	var guaranteed := data.crit_cycle > 0 and (focus_hits + 1) % data.crit_cycle == 0
-	var damage := player.stats.roll_damage(data.damage_at_tier(tier) / 18.0, data.crit_bonus, data.crit_multiplier, guaranteed)
+	var damage := player.stats.roll_critical_damage(data.raw_damage_with_stats(tier, player.stats), data.crit_bonus, data.crit_multiplier, guaranteed)
 	damage *= 1.0 + minf(float(focus_hits) * data.focus_step, data.focus_cap)
 	focus_hits = mini(focus_hits + 1, 1000)
 	cooldown = attack_interval()

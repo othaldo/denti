@@ -2,6 +2,8 @@
 
 In der Zahnklinik gibt es 30 Items in vier Seltenheitsstufen. Ein Kauf gewährt den beschriebenen Effekt sofort; mehrere Exemplare verstärken ihn bis zum Stapellimit. Im Shop werden maximale Stapel nicht mehr angeboten. Die Pausenseite **Items** zeigt den Besitz, die Shopzeile eine kompakte Zusammenfassung.
 
+Schadensstats verwenden jetzt Prozentboni: Goldfüllung +5 %, Implantat +12 %, Keramikschale, Ansteckende Zahnseide und Rücklaufbohrer jeweils -5 %, Blutungsuhr -6 %. Zahnseide-Spule gibt +2 Nahschaden. Bisskraft und Item-Prozentboni werden addiert; trefferabhängige Folgeeffekte skalieren den bereits berechneten Trefferschaden nicht erneut. Details stehen im [Schadens- und Verteidigungsbericht](DAMAGE_DEFENSE_BALANCE.md).
+
 Glück beeinflusst wie bisher die Stufe der Angebote. Zusätzlich hat ein Item-Angebot eine Chance von 28 %, aus den Items mit passenden Eigenschaften gewählt zu werden, sofern solche Items in der gewürfelten Stufe verfügbar sind. Dabei zählen die Eigenschaften bereits gekaufter Items und der ausgerüsteten Waffen. Seltenheit und Preis bleiben von dieser Vorliebe unberührt.
 
 | Item | Effekt neben den angezeigten Stats | Max. |
@@ -12,7 +14,7 @@ Glück beeinflusst wie bisher die Stufe der Angebote. Zusätzlich hat ein Item-A
 | Mundspülung | Fernkampfprojektile verursachen 25 % ihres Trefferschadens im Umkreis | 3 |
 | Implantat | 25 % mehr Waffenschaden gegen Bosse | 2 |
 | Polierpaste | Kritische Treffer lösen einen Flächenblitz mit 35 % Trefferschaden aus | 3 |
-| Speichelquelle | Alle acht Kills 3 Leben heilen | 3 |
+| Speichelquelle | +2 Regenerationspunkte, -3 % Bewegung; alle acht Kills 3 Leben heilen | 3 |
 | Keramikschale | Nach erlittenem Schaden 16 Schaden im Umkreis | 3 |
 | Minz-Essenz | Beute wird aus 55 zusätzlichen Pixeln Entfernung angezogen | 3 |
 | Glücks-Molar | 10 % mehr XP beim Einsammeln | 3 |
@@ -35,7 +37,7 @@ Glück beeinflusst wie bisher die Stufe der Angebote. Zusätzlich hat ein Item-A
 | Zinszahn | Am Wellenende 8 % Zins auf verbleibende Münzen pro Exemplar, höchstens 6 Münzen pro Exemplar; weniger maximales Leben | 2 |
 | Rücklaufbohrer | Direkte Projektile fliegen nach dem Treffer oder Reichweitenende zu Denti zurück und können erneut treffen; weniger Bisskraft | 2 |
 | Speichelkelch | Überheilung sammelt sich zu 50 % pro Exemplar und erzeugt bei 20 gesammelten Punkten einen Schild; weniger maximales Leben | 2 |
-| Zuckerschock | Alle zwölf normalen Kills folgen vier Sekunden schnellerer Waffenangriffe und drei Sekunden verlangsamter Angriffe; weniger maximales Leben | 2 |
+| Zuckerschock | Alle zwölf normalen Kills: vier Sekunden +30 % Putzeifer pro Exemplar (max. +50 %), dann drei Sekunden -25 %; weniger maximales Leben | 2 |
 
 Peitsche und Kratzer verursachen auch ohne Items Blutung; der Wasserflosser macht Ziele auch ohne Leitlack nass. Blutung stapelt sich normalerweise auf Gegnern bis zu dreimal und läuft nach 2,5 Sekunden ohne erneuten Schnitt aus; die Blutungsuhr erhöht Dauer und Stapelgrenze. Wet läuft nach 2,5 Sekunden ab, mit Leitlack nach 3 Sekunden. Schilde fangen jeweils einen Treffer ab und sind insgesamt auf fünf Ladungen begrenzt. Kettenblitze, Blutungsübertragung, Spritzer, kritische Blitze, Lichtstrahlen und Keramiksplitter haben kurze interne Abklingzeiten, damit dichte Gegnergruppen das Spiel nicht mit Effekten überfluten. Laufende Effekte, Schildladungen, Stapel und Fortschritte zu Kill-Boni werden mit dem Spielstand gespeichert. Bei Kisten steht der normale Zerlegewert schon beim Drop fest; das Zahnfee-Pfand erhöht den angezeigten und ausgezahlten Wert bei der Entscheidung.
 

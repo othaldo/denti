@@ -4,7 +4,7 @@
 script = ExtResource("1")
 display_name = "Härte"
 icon_index = 0
-description = "+2 Rüstung"
+description = "+1 Rüstung"
 stat = &"armor"
-amount = 2.0
-tier_amounts = Array[float]([2.0, 3.0, 5.0, 7.0])
+amount = 1.0
+tier_amounts = Array[float]([1.0, 2.0, 3.0, 4.0])

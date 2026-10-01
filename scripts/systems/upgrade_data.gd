@@ -22,12 +22,14 @@ func with_tier(new_tier: int) -> UpgradeData:
 
 func effect_text() -> String:
 	match stat:
-		&"damage": return "+%d Schaden" % roundi(amount)
+		&"damage_bonus": return "+%d %% Schaden" % roundi(amount)
+		&"melee_damage": return "+%d Nahschaden (Waffenskalierung)" % roundi(amount)
+		&"ranged_damage": return "+%d Fernschaden (Waffenskalierung)" % roundi(amount)
 		&"armor": return "+%d Rüstung" % roundi(amount)
 		&"max_health": return "+%d maximales Leben und Heilung" % roundi(amount)
-		&"move_speed": return "+%d Lauftempo" % roundi(amount)
-		&"attack_interval": return "%.2f s schneller angreifen" % amount
-		&"regen": return "+%.1f Leben pro Sekunde" % amount
+		&"speed_bonus": return "+%d %% Bewegung" % roundi(amount)
+		&"attack_speed": return "+%d %% Angriffstempo" % roundi(amount)
+		&"regen": return "+%d Regeneration" % roundi(amount)
 		&"crit_chance": return "+%d %% kritische Chance" % roundi(amount * 100.0)
 		&"luck": return "+%d Glück" % roundi(amount)
 	return description

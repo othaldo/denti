@@ -1,6 +1,8 @@
 class_name WeaponData
 extends Resource
 
+const MIN_ATTACK_COOLDOWN := 0.05
+
 @export var id: StringName
 @export var display_name: String
 @export var role: String
@@ -9,6 +11,8 @@ extends Resource
 @export var attack_mode: StringName = &"projectile"
 @export var damage_type: String = "Schmelz"
 @export var base_damage: float = 18.0
+@export_enum("melee", "ranged") var damage_stat: String = "ranged"
+@export_range(0.0, 3.0) var stat_scaling: float = 1.0
 @export var interval: float = 0.8
 @export var attack_range: float = 300.0
 @export var projectile_speed: float = 520.0
@@ -64,6 +68,23 @@ func interval_at_tier(tier: int) -> float:
 	return interval * pow(0.94, clampi(tier, 1, 4) - 1)
 
 
+func raw_damage_with_stats(tier: int, stats: PlayerStats) -> float:
+	var flat := stats.melee_damage if damage_stat == "melee" else stats.ranged_damage
+	return maxf(damage_at_tier(tier) + flat * stat_scaling, 0.0)
+
+
+func damage_with_stats(tier: int, stats: PlayerStats, additional_bonus: float = 0.0) -> float:
+	return stats.scale_damage(raw_damage_with_stats(tier, stats), additional_bonus)
+
+
+func scaling_text() -> String:
+	return "%s: %.0f %%" % ["Nahschaden" if damage_stat == "melee" else "Fernschaden", stat_scaling * 100.0]
+
+
+func cooldown_at_tier(tier: int, player_interval: float, item_interval_factor: float) -> float:
+	return maxf(interval_at_tier(tier) * player_interval / PlayerStats.BASE_ATTACK_INTERVAL * item_interval_factor, MIN_ATTACK_COOLDOWN)
+
+
 func range_at_tier(tier: int) -> float:
 	return range_tiers[clampi(tier, 1, 4) - 1] if range_tiers.size() >= clampi(tier, 1, 4) else attack_range
 
@@ -99,7 +120,7 @@ func stats_text(tier: int) -> String:
 
 
 func combat_text() -> String:
-	var result := "Schadensart: %s" % damage_type
+	var result := "Schadensart: %s · %s" % [damage_type, scaling_text()]
 	if bleed_dps > 0.0:
 		result += " · Blutung %.1f Schaden/s (%.1f s)" % [bleed_dps, bleed_duration]
 	if wet_duration > 0.0:
@@ -123,13 +144,16 @@ func combat_text() -> String:
 	return result
 
 
-func estimated_dps(tier: int, player_damage: float, crit_chance: float, attack_interval: float, item_interval_factor: float) -> float:
-	var chance := clampf(crit_chance + crit_bonus, 0.0, 1.0)
+func estimated_dps(tier: int, stats: PlayerStats, item_interval_factor: float = 1.0, additional_bonus: float = 0.0) -> float:
+	var chance := clampf(stats.crit_chance + crit_bonus, 0.0, 1.0)
 	if crit_cycle > 0:
 		chance = 1.0 / float(crit_cycle) + (1.0 - 1.0 / float(crit_cycle)) * chance
-	var hit := player_damage * damage_at_tier(tier) / 18.0 * (1.0 + chance * (crit_multiplier - 1.0)) * trash_damage_factor
-	var cooldown := interval_at_tier(tier) * attack_interval / 0.65 * item_interval_factor
-	return hit * (1.0 + 0.55 * float(projectile_count_at_tier(tier) - 1)) / maxf(cooldown, 0.01)
+	var raw := raw_damage_with_stats(tier, stats)
+	var normal_hit := maxf(stats.scale_damage(raw, additional_bonus) * trash_damage_factor, 1.0)
+	var critical_hit := maxf(stats.scale_damage(raw * crit_multiplier, additional_bonus) * trash_damage_factor, 1.0)
+	var hit := normal_hit * (1.0 - chance) + critical_hit * chance
+	var cooldown := cooldown_at_tier(tier, stats.attack_interval, item_interval_factor)
+	return hit * (1.0 + 0.55 * float(projectile_count_at_tier(tier) - 1)) / cooldown
 
 
 func damage_against(enemy: Node2D, attack_damage: float, tier: int = 1) -> float:

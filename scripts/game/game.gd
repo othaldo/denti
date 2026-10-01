@@ -8,6 +8,8 @@ const SPAWN_PADDING := 32.0
 const MAX_ACTIVE_ENEMIES := 110
 const UPGRADES: Array[UpgradeData] = [
 	preload("res://data/upgrades/bisskraft.tres"),
+	preload("res://data/upgrades/nahschaden.tres"),
+	preload("res://data/upgrades/fernschaden.tres"),
 	preload("res://data/upgrades/haerte.tres"),
 	preload("res://data/upgrades/schmelz.tres"),
 	preload("res://data/upgrades/putzeifer.tres"),
@@ -361,7 +363,14 @@ func _award_xp(amount: int) -> void:
 
 
 func _show_level_choice() -> void:
-	var pool: Array[UpgradeData] = UPGRADES.duplicate()
+	var pool: Array[UpgradeData] = []
+	var equipped_stats: Array[StringName] = []
+	for weapon in player.loadout.equipped():
+		equipped_stats.append(StringName(weapon.data.damage_stat + "_damage"))
+	for upgrade in UPGRADES:
+		if upgrade.stat in [&"melee_damage", &"ranged_damage"] and not equipped_stats.has(upgrade.stat):
+			continue
+		pool.append(upgrade)
 	pool.shuffle()
 	var choices: Array[UpgradeData] = []
 	for index in 3:
@@ -574,7 +583,7 @@ func _update_shop_panel() -> void:
 
 
 func _weapon_dps(data: WeaponData, tier: int) -> float:
-	return data.estimated_dps(tier, player.stats.damage, player.stats.crit_chance, player.stats.attack_interval, items.attack_interval_factor())
+	return data.estimated_dps(tier, player.stats, items.attack_interval_factor(), items.base_weapon_damage_bonus())
 
 
 func _on_shop_buy(index: int) -> void:
@@ -699,7 +708,11 @@ func debug_start_wave(number: int) -> void:
 	player.global_position = arena.arena_size / 2.0
 	player.hurt_time = 0.0
 	player.sprite.modulate = Color.WHITE
-	player.stats.load_save_data({"health": player.stats.max_health, "luck": player.stats.luck, "shield_charges": 0})
+	var configured_stats := player.stats.to_save_data()
+	configured_stats["health"] = player.stats.max_health
+	configured_stats["shield_charges"] = 0
+	configured_stats["regen_progress"] = 0.0
+	player.stats.load_save_data(configured_stats)
 	# A pending strike may still retain a reference to a removed enemy.
 	player.loadout.restore(player.loadout.save_data())
 	rewards.begin_wave()

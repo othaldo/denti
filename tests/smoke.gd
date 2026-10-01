@@ -145,7 +145,7 @@ func _run() -> void:
 	var armor_before: float = player.stats.armor
 	var speed_before: float = player.stats.move_speed
 	game._on_shop_buy(1)
-	if player.stats.armor != armor_before + 3.0 or player.stats.move_speed != speed_before - 18.0:
+	if player.stats.armor != armor_before + 3.0 or not is_equal_approx(player.stats.move_speed, speed_before - PlayerStats.BASE_MOVE_SPEED * 0.08):
 		_fail("shop item did not apply both stat changes")
 		return
 	game.shop.offers[2] = load("res://data/weapons/shop_turbo_drill.tres")
@@ -160,7 +160,7 @@ func _run() -> void:
 		return
 	player.stats.apply_upgrade(&"regen", 1.0)
 	player.stats.health = 80.0
-	player.stats._process(1.0)
+	player.stats._process(5.0)
 	if player.stats.health <= 80.0:
 		_fail("Speichel did not regenerate health")
 		return

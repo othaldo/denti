@@ -70,7 +70,7 @@ func _run() -> void:
 		return
 	game.coins = 150
 	game._update_shop_panel()
-	game.player.stats.damage *= 2
+	game.player.stats.damage_bonus += 100
 	ui._select("offer", 0)
 	var values := WeaponPresentation.values(game.shop.offers[0].weapon_data, 1, game.player)
 	if not ui.details.values_grid.get_child(1).text.contains("%.1f" % values.damage):

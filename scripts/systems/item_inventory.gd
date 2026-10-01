@@ -134,9 +134,12 @@ func projectile_return_factor() -> float:
 
 
 func attack_interval_factor() -> float:
+	var temporary_bonus := 0.0
 	if sugar_rush_time > 0.0:
-		return 1.0 - minf(_power(&"sugar_rush"), 0.50)
-	return 1.25 if sugar_crash_time > 0.0 else 1.0
+		temporary_bonus = minf(_power(&"sugar_rush"), 0.50) * 100.0
+	elif sugar_crash_time > 0.0:
+		temporary_bonus = -25.0
+	return player.stats.attack_interval_with_bonus(temporary_bonus) / player.stats.attack_interval
 
 
 func on_wave_start() -> void:
@@ -210,7 +213,7 @@ func on_kill(at: Vector2, is_boss: bool) -> int:
 		if kill_burst_progress >= 10 and not burst_busy:
 			kill_burst_progress -= 10
 			burst_busy = true
-			_area_damage(at, BURST_RADIUS, _power(&"kill_burst"), null, &"kill_burst")
+			_area_damage(at, BURST_RADIUS, player.stats.scale_damage(_power(&"kill_burst")), null, &"kill_burst")
 			_ring(at, BURST_RADIUS, Color(1.0, 0.78, 0.34))
 			_announce("Zahnblitz!", at, Color(1.0, 0.85, 0.40))
 			burst_busy = false
@@ -218,21 +221,20 @@ func on_kill(at: Vector2, is_boss: bool) -> int:
 
 
 func modify_damage(enemy: Enemy, weapon: WeaponData, base: float) -> float:
-	var value := base
-	value *= base_weapon_damage_factor()
+	var bonus := base_weapon_damage_bonus()
 	if enemy.data.is_boss:
-		value *= 1.0 + _power(&"boss_bonus")
+		bonus += _power(&"boss_bonus") * 100.0
 	if enemy.bleed_stacks > 0:
-		value *= 1.0 + _power(&"bleed_bonus")
+		bonus += _power(&"bleed_bonus") * 100.0
 	if enemy.wet_time > 0.0 and (weapon.damage_type == "Wasser" or weapon.damage_type == "Licht"):
-		value *= 1.0 + minf(_power(&"conductive_wet"), 0.36)
+		bonus += minf(_power(&"conductive_wet"), 0.36) * 100.0
 	if player.is_moving:
-		value *= 1.0 + minf(_power(&"moving_damage"), 0.40)
-	return value
+		bonus += minf(_power(&"moving_damage"), 0.40) * 100.0
+	return player.stats.scale_damage(base, bonus)
 
 
-func base_weapon_damage_factor() -> float:
-	return relics.damage_factor() * (1.0 + minf(maxf(player.stats.armor, 0.0) * _power(&"armor_damage"), 0.60))
+func base_weapon_damage_bonus() -> float:
+	return (relics.damage_factor() - 1.0 + minf(maxf(player.stats.armor, 0.0) * _power(&"armor_damage"), 0.60)) * 100.0
 
 
 func on_weapon_hit(enemy: Enemy, amount: float, weapon: WeaponData, critical: bool) -> void:
@@ -240,7 +242,7 @@ func on_weapon_hit(enemy: Enemy, amount: float, weapon: WeaponData, critical: bo
 		enemy.apply_enamel_exposure(weapon.enamel_exposure, weapon.exposure_duration)
 	if enemy.health > 0.0 and weapon.bleed_dps > 0.0:
 		var extra_stacks := roundi(_power(&"bleed_clock"))
-		enemy.apply_bleed(weapon.bleed_dps + _power(&"bleed"), weapon.bleed_duration + _power(&"bleed_clock"), 3 + extra_stacks)
+		enemy.apply_bleed((weapon.bleed_dps + _power(&"bleed")) * player.stats.damage_factor(), weapon.bleed_duration + _power(&"bleed_clock"), 3 + extra_stacks)
 	if enemy.health > 0.0 and weapon.wet_duration > 0.0:
 		enemy.apply_wet(weapon.wet_duration + (0.5 if _power(&"conductive_wet") > 0.0 else 0.0))
 	if weapon.damage_type == "Wasser" and _power(&"water_puddle") > 0.0 and _ready_proc(&"water_puddle", 1.5):
@@ -276,7 +278,7 @@ func on_weapon_hit(enemy: Enemy, amount: float, weapon: WeaponData, critical: bo
 func on_player_hurt(_at: Vector2, amount: float) -> void:
 	if amount <= 0.0 or _power(&"thorns") <= 0.0 or not _ready_proc(&"thorns", 0.9):
 		return
-	_area_damage(player.global_position, THORNS_RADIUS, _power(&"thorns"), null, &"thorns")
+	_area_damage(player.global_position, THORNS_RADIUS, player.stats.scale_damage(_power(&"thorns")), null, &"thorns")
 	_ring(player.global_position, THORNS_RADIUS, Color(0.82, 0.78, 1.0))
 	_announce("Keramiksplitter!", player.global_position, Color(0.82, 0.78, 1.0))
 
@@ -285,7 +287,7 @@ func on_shield_blocked() -> void:
 	_announce("BLOCK!", player.global_position, Color(0.45, 0.85, 1.0))
 	_ring(player.global_position, 48.0, Color(0.45, 0.85, 1.0))
 	if _power(&"shield_shards") > 0.0 and _ready_proc(&"shield_shards", 0.9):
-		_area_damage(player.global_position, THORNS_RADIUS, _power(&"shield_shards"), null, &"shield_shards")
+		_area_damage(player.global_position, THORNS_RADIUS, player.stats.scale_damage(_power(&"shield_shards")), null, &"shield_shards")
 		_ring(player.global_position, THORNS_RADIUS, Color(0.94, 0.89, 0.76))
 
 
@@ -385,7 +387,7 @@ func _puddle_tick(at: Vector2) -> void:
 		var enemy := node as Enemy
 		if enemy != null and enemy.health > 0.0 and at.distance_to(enemy.global_position) <= PUDDLE_RADIUS + enemy.data.radius:
 			enemy.apply_wet(1.1)
-			enemy.take_damage(_power(&"water_puddle"), null, false, &"water_puddle")
+			enemy.take_damage(player.stats.scale_damage(_power(&"water_puddle")), null, false, &"water_puddle")
 
 
 func _announce(message: String, at: Vector2, color: Color) -> void:

@@ -31,7 +31,7 @@ func _run() -> void:
 	player.stats.armor = 5.0
 	player.hurt_time = 0.0
 	player.take_hit(15.0)
-	if not is_equal_approx(player.hurt_time, 0.4 * 0.10 / 0.15):
+	if not is_equal_approx(player.hurt_time, 0.4 * 0.1125 / 0.15):
 		_fail("i-frames used raw damage instead of damage after armor")
 		return
 	player.stats.health = 100.0

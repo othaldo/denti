@@ -63,7 +63,7 @@ func _run() -> void:
 	if paused:
 		_fail("pause menu did not resume play")
 		return
-	game.player.stats.damage = 42.0
+	game.player.stats.damage_bonus = 42.0
 	game.coins = 17
 	game.xp = 3
 	game.wave.remaining = 23.0
@@ -120,7 +120,7 @@ func _run() -> void:
 	await process_frame
 	await process_frame
 	game = current_scene
-	if game.coins != 17 or game.xp != 3 or game.wave.current_wave != 4 or not is_equal_approx(game.wave.duration, WaveController.duration_for_wave(4)) or absf(game.wave.remaining - 23.0) > 0.2 or game.player.stats.damage != 42.0:
+	if game.coins != 17 or game.xp != 3 or game.wave.current_wave != 4 or not is_equal_approx(game.wave.duration, WaveController.duration_for_wave(4)) or absf(game.wave.remaining - 23.0) > 0.2 or game.player.stats.damage_bonus != 42.0:
 		_fail("continue did not restore progression")
 		return
 	var restored_acid := false

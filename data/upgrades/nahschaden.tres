@@ -2,9 +2,9 @@
 [ext_resource type="Script" path="res://scripts/systems/upgrade_data.gd" id="1"]
 [resource]
 script = ExtResource("1")
-display_name = "Bisskraft"
-icon_index = 11
-description = "+4 % Schaden"
-stat = &"damage_bonus"
-amount = 4.0
-tier_amounts = Array[float]([4.0, 8.0, 12.0, 16.0])
+display_name = "Nahschaden"
+icon_index = 7
+description = "+2 Nahschaden (Waffenskalierung)"
+stat = &"melee_damage"
+amount = 2.0
+tier_amounts = Array[float]([2.0, 4.0, 6.0, 8.0])

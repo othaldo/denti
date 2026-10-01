@@ -4,7 +4,7 @@
 script = ExtResource("1")
 display_name = "Speichel"
 icon_index = 6
-description = "+0,5 Leben pro Sekunde"
+description = "+1 Regeneration"
 stat = &"regen"
-amount = 0.5
-tier_amounts = Array[float]([0.5, 1.0, 1.5, 2.2])
+amount = 1.0
+tier_amounts = Array[float]([1.0, 2.0, 3.0, 4.0])

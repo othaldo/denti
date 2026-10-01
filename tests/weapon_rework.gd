@@ -28,7 +28,7 @@ func _run() -> void:
 	if brush.projectile_count_at_tier(1) != 1 or brush.projectile_count_at_tier(3) != 2 or brush.projectile_count_at_tier(4) != 3:
 		_fail("brush projectile tiers were not loaded")
 		return
-	if not brush.stats_text(4).contains("3 Geschosse") or brush.estimated_dps(4, 18.0, 0.0, 0.65, 1.0) <= brush.damage_at_tier(4) / brush.interval_at_tier(4):
+	if not brush.stats_text(4).contains("3 Geschosse") or _base_dps(brush, 4) <= brush.damage_at_tier(4) / brush.interval_at_tier(4):
 		_fail("brush tier traits were missing from shop information")
 		return
 	if whip.range_at_tier(4) != 140.0 or crown.pierce_at_tier(1) != 1 or crown.pierce_at_tier(4) != 3 or mortar.splash_at_tier(4) != 115.0:
@@ -100,3 +100,11 @@ func _fail(message: String) -> void:
 	root.get_node("GameSession").clear_run()
 	push_error(message)
 	quit(1)
+
+
+func _base_dps(weapon: WeaponData, tier: int) -> float:
+	var stats := PlayerStats.new()
+	stats.crit_chance = 0.0
+	var result := weapon.estimated_dps(tier, stats)
+	stats.free()
+	return result

@@ -261,7 +261,7 @@ func _show_stats() -> void:
 	grid.add_theme_constant_override("h_separation", 14)
 	grid.add_theme_constant_override("v_separation", 5)
 	rows.add_child(grid)
-	for pair in [["Bisskraft", "%.0f" % stats.damage], ["Härte", "%.0f" % stats.armor], ["Schmelz", "%.0f HP" % stats.max_health], ["Putzeifer", "%.2f/s" % (1.0 / stats.attack_interval)], ["Glanz", "%.0f %%" % (stats.crit_chance * 100)], ["Speichel", "%.1f HP/s" % stats.regen], ["Bewegung", "%.0f" % stats.move_speed], ["Glück", "%.0f" % stats.luck]]:
+	for pair in [["Bisskraft", "%+.0f %%" % stats.damage_bonus], ["Härte", stats.armor_text()], ["Schmelz", "%.0f HP" % stats.max_health], ["Putzeifer", "%+.0f %%" % stats.attack_speed], ["Glanz", "%.0f %%" % (stats.crit_chance * 100)], ["Speichel", stats.regen_text()], ["Bewegung", "%+.0f %%" % stats.speed_bonus], ["Glück", "%.0f" % stats.luck], ["Nahschaden", "%+.0f" % stats.melee_damage], ["Fernschaden", "%+.0f" % stats.ranged_damage]]:
 		var key := ShopDetails._label(grid, pair[0], 16)
 		key.autowrap_mode = TextServer.AUTOWRAP_OFF
 		key.size_flags_horizontal = Control.SIZE_EXPAND_FILL

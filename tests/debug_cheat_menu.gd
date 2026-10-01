@@ -65,8 +65,8 @@ func _run() -> void:
 	if added != item.max_stacks or game.items.count(item.id) != item.max_stacks or game.player.stats.max_health != health_before + float(item.stat_changes["max_health"]) * added:
 		_fail("item stacks or their stat effects differ from real acquisitions")
 		return
-	cheats.set_stats({"max_health": 500, "health": 999, "damage": 300, "crit_chance": 0.5, "attack_interval": 0.01})
-	if game.player.stats.health != 500 or game.player.stats.damage != 300 or game.player.stats.attack_interval != 0.18:
+	cheats.set_stats({"max_health": 500, "health": 999, "damage_bonus": 300, "melee_damage": 4.0, "ranged_damage": 2.0, "crit_chance": 0.5, "attack_speed": 100.0, "speed_bonus": 20.0, "regen": 10.0})
+	if game.player.stats.health != 500 or game.player.stats.damage_bonus != 300 or not is_equal_approx(game.player.stats.attack_interval, 0.325) or not is_equal_approx(game.player.stats.move_speed, 276.0) or game.player.stats.regen_per_second() != 1.0:
 		_fail("stats did not use the authoritative model and limits")
 		return
 	cheats.set_coins(1234)
@@ -109,6 +109,9 @@ func _run() -> void:
 	if game.ended or game.player.stats.health != 500 or game.wave.current_wave != 5 or game.boss.data != WaveController.CAVITY_COUNT:
 		_fail("wave jump could not revive and restart a boss encounter")
 		return
+	if game.player.stats.attack_speed != 100.0 or game.player.stats.speed_bonus != 20.0 or game.player.stats.regen != 10.0 or game.player.stats.melee_damage != 4.0 or game.player.stats.ranged_damage != 2.0:
+		_fail("wave jump reset the configured stat model")
+		return
 	var saved: Dictionary = game.RUN_SNAPSHOT.capture(game)
 	game.free()
 	await process_frame
@@ -117,8 +120,8 @@ func _run() -> void:
 	game = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(game)
 	current_scene = game
-	if not game.has_node("DebugCheatMenu") or game.coins != 1234 or game.wave.current_wave != 5 or game.items.count(item.id) != added or game.player.stats.damage != 300:
-		_fail("modified build or cheat access was lost on resume")
+	if not game.has_node("DebugCheatMenu") or game.coins != 1234 or game.wave.current_wave != 5 or game.items.count(item.id) != added or game.player.stats.damage_bonus != 300:
+		_fail("modified build or cheat access was lost on resume: coins=%d wave=%d items=%d damage=%s" % [game.coins, game.wave.current_wave, game.items.count(item.id), game.player.stats.damage_bonus])
 		return
 	session.clear_run()
 	game.free()

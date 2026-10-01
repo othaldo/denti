@@ -252,6 +252,15 @@ static func restore(game, saved: Dictionary) -> void:
 	if game.rewards.step == PostWaveRewards.Step.LEVELS and upgrade_data.size() == 3:
 		var options: Array[UpgradeData] = []
 		for value in upgrade_data:
+			if value is Dictionary:
+				value = value.duplicate()
+				# Choices in older saves used absolute movement and cooldown stats.
+				if str(value.get("stat", "")) == "move_speed":
+					value["stat"] = "speed_bonus"
+				elif str(value.get("stat", "")) == "attack_interval":
+					value["stat"] = "attack_speed"
+				elif str(value.get("stat", "")) == "damage":
+					value["stat"] = "damage_bonus"
 			for upgrade in game.UPGRADES:
 				if value is Dictionary and str(upgrade.stat) == str(value.get("stat", "")):
 					options.append(upgrade.with_tier(int(value.get("tier", 1))))
