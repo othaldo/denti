@@ -65,6 +65,8 @@ func _run() -> void:
 			root.get_texture().get_image().save_png(capture_path + "/levelup_%dx%d.png" % [extent.x, extent.y])
 		game.choice_panel.visible = false
 		game._open_shop()
+		if capture and not game.shop.reserved[1]:
+			game._on_shop_reserve(1)
 		for frame in 5:
 			await process_frame
 		var ui: ShopPanel = game.shop_panel
@@ -94,6 +96,8 @@ func _run() -> void:
 			_fail("last collected relic is unreachable at %s" % extent)
 			return
 		ui.items_scroll.scroll_horizontal = 0
+		if not await _check_stable_actions(ui, extent):
+			return
 		var wide: bool = extent.x >= 1000 and extent.y >= 560
 		if wide:
 			if ui.offers_grid.columns != 4 or ui.offers_section.get_index() >= ui.main_scroll.get_index():
@@ -159,6 +163,51 @@ func _run() -> void:
 	paused = false
 	print("Denti four-choice layout test passed")
 	quit(0)
+
+func _check_stable_actions(ui: ShopPanel, extent: Vector2i) -> bool:
+	var buys: Array[Rect2] = []
+	var pins: Array[Rect2] = []
+	var card_sizes: Array[Vector2] = []
+	for card: OfferCard in ui.offer_buttons:
+		buys.append(Rect2(card.buy_button.global_position - card.global_position, card.buy_button.size))
+		pins.append(Rect2(card.reserve_button.global_position - card.global_position, card.reserve_button.size))
+		card_sizes.append(card.size)
+	var names := ["Minze", "Sehr lange göttliche Interdental-Ausrüstung MK IV", "Goldzahn", "Zahnarztbesteck"]
+	var descriptions := ["+1 Härte", "+10 % Angriffstempo. Jede dritte Attacke erzeugt einen zusätzlichen heiligen Zahnstrahl mit Kettenreaktionen.", "Erste Zeile\nZweite Zeile\nDritte Zeile mit weiteren Effekten", "+25 Leben und Heilung. Gegner werden nass und erhöhen den Kettenschaden."]
+	var prices := [5, 100, 1000, 9999]
+	for change in 2:
+		for index in ui.offer_buttons.size():
+			var fixture := ShopOfferData.new()
+			fixture.display_name = names[(index + change) % 4]
+			fixture.description = descriptions[(index + change) % 4]
+			fixture.price = prices[(index + change) % 4]
+			fixture.rarity_tier = (index + change) % 4 + 1
+			ui.offer_buttons[index].show_offer(fixture, 10000)
+			ui.offer_buttons[index].show_reservation((index + change) % 2 == 0)
+			ui.offer_buttons[index].mouse_entered.emit()
+		for frame in 6:
+			await process_frame
+		for index in ui.offer_buttons.size():
+			var card: OfferCard = ui.offer_buttons[index]
+			var buy := Rect2(card.buy_button.global_position - card.global_position, card.buy_button.size)
+			var pin := Rect2(card.reserve_button.global_position - card.global_position, card.reserve_button.size)
+			if not buy.is_equal_approx(buys[index]) or not pin.is_equal_approx(pins[index]) or not card.size.is_equal_approx(card_sizes[index]) or not card.scale.is_equal_approx(Vector2.ONE):
+				_fail("text, price or reservation moved/resized actions at %s: buy %s -> %s, pin %s -> %s" % [extent, buys[index], buy, pins[index], pin])
+				return false
+			if not card.buy_button.size.is_equal_approx(ui.offer_buttons[0].buy_button.size) or not card.reserve_button.size.is_equal_approx(ui.offer_buttons[0].reserve_button.size) or absf(buy.position.y - buys[0].position.y) > 0.5 or absf(pin.position.y - pins[0].position.y) > 0.5:
+				_fail("offer actions differ in size or baseline between cards at %s" % extent)
+				return false
+			if card.reserve_button.icon == null or not card.buy_button.get_global_rect().encloses(card.price_label.get_global_rect()):
+				_fail("pin or fixed-width price is clipped at %s" % extent)
+				return false
+			for control in [card.icon_rect, card.name_label, card.rarity_label, card.effect_label, card.buy_button, card.reserve_button]:
+				if not card.get_global_rect().encloses(control.get_global_rect()):
+					_fail("fixed card clips its contents at %s" % extent)
+					return false
+	ui.get_parent()._update_shop_panel()
+	for frame in 4:
+		await process_frame
+	return true
 
 func _fail(message: String) -> void:
 	paused = false

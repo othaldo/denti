@@ -2,6 +2,7 @@ class_name OfferCard
 extends Button
 
 const ICONS: Script = preload("res://scripts/ui/denti_ui_icons.gd")
+const PIN_ICON: Texture2D = preload("res://assets/ui/pin.svg")
 
 signal purchase_requested
 signal reservation_requested
@@ -13,6 +14,7 @@ var content: BoxContainer
 var catalog_header: HBoxContainer
 var info_box: VBoxContainer
 var action_box: BoxContainer
+var action_spacer: Control
 var card_margin: MarginContainer
 var icon_rect: TextureRect
 var name_label: Label
@@ -20,12 +22,15 @@ var rarity_label: Label
 var effect_label: Label
 var price_label: Label
 var hover_tween: Tween
-var dense_catalog := false
+var catalog_minimum_height := 100.0
 
 func set_catalog_layout(vertical: bool, dense: bool = false) -> void:
-	dense_catalog = dense
 	content.vertical = vertical
-	action_box.vertical = not dense
+	action_box.vertical = not vertical
+	action_spacer.visible = vertical
+	action_box.size_flags_vertical = Control.SIZE_SHRINK_END
+	info_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	info_box.alignment = BoxContainer.ALIGNMENT_BEGIN
 	catalog_header.visible = dense
 	if dense:
 		if icon_rect.get_parent() != catalog_header:
@@ -37,14 +42,26 @@ func set_catalog_layout(vertical: bool, dense: bool = false) -> void:
 			content.move_child(icon_rect, 1)
 			name_label.reparent(info_box)
 			info_box.move_child(name_label, 0)
-	buy_button.custom_minimum_size.y = 40 if dense else (48 if vertical else 64)
-	reserve_button.custom_minimum_size.y = 32 if dense else 36
-	custom_minimum_size.y = 164 if dense else (210 if vertical else 96)
+	var action_height := 40.0 if dense else 44.0
+	buy_button.custom_minimum_size = Vector2(96, action_height)
+	reserve_button.custom_minimum_size = Vector2(action_height if vertical else 96.0, action_height)
+	buy_button.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	reserve_button.size_flags_horizontal = Control.SIZE_SHRINK_END
+	buy_button.size_flags_vertical = Control.SIZE_SHRINK_END
+	reserve_button.size_flags_vertical = Control.SIZE_SHRINK_END
+	catalog_minimum_height = 164.0 if dense else (220.0 if vertical else 120.0)
+	custom_minimum_size.y = catalog_minimum_height
 	icon_rect.custom_minimum_size = Vector2(40, 40) if dense else Vector2(48, 48)
 	name_label.add_theme_font_size_override("font_size", 16 if dense else 18)
 	effect_label.add_theme_font_size_override("font_size", 13 if dense else 14)
-	effect_label.max_lines_visible = 2 if dense else -1
-	effect_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS if dense else TextServer.OVERRUN_NO_TRIMMING
+	# Reserve identical text slots; text never determines the action baseline.
+	name_label.custom_minimum_size.y = 2.0 * ceilf(name_label.get_theme_font("font").get_height(name_label.get_theme_font_size("font_size")))
+	effect_label.custom_minimum_size.y = 2.0 * ceilf(effect_label.get_theme_font("font").get_height(effect_label.get_theme_font_size("font_size")))
+	name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER if dense else VERTICAL_ALIGNMENT_TOP
+	catalog_header.custom_minimum_size.y = name_label.custom_minimum_size.y if dense else 0.0
+	effect_label.max_lines_visible = 2
+	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	effect_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	for edge in ["left", "right"]:
 		card_margin.add_theme_constant_override("margin_" + edge, 9 if dense else 13)
 
@@ -83,26 +100,34 @@ func show_offer(offer: ShopOfferData, coins: int, available: bool = true, owned_
 	reserve_button.disabled = false
 	disabled = (coins < offer.price or not available) and not selection_only
 	if offer.weapon_data != null:
-		tooltip_text = "%s\n%s\n%s\n≈ %.1f DPS pro Ziel" % [offer.description, offer.weapon_data.combat_text(), effect_label.text, dps]
+		tooltip_text = "%s\n%s\n%s\n%s\n≈ %.1f DPS pro Ziel" % [offer.display_name, offer.description, offer.weapon_data.combat_text(), effect_label.text, dps]
 		if not available:
 			tooltip_text += "\nAusrüstung voll: Platz schaffen oder passende Waffe verschmelzen"
 	else:
-		tooltip_text = "Limit erreicht: %d Stück" % offer.max_stacks if not available else effect_label.text
+		tooltip_text = "%s\n%s" % [offer.display_name, offer.description]
+		if not available:
+			tooltip_text += "\nLimit erreicht: %d Stück" % offer.max_stacks
 	DentiUIStyle.style_card(self, offer.rarity_tier)
 	call_deferred("_fit_content")
 
 
 func show_reservation(reserved: bool) -> void:
-	reserve_button.text = "Gemerkt" if reserved else "Merken"
-	reserve_button.tooltip_text = "Angebot freigeben" if reserved else "Kostenlos für später merken; der Preis bleibt gleich."
+	reserve_button.text = ""
+	reserve_button.tooltip_text = "Gemerkt · Angebot freigeben" if reserved else "Merken · Kostenlos für später merken; der Preis bleibt gleich."
 	reserve_button.visible = selection_only
 	DentiUIStyle.style_button(reserve_button, reserved)
 	reserve_button.add_theme_font_size_override("font_size", 13)
+	for state in ["normal", "hover", "pressed", "disabled", "focus"]:
+		var style := reserve_button.get_theme_stylebox(state)
+		style.content_margin_left = 8
+		style.content_margin_right = 8
+		style.content_margin_top = 6
+		style.content_margin_bottom = 6
 
 
 func _fit_content() -> void:
 	if selection_only:
-		custom_minimum_size.y = maxf(164.0 if dense_catalog else (96.0 if not content.vertical else 210.0), card_margin.get_combined_minimum_size().y + (8.0 if dense_catalog else 0.0))
+		custom_minimum_size.y = catalog_minimum_height
 
 
 func set_compact(compact: bool) -> void:
@@ -176,8 +201,17 @@ func _build_content() -> void:
 	actions.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	content.add_child(actions)
 	actions.add_child(price_chip)
+	action_spacer = Control.new()
+	action_spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	action_spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	action_spacer.visible = false
+	actions.add_child(action_spacer)
 	reserve_button = Button.new()
 	reserve_button.custom_minimum_size = Vector2(86, 36)
+	reserve_button.icon = PIN_ICON
+	reserve_button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	reserve_button.expand_icon = true
+	reserve_button.add_theme_constant_override("icon_max_width", 18)
 	reserve_button.pressed.connect(func() -> void: reservation_requested.emit())
 	actions.add_child(reserve_button)
 	show_reservation(false)
@@ -203,7 +237,7 @@ func _build_content() -> void:
 
 
 func _on_hover(hovered: bool) -> void:
-	if disabled:
+	if disabled or selection_only:
 		return
 	if hover_tween != null:
 		hover_tween.kill()
