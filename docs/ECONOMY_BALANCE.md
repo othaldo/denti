@@ -25,7 +25,7 @@ Die Werte werden genau einmal beim Tod des Gegners festgelegt und als fertige Be
 
 ![Neue gemalte Economy-Icons](../assets/items/item_icons_economy.png)
 
-Der transparente Atlas ergänzt die bestehenden gemalten Icons um Zellen 28/29. Beide Motive wurden gemeinsam mit ImageGen anhand von `item_icons_expansion_2.png` erzeugt, danach in vollständige 512×512-Zellen mit mindestens 56 Pixeln Rand gepackt. Die ursprüngliche Generierungsquelle liegt unverändert in `assets/items/reference/economy_icons_source.png`; die Korrektur des Goldextraktors mit zwei statt drei Klingen liegt separat in `economy_icons_source_v2.png`. `.gdignore` hält beide Quellen aus dem Spielimport. `tools/pack_economy_icons.py` reproduziert das Packen und erhält die linke Zelle exakt. Die vollständigen [Generierungs- und Bearbeitungsprompts](ECONOMY_ICON_PROMPT.md) sind abgelegt.
+Der transparente Atlas ergänzt die bestehenden gemalten Icons um Zellen 28/29. Beide Motive wurden gemeinsam mit ImageGen anhand von `item_icons_expansion_2.png` erzeugt, danach in vollständige 512×512-Zellen mit mindestens 56 Pixeln Rand gepackt. Die ursprüngliche Generierungsquelle liegt unverändert in `assets/items/reference/economy_icons_source.png`; die aktuelle Korrektur der Armführung des Goldextraktors liegt separat in `economy_icons_source_v3.png`. `.gdignore` hält die Quellen aus dem Spielimport. `tools/pack_economy_icons.py` reproduziert das Packen und erhält die linke Zelle exakt. Die vollständigen [Generierungs- und Bearbeitungsprompts](ECONOMY_ICON_PROMPT.md) sind abgelegt.
 
 ## Level-up-Rerolls
 
