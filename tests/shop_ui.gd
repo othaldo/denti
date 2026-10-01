@@ -35,6 +35,10 @@ func _run() -> void:
 			_fail("shop item icon or tooltip missing")
 			return
 	var weapon_button: Button = game.shop_panel.inventory_row.get_child(0).get_child(0)
+	var free_hand: Button = game.shop_panel.inventory_row.get_child(1).get_child(0)
+	if weapon_button.get_meta("hands", 1) != 2 or absf(weapon_button.size.x - 2.0 * free_hand.size.x) > 6.0:
+		_fail("two-handed weapon does not occupy two hand widths: weapon %s, free %s, hands %s" % [weapon_button.size, free_hand.size, weapon_button.get_meta("hands", 1)])
+		return
 	var offer_card: OfferCard = game.shop_panel.offer_buttons[0]
 	var rarity_font := offer_card.rarity_label.get_theme_font("font")
 	var rarity_width := rarity_font.get_string_size(offer_card.rarity_label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, offer_card.rarity_label.get_theme_font_size("font_size")).x

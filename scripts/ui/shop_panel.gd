@@ -14,7 +14,6 @@ signal continue_requested
 var title_label: Label
 var coins_label: Label
 var luck_label: Label
-var preview_label: Label
 var offer_buttons: Array[Button] = []
 var reroll_button: Button
 var continue_button: Button
@@ -65,7 +64,6 @@ func _ready() -> void:
 	titles.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(titles)
 	title_label = ShopDetails._label(titles, "Zahnklinik", 27)
-	preview_label = ShopDetails._label(titles, "", 15)
 	var wallet_box := VBoxContainer.new()
 	header.add_child(wallet_box)
 	var coin_row := HBoxContainer.new()
@@ -134,6 +132,8 @@ func _ready() -> void:
 	inventory_scroll.custom_minimum_size.y = 76
 	left.add_child(inventory_scroll)
 	inventory_row = HBoxContainer.new()
+	inventory_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	inventory_row.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	inventory_row.add_theme_constant_override("separation", 5)
 	inventory_scroll.add_child(inventory_row)
 	stats_label = ShopDetails._label(left, "", 16)
@@ -200,7 +200,6 @@ func _update_layout() -> void:
 	var narrow := extent.x < 600
 	shop_actions.vertical = narrow and extent.y >= 480
 	detail_actions.vertical = narrow and extent.y >= 480
-	preview_label.visible = extent.y >= 480
 	items_label.visible = true
 	title_label.add_theme_font_size_override("font_size", 21 if extent.y < 480 else 27)
 	details.heading.add_theme_font_size_override("font_size", 17 if narrow else 21)
@@ -239,8 +238,19 @@ func _update_layout() -> void:
 		chip.custom_minimum_size = Vector2(48, 44)
 	for card in offer_buttons:
 		card.set_catalog_layout(offer_row or extent.x >= 760 or narrow, offer_row)
+	_layout_inventory()
 
-func show_shop(wave_number: int, coins: int, reroll_cost: int, new_offers: Array[ShopOfferData], preview: String = "", new_equipment: Array[Dictionary] = [], used_slots: int = 0, capacity: int = 6, buyable: Array[bool] = [], luck: float = 0.0, collected: Array[Dictionary] = [], counts: Dictionary = {}, offer_dps: Array[float] = [], reserved: Array[bool] = []) -> void:
+func _layout_inventory() -> void:
+	var extent: Vector2 = $Root.size
+	var slot_width := 64.0 if compact else 80.0
+	var slot_height := (72.0 if extent.y >= 480 else 64.0) if compact else 80.0
+	inventory_scroll.custom_minimum_size.y = slot_height + 12.0
+	for slot in inventory_row.get_children():
+		var button: Button = slot.get_child(0)
+		var hands := int(button.get_meta("hands", 1))
+		button.custom_minimum_size = Vector2(slot_width * hands + 5.0 * (hands - 1), slot_height)
+
+func show_shop(wave_number: int, coins: int, reroll_cost: int, new_offers: Array[ShopOfferData], new_equipment: Array[Dictionary] = [], used_slots: int = 0, capacity: int = 6, buyable: Array[bool] = [], luck: float = 0.0, collected: Array[Dictionary] = [], counts: Dictionary = {}, offer_dps: Array[float] = [], reserved: Array[bool] = []) -> void:
 	offers = new_offers
 	equipment = new_equipment
 	owned_items = collected
@@ -249,7 +259,6 @@ func show_shop(wave_number: int, coins: int, reroll_cost: int, new_offers: Array
 	title_label.text = "Zahnklinik · Welle %d" % wave_number
 	coins_label.text = str(coins)
 	luck_label.text = "%d Glück" % roundi(luck)
-	preview_label.text = preview
 	for index in offer_buttons.size():
 		var offer := offers[index]
 		var count := int(counts.get(str(offer.id), 0)) if offer != null else 0
@@ -372,12 +381,44 @@ func _show_inventory(entries: Array[Dictionary], used_slots: int, capacity: int)
 		slot.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		slot.size_flags_stretch_ratio = float(entry.get("hands", 1))
 		inventory_row.add_child(slot)
-		var button := _button(slot, ["I", "II", "III", "IV"][int(entry.tier)-1])
-		button.custom_minimum_size = Vector2(50, 64)
-		button.icon = entry.get("icon")
-		button.expand_icon = true
-		button.add_theme_constant_override("icon_max_width", 42)
-		button.tooltip_text = "%s\n%s\n%s\n≈ %.1f DPS pro Ziel\nAntippen: Details, verkaufen oder fusionieren" % [entry.description, entry.combat, entry.stats, entry.dps]
+		var tier: String = ["I", "II", "III", "IV"][int(entry.tier)-1]
+		var button := _button(slot, "")
+		button.set_meta("hands", int(entry.get("hands", 1)))
+		var icon := TextureRect.new()
+		icon.name = "WeaponIcon"
+		icon.texture = entry.get("icon")
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		button.add_child(icon)
+		icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		icon.offset_left = 6
+		icon.offset_top = 6
+		icon.offset_right = -6
+		icon.offset_bottom = -6
+		var tier_label := Label.new()
+		tier_label.name = "WeaponTier"
+		tier_label.text = tier
+		tier_label.add_theme_font_size_override("font_size", 15)
+		tier_label.add_theme_color_override("font_color", DentiUIStyle.INK)
+		var tier_badge := StyleBoxFlat.new()
+		tier_badge.bg_color = DentiUIStyle.GOLD.lightened(0.65)
+		tier_badge.border_color = DentiUIStyle.MUTED
+		tier_badge.set_border_width_all(1)
+		tier_badge.set_corner_radius_all(4)
+		tier_badge.content_margin_left = 3
+		tier_badge.content_margin_right = 3
+		tier_label.add_theme_stylebox_override("normal", tier_badge)
+		tier_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		tier_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		tier_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		button.add_child(tier_label)
+		tier_label.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+		tier_label.offset_left = -33
+		tier_label.offset_top = -27
+		tier_label.offset_right = -5
+		tier_label.offset_bottom = -3
+		button.tooltip_text = "%s · Stufe %s\n%s\n%s\n%s\nca. %.1f DPS pro Ziel\nAntippen: Details, verkaufen oder fusionieren" % [entry.name, tier, entry.description, entry.combat, entry.stats, entry.dps]
 		button.pressed.connect(_select.bind("equipment", index))
 		button.gui_input.connect(_on_inventory_input.bind(index))
 	for index in maxi(capacity - used_slots, 0):
@@ -386,8 +427,9 @@ func _show_inventory(entries: Array[Dictionary], used_slots: int, capacity: int)
 		inventory_row.add_child(slot)
 		var empty := _button(slot, "+")
 		empty.disabled = true
-		empty.custom_minimum_size = Vector2(40, 64)
+		empty.add_theme_font_size_override("font_size", 28)
 		empty.tooltip_text = "Freie Hand"
+	_layout_inventory()
 
 func _highlight_equipment() -> void:
 	for index in equipment.size():

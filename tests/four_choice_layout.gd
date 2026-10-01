@@ -70,6 +70,17 @@ func _run() -> void:
 		for frame in 5:
 			await process_frame
 		var ui: ShopPanel = game.shop_panel
+		for slot in ui.inventory_row.get_children():
+			var button: Button = slot.get_child(0)
+			if button.has_node("WeaponIcon"):
+				var icon: TextureRect = button.get_node("WeaponIcon")
+				var tier_label: Label = button.get_node("WeaponTier")
+				if icon.texture == null or not button.get_global_rect().encloses(icon.get_global_rect()) or not button.get_global_rect().encloses(tier_label.get_global_rect()):
+					_fail("equipped weapon icon/tier clipped at %s" % extent)
+					return
+				if extent.x >= 1000 and extent.y >= 560 and (button.size.x < 80 or button.size.y < 80):
+					_fail("desktop hand slots remain too small at %s" % extent)
+					return
 		if not ui.items_label.is_visible_in_tree() or not ui.items_scroll.is_visible_in_tree() or ui.items_row.get_child_count() != ui.owned_items.size():
 			_fail("collected items or relics disappear at %s" % extent)
 			return
