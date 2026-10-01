@@ -67,6 +67,13 @@ jobs:
           mkdir -p build/web
           godot --headless --verbose --path . --export-release "Web" build/web/index.html
 
+      - name: Upload reusable Web artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: denti-web
+          path: build/web
+          if-no-files-found: error
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
@@ -84,3 +91,46 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+
+  deploy-vercel:
+    name: Deploy to Vercel
+    needs: build
+    runs-on: ubuntu-24.04
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+    steps:
+      - name: Check Vercel configuration
+        id: vercel-config
+        shell: bash
+        run: |
+          if [[ -n "$VERCEL_ORG_ID" && -n "$VERCEL_PROJECT_ID" && -n "$VERCEL_TOKEN" ]]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "Vercel deployment skipped: add VERCEL_ORG_ID, VERCEL_PROJECT_ID and VERCEL_TOKEN as GitHub Actions secrets."
+          fi
+
+      - name: Download Web artifact
+        if: steps.vercel-config.outputs.configured == 'true'
+        uses: actions/download-artifact@v5
+        with:
+          name: denti-web
+          path: .vercel/output/static
+
+      - name: Prepare Vercel Build Output API
+        if: steps.vercel-config.outputs.configured == 'true'
+        shell: bash
+        run: |
+          mkdir -p .vercel/output
+          printf '%s\n' '{"version":3}' > .vercel/output/config.json
+
+      - name: Install Vercel CLI
+        if: steps.vercel-config.outputs.configured == 'true'
+        run: npm install --global vercel@latest
+
+      - name: Deploy production build to Vercel
+        if: steps.vercel-config.outputs.configured == 'true'
+        run: vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
