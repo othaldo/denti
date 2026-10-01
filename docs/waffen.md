@@ -29,6 +29,8 @@ Die Waffen haben eigene Sprites unter `assets/weapons/` und werden getrennt von 
 
 Eine [Vergleichsansicht mit Denti und allen 18 Waffen](WEAPON_SIZE_BALANCE.md) zeigt Ruhehaltung und Angriff bei gleicher Vergrößerung. Der Bohrer ist auf Stufe I 60 Pixel groß, trifft für 22 Basisschaden alle 0,72 Sekunden und skaliert mit 100 % Nahschaden. Kratzer, Peitsche, Garotte und Speer wurden ebenfalls in ihren Proportionen angepasst; Reichweiten bleiben erhalten.
 
+Die [optische Prüfung aller Waffen](WEAPON_ART_REVIEW.md) bewertet Perspektive, Werkzeugform, Haltung und Animation und nennt konkrete Prioritäten für die nächste Überarbeitung.
+
 ## Grundwerte der Erweiterung
 
 Werte für Stufe I vor Spielerwerten, Items und kritischen Treffern. Schaden ist
