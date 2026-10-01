@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"gold_extractor"
+icon_index = 29
+display_name = "Goldextraktor"
+description = "+1 Münze bei Drops mit mindestens 2 Basis-Münzen (Zucker und Eliten). -3 % Bewegung."
+rarity_tier = 2
+price = 10
+stat_changes = { &"speed_bonus": -3.0 }
+effect_kind = &"rich_coin_bonus"
+effect_value = 1.0
+max_stacks = 2
+tags = Array[StringName]([&"economy", &"defense"])

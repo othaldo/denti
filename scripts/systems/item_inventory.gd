@@ -125,6 +125,25 @@ func pickup_range() -> float:
 	return Loot.MAGNET_DISTANCE + _power(&"magnet")
 
 
+func coin_double_chance() -> float:
+	var chance := _power(&"coin_double")
+	if chance <= 0.0:
+		return 0.0
+	return minf(chance + clampf(player.stats.luck, 0.0, 100.0) * 0.001, 0.50)
+
+
+# Roll once when an enemy drops gold. Merged loot and saved loot retain this value.
+# The extractor checks the enemy's base value, not a previously doubled pickup.
+func coin_drop_value(base_coins: int) -> int:
+	if base_coins <= 0:
+		return 0
+	var chance := coin_double_chance()
+	var value := base_coins * (2 if chance > 0.0 and randf() < chance else 1)
+	if base_coins >= 2:
+		value += roundi(_power(&"rich_coin_bonus"))
+	return value
+
+
 func scrap_value(base_coins: int) -> int:
 	return maxi(roundi(float(base_coins) * (1.0 + minf(_power(&"scrap_bonus"), 1.0))), 1)
 

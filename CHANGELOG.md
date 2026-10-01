@@ -4,6 +4,10 @@ Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü an
 
 ## In Entwicklung
 
+- Normale Gegner haben auf Normal 100 % Basis-Münzchance, mit Wellenabschwächung ab Welle 5 auf 70 % in Welle 20. Die bisherige zusätzliche niedrige Grundchance entfällt; XP bleibt unabhängig.
+- **32 Shop-Items:** Goldsonde kann Münz-Drops verdoppeln und profitiert begrenzt von Glück; Goldextraktor gibt mehr Münzen aus Zucker und Eliten. Beide haben Nachteile, Stapellimits und neue gemalte Icons.
+- **Level-up-Rerolls:** vier neue Angebote gegen Münzen, steigende Kosten pro Auswahl und Zurücksetzen beim nächsten verdienten Level. Meilenstein-Seltenheit und Save/Resume bleiben erhalten. [Messungen und Vorschau](docs/ECONOMY_BALANCE.md).
+
 - Dentis Ausrüstung belegt **Wurzeln**: Shop, Waffenbeschreibungen, Fusion und Pausemenü verwenden „1 Wurzel“ beziehungsweise „2 Wurzeln“. Im Shop-Tooltip steht „ca.“ statt des von der Schrift nicht unterstützten „≈“-Zeichens vor dem DPS-Wert.
 
 - Acht überarbeitete Waffengrafiken mit klareren Formen: Kronenwerfer, Mörser, Wasserflosser, Fluorid-Sprüher, Turbine, Schleuder, Fräse und Polierer. Separate Arbeitsflächen drehen sich bei stabiler Perspektive; die Schleuder spannt Gummibänder und Beutel statt den Griff zu verformen. Fernkampfwaffen erhalten passendere Ruhepositionen, die Zauberbürste steht aufrecht. [Bilder, Animation und Prüfung](docs/WEAPON_ART_REFINEMENT.md).

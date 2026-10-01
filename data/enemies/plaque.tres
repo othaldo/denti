@@ -10,5 +10,5 @@ max_health = 36.0
 health_per_wave = 6.0
 late_health_acceleration = 0.3
 move_speed = 82.0
-coin_drop_chance = 0.40
+coin_drop_chance = 1.0
 sprite = ExtResource("2")

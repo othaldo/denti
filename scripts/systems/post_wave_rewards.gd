@@ -6,6 +6,7 @@ enum Step { COMBAT, COLLECTING, LEVELS, CHESTS, SHOP, END, RELICS }
 
 var step: Step = Step.COMBAT
 var pending_levels: int = 0
+var level_rerolls: int = 0
 var pending_chests: Array[Dictionary] = []
 var pending_relics: Array[String] = []
 var chest_spawned: bool = false
@@ -15,6 +16,7 @@ var final_wave: bool = false
 func begin_wave() -> void:
 	step = Step.COMBAT
 	pending_levels = 0
+	level_rerolls = 0
 	pending_chests.clear()
 	pending_relics.clear()
 	chest_spawned = false
@@ -56,6 +58,7 @@ func resolve_level() -> void:
 	if step != Step.LEVELS or pending_levels <= 0:
 		return
 	pending_levels -= 1
+	level_rerolls = 0
 	_advance()
 
 
@@ -78,13 +81,14 @@ func current_chest() -> Dictionary:
 
 
 func save_data() -> Dictionary:
-	return {"step": step, "pending_levels": pending_levels, "pending_chests": pending_chests.duplicate(true),
+	return {"step": step, "pending_levels": pending_levels, "level_rerolls": level_rerolls, "pending_chests": pending_chests.duplicate(true),
 		"pending_relics": pending_relics.duplicate(), "chest_spawned": chest_spawned, "final_wave": final_wave}
 
 
 func restore(saved: Dictionary) -> void:
 	step = clampi(int(saved.get("step", Step.COMBAT)), Step.COMBAT, Step.RELICS) as Step
 	pending_levels = maxi(int(saved.get("pending_levels", 0)), 0)
+	level_rerolls = maxi(int(saved.get("level_rerolls", 0)), 0) if step == Step.LEVELS and pending_levels > 0 else 0
 	pending_chests.clear()
 	for entry in saved.get("pending_chests", []):
 		if not entry is Dictionary:

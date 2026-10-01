@@ -4,6 +4,7 @@ extends RefCounted
 const ITEM_ATLAS: Texture2D = preload("res://assets/items/item_icons_atlas.png")
 const ITEM_EXPANSION: Texture2D = preload("res://assets/items/item_icons_expansion.png")
 const ITEM_EXPANSION_2: Texture2D = preload("res://assets/items/item_icons_expansion_2.png")
+const ITEM_ECONOMY: Texture2D = preload("res://assets/items/item_icons_economy.png")
 const RELIC_ATLAS: Texture2D = preload("res://assets/relics/relic_icons_atlas.png")
 const HUD_ATLAS: Texture2D = preload("res://assets/ui/hud_icons_atlas.png")
 const STAT_ATLAS: Texture2D = preload("res://assets/ui/stat_icons_atlas.png")
@@ -24,6 +25,8 @@ const HUD_ROWS := 2
 
 
 static func item(index: int) -> Texture2D:
+	if index >= 28:
+		return _region(ITEM_ECONOMY, clampi(index - 28, 0, 1), 2, 1)
 	if index >= 20:
 		return _region(ITEM_EXPANSION_2, clampi(index - 20, 0, 7), 4, 2)
 	if index >= ITEM_COLUMNS * ITEM_ROWS:

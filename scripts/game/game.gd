@@ -70,6 +70,7 @@ func _ready() -> void:
 	items.feedback.connect(_show_item_feedback)
 	relics.feedback.connect(_show_item_feedback)
 	choice_panel.upgrade_chosen.connect(_on_upgrade_chosen)
+	choice_panel.level_reroll_requested.connect(_on_level_reroll)
 	choice_panel.chest_resolved.connect(_on_chest_resolved)
 	choice_panel.relic_chosen.connect(_on_relic_chosen)
 	choice_panel.starter_chosen.connect(_on_starter_chosen)
@@ -272,7 +273,7 @@ func _on_enemy_defeated(at: Vector2, data: EnemyData) -> void:
 	if reward_drop:
 		_spawn_loot(at + Vector2(-11.0, 0.0), &"xp", data.xp_drop)
 	if wave.active and data.coin_drop > 0 and randf() < EconomyRules.coin_chance(data, wave.current_wave, DifficultyCatalog.by_id(wave.difficulty_id).reward_chance_multiplier):
-		_spawn_loot(at + Vector2(11.0, 0.0), &"coin", data.coin_drop)
+		_spawn_loot(at + Vector2(11.0, 0.0), &"coin", items.coin_drop_value(data.coin_drop))
 
 
 func _on_boss_death_started(_at: Vector2) -> void:
@@ -380,8 +381,27 @@ func _show_level_choice() -> void:
 	for index in ChoicePanel.UPGRADE_COUNT:
 		choices.append(pool[index].with_tier(DentiRarity.upgrade_tier(earned_level, player.stats.luck)))
 	choice_panel.show_upgrades(choices)
+	_update_level_reroll()
 	get_tree().paused = true
 	_save_run()
+
+
+func _update_level_reroll() -> void:
+	var earned_level := level - maxi(rewards.pending_levels - 1, 0)
+	choice_panel.update_level_reroll(coins, EconomyRules.level_reroll_cost(earned_level, rewards.level_rerolls), earned_level)
+
+
+func _on_level_reroll() -> void:
+	if ended or starter_pending or wave.active or in_shop or rewards.step != PostWaveRewards.Step.LEVELS or rewards.pending_levels <= 0 or not choice_panel.visible or choice_panel.mode != &"upgrade":
+		return
+	var earned_level := level - maxi(rewards.pending_levels - 1, 0)
+	var cost := EconomyRules.level_reroll_cost(earned_level, rewards.level_rerolls)
+	if coins < cost:
+		return
+	coins -= cost
+	rewards.level_rerolls += 1
+	telemetry.record_shop_spending(&"level_reroll", cost)
+	_show_level_choice()
 
 
 func _on_upgrade_chosen(upgrade: UpgradeData) -> void:

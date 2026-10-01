@@ -14,9 +14,11 @@ func _run() -> void:
 	if EconomyRules.coin_chance(WaveController.ACID_CROWN, 19, 0.5) != 1.0:
 		_fail("elite gold is not guaranteed")
 		return
-	if not is_equal_approx(EconomyRules.coin_chance(WaveController.PLAQUE, 1), 0.64) or not is_equal_approx(EconomyRules.coin_chance(WaveController.PLAQUE, 4), 0.40):
-		_fail("early gold boost does not fade out before normal drop decay")
-		return
+	for enemy in [WaveController.PLAQUE, WaveController.BACTERIA, WaveController.ACID_SPITTER, WaveController.SUGAR]:
+		for entry in [[1, 1.0], [4, 1.0], [5, 0.925], [10, 0.85], [20, 0.70], [40, 0.50]]:
+			if not is_equal_approx(EconomyRules.coin_chance(enemy, entry[0]), entry[1]):
+				_fail("normal enemy gold chance does not follow the materials curve")
+				return
 	var session: Node = root.get_node("GameSession")
 	session.save_path = "user://test_economy_shop.json"
 	session.resume_requested = false
@@ -44,7 +46,7 @@ func _run() -> void:
 		gold_drops += int(gold)
 		xp_drops += int(experience)
 		gold_without_xp += int(gold and not experience)
-	if absi(gold_drops - 1144) > 120 or absi(xp_drops - 1520) > 120 or gold_without_xp < 500:
+	if absi(gold_drops - 2860) > 120 or absi(xp_drops - 1520) > 120 or gold_without_xp < 1400:
 		_fail("gold is still gated by XP or the unchanged XP rate drifted: %d gold, %d XP, %d independent gold" % [gold_drops, xp_drops, gold_without_xp])
 		return
 	game.wave.active = false

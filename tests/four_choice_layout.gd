@@ -40,11 +40,16 @@ func _run() -> void:
 			for index in 4:
 				options.append(game.UPGRADES[(start + index) % game.UPGRADES.size()].with_tier(4))
 			game.choice_panel.show_upgrades(options)
+			game.choice_panel.update_level_reroll(1000, 12, 25)
 			for frame in 4:
 				await process_frame
 			if not bounds.encloses(game.choice_panel.dialog_panel.get_global_rect()):
 				_fail("four-choice dialog exceeds %s: %s" % [extent, game.choice_panel.dialog_panel.get_global_rect()])
 				return
+			for control in [game.choice_panel.level_coins, game.choice_panel.reroll_button]:
+				if not control.is_visible_in_tree() or not game.choice_panel.dialog_panel.get_global_rect().encloses(control.get_global_rect()) or control.size.y < control.get_minimum_size().y:
+					_fail("level reroll action or wallet clipped at %s" % extent)
+					return
 			var rectangles: Array[Rect2] = []
 			for card: UpgradeCard in game.choice_panel.buttons:
 				var rect := card.get_global_rect()

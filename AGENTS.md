@@ -18,7 +18,7 @@ Current playable state includes roughly:
 - minibosses every 5 waves and a final boss on wave 20
 - 4 normal enemy types, 2 elite variants and bosses
 - 8 weapons with root-slot costs and weapon fusion up to tier IV
-- 30 shop items with stack limits and real synergies
+- 32 shop items with stack limits and real synergies
 - 8 level-up stats
 - rarity and luck systems
 - shop rerolls, weapon selling and build-aware item weighting

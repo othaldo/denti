@@ -32,6 +32,8 @@ const CATALOG: Array[ShopOfferData] = [
 	preload("res://data/items/return_drill.tres"),
 	preload("res://data/items/saliva_chalice.tres"),
 	preload("res://data/items/sugar_shock.tres"),
+	preload("res://data/items/gold_probe.tres"),
+	preload("res://data/items/gold_extractor.tres"),
 	preload("res://data/weapons/shop_magic_toothbrush.tres"),
 	preload("res://data/weapons/shop_turbo_drill.tres"),
 	preload("res://data/weapons/shop_floss_whip.tres"),

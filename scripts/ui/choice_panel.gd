@@ -2,6 +2,7 @@ class_name ChoicePanel
 extends CanvasLayer
 
 signal upgrade_chosen(upgrade: UpgradeData)
+signal level_reroll_requested
 signal chest_resolved(keep: bool)
 signal relic_chosen(id: StringName)
 signal starter_chosen(weapon: WeaponData)
@@ -13,6 +14,9 @@ const UPGRADE_COUNT := 4
 @onready var subtitle_label: Label = $Root/Center/Panel/Margin/Rows/Subtitle
 @onready var dialog_panel: PanelContainer = $Root/Center/Panel
 @onready var cards: GridContainer = $Root/Center/Panel/Margin/Rows/Cards
+@onready var level_actions: HBoxContainer = $Root/Center/Panel/Margin/Rows/LevelActions
+@onready var level_coins: Label = $Root/Center/Panel/Margin/Rows/LevelActions/Coins
+@onready var reroll_button: Button = $Root/Center/Panel/Margin/Rows/LevelActions/Reroll
 @onready var buttons: Array[Button] = [
 	$Root/Center/Panel/Margin/Rows/Cards/Choice1,
 	$Root/Center/Panel/Margin/Rows/Cards/Choice2,
@@ -38,6 +42,11 @@ func _ready() -> void:
 	title_label.add_theme_color_override("font_color", DentiUIStyle.INK)
 	title_label.add_theme_font_size_override("font_size", 32)
 	subtitle_label.add_theme_color_override("font_color", DentiUIStyle.MUTED)
+	level_coins.add_theme_color_override("font_color", DentiUIStyle.INK)
+	DentiUIStyle.style_button(reroll_button)
+	reroll_button.icon = preload("res://assets/ui/reload.svg")
+	reroll_button.add_theme_constant_override("icon_max_width", 18)
+	reroll_button.pressed.connect(func() -> void: level_reroll_requested.emit())
 	for index in buttons.size():
 		buttons[index].pressed.connect(_on_choice_pressed.bind(index))
 	get_viewport().size_changed.connect(_update_layout)
@@ -47,11 +56,15 @@ func _ready() -> void:
 func _update_layout() -> void:
 	var viewport_size: Vector2 = $Root.size
 	var portrait := viewport_size.y > viewport_size.x and viewport_size.x < 800.0
+	level_actions.visible = mode == &"upgrade"
 	if mode == &"upgrade":
 		var narrow := viewport_size.x < 600.0 or viewport_size.y < 480.0
+		reroll_button.custom_minimum_size = Vector2(80, 32 if narrow else 40)
+		reroll_button.add_theme_font_size_override("font_size", 14 if narrow else 17)
+		level_coins.add_theme_font_size_override("font_size", 14 if narrow else 17)
 		cards.columns = 1 if portrait and viewport_size.y >= 1000.0 else (4 if (viewport_size.x >= 1150.0 and viewport_size.y >= 650.0) or viewport_size.y < 480.0 else 2)
 		$Root/Center/Panel/Margin/Rows/Portrait.visible = viewport_size.y >= 480.0
-		subtitle_label.visible = viewport_size.y >= 480.0
+		subtitle_label.visible = viewport_size.y >= 600.0
 		dialog_panel.custom_minimum_size = Vector2(minf(viewport_size.x - 24.0, 1120.0), 0)
 		$Root/Center/Panel/Margin/Rows/Portrait.custom_minimum_size.y = 48.0 if viewport_size.y >= 650.0 else 24.0
 		title_label.add_theme_font_size_override("font_size", 24 if narrow else 30)
@@ -80,6 +93,13 @@ func _update_layout() -> void:
 		(button as UpgradeCard).set_mobile_text(portrait or viewport_size.y <= 620.0)
 		if mode == &"starter":
 			button.custom_minimum_size.y = 285.0 if portrait or viewport_size.y <= 620.0 else 250.0
+
+
+func update_level_reroll(coins: int, cost: int, earned_level: int = 0) -> void:
+	level_coins.text = ("Level %d · " % earned_level if earned_level > 0 else "") + "%d Münzen" % coins
+	reroll_button.text = str(cost)
+	reroll_button.disabled = coins < cost
+	reroll_button.tooltip_text = "Level-up neu würfeln · %d Münzen\nVier neue Angebote für dieses Level. Nächster Reroll: +1 Münze." % cost
 
 
 func show_upgrades(options: Array[UpgradeData]) -> void:

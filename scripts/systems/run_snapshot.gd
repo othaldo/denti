@@ -276,6 +276,7 @@ static func restore(game, saved: Dictionary) -> void:
 					break
 		if options.size() == upgrade_data.size():
 			game.choice_panel.show_upgrades(options)
+			game._update_level_reroll()
 			game.get_tree().paused = true
 		else:
 			game._advance_post_wave_rewards()
