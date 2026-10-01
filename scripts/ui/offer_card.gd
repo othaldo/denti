@@ -4,8 +4,10 @@ extends Button
 const ICONS: Script = preload("res://scripts/ui/denti_ui_icons.gd")
 
 signal purchase_requested
+signal reservation_requested
 
 var buy_button: Button
+var reserve_button: Button
 var selection_only := false
 var content: BoxContainer
 var card_margin: MarginContainer
@@ -56,6 +58,7 @@ func show_offer(offer: ShopOfferData, coins: int, available: bool = true, owned_
 	buy_button.disabled = coins < offer.price or not available
 	buy_button.get_child(0).modulate = Color(1, 1, 1, 0.45) if buy_button.disabled else Color.WHITE
 	buy_button.tooltip_text = "Zu wenig Münzen" if coins < offer.price else ("Nicht verfügbar" if not available else "Kaufen")
+	reserve_button.disabled = false
 	disabled = (coins < offer.price or not available) and not selection_only
 	if offer.weapon_data != null:
 		tooltip_text = "%s\n%s\n%s\n≈ %.1f DPS pro Ziel" % [offer.description, offer.weapon_data.combat_text(), effect_label.text, dps]
@@ -65,6 +68,14 @@ func show_offer(offer: ShopOfferData, coins: int, available: bool = true, owned_
 		tooltip_text = "Limit erreicht: %d Stück" % offer.max_stacks if not available else effect_label.text
 	DentiUIStyle.style_card(self, offer.rarity_tier)
 	call_deferred("_fit_content")
+
+
+func show_reservation(reserved: bool) -> void:
+	reserve_button.text = "Gemerkt" if reserved else "Merken"
+	reserve_button.tooltip_text = "Angebot freigeben" if reserved else "Kostenlos für später merken; der Preis bleibt gleich."
+	reserve_button.visible = selection_only
+	DentiUIStyle.style_button(reserve_button, reserved)
+	reserve_button.add_theme_font_size_override("font_size", 13)
 
 
 func _fit_content() -> void:
@@ -130,7 +141,15 @@ func _build_content() -> void:
 	price_chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	price_chip.custom_minimum_size.y = 48
 	DentiUIStyle.style_button(price_chip, true)
-	content.add_child(price_chip)
+	var actions := VBoxContainer.new()
+	actions.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	content.add_child(actions)
+	actions.add_child(price_chip)
+	reserve_button = Button.new()
+	reserve_button.custom_minimum_size = Vector2(86, 36)
+	reserve_button.pressed.connect(func() -> void: reservation_requested.emit())
+	actions.add_child(reserve_button)
+	show_reservation(false)
 	var price_row := HBoxContainer.new()
 	price_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	price_row.add_theme_constant_override("separation", 3)

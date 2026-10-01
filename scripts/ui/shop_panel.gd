@@ -6,6 +6,7 @@ signal buy_requested(index: int)
 signal sell_requested(index: int)
 signal merge_requested(index: int)
 signal reroll_requested
+signal reservation_requested(index: int)
 signal continue_requested
 
 @onready var rows: VBoxContainer = $Root/Center/Panel/Margin/Rows
@@ -18,6 +19,7 @@ var reroll_button: Button
 var continue_button: Button
 var inventory_label: Label
 var inventory_row: HBoxContainer
+var inventory_scroll: ScrollContainer
 var items_label: Label
 var items_scroll: ScrollContainer
 var items_row: HBoxContainer
@@ -29,7 +31,8 @@ var details_panel: PanelContainer
 var left_scroll: ScrollContainer
 var details_scroll: ScrollContainer
 var detail_column: VBoxContainer
-var detail_actions: HBoxContainer
+var detail_actions: BoxContainer
+var shop_actions: BoxContainer
 var stats_label: Label
 var player: Player
 var offers: Array[ShopOfferData] = []
@@ -95,10 +98,10 @@ func _ready() -> void:
 	left_scroll.add_child(left)
 	ShopDetails._label(left, "Angebote", 16)
 	offers_grid = GridContainer.new()
-	offers_grid.columns = 3
+	offers_grid.columns = 2
 	offers_grid.add_theme_constant_override("h_separation", 9)
 	left.add_child(offers_grid)
-	for index in 3:
+	for index in ShopController.OFFER_COUNT:
 		var card := OfferCard.new()
 		card.selection_only = true
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -106,10 +109,16 @@ func _ready() -> void:
 		offer_buttons.append(card)
 		card.pressed.connect(_select.bind("offer", index))
 		card.purchase_requested.connect(func() -> void: buy_requested.emit(index))
+		card.reservation_requested.connect(func() -> void: reservation_requested.emit(index))
 	inventory_label = ShopDetails._label(left, "", 17)
+	inventory_scroll = ScrollContainer.new()
+	inventory_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	inventory_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	inventory_scroll.custom_minimum_size.y = 76
+	left.add_child(inventory_scroll)
 	inventory_row = HBoxContainer.new()
 	inventory_row.add_theme_constant_override("separation", 5)
-	left.add_child(inventory_row)
+	inventory_scroll.add_child(inventory_row)
 	stats_label = ShopDetails._label(left, "", 16)
 	details_panel = PanelContainer.new()
 	details_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -134,13 +143,14 @@ func _ready() -> void:
 	details.confirm_button.pressed.connect(func() -> void: sell_requested.emit(selected_index))
 	details.cancel_button.pressed.connect(_render_selection)
 	details.compare.item_selected.connect(_compare)
-	detail_actions = HBoxContainer.new()
+	detail_actions = BoxContainer.new()
 	detail_column.add_child(detail_actions)
 	for button in [details.merge_button, details.sell_button, details.confirm_button, details.cancel_button]:
 		button.reparent(detail_actions)
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.add_theme_font_size_override("font_size", 16)
-	var actions := HBoxContainer.new()
+	var actions := BoxContainer.new()
+	shop_actions = actions
 	rows.add_child(actions)
 	reroll_button = _button(actions, "Neu würfeln")
 	continue_button = _button(actions, "Weiter", true)
@@ -163,8 +173,16 @@ func set_build_context(context: Player) -> void:
 func _update_layout() -> void:
 	var extent: Vector2 = $Root.size
 	compact = extent.x < 1000 or extent.y <= 620
+	var narrow := extent.x < 600
+	shop_actions.vertical = narrow and extent.y >= 480
+	detail_actions.vertical = narrow and extent.y >= 480
+	preview_label.visible = extent.y >= 480
+	items_label.visible = extent.y >= 480
+	title_label.add_theme_font_size_override("font_size", 21 if extent.y < 480 else 27)
+	details.heading.add_theme_font_size_override("font_size", 17 if narrow else 21)
+	details.icon.custom_minimum_size = Vector2(40, 40) if narrow else Vector2(56, 56)
 	flow.vertical = compact
-	offers_grid.columns = 1 if compact else 3
+	offers_grid.columns = 1 if compact else 2
 	detail_column.custom_minimum_size.x = 0 if compact else 380
 	var action_parent: Node = rows if compact else detail_column
 	if detail_actions.get_parent() != action_parent:
@@ -177,15 +195,16 @@ func _update_layout() -> void:
 	$Root/Center/Panel.custom_minimum_size = Vector2(minf(extent.x - 24, 1180), extent.y - 24)
 	for edge in ["left", "right"]:
 		$Root/Center/Panel/Margin.add_theme_constant_override("margin_" + edge, 12)
-	items_scroll.custom_minimum_size.y = 64 if compact else 58
+	items_scroll.custom_minimum_size.y = 48 if extent.y < 480 else (64 if compact else 58)
 	for button in [reroll_button, continue_button, details.merge_button, details.sell_button, details.confirm_button, details.cancel_button]:
-		button.custom_minimum_size.y = 64 if compact else 54
+		button.custom_minimum_size.y = 48 if narrow or extent.y < 480 else (64 if compact else 54)
+		button.add_theme_font_size_override("font_size", 15 if narrow else 16)
 	for chip in items_row.get_children():
 		chip.custom_minimum_size = Vector2(64, 60) if compact else Vector2(56, 52)
 	for card in offer_buttons:
-		card.set_catalog_layout(not compact)
+		card.set_catalog_layout(not compact or narrow)
 
-func show_shop(wave_number: int, coins: int, reroll_cost: int, new_offers: Array[ShopOfferData], preview: String = "", new_equipment: Array[Dictionary] = [], used_slots: int = 0, capacity: int = 6, buyable: Array[bool] = [], luck: float = 0.0, collected: Array[Dictionary] = [], counts: Dictionary = {}, offer_dps: Array[float] = []) -> void:
+func show_shop(wave_number: int, coins: int, reroll_cost: int, new_offers: Array[ShopOfferData], preview: String = "", new_equipment: Array[Dictionary] = [], used_slots: int = 0, capacity: int = 6, buyable: Array[bool] = [], luck: float = 0.0, collected: Array[Dictionary] = [], counts: Dictionary = {}, offer_dps: Array[float] = [], reserved: Array[bool] = []) -> void:
 	offers = new_offers
 	equipment = new_equipment
 	owned_items = collected
@@ -199,6 +218,7 @@ func show_shop(wave_number: int, coins: int, reroll_cost: int, new_offers: Array
 		var offer := offers[index]
 		var count := int(counts.get(str(offer.id), 0)) if offer != null else 0
 		offer_buttons[index].show_offer(offer, coins, buyable.is_empty() or buyable[index], count, offer_dps[index] if index < offer_dps.size() else 0.0)
+		offer_buttons[index].show_reservation(index < reserved.size() and reserved[index])
 		if offer != null and offer.weapon_data != null:
 			offer_buttons[index].effect_label.text = WeaponPresentation.quick_text(offer.weapon_data, offer.weapon_tier, player)
 	_show_inventory(equipment, used_slots, capacity)
@@ -208,6 +228,11 @@ func show_shop(wave_number: int, coins: int, reroll_cost: int, new_offers: Array
 		stats_label.text = "Bisskraft %+.0f %% · Härte %s · Schmelz %.0f HP\nPutzeifer %+.0f %% · Glanz %d %% Crit · Speichel %s\nBewegung %+.0f %% · Zahnglück %.0f · Nah %+.0f · Fern %+.0f" % [s.damage_bonus, s.armor_text(), s.max_health, s.attack_speed, roundi(s.crit_chance * 100), s.regen_text(), s.speed_bonus, s.luck, s.melee_damage, s.ranged_damage]
 	reroll_button.text = "Neu würfeln · %d" % reroll_cost
 	reroll_button.disabled = coins < reroll_cost
+	if reserved.size() == ShopController.OFFER_COUNT and reserved.all(func(value: bool) -> bool: return value):
+		reroll_button.disabled = true
+		reroll_button.tooltip_text = "Alle Angebote sind gemerkt. Gib zuerst eines frei."
+	else:
+		reroll_button.tooltip_text = "Gemerkte Angebote bleiben erhalten."
 	continue_button.text = "Welle %d starten" % (wave_number + 1)
 	continue_button.disabled = equipment.is_empty()
 	if selected_kind == "equipment":
@@ -323,7 +348,7 @@ func _show_inventory(entries: Array[Dictionary], used_slots: int, capacity: int)
 		var slot := HBoxContainer.new()
 		slot.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		inventory_row.add_child(slot)
-		var empty := _button(slot, "＋")
+		var empty := _button(slot, "+")
 		empty.disabled = true
 		empty.custom_minimum_size = Vector2(40, 64)
 		empty.tooltip_text = "Freie Hand"

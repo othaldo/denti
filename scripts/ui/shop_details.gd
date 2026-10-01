@@ -43,6 +43,7 @@ func _ready() -> void:
 	compare.custom_minimum_size.y = 44
 	compare.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	compare.clip_text = true
+	compare.fit_to_longest_item = false
 	add_child(compare)
 	compare_text = _label(self, "", 15)
 	action_hint = _label(self, "", 16)

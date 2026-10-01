@@ -28,7 +28,7 @@ static func quick_text(data: WeaponData, tier: int, player: Player) -> String:
 static func comparison(data: WeaponData, tier: int, other: WeaponData, other_tier: int, player: Player) -> String:
 	var before := values(other, other_tier, player)
 	var after := values(data, tier, player)
-	return "Treffer %.1f → %.1f · Pause %.2f → %.2f s\nReichweite %d → %d · Hände %d → %d" % [
+	return "Treffer %.1f -> %.1f · Pause %.2f -> %.2f s\nReichweite %d -> %d · Hände %d -> %d" % [
 		before.damage, after.damage, before.pause, after.pause,
 		roundi(before.range), roundi(after.range), other.hands, data.hands]
 

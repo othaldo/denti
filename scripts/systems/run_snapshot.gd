@@ -46,8 +46,9 @@ static func capture(game) -> Dictionary:
 	for projectile: AcidProjectile in game.get_node("EnemyProjectiles").get_children():
 		acid_data.append({"position": _vector_data(projectile.position), "direction": _vector_data(projectile.direction), "speed": projectile.speed, "damage": projectile.damage, "lifetime": projectile.lifetime, "color": projectile.projectile_color.to_html(), "hit_radius": projectile.hit_radius, "visual_radius": projectile.visual_radius})
 	var offer_data: Array[Dictionary] = []
-	for offer in game.shop.offers:
-		offer_data.append({"id": str(offer.id), "tier": offer.weapon_tier, "price": offer.price} if offer != null else {})
+	for index in game.shop.offers.size():
+		var offer: ShopOfferData = game.shop.offers[index]
+		offer_data.append({"id": str(offer.id), "tier": offer.weapon_tier, "price": offer.price, "reserved": game.shop.reserved[index]} if offer != null else {})
 	var upgrades: Array[Dictionary] = []
 	if game.choice_panel.visible and game.choice_panel.mode == &"upgrade":
 		for upgrade in game.choice_panel.current_upgrades:
@@ -210,6 +211,7 @@ static func restore(game, saved: Dictionary) -> void:
 		projectile.lifetime = float(entry.get("lifetime", 2.2))
 	shop.reroll_cost = maxi(int(saved.get("reroll_cost", 2)), 2)
 	shop.offers.clear()
+	shop.reserved = [false, false, false, false]
 	for value in saved.get("offers", []):
 		var offer_id := str(value.get("id", "")) if value is Dictionary else str(value)
 		if offer_id == "floss":
@@ -225,6 +227,9 @@ static func restore(game, saved: Dictionary) -> void:
 				found = template.duplicate() as ShopOfferData
 			if value is Dictionary:
 				found.price = maxi(int(value.get("price", found.price)), 1)
+		if shop.offers.size() >= ShopController.OFFER_COUNT:
+			break
+		shop.reserved[shop.offers.size()] = found != null and value is Dictionary and bool(value.get("reserved", false))
 		shop.offers.append(found)
 	game.in_shop = bool(saved.get("shop", false))
 	game.boss_pending = bool(saved.get("boss_pending", false))
@@ -236,7 +241,7 @@ static func restore(game, saved: Dictionary) -> void:
 	if not saved.has("rewards"):
 		if game.in_shop:
 			game.rewards.step = PostWaveRewards.Step.SHOP
-		elif upgrade_data.size() == 3:
+		elif upgrade_data.size() in [3, ChoicePanel.UPGRADE_COUNT]:
 			game.rewards.pending_levels = 1
 			game.rewards.step = PostWaveRewards.Step.COMBAT if wave.active or game.boss_pending else PostWaveRewards.Step.LEVELS
 		elif bool(saved.get("intermission_pending", false)):
@@ -249,7 +254,7 @@ static func restore(game, saved: Dictionary) -> void:
 		game.get_tree().paused = true
 		game._refresh_hud()
 		return
-	if game.rewards.step == PostWaveRewards.Step.LEVELS and upgrade_data.size() == 3:
+	if game.rewards.step == PostWaveRewards.Step.LEVELS and upgrade_data.size() in [3, ChoicePanel.UPGRADE_COUNT]:
 		var options: Array[UpgradeData] = []
 		for value in upgrade_data:
 			if value is Dictionary:
@@ -268,7 +273,7 @@ static func restore(game, saved: Dictionary) -> void:
 				if value is String and upgrade.resource_path == value:
 					options.append(upgrade.with_tier(1))
 					break
-		if options.size() == 3:
+		if options.size() == upgrade_data.size():
 			game.choice_panel.show_upgrades(options)
 			game.get_tree().paused = true
 		else:
@@ -278,8 +283,8 @@ static func restore(game, saved: Dictionary) -> void:
 	elif game.rewards.step == PostWaveRewards.Step.LEVELS:
 		game._advance_post_wave_rewards()
 	elif game.in_shop or game.rewards.step == PostWaveRewards.Step.SHOP:
-		if shop.offers.size() != 3:
-			shop.open_shop(wave.current_wave, player.stats.luck, player.loadout, game.items)
+		if shop.offers.size() != ShopController.OFFER_COUNT:
+			shop.complete_saved_offers(wave.current_wave, player.stats.luck, player.loadout, game.items)
 		game.in_shop = true
 		game._update_shop_panel()
 		game.get_tree().paused = true

@@ -9,6 +9,8 @@ var name_label: Label
 var rarity_label: Label
 var effect_label: Label
 var hover_tween: Tween
+var upgrade_tier: int = 1
+var upgrade_description: String = ""
 
 
 func _ready() -> void:
@@ -22,6 +24,8 @@ func _ready() -> void:
 
 
 func show_upgrade(upgrade: UpgradeData) -> void:
+	upgrade_tier = upgrade.tier
+	upgrade_description = upgrade.description
 	custom_minimum_size.y = 186.0
 	text = ""
 	content.visible = true
@@ -30,6 +34,7 @@ func show_upgrade(upgrade: UpgradeData) -> void:
 	rarity_label.text = "STUFE %d · %s" % [upgrade.tier, DentiRarity.name_for(upgrade.tier).to_upper()]
 	DentiUIStyle.style_rarity_label(rarity_label, upgrade.tier)
 	effect_label.text = upgrade.description
+	tooltip_text = upgrade.description
 	disabled = false
 	DentiUIStyle.style_card(self, upgrade.tier)
 
@@ -88,6 +93,29 @@ func show_action(action_name: String, accent: bool = false) -> void:
 func set_mobile_text(enabled: bool) -> void:
 	name_label.add_theme_font_size_override("font_size", 21 if enabled else 19)
 	effect_label.add_theme_font_size_override("font_size", 17 if enabled else 14)
+
+
+func set_upgrade_layout(narrow: bool, compact: bool) -> void:
+	custom_minimum_size = Vector2(0, 186 if narrow else (174 if compact else 186))
+	icon_rect.custom_minimum_size.y = 30 if compact else 48
+	name_label.custom_minimum_size.y = 34 if narrow else 26
+	name_label.add_theme_font_size_override("font_size", 15 if narrow else 18)
+	effect_label.add_theme_font_size_override("font_size", 15 if narrow else 17)
+	effect_label.text = upgrade_description.replace(" (Waffenskalierung)", "").replace("maximales Leben und Heilung", "Leben + Heilung").replace("kritische Chance", "Crit") if compact or narrow else upgrade_description
+	rarity_label.text = DentiRarity.name_for(upgrade_tier).to_upper()
+	rarity_label.clip_text = true
+	rarity_label.size_flags_horizontal = Control.SIZE_FILL
+	rarity_label.add_theme_font_size_override("font_size", 10 if narrow else 12)
+	content.add_theme_constant_override("separation", 3 if compact else 5)
+
+
+func reset_card_layout() -> void:
+	custom_minimum_size.x = 235
+	icon_rect.custom_minimum_size.y = 56
+	name_label.custom_minimum_size.y = 48
+	rarity_label.clip_text = false
+	rarity_label.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	content.add_theme_constant_override("separation", 5)
 
 
 func _build_content() -> void:

@@ -43,6 +43,8 @@ func _run() -> void:
 		return
 	var previous_right := -1.0
 	for button: Button in game.choice_panel.buttons:
+		if not button.visible:
+			continue
 		if not _inside(button.get_global_rect(), Vector2(1280, 720)) or button.position.x < previous_right:
 			_fail("upgrade cards overlap or exceed viewport")
 			return
@@ -115,6 +117,7 @@ func _run() -> void:
 		load("res://data/upgrades/bisskraft.tres"),
 		load("res://data/upgrades/haerte.tres"),
 		load("res://data/upgrades/glanz.tres"),
+		load("res://data/upgrades/fernschaden.tres"),
 	]
 	game.choice_panel.show_upgrades(upgrades)
 	await process_frame
@@ -123,6 +126,8 @@ func _run() -> void:
 		return
 	var previous_bottom := -1.0
 	for button: Button in game.choice_panel.buttons:
+		if not button.visible:
+			continue
 		var rect := button.get_global_rect()
 		if not _inside(rect, Vector2(720, 1280)) or rect.position.y < previous_bottom:
 			_fail("portrait upgrade cards overlap or exceed the phone viewport")

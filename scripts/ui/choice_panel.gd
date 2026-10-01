@@ -7,6 +7,7 @@ signal relic_chosen(id: StringName)
 signal starter_chosen(weapon: WeaponData)
 signal restart_requested
 signal main_menu_requested
+const UPGRADE_COUNT := 4
 
 @onready var title_label: Label = $Root/Center/Panel/Margin/Rows/Title
 @onready var subtitle_label: Label = $Root/Center/Panel/Margin/Rows/Subtitle
@@ -16,6 +17,7 @@ signal main_menu_requested
 	$Root/Center/Panel/Margin/Rows/Cards/Choice1,
 	$Root/Center/Panel/Margin/Rows/Cards/Choice2,
 	$Root/Center/Panel/Margin/Rows/Cards/Choice3,
+	$Root/Center/Panel/Margin/Rows/Cards/Choice4,
 ]
 
 var current_upgrades: Array[UpgradeData] = []
@@ -45,10 +47,36 @@ func _ready() -> void:
 func _update_layout() -> void:
 	var viewport_size: Vector2 = $Root.size
 	var portrait := viewport_size.y > viewport_size.x and viewport_size.x < 800.0
+	if mode == &"upgrade":
+		var narrow := viewport_size.x < 600.0 or viewport_size.y < 480.0
+		cards.columns = 1 if portrait and viewport_size.y >= 1000.0 else (4 if (viewport_size.x >= 1150.0 and viewport_size.y >= 650.0) or viewport_size.y < 480.0 else 2)
+		$Root/Center/Panel/Margin/Rows/Portrait.visible = viewport_size.y >= 480.0
+		subtitle_label.visible = viewport_size.y >= 480.0
+		dialog_panel.custom_minimum_size = Vector2(minf(viewport_size.x - 24.0, 1120.0), 0)
+		$Root/Center/Panel/Margin/Rows/Portrait.custom_minimum_size.y = 48.0 if viewport_size.y >= 650.0 else 24.0
+		title_label.add_theme_font_size_override("font_size", 24 if narrow else 30)
+		subtitle_label.add_theme_font_size_override("font_size", 14 if narrow else 17)
+		subtitle_label.custom_minimum_size.y = 32.0
+		for edge in ["left", "right", "top", "bottom"]:
+			$Root/Center/Panel/Margin.add_theme_constant_override("margin_" + edge, 8 if narrow else 14)
+		cards.add_theme_constant_override("h_separation", 8 if narrow else 12)
+		cards.add_theme_constant_override("v_separation", 8 if narrow else 12)
+		for button in buttons:
+			(button as UpgradeCard).set_upgrade_layout(narrow, cards.columns != 4 or narrow)
+		return
+	$Root/Center/Panel/Margin/Rows/Portrait.visible = true
+	subtitle_label.visible = true
+	$Root/Center/Panel/Margin/Rows/Portrait.custom_minimum_size.y = 80.0 if mode == &"end" else 108.0
+	title_label.add_theme_font_size_override("font_size", 32)
+	for edge in ["left", "right"]:
+		$Root/Center/Panel/Margin.add_theme_constant_override("margin_" + edge, 28)
+	$Root/Center/Panel/Margin.add_theme_constant_override("margin_top", 18)
+	$Root/Center/Panel/Margin.add_theme_constant_override("margin_bottom", 24)
 	cards.columns = 1 if portrait else 3
 	var desktop_width := 760.0 if mode == &"chest" else (800.0 if mode == &"credits" else 900.0)
 	dialog_panel.custom_minimum_size.x = 660.0 if portrait else desktop_width
 	for button in buttons:
+		(button as UpgradeCard).reset_card_layout()
 		(button as UpgradeCard).set_mobile_text(portrait or viewport_size.y <= 620.0)
 		if mode == &"starter":
 			button.custom_minimum_size.y = 285.0 if portrait or viewport_size.y <= 620.0 else 250.0
@@ -63,8 +91,10 @@ func show_upgrades(options: Array[UpgradeData]) -> void:
 	subtitle_label.text = "Ein göttlicher Segen wurde gewährt. Wähle einen für Denti."
 	subtitle_label.custom_minimum_size.y = 40.0
 	for index in buttons.size():
-		buttons[index].visible = true
-		buttons[index].call("show_upgrade", options[index])
+		buttons[index].visible = index < options.size()
+		if index < options.size():
+			buttons[index].call("show_upgrade", options[index])
+	_update_layout()
 	visible = true
 	buttons[0].grab_focus()
 
@@ -78,8 +108,9 @@ func show_starters(options: Array[WeaponData]) -> void:
 	subtitle_label.text = "Wähle eine Waffe. Weitere findest du später in der Zahnklinik."
 	subtitle_label.custom_minimum_size.y = 40.0
 	for index in buttons.size():
-		buttons[index].visible = true
-		buttons[index].call("show_weapon", options[index])
+		buttons[index].visible = index < options.size()
+		if index < options.size():
+			buttons[index].call("show_weapon", options[index])
 	_update_layout()
 	visible = true
 	buttons[0].grab_focus()
@@ -98,6 +129,7 @@ func show_chest(item: ShopOfferData, scrap_coins: int) -> void:
 	buttons[1].call("show_action", "Für %d Münzen zerlegen" % scrap_coins)
 	buttons[1].visible = true
 	buttons[2].visible = false
+	buttons[3].visible = false
 	visible = true
 	buttons[0].grab_focus()
 
@@ -137,6 +169,7 @@ func show_end(won: bool, coins: int, recap: Dictionary = {}) -> void:
 	buttons[1].visible = true
 	buttons[2].call("show_action", "Hauptmenü")
 	buttons[2].visible = true
+	buttons[3].visible = false
 	visible = true
 	buttons[0].grab_focus()
 
@@ -147,6 +180,8 @@ func _on_choice_pressed(index: int) -> void:
 			visible = false
 			starter_chosen.emit(starter_options[index])
 		&"upgrade":
+			if index >= current_upgrades.size():
+				return
 			visible = false
 			upgrade_chosen.emit(current_upgrades[index])
 		&"chest":
@@ -247,4 +282,5 @@ func _show_credits() -> void:
 	buttons[0].call("show_action", "Zurück", true)
 	buttons[1].visible = false
 	buttons[2].visible = false
+	buttons[3].visible = false
 	buttons[0].grab_focus()

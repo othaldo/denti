@@ -174,8 +174,8 @@ func _run() -> void:
 	if game.coins != coins_before_reroll - 2 or game.shop.reroll_cost != 3:
 		_fail("reroll cost was not charged")
 		return
-	if game.shop.offers.size() != 3:
-		_fail("reroll did not produce three offers")
+	if game.shop.offers.size() != 4:
+		_fail("reroll did not produce four offers")
 		return
 
 	game._on_shop_continue()

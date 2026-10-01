@@ -90,3 +90,10 @@ custom_minimum_size = Vector2(235, 186)
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("3")
+
+[node name="Choice4" type="Button" parent="Root/Center/Panel/Margin/Rows/Cards"]
+visible = false
+custom_minimum_size = Vector2(235, 186)
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("3")

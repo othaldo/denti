@@ -30,6 +30,10 @@ func _run() -> void:
 	if not ui.details.merge_button.visible or ui.details.merge_button.disabled or not ui.details.action_hint.text.contains("Hand frei"):
 		_fail("equipped weapon lacks fusion and freed-hand preview")
 		return
+	for character in ui.details.compare_text.text + ui.details.action_hint.text:
+		if character != "\n" and not DentiUIStyle.FONT.has_char(character.unicode_at(0)):
+			_fail("weapon comparison contains a glyph missing from the bundled font: %s" % character)
+			return
 	ui.details.sell_button.pressed.emit()
 	if game.coins != balance or not ui.details.confirm_button.visible:
 		_fail("sale lacked confirmation")

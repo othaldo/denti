@@ -1,5 +1,7 @@
 # Items und Builds
 
+Shopangebote haben jetzt vier Plätze und steigende Wellenpreise. Mit „Merken“ lassen sich Angebote samt Preis kostenlos über Rerolls und Wellen hinweg reservieren. Gold fällt unabhängig von XP häufiger; die neuen Werte und Messungen stehen in [ECONOMY_BALANCE.md](ECONOMY_BALANCE.md). Die Itempreise sind Basispreise vor der Welleninflation.
+
 In der Zahnklinik gibt es 30 Items in vier Seltenheitsstufen. Ein Kauf gewährt den beschriebenen Effekt sofort; mehrere Exemplare verstärken ihn bis zum Stapellimit. Im Shop werden maximale Stapel nicht mehr angeboten. Die Pausenseite **Items** zeigt den Besitz, die Shopzeile eine kompakte Zusammenfassung.
 
 Schadensstats verwenden jetzt Prozentboni: Goldfüllung +5 %, Implantat +12 %, Keramikschale, Ansteckende Zahnseide und Rücklaufbohrer jeweils -5 %, Blutungsuhr -6 %. Zahnseide-Spule gibt +2 Nahschaden. Bisskraft und Item-Prozentboni werden addiert; trefferabhängige Folgeeffekte skalieren den bereits berechneten Trefferschaden nicht erneut. Details stehen im [Schadens- und Verteidigungsbericht](DAMAGE_DEFENSE_BALANCE.md).

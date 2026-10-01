@@ -79,6 +79,7 @@ func _ready() -> void:
 	shop_panel.sell_requested.connect(_on_shop_sell)
 	shop_panel.merge_requested.connect(_on_shop_merge)
 	shop_panel.reroll_requested.connect(_on_shop_reroll)
+	shop_panel.reservation_requested.connect(_on_shop_reserve)
 	shop_panel.continue_requested.connect(_on_shop_continue)
 	mobile_controls.pause_requested.connect(game_menu.open_pause)
 	if DebugRunControls.allowed():
@@ -257,7 +258,7 @@ func _on_enemy_defeated(at: Vector2, data: EnemyData) -> void:
 	var reward_drop: bool = wave.active and (data.is_elite or randf() < WaveController.loot_chance(wave.current_wave) * DifficultyCatalog.by_id(wave.difficulty_id).reward_chance_multiplier)
 	var bonus_coins := items.on_kill(at, data.is_boss)
 	coins += bonus_coins
-	telemetry.record_loot(&"coin", bonus_coins)
+	telemetry.record_loot(&"coin", bonus_coins, &"kill_item")
 	if data.is_boss:
 		boss = null
 		if boss_pending:
@@ -268,10 +269,9 @@ func _on_enemy_defeated(at: Vector2, data: EnemyData) -> void:
 		if not chest.is_empty():
 			rewards.mark_chest_spawned()
 			_spawn_loot(at, &"chest", int(chest["scrap_coins"]), StringName(str(chest["item_id"])))
-	if not reward_drop:
-		return
-	_spawn_loot(at + Vector2(-11.0, 0.0), &"xp", data.xp_drop)
-	if data.coin_drop > 0 and randf() < data.coin_drop_chance:
+	if reward_drop:
+		_spawn_loot(at + Vector2(-11.0, 0.0), &"xp", data.xp_drop)
+	if wave.active and data.coin_drop > 0 and randf() < EconomyRules.coin_chance(data, wave.current_wave, DifficultyCatalog.by_id(wave.difficulty_id).reward_chance_multiplier):
 		_spawn_loot(at + Vector2(11.0, 0.0), &"coin", data.coin_drop)
 
 
@@ -320,7 +320,8 @@ func _on_loot_collected(kind: StringName, amount: int, reward_id: StringName = &
 		telemetry.record_chest_found()
 	else:
 		var bonus := items.on_pickup(kind, amount)
-		telemetry.record_loot(kind, amount + bonus)
+		telemetry.record_loot(kind, amount)
+		telemetry.record_loot(kind, bonus, &"pickup_item")
 		if kind == &"coin":
 			coins += amount + bonus
 		else:
@@ -373,7 +374,7 @@ func _show_level_choice() -> void:
 		pool.append(upgrade)
 	pool.shuffle()
 	var choices: Array[UpgradeData] = []
-	for index in 3:
+	for index in ChoicePanel.UPGRADE_COUNT:
 		choices.append(pool[index].with_tier(DentiRarity.upgrade_tier(level, player.stats.luck)))
 	choice_panel.show_upgrades(choices)
 	get_tree().paused = true
@@ -396,7 +397,7 @@ func _on_chest_resolved(keep: bool) -> void:
 	else:
 		var scrap_coins := items.scrap_value(int(chest["scrap_coins"]))
 		coins += scrap_coins
-		telemetry.record_loot(&"coin", scrap_coins)
+		telemetry.record_loot(&"coin", scrap_coins, &"chest_scrap")
 		telemetry.record_chest_scrapped()
 	rewards.resolve_chest()
 	_advance_post_wave_rewards()
@@ -462,7 +463,7 @@ func _finish_loot_collection() -> void:
 	player.set_physics_process(true)
 	var interest := items.on_wave_end(coins)
 	coins += interest
-	telemetry.record_loot(&"coin", interest)
+	telemetry.record_loot(&"coin", interest, &"interest")
 	if wave.current_wave < WaveController.MAX_WAVES and WaveController.is_boss_wave(wave.current_wave) and rewards.pending_relics.is_empty():
 		rewards.queue_relics(RelicCatalog.choices(relics.owned))
 	rewards.finish_collection(wave.current_wave >= WaveController.MAX_WAVES)
@@ -512,7 +513,8 @@ func _clear_arena(collect_drops: bool, keep_boss: bool = false) -> void:
 				telemetry.record_chest_found()
 			else:
 				var bonus := items.on_pickup(drop.kind, drop.amount)
-				telemetry.record_loot(drop.kind, drop.amount + bonus)
+				telemetry.record_loot(drop.kind, drop.amount)
+				telemetry.record_loot(drop.kind, bonus, &"pickup_item")
 				if drop.kind == &"coin":
 					coins += drop.amount + bonus
 				else:
@@ -578,7 +580,7 @@ func _update_shop_panel() -> void:
 		if relic != null:
 			owned_display.append({"name": "Relikt: " + relic.display_name, "count": 1, "description": relic.description, "tier": 4, "icon": DentiUIIcons.relic(relic.icon_index), "relic": true})
 	shop_panel.set_build_context(player)
-	shop_panel.show_shop(wave.current_wave, coins, shop.reroll_cost, shop.offers, wave.next_wave_preview(), equipment, player.loadout.used_slots(), WeaponLoadout.CAPACITY, buyable, player.stats.luck, owned_display, items.owned, offer_dps)
+	shop_panel.show_shop(wave.current_wave, coins, shop.reroll_cost, shop.offers, wave.next_wave_preview(), equipment, player.loadout.used_slots(), WeaponLoadout.CAPACITY, buyable, player.stats.luck, owned_display, items.owned, offer_dps, shop.reserved)
 	_refresh_hud()
 
 
@@ -600,6 +602,7 @@ func _on_shop_buy(index: int) -> void:
 	if not acquired:
 		return
 	coins -= offer.price
+	telemetry.record_shop_spending(&"weapon" if offer.weapon_data != null else &"item", offer.price)
 	shop.take_offer(index)
 	_update_shop_panel()
 	_save_run()
@@ -608,7 +611,9 @@ func _on_shop_buy(index: int) -> void:
 func _on_shop_sell(index: int) -> void:
 	if not in_shop:
 		return
-	coins += player.loadout.sell(index)
+	var refund := player.loadout.sell(index)
+	coins += refund
+	telemetry.record_loot(&"coin", refund, &"weapon_sale")
 	_update_shop_panel()
 	_save_run()
 
@@ -621,10 +626,18 @@ func _on_shop_merge(index: int) -> void:
 
 
 func _on_shop_reroll() -> void:
-	if not in_shop or coins < shop.reroll_cost:
+	if not in_shop or coins < shop.reroll_cost or not shop.can_reroll():
 		return
 	coins -= shop.reroll_cost
+	telemetry.record_shop_spending(&"reroll", shop.reroll_cost)
 	shop.reroll(wave.current_wave, player.stats.luck, player.loadout, items)
+	_update_shop_panel()
+	_save_run()
+
+
+func _on_shop_reserve(index: int) -> void:
+	if not in_shop or not shop.toggle_reservation(index):
+		return
 	_update_shop_panel()
 	_save_run()
 

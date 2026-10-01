@@ -76,7 +76,7 @@ func _run() -> void:
 	await _capture("bosskampf.png")
 
 	game.level = 5
-	var upgrades: Array[UpgradeData] = [game.UPGRADES[0].with_tier(1), game.UPGRADES[2].with_tier(2), game.UPGRADES[3].with_tier(3)]
+	var upgrades: Array[UpgradeData] = [game.UPGRADES[0].with_tier(1), game.UPGRADES[2].with_tier(2), game.UPGRADES[3].with_tier(3), game.UPGRADES[4].with_tier(2)]
 	game.choice_panel.show_upgrades(upgrades)
 	game._refresh_hud()
 	await _capture("levelaufstieg.png")
@@ -93,6 +93,10 @@ func _run() -> void:
 	game.shop.offers.append(ShopController.weapon_offer(ShopController.by_id(&"turbo_drill"), 2))
 	game.shop.offers.append(ShopController.by_id(&"radiant_filling"))
 	game.shop.offers.append(ShopController.by_id(&"holy_flash"))
+	game.shop.offers.append(ShopController.by_id(&"saliva_fountain"))
+	for index in game.shop.offers.size():
+		game.shop.offers[index] = game.shop.offers[index].duplicate()
+		game.shop.offers[index].price = EconomyRules.shop_price(game.shop.offers[index].price, game.wave.current_wave)
 	game._update_shop_panel()
 	await _capture("shop.png")
 

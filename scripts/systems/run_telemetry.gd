@@ -28,6 +28,8 @@ var wave_elites_spawned: int = 0
 var wave_elites_killed: int = 0
 var wave_coins: int = 0
 var wave_xp: int = 0
+var wave_gold_sources: Dictionary = {}
+var wave_shop_spending: Dictionary = {}
 var wave_chests_found: int = 0
 var wave_chests_kept: int = 0
 var wave_chests_scrapped: int = 0
@@ -58,6 +60,8 @@ func begin_wave(number: int, profile_id: StringName = &"") -> void:
 	wave_elites_killed = 0
 	wave_coins = 0
 	wave_xp = 0
+	wave_gold_sources.clear()
+	wave_shop_spending.clear()
 	wave_chests_found = 0
 	wave_chests_kept = 0
 	wave_chests_scrapped = 0
@@ -138,13 +142,20 @@ func record_taken(amount: float) -> void:
 	taken_events.append({"at": elapsed, "amount": amount})
 
 
-func record_loot(kind: StringName, amount: int) -> void:
+func record_loot(kind: StringName, amount: int, source: StringName = &"drop") -> void:
 	if kind == &"coin":
 		coins_collected += amount
 		wave_coins += amount
+		if amount > 0:
+			wave_gold_sources[str(source)] = int(wave_gold_sources.get(str(source), 0)) + amount
 	elif kind == &"xp":
 		xp_collected += amount
 		wave_xp += amount
+
+
+func record_shop_spending(kind: StringName, amount: int) -> void:
+	if amount > 0:
+		wave_shop_spending[str(kind)] = int(wave_shop_spending.get(str(kind), 0)) + amount
 
 
 func record_chest_found() -> void:
@@ -195,6 +206,7 @@ func current_wave_summary() -> Dictionary:
 		"damage_dealt": wave_damage, "average_dps": wave_damage / maxf(duration, 1.0),
 		"peak_dps": wave_peak_dps, "damage_taken": wave_taken,
 		"coins_collected": wave_coins, "xp_collected": wave_xp,
+		"gold_sources": wave_gold_sources.duplicate(), "shop_spending": wave_shop_spending.duplicate(),
 		"chests_found": wave_chests_found, "chests_kept": wave_chests_kept, "chests_scrapped": wave_chests_scrapped,
 		"boss_ttk": wave_boss_ttk,
 	}
@@ -221,6 +233,7 @@ func save_data() -> Dictionary:
 		"wave_kills": wave_kills, "wave_elites_spawned": wave_elites_spawned,
 		"wave_elites_killed": wave_elites_killed,
 		"wave_coins": wave_coins, "wave_xp": wave_xp,
+		"wave_gold_sources": wave_gold_sources.duplicate(), "wave_shop_spending": wave_shop_spending.duplicate(),
 		"wave_chests_found": wave_chests_found, "wave_chests_kept": wave_chests_kept,
 		"wave_chests_scrapped": wave_chests_scrapped,
 		"wave_damage": wave_damage, "wave_taken": wave_taken,
@@ -259,6 +272,8 @@ func restore(saved: Dictionary, wave_number: int) -> void:
 	wave_elites_killed = maxi(int(saved.get("wave_elites_killed", 0)), 0)
 	wave_coins = maxi(int(saved.get("wave_coins", 0)), 0)
 	wave_xp = maxi(int(saved.get("wave_xp", 0)), 0)
+	wave_gold_sources = saved.get("wave_gold_sources", {}).duplicate()
+	wave_shop_spending = saved.get("wave_shop_spending", {}).duplicate()
 	wave_chests_found = maxi(int(saved.get("wave_chests_found", 0)), 0)
 	wave_chests_kept = maxi(int(saved.get("wave_chests_kept", 0)), 0)
 	wave_chests_scrapped = maxi(int(saved.get("wave_chests_scrapped", 0)), 0)

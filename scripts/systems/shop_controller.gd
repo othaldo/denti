@@ -56,8 +56,10 @@ const SAME_WEAPON_CHANCE := 0.30
 const SAME_MODE_CHANCE := 0.15
 const ITEM_TAG_CHANCE := 0.28
 const WEAPON_PRICE_MULTIPLIERS := [1.0, 1.65, 2.4, 3.3]
+const OFFER_COUNT := 4
 
 var offers: Array[ShopOfferData] = []
+var reserved: Array[bool] = [false, false, false, false]
 var reroll_cost: int = 2
 var rng := RandomNumberGenerator.new()
 
@@ -79,7 +81,22 @@ func reroll(wave_number: int, luck: float, loadout: WeaponLoadout, items: ItemIn
 func take_offer(index: int) -> ShopOfferData:
 	var offer := offers[index]
 	offers[index] = null
+	reserved[index] = false
 	return offer
+
+
+func toggle_reservation(index: int) -> bool:
+	if index < 0 or index >= offers.size() or offers[index] == null:
+		return false
+	reserved[index] = not reserved[index]
+	return true
+
+
+func can_reroll() -> bool:
+	for index in OFFER_COUNT:
+		if not reserved[index] or index >= offers.size() or offers[index] == null:
+			return true
+	return false
 
 
 static func by_id(id: StringName) -> ShopOfferData:
@@ -97,9 +114,21 @@ static func weapon_offer(template: ShopOfferData, tier: int) -> ShopOfferData:
 	return offer
 
 
-func _roll_offers(wave_number: int, luck: float, loadout: WeaponLoadout, items: ItemInventory) -> void:
-	offers.clear()
-	for index in 3:
+func complete_saved_offers(wave_number: int, luck: float, loadout: WeaponLoadout, items: ItemInventory) -> void:
+	_roll_offers(wave_number, luck, loadout, items, true)
+
+
+func _roll_offers(wave_number: int, luck: float, loadout: WeaponLoadout, items: ItemInventory, preserve_existing: bool = false) -> void:
+	var previous := offers.duplicate()
+	offers = [null, null, null, null]
+	for index in OFFER_COUNT:
+		if index < previous.size() and (preserve_existing or (reserved[index] and previous[index] != null)):
+			offers[index] = previous[index]
+		else:
+			reserved[index] = false
+	for index in OFFER_COUNT:
+		if offers[index] != null or (preserve_existing and index < previous.size()):
+			continue
 		var tier := DentiRarity.roll(wave_number, luck, rng)
 		var wants_weapon := index < (2 if wave_number <= 2 else 1) or rng.randf() < WEAPON_CHANCE
 		var offer: ShopOfferData = _pick_weapon(tier, loadout) if wants_weapon else null
@@ -107,8 +136,10 @@ func _roll_offers(wave_number: int, luck: float, loadout: WeaponLoadout, items: 
 			offer = _pick_item(tier, items, loadout)
 		if offer == null:
 			offer = _pick_weapon(tier, loadout)
-		offers.append(offer)
-	offers.shuffle()
+		if offer != null:
+			offer = offer.duplicate() as ShopOfferData
+			offer.price = EconomyRules.shop_price(offer.price, wave_number)
+		offers[index] = offer
 
 
 func _pick_item(tier: int, items: ItemInventory, loadout: WeaponLoadout) -> ShopOfferData:

@@ -167,7 +167,7 @@ func _run() -> void:
 		_fail("continue lost the level-up earned during combat")
 		return
 	game.wave._process(game.wave.remaining)
-	if not paused or not game.choice_panel.visible or game.choice_panel.current_upgrades.size() != 3:
+	if not paused or not game.choice_panel.visible or game.choice_panel.current_upgrades.size() != 4:
 		_fail("post-wave level-up choices did not open after loot collection")
 		return
 	game.game_menu._to_main_menu()
@@ -178,7 +178,7 @@ func _run() -> void:
 	await process_frame
 	await process_frame
 	game = current_scene
-	if not paused or game.rewards.pending_levels != 1 or not game.choice_panel.visible or game.choice_panel.current_upgrades.size() != 3:
+	if not paused or game.rewards.pending_levels != 1 or not game.choice_panel.visible or game.choice_panel.current_upgrades.size() != 4:
 		_fail("continue lost a post-wave level-up choice")
 		return
 	game.choice_panel._on_choice_pressed(0)
@@ -193,7 +193,7 @@ func _run() -> void:
 	await process_frame
 	await process_frame
 	game = current_scene
-	if not paused or not game.in_shop or not game.shop_panel.visible or game.shop.offers.size() != 3:
+	if not paused or not game.in_shop or not game.shop_panel.visible or game.shop.offers.size() != 4:
 		_fail("continue did not restore the shop")
 		return
 	game.game_menu._to_main_menu()

@@ -40,11 +40,13 @@ func _run() -> void:
 	await _capture("weapon_expansion_combat.png")
 	game._clear_arena(false)
 	game._open_shop()
-	for batch in 4:
+	for batch in 3:
 		game.shop.offers.clear()
-		for offset in 3:
-			var index := 8 + batch * 3 + offset
+		for offset in ShopController.OFFER_COUNT:
+			var index := 8 + batch * ShopController.OFFER_COUNT + offset
 			game.shop.offers.append(ShopController.weapon_offer(ShopController.by_id(WeaponCatalog.ALL[index].id), 1) if index < WeaponCatalog.ALL.size() else null)
+			if game.shop.offers[-1] != null:
+				game.shop.offers[-1].price = EconomyRules.shop_price(game.shop.offers[-1].price, game.wave.current_wave)
 		game._update_shop_panel()
 		await _capture("weapon_expansion_shop_%d.png" % (batch + 1))
 	session.clear_run()
