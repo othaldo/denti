@@ -3,3 +3,5 @@
 /addons/
 /.codex/
 /.mcp.json
+/build/
+/.vercel/
