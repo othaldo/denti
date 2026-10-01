@@ -80,7 +80,7 @@ func _test_weapon_scaling() -> void:
 		_check(is_equal_approx(weapon.estimated_dps(4, stats), expected), "DPS estimate uses an outdated damage formula")
 	var fast := WeaponCatalog.by_id(&"interdental_brush")
 	var heavy := WeaponCatalog.by_id(&"turbo_drill")
-	_check(fast.stat_scaling == 0.2 and heavy.stat_scaling == 1.5, "fast AoE has the same flat scaling as a slow single-target weapon")
+	_check(fast.stat_scaling < heavy.stat_scaling and fast.interval < heavy.interval, "fast AoE has the same flat scaling as a slower single-target weapon")
 	stats.damage_bonus = -200.0
 	var grinder := WeaponCatalog.by_id(&"cavity_grinder")
 	_check(is_equal_approx(grinder.estimated_dps(1, stats), 1.0 / grinder.interval_at_tier(1)), "minimum damage DPS is reduced below one HP by a trash modifier")

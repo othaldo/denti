@@ -20,11 +20,11 @@ Der bisherige Stat war bereits ein versteckter Multiplikator: `Waffenbasis * Bis
 
 ## Waffenskalierung
 
-Die bisherigen Grundschäden und Stufenkurven aller 18 Waffen bleiben erhalten. Schwere Einzelangriffe erhalten stärkere Gewichte für rohe Punkte als schnelle Gruppenangriffe.
+Beim Umbau auf Prozent- und Nah-/Fernschaden blieben die Grundschäden und Stufenkurven aller 18 Waffen erhalten. Der anschließende [Größen- und Tempo-Pass](WEAPON_SIZE_BALANCE.md) verkleinert den Bohrer und stimmt Schaden, Tempo und Nahschaden-Skalierung neu ab. Schwere Einzelangriffe erhalten stärkere Gewichte für rohe Punkte als schnelle Gruppenangriffe.
 
 | Nahwaffe | Gewicht Nahschaden | Fernwaffe | Gewicht Fernschaden |
 | --- | ---: | --- | ---: |
-| Turbo-Bohrer | 150 % | Zauberbürste | 80 % |
+| Turbo-Bohrer | 100 % | Zauberbürste | 80 % |
 | Zahnseidenpeitsche | 70 % | Wasserflosser | 35 % |
 | Zahnsteinkratzer | 70 % | Kronenwerfer | 125 % |
 | Zahnstocher-Speer | 100 % | Schmelzspiegel | 90 % |
@@ -35,7 +35,7 @@ Die bisherigen Grundschäden und Stufenkurven aller 18 Waffen bleiben erhalten. 
 | | | Amalgam-Schleuder | 100 % |
 | | | Fluorid-Rakete | 160 % |
 
-Beispiel: +2 Nahschaden ergänzt beim Bohrer 3 Basisschaden, bei der Interdental-Bürste 0,4. Bisskraft wirkt danach auf diesen gemeinsamen Grundwert. Ein Licht-Nahkämpfer wie der Polierer skaliert mit Nahschaden; ein kurzer Sprühkegel mit Fernschaden. Entscheidend ist die deklarierte Waffenfamilie, nicht die Schadensart oder Reichweite.
+Beispiel: +2 Nahschaden ergänzt beim Bohrer 2 Basisschaden, bei der Interdental-Bürste 0,4. Bisskraft wirkt danach auf diesen gemeinsamen Grundwert. Ein Licht-Nahkämpfer wie der Polierer skaliert mit Nahschaden; ein kurzer Sprühkegel mit Fernschaden. Entscheidend ist die deklarierte Waffenfamilie, nicht die Schadensart oder Reichweite.
 
 ## Verteidigung
 
@@ -70,9 +70,9 @@ Die Simulation verwendet Zufallsstartwert 13579, 60 Physikschritte/s und sechs H
 
 | Welle | Boss-HP | Zeit bis null HP | Phasenwechsel | Erlittener Schaden ohne Ausweichen |
 | ---: | ---: | ---: | ---: | ---: |
-| 5 | 1560 | 18,2 s | 2 | 321 |
-| 10 | 3087 | 23,6 s | 2 | 426 |
-| 20 | 15325 | 46,9 s | 2 | 1385 |
+| 5 | 1560 | 18,2 s | 2 | 350 |
+| 10 | 3087 | 23,4 s | 2 | 398 |
+| 20 | 15325 | 46,9 s | 2 | 1337 |
 
 Die Durchläufe dauern deutlich länger als 2–5 Sekunden, und beide Phasenwechsel kommen vor. Ohne Bewegung würde ein normaler 100-HP-Spieler in allen drei Messungen sterben. Die Waffenmatrix enthält direkten Einzelziel-DPS pro Hand, einschließlich Crit und der bisherigen Gewichtung zusätzlicher Geschosse; Blutung, Flächentreffer, Rückstoß, Nass-Synergien und voller Fokus sind zusätzliche Leistung. Sie ist daher keine Waffenrangliste.
 

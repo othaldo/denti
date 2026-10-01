@@ -22,6 +22,10 @@ Die Bilder sind direkt aus Godot aufgenommen. Für die Kampfbilder wurden Gegner
 
 Die vier Farbstufen der Boss-Entzündung. Die Vorschau zeigt einen Frame der Animation; für den direkten Vergleich sind die Bosse gleich groß dargestellt. [Details zur Entzündung](docs/BOSS_INFLAMMATION.md).
 
+[![Denti mit jeder der 18 Waffen bei gleicher Vergrößerung](docs/screenshots/weapon_sizes/all_idle_after.png)](docs/WEAPON_SIZE_BALANCE.md)
+
+[Alle Waffen in Ruhe und im Angriff](docs/WEAPON_SIZE_BALANCE.md), einschließlich Größenvergleich und Messungen zum kleineren, schnelleren Turbo-Bohrer.
+
 ## Spielen
 
 Das Projekt mit **Godot 4.4 oder neuer** öffnen und mit **F5** starten. Unter Linux geht es auch im Projektordner:

@@ -63,6 +63,10 @@ static func pose(data: WeaponData, tier: int, home: Vector2, aim: Vector2, progr
 				extension = sin(action * PI)
 				angle += sin(action * TAU * 3.0) * 0.045
 		var hand_distance := maxf(reach - length, 12.0)
+		if data.attack_animation in ["slash", "spin"]:
+			# A short blade must not orbit outside a nearby target's body.
+			# Distant targets still use the full extension up to the weapon's range.
+			hand_distance = minf(hand_distance, maxf(target_distance - data.attack_width * 0.5, 12.0))
 		var attack_grip := Vector2.RIGHT.rotated(angle) * hand_distance
 		if data.attack_animation in ["thrust", "drill", "polish"]:
 			attack_grip = aim * lerpf(12.0, hand_distance, extension)

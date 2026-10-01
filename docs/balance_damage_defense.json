@@ -53,23 +53,23 @@
 		{
 			"boss_alive": false,
 			"boss_hp": 1560.0,
-			"damage_taken": 320.664000000339,
+			"damage_taken": 350.424000000348,
 			"phases_reached": 2,
-			"seconds": 18.2166666666667,
+			"seconds": 18.2333333333333,
 			"wave": 5
 		},
 		{
 			"boss_alive": false,
 			"boss_hp": 3087.0,
-			"damage_taken": 426.475799999898,
+			"damage_taken": 397.650600000168,
 			"phases_reached": 2,
-			"seconds": 23.55,
+			"seconds": 23.45,
 			"wave": 10
 		},
 		{
 			"boss_alive": false,
 			"boss_hp": 15325.0,
-			"damage_taken": 1385.22400000051,
+			"damage_taken": 1336.90700000071,
 			"phases_reached": 2,
 			"seconds": 46.85,
 			"wave": 20
@@ -145,11 +145,11 @@
 			"weapon": "magic_toothbrush"
 		},
 		{
-			"dps_per_hand": 26.42578125,
+			"dps_per_hand": 31.3194444444444,
 			"family": "melee",
-			"hit": 33.0,
+			"hit": 22.0,
 			"profile": "Start",
-			"scaling": 1.5,
+			"scaling": 1.0,
 			"tier": 1,
 			"weapon": "turbo_drill"
 		},
@@ -307,11 +307,11 @@
 			"weapon": "magic_toothbrush"
 		},
 		{
-			"dps_per_hand": 41.2059375,
+			"dps_per_hand": 48.8366666666667,
 			"family": "melee",
-			"hit": 43.68,
+			"hit": 29.12,
 			"profile": "Welle 5",
-			"scaling": 1.5,
+			"scaling": 1.0,
 			"tier": 1,
 			"weapon": "turbo_drill"
 		},
@@ -469,11 +469,11 @@
 			"weapon": "magic_toothbrush"
 		},
 		{
-			"dps_per_hand": 77.856197502796,
+			"dps_per_hand": 92.2740118551656,
 			"family": "melee",
-			"hit": 69.7128013658524,
+			"hit": 46.4752009105682,
 			"profile": "Welle 10",
-			"scaling": 1.5,
+			"scaling": 1.0,
 			"tier": 2,
 			"weapon": "turbo_drill"
 		},
@@ -631,11 +631,11 @@
 			"weapon": "magic_toothbrush"
 		},
 		{
-			"dps_per_hand": 191.329280437018,
+			"dps_per_hand": 226.760628666095,
 			"family": "melee",
-			"hit": 129.15,
+			"hit": 86.1,
 			"profile": "Welle 20",
-			"scaling": 1.5,
+			"scaling": 1.0,
 			"tier": 4,
 			"weapon": "turbo_drill"
 		},

@@ -1,0 +1,1214 @@
+{
+  "before": {
+    "measurements": [
+      {
+        "boss": false,
+        "direct_dps": 27.5,
+        "distance": 45.0,
+        "estimated_dps": 25.78125,
+        "hits": 10,
+        "side": 1.0,
+        "size": 100.0,
+        "weapon": "turbo_drill"
+      },
+      {
+        "boss": false,
+        "direct_dps": 27.5,
+        "distance": 45.0,
+        "estimated_dps": 25.78125,
+        "hits": 10,
+        "side": -1.0,
+        "size": 100.0,
+        "weapon": "turbo_drill"
+      },
+      {
+        "boss": false,
+        "direct_dps": 27.5,
+        "distance": 104.0,
+        "estimated_dps": 25.78125,
+        "hits": 10,
+        "side": 1.0,
+        "size": 100.0,
+        "weapon": "turbo_drill"
+      },
+      {
+        "boss": false,
+        "direct_dps": 27.5,
+        "distance": 104.0,
+        "estimated_dps": 25.78125,
+        "hits": 10,
+        "side": -1.0,
+        "size": 100.0,
+        "weapon": "turbo_drill"
+      },
+      {
+        "boss": false,
+        "direct_dps": 27.5,
+        "distance": 160.0,
+        "estimated_dps": 25.78125,
+        "hits": 10,
+        "side": 1.0,
+        "size": 100.0,
+        "weapon": "turbo_drill"
+      },
+      {
+        "boss": false,
+        "direct_dps": 27.5,
+        "distance": 160.0,
+        "estimated_dps": 25.78125,
+        "hits": 10,
+        "side": -1.0,
+        "size": 100.0,
+        "weapon": "turbo_drill"
+      },
+      {
+        "boss": true,
+        "direct_dps": 34.375,
+        "distance": 45.0,
+        "estimated_dps": 25.78125,
+        "hits": 10,
+        "side": 1.0,
+        "size": 100.0,
+        "weapon": "turbo_drill"
+      },
+      {
+        "boss": true,
+        "direct_dps": 34.375,
+        "distance": 45.0,
+        "estimated_dps": 25.78125,
+        "hits": 10,
+        "side": -1.0,
+        "size": 100.0,
+        "weapon": "turbo_drill"
+      },
+      {
+        "boss": true,
+        "direct_dps": 34.375,
+        "distance": 104.0,
+        "estimated_dps": 25.78125,
+        "hits": 10,
+        "side": 1.0,
+        "size": 100.0,
+        "weapon": "turbo_drill"
+      },
+      {
+        "boss": true,
+        "direct_dps": 34.375,
+        "distance": 104.0,
+        "estimated_dps": 25.78125,
+        "hits": 10,
+        "side": -1.0,
+        "size": 100.0,
+        "weapon": "turbo_drill"
+      },
+      {
+        "boss": true,
+        "direct_dps": 34.375,
+        "distance": 160.0,
+        "estimated_dps": 25.78125,
+        "hits": 10,
+        "side": 1.0,
+        "size": 100.0,
+        "weapon": "turbo_drill"
+      },
+      {
+        "boss": true,
+        "direct_dps": 34.375,
+        "distance": 160.0,
+        "estimated_dps": 25.78125,
+        "hits": 10,
+        "side": -1.0,
+        "size": 100.0,
+        "weapon": "turbo_drill"
+      },
+      {
+        "boss": false,
+        "direct_dps": 26.4500000000893,
+        "distance": 45.0,
+        "estimated_dps": 23.0769230769231,
+        "hits": 23,
+        "side": 1.0,
+        "size": 100.0,
+        "weapon": "plaque_scaler"
+      },
+      {
+        "boss": false,
+        "direct_dps": 26.4500000000893,
+        "distance": 45.0,
+        "estimated_dps": 23.0769230769231,
+        "hits": 23,
+        "side": -1.0,
+        "size": 100.0,
+        "weapon": "plaque_scaler"
+      },
+      {
+        "boss": false,
+        "direct_dps": 26.4500000000893,
+        "distance": 71.5,
+        "estimated_dps": 23.0769230769231,
+        "hits": 23,
+        "side": 1.0,
+        "size": 100.0,
+        "weapon": "plaque_scaler"
+      },
+      {
+        "boss": false,
+        "direct_dps": 26.4500000000893,
+        "distance": 71.5,
+        "estimated_dps": 23.0769230769231,
+        "hits": 23,
+        "side": -1.0,
+        "size": 100.0,
+        "weapon": "plaque_scaler"
+      },
+      {
+        "boss": false,
+        "direct_dps": 26.4500000000893,
+        "distance": 110.0,
+        "estimated_dps": 23.0769230769231,
+        "hits": 23,
+        "side": 1.0,
+        "size": 100.0,
+        "weapon": "plaque_scaler"
+      },
+      {
+        "boss": false,
+        "direct_dps": 26.4500000000893,
+        "distance": 110.0,
+        "estimated_dps": 23.0769230769231,
+        "hits": 23,
+        "side": -1.0,
+        "size": 100.0,
+        "weapon": "plaque_scaler"
+      },
+      {
+        "boss": true,
+        "direct_dps": 26.4500000000893,
+        "distance": 45.0,
+        "estimated_dps": 23.0769230769231,
+        "hits": 23,
+        "side": 1.0,
+        "size": 100.0,
+        "weapon": "plaque_scaler"
+      },
+      {
+        "boss": true,
+        "direct_dps": 26.4500000000893,
+        "distance": 45.0,
+        "estimated_dps": 23.0769230769231,
+        "hits": 23,
+        "side": -1.0,
+        "size": 100.0,
+        "weapon": "plaque_scaler"
+      },
+      {
+        "boss": true,
+        "direct_dps": 26.4500000000893,
+        "distance": 71.5,
+        "estimated_dps": 23.0769230769231,
+        "hits": 23,
+        "side": 1.0,
+        "size": 100.0,
+        "weapon": "plaque_scaler"
+      },
+      {
+        "boss": true,
+        "direct_dps": 26.4500000000893,
+        "distance": 71.5,
+        "estimated_dps": 23.0769230769231,
+        "hits": 23,
+        "side": -1.0,
+        "size": 100.0,
+        "weapon": "plaque_scaler"
+      },
+      {
+        "boss": true,
+        "direct_dps": 26.4500000000893,
+        "distance": 110.0,
+        "estimated_dps": 23.0769230769231,
+        "hits": 23,
+        "side": 1.0,
+        "size": 100.0,
+        "weapon": "plaque_scaler"
+      },
+      {
+        "boss": true,
+        "direct_dps": 26.4500000000893,
+        "distance": 110.0,
+        "estimated_dps": 23.0769230769231,
+        "hits": 23,
+        "side": -1.0,
+        "size": 100.0,
+        "weapon": "plaque_scaler"
+      },
+      {
+        "boss": false,
+        "direct_dps": 27.4083333333838,
+        "distance": 45.0,
+        "estimated_dps": 23.1578947368421,
+        "hits": 13,
+        "side": 1.0,
+        "size": 96.0,
+        "weapon": "toothpick_spear"
+      },
+      {
+        "boss": false,
+        "direct_dps": 27.4083333333838,
+        "distance": 45.0,
+        "estimated_dps": 23.1578947368421,
+        "hits": 13,
+        "side": -1.0,
+        "size": 96.0,
+        "weapon": "toothpick_spear"
+      },
+      {
+        "boss": false,
+        "direct_dps": 27.4083333333838,
+        "distance": 133.25,
+        "estimated_dps": 23.1578947368421,
+        "hits": 13,
+        "side": 1.0,
+        "size": 96.0,
+        "weapon": "toothpick_spear"
+      },
+      {
+        "boss": false,
+        "direct_dps": 27.4083333333838,
+        "distance": 133.25,
+        "estimated_dps": 23.1578947368421,
+        "hits": 13,
+        "side": -1.0,
+        "size": 96.0,
+        "weapon": "toothpick_spear"
+      },
+      {
+        "boss": false,
+        "direct_dps": 27.4083333333838,
+        "distance": 205.0,
+        "estimated_dps": 23.1578947368421,
+        "hits": 13,
+        "side": 1.0,
+        "size": 96.0,
+        "weapon": "toothpick_spear"
+      },
+      {
+        "boss": false,
+        "direct_dps": 27.4083333333838,
+        "distance": 205.0,
+        "estimated_dps": 23.1578947368421,
+        "hits": 13,
+        "side": -1.0,
+        "size": 96.0,
+        "weapon": "toothpick_spear"
+      },
+      {
+        "boss": true,
+        "direct_dps": 27.4083333333838,
+        "distance": 45.0,
+        "estimated_dps": 23.1578947368421,
+        "hits": 13,
+        "side": 1.0,
+        "size": 96.0,
+        "weapon": "toothpick_spear"
+      },
+      {
+        "boss": true,
+        "direct_dps": 27.4083333333838,
+        "distance": 45.0,
+        "estimated_dps": 23.1578947368421,
+        "hits": 13,
+        "side": -1.0,
+        "size": 96.0,
+        "weapon": "toothpick_spear"
+      },
+      {
+        "boss": true,
+        "direct_dps": 27.4083333333838,
+        "distance": 133.25,
+        "estimated_dps": 23.1578947368421,
+        "hits": 13,
+        "side": 1.0,
+        "size": 96.0,
+        "weapon": "toothpick_spear"
+      },
+      {
+        "boss": true,
+        "direct_dps": 27.4083333333838,
+        "distance": 133.25,
+        "estimated_dps": 23.1578947368421,
+        "hits": 13,
+        "side": -1.0,
+        "size": 96.0,
+        "weapon": "toothpick_spear"
+      },
+      {
+        "boss": true,
+        "direct_dps": 27.4083333333838,
+        "distance": 205.0,
+        "estimated_dps": 23.1578947368421,
+        "hits": 13,
+        "side": 1.0,
+        "size": 96.0,
+        "weapon": "toothpick_spear"
+      },
+      {
+        "boss": true,
+        "direct_dps": 27.4083333333838,
+        "distance": 205.0,
+        "estimated_dps": 23.1578947368421,
+        "hits": 13,
+        "side": -1.0,
+        "size": 96.0,
+        "weapon": "toothpick_spear"
+      },
+      {
+        "boss": false,
+        "direct_dps": 29.7916666665794,
+        "distance": 45.0,
+        "estimated_dps": 22.0,
+        "hits": 56,
+        "side": 1.0,
+        "size": 70.0,
+        "weapon": "cavity_grinder"
+      },
+      {
+        "boss": false,
+        "direct_dps": 29.7916666665794,
+        "distance": 45.0,
+        "estimated_dps": 22.0,
+        "hits": 56,
+        "side": -1.0,
+        "size": 70.0,
+        "weapon": "cavity_grinder"
+      },
+      {
+        "boss": false,
+        "direct_dps": 29.7916666665794,
+        "distance": 50.7,
+        "estimated_dps": 22.0,
+        "hits": 56,
+        "side": 1.0,
+        "size": 70.0,
+        "weapon": "cavity_grinder"
+      },
+      {
+        "boss": false,
+        "direct_dps": 29.7916666665794,
+        "distance": 50.7,
+        "estimated_dps": 22.0,
+        "hits": 56,
+        "side": -1.0,
+        "size": 70.0,
+        "weapon": "cavity_grinder"
+      },
+      {
+        "boss": false,
+        "direct_dps": 29.7916666665794,
+        "distance": 78.0,
+        "estimated_dps": 22.0,
+        "hits": 56,
+        "side": 1.0,
+        "size": 70.0,
+        "weapon": "cavity_grinder"
+      },
+      {
+        "boss": false,
+        "direct_dps": 29.7916666665794,
+        "distance": 78.0,
+        "estimated_dps": 22.0,
+        "hits": 56,
+        "side": -1.0,
+        "size": 70.0,
+        "weapon": "cavity_grinder"
+      },
+      {
+        "boss": true,
+        "direct_dps": 73.1249996771415,
+        "distance": 45.0,
+        "estimated_dps": 22.0,
+        "hits": 56,
+        "side": 1.0,
+        "size": 70.0,
+        "weapon": "cavity_grinder"
+      },
+      {
+        "boss": true,
+        "direct_dps": 73.1249996771415,
+        "distance": 45.0,
+        "estimated_dps": 22.0,
+        "hits": 56,
+        "side": -1.0,
+        "size": 70.0,
+        "weapon": "cavity_grinder"
+      },
+      {
+        "boss": true,
+        "direct_dps": 73.1249996771415,
+        "distance": 50.7,
+        "estimated_dps": 22.0,
+        "hits": 56,
+        "side": 1.0,
+        "size": 70.0,
+        "weapon": "cavity_grinder"
+      },
+      {
+        "boss": true,
+        "direct_dps": 73.1249996771415,
+        "distance": 50.7,
+        "estimated_dps": 22.0,
+        "hits": 56,
+        "side": -1.0,
+        "size": 70.0,
+        "weapon": "cavity_grinder"
+      },
+      {
+        "boss": true,
+        "direct_dps": 73.1249996771415,
+        "distance": 78.0,
+        "estimated_dps": 22.0,
+        "hits": 56,
+        "side": 1.0,
+        "size": 70.0,
+        "weapon": "cavity_grinder"
+      },
+      {
+        "boss": true,
+        "direct_dps": 73.1249996771415,
+        "distance": 78.0,
+        "estimated_dps": 22.0,
+        "hits": 56,
+        "side": -1.0,
+        "size": 70.0,
+        "weapon": "cavity_grinder"
+      },
+      {
+        "boss": false,
+        "direct_dps": 25.6666666666667,
+        "distance": 45.0,
+        "estimated_dps": 26.25,
+        "hits": 36,
+        "side": 1.0,
+        "size": 65.0,
+        "weapon": "prophylaxis_polisher"
+      },
+      {
+        "boss": false,
+        "direct_dps": 25.6666666666667,
+        "distance": 45.0,
+        "estimated_dps": 26.25,
+        "hits": 36,
+        "side": -1.0,
+        "size": 65.0,
+        "weapon": "prophylaxis_polisher"
+      },
+      {
+        "boss": false,
+        "direct_dps": 25.6666666666667,
+        "distance": 55.25,
+        "estimated_dps": 26.25,
+        "hits": 36,
+        "side": 1.0,
+        "size": 65.0,
+        "weapon": "prophylaxis_polisher"
+      },
+      {
+        "boss": false,
+        "direct_dps": 25.6666666666667,
+        "distance": 55.25,
+        "estimated_dps": 26.25,
+        "hits": 36,
+        "side": -1.0,
+        "size": 65.0,
+        "weapon": "prophylaxis_polisher"
+      },
+      {
+        "boss": false,
+        "direct_dps": 25.6666666666667,
+        "distance": 85.0,
+        "estimated_dps": 26.25,
+        "hits": 36,
+        "side": 1.0,
+        "size": 65.0,
+        "weapon": "prophylaxis_polisher"
+      },
+      {
+        "boss": false,
+        "direct_dps": 25.6666666666667,
+        "distance": 85.0,
+        "estimated_dps": 26.25,
+        "hits": 36,
+        "side": -1.0,
+        "size": 65.0,
+        "weapon": "prophylaxis_polisher"
+      },
+      {
+        "boss": true,
+        "direct_dps": 25.6666666666667,
+        "distance": 45.0,
+        "estimated_dps": 26.25,
+        "hits": 36,
+        "side": 1.0,
+        "size": 65.0,
+        "weapon": "prophylaxis_polisher"
+      },
+      {
+        "boss": true,
+        "direct_dps": 25.6666666666667,
+        "distance": 45.0,
+        "estimated_dps": 26.25,
+        "hits": 36,
+        "side": -1.0,
+        "size": 65.0,
+        "weapon": "prophylaxis_polisher"
+      },
+      {
+        "boss": true,
+        "direct_dps": 25.6666666666667,
+        "distance": 55.25,
+        "estimated_dps": 26.25,
+        "hits": 36,
+        "side": 1.0,
+        "size": 65.0,
+        "weapon": "prophylaxis_polisher"
+      },
+      {
+        "boss": true,
+        "direct_dps": 25.6666666666667,
+        "distance": 55.25,
+        "estimated_dps": 26.25,
+        "hits": 36,
+        "side": -1.0,
+        "size": 65.0,
+        "weapon": "prophylaxis_polisher"
+      },
+      {
+        "boss": true,
+        "direct_dps": 25.6666666666667,
+        "distance": 85.0,
+        "estimated_dps": 26.25,
+        "hits": 36,
+        "side": 1.0,
+        "size": 65.0,
+        "weapon": "prophylaxis_polisher"
+      },
+      {
+        "boss": true,
+        "direct_dps": 25.6666666666667,
+        "distance": 85.0,
+        "estimated_dps": 26.25,
+        "hits": 36,
+        "side": -1.0,
+        "size": 65.0,
+        "weapon": "prophylaxis_polisher"
+      }
+    ],
+    "method": "60 Hz; seed 13579 per case; tier I; stationary target; direct contact damage only; player crit 0, innate weapon crit/focus active; no items/AI/bleed ticks; boss guard disabled to isolate weapon throughput",
+    "seconds": 12.0
+  },
+  "after": {
+    "measurements": [
+      {
+        "boss": false,
+        "direct_dps": 31.1666666666667,
+        "distance": 45.0,
+        "estimated_dps": 30.5555555555556,
+        "hits": 17,
+        "side": 1.0,
+        "size": 60.0,
+        "weapon": "turbo_drill"
+      },
+      {
+        "boss": false,
+        "direct_dps": 31.1666666666667,
+        "distance": 45.0,
+        "estimated_dps": 30.5555555555556,
+        "hits": 17,
+        "side": -1.0,
+        "size": 60.0,
+        "weapon": "turbo_drill"
+      },
+      {
+        "boss": false,
+        "direct_dps": 31.1666666666667,
+        "distance": 104.0,
+        "estimated_dps": 30.5555555555556,
+        "hits": 17,
+        "side": 1.0,
+        "size": 60.0,
+        "weapon": "turbo_drill"
+      },
+      {
+        "boss": false,
+        "direct_dps": 31.1666666666667,
+        "distance": 104.0,
+        "estimated_dps": 30.5555555555556,
+        "hits": 17,
+        "side": -1.0,
+        "size": 60.0,
+        "weapon": "turbo_drill"
+      },
+      {
+        "boss": false,
+        "direct_dps": 31.1666666666667,
+        "distance": 160.0,
+        "estimated_dps": 30.5555555555556,
+        "hits": 17,
+        "side": 1.0,
+        "size": 60.0,
+        "weapon": "turbo_drill"
+      },
+      {
+        "boss": false,
+        "direct_dps": 31.1666666666667,
+        "distance": 160.0,
+        "estimated_dps": 30.5555555555556,
+        "hits": 17,
+        "side": -1.0,
+        "size": 60.0,
+        "weapon": "turbo_drill"
+      },
+      {
+        "boss": true,
+        "direct_dps": 38.9583333333333,
+        "distance": 45.0,
+        "estimated_dps": 30.5555555555556,
+        "hits": 17,
+        "side": 1.0,
+        "size": 60.0,
+        "weapon": "turbo_drill"
+      },
+      {
+        "boss": true,
+        "direct_dps": 38.9583333333333,
+        "distance": 45.0,
+        "estimated_dps": 30.5555555555556,
+        "hits": 17,
+        "side": -1.0,
+        "size": 60.0,
+        "weapon": "turbo_drill"
+      },
+      {
+        "boss": true,
+        "direct_dps": 38.9583333333333,
+        "distance": 104.0,
+        "estimated_dps": 30.5555555555556,
+        "hits": 17,
+        "side": 1.0,
+        "size": 60.0,
+        "weapon": "turbo_drill"
+      },
+      {
+        "boss": true,
+        "direct_dps": 38.9583333333333,
+        "distance": 104.0,
+        "estimated_dps": 30.5555555555556,
+        "hits": 17,
+        "side": -1.0,
+        "size": 60.0,
+        "weapon": "turbo_drill"
+      },
+      {
+        "boss": true,
+        "direct_dps": 38.9583333333333,
+        "distance": 160.0,
+        "estimated_dps": 30.5555555555556,
+        "hits": 17,
+        "side": 1.0,
+        "size": 60.0,
+        "weapon": "turbo_drill"
+      },
+      {
+        "boss": true,
+        "direct_dps": 38.9583333333333,
+        "distance": 160.0,
+        "estimated_dps": 30.5555555555556,
+        "hits": 17,
+        "side": -1.0,
+        "size": 60.0,
+        "weapon": "turbo_drill"
+      },
+      {
+        "boss": false,
+        "direct_dps": 26.4500000000893,
+        "distance": 45.0,
+        "estimated_dps": 23.0769230769231,
+        "hits": 23,
+        "side": 1.0,
+        "size": 72.0,
+        "weapon": "plaque_scaler"
+      },
+      {
+        "boss": false,
+        "direct_dps": 26.4500000000893,
+        "distance": 45.0,
+        "estimated_dps": 23.0769230769231,
+        "hits": 23,
+        "side": -1.0,
+        "size": 72.0,
+        "weapon": "plaque_scaler"
+      },
+      {
+        "boss": false,
+        "direct_dps": 26.4500000000893,
+        "distance": 71.5,
+        "estimated_dps": 23.0769230769231,
+        "hits": 23,
+        "side": 1.0,
+        "size": 72.0,
+        "weapon": "plaque_scaler"
+      },
+      {
+        "boss": false,
+        "direct_dps": 26.4500000000893,
+        "distance": 71.5,
+        "estimated_dps": 23.0769230769231,
+        "hits": 23,
+        "side": -1.0,
+        "size": 72.0,
+        "weapon": "plaque_scaler"
+      },
+      {
+        "boss": false,
+        "direct_dps": 26.4500000000893,
+        "distance": 110.0,
+        "estimated_dps": 23.0769230769231,
+        "hits": 23,
+        "side": 1.0,
+        "size": 72.0,
+        "weapon": "plaque_scaler"
+      },
+      {
+        "boss": false,
+        "direct_dps": 26.4500000000893,
+        "distance": 110.0,
+        "estimated_dps": 23.0769230769231,
+        "hits": 23,
+        "side": -1.0,
+        "size": 72.0,
+        "weapon": "plaque_scaler"
+      },
+      {
+        "boss": true,
+        "direct_dps": 26.4500000000893,
+        "distance": 45.0,
+        "estimated_dps": 23.0769230769231,
+        "hits": 23,
+        "side": 1.0,
+        "size": 72.0,
+        "weapon": "plaque_scaler"
+      },
+      {
+        "boss": true,
+        "direct_dps": 26.4500000000893,
+        "distance": 45.0,
+        "estimated_dps": 23.0769230769231,
+        "hits": 23,
+        "side": -1.0,
+        "size": 72.0,
+        "weapon": "plaque_scaler"
+      },
+      {
+        "boss": true,
+        "direct_dps": 26.4500000000893,
+        "distance": 71.5,
+        "estimated_dps": 23.0769230769231,
+        "hits": 23,
+        "side": 1.0,
+        "size": 72.0,
+        "weapon": "plaque_scaler"
+      },
+      {
+        "boss": true,
+        "direct_dps": 26.4500000000893,
+        "distance": 71.5,
+        "estimated_dps": 23.0769230769231,
+        "hits": 23,
+        "side": -1.0,
+        "size": 72.0,
+        "weapon": "plaque_scaler"
+      },
+      {
+        "boss": true,
+        "direct_dps": 26.4500000000893,
+        "distance": 110.0,
+        "estimated_dps": 23.0769230769231,
+        "hits": 23,
+        "side": 1.0,
+        "size": 72.0,
+        "weapon": "plaque_scaler"
+      },
+      {
+        "boss": true,
+        "direct_dps": 26.4500000000893,
+        "distance": 110.0,
+        "estimated_dps": 23.0769230769231,
+        "hits": 23,
+        "side": -1.0,
+        "size": 72.0,
+        "weapon": "plaque_scaler"
+      },
+      {
+        "boss": false,
+        "direct_dps": 27.4083333333838,
+        "distance": 45.0,
+        "estimated_dps": 23.1578947368421,
+        "hits": 13,
+        "side": 1.0,
+        "size": 96.0,
+        "weapon": "toothpick_spear"
+      },
+      {
+        "boss": false,
+        "direct_dps": 27.4083333333838,
+        "distance": 45.0,
+        "estimated_dps": 23.1578947368421,
+        "hits": 13,
+        "side": -1.0,
+        "size": 96.0,
+        "weapon": "toothpick_spear"
+      },
+      {
+        "boss": false,
+        "direct_dps": 27.4083333333838,
+        "distance": 133.25,
+        "estimated_dps": 23.1578947368421,
+        "hits": 13,
+        "side": 1.0,
+        "size": 96.0,
+        "weapon": "toothpick_spear"
+      },
+      {
+        "boss": false,
+        "direct_dps": 27.4083333333838,
+        "distance": 133.25,
+        "estimated_dps": 23.1578947368421,
+        "hits": 13,
+        "side": -1.0,
+        "size": 96.0,
+        "weapon": "toothpick_spear"
+      },
+      {
+        "boss": false,
+        "direct_dps": 27.4083333333838,
+        "distance": 205.0,
+        "estimated_dps": 23.1578947368421,
+        "hits": 13,
+        "side": 1.0,
+        "size": 96.0,
+        "weapon": "toothpick_spear"
+      },
+      {
+        "boss": false,
+        "direct_dps": 27.4083333333838,
+        "distance": 205.0,
+        "estimated_dps": 23.1578947368421,
+        "hits": 13,
+        "side": -1.0,
+        "size": 96.0,
+        "weapon": "toothpick_spear"
+      },
+      {
+        "boss": true,
+        "direct_dps": 27.4083333333838,
+        "distance": 45.0,
+        "estimated_dps": 23.1578947368421,
+        "hits": 13,
+        "side": 1.0,
+        "size": 96.0,
+        "weapon": "toothpick_spear"
+      },
+      {
+        "boss": true,
+        "direct_dps": 27.4083333333838,
+        "distance": 45.0,
+        "estimated_dps": 23.1578947368421,
+        "hits": 13,
+        "side": -1.0,
+        "size": 96.0,
+        "weapon": "toothpick_spear"
+      },
+      {
+        "boss": true,
+        "direct_dps": 27.4083333333838,
+        "distance": 133.25,
+        "estimated_dps": 23.1578947368421,
+        "hits": 13,
+        "side": 1.0,
+        "size": 96.0,
+        "weapon": "toothpick_spear"
+      },
+      {
+        "boss": true,
+        "direct_dps": 27.4083333333838,
+        "distance": 133.25,
+        "estimated_dps": 23.1578947368421,
+        "hits": 13,
+        "side": -1.0,
+        "size": 96.0,
+        "weapon": "toothpick_spear"
+      },
+      {
+        "boss": true,
+        "direct_dps": 27.4083333333838,
+        "distance": 205.0,
+        "estimated_dps": 23.1578947368421,
+        "hits": 13,
+        "side": 1.0,
+        "size": 96.0,
+        "weapon": "toothpick_spear"
+      },
+      {
+        "boss": true,
+        "direct_dps": 27.4083333333838,
+        "distance": 205.0,
+        "estimated_dps": 23.1578947368421,
+        "hits": 13,
+        "side": -1.0,
+        "size": 96.0,
+        "weapon": "toothpick_spear"
+      },
+      {
+        "boss": false,
+        "direct_dps": 29.7916666665794,
+        "distance": 45.0,
+        "estimated_dps": 22.0,
+        "hits": 56,
+        "side": 1.0,
+        "size": 70.0,
+        "weapon": "cavity_grinder"
+      },
+      {
+        "boss": false,
+        "direct_dps": 29.7916666665794,
+        "distance": 45.0,
+        "estimated_dps": 22.0,
+        "hits": 56,
+        "side": -1.0,
+        "size": 70.0,
+        "weapon": "cavity_grinder"
+      },
+      {
+        "boss": false,
+        "direct_dps": 29.7916666665794,
+        "distance": 50.7,
+        "estimated_dps": 22.0,
+        "hits": 56,
+        "side": 1.0,
+        "size": 70.0,
+        "weapon": "cavity_grinder"
+      },
+      {
+        "boss": false,
+        "direct_dps": 29.7916666665794,
+        "distance": 50.7,
+        "estimated_dps": 22.0,
+        "hits": 56,
+        "side": -1.0,
+        "size": 70.0,
+        "weapon": "cavity_grinder"
+      },
+      {
+        "boss": false,
+        "direct_dps": 29.7916666665794,
+        "distance": 78.0,
+        "estimated_dps": 22.0,
+        "hits": 56,
+        "side": 1.0,
+        "size": 70.0,
+        "weapon": "cavity_grinder"
+      },
+      {
+        "boss": false,
+        "direct_dps": 29.7916666665794,
+        "distance": 78.0,
+        "estimated_dps": 22.0,
+        "hits": 56,
+        "side": -1.0,
+        "size": 70.0,
+        "weapon": "cavity_grinder"
+      },
+      {
+        "boss": true,
+        "direct_dps": 73.1249996771415,
+        "distance": 45.0,
+        "estimated_dps": 22.0,
+        "hits": 56,
+        "side": 1.0,
+        "size": 70.0,
+        "weapon": "cavity_grinder"
+      },
+      {
+        "boss": true,
+        "direct_dps": 73.1249996771415,
+        "distance": 45.0,
+        "estimated_dps": 22.0,
+        "hits": 56,
+        "side": -1.0,
+        "size": 70.0,
+        "weapon": "cavity_grinder"
+      },
+      {
+        "boss": true,
+        "direct_dps": 73.1249996771415,
+        "distance": 50.7,
+        "estimated_dps": 22.0,
+        "hits": 56,
+        "side": 1.0,
+        "size": 70.0,
+        "weapon": "cavity_grinder"
+      },
+      {
+        "boss": true,
+        "direct_dps": 73.1249996771415,
+        "distance": 50.7,
+        "estimated_dps": 22.0,
+        "hits": 56,
+        "side": -1.0,
+        "size": 70.0,
+        "weapon": "cavity_grinder"
+      },
+      {
+        "boss": true,
+        "direct_dps": 73.1249996771415,
+        "distance": 78.0,
+        "estimated_dps": 22.0,
+        "hits": 56,
+        "side": 1.0,
+        "size": 70.0,
+        "weapon": "cavity_grinder"
+      },
+      {
+        "boss": true,
+        "direct_dps": 73.1249996771415,
+        "distance": 78.0,
+        "estimated_dps": 22.0,
+        "hits": 56,
+        "side": -1.0,
+        "size": 70.0,
+        "weapon": "cavity_grinder"
+      },
+      {
+        "boss": false,
+        "direct_dps": 25.6666666666667,
+        "distance": 45.0,
+        "estimated_dps": 26.25,
+        "hits": 36,
+        "side": 1.0,
+        "size": 65.0,
+        "weapon": "prophylaxis_polisher"
+      },
+      {
+        "boss": false,
+        "direct_dps": 25.6666666666667,
+        "distance": 45.0,
+        "estimated_dps": 26.25,
+        "hits": 36,
+        "side": -1.0,
+        "size": 65.0,
+        "weapon": "prophylaxis_polisher"
+      },
+      {
+        "boss": false,
+        "direct_dps": 25.6666666666667,
+        "distance": 55.25,
+        "estimated_dps": 26.25,
+        "hits": 36,
+        "side": 1.0,
+        "size": 65.0,
+        "weapon": "prophylaxis_polisher"
+      },
+      {
+        "boss": false,
+        "direct_dps": 25.6666666666667,
+        "distance": 55.25,
+        "estimated_dps": 26.25,
+        "hits": 36,
+        "side": -1.0,
+        "size": 65.0,
+        "weapon": "prophylaxis_polisher"
+      },
+      {
+        "boss": false,
+        "direct_dps": 25.6666666666667,
+        "distance": 85.0,
+        "estimated_dps": 26.25,
+        "hits": 36,
+        "side": 1.0,
+        "size": 65.0,
+        "weapon": "prophylaxis_polisher"
+      },
+      {
+        "boss": false,
+        "direct_dps": 25.6666666666667,
+        "distance": 85.0,
+        "estimated_dps": 26.25,
+        "hits": 36,
+        "side": -1.0,
+        "size": 65.0,
+        "weapon": "prophylaxis_polisher"
+      },
+      {
+        "boss": true,
+        "direct_dps": 25.6666666666667,
+        "distance": 45.0,
+        "estimated_dps": 26.25,
+        "hits": 36,
+        "side": 1.0,
+        "size": 65.0,
+        "weapon": "prophylaxis_polisher"
+      },
+      {
+        "boss": true,
+        "direct_dps": 25.6666666666667,
+        "distance": 45.0,
+        "estimated_dps": 26.25,
+        "hits": 36,
+        "side": -1.0,
+        "size": 65.0,
+        "weapon": "prophylaxis_polisher"
+      },
+      {
+        "boss": true,
+        "direct_dps": 25.6666666666667,
+        "distance": 55.25,
+        "estimated_dps": 26.25,
+        "hits": 36,
+        "side": 1.0,
+        "size": 65.0,
+        "weapon": "prophylaxis_polisher"
+      },
+      {
+        "boss": true,
+        "direct_dps": 25.6666666666667,
+        "distance": 55.25,
+        "estimated_dps": 26.25,
+        "hits": 36,
+        "side": -1.0,
+        "size": 65.0,
+        "weapon": "prophylaxis_polisher"
+      },
+      {
+        "boss": true,
+        "direct_dps": 25.6666666666667,
+        "distance": 85.0,
+        "estimated_dps": 26.25,
+        "hits": 36,
+        "side": 1.0,
+        "size": 65.0,
+        "weapon": "prophylaxis_polisher"
+      },
+      {
+        "boss": true,
+        "direct_dps": 25.6666666666667,
+        "distance": 85.0,
+        "estimated_dps": 26.25,
+        "hits": 36,
+        "side": -1.0,
+        "size": 65.0,
+        "weapon": "prophylaxis_polisher"
+      }
+    ],
+    "method": "60 Hz; seed 13579 per case; tier I; stationary target; direct contact damage only; player crit 0, innate weapon crit/focus active; no items/AI/bleed ticks; boss guard disabled to isolate weapon throughput",
+    "seconds": 12.0
+  }
+}

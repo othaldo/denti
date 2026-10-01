@@ -33,5 +33,5 @@ projectile_color = Color(1.0, 0.81, 0.40, 1)
 held_style = "staff"
 attack_animation = "thrust"
 tip_anchor = Vector2(0.86, 0.17)
-visual_size = 190.0
+visual_size = 96.0
 animation_duration = 0.38

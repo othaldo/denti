@@ -7,7 +7,7 @@ Bisskraft verstärkt alle Waffen prozentual. Nah- oder Fernschaden ergänzt ihre
 | Waffe | Hände | Angriff | Rolle |
 | --- | ---: | --- | --- |
 | Zauberbürste | 2 | Schmelz-Projektil | Verlässliche Reichweite; ab Stufe III zwei, ab IV drei Pastegeschosse mit leichtem Streuwinkel. |
-| Turbo-Bohrer | 1 | Bohrung im Nahkampf | Kräftiger Einzelstich; Bossbonus wächst von 25 % auf 40 %. |
+| Turbo-Bohrer | 1 | Bohrung im Nahkampf | Kompakte, schnelle Bohrstöße; Bossbonus wächst von 25 % auf 40 %. |
 | Zahnseidenpeitsche | 1 | Rundumschnitt | Trifft alle nahen Gegner und verursacht Blutung; der Radius wächst mit der Stufe. |
 | Wasserflosser | 1 | Schnelles Wasserprojektil | Macht Ziele nass, hat niedrigen Rohschaden und wachsenden Rückstoß. |
 | Kronenwerfer | 2 | Schweres Metallprojektil | Durchdringt auf Stufe I einen weiteren Gegner, auf Stufe IV drei. |
@@ -26,6 +26,8 @@ Bisskraft verstärkt alle Waffen prozentual. Nah- oder Fernschaden ergänzt ihre
 | Fluorid-Rakete | 2 | Schmelz-Rakete | Hoher Flächenschaden, große Explosion und lange Pause; explodiert auch am Reichweitenende. |
 
 Die Waffen haben eigene Sprites unter `assets/weapons/` und werden getrennt von Dentis Körper geschwenkt beziehungsweise beim Schuss zurückgestoßen. Die zehn neuen Waffen verwenden zugeschnittene Regionen des transparenten `weapon_icons_expansion.png`-Atlas; derselbe Ausschnitt dient als Shopbild. Projektilfarbe, Tempo, Reichweite und Trefferform liegen in den jeweiligen `WeaponData`-Ressourcen unter `data/weapons/`.
+
+Eine [Vergleichsansicht mit Denti und allen 18 Waffen](WEAPON_SIZE_BALANCE.md) zeigt Ruhehaltung und Angriff bei gleicher Vergrößerung. Der Bohrer ist auf Stufe I 60 Pixel groß, trifft für 22 Basisschaden alle 0,72 Sekunden und skaliert mit 100 % Nahschaden. Kratzer, Peitsche, Garotte und Speer wurden ebenfalls in ihren Proportionen angepasst; Reichweiten bleiben erhalten.
 
 ## Grundwerte der Erweiterung
 
@@ -71,8 +73,8 @@ bleibt aufrecht. Ruhepositionen kreisen nicht automatisch um Denti.
 
 `WeaponLayout` setzt gemeinsame Größenlimits (100 px Nahkampf, 76 px Fernkampf),
 seitliche Haltepunkte und eine zusätzliche Verkleinerung bis 12 % bei sechs Waffen.
-Die Limits gelten unabhängig von der Atlasauflösung; einzelne Waffen benötigen
-dafür keine neue Konfiguration. Linke Nahkampfwaffen ruhen nach außen gespiegelt
+Die Limits gelten unabhängig von der Atlasauflösung; die individuellen Größen
+liegen in den Waffenressourcen. Linke Nahkampfwaffen ruhen nach außen gespiegelt
 und werden hinter Denti gezeichnet, damit sein Gesicht sichtbar bleibt.
 Angriffsanimation und Kontaktprüfung verwenden dieselbe Skalierung. Kleine
 Waffen erreichen weiterhin ihre volle Reichweite durch die Angriffsbewegung.

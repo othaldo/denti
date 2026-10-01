@@ -26,5 +26,5 @@ price = 7
 held_style = "staff"
 attack_animation = "spin"
 tip_anchor = Vector2(0.89, 0.71)
-visual_size = 110.0
+visual_size = 78.0
 animation_duration = 0.42

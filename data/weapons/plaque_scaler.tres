@@ -25,5 +25,5 @@ price = 7
 held_style = "staff"
 attack_animation = "slash"
 tip_anchor = Vector2(0.88, 0.12)
-visual_size = 100.0
+visual_size = 72.0
 animation_duration = 0.3

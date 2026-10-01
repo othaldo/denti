@@ -2,6 +2,12 @@
 
 Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü angezeigt. 0.1.0 wurde rückblickend anhand der Git-Historie dokumentiert; 0.2.0 bündelt die seitdem entstandenen Änderungen. Die Einträge beschreiben implementierte Funktionen. Weitere Pläne stehen in der [Roadmap](docs/ROADMAP.md).
 
+## In Entwicklung
+
+- Größenvergleich mit Denti und allen 18 Waffen als Screenshots in Ruhe und im Angriff. Bohrer, Kratzer, Peitsche, Garotte und Speer erhalten passendere Proportionen.
+- Turbo-Bohrer: 60 statt 100 Pixel, 0,72 statt 1,28 Sekunden Angriffspause, 22 statt 33 Basisschaden und 100 statt 150 % Nahschaden-Skalierung. Schnellerer Takt und moderat höherer dauerhafter Schaden; Reichweite und Bossbonus bleiben erhalten.
+- Nahe Gegner werden bei kurzen Rundum- und Bogenschnitten zuverlässiger getroffen. Zusätzliche Kontaktprüfungen für alle Stufen und Richtungen sichern die Reichweite kleinerer Waffen ab. [Vorschau und Messungen](docs/WEAPON_SIZE_BALANCE.md).
+
 ## 0.2.0 · Pressure + Build Depth — 01.10.2026
 
 ### Mehr Builds und Belohnungen

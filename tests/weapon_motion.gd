@@ -116,6 +116,27 @@ func _run() -> void:
 		if tool.working_head.rotation == rotation:
 			_fail("working head did not spin during the attack")
 			return
+	# Compact art must retain real contact at close range and the range boundary,
+	# in every direction/tier, including the shrink applied to six-weapon builds.
+	game.player.attack_performed.disconnect(game.sound.play_attack)
+	for id in [&"turbo_drill", &"plaque_scaler", &"floss_whip", &"floss_garrote", &"toothpick_spear"]:
+		for tier in range(1, 5):
+			var data := WeaponCatalog.by_id(id)
+			for direction in [Vector2.RIGHT, Vector2.LEFT, Vector2.UP, Vector2.DOWN]:
+				for distance in [45.0, data.range_at_tier(tier)]:
+					_clear()
+					var compact_target := _enemy(direction * distance)
+					var compact := _equip(id)
+					compact.tier = tier
+					compact.visual_density = WeaponLayout.density_scale(6)
+					compact._physics_process(0.001)
+					if compact_target.health != 10000:
+						_fail("compact weapon dealt damage before contact: " + str(id))
+						return
+					compact._physics_process(compact.attack_duration)
+					if compact_target.health >= 10000:
+						_fail("compact contact missed: %s tier %d direction %s distance %.0f" % [id, tier, direction, distance])
+						return
 	session.clear_run()
 	paused = false
 	game.free()
