@@ -1,6 +1,12 @@
-[gd_resource type="Resource" script_class="WeaponData" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="WeaponData" load_steps=4 format=3]
 [ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/weapons/water_jet.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/weapons/weapon_icons_refined.png" id="2"]
+
+[sub_resource type="AtlasTexture" id="Atlas_weapon"]
+atlas = ExtResource("2")
+region = Rect2(1024, 0, 512, 512)
+filter_clip = true
+
 [resource]
 script = ExtResource("1")
 role = "Schnelle Treffer und Nass"
@@ -20,13 +26,13 @@ knockback = 20.0
 wet_duration = 2.5
 damage_tiers = PackedFloat32Array(1.0, 1.25, 1.55, 1.9)
 knockback_tiers = PackedFloat32Array(20.0, 24.0, 27.0, 30.0)
-sprite = ExtResource("2")
-grip_anchor = Vector2(0.58, 0.87)
+sprite = SubResource("Atlas_weapon")
+grip_anchor = Vector2(0.44377, 0.7873)
 projectile_color = Color(0.24, 0.8, 1, 1)
-visual_angle_degrees = 45
+visual_angle_degrees = 30
 price = 8
 held_style = "aimed"
 attack_animation = "shoot"
-tip_anchor = Vector2(0.935, 0.065)
+tip_anchor = Vector2(0.89915, 0.09588)
 visual_size = 58.0
 animation_duration = 0.22

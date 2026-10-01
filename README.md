@@ -26,6 +26,8 @@ Die vier Farbstufen der Boss-Entzündung. Die Vorschau zeigt einen Frame der Ani
 
 [Alle Waffen in Ruhe und im Angriff](docs/WEAPON_SIZE_BALANCE.md), einschließlich Größenvergleich und Messungen zum kleineren, schnelleren Turbo-Bohrer.
 
+[Neue Waffengrafiken und animierte Vorschau](docs/WEAPON_ART_REFINEMENT.md): klarere Geräteformen, separat rotierende Arbeitsköpfe und eine Schleuder mit beweglichen Gummibändern und Beutel.
+
 ## Spielen
 
 Das Projekt mit **Godot 4.4 oder neuer** öffnen und mit **F5** starten. Unter Linux geht es auch im Projektordner:

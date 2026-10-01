@@ -53,9 +53,23 @@ const MIN_ATTACK_COOLDOWN := 0.05
 @export_enum("shoot", "lob", "pull", "thrust", "slash", "spin", "drill", "polish", "spray", "beam") var attack_animation: String = "shoot"
 @export var tip_anchor: Vector2 = Vector2(0.85, 0.15)
 @export var visual_size: float = 58.0
+@export var held_sprite: Texture2D
+@export var upright_at_rest: bool = false
 @export_range(0.08, 0.8) var animation_duration: float = 0.32
 @export_range(0.0, 0.3) var working_head_radius: float = 0.0
+@export var working_head_texture: Texture2D
+@export var working_head_aspect: float = 0.65
+@export var working_head_angle_degrees: float = -25.0
 @export var head_turns_per_second: float = 5.0
+@export var pull_texture: Texture2D
+@export var fork_left_anchor: Vector2 = Vector2(0.23, 0.20)
+@export var fork_right_anchor: Vector2 = Vector2(0.77, 0.20)
+@export var pouch_anchor: Vector2 = Vector2(0.5, 0.38)
+@export var pouch_width: float = 0.24
+
+
+func held_texture() -> Texture2D:
+	return held_sprite if held_sprite != null else sprite
 
 
 func damage_at_tier(tier: int) -> float:

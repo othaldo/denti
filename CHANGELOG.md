@@ -4,6 +4,8 @@ Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü an
 
 ## In Entwicklung
 
+- Acht überarbeitete Waffengrafiken mit klareren Formen: Kronenwerfer, Mörser, Wasserflosser, Fluorid-Sprüher, Turbine, Schleuder, Fräse und Polierer. Separate Arbeitsflächen drehen sich bei stabiler Perspektive; die Schleuder spannt Gummibänder und Beutel statt den Griff zu verformen. Fernkampfwaffen erhalten passendere Ruhepositionen, die Zauberbürste steht aufrecht. [Bilder, Animation und Prüfung](docs/WEAPON_ART_REFINEMENT.md).
+
 - Größenvergleich mit Denti und allen 18 Waffen als Screenshots in Ruhe und im Angriff. Bohrer, Kratzer, Peitsche, Garotte und Speer erhalten passendere Proportionen.
 - Turbo-Bohrer: 60 statt 100 Pixel, 0,72 statt 1,28 Sekunden Angriffspause, 22 statt 33 Basisschaden und 100 statt 150 % Nahschaden-Skalierung. Schnellerer Takt und moderat höherer dauerhafter Schaden; Reichweite und Bossbonus bleiben erhalten.
 - Nahe Gegner werden bei kurzen Rundum- und Bogenschnitten zuverlässiger getroffen. Zusätzliche Kontaktprüfungen für alle Stufen und Richtungen sichern die Reichweite kleinerer Waffen ab. [Vorschau und Messungen](docs/WEAPON_SIZE_BALANCE.md).

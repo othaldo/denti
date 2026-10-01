@@ -108,18 +108,18 @@ func _run() -> void:
 		_enemy(Vector2(50, 0))
 		var tool := _equip(id)
 		tool._physics_process(0.01)
-		if tool.working_head == null or tool.working_head.texture == null:
+		if tool.working_head == null or tool.working_head.face.texture == null:
 			_fail("working head is missing: " + str(id))
 			return
-		var rotation := tool.working_head.rotation
+		var rotation := tool.working_head.spin_angle
 		tool._physics_process(0.02)
-		if tool.working_head.rotation == rotation:
+		if tool.working_head.spin_angle == rotation:
 			_fail("working head did not spin during the attack")
 			return
 	# Compact art must retain real contact at close range and the range boundary,
 	# in every direction/tier, including the shrink applied to six-weapon builds.
 	game.player.attack_performed.disconnect(game.sound.play_attack)
-	for id in [&"turbo_drill", &"plaque_scaler", &"floss_whip", &"floss_garrote", &"toothpick_spear"]:
+	for id in [&"turbo_drill", &"plaque_scaler", &"floss_whip", &"floss_garrote", &"toothpick_spear", &"cavity_grinder", &"prophylaxis_polisher"]:
 		for tier in range(1, 5):
 			var data := WeaponCatalog.by_id(id)
 			for direction in [Vector2.RIGHT, Vector2.LEFT, Vector2.UP, Vector2.DOWN]:

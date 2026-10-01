@@ -1,5 +1,7 @@
 # Optische Prüfung aller 18 Waffen
 
+**Dieser Bericht dokumentiert den Ausgangsstand.** Die wichtigsten Anpassungen sind inzwischen umgesetzt: [neue Grafiken, getrennte Arbeitsköpfe, Haltung und animierte Vorschau](WEAPON_ART_REFINEMENT.md).
+
 Stand: 1. Oktober 2026, nach dem [Größen- und Tempo-Pass](WEAPON_SIZE_BALANCE.md). Geprüft wurden die acht Einzelgrafiken, alle zehn Ausschnitte des Erweiterungsatlas, die bestehenden Spielaufnahmen sowie zusätzliche Ansichten in vier Angriffsrichtungen. Fräse und Polierer wurden außerdem in der laufenden Animation betrachtet.
 
 **Die auffälligsten Probleme sind der doppelt gezeichnete Polierkopf, die überladenen Konstruktionen von Kronenwerfer und Mörser sowie der unklare Spannmechanismus der Schleuder.** Hinzu kommen permanent gemalte Spritzer und einige ungünstige Ruhehaltungen. Viele Grundformen funktionieren bereits gut.

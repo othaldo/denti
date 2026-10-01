@@ -23,7 +23,7 @@ func _run() -> void:
 	for data in WeaponCatalog.ALL:
 		game.player.loadout.restore([{"id": str(data.id), "tier": 1}])
 		var weapon: WeaponInstance = game.player.loadout.equipped()[0]
-		if weapon.sprite.texture != data.sprite or weapon.tier != 1:
+		if weapon.sprite.texture != data.held_texture() or weapon.tier != 1:
 			_fail("weapon sprite or tier failed: " + str(data.id))
 			return
 		game._create_enemy(WaveController.PLAQUE, game.player.position + Vector2(80.0, 0.0))

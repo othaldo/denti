@@ -31,6 +31,8 @@ Eine [Vergleichsansicht mit Denti und allen 18 Waffen](WEAPON_SIZE_BALANCE.md) z
 
 Die [optische Prüfung aller Waffen](WEAPON_ART_REVIEW.md) bewertet Perspektive, Werkzeugform, Haltung und Animation und nennt konkrete Prioritäten für die nächste Überarbeitung.
 
+Die [anschließende Überarbeitung](WEAPON_ART_REFINEMENT.md) zeigt acht neue Waffengrafiken, separate rotierende Arbeitsköpfe und die bewegte Schleuder mit Bildern aus dem Spiel.
+
 ## Grundwerte der Erweiterung
 
 Werte für Stufe I vor Spielerwerten, Items und kritischen Treffern. Schaden ist

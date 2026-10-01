@@ -20,6 +20,7 @@ var aim_distance: float = 1000.0
 var hit_point: Vector2 = Vector2.ZERO
 var sprite: Sprite2D
 var working_head: WeaponWorkingHead
+var elastic: WeaponElastic
 var player: Player
 var strike := WeaponStrike.new()
 var focus_target_id: int = 0
@@ -36,13 +37,17 @@ func configure(weapon: WeaponData, weapon_tier: int = 1) -> void:
 func _ready() -> void:
 	player = get_parent().get_parent() as Player
 	sprite = Sprite2D.new()
-	sprite.texture = data.sprite
-	sprite.offset = (Vector2(0.5, 0.5) - data.grip_anchor) * data.sprite.get_size()
+	sprite.texture = data.held_texture()
+	sprite.offset = (Vector2(0.5, 0.5) - data.grip_anchor) * data.held_texture().get_size()
 	add_child(sprite)
-	if data.working_head_radius > 0.0:
+	if data.working_head_texture != null:
 		working_head = WeaponWorkingHead.new()
 		working_head.configure(data)
 		sprite.add_child(working_head)
+	if data.pull_texture != null:
+		elastic = WeaponElastic.new()
+		elastic.configure(data)
+		sprite.add_child(elastic)
 	z_index = 1
 	update_visual()
 
@@ -58,11 +63,13 @@ func muzzle_position() -> Vector2:
 func update_visual() -> void:
 	if sprite == null:
 		return
-	var home := home_position if WeaponMotion.is_contact(data) else hold_position
+	var home := home_position if WeaponMotion.is_contact(data) or attack_time <= 0.0 else hold_position
 	var pose_data := WeaponMotion.pose(data, tier, home, aim, progress(), idle_time, aim_distance, visual_density)
 	sprite.position = pose_data.position
 	sprite.rotation = pose_data.rotation
 	sprite.scale = pose_data.scale
+	if elastic != null:
+		elastic.set_progress(progress())
 	# Denti's face stays readable even when a rear hand thrusts across the body.
 	z_index = -1 if WeaponMotion.is_contact(data) or sprite.position.y < -12.0 else 1
 
@@ -70,7 +77,7 @@ func update_visual() -> void:
 func _physics_process(delta: float) -> void:
 	idle_time += delta
 	if working_head != null:
-		working_head.rotation += delta * TAU * data.head_turns_per_second * (1.0 if attack_time > 0.0 else 0.15)
+		working_head.advance(delta * TAU * data.head_turns_per_second * (1.0 if attack_time > 0.0 else 0.15))
 	focus_time = maxf(focus_time - delta, 0.0)
 	cooldown = maxf(cooldown - delta, 0.0)
 	if attack_time > 0.0:

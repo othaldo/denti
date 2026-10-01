@@ -10,11 +10,11 @@ static func is_contact(data: WeaponData) -> bool:
 
 
 static func base_scale(data: WeaponData, density: float = 1.0) -> float:
-	return WeaponLayout.visual_size(data, density) / maxf(data.sprite.get_size().x, data.sprite.get_size().y)
+	return WeaponLayout.visual_size(data, density) / maxf(data.held_texture().get_size().x, data.held_texture().get_size().y)
 
 
 static func tip_local(data: WeaponData) -> Vector2:
-	return (data.tip_anchor - data.grip_anchor) * data.sprite.get_size()
+	return (data.tip_anchor - data.grip_anchor) * data.held_texture().get_size()
 
 
 static func hand_position(home: Vector2, direction: Vector2) -> Vector2:
@@ -34,7 +34,7 @@ static func pose(data: WeaponData, tier: int, home: Vector2, aim: Vector2, progr
 	if data.held_style == "aimed":
 		scale.y *= side
 		rotation = aim.angle() + deg_to_rad(data.visual_angle_degrees) * side
-		if not is_contact(data):
+		if not is_contact(data) and active:
 			var nozzle := home + aim * minf(24.0, maxf(target_distance - home.length() - 12.0, 8.0))
 			if data.attack_mode in [&"projectile", &"beam"]:
 				nozzle = home + aim * minf(42.0, maxf(target_distance - home.length() - 12.0, 8.0))
@@ -43,6 +43,9 @@ static func pose(data: WeaponData, tier: int, home: Vector2, aim: Vector2, progr
 		scale.x *= side
 	else:
 		scale.x *= -1.0 if home.x < 0.0 else 1.0
+	if data.upright_at_rest and not active:
+		scale = Vector2(side, 1.0) * factor
+		rotation = 0.0
 	if is_contact(data) and active:
 		var rest_rotation := rotation
 		scale = Vector2.ONE * factor
@@ -88,8 +91,8 @@ static func pose(data: WeaponData, tier: int, home: Vector2, aim: Vector2, progr
 			"shoot", "lob":
 				grip -= aim * sin(minf(progress / 0.3, 1.0) * PI) * (8.0 if data.attack_animation == "shoot" else 12.0)
 			"pull":
-				grip -= aim * pulse * 6.0
-				scale *= Vector2(1.0 + pulse * 0.07, 1.0 - pulse * 0.08)
+				# Only the elastic bands/pouch deform; the painted fork stays rigid.
+				grip -= aim * pulse * 2.0
 			"spray":
 				rotation += sin(progress * TAU * 2.0) * 0.045
 	return {"position": grip, "rotation": rotation, "scale": scale}

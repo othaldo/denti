@@ -1,11 +1,24 @@
-[gd_resource type="Resource" script_class="WeaponData" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="WeaponData" load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/weapons/weapon_icons_expansion.png" id="2"]
+
+[ext_resource type="Texture2D" path="res://assets/weapons/weapon_icons_refined.png" id="2"]
+
+[ext_resource type="Texture2D" path="res://assets/weapons/weapon_animation_parts.png" id="3"]
 
 [sub_resource type="AtlasTexture" id="Atlas_weapon"]
 atlas = ExtResource("2")
-region = Rect2(397, 0, 396, 397)
+region = Rect2(0, 1024, 512, 512)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="Atlas_body"]
+atlas = ExtResource("3")
+region = Rect2(0, 0, 512, 512)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="Atlas_part"]
+atlas = ExtResource("3")
+region = Rect2(0, 512, 512, 512)
 filter_clip = true
 
 [resource]
@@ -24,19 +37,22 @@ stat_scaling = 0.35
 interval = 0.2
 attack_range = 78
 price = 15
-visual_angle_degrees = 20
+visual_angle_degrees = 25
 focus_step = 0.05
 focus_cap = 0.5
 trash_damage_factor = 0.55
 elite_damage_bonus = 0.4
 boss_bonus_tiers = PackedFloat32Array(0.35, 0.40, 0.45, 0.50)
 damage_tiers = PackedFloat32Array(1.0, 1.25, 1.55, 1.90)
-grip_anchor = Vector2(0.65, 0.70)
+grip_anchor = Vector2(0.17, 0.72)
 projectile_color = Color(0.65, 0.95, 0.95, 1)
 held_style = "aimed"
 attack_animation = "drill"
-tip_anchor = Vector2(0.82, 0.33)
+tip_anchor = Vector2(0.73, 0.205)
 visual_size = 70.0
 animation_duration = 0.3
 working_head_radius = 0.15
 head_turns_per_second = 8.0
+
+held_sprite = SubResource("Atlas_body")
+working_head_texture = SubResource("Atlas_part")
