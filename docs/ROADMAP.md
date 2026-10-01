@@ -1,5 +1,7 @@
 # Denti v0.2 Roadmap — Pressure + Build Depth
 
+Version **0.2.0** bundles the implemented changes on 2026-10-01; see the [patch history](../CHANGELOG.md). This document keeps the design rationale, progress notes and remaining plans. Weapon evolutions, meta progression and other unfinished stages below are still future work.
+
 This roadmap captures the current player feedback and the intended next development loop for Denti: Divine Dentistry.
 
 ## Current progress
@@ -16,7 +18,7 @@ This roadmap captures the current player feedback and the intended next developm
 - Wave length now ramps from 35 to 44 seconds in waves 1-4, is 42 seconds in waves 6-9, 46 seconds in waves 11-14 and 50 seconds in waves 16-19. Boss waves stay at 45 seconds. Bursts, hordes and elites use relative timing, and save/resume preserves the current wave's duration, including legacy 45-second saves.
 - Boss relics now appear after the defeated milestone bosses in waves 5, 10 and 15, after level-ups and chests but before the shop. Five distinct relics alter bleed kills, water hits, shield blocks, crits and moving attacks. Choices, ownership and active effects survive save/resume; relics use a new painted icon atlas.
 - The run-end screen now summarizes run length, wave, level, kills, bosses, damage, loot and chest decisions, with the top three weapons and top two synergy sources. Completed-run JSON reports and the in-game summary use the same telemetry snapshot.
-- Normal waves now preview a randomized spawn profile and vary the role mix across Swarm, Crossfire, Rush and Sugar Flood. Profiles only reweight the existing normal spawn choices, leave spawn cadence and enemy stats unchanged, skip boss waves and persist through save/resume.
+- Normal waves use a randomized spawn profile and vary the role mix across Swarm, Crossfire, Rush and Sugar Flood. Profiles only reweight the existing normal spawn choices, leave spawn cadence and enemy stats unchanged, skip boss waves and persist through save/resume. The shop's profile subtitle has since been removed to simplify the header.
 - Phase 3 now adds two reusable telegraphed projectile patterns: Säurespucker fire a parallel lane from wave 13, and Säurekrone launches a slow, large space-denial orb from wave 15. Both use the common projectile scene, and the orb’s size and collision radius survive save/resume.
 - Relic card names now wrap to two centered lines so long German names stay inside their cards.
 - Phase 4 now gives the Prince a trailing fan, the King a charge-aligned projectile lane and the Emperor a slow space orb. At each health threshold, radial bursts add projectiles; the final phase combines that burst with the boss's signature pattern and telegraphs the added danger.
