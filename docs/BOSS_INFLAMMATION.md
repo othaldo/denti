@@ -1,5 +1,11 @@
 # Entzündete Bosse
 
+![Die vier entzündeten Bosse mit orangefarbener, roter, pinker und violetter Energie-Aura](screenshots/boss_entzuendung.png)
+
+Direkt aus Godot aufgenommen. Für den Farbvergleich sind die Bosse hier gleich
+groß dargestellt; im Spiel behalten sie ihre tatsächliche Größe. Die Aufnahme
+zeigt einen Frame der laufenden Aura-Animation nach 30 Sekunden Entzündung.
+
 Nach Ablauf des Wellenzeitlimits erscheint **ENTZÜNDET +Ns** im HUD und einmal
 **ENTZÜNDET!** am Boss. Die bereits vorhandene Wutphase bei halbem Leben bleibt
 getrennt und heißt im Feedback **BOSS WIRD WÜTEND!**.

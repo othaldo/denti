@@ -16,6 +16,10 @@ Ein kleiner 2D-Arena-Survivor über einen göttlichen Zahn, der Plaque, Zucker u
 
 Die Bilder sind direkt aus Godot aufgenommen. Für die Kampfbilder wurden Gegner und Beute in einem separaten Testlauf arrangiert.
 
+[![Die vier Bossränge mit ihren animierten Entzündungs-Auren](docs/screenshots/boss_entzuendung.png)](docs/BOSS_INFLAMMATION.md)
+
+Die vier Farbstufen der Boss-Entzündung. Die Vorschau zeigt einen Frame der Animation; für den direkten Vergleich sind die Bosse gleich groß dargestellt. [Details zur Entzündung](docs/BOSS_INFLAMMATION.md).
+
 ## Spielen
 
 Das Projekt mit **Godot 4.4 oder neuer** öffnen und mit **F5** starten. Unter Linux geht es auch im Projektordner:
