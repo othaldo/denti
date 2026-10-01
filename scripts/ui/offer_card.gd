@@ -12,6 +12,7 @@ var selection_only := false
 var content: BoxContainer
 var catalog_header: HBoxContainer
 var info_box: VBoxContainer
+var action_box: BoxContainer
 var card_margin: MarginContainer
 var icon_rect: TextureRect
 var name_label: Label
@@ -24,6 +25,7 @@ var dense_catalog := false
 func set_catalog_layout(vertical: bool, dense: bool = false) -> void:
 	dense_catalog = dense
 	content.vertical = vertical
+	action_box.vertical = not dense
 	catalog_header.visible = dense
 	if dense:
 		if icon_rect.get_parent() != catalog_header:
@@ -37,7 +39,7 @@ func set_catalog_layout(vertical: bool, dense: bool = false) -> void:
 			info_box.move_child(name_label, 0)
 	buy_button.custom_minimum_size.y = 40 if dense else (48 if vertical else 64)
 	reserve_button.custom_minimum_size.y = 32 if dense else 36
-	custom_minimum_size.y = 208 if dense else (210 if vertical else 96)
+	custom_minimum_size.y = 164 if dense else (210 if vertical else 96)
 	icon_rect.custom_minimum_size = Vector2(40, 40) if dense else Vector2(48, 48)
 	name_label.add_theme_font_size_override("font_size", 16 if dense else 18)
 	effect_label.add_theme_font_size_override("font_size", 13 if dense else 14)
@@ -100,7 +102,7 @@ func show_reservation(reserved: bool) -> void:
 
 func _fit_content() -> void:
 	if selection_only:
-		custom_minimum_size.y = maxf(208.0 if dense_catalog else (96.0 if not content.vertical else 210.0), card_margin.get_combined_minimum_size().y + (8.0 if dense_catalog else 0.0))
+		custom_minimum_size.y = maxf(164.0 if dense_catalog else (96.0 if not content.vertical else 210.0), card_margin.get_combined_minimum_size().y + (8.0 if dense_catalog else 0.0))
 
 
 func set_compact(compact: bool) -> void:
@@ -168,7 +170,9 @@ func _build_content() -> void:
 	price_chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	price_chip.custom_minimum_size.y = 48
 	DentiUIStyle.style_button(price_chip, true)
-	var actions := VBoxContainer.new()
+	var actions := BoxContainer.new()
+	action_box = actions
+	actions.vertical = true
 	actions.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	content.add_child(actions)
 	actions.add_child(price_chip)

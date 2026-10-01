@@ -63,7 +63,7 @@ func _run() -> void:
 		_fail("touch inspection lacks owned item count and effect")
 		return
 	var crown_chip: PanelContainer = ui.items_row.get_child(0)
-	if not crown_chip.tooltip_text.contains("×2") or crown_chip.get_child(0).get_child(1).text != "×2":
+	if not crown_chip.tooltip_text.contains("×2") or crown_chip.get_node("Icon/StackCount").text != "×2":
 		_fail("item icon lacks count badge or hover effect")
 		return
 	game.coins = 0

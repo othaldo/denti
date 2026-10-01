@@ -15,6 +15,13 @@ func _run() -> void:
 	game.wave.active = false
 	game.coins = 100
 	game.player.loadout.restore([{"id": "turbo_drill", "tier": 1}, {"id": "floss_whip", "tier": 1}, {"id": "water_jet", "tier": 1}, {"id": "toothpick_spear", "tier": 1}, {"id": "prophylaxis_polisher", "tier": 1}, {"id": "plaque_scaler", "tier": 1}])
+	# A late-run collection, rather than an empty footer, must remain reachable.
+	for template in ShopController.CATALOG:
+		if template.weapon_data == null:
+			game.items.acquire(template)
+	game.items.acquire(ShopController.by_id(&"metal_crown"))
+	for id in [&"tidal_seal", &"shattered_halo", &"sun_mark"]:
+		game.relics.acquire(id)
 	var capture := "--capture" in OS.get_cmdline_user_args()
 	var capture_path := ProjectSettings.globalize_path("res://.codex/economy-previews")
 	if capture:
@@ -61,6 +68,32 @@ func _run() -> void:
 		for frame in 5:
 			await process_frame
 		var ui: ShopPanel = game.shop_panel
+		if not ui.items_label.is_visible_in_tree() or not ui.items_scroll.is_visible_in_tree() or ui.items_row.get_child_count() != ui.owned_items.size():
+			_fail("collected items or relics disappear at %s" % extent)
+			return
+		for control in [ui.items_label, ui.items_scroll, ui.continue_button]:
+			if not bounds.encloses(control.get_global_rect()):
+				_fail("fixed collection/footer exceeds %s: %s" % [extent, control.get_global_rect()])
+				return
+		if ui.items_scroll.get_global_rect().intersects(ui.continue_button.get_global_rect()) or ui.continue_button.size.x > 200:
+			_fail("next wave button overlaps the collection or remains too wide at %s" % extent)
+			return
+		if ui.reroll_button.get_parent() != ui.offers_header or ui.reroll_button.icon == null or ui.reroll_button.size.x > 120:
+			_fail("reload is missing from the compact offer header at %s" % extent)
+			return
+		for index in ui.owned_items.size():
+			var chip: PanelContainer = ui.items_row.get_child(index)
+			if not chip.tooltip_text.contains(ui.owned_items[index].name) or not chip.tooltip_text.contains(ui.owned_items[index].description) or chip.get_node("Icon/StackCount").text != "×%d" % int(ui.owned_items[index].count):
+				_fail("collected item tooltip or stack count missing at %s" % extent)
+				return
+		ui.items_scroll.scroll_horizontal = int(ui.items_scroll.get_h_scroll_bar().max_value)
+		for frame in 3:
+			await process_frame
+		var last_chip: PanelContainer = ui.items_row.get_child(ui.items_row.get_child_count() - 1)
+		if not ui.items_scroll.get_global_rect().encloses(last_chip.get_global_rect()):
+			_fail("last collected relic is unreachable at %s" % extent)
+			return
+		ui.items_scroll.scroll_horizontal = 0
 		var wide: bool = extent.x >= 1000 and extent.y >= 560
 		if wide:
 			if ui.offers_grid.columns != 4 or ui.offers_section.get_index() >= ui.main_scroll.get_index():
@@ -101,6 +134,11 @@ func _run() -> void:
 			_fail("full equipment or sell action exceeds %s: panel %s, sell %s" % [extent, ui.get_node("Root/Center/Panel").get_global_rect(), ui.details.sell_button.get_global_rect()])
 			return
 		ui._select("offer", 0)
+		for frame in 4:
+			await process_frame
+		ui.main_scroll.scroll_vertical = 0
+		for frame in 2:
+			await process_frame
 		if capture and extent in [Vector2i(320, 568), Vector2i(720, 1280), Vector2i(1024, 600), Vector2i(1280, 670), Vector2i(1280, 720)]:
 			await RenderingServer.frame_post_draw
 			root.get_texture().get_image().save_png(capture_path + "/shop_%dx%d.png" % [extent.x, extent.y])

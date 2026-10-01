@@ -2,6 +2,7 @@ class_name ShopPanel
 extends CanvasLayer
 
 const ICONS: Script = preload("res://scripts/ui/denti_ui_icons.gd")
+const RELOAD_ICON: Texture2D = preload("res://assets/ui/reload.svg")
 signal buy_requested(index: int)
 signal sell_requested(index: int)
 signal merge_requested(index: int)
@@ -23,11 +24,13 @@ var inventory_scroll: ScrollContainer
 var items_label: Label
 var items_scroll: ScrollContainer
 var items_row: HBoxContainer
+var items_column: VBoxContainer
 var details: ShopDetails
 var main_scroll: ScrollContainer
 var flow: BoxContainer
 var offers_grid: GridContainer
 var offers_section: VBoxContainer
+var offers_header: HBoxContainer
 var build_column: VBoxContainer
 var details_panel: PanelContainer
 var left_scroll: ScrollContainer
@@ -102,7 +105,15 @@ func _ready() -> void:
 	offers_section = VBoxContainer.new()
 	offers_section.add_theme_constant_override("separation", 4)
 	left.add_child(offers_section)
-	ShopDetails._label(offers_section, "Angebote", 16)
+	offers_header = HBoxContainer.new()
+	offers_section.add_child(offers_header)
+	var offers_label := ShopDetails._label(offers_header, "Angebote", 16)
+	offers_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	offers_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	reroll_button = _button(offers_header, "2")
+	reroll_button.icon = RELOAD_ICON
+	reroll_button.add_theme_constant_override("icon_max_width", 20)
+	reroll_button.size_flags_horizontal = Control.SIZE_SHRINK_END
 	offers_grid = GridContainer.new()
 	offers_grid.columns = 2
 	offers_grid.add_theme_constant_override("h_separation", 9)
@@ -158,18 +169,24 @@ func _ready() -> void:
 	var actions := BoxContainer.new()
 	shop_actions = actions
 	rows.add_child(actions)
-	reroll_button = _button(actions, "Neu würfeln")
-	continue_button = _button(actions, "Weiter", true)
 	reroll_button.pressed.connect(func() -> void: reroll_requested.emit())
-	continue_button.pressed.connect(func() -> void: continue_requested.emit())
-	items_label = ShopDetails._label(rows, "Items & Relikte", 15)
+	items_column = VBoxContainer.new()
+	items_column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	items_column.add_theme_constant_override("separation", 3)
+	actions.add_child(items_column)
+	items_label = ShopDetails._label(items_column, "Gesammelt · Keine Items", 13)
 	items_scroll = ScrollContainer.new()
+	items_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	items_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	items_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	rows.add_child(items_scroll)
+	items_column.add_child(items_scroll)
 	items_row = HBoxContainer.new()
 	items_row.add_theme_constant_override("separation", 5)
 	items_scroll.add_child(items_row)
+	continue_button = _button(actions, "Weiter", true)
+	continue_button.size_flags_horizontal = Control.SIZE_SHRINK_END
+	continue_button.size_flags_vertical = Control.SIZE_SHRINK_END
+	continue_button.pressed.connect(func() -> void: continue_requested.emit())
 	get_viewport().size_changed.connect(_update_layout)
 	_update_layout()
 
@@ -184,7 +201,7 @@ func _update_layout() -> void:
 	shop_actions.vertical = narrow and extent.y >= 480
 	detail_actions.vertical = narrow and extent.y >= 480
 	preview_label.visible = extent.y >= 480
-	items_label.visible = extent.y >= 480
+	items_label.visible = true
 	title_label.add_theme_font_size_override("font_size", 21 if extent.y < 480 else 27)
 	details.heading.add_theme_font_size_override("font_size", 17 if narrow else 21)
 	details.icon.custom_minimum_size = Vector2(40, 40) if narrow else Vector2(56, 56)
@@ -210,12 +227,16 @@ func _update_layout() -> void:
 	$Root/Center/Panel.custom_minimum_size = Vector2(minf(extent.x - 24, 1180), extent.y - 24)
 	for edge in ["left", "right"]:
 		$Root/Center/Panel/Margin.add_theme_constant_override("margin_" + edge, 12)
-	items_scroll.custom_minimum_size.y = 48 if extent.y < 480 else (64 if compact else 58)
-	for button in [reroll_button, continue_button, details.merge_button, details.sell_button, details.confirm_button, details.cancel_button]:
+	items_scroll.custom_minimum_size.y = 52 if extent.y < 480 else 58
+	reroll_button.custom_minimum_size = Vector2(68, 40)
+	reroll_button.add_theme_font_size_override("font_size", 14)
+	continue_button.custom_minimum_size = Vector2(148, 44)
+	continue_button.add_theme_font_size_override("font_size", 14)
+	for button in [details.merge_button, details.sell_button, details.confirm_button, details.cancel_button]:
 		button.custom_minimum_size.y = 48 if narrow or extent.y < 480 else (64 if compact else 54)
 		button.add_theme_font_size_override("font_size", 15 if narrow else 16)
 	for chip in items_row.get_children():
-		chip.custom_minimum_size = Vector2(64, 60) if compact else Vector2(56, 52)
+		chip.custom_minimum_size = Vector2(48, 44)
 	for card in offer_buttons:
 		card.set_catalog_layout(offer_row or extent.x >= 760 or narrow, offer_row)
 
@@ -241,13 +262,13 @@ func show_shop(wave_number: int, coins: int, reroll_cost: int, new_offers: Array
 	if player != null:
 		var s := player.stats
 		stats_label.text = "Bisskraft %+.0f %% · Härte %s · Schmelz %.0f HP\nPutzeifer %+.0f %% · Glanz %d %% Crit · Speichel %s\nBewegung %+.0f %% · Zahnglück %.0f · Nah %+.0f · Fern %+.0f" % [s.damage_bonus, s.armor_text(), s.max_health, s.attack_speed, roundi(s.crit_chance * 100), s.regen_text(), s.speed_bonus, s.luck, s.melee_damage, s.ranged_damage]
-	reroll_button.text = "Neu würfeln · %d" % reroll_cost
+	reroll_button.text = str(reroll_cost)
 	reroll_button.disabled = coins < reroll_cost
 	if reserved.size() == ShopController.OFFER_COUNT and reserved.all(func(value: bool) -> bool: return value):
 		reroll_button.disabled = true
-		reroll_button.tooltip_text = "Alle Angebote sind gemerkt. Gib zuerst eines frei."
+		reroll_button.tooltip_text = "Neu würfeln · %d Münzen\nAlle Angebote sind gemerkt. Gib zuerst eines frei." % reroll_cost
 	else:
-		reroll_button.tooltip_text = "Gemerkte Angebote bleiben erhalten."
+		reroll_button.tooltip_text = "Neu würfeln · %d Münzen\nGemerkte Angebote bleiben erhalten." % reroll_cost
 	continue_button.text = "Welle %d starten" % (wave_number + 1)
 	continue_button.disabled = equipment.is_empty()
 	if selected_kind == "equipment":
@@ -384,22 +405,32 @@ func _show_items(entries: Array[Dictionary]) -> void:
 	owned_items = entries
 	_clear(items_row)
 	var total := 0
+	var relic_count := 0
 	for index in entries.size():
 		var entry := entries[index]
 		var copies := int(entry.count)
-		total += copies
+		if bool(entry.get("relic", false)):
+			relic_count += copies
+		else:
+			total += copies
 		var chip := PanelContainer.new()
-		chip.custom_minimum_size = Vector2(64, 60) if compact else Vector2(56, 52)
+		chip.custom_minimum_size = Vector2(48, 44)
 		chip.focus_mode = Control.FOCUS_ALL
 		chip.tooltip_text = "%s ×%d\n%s" % [entry.name, copies, entry.description]
 		DentiUIStyle.style_chip(chip, Color(0.91, 0.84, 0.97) if bool(entry.get("relic", false)) else Color(0.96, 0.91, 0.78))
+		var chip_style := chip.get_theme_stylebox("panel")
+		chip_style.content_margin_left = 6
+		chip_style.content_margin_right = 6
 		items_row.add_child(chip)
 		chip.gui_input.connect(_on_item_input.bind(index))
 		var holder := Control.new()
-		holder.custom_minimum_size = Vector2(40, 40)
+		holder.name = "Icon"
+		holder.custom_minimum_size = Vector2(36, 36)
+		holder.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		chip.add_child(holder)
 		var icon := TextureRect.new()
+		icon.name = "Texture"
 		icon.texture = entry.icon
 		icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -407,6 +438,7 @@ func _show_items(entries: Array[Dictionary]) -> void:
 		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		holder.add_child(icon)
 		var count := Label.new()
+		count.name = "StackCount"
 		count.text = "×%d" % copies
 		count.add_theme_color_override("font_color", DentiUIStyle.INK)
 		count.add_theme_color_override("font_outline_color", Color.WHITE)
@@ -415,8 +447,8 @@ func _show_items(entries: Array[Dictionary]) -> void:
 		count.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		holder.add_child(count)
 		count.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
-	items_label.text = "Items & Relikte · %d" % total
-	items_scroll.visible = total > 0
+	items_label.text = "Gesammelt · %d Items · %d Relikte" % [total, relic_count] if total + relic_count > 0 else "Gesammelt · Keine Items"
+	items_scroll.visible = total + relic_count > 0
 
 func _on_item_input(event: InputEvent, index: int) -> void:
 	if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) or (event is InputEventScreenTouch and event.pressed) or event.is_action_pressed("ui_accept"):

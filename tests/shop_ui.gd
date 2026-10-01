@@ -30,7 +30,7 @@ func _run() -> void:
 		_fail("shop did not render purchased items and relics as icons")
 		return
 	for chip: PanelContainer in game.shop_panel.items_row.get_children():
-		var icon: TextureRect = chip.get_child(0).get_child(0)
+		var icon: TextureRect = chip.get_node("Icon/Texture")
 		if icon.texture == null or chip.tooltip_text.is_empty():
 			_fail("shop item icon or tooltip missing")
 			return
