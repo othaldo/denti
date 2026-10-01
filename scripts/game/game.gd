@@ -374,8 +374,10 @@ func _show_level_choice() -> void:
 		pool.append(upgrade)
 	pool.shuffle()
 	var choices: Array[UpgradeData] = []
+	# Pending levels include this choice; resolve their earned levels oldest first.
+	var earned_level := level - maxi(rewards.pending_levels - 1, 0)
 	for index in ChoicePanel.UPGRADE_COUNT:
-		choices.append(pool[index].with_tier(DentiRarity.upgrade_tier(level, player.stats.luck)))
+		choices.append(pool[index].with_tier(DentiRarity.upgrade_tier(earned_level, player.stats.luck)))
 	choice_panel.show_upgrades(choices)
 	get_tree().paused = true
 	_save_run()
