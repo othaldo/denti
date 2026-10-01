@@ -7,6 +7,6 @@
 script = ExtResource("1")
 id = &"fluoride_rocket"
 display_name = "Fluorid-Rakete"
-description = "Zweihand · Langsame Rakete mit großer Explosion. Stark gegen Horden; profitiert von Fluorid-Spray."
+description = "2 Wurzeln · Langsame Rakete mit großer Explosion. Stark gegen Horden; profitiert von Fluorid-Spray."
 price = 18
 weapon_data = ExtResource("2")

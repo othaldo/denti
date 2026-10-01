@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = &"crown_launcher"
 display_name = "Kronenwerfer"
-description = "Zweihand · Fernkampf · durchdringt Gegner"
+description = "2 Wurzeln · Fernkampf · durchdringt Gegner"
 price = 13
 weapon_data = ExtResource("2")
 icon_texture = ExtResource("3")

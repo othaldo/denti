@@ -58,7 +58,7 @@ func show_weapon(data: WeaponData, tier: int, player: Player, equipped: bool, eq
 	clear_actions()
 	heading.text = data.display_name
 	icon.texture = data.sprite
-	subtitle.text = "%s · Stufe %s · %d %s · %s" % ["Ausgerüstet" if equipped else "Angebot", ["I", "II", "III", "IV"][tier - 1], data.hands, "Hand" if data.hands == 1 else "Hände", data.damage_type]
+	subtitle.text = "%s · Stufe %s · %s · %s" % ["Ausgerüstet" if equipped else "Angebot", ["I", "II", "III", "IV"][tier - 1], data.roots_text(), data.damage_type]
 	var current := WeaponPresentation.values(data, tier, player)
 	_clear_values()
 	_value("Treffer", "%.1f" % current.damage)

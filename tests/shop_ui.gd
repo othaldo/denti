@@ -51,6 +51,13 @@ func _run() -> void:
 	if not weapon_button.tooltip_text.contains("Schadensart: Schmelz") or not offer_card.rarity_label.text.contains("BOHRUNG") or not offer_card.tooltip_text.contains("Schadensart: Bohrung"):
 		_fail("weapon damage types are missing from cards or tooltips")
 		return
+	# Missing font glyphs appear as broken boxes even with correctly encoded UTF-8.
+	for tooltip in [weapon_button.tooltip_text, offer_card.tooltip_text]:
+		for index in tooltip.length():
+			var code: int = tooltip.unicode_at(index)
+			if code > 32 and not DentiUIStyle.FONT.has_char(code):
+				_fail("shop tooltip uses an unsupported glyph: U+%04X" % code)
+				return
 	var starter: WeaponData = game.player.loadout.equipped()[0].data
 	game.player.loadout.acquire(starter)
 	game._update_shop_panel()

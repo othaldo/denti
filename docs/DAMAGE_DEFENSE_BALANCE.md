@@ -60,7 +60,7 @@ Reproduzierbar mit:
 Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . --script res://tools/benchmark_damage_defense.gd
 ```
 
-Die Simulation verwendet Zufallsstartwert 13579, 60 Physikschritte/s und sechs Hände: Zauberbürste, Turbo-Bohrer, Wasserflosser, Zahnstocher-Speer und Prophylaxe-Polierer. Denti steht still und hat zur Messung 1.000.000 HP. Items und Relikte fehlen; Bossbewegung, Angriffe, Adds und beide Phasenwechsel bleiben aktiv. Gemessen wird bis null Boss-HP, ohne Todesanimation. Dies sind Beispielbuilds, keine Schätzung eines durchschnittlichen Runs.
+Die Simulation verwendet Zufallsstartwert 13579, 60 Physikschritte/s und sechs Wurzeln: Zauberbürste, Turbo-Bohrer, Wasserflosser, Zahnstocher-Speer und Prophylaxe-Polierer. Denti steht still und hat zur Messung 1.000.000 HP. Items und Relikte fehlen; Bossbewegung, Angriffe, Adds und beide Phasenwechsel bleiben aktiv. Gemessen wird bis null Boss-HP, ohne Todesanimation. Dies sind Beispielbuilds, keine Schätzung eines durchschnittlichen Runs.
 
 | Welle | Waffenstufe | Bisskraft | Nah / Fern | Putzeifer | Crit | Rüstung |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -74,7 +74,7 @@ Die Simulation verwendet Zufallsstartwert 13579, 60 Physikschritte/s und sechs H
 | 10 | 3087 | 23,4 s | 2 | 398 |
 | 20 | 15325 | 46,9 s | 2 | 1337 |
 
-Die Durchläufe dauern deutlich länger als 2–5 Sekunden, und beide Phasenwechsel kommen vor. Ohne Bewegung würde ein normaler 100-HP-Spieler in allen drei Messungen sterben. Die Waffenmatrix enthält direkten Einzelziel-DPS pro Hand, einschließlich Crit und der bisherigen Gewichtung zusätzlicher Geschosse; Blutung, Flächentreffer, Rückstoß, Nass-Synergien und voller Fokus sind zusätzliche Leistung. Sie ist daher keine Waffenrangliste.
+Die Durchläufe dauern deutlich länger als 2–5 Sekunden, und beide Phasenwechsel kommen vor. Ohne Bewegung würde ein normaler 100-HP-Spieler in allen drei Messungen sterben. Die Waffenmatrix enthält direkten Einzelziel-DPS pro Wurzel, einschließlich Crit und der bisherigen Gewichtung zusätzlicher Geschosse; Blutung, Flächentreffer, Rückstoß, Nass-Synergien und voller Fokus sind zusätzliche Leistung. Sie ist daher keine Waffenrangliste.
 
 Das prüft Schadensrechnung, Waffeninteraktion und Bossmechaniken. Dichte normale Wellen, reine Nah-/Fernbuilds, spezialisierte Itemkombinationen, Shopökonomie und Hard/Hell benötigen weitere Spieltests. Gewinnraten werden hier nicht gemessen.
 

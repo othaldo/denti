@@ -11,13 +11,13 @@ Acht Waffen verwenden einen neuen gemalten Atlas in der bisherigen Elfenbein-/T�
 | Kronenwerfer | Einfacher Lauf mit einer erkennbar geladenen Krone und zwei Griffen; weniger konkurrierende Bauteile. |
 | Mundspülungs-Mörser | Ein Mundspülungsbehälter, breite Mündung und zwei Griffe; keine Anhänger oder dauerhaft gemalten Spritzer. |
 | Wasserflosser | Schlanker Wasserbehälter und gebogene Dentaldüse; der feste Tropfen entfällt. |
-| Fluorid-Sprüher | Grüner oberer Behälter und kurze Sprühdüse; deutlicher von der Turbine unterscheidbar. Die Zweihand-Kosten bleiben bestehen: Pistolengriff und vorderes Gehäuse dienen als Haltepunkte. |
+| Fluorid-Sprüher | Grüner oberer Behälter und kurze Sprühdüse; deutlicher von der Turbine unterscheidbar. Die Kosten von zwei Wurzelplätzen bleiben bestehen: Pistolengriff und vorderes Gehäuse dienen als Haltepunkte. |
 | Mundduschen-Turbine | Blaue Turbinenkammer mit zwei Griffen; klare Wasserwaffe ohne fest gemalten Strahl. |
 | Amalgam-Schleuder | Erkennbare Metallkugel im Lederbeutel; Gummibänder und Beutel bewegen sich unabhängig vom starren Griff. |
 | Karies-Fräse | Gehäuse und runde Fräsfläche sind separate Grafiken; nur die Arbeitsfläche dreht sich. |
 | Prophylaxe-Polierer | Schlankes Handstück und separate violette Polierfläche; keine mitdrehenden Gehäuseausschnitte mehr. |
 
-Fernkampfwaffen ruhen direkt an ihrer Handposition. Die Zauberbürste steht dabei aufrecht. Beim Angriff bleiben die bestehenden Abschussanker und Zielkorrekturen aktiv. Wasser und Sprühnebel werden durch die Angriffseffekte dargestellt.
+Fernkampfwaffen ruhen direkt an ihrer Halteposition. Die Zauberbürste steht dabei aufrecht. Beim Angriff bleiben die bestehenden Abschussanker und Zielkorrekturen aktiv. Wasser und Sprühnebel werden durch die Angriffseffekte dargestellt.
 
 Die kreisförmigen Arbeitsflächen rotieren vor ihrer elliptischen Projektion. So bleibt die Perspektive des Kopfes am Schaft stabil; seine Kontur kippt nicht mit jeder Umdrehung. Shopicons von Fräse und Polierer werden aus denselben Körper-/Kopfbildern zusammengesetzt, die im Kampf verwendet werden. Alle neuen Icons haben freie Ränder in ihren Atlaszellen.
 
@@ -35,7 +35,7 @@ Weitere Richtungen: [links](screenshots/weapon_art_refinement/all_links_after.pn
 
 Alle **47 Testskripte** bestehen mit Godot 4.7.2. Die Kontaktprüfung umfasst jetzt **224 Kombinationen** aus sieben Waffen, vier Stufen, vier Richtungen und zwei Entfernungen mit der Verkleinerung eines Sechs-Waffen-Builds. Separate Prüfungen sichern die feste Perspektive der Arbeitsköpfe, das Spannen der Schleuder ohne Griffverformung, die Ruhepositionen und freie Iconränder ab. Projektilursprung, Zielrichtung, Fusion, Shopdarstellung und Fortsetzen während eines Angriffs werden durch die bestehenden Tests geprüft.
 
-Der kontrollierte Kontaktbenchmark enthält **60 Messfälle** mit nahen und entfernten normalen Gegnern beziehungsweise Bossen. Trefferzahlen und direkter DPS stimmen in allen Fällen mit dem Stand vor dieser Grafiküberarbeitung überein. Die Rohwerte, Angriffstakte, Skalierungen, Reichweiten und Handkosten bleiben unverändert. [Messdaten vor/nach der Überarbeitung](balance_weapon_art.json).
+Der kontrollierte Kontaktbenchmark enthält **60 Messfälle** mit nahen und entfernten normalen Gegnern beziehungsweise Bossen. Trefferzahlen und direkter DPS stimmen in allen Fällen mit dem Stand vor dieser Grafiküberarbeitung überein. Die Rohwerte, Angriffstakte, Skalierungen, Reichweiten und Wurzelkosten bleiben unverändert. [Messdaten vor/nach der Überarbeitung](balance_weapon_art.json).
 
 Einige bestehende Tests melden beim Beenden weiterhin gehaltene Audioressourcen. Die Auswertung prüft Rückgabecode und GDScript-Fehler; die Abschaltwarnungen wurden durch diese Grafikänderung nicht behoben.
 

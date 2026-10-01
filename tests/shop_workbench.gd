@@ -27,7 +27,7 @@ func _run() -> void:
 		_fail("offer inspection changed the run or omitted purchase details")
 		return
 	ui.inventory_row.get_child(0).get_child(0).pressed.emit()
-	if not ui.details.merge_button.visible or ui.details.merge_button.disabled or not ui.details.action_hint.text.contains("Hand frei"):
+	if not ui.details.merge_button.visible or ui.details.merge_button.disabled or not ui.details.action_hint.text.contains("Wurzel frei"):
 		_fail("equipped weapon lacks fusion and freed-hand preview")
 		return
 	for character in ui.details.compare_text.text + ui.details.action_hint.text:

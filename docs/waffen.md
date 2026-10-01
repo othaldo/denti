@@ -4,7 +4,7 @@ Denti beginnt ohne fest ins Charakterbild eingebaute Waffe. Vor Welle 1 wählt m
 
 Bisskraft verstärkt alle Waffen prozentual. Nah- oder Fernschaden ergänzt ihren Basisschaden mit einem individuellen Gewicht; die Waffenkarte zeigt den passenden Stat und seine Skalierung. Schnelle Flächenwaffen erhalten kleinere Gewichte als schwere Einzelangriffe. Fusion erhöht die Waffenbasis, ohne die rohen Stat-Beiträge zusätzlich zu vervielfachen. Die vollständigen Faktoren und Messungen stehen im [Schadens- und Verteidigungsbericht](DAMAGE_DEFENSE_BALANCE.md).
 
-| Waffe | Hände | Angriff | Rolle |
+| Waffe | Wurzeln | Angriff | Rolle |
 | --- | ---: | --- | --- |
 | Zauberbürste | 2 | Schmelz-Projektil | Verlässliche Reichweite; ab Stufe III zwei, ab IV drei Pastegeschosse mit leichtem Streuwinkel. |
 | Turbo-Bohrer | 1 | Bohrung im Nahkampf | Kompakte, schnelle Bohrstöße; Bossbonus wächst von 25 % auf 40 %. |
@@ -64,7 +64,7 @@ Zähler und Cooldown sowie aktive Fluorid-Markierungen. Angezeigte DPS schätzen
 ein normales Einzelziel inklusive Waffen-Crit; Flächentreffer, Blutung,
 voller Fokus und situative Itemeffekte sind zusätzliche Leistung.
 
-Die Ausrüstung fasst sechs Hand-Plätze. Einhandwaffen belegen einen, Zweihandwaffen zwei. Solange genug Plätze frei sind, fügt ein Kauf die Waffe einzeln hinzu. Ist die Ausrüstung voll, verschmilzt eine gekaufte Waffe mit einem gleichen Exemplar derselben Stufe (bis IV). Zwei bereits ausgerüstete gleiche Waffen derselben Stufe lassen sich per Rechtsklick auf eine der Waffen verschmelzen. Verkauf benötigt zwei Linksklicks und erstattet die Hälfte des Kaufwerts aller in dieser Waffe aufgegangenen Exemplare. Jede Stufe erhöht Schaden und Angriffstempo. Der Spielstand speichert Waffentypen, Stufen und investierte Münzen.
+Die Ausrüstung fasst sechs Wurzelplätze. Waffen mit einer Wurzel belegen einen, Waffen mit zwei Wurzeln zwei. Solange genug Plätze frei sind, fügt ein Kauf die Waffe einzeln hinzu. Ist die Ausrüstung voll, verschmilzt eine gekaufte Waffe mit einem gleichen Exemplar derselben Stufe (bis IV). Zwei bereits ausgerüstete gleiche Waffen derselben Stufe lassen sich per Rechtsklick auf eine der Waffen verschmelzen. Verkauf benötigt zwei Linksklicks und erstattet die Hälfte des Kaufwerts aller in dieser Waffe aufgegangenen Exemplare. Jede Stufe erhöht Schaden und Angriffstempo. Der Spielstand speichert Waffentypen, Stufen und investierte Münzen.
 
 Bohrung verursacht je nach Stufe 25–40 % mehr Schaden gegen Bosse. Schnitt verursacht 15 % mehr Schaden gegen nahezu unverletzte Gegner und baut Blutung auf. Wasserflosser-Treffer machen Gegner nass. Die anderen Schadensarten unterscheiden sich über Reichweite, Projektiltempo, Durchschlag, Rückstoß, Strahl oder Flächentreffer. Gegner haben derzeit keine elementaren Resistenzen. Die Waffen haben individuelle Schadensmultiplikatoren und ausgewählte Eigenschaften, die mit ihrer Stufe wachsen.
 
@@ -72,7 +72,7 @@ Bohrung verursacht je nach Stufe 25–40 % mehr Schaden gegen Bosse. Schnitt ver
 
 Alle 18 Waffen haben einen Griffpunkt und einen eigenen Abschuss- beziehungsweise
 Kontaktpunkt. Fernkampfgeschosse starten am Waffenkopf. Laufwaffen zielen aus einer
-Handposition neben Denti und spiegeln beim Seitenwechsel; die Amalgam-Schleuder
+Halteposition neben Denti und spiegeln beim Seitenwechsel; die Amalgam-Schleuder
 bleibt aufrecht. Ruhepositionen kreisen nicht automatisch um Denti.
 
 `WeaponLayout` setzt gemeinsame Größenlimits (100 px Nahkampf, 76 px Fernkampf),

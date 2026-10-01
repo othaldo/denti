@@ -7,6 +7,6 @@
 script = ExtResource("1")
 id = &"fluoride_sprayer"
 display_name = "Fluorid-Sprüher"
-description = "Zweihand · Sprühkegel macht Gegner 2 s anfällig für +20 % Schmelzschaden. Kombiniere mit Paste und Raketen."
+description = "2 Wurzeln · Sprühkegel macht Gegner 2 s anfällig für +20 % Schmelzschaden. Kombiniere mit Paste und Raketen."
 price = 14
 weapon_data = ExtResource("2")

@@ -7,6 +7,6 @@
 script = ExtResource("1")
 id = &"water_turbine"
 display_name = "Mundduschen-Turbine"
-description = "Zweihand · Breiter Wasserfächer stößt Gruppen zurück und macht sie nass; Kontrolle statt Rohschaden."
+description = "2 Wurzeln · Breiter Wasserfächer stößt Gruppen zurück und macht sie nass; Kontrolle statt Rohschaden."
 price = 14
 weapon_data = ExtResource("2")

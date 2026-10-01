@@ -21,7 +21,7 @@ zusätzliche Shopangebote sind keine Voraussetzung für dieses UI-Konzept.
 ### Waffenkarte
 
 Großes Sprite, Name in normaler Schreibweise, Stufe I–IV und expliziter
-Handbedarf. Dazu eine verständliche Rolle wie „Gruppen zurückdrängen“,
+Wurzelbedarf. Dazu eine verständliche Rolle wie „Gruppen zurückdrängen“,
 „Boss-Fokus“ oder „Blutung aufbauen“. Die Rolle erklärt den Einsatz; die
 Schadensart erklärt Synergien. Seltenheit bleibt mit Farbe UND Text erkennbar.
 
@@ -45,27 +45,27 @@ keine wesentliche Information ist nur per Hover zugänglich.
 Für echte Gegenüberstellungen wählt der Spieler eine Vergleichswaffe selbst.
 Bei demselben Waffentyp kann das vorhandene Exemplar vorgewählt werden.
 Grün/Rot kennzeichnet ausschließlich eindeutig gerichtete Änderungen und steht
-immer neben einer Zahl. Zwei Hände sind Platzbedarf, nicht automatisch ein
+immer neben einer Zahl. Zwei Wurzeln sind Platzbedarf, nicht automatisch ein
 Nachteil. Wasserfächer und Rakete verdienen einen Rollenvergleich statt einer
 pauschalen „besser“-Markierung.
 
-### Sechs Handplätze sichtbar machen
+### Sechs Wurzelplätze sichtbar machen
 
 Die Ausrüstung als Bildleiste zeigen. Jede Waffe trägt eine Stufenmarke;
-Zweihandwaffen belegen zwei zusammenhängende Plätze. Dieselbe Waffe wird
-trotzdem nur einmal gezeigt, sodass Anzahl und Handkosten nicht verwechselt
+Waffen mit zwei Wurzeln belegen zwei zusammenhängende Plätze. Dieselbe Waffe wird
+trotzdem nur einmal gezeigt, sodass Anzahl und Wurzelkosten nicht verwechselt
 werden. Auswahl öffnet den gemeinsamen Detailbereich mit Verkaufen und Fusion.
 
-Kaufaktionen beschreiben ihr Ergebnis: „Ausrüsten · 2 Hände“, „Zu Stufe III
-fusionieren“ oder „Kein Platz · 2 Hände benötigt“. Ein konkreter Fusionspartner
+Kaufaktionen beschreiben ihr Ergebnis: „Ausrüsten · 2 Wurzeln“, „Zu Stufe III
+fusionieren“ oder „Kein Platz · 2 Wurzeln benötigt“. Ein konkreter Fusionspartner
 wird sichtbar hervorgehoben. Verkauf bleibt bestätigt; ein nur auf Text
 basierender versteckter Doppelklick ist langfristig weniger verständlich.
 
-Die klickbare Skizze setzt die Auswahl belegter Handplätze um: Im gemeinsamen
+Die klickbare Skizze setzt die Auswahl belegter Wurzelplätze um: Im gemeinsamen
 Detailbereich lässt sich eine ausgerüstete Waffe verkaufen (mit Bestätigung)
 oder mit einem gleichen Exemplar derselben Stufe fusionieren. Der passende
 Partner wird markiert; die Vorschau zeigt neue Stufe, Werte und frei werdende
-Handplätze. Ohne Partner beziehungsweise auf Stufe IV ist Fusion deaktiviert.
+Wurzelplätze. Ohne Partner beziehungsweise auf Stufe IV ist Fusion deaktiviert.
 Als Beispiel enthält die Startausrüstung zwei Polierer auf Stufe I.
 
 ### Aktueller Build
@@ -101,7 +101,7 @@ auf Käufe, erfolgreiche Fusionen und Belohnungen. Beispiele: „Frisch poliert!
 bei einer Fusion oder „Bereit für die nächste Behandlung?“ am Wellenstart.
 Klare Aktionsnamen bleiben erhalten; Humor steht daneben statt an ihrer Stelle.
 
-Kauf: Münze fliegt kurz zum Angebot, die Waffe landet im richtigen Handplatz.
+Kauf: Münze fliegt kurz zum Angebot, die Waffe landet im richtigen Wurzelplatz.
 Fusion: beide Exemplare verbinden sich zu einer neuen Stufenmarke.
 Upgrade: der geänderte Stat wird kurz hervorgehoben. Animationen bleiben kurz,
 überspringbar und blockieren keine nächste Eingabe. Reduzierte Bewegung beachten.
@@ -123,7 +123,7 @@ Statusschaden. Supportwaffen erhalten keinen irreführenden Schadensrang.
 
 ## Empfohlene Reihenfolge
 
-1. Gemeinsame Waffendetails, aktuelle Buildwerte, Rollen und Handplätze.
+1. Gemeinsame Waffendetails, aktuelle Buildwerte, Rollen und Wurzelplätze.
 2. Explizite Kauf-/Fusionsergebnisse und Vergleich mit eigener Ausrüstung.
 3. Derselbe Detailstil für Level-ups, Kisten, Relikte und Startwaffen.
 4. Konkrete Synergiehinweise und kurze Denti-Reaktionen.
@@ -138,7 +138,7 @@ Leistungswerte darin sind illustrative Beispiele, keine gemessenen Runs.
 
 Der Shop verwendet jetzt Angebotskarten mit gemeinsamen Details auf Desktop und Angebotszeilen mit Details darunter auf kleineren Ansichten. Die aktuellen Buildwerte, Waffenrollen, tatsächliche Synergiehinweise und ein Vergleich mit eigener Ausrüstung stehen zur Verfügung. Der Preisbutton auf jeder Karte kauft direkt und wird bei fehlenden Münzen, vollem Loadout oder Stapellimit deaktiviert. Die Karte bleibt für Details anwählbar. Ein zusätzlicher Kaufbutton und der Berechnungsbereich entfallen.
 
-Belegte Hände öffnen denselben Detailbereich. Verkauf braucht eine Bestätigung; Fusion zeigt die nächste Stufe, frei werdende Hände und markiert passende Exemplare. Kauf fusioniert nur dann automatisch, wenn für eine zusätzliche Waffe kein Platz bleibt und ein passendes Exemplar vorhanden ist. Die bestehenden Spielregeln bleiben maßgeblich.
+Belegte Wurzeln öffnen denselben Detailbereich. Verkauf braucht eine Bestätigung; Fusion zeigt die nächste Stufe, frei werdende Wurzeln und markiert passende Exemplare. Kauf fusioniert nur dann automatisch, wenn für eine zusätzliche Waffe kein Platz bleibt und ein passendes Exemplar vorhanden ist. Die bestehenden Spielregeln bleiben maßgeblich.
 
 Items und Relikte stehen als horizontal scrollende Icons mit Stückzahl unten. Hover zeigt Name und Effekt, Antippen öffnet die Details. Aktionen, Weiter und Itemleiste bleiben auch im mobilen Hoch- und Querformat erreichbar. Level-up-, Kisten- und Reliktauswahl verwenden vorerst ihre vorhandene Darstellung; Kaufanimationen und neue Waffentelemetrie sind weitere Konzeptideen.
 

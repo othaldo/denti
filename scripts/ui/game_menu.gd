@@ -268,7 +268,7 @@ func _show_stats() -> void:
 		var value := ShopDetails._label(grid, pair[1], 16)
 		value.autowrap_mode = TextServer.AUTOWRAP_OFF
 		value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	ShopDetails._label(rows, "Hände · %d/6" % game.player.loadout.used_slots(), 16)
+	ShopDetails._label(rows, "Wurzeln · %d/6" % game.player.loadout.used_slots(), 16)
 	var weapons := HBoxContainer.new()
 	weapons.add_theme_constant_override("separation", 4)
 	rows.add_child(weapons)

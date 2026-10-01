@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = &"enamel_mirror"
 display_name = "Schmelzspiegel"
-description = "Einhand · Lichtstrahl · sofortiger Treffer"
+description = "1 Wurzel · Lichtstrahl · sofortiger Treffer"
 price = 11
 weapon_data = ExtResource("2")
 icon_texture = ExtResource("3")

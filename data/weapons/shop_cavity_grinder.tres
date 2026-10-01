@@ -7,6 +7,6 @@
 script = ExtResource("1")
 id = &"cavity_grinder"
 display_name = "Karies-Fräse"
-description = "Zweihand · Kurze Reichweite. Wiederholte Treffer steigern Schaden bis +50 %; stark gegen Bosse und Eliten."
+description = "2 Wurzeln · Kurze Reichweite. Wiederholte Treffer steigern Schaden bis +50 %; stark gegen Bosse und Eliten."
 price = 15
 weapon_data = ExtResource("2")

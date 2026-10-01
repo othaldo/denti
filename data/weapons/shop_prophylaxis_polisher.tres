@@ -7,6 +7,6 @@
 script = ExtResource("1")
 id = &"prophylaxis_polisher"
 display_name = "Prophylaxe-Polierer"
-description = "Einhand · Schnelle Politur mit +10 % Waffen-Crit. Jeder dritte Treffer auf dasselbe Ziel glänzt kritisch."
+description = "1 Wurzel · Schnelle Politur mit +10 % Waffen-Crit. Jeder dritte Treffer auf dasselbe Ziel glänzt kritisch."
 price = 10
 weapon_data = ExtResource("2")

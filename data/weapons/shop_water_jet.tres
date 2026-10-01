@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = &"water_jet"
 display_name = "Wasserflosser"
-description = "Einhand · Fernkampf · schneller Strahl mit Rückstoß"
+description = "1 Wurzel · Fernkampf · schneller Strahl mit Rückstoß"
 price = 8
 weapon_data = ExtResource("2")
 icon_texture = ExtResource("3")

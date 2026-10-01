@@ -69,7 +69,7 @@ func _run() -> void:
 		var captions := CanvasLayer.new()
 		view.add_child(captions)
 		_label(captions, data.display_name, Vector2(12, 10), 21)
-		_label(captions, "%s · %.0f px · %.0f / %.2f s" % ["1 Hand" if data.hands == 1 else "2 Hände", WeaponLayout.visual_size(data), data.base_damage, data.interval], Vector2(12, 283), 18)
+		_label(captions, "%s · %.0f px · %.0f / %.2f s" % [data.roots_text(), WeaponLayout.visual_size(data), data.base_damage, data.interval], Vector2(12, 283), 18)
 	paused = true
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUTPUT))
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://.codex/weapon_sizes"))

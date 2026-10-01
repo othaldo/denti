@@ -72,6 +72,10 @@ func held_texture() -> Texture2D:
 	return held_sprite if held_sprite != null else sprite
 
 
+func roots_text() -> String:
+	return "%d %s" % [hands, "Wurzel" if hands == 1 else "Wurzeln"]
+
+
 func damage_at_tier(tier: int) -> float:
 	if damage_tiers.size() >= clampi(tier, 1, 4):
 		return base_damage * damage_tiers[clampi(tier, 1, 4) - 1]

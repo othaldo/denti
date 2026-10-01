@@ -4,6 +4,8 @@ Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü an
 
 ## In Entwicklung
 
+- Dentis Ausrüstung belegt **Wurzeln**: Shop, Waffenbeschreibungen, Fusion und Pausemenü verwenden „1 Wurzel“ beziehungsweise „2 Wurzeln“. Im Shop-Tooltip steht „ca.“ statt des von der Schrift nicht unterstützten „≈“-Zeichens vor dem DPS-Wert.
+
 - Acht überarbeitete Waffengrafiken mit klareren Formen: Kronenwerfer, Mörser, Wasserflosser, Fluorid-Sprüher, Turbine, Schleuder, Fräse und Polierer. Separate Arbeitsflächen drehen sich bei stabiler Perspektive; die Schleuder spannt Gummibänder und Beutel statt den Griff zu verformen. Fernkampfwaffen erhalten passendere Ruhepositionen, die Zauberbürste steht aufrecht. [Bilder, Animation und Prüfung](docs/WEAPON_ART_REFINEMENT.md).
 
 - Größenvergleich mit Denti und allen 18 Waffen als Screenshots in Ruhe und im Angriff. Bohrer, Kratzer, Peitsche, Garotte und Speer erhalten passendere Proportionen.

@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = &"mouthwash_mortar"
 display_name = "Mundspülungs-Mörser"
-description = "Zweihand · Fernkampf · Minzbombe"
+description = "2 Wurzeln · Fernkampf · Minzbombe"
 price = 14
 weapon_data = ExtResource("2")
 icon_texture = ExtResource("3")

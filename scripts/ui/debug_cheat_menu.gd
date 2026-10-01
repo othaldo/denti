@@ -242,7 +242,7 @@ func refresh() -> void:
 	for child in equipped_rows.get_children():
 		child.free()
 	var equipped: Array[WeaponInstance] = game.player.loadout.equipped()
-	equipped_rows.add_child(_label("Hände · %d/%d" % [game.player.loadout.used_slots(), WeaponLoadout.CAPACITY]))
+	equipped_rows.add_child(_label("Wurzeln · %d/%d" % [game.player.loadout.used_slots(), WeaponLoadout.CAPACITY]))
 	for index in equipped.size():
 		var row := HBoxContainer.new()
 		equipped_rows.add_child(row)
@@ -267,7 +267,7 @@ func refresh() -> void:
 func _refresh_weapon_button() -> void:
 	var data: WeaponData = WeaponCatalog.ALL[weapon_select.selected]
 	add_weapon_button.disabled = controls.game.player.loadout.used_slots() + data.hands > WeaponLoadout.CAPACITY
-	add_weapon_button.tooltip_text = "Keine freien Hände" if add_weapon_button.disabled else ""
+	add_weapon_button.tooltip_text = "Keine freien Wurzeln" if add_weapon_button.disabled else ""
 
 
 func _refresh_item_detail() -> void:

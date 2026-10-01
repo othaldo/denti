@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = &"magic_toothbrush"
 display_name = "Zauberbürste"
-description = "Zweihand · Fernkampf · heilige Paste"
+description = "2 Wurzeln · Fernkampf · heilige Paste"
 price = 9
 weapon_data = ExtResource("2")
 icon_texture = ExtResource("3")

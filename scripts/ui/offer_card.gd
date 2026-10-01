@@ -100,7 +100,7 @@ func show_offer(offer: ShopOfferData, coins: int, available: bool = true, owned_
 	reserve_button.disabled = false
 	disabled = (coins < offer.price or not available) and not selection_only
 	if offer.weapon_data != null:
-		tooltip_text = "%s\n%s\n%s\n%s\n≈ %.1f DPS pro Ziel" % [offer.display_name, offer.description, offer.weapon_data.combat_text(), effect_label.text, dps]
+		tooltip_text = "%s\n%s\n%s\n%s\nca. %.1f DPS pro Ziel" % [offer.display_name, offer.description, offer.weapon_data.combat_text(), effect_label.text, dps]
 		if not available:
 			tooltip_text += "\nAusrüstung voll: Platz schaffen oder passende Waffe verschmelzen"
 	else:

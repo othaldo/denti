@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = &"plaque_scaler"
 display_name = "Zahnsteinkratzer"
-description = "Einhand · Nahkampf · schnell, erster Schnitt stärker"
+description = "1 Wurzel · Nahkampf · schnell, erster Schnitt stärker"
 price = 7
 weapon_data = ExtResource("2")
 icon_texture = ExtResource("3")

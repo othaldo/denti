@@ -7,6 +7,6 @@
 script = ExtResource("1")
 id = &"uv_lamp"
 display_name = "UV-Lampe"
-description = "Zweihand · Breiter Sofortstrahl trifft die ganze Linie. +10 % Waffen-Crit; kritische Treffer verursachen ×2 Schaden."
+description = "2 Wurzeln · Breiter Sofortstrahl trifft die ganze Linie. +10 % Waffen-Crit; kritische Treffer verursachen ×2 Schaden."
 price = 17
 weapon_data = ExtResource("2")

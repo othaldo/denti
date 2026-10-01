@@ -17,7 +17,7 @@ Current playable state includes roughly:
 - 20 timed waves
 - minibosses every 5 waves and a final boss on wave 20
 - 4 normal enemy types, 2 elite variants and bosses
-- 8 weapons with hand-slot costs and weapon fusion up to tier IV
+- 8 weapons with root-slot costs and weapon fusion up to tier IV
 - 30 shop items with stack limits and real synergies
 - 8 level-up stats
 - rarity and luck systems
@@ -280,6 +280,8 @@ Post-wave reward screens should feel like one coherent intermission rather than 
 ## Denti - canonical character reference
 
 Denti is the mascot: a cute small anthropomorphic white/ivory tooth with a divine/holy visual joke.
+
+Denti is a molar. Its equipment slots are called **Wurzeln**, not hands: use **1 Wurzel**, **2 Wurzeln**, **Freie Wurzel** and **Wurzeln · n/6** in player-facing text. Existing internal `hands` fields may remain for resource/save compatibility. Tool handles are still called Griffe.
 
 Important current design decision: base Denti begins visually unarmed / "naked". The base reference is `assets/denti/reference/denti-initial.png` / `assets/denti/denti_unarmed.png` where appropriate. The upgraded/crowned imagery is useful as upgraded, promotional or equipment-state art, but a golden crown is not required as permanent base equipment.
 

@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = &"turbo_drill"
 display_name = "Turbo-Bohrer"
-description = "Einhand · Nahkampf · schnelle Bohrstöße, +25 % gegen Bosse"
+description = "1 Wurzel · Nahkampf · schnelle Bohrstöße, +25 % gegen Bosse"
 price = 9
 weapon_data = ExtResource("2")
 icon_texture = ExtResource("3")

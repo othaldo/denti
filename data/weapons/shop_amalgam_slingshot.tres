@@ -7,6 +7,6 @@
 script = ExtResource("1")
 id = &"amalgam_slingshot"
 display_name = "Amalgam-Schleuder"
-description = "Einhand · Langsame Metallkugel mit Rückstoß und kleinem Flächenschaden."
+description = "1 Wurzel · Langsame Metallkugel mit Rückstoß und kleinem Flächenschaden."
 price = 10
 weapon_data = ExtResource("2")

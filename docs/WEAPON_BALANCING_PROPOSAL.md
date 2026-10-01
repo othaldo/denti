@@ -29,14 +29,14 @@ Eine Waffe darf weniger DPS haben, wenn sie dafür:
 - Bosse besonders hart trifft,
 - oder extrem sicher aus großer Distanz funktioniert.
 
-### 2. Einhand vs. Zweihand muss spürbar sein
+### 2. Der Unterschied zwischen einer und zwei Wurzeln muss spürbar sein
 
-Denti hat sechs Hand-Slots. Deshalb muss eine Zweihandwaffe deutlich mehr leisten als eine Einhandwaffe.
+Denti hat sechs Wurzelplätze. Deshalb muss eine Waffe mit zwei Wurzeln deutlich mehr leisten als eine Waffe mit einer Wurzel.
 
 Faustregel:
 
-- **Einhand:** flexibel, spezifischer Vorteil, moderater Output
-- **Zweihand:** hoher Output oder besonders starker Flächeneffekt
+- **Eine Wurzel:** flexibel, spezifischer Vorteil, moderater Output
+- **Zwei Wurzeln:** hoher Output oder besonders starker Flächeneffekt
 
 ### 3. Nahkampf braucht ein eigenes Profil
 
@@ -68,13 +68,13 @@ Diese Typen sollten stärker die Identität der Waffen bestimmen.
 
 ## Zauberbürste
 
-**Rolle:** Zweihand-Allrounder / Spread-Waffe
+**Rolle:** Allrounder für zwei Wurzeln / Spread-Waffe
 
 Aktuell fühlt sie sich zu sehr wie ein schlechterer Wasserflosser an.
 
 ### Vorschlag
 
-- 2 Hände
+- 2 Wurzeln
 - 20 Schaden
 - 0,65 s
 - 430 Reichweite
@@ -86,7 +86,7 @@ Aktuell fühlt sie sich zu sehr wie ein schlechterer Wasserflosser an.
 
 ### Identität
 
-Die Zauberbürste wird Dentis klassische "Shotgun-/Paste-Waffe": zuverlässig, visuell befriedigend und als Zweihandwaffe stark genug.
+Die Zauberbürste wird Dentis klassische "Shotgun-/Paste-Waffe": zuverlässig, visuell befriedigend und als Waffe mit zwei Wurzeln stark genug.
 
 ### Spezialidee
 
@@ -104,7 +104,7 @@ Die Grundidee funktioniert bereits gut.
 
 ### Vorschlag
 
-- 1 Hand
+- 1 Wurzel
 - 32–34 Schaden
 - 1,25–1,30 s statt 1,35 s
 - 155–165 Reichweite statt 175
@@ -133,7 +133,7 @@ Aktuell ist die Single-Target-Leistung sehr schwach, während große Gegnergrupp
 
 ### Vorschlag
 
-- 1 Hand
+- 1 Wurzel
 - 13–14 Schaden
 - 1,15–1,25 s statt 1,80 s
 - 115–125 Radius statt 108
@@ -166,7 +166,7 @@ Der Wasserflosser profitiert stark von schnellen Treffern und mehreren vorhanden
 
 ### Vorschlag
 
-- 1 Hand
+- 1 Wurzel
 - 8–9 Schaden statt 11
 - 0,47–0,50 s statt 0,43
 - 310 Reichweite
@@ -196,7 +196,7 @@ Er soll selten die höchste reine DPS-Waffe sein.
 
 ### Vorschlag
 
-- 2 Hände
+- 2 Wurzeln
 - 32–34 Schaden statt 28
 - 1,40–1,45 s statt 1,50
 - 520–550 Reichweite
@@ -223,7 +223,7 @@ Langsam, schwer, geradlinig, aber enorm stark, wenn Gegner hintereinander stehen
 
 ### Vorschlag
 
-- 1 Hand
+- 1 Wurzel
 - 21–22 Schaden
 - 1,00–1,05 s
 - 390 Reichweite
@@ -252,7 +252,7 @@ Momentan ist die Raw-DPS sehr hoch und er profitiert zusätzlich von Schnitt-/Bl
 
 ### Vorschlag
 
-- 1 Hand
+- 1 Wurzel
 - 11–12 Schaden statt 14
 - 0,50–0,53 s statt 0,48
 - 105–115 Reichweite statt 125
@@ -273,13 +273,13 @@ Extrem kurze Reichweite, dafür schnelle Treffer und sehr guter Status-Aufbau.
 
 ## Mundspülungs-Mörser
 
-**Rolle:** Zweihand-AoE / Horde-Killer
+**Rolle:** AoE für zwei Wurzeln / Horde-Killer
 
-Aktuell ist die Waffe pro Hand-Slot zu schwach.
+Aktuell ist die Waffe pro Wurzelplatz zu schwach.
 
 ### Vorschlag
 
-- 2 Hände
+- 2 Wurzeln
 - 29–31 Schaden statt 24
 - 1,55–1,65 s statt 1,85
 - 470 Reichweite
@@ -424,7 +424,7 @@ Mögliche Effekte:
 
 ## 1. Zahnstocher-Speer
 
-**Typ:** Nahkampf / Stich / Einhand
+**Typ:** Nahkampf / Stich / 1 Wurzel
 
 - sehr lange Nahkampf-Reichweite
 - mittlere Angriffsgeschwindigkeit
@@ -437,7 +437,7 @@ Rolle: sicherer Nahkampf zwischen Kratzer und Bohrer.
 
 ## 2. Karies-Fräse
 
-**Typ:** Nahkampf / Bohrung / Zweihand
+**Typ:** Nahkampf / Bohrung / 2 Wurzeln
 
 - extrem kurze Reichweite
 - sehr schnelle kleine Treffer
@@ -450,7 +450,7 @@ Mechanik: Schaden steigt leicht, solange dieselbe Einheit dauerhaft getroffen wi
 
 ## 3. Interdental-Bürste
 
-**Typ:** Nahkampf / Schnitt / Einhand
+**Typ:** Nahkampf / Schnitt / 1 Wurzel
 
 - sehr kurzer Radius
 - extrem schnell
@@ -463,7 +463,7 @@ Rolle: Status-Maschine.
 
 ## 4. Fluorid-Sprüher
 
-**Typ:** Fernkampf / Schmelz oder Minze / Zweihand
+**Typ:** Fernkampf / Schmelz oder Minze / 2 Wurzeln
 
 - kurzer Kegel vor Denti
 - kontinuierliche kleine Hits
@@ -476,7 +476,7 @@ Mechanik: Gegner im Spray erhalten kurz einen Debuff und nehmen mehr Schmelzscha
 
 ## 5. Mundduschen-Turbine
 
-**Typ:** Wasser / Zweihand
+**Typ:** Wasser / 2 Wurzeln
 
 - breiter Wasserstrahl
 - niedriger Damage
@@ -489,7 +489,7 @@ Rolle: Crowd-Control-Support.
 
 ## 6. UV-Lampe
 
-**Typ:** Licht / Zweihand
+**Typ:** Licht / 2 Wurzeln
 
 - langsamer, breiter Beam
 - durchdringt Gegner
@@ -502,20 +502,20 @@ Rolle: schweres Präzisions-/Line-Clear-Licht-Geschütz.
 
 ## 7. Amalgam-Schleuder
 
-**Typ:** Metall / Fernkampf / Einhand
+**Typ:** Metall / Fernkampf / 1 Wurzel
 
 - langsame schwere Kugel
 - hoher Knockback
 - kleiner Splash
 - niedrige Feuerrate
 
-Rolle: schwere Einhand-Alternative zum Kronenwerfer.
+Rolle: schwere Alternative zum Kronenwerfer für eine Wurzel.
 
 ---
 
 ## 8. Zahnseiden-Garotte
 
-**Typ:** Schnitt / Nahkampf / Zweihand
+**Typ:** Schnitt / Nahkampf / 2 Wurzeln
 
 - großer Bogen vor Denti statt kompletter Kreis
 - hoher Schaden
@@ -528,7 +528,7 @@ Rolle: schwere Bleed-Waffe.
 
 ## 9. Prophylaxe-Polierer
 
-**Typ:** Nahkampf / Licht oder Schmelz / Einhand
+**Typ:** Nahkampf / Licht oder Schmelz / 1 Wurzel
 
 - kurze Reichweite
 - schnelle kreisende Treffer
@@ -541,7 +541,7 @@ Rolle: schnelle Crit-Melee-Waffe.
 
 ## 10. Fluorid-Rakete
 
-**Typ:** Schmelz / Zweihand
+**Typ:** Schmelz / 2 Wurzeln
 
 - sehr langsamer Schuss
 - große Explosion

@@ -7,6 +7,6 @@
 script = ExtResource("1")
 id = &"toothpick_spear"
 display_name = "Zahnstocher-Speer"
-description = "Einhand · Langer Stich trifft Gegner auf einer schmalen Linie."
+description = "1 Wurzel · Langer Stich trifft Gegner auf einer schmalen Linie."
 price = 10
 weapon_data = ExtResource("2")

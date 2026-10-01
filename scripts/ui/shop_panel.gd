@@ -327,7 +327,7 @@ func _render_selection() -> void:
 		details.merge_button.disabled = not bool(entry.mergeable)
 		details.merge_button.text = "Maximale Stufe IV" if tier == 4 else "Fusionieren · Stufe %s" % ["I", "II", "III", "IV"][tier]
 		if bool(entry.mergeable):
-			details.action_hint.text = "%d %s frei\n%s" % [data.hands, "Hand" if data.hands == 1 else "Hände", WeaponPresentation.comparison(data, tier + 1, data, tier, player)]
+			details.action_hint.text = "%s frei\n%s" % [data.roots_text(), WeaponPresentation.comparison(data, tier + 1, data, tier, player)]
 		else:
 			details.action_hint.text = "Kein Fusionspartner" if tier < 4 else ""
 		details.action_hint.visible = not details.action_hint.text.is_empty()
@@ -352,7 +352,7 @@ func _render_selection() -> void:
 		if data != null and offer.weapon_data != null and data.id == offer.weapon_data.id and int(entry.tier) == offer.weapon_tier and offer.weapon_tier < 4:
 			fusion = player != null and player.loadout.used_slots() + offer.weapon_data.hands > WeaponLoadout.CAPACITY
 	offer_buttons[selected_index].buy_button.tooltip_text = "Kaufen & fusionieren" if fusion and can_buy and wallet >= offer.price else offer_buttons[selected_index].buy_button.tooltip_text
-	details.action_hint.text = "Zu wenig Münzen" if wallet < offer.price else (("Hände voll" if offer.weapon_data != null else "Stapellimit erreicht") if not can_buy else ("Kauf fusioniert zu Stufe %s" % ["I", "II", "III", "IV"][offer.weapon_tier] if fusion else ""))
+	details.action_hint.text = "Zu wenig Münzen" if wallet < offer.price else (("Alle Wurzeln belegt" if offer.weapon_data != null else "Stapellimit erreicht") if not can_buy else ("Kauf fusioniert zu Stufe %s" % ["I", "II", "III", "IV"][offer.weapon_tier] if fusion else ""))
 	details.action_hint.visible = not details.action_hint.text.is_empty()
 	_highlight_equipment()
 
@@ -373,7 +373,7 @@ func _confirm_sale() -> void:
 	details.action_hint.visible = true
 
 func _show_inventory(entries: Array[Dictionary], used_slots: int, capacity: int) -> void:
-	inventory_label.text = "Hände · %d/%d" % [used_slots, capacity]
+	inventory_label.text = "Wurzeln · %d/%d" % [used_slots, capacity]
 	_clear(inventory_row)
 	for index in entries.size():
 		var entry := entries[index]
@@ -428,7 +428,7 @@ func _show_inventory(entries: Array[Dictionary], used_slots: int, capacity: int)
 		var empty := _button(slot, "+")
 		empty.disabled = true
 		empty.add_theme_font_size_override("font_size", 28)
-		empty.tooltip_text = "Freie Hand"
+		empty.tooltip_text = "Freie Wurzel"
 	_layout_inventory()
 
 func _highlight_equipment() -> void:
