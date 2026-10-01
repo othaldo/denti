@@ -35,9 +35,9 @@ Kisten-Zerlegewerte bleiben zunächst bei 60 % des Item-Basispreises plus vorhan
 
 Level-ups bieten vier Karten nebeneinander auf breiten Bildschirmen, ein 2×2-Raster in kleineren Fenstern und vier Karten untereinander in hohem Hochformat. In kurzem Querformat werden das Maskottchen und der Erklärungstext ausgeblendet, um Platz für die vier Entscheidungen zu schaffen. Die Effekte bleiben sichtbar; ausführliche Texte stehen zusätzlich im Tooltip.
 
-Der Shop zeigt auf Desktop ein 2×2-Raster und auf kleineren Bildschirmen eine scrollbare Liste. Sehr schmale Ansichten verwenden senkrechte Karten und Aktionsknöpfe. Kaufen und Merken liegen auf jeder Karte, Reroll und Wellenstart bleiben außerhalb der Angebotsliste erreichbar.
+Der Shop zeigt ab 1000×560 vier kompakte Angebote nebeneinander über die gesamte Dialogbreite. Ausrüstung, Stats und der ausgewählte Vergleich stehen darunter. Die Karten zeigen Icon und Namen in einer Zeile sowie bis zu zwei Zeilen Kurzbeschreibung; vollständige Effekte stehen im Tooltip und in den Details. Unterhalb dieser Breite wird ab 760 Pixeln ein 2×2-Raster verwendet, darunter eine scrollbare Liste. Sehr schmale Ansichten verwenden senkrechte Karten und Aktionsknöpfe. Kaufen und Merken liegen auf jeder Karte, Reroll und Wellenstart bleiben außerhalb der Angebotsliste erreichbar.
 
-Automatisch geprüft wurden 320×568, 360×640, 568×320, 640×360, 540×960, 720×1280, 800×600, 1024×600, 1280×720 und 1920×1080. Karten, Text/Icon-Grenzen und Knöpfe werden auf Überschneidungen und Überläufe geprüft. Gerenderte Ansichten bei 320×568, 720×1280 und 1280×720 wurden zusätzlich visuell geprüft.
+Automatisch geprüft wurden 320×568, 360×640, 568×320, 640×360, 540×960, 720×1280, 800×600, 1024×600, 1280×670, 1280×720 und 1920×1080 sowie der anschließende Wechsel zurück ins Hochformat. Karten, Text/Icon-Grenzen und Knöpfe werden auf Überschneidungen und Überläufe geprüft, auf breiten Bildschirmen auch alle Katalogtexte in den schmalen Karten. Gerenderte Ansichten bei 320×568, 720×1280, 1024×600, 1280×670 und 1280×720 wurden zusätzlich visuell geprüft.
 
 ## Messung und Grenzen
 

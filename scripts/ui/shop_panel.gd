@@ -27,6 +27,8 @@ var details: ShopDetails
 var main_scroll: ScrollContainer
 var flow: BoxContainer
 var offers_grid: GridContainer
+var offers_section: VBoxContainer
+var build_column: VBoxContainer
 var details_panel: PanelContainer
 var left_scroll: ScrollContainer
 var details_scroll: ScrollContainer
@@ -93,14 +95,18 @@ func _ready() -> void:
 	left_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	flow.add_child(left_scroll)
 	var left := VBoxContainer.new()
+	build_column = left
 	left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	left.add_theme_constant_override("separation", 6)
 	left_scroll.add_child(left)
-	ShopDetails._label(left, "Angebote", 16)
+	offers_section = VBoxContainer.new()
+	offers_section.add_theme_constant_override("separation", 4)
+	left.add_child(offers_section)
+	ShopDetails._label(offers_section, "Angebote", 16)
 	offers_grid = GridContainer.new()
 	offers_grid.columns = 2
 	offers_grid.add_theme_constant_override("h_separation", 9)
-	left.add_child(offers_grid)
+	offers_section.add_child(offers_grid)
 	for index in ShopController.OFFER_COUNT:
 		var card := OfferCard.new()
 		card.selection_only = true
@@ -172,7 +178,8 @@ func set_build_context(context: Player) -> void:
 
 func _update_layout() -> void:
 	var extent: Vector2 = $Root.size
-	compact = extent.x < 1000 or extent.y <= 620
+	var offer_row := extent.x >= 1000 and extent.y >= 560
+	compact = not offer_row
 	var narrow := extent.x < 600
 	shop_actions.vertical = narrow and extent.y >= 480
 	detail_actions.vertical = narrow and extent.y >= 480
@@ -182,7 +189,15 @@ func _update_layout() -> void:
 	details.heading.add_theme_font_size_override("font_size", 17 if narrow else 21)
 	details.icon.custom_minimum_size = Vector2(40, 40) if narrow else Vector2(56, 56)
 	flow.vertical = compact
-	offers_grid.columns = 1 if compact else 2
+	# Use the full dialog width for offers; build and comparison stay below.
+	var offer_parent: Node = rows if offer_row else build_column
+	if offers_section.get_parent() != offer_parent:
+		offers_section.reparent(offer_parent)
+	if offer_row:
+		rows.move_child(offers_section, 1)
+	else:
+		build_column.move_child(offers_section, 0)
+	offers_grid.columns = 4 if offer_row else (2 if extent.x >= 760 else 1)
 	detail_column.custom_minimum_size.x = 0 if compact else 380
 	var action_parent: Node = rows if compact else detail_column
 	if detail_actions.get_parent() != action_parent:
@@ -202,7 +217,7 @@ func _update_layout() -> void:
 	for chip in items_row.get_children():
 		chip.custom_minimum_size = Vector2(64, 60) if compact else Vector2(56, 52)
 	for card in offer_buttons:
-		card.set_catalog_layout(not compact or narrow)
+		card.set_catalog_layout(offer_row or extent.x >= 760 or narrow, offer_row)
 
 func show_shop(wave_number: int, coins: int, reroll_cost: int, new_offers: Array[ShopOfferData], preview: String = "", new_equipment: Array[Dictionary] = [], used_slots: int = 0, capacity: int = 6, buyable: Array[bool] = [], luck: float = 0.0, collected: Array[Dictionary] = [], counts: Dictionary = {}, offer_dps: Array[float] = [], reserved: Array[bool] = []) -> void:
 	offers = new_offers

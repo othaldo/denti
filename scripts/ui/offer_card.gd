@@ -10,6 +10,8 @@ var buy_button: Button
 var reserve_button: Button
 var selection_only := false
 var content: BoxContainer
+var catalog_header: HBoxContainer
+var info_box: VBoxContainer
 var card_margin: MarginContainer
 var icon_rect: TextureRect
 var name_label: Label
@@ -17,14 +19,32 @@ var rarity_label: Label
 var effect_label: Label
 var price_label: Label
 var hover_tween: Tween
+var dense_catalog := false
 
-func set_catalog_layout(vertical: bool) -> void:
+func set_catalog_layout(vertical: bool, dense: bool = false) -> void:
+	dense_catalog = dense
 	content.vertical = vertical
-	buy_button.custom_minimum_size.y = 48 if vertical else 64
-	custom_minimum_size.y = 210 if vertical else 96
-	icon_rect.custom_minimum_size = Vector2(48, 48)
-	name_label.add_theme_font_size_override("font_size", 18)
-	effect_label.add_theme_font_size_override("font_size", 14)
+	catalog_header.visible = dense
+	if dense:
+		if icon_rect.get_parent() != catalog_header:
+			icon_rect.reparent(catalog_header)
+			name_label.reparent(catalog_header)
+	else:
+		if icon_rect.get_parent() != content:
+			icon_rect.reparent(content)
+			content.move_child(icon_rect, 1)
+			name_label.reparent(info_box)
+			info_box.move_child(name_label, 0)
+	buy_button.custom_minimum_size.y = 40 if dense else (48 if vertical else 64)
+	reserve_button.custom_minimum_size.y = 32 if dense else 36
+	custom_minimum_size.y = 208 if dense else (210 if vertical else 96)
+	icon_rect.custom_minimum_size = Vector2(40, 40) if dense else Vector2(48, 48)
+	name_label.add_theme_font_size_override("font_size", 16 if dense else 18)
+	effect_label.add_theme_font_size_override("font_size", 13 if dense else 14)
+	effect_label.max_lines_visible = 2 if dense else -1
+	effect_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS if dense else TextServer.OVERRUN_NO_TRIMMING
+	for edge in ["left", "right"]:
+		card_margin.add_theme_constant_override("margin_" + edge, 9 if dense else 13)
 
 
 
@@ -80,7 +100,7 @@ func show_reservation(reserved: bool) -> void:
 
 func _fit_content() -> void:
 	if selection_only:
-		custom_minimum_size.y = maxf(96.0 if not content.vertical else 210.0, card_margin.get_combined_minimum_size().y)
+		custom_minimum_size.y = maxf(208.0 if dense_catalog else (96.0 if not content.vertical else 210.0), card_margin.get_combined_minimum_size().y + (8.0 if dense_catalog else 0.0))
 
 
 func set_compact(compact: bool) -> void:
@@ -103,6 +123,11 @@ func _build_content() -> void:
 	content.add_theme_constant_override("separation", 4)
 	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	card_margin.add_child(content)
+	catalog_header = HBoxContainer.new()
+	catalog_header.add_theme_constant_override("separation", 6)
+	catalog_header.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	catalog_header.visible = false
+	content.add_child(catalog_header)
 	icon_rect = TextureRect.new()
 	icon_rect.custom_minimum_size = Vector2(78, 78)
 	icon_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -110,6 +135,7 @@ func _build_content() -> void:
 	icon_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	content.add_child(icon_rect)
 	var details := VBoxContainer.new()
+	info_box = details
 	details.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	details.alignment = BoxContainer.ALIGNMENT_CENTER
 	details.add_theme_constant_override("separation", 1)
@@ -120,6 +146,7 @@ func _build_content() -> void:
 	name_label.add_theme_font_size_override("font_size", 21)
 	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	name_label.max_lines_visible = 2
+	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	details.add_child(name_label)
 	rarity_label = Label.new()

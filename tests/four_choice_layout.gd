@@ -19,7 +19,7 @@ func _run() -> void:
 	var capture_path := ProjectSettings.globalize_path("res://.codex/economy-previews")
 	if capture:
 		DirAccess.make_dir_recursive_absolute(capture_path)
-	for extent in [Vector2i(320, 568), Vector2i(360, 640), Vector2i(568, 320), Vector2i(640, 360), Vector2i(540, 960), Vector2i(720, 1280), Vector2i(800, 600), Vector2i(1024, 600), Vector2i(1280, 720), Vector2i(1920, 1080)]:
+	for extent in [Vector2i(320, 568), Vector2i(360, 640), Vector2i(568, 320), Vector2i(640, 360), Vector2i(540, 960), Vector2i(720, 1280), Vector2i(800, 600), Vector2i(1024, 600), Vector2i(1280, 670), Vector2i(1280, 720), Vector2i(1920, 1080), Vector2i(360, 640)]:
 		root.content_scale_size = extent
 		root.size = extent
 		if capture:
@@ -61,12 +61,38 @@ func _run() -> void:
 		for frame in 5:
 			await process_frame
 		var ui: ShopPanel = game.shop_panel
+		var wide: bool = extent.x >= 1000 and extent.y >= 560
+		if wide:
+			if ui.offers_grid.columns != 4 or ui.offers_section.get_index() >= ui.main_scroll.get_index():
+				_fail("wide shop does not place four offers above the build at %s" % extent)
+				return
+			var previous_right := -1.0
+			var row_y := ui.offer_buttons[0].get_global_rect().position.y
+			for card: OfferCard in ui.offer_buttons:
+				var rect := card.get_global_rect()
+				if not bounds.encloses(rect) or absf(rect.position.y - row_y) > 1.0 or rect.position.x < previous_right:
+					_fail("wide shop offers overlap or leave their row at %s" % extent)
+					return
+				previous_right = rect.end.x
+			# All catalog descriptions must fit the narrow cards, including long synergies.
+			for template in ShopController.CATALOG:
+				var card: OfferCard = ui.offer_buttons[0]
+				card.show_offer(template, 100)
+				for frame in 2:
+					await process_frame
+				for control in [card.icon_rect, card.name_label, card.rarity_label, card.effect_label, card.buy_button, card.reserve_button]:
+					if not card.get_global_rect().encloses(control.get_global_rect()):
+						_fail("compact catalog content exceeds card at %s: %s" % [extent, template.id])
+						return
+			game._update_shop_panel()
+			for frame in 4:
+				await process_frame
 		if not bounds.encloses(ui.get_node("Root/Center/Panel").get_global_rect()) or not bounds.encloses(ui.continue_button.get_global_rect()):
 			_fail("four-offer shop or continue action exceeds %s: panel %s, continue %s" % [extent, ui.get_node("Root/Center/Panel").get_global_rect(), ui.continue_button.get_global_rect()])
 			return
 		for card: OfferCard in ui.offer_buttons:
 			if card.content.visible and (not card.get_global_rect().encloses(card.buy_button.get_global_rect()) or not card.get_global_rect().encloses(card.reserve_button.get_global_rect())):
-				_fail("buy/reserve controls exceed shop card at %s" % extent)
+				_fail("buy/reserve controls exceed shop card at %s: card %s, buy %s, reserve %s" % [extent, card.get_global_rect(), card.buy_button.get_global_rect(), card.reserve_button.get_global_rect()])
 				return
 		ui._select("equipment", 0)
 		for frame in 4:
@@ -75,7 +101,7 @@ func _run() -> void:
 			_fail("full equipment or sell action exceeds %s: panel %s, sell %s" % [extent, ui.get_node("Root/Center/Panel").get_global_rect(), ui.details.sell_button.get_global_rect()])
 			return
 		ui._select("offer", 0)
-		if capture and extent in [Vector2i(320, 568), Vector2i(720, 1280), Vector2i(1280, 720)]:
+		if capture and extent in [Vector2i(320, 568), Vector2i(720, 1280), Vector2i(1024, 600), Vector2i(1280, 670), Vector2i(1280, 720)]:
 			await RenderingServer.frame_post_draw
 			root.get_texture().get_image().save_png(capture_path + "/shop_%dx%d.png" % [extent.x, extent.y])
 	# Fresh choices and save/resume preserve the fourth option and its effect.
