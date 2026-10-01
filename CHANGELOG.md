@@ -4,6 +4,8 @@ Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü an
 
 ## In Entwicklung
 
+- Goldextraktor-Icon: zusätzliche dritte Metallspitze entfernt; zwei klar getrennte Klingen. Die Goldsonde bleibt unverändert.
+
 - **Endlosmodus:** nach dem Sieg in Welle 20 mit dem bestehenden Build weiterspielen. Ab Welle 21 dauern Wellen 60 Sekunden; die Brotato-Endloskurve verstärkt Gegner und Shoppreise. Mehr Elite- und Gegnerdruck, Doppelbosse in Welle 30/40/... und vollständiges Save/Resume. Der ursprüngliche Sieg bleibt erhalten. [Kurve, Messungen und Vorschau](docs/ENDLESS_MODE.md).
 
 - Normale Gegner haben auf Normal 100 % Basis-Münzchance, mit Wellenabschwächung ab Welle 5 auf 70 % in Welle 20. Die bisherige zusätzliche niedrige Grundchance entfällt; XP bleibt unabhängig.
