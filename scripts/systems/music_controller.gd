@@ -58,7 +58,7 @@ func _process(delta: float) -> void:
 
 
 func play_wave(wave_number: int) -> void:
-	if wave_number >= WaveController.MAX_WAVES:
+	if wave_number >= WaveController.MAX_WAVES and WaveController.is_boss_wave(wave_number):
 		_request_mode(&"final_boss_1")
 	elif WaveController.is_boss_wave(wave_number):
 		_request_mode(&"mini_boss_1" if wave_number % (WaveController.MINI_BOSS_INTERVAL * 2) == WaveController.MINI_BOSS_INTERVAL else &"mini_boss_2")

@@ -71,6 +71,7 @@ var elite_index: int = 0
 var current_profile_id: StringName = &""
 var next_profile_id: StringName = &""
 var difficulty_id: StringName = &"normal"
+var endless_enabled: bool = false
 
 
 func plan_hordes() -> void:
@@ -82,6 +83,8 @@ static func is_boss_wave(wave_number: int) -> bool:
 
 
 static func duration_for_wave(wave_number: int) -> float:
+	if wave_number >= EndlessRules.FIRST_WAVE:
+		return EndlessRules.WAVE_DURATION
 	if wave_number <= 0 or is_boss_wave(wave_number):
 		return DURATION
 	if wave_number <= 4:
@@ -109,6 +112,11 @@ static func elite_for_wave(wave_number: int) -> EnemyData:
 
 static func elite_groups_for_wave(wave_number: int, selected_difficulty_id: StringName = &"normal") -> Array[int]:
 	var difficulty := DifficultyCatalog.by_id(selected_difficulty_id)
+	if wave_number >= EndlessRules.FIRST_WAVE:
+		var extra := EndlessRules.extra_elites(wave_number) + difficulty.elite_group_bonus
+		if is_boss_wave(wave_number):
+			return [clampi(extra, 1, EndlessRules.MAX_ELITE_GROUP)]
+		return [clampi(2 + extra, 1, EndlessRules.MAX_ELITE_GROUP), clampi(1 + extra, 1, EndlessRules.MAX_ELITE_GROUP), 1]
 	var stage_wave := wave_number + difficulty.elite_wave_offset
 	if stage_wave < 8 or is_boss_wave(wave_number):
 		return []
@@ -139,6 +147,8 @@ func elite_reserved_slots() -> int:
 
 
 static func health_multiplier(data: EnemyData, wave_number: int) -> float:
+	if wave_number >= EndlessRules.FIRST_WAVE:
+		return health_multiplier(data, EndlessRules.baseline_wave(wave_number)) * EndlessRules.health_factor(wave_number)
 	if not data.is_boss and data.health_per_wave > 0.0:
 		var late_waves := maxi(wave_number - MOB_LATE_START_WAVE, 0)
 		return 1.0 + (maxi(wave_number - 1, 0) * data.health_per_wave + late_waves * late_waves * data.late_health_acceleration) / maxf(data.max_health, 1.0)
@@ -151,6 +161,7 @@ static func health_multiplier(data: EnemyData, wave_number: int) -> float:
 
 
 static func damage_reduction(data: EnemyData, wave_number: int) -> float:
+	wave_number = EndlessRules.baseline_wave(wave_number)
 	var step := BOSS_DEFENSE_WAVE_STEP if data.is_boss else MOB_DEFENSE_WAVE_STEP
 	var reduction := data.damage_reduction + maxi(wave_number - 1, 0) * step
 	if not data.is_boss:
@@ -159,6 +170,8 @@ static func damage_reduction(data: EnemyData, wave_number: int) -> float:
 
 
 static func enemy_damage_multiplier(data: EnemyData, wave_number: int) -> float:
+	if wave_number >= EndlessRules.FIRST_WAVE:
+		return enemy_damage_multiplier(data, EndlessRules.baseline_wave(wave_number)) * EndlessRules.damage_factor(wave_number)
 	var multiplier := 1.0 + maxi(wave_number - 1, 0) * ENEMY_DAMAGE_WAVE_STEP
 	if not data.is_boss:
 		multiplier += maxi(wave_number - MOB_LATE_START_WAVE, 0) * MOB_DAMAGE_LATE_STEP
@@ -166,6 +179,8 @@ static func enemy_damage_multiplier(data: EnemyData, wave_number: int) -> float:
 
 
 static func enemy_speed_multiplier(data: EnemyData, wave_number: int) -> float:
+	if wave_number >= EndlessRules.FIRST_WAVE:
+		return enemy_speed_multiplier(data, EndlessRules.baseline_wave(wave_number)) * EndlessRules.speed_factor(wave_number)
 	var multiplier := 1.0 + maxi(wave_number - 1, 0) * ENEMY_SPEED_WAVE_STEP
 	if not data.is_boss:
 		multiplier += maxi(wave_number - MOB_LATE_START_WAVE, 0) * MOB_SPEED_LATE_STEP
@@ -213,12 +228,14 @@ func next_wave_preview() -> String:
 
 
 func prepare_next_wave_profile() -> StringName:
-	if next_profile_id == &"" and current_wave + 1 <= MAX_WAVES and not is_boss_wave(current_wave + 1):
+	if next_profile_id == &"" and (current_wave + 1 <= MAX_WAVES or endless_enabled) and not is_boss_wave(current_wave + 1):
 		next_profile_id = _roll_profile(current_wave + 1, current_profile_id)
 	return next_profile_id
 
 
 func start_next_wave() -> void:
+	if current_wave >= MAX_WAVES and not endless_enabled:
+		return
 	if horde_waves.is_empty():
 		plan_hordes()
 	current_wave += 1
@@ -233,6 +250,8 @@ func start_next_wave() -> void:
 	active = true
 	if is_boss_wave(current_wave):
 		boss_requested.emit(boss_for_wave(current_wave))
+		if current_wave > MAX_WAVES and current_wave % 10 == 0:
+			boss_requested.emit(CAVITY_KING if current_wave % 20 == 10 else CAVITY_PRINCE)
 
 
 func _process(delta: float) -> void:
@@ -259,7 +278,7 @@ func _process(delta: float) -> void:
 	if spawn_cooldown <= 0.0:
 		enemy_requested.emit(_choose_enemy())
 		var spawn_floor := BOSS_WAVE_SPAWN_INTERVAL_MIN if is_boss_wave(current_wave) else SPAWN_INTERVAL_MIN
-		spawn_cooldown = maxf(SPAWN_INTERVAL_START - elapsed * SPAWN_INTERVAL_ACCELERATION - (current_wave - 1) * SPAWN_INTERVAL_WAVE_STEP, spawn_floor) * DifficultyCatalog.by_id(difficulty_id).spawn_interval_multiplier
+		spawn_cooldown = maxf(SPAWN_INTERVAL_START - elapsed * SPAWN_INTERVAL_ACCELERATION - (current_wave - 1) * SPAWN_INTERVAL_WAVE_STEP, spawn_floor) * DifficultyCatalog.by_id(difficulty_id).spawn_interval_multiplier / EndlessRules.density_factor(current_wave)
 
 
 func plan_bursts() -> void:
@@ -308,7 +327,7 @@ func _burst_count(index: int) -> int:
 			base_count = 5 + current_wave
 		_:
 			base_count = 2 + current_wave / 5 if is_boss_wave(current_wave) else 3 + current_wave / 3
-	return maxi(roundi(float(base_count) * DifficultyCatalog.by_id(difficulty_id).horde_size_multiplier), 1)
+	return clampi(roundi(float(base_count) * DifficultyCatalog.by_id(difficulty_id).horde_size_multiplier), 1, 60)
 
 
 func _choose_enemy() -> EnemyData:
@@ -344,6 +363,6 @@ func _horde_data(wave_number: int) -> EnemyData:
 
 
 func _roll_profile(wave_number: int, avoid_id: StringName = &"") -> StringName:
-	if wave_number > MAX_WAVES or is_boss_wave(wave_number):
+	if (wave_number > MAX_WAVES and not endless_enabled) or is_boss_wave(wave_number):
 		return &""
 	return WaveProfileCatalog.roll_for_wave(wave_number, avoid_id)

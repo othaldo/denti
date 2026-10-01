@@ -246,7 +246,8 @@ func _show_stats() -> void:
 	_clear_rows()
 	_compact_title("Stats")
 	var stats: PlayerStats = game.player.stats
-	ShopDetails._label(rows, "Leben %.0f / %.0f · Schild %d · Level %d\nXP %d / %d · Welle %d / %d" % [stats.health, stats.max_health, stats.shield_charges, game.level, game.xp, game.xp_goal, game.wave.current_wave, WaveController.MAX_WAVES], 16)
+	var wave_text := "Endlos · Welle %d" % game.wave.current_wave if game.wave.endless_enabled else "Welle %d / %d" % [game.wave.current_wave, WaveController.MAX_WAVES]
+	ShopDetails._label(rows, "Leben %.0f / %.0f · Schild %d · Level %d\nXP %d / %d · %s" % [stats.health, stats.max_health, stats.shield_charges, game.level, game.xp, game.xp_goal, wave_text], 16)
 	var wallet := HBoxContainer.new()
 	rows.add_child(wallet)
 	ShopDetails._label(wallet, str(game.coins), 18).autowrap_mode = TextServer.AUTOWRAP_OFF

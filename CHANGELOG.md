@@ -4,6 +4,8 @@ Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü an
 
 ## In Entwicklung
 
+- **Endlosmodus:** nach dem Sieg in Welle 20 mit dem bestehenden Build weiterspielen. Ab Welle 21 dauern Wellen 60 Sekunden; die Brotato-Endloskurve verstärkt Gegner und Shoppreise. Mehr Elite- und Gegnerdruck, Doppelbosse in Welle 30/40/... und vollständiges Save/Resume. Der ursprüngliche Sieg bleibt erhalten. [Kurve, Messungen und Vorschau](docs/ENDLESS_MODE.md).
+
 - Normale Gegner haben auf Normal 100 % Basis-Münzchance, mit Wellenabschwächung ab Welle 5 auf 70 % in Welle 20. Die bisherige zusätzliche niedrige Grundchance entfällt; XP bleibt unabhängig.
 - **32 Shop-Items:** Goldsonde kann Münz-Drops verdoppeln und profitiert begrenzt von Glück; Goldextraktor gibt mehr Münzen aus Zucker und Eliten. Beide haben Nachteile, Stapellimits und neue gemalte Icons.
 - **Level-up-Rerolls:** vier neue Angebote gegen Münzen, steigende Kosten pro Auswahl und Zurücksetzen beim nächsten verdienten Level. Meilenstein-Seltenheit und Save/Resume bleiben erhalten. [Messungen und Vorschau](docs/ECONOMY_BALANCE.md).

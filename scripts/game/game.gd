@@ -39,6 +39,7 @@ var xp_goal: int = 5
 var level: int = 1
 var coins: int = 0
 var ended: bool = false
+var base_victory: bool = false
 var in_shop: bool = false
 var starter_pending: bool = false
 var boss: Enemy
@@ -76,6 +77,7 @@ func _ready() -> void:
 	choice_panel.starter_chosen.connect(_on_starter_chosen)
 	choice_panel.restart_requested.connect(_restart)
 	choice_panel.main_menu_requested.connect(_on_end_main_menu)
+	choice_panel.endless_requested.connect(_on_endless_requested)
 	shop_panel.buy_requested.connect(_on_shop_buy)
 	shop_panel.sell_requested.connect(_on_shop_sell)
 	shop_panel.merge_requested.connect(_on_shop_merge)
@@ -151,8 +153,21 @@ func _notification(what: int) -> void:
 
 
 func _refresh_hud() -> void:
+	boss = BossEncounter.primary($Enemies)
 	var visible_boss: Enemy = boss if is_instance_valid(boss) else null
 	hud.update_status(player.stats, xp, xp_goal, level, coins, wave.current_wave, wave.remaining, in_shop, visible_boss, boss_pending, collecting_wave_loot, rewards.pending_levels)
+	if wave.endless_enabled:
+		hud.wave_label.text = "ENDLOS · %d" % wave.current_wave
+	var encounter_bosses := BossEncounter.remaining($Enemies)
+	if encounter_bosses.size() > 1:
+		var encounter_health := 0.0
+		var encounter_max_health := 0.0
+		for member in encounter_bosses:
+			encounter_health += member.health
+			encounter_max_health += member.max_health
+		hud.boss_label.text = "%d Bosse · %.0f / %.0f" % [encounter_bosses.size(), encounter_health, encounter_max_health]
+		hud.boss_bar.max_value = encounter_max_health
+		hud.boss_bar.value = encounter_health
 	hud.update_telemetry(telemetry, $Enemies.get_child_count(), $Projectiles.get_child_count() + $EnemyProjectiles.get_child_count())
 
 
@@ -240,7 +255,7 @@ func _create_enemy(data: EnemyData, at: Vector2) -> void:
 	enemy.attack_performed.connect(sound.play_cue)
 	if data.is_boss:
 		enemy.death_started.connect(_on_boss_death_started)
-		enemy.enraged.connect(_on_boss_enraged)
+		enemy.enraged.connect(_on_boss_enraged.bind(enemy))
 		enemy.boss_phase_started.connect(_on_boss_phase_started)
 		enemy.boss_guarded.connect(_on_boss_guarded)
 		enemy.reinforcements_requested.connect(_on_boss_reinforcements)
@@ -261,7 +276,7 @@ func _on_enemy_defeated(at: Vector2, data: EnemyData) -> void:
 	coins += bonus_coins
 	telemetry.record_loot(&"coin", bonus_coins, &"kill_item")
 	if data.is_boss:
-		boss = null
+		boss = BossEncounter.primary($Enemies)
 		if boss_pending:
 			call_deferred("_resolve_boss_wave")
 		return
@@ -277,15 +292,17 @@ func _on_enemy_defeated(at: Vector2, data: EnemyData) -> void:
 
 
 func _on_boss_death_started(_at: Vector2) -> void:
-	telemetry.record_boss_death()
+	if BossEncounter.remaining($Enemies, false).is_empty():
+		telemetry.record_boss_death()
 	sound.play_cue(&"boss_break")
 	camera_shake_time = 0.45
 
 
-func _on_boss_enraged(at: Vector2) -> void:
+func _on_boss_enraged(at: Vector2, source: Enemy = null) -> void:
 	sound.play_cue(&"boss_warning")
-	var inflamed := is_instance_valid(boss) and boss.overtime_active
-	_show_item_feedback("ENTZÜNDET!" if inflamed else "BOSS WIRD WÜTEND!", at, boss.data.inflammation_color if inflamed else Color(1.0, 0.39, 0.27))
+	var member := source if is_instance_valid(source) else boss
+	var inflamed := is_instance_valid(member) and member.overtime_active
+	_show_item_feedback("ENTZÜNDET!" if inflamed else "BOSS WIRD WÜTEND!", at, member.data.inflammation_color if inflamed else Color(1.0, 0.39, 0.27))
 	camera_shake_time = 0.25
 
 
@@ -304,7 +321,7 @@ func _on_elite_guarded(at: Vector2) -> void:
 
 
 func _on_boss_reinforcements(count: int) -> void:
-	_spawn_horde(WaveController.ACID_SPITTER if wave.current_wave == WaveController.MAX_WAVES else WaveController.BACTERIA, count)
+	_spawn_horde(WaveController.ACID_SPITTER if wave.current_wave >= WaveController.MAX_WAVES else WaveController.BACTERIA, count)
 
 
 func _spawn_loot(at: Vector2, kind: StringName, amount: int, reward_id: StringName = &"") -> void:
@@ -438,9 +455,11 @@ func _on_wave_finished(wave_number: int) -> void:
 	if ended:
 		return
 	if WaveController.is_boss_wave(wave_number):
-		if is_instance_valid(boss):
+		var remaining_bosses := BossEncounter.remaining($Enemies)
+		if not remaining_bosses.is_empty():
 			boss_pending = true
-			boss.start_overtime()
+			for member in remaining_bosses:
+				member.start_overtime()
 			_clear_combat(true)
 			_sync_music()
 			_refresh_hud()
@@ -452,7 +471,7 @@ func _on_wave_finished(wave_number: int) -> void:
 
 
 func _resolve_boss_wave() -> void:
-	if ended or not boss_pending:
+	if ended or not boss_pending or not BossEncounter.remaining($Enemies).is_empty():
 		return
 	boss_pending = false
 	_clear_combat()
@@ -487,9 +506,9 @@ func _finish_loot_collection() -> void:
 	var interest := items.on_wave_end(coins)
 	coins += interest
 	telemetry.record_loot(&"coin", interest, &"interest")
-	if wave.current_wave < WaveController.MAX_WAVES and WaveController.is_boss_wave(wave.current_wave) and rewards.pending_relics.is_empty():
+	if (wave.current_wave < WaveController.MAX_WAVES or wave.current_wave > WaveController.MAX_WAVES and wave.current_wave % 10 == 0) and WaveController.is_boss_wave(wave.current_wave) and rewards.pending_relics.is_empty():
 		rewards.queue_relics(RelicCatalog.choices(relics.owned))
-	rewards.finish_collection(wave.current_wave >= WaveController.MAX_WAVES)
+	rewards.finish_collection(wave.current_wave >= WaveController.MAX_WAVES and not wave.endless_enabled)
 	_advance_post_wave_rewards()
 
 
@@ -548,7 +567,7 @@ func _clear_arena(collect_drops: bool, keep_boss: bool = false) -> void:
 
 func _clear_combat(keep_boss: bool = false) -> void:
 	for enemy in $Enemies.get_children():
-		if keep_boss and enemy == boss:
+		if keep_boss and enemy.data.is_boss:
 			continue
 		enemy.queue_free()
 	if not keep_boss:
@@ -564,6 +583,7 @@ func _finish_run() -> void:
 		return
 	rewards.step = PostWaveRewards.Step.END
 	ended = true
+	base_victory = true
 	boss_pending = false
 	_sync_music()
 	_clear_arena(true)
@@ -574,6 +594,17 @@ func _finish_run() -> void:
 	session.clear_run()
 	_refresh_hud()
 	get_tree().paused = true
+
+
+func _on_endless_requested() -> void:
+	if not ended or not base_victory or wave.endless_enabled or wave.current_wave != WaveController.MAX_WAVES:
+		return
+	wave.endless_enabled = true
+	ended = false
+	rewards.final_wave = false
+	choice_panel.visible = false
+	player.set_physics_process(true)
+	_open_shop()
 
 
 func _open_shop() -> void:
@@ -702,13 +733,16 @@ func _on_player_died() -> void:
 
 func _save_completed_report(won: bool) -> void:
 	var report := _run_recap_data()
-	report["outcome"] = "victory" if won else "death"
+	report["outcome"] = "victory" if won or base_victory else "death"
+	report["ended_by"] = "completion" if won else "death"
 	session.save_run_report(report)
 
 
 func _run_recap_data() -> Dictionary:
 	return {
 		"difficulty_id": str(wave.difficulty_id),
+		"endless_enabled": wave.endless_enabled,
+		"base_victory": base_victory,
 		"wave_reached": wave.current_wave,
 		"final_level": level,
 		"coins_left": coins,

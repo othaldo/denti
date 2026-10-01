@@ -199,6 +199,7 @@ func current_wave_summary() -> Dictionary:
 	var duration := maxf(elapsed - wave_started_at, 0.0)
 	return {
 		"wave": current_wave, "profile_id": str(current_profile_id), "combat_seconds": duration,
+		"endless_factor": EndlessRules.factor(current_wave),
 		"spawns": wave_spawns, "spawns_blocked": wave_spawns_blocked, "kills": wave_kills,
 		"elites_spawned": wave_elites_spawned, "elites_killed": wave_elites_killed,
 		"peak_enemies_alive": wave_peak_enemies, "average_enemies_alive": wave_enemy_seconds / maxf(duration, 1.0),

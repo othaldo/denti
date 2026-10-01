@@ -63,6 +63,7 @@ const OFFER_COUNT := 4
 var offers: Array[ShopOfferData] = []
 var reserved: Array[bool] = [false, false, false, false]
 var reroll_cost: int = 2
+var reroll_step: int = 1
 var rng := RandomNumberGenerator.new()
 
 
@@ -71,13 +72,14 @@ func _ready() -> void:
 
 
 func open_shop(wave_number: int, luck: float, loadout: WeaponLoadout, items: ItemInventory = null) -> void:
-	reroll_cost = 2
+	reroll_cost = EndlessRules.shop_reroll_start(wave_number)
+	reroll_step = EndlessRules.shop_reroll_step(wave_number)
 	_roll_offers(wave_number, luck, loadout, items)
 
 
 func reroll(wave_number: int, luck: float, loadout: WeaponLoadout, items: ItemInventory = null) -> void:
 	_roll_offers(wave_number, luck, loadout, items)
-	reroll_cost += 1
+	reroll_cost += reroll_step
 
 
 func take_offer(index: int) -> ShopOfferData:

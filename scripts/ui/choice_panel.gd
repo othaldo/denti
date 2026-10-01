@@ -8,6 +8,7 @@ signal relic_chosen(id: StringName)
 signal starter_chosen(weapon: WeaponData)
 signal restart_requested
 signal main_menu_requested
+signal endless_requested
 const UPGRADE_COUNT := 4
 
 @onready var title_label: Label = $Root/Center/Panel/Margin/Rows/Title
@@ -57,6 +58,9 @@ func _update_layout() -> void:
 	var viewport_size: Vector2 = $Root.size
 	var portrait := viewport_size.y > viewport_size.x and viewport_size.x < 800.0
 	level_actions.visible = mode == &"upgrade"
+	if mode == &"end":
+		_layout_end(viewport_size)
+		return
 	if mode == &"upgrade":
 		var narrow := viewport_size.x < 600.0 or viewport_size.y < 480.0
 		reroll_button.custom_minimum_size = Vector2(80, 32 if narrow else 40)
@@ -93,6 +97,28 @@ func _update_layout() -> void:
 		(button as UpgradeCard).set_mobile_text(portrait or viewport_size.y <= 620.0)
 		if mode == &"starter":
 			button.custom_minimum_size.y = 285.0 if portrait or viewport_size.y <= 620.0 else 250.0
+
+
+func _layout_end(viewport_size: Vector2) -> void:
+	var compact := viewport_size.x < 600.0 or viewport_size.y < 600.0
+	dialog_panel.custom_minimum_size = Vector2(minf(viewport_size.x - 24.0, 900.0), 0)
+	$Root/Center/Panel/Margin/Rows/Portrait.visible = viewport_size.y >= 600.0
+	$Root/Center/Panel/Margin/Rows/Portrait.custom_minimum_size.y = 64.0
+	title_label.add_theme_font_size_override("font_size", 22 if compact else 30)
+	subtitle_label.visible = true
+	subtitle_label.custom_minimum_size.y = 0
+	subtitle_label.add_theme_font_size_override("font_size", 14 if compact else 17)
+	subtitle_label.text = _end_summary(end_won, end_coins, end_recap)
+	for edge in ["left", "right", "top", "bottom"]:
+		$Root/Center/Panel/Margin.add_theme_constant_override("margin_" + edge, 8 if compact else 14)
+	cards.columns = 2
+	cards.add_theme_constant_override("h_separation", 8 if compact else 12)
+	cards.add_theme_constant_override("v_separation", 8 if compact else 12)
+	var labels := ["Neuer Run", "Credits", "Hauptmenü", "Endlos"] if compact else ["Noch einmal spielen", "Credits", "Hauptmenü", "Endlos weiterspielen"]
+	for index in buttons.size():
+		buttons[index].custom_minimum_size = Vector2(0, 40 if compact else 48)
+		buttons[index].add_theme_font_size_override("font_size", 14 if compact else 18)
+		buttons[index].text = labels[index]
 
 
 func update_level_reroll(coins: int, cost: int, earned_level: int = 0) -> void:
@@ -179,7 +205,7 @@ func show_end(won: bool, coins: int, recap: Dictionary = {}) -> void:
 	dialog_panel.custom_minimum_size = Vector2(900, 560)
 	_update_layout()
 	$Root/Center/Panel/Margin/Rows/Portrait.custom_minimum_size.y = 80.0
-	title_label.text = "Alle huldigen Denti!" if won else "Denti ist ausgefallen!"
+	title_label.text = "Endlos beendet!" if not won and bool(recap.get("endless_enabled", false)) else ("Alle huldigen Denti!" if won else "Denti ist ausgefallen!")
 	subtitle_label.add_theme_font_size_override("font_size", 17)
 	subtitle_label.text = _end_summary(won, coins, end_recap)
 	subtitle_label.custom_minimum_size.y = 270.0
@@ -189,7 +215,10 @@ func show_end(won: bool, coins: int, recap: Dictionary = {}) -> void:
 	buttons[1].visible = true
 	buttons[2].call("show_action", "Hauptmenü")
 	buttons[2].visible = true
-	buttons[3].visible = false
+	buttons[3].visible = won and not bool(recap.get("endless_enabled", false)) and int(recap.get("wave_reached", 0)) == WaveController.MAX_WAVES
+	buttons[3].call("show_action", "Endlos weiterspielen", true)
+	buttons[3].tooltip_text = "Mit diesem Build in Welle 21 weiterspielen. Dein Sieg bleibt erhalten."
+	_update_layout()
 	visible = true
 	buttons[0].grab_focus()
 
@@ -222,6 +251,8 @@ func _on_choice_pressed(index: int) -> void:
 				_show_credits()
 			elif index == 2:
 				main_menu_requested.emit()
+			elif index == 3 and buttons[3].visible:
+				endless_requested.emit()
 		&"credits":
 			show_end(end_won, end_coins, end_recap)
 
@@ -233,7 +264,10 @@ func _end_summary(won: bool, coins: int, recap: Dictionary) -> String:
 	var elapsed := maxi(roundi(float(run.get("elapsed", 0.0))), 0)
 	var minutes := floori(float(elapsed) / 60.0)
 	var seconds := elapsed % 60
-	var outcome := "Sieg" if won else "Niederlage"
+	var outcome := "Sieg" if won or bool(recap.get("base_victory", false)) else "Niederlage"
+	var compact: bool = $Root.size.x < 600.0 or $Root.size.y < 600.0
+	if compact:
+		return "%s · %s\nWelle %d · Level %d · %02d:%02d\n%d Kills · %d Münzen übrig%s" % [outcome, DifficultyCatalog.by_id(StringName(str(recap.get("difficulty_id", "normal")))).display_name, int(recap.get("wave_reached", 0)), int(recap.get("final_level", 1)), minutes, seconds, int(run.get("kills", 0)), coins, "\nSieg in Welle 20 bleibt erhalten." if bool(recap.get("endless_enabled", false)) else ""]
 	var lines: PackedStringArray = [
 		"%s auf %s · Welle %d · Level %d · %02d:%02d Minuten" % [outcome, DifficultyCatalog.by_id(StringName(str(recap.get("difficulty_id", "normal")))).display_name, int(recap.get("wave_reached", 0)), int(recap.get("final_level", 1)), minutes, seconds],
 		"%s Gegner besiegt · %s Bosse · %s Gesamtschaden" % [

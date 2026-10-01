@@ -55,6 +55,8 @@ static func capture(game) -> Dictionary:
 			upgrades.append({"stat": str(upgrade.stat), "tier": upgrade.tier})
 	return {
 		"difficulty_id": str(game.wave.difficulty_id),
+		"endless_enabled": game.wave.endless_enabled,
+		"base_victory": game.base_victory,
 		"wave": game.wave.current_wave, "duration": game.wave.duration, "remaining": game.wave.remaining,
 		"spawn_cooldown": game.wave.spawn_cooldown, "active": game.wave.active,
 		"horde_waves": game.wave.horde_waves, "horde_spawned": game.wave.horde_spawned,
@@ -82,7 +84,9 @@ static func restore(game, saved: Dictionary) -> void:
 	wave.difficulty_id = DifficultyCatalog.by_id(StringName(str(saved.get("difficulty_id", "normal")))).id
 	var player: Player = game.player
 	var shop: ShopController = game.shop
-	wave.current_wave = clampi(int(saved.get("wave", 1)), 1, WaveController.MAX_WAVES)
+	wave.endless_enabled = bool(saved.get("endless_enabled", false))
+	game.base_victory = bool(saved.get("base_victory", wave.endless_enabled))
+	wave.current_wave = maxi(int(saved.get("wave", 1)), 1) if wave.endless_enabled else clampi(int(saved.get("wave", 1)), 1, WaveController.MAX_WAVES)
 	wave.duration = clampf(float(saved.get("duration", WaveController.DURATION)), 1.0, 120.0)
 	wave.remaining = clampf(float(saved.get("remaining", wave.duration)), 0.0, wave.duration)
 	wave.spawn_cooldown = maxf(float(saved.get("spawn_cooldown", 0.0)), 0.0)
@@ -109,7 +113,7 @@ static func restore(game, saved: Dictionary) -> void:
 		var saved_counts: Array = saved.get("elite_counts", [])
 		for index in mini(saved_times.size(), saved_counts.size()):
 			wave.elite_times.append(clampf(float(saved_times[index]), 0.0, wave.duration))
-			wave.elite_counts.append(clampi(int(saved_counts[index]), 1, 3))
+			wave.elite_counts.append(clampi(int(saved_counts[index]), 1, EndlessRules.MAX_ELITE_GROUP if wave.endless_enabled else 3))
 		wave.elite_index = clampi(int(saved.get("elite_index", 0)), 0, wave.elite_times.size())
 	else:
 		var old_elite_time := float(saved.get("elite_time", -1.0))
@@ -211,6 +215,7 @@ static func restore(game, saved: Dictionary) -> void:
 		projectile.launch(_read_vector(entry.get("position", [0.0, 0.0])), _read_vector(entry.get("direction", [1.0, 0.0])), float(entry.get("speed", 290.0)), float(entry.get("damage", 8.0)), player, Color(str(entry.get("color", "87e021"))), float(entry.get("hit_radius", 21.0)), float(entry.get("visual_radius", 9.0)))
 		projectile.lifetime = float(entry.get("lifetime", 2.2))
 	shop.reroll_cost = maxi(int(saved.get("reroll_cost", 2)), 2)
+	shop.reroll_step = EndlessRules.shop_reroll_step(wave.current_wave)
 	shop.offers.clear()
 	shop.reserved = [false, false, false, false]
 	for value in saved.get("offers", []):

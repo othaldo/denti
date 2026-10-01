@@ -6,7 +6,7 @@ Umgesetzt am 2026-10-01 auf Grundlage der [Untersuchung](ECONOMY_RESEARCH.md).
 
 Gold wird unabhängig von XP gewürfelt. Die bisherigen XP-Werte und deren Drop-Abschwächung bleiben bestehen. Plaque, Bakterien, Säurespucker und Zucker haben jetzt **100 % Basis-Münzchance**. Die ersten drei geben Wert 1, Zucker Wert 2. Eliten geben weiterhin garantiert 4 Münzen.
 
-Der Gold-Faktor beträgt in Welle 1–4 100 %. Danach gilt `max(1 - 0,015 * Welle, 0,50)`, unabhängig davon, ob es eine Bosswelle ist. Auf Normal entspricht die tatsächliche Münzchance damit der [Brotato-Materials-Kurve](https://brotato.wiki.spellsandguns.com/Materials): Welle 5: 92,5 %, Welle 10: 85 %, Welle 20: 70 %. Die Untergrenze von 50 % wäre erst außerhalb unseres 20-Wellen-Runs relevant. Easy/Hard/Hell wenden weiterhin ihre Belohnungsfaktoren 1,15/0,9/0,8 an; Eliten bleiben garantiert. Boss-Kills selbst geben weiterhin Relikt-Fortschritt und keinen neuen Gold-Bonus.
+Der Gold-Faktor beträgt in Welle 1–4 100 %. Danach gilt `max(1 - 0,015 * Welle, 0,50)`, unabhängig davon, ob es eine Bosswelle ist. Auf Normal entspricht die tatsächliche Münzchance damit der [Brotato-Materials-Kurve](https://brotato.wiki.spellsandguns.com/Materials): Welle 5: 92,5 %, Welle 10: 85 %, Welle 20: 70 %. Im Endlosmodus greift die Untergrenze von 50 % ab Welle 34. Easy/Hard/Hell wenden weiterhin ihre Belohnungsfaktoren 1,15/0,9/0,8 an; Eliten bleiben garantiert. Boss-Kills selbst geben weiterhin Relikt-Fortschritt und keinen neuen Gold-Bonus.
 
 Zuvor wurde die Wellenkurve zusätzlich mit Basiswerten von nur 40/45/50/65 % multipliziert. Bei Plaque blieben in Welle 20 so lediglich 28 % tatsächliche Münzchance. Der alte Startbonus entfällt: frühe Drops sind auf Normal bereits garantiert. Glück erhöht ohne Goldsonde weder die normale Drop-Chance noch den Münzwert.
 
@@ -41,7 +41,7 @@ Save/Resume bewahrt die vier konkreten Angebote, verbleibende Münzen und Reroll
 
 ## Shop
 
-`Preis = floor(Basispreis * (1 + 0,1 * Welle) + Welle)`.
+`Preis = floor(Basispreis * (1 + 0,1 * Welle) + Welle)` gilt für Welle 1–20. Im [Endlosmodus](ENDLESS_MODE.md) wird vor dem Abrunden zusätzlich mit `1 + E / 5` multipliziert.
 
 Die Welle ist die gerade abgeschlossene Welle, der erste Shop verwendet also 1. Für Waffen wird zunächst ihr Stufenpreis mit den bestehenden Faktoren 1/1,65/2,4/3,3 ermittelt und gerundet; darauf folgt genau einmal die Welleninflation. Katalog-Ressourcen und Itemeffekte werden nicht verändert, um Preise zu berechnen.
 
@@ -54,7 +54,7 @@ Die Welle ist die gerade abgeschlossene Welle, der erste Shop verwendet also 1. 
 
 Stufe IV wird hier nur als Preisvergleich gezeigt, nicht als Angebot früher Shops.
 
-Jeder Shop hat vier Angebote. „Merken“ reserviert ein Angebot kostenlos, auch wenn aktuell Münzen oder freie Wurzeln fehlen. Es bleibt beim Reroll und im nächsten Shop im selben Platz und behält seinen Preis. „Gemerkt“ gibt es wieder frei. Ein Kauf entfernt die Reservierung. Vier gemerkte Angebote sperren bezahlte Rerolls. Rerolls behalten die bisherige Kostenfolge 2/3/4/... und beginnen pro Shop erneut bei 2.
+Jeder Shop hat vier Angebote. „Merken“ reserviert ein Angebot kostenlos, auch wenn aktuell Münzen oder freie Wurzeln fehlen. Es bleibt beim Reroll und im nächsten Shop im selben Platz und behält seinen Preis. „Gemerkt“ gibt es wieder frei. Ein Kauf entfernt die Reservierung. Vier gemerkte Angebote sperren bezahlte Rerolls. Bis Welle 20 behalten Rerolls die Kostenfolge 2/3/4/... und beginnen pro Shop erneut bei 2. Danach erhöhen Endlosfaktor und Welle den Startpreis und die Schritte, siehe [Endlosmodus](ENDLESS_MODE.md).
 
 Save/Resume erhält alle vier Angebote, ihre exakten Preise, Reservierungen und Rerollkosten, auch während der folgenden Kampfwelle. Alte Shops mit drei Plätzen behalten ihre Angebote, ausverkauften Plätze und Preise; nur der vierte Platz wird ergänzt. Alte gespeicherte Level-ups mit drei Optionen bleiben erhalten, neue Level-ups bieten vier verschiedene geeignete Stats.
 

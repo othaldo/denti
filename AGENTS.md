@@ -14,7 +14,7 @@ The original prototype scope has already been exceeded. Do not treat this reposi
 
 Current playable state includes roughly:
 
-- 20 timed waves
+- 20 timed waves with optional endless continuation after victory (60-second waves, double bosses every 10 waves after 20); see `docs/ENDLESS_MODE.md`
 - minibosses every 5 waves and a final boss on wave 20
 - 4 normal enemy types, 2 elite variants and bosses
 - 8 weapons with root-slot costs and weapon fusion up to tier IV

@@ -21,4 +21,4 @@ static func level_reroll_cost(earned_level: int, rerolls: int) -> int:
 
 static func shop_price(base_price: int, wave_number: int) -> int:
 	var number := maxi(wave_number, 0)
-	return maxi(floori(base_price * (1.0 + PRICE_INCREASE_PER_WAVE * number) + number), 1)
+	return maxi(floori((base_price * (1.0 + PRICE_INCREASE_PER_WAVE * number) + number) * EndlessRules.price_factor(number)), 1)
