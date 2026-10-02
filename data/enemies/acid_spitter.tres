@@ -14,6 +14,7 @@ move_speed = 92.0
 contact_damage = 5.0
 coin_drop_chance = 1.0
 sprite = ExtResource("2")
+sprite_facing = 1
 special_attack = 3
 special_interval = 2.8
 warning_time = 0.55

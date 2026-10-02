@@ -68,6 +68,8 @@ func _ready() -> void:
 	player.stats.healed.connect(items.on_healed)
 	player.stats.dodged.connect(items.on_player_dodged)
 	player.stats.dodged.connect(telemetry.record_dodge)
+	player.stats.status_damage_taken.connect(_on_status_damage_taken)
+	player.status_effects.applied.connect(_on_status_applied)
 	player.attack_performed.connect(sound.play_attack)
 	player.damaged.connect(_on_player_damaged)
 	player.damaged.connect(items.on_player_hurt)
@@ -159,6 +161,7 @@ func _refresh_hud() -> void:
 	boss = BossEncounter.primary($Enemies)
 	var visible_boss: Enemy = boss if is_instance_valid(boss) else null
 	hud.update_status(player.stats, xp, xp_goal, level, coins, wave.current_wave, wave.remaining, in_shop, visible_boss, boss_pending, collecting_wave_loot, rewards.pending_levels)
+	hud.update_ailments(player.status_effects)
 	if wave.endless_enabled:
 		hud.wave_label.text = "ENDLOS · %d" % wave.current_wave
 	var encounter_bosses := BossEncounter.remaining($Enemies)
@@ -364,6 +367,16 @@ func _on_player_damaged(at: Vector2, amount: float) -> void:
 	sound.play_cue(&"hurt")
 
 
+func _on_status_applied(kind: DentiStatus.Type) -> void:
+	_show_item_feedback(DentiStatus.NAMES[kind], player.global_position + Vector2(0, -50 - kind * 26), DentiStatus.COLORS[kind])
+	telemetry.record_status_applied(kind)
+
+
+func _on_status_damage_taken(kind: DentiStatus.Type, amount: float) -> void:
+	telemetry.record_status_damage(kind, amount)
+	_show_item_feedback("-%s" % DentiAttributes.number(amount), player.global_position + Vector2(0, -42 - kind * 20), DentiStatus.COLORS[kind])
+
+
 func _show_item_feedback(message: String, at: Vector2, color: Color) -> void:
 	var number: DamageNumber = DAMAGE_NUMBER_SCENE.instantiate()
 	$DamageNumbers.add_child(number)
@@ -486,6 +499,7 @@ func _begin_loot_collection() -> void:
 	if collecting_wave_loot or ended:
 		return
 	collecting_wave_loot = true
+	player.status_effects.clear()
 	player.expressions.celebrate()
 	rewards.begin_collection()
 	player.velocity = Vector2.ZERO
@@ -587,6 +601,7 @@ func _finish_run() -> void:
 		return
 	rewards.step = PostWaveRewards.Step.END
 	ended = true
+	player.status_effects.clear()
 	base_victory = true
 	boss_pending = false
 	_sync_music()
@@ -726,6 +741,8 @@ func _on_player_died() -> void:
 	if ended:
 		return
 	ended = true
+	player.status_effects.clear()
+	hud.update_ailments(player.status_effects)
 	_sync_music()
 	_clear_arena(false)
 	shop_panel.visible = false
@@ -782,6 +799,7 @@ func debug_start_wave(number: int) -> void:
 	player.global_position = arena.arena_size / 2.0
 	player.hurt_time = 0.0
 	player.dodge_time = 0.0
+	player.status_effects.clear()
 	player.sprite.modulate = Color.WHITE
 	var configured_stats := player.stats.to_save_data()
 	configured_stats["health"] = player.stats.max_health

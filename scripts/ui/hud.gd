@@ -23,10 +23,19 @@ const ICONS: Script = preload("res://scripts/ui/denti_ui_icons.gd")
 @onready var session: Node = get_node("/root/GameSession")
 
 var fps_refresh_time: float = 0.0
+var ailments_label: Label
 
 
 func _ready() -> void:
 	$Root.theme = DentiUIStyle.make_theme()
+	ailments_label = Label.new()
+	ailments_label.name = "Ailments"
+	ailments_label.position = Vector2(24, 130)
+	ailments_label.size = Vector2(260, 50)
+	ailments_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	ailments_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	$Root.add_child(ailments_label)
+	DentiUIStyle.style_hud_text(ailments_label, DentiUIStyle.INK, 14, 3, DentiUIStyle.CREAM)
 	DentiUIStyle.style_hud_panel($Root/VitalsFrame)
 	DentiUIStyle.style_hud_panel(wave_frame)
 	DentiUIStyle.style_hud_panel(fps_panel)
@@ -83,6 +92,13 @@ func update_telemetry(stats: RunTelemetry, enemies_alive: int, projectiles_alive
 		stats.last_boss_ttk, stats.wave_coins, stats.wave_xp, stats.total_damage,
 	]
 	telemetry_label.text += "\nZahnflutsch: %d Welle · %d Run" % [stats.wave_dodges, stats.dodges]
+	telemetry_label.text += "\nGift/Blutung HP: %.1f / %.1f" % [stats.status_damage.get("poison", 0.0), stats.status_damage.get("bleed", 0.0)]
+
+
+func update_ailments(effects: PlayerStatusEffects) -> void:
+	ailments_label.text = effects.hud_text()
+	ailments_label.visible = not effects.active.is_empty()
+	ailments_label.tooltip_text = "Gift ignoriert Härte. Blutung wird durch Härte reduziert. Dodge und Schilde verhindern neue Effekte; laufende Effekte enden nach dem Kampf."
 
 
 func _profile_label(id: StringName, wave_number: int) -> String:

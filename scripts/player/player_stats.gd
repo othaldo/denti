@@ -7,6 +7,7 @@ signal shield_blocked
 signal damage_taken(amount: float)
 signal healed(amount: float, overheal: float)
 signal dodged
+signal status_damage_taken(kind: DentiStatus.Type, amount: float)
 
 const STAT_MODEL_VERSION := 3
 const TEMPO_MODEL_VERSION := 2
@@ -160,10 +161,24 @@ func take_damage(amount: float, can_dodge: bool = true) -> float:
 		changed.emit()
 		shield_blocked.emit()
 		return 0.0
+	return _lose_health(maxf(amount * armor_damage_factor(), 1.0))
+
+
+func take_status_damage(amount: float, kind: DentiStatus.Type) -> float:
+	# An existing ailment cannot be dodged or consume shield charges/i-frames.
+	# Fractional ticks keep their actual value instead of the direct-hit floor.
+	if health <= 0.0 or amount <= 0.0:
+		return 0.0
+	return _lose_health(amount * (1.0 if kind == DentiStatus.Type.POISON else armor_damage_factor()), kind)
+
+
+func _lose_health(amount: float, status_kind: int = -1) -> float:
 	var before := health
-	health = maxf(health - maxf(amount * armor_damage_factor(), 1.0), 0.0)
+	health = maxf(health - amount, 0.0)
 	changed.emit()
 	damage_taken.emit(before - health)
+	if status_kind >= 0:
+		status_damage_taken.emit(status_kind as DentiStatus.Type, before - health)
 	if health <= 0.0:
 		died.emit()
 	return before - health

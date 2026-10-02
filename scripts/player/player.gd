@@ -16,6 +16,7 @@ const DODGE_IFRAMES := 0.15
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var sprite_base_scale: Vector2 = sprite.scale
 @onready var expressions: DentiExpressions = $Sprite2D/Expressions
+@onready var status_effects: PlayerStatusEffects = $StatusEffects
 @onready var arena: DentiArena = get_node("../Arena")
 @onready var mobile_controls: MobileControls = get_node("../MobileControls/Root")
 
@@ -29,6 +30,7 @@ var is_moving: bool = false
 
 func _ready() -> void:
 	expressions.configure(stats)
+	status_effects.configure(self)
 	stats.dodged.connect(_on_dodged)
 
 
@@ -66,13 +68,15 @@ func play_attack_animation(aim: Vector2, kind: StringName = &"brush") -> void:
 	attack_performed.emit(kind)
 
 
-func take_hit(amount: float) -> void:
+func take_hit(amount: float, inflicted_statuses: Array[Dictionary] = []) -> float:
 	if hurt_time > 0.0 or dodge_time > 0.0 or stats.health <= 0.0:
-		return
+		return 0.0
 	var actual := stats.take_damage(amount)
 	if actual > 0.0:
 		hurt_time = clampf(MAX_IFRAMES * actual / (stats.max_health * FULL_IFRAMES_DAMAGE_FRACTION), MIN_IFRAMES, MAX_IFRAMES)
 		damaged.emit(global_position + Vector2(0.0, -28.0), actual)
+		status_effects.apply_attacks(inflicted_statuses)
+	return actual
 
 
 func _on_dodged() -> void:

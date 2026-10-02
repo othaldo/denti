@@ -6,4 +6,12 @@
 script = ExtResource("1")
 id = &"normal"
 display_name = "Normal"
-description = "Die bisherige Balance."
+description = "Ausgewogener Gegnerdruck. Giftkeime ab Welle 6, Blutungsgegner ab Welle 8."
+poison_first_wave = 6
+bleed_first_wave = 8
+status_trait_first_wave = 9
+status_trait_chance_step = 0.012
+status_trait_chance_cap = 0.18
+status_damage_multiplier = 1.0
+status_duration_multiplier = 1.0
+status_specialist_weight = 1.0

@@ -73,6 +73,7 @@ var spawn_wave: int = 1
 var active_special_attack: int = EnemyData.SpecialAttack.NONE
 var active_trigger_range: float = 0.0
 var inflammation_aura: BossInflammationAura
+var inflicted_statuses: Array[Dictionary] = []
 
 
 func configure(enemy_data: EnemyData, player: Player, wave_number: int = 1, difficulty_id: StringName = &"normal") -> void:
@@ -80,6 +81,7 @@ func configure(enemy_data: EnemyData, player: Player, wave_number: int = 1, diff
 	difficulty = DifficultyCatalog.by_id(difficulty_id)
 	target = player
 	spawn_wave = wave_number
+	inflicted_statuses = EnemyStatusRules.attacks_for(data, wave_number, difficulty)
 	var advanced := data.advanced_special_wave > 0 and wave_number >= data.advanced_special_wave
 	active_special_attack = data.advanced_special_attack if advanced else data.special_attack
 	active_trigger_range = data.advanced_trigger_range if advanced and data.advanced_trigger_range > 0.0 else data.trigger_range
@@ -110,6 +112,8 @@ func _ready() -> void:
 	sprite.scale = Vector2.ONE * (data.radius * 2.35 / side)
 	sprite_base_scale = sprite.scale
 	animation_time = randf_range(0.0, TAU)
+	if target != null:
+		_update_sprite_facing(global_position.direction_to(target.global_position))
 	if data.is_boss:
 		inflammation_aura = BossInflammationAura.new()
 		inflammation_aura.configure(data)
@@ -135,8 +139,6 @@ func _process(delta: float) -> void:
 	sprite.position.y = sin(animation_time) * (2.2 if data.is_boss else 1.2)
 	sprite.rotation = sin(animation_time * 0.7) * (0.025 if data.is_boss else 0.045)
 	sync_inflammation_aura(delta)
-	if active_special_attack == EnemyData.SpecialAttack.SHOOT and target != null:
-		sprite.flip_h = target.global_position.x < global_position.x
 	if pulse_flash_time > 0.0:
 		pulse_flash_time = maxf(pulse_flash_time - delta, 0.0)
 		queue_redraw()
@@ -200,12 +202,27 @@ func _physics_process(delta: float) -> void:
 	if active_special_attack == EnemyData.SpecialAttack.NONE:
 		global_position += direction * _movement_speed() * delta
 	else:
+		if special_phase == SpecialPhase.WARNING:
+			_update_sprite_facing(special_direction)
 		_process_special(delta, direction)
+	var movement := global_position - before_move
+	# A warning is stationary, but its locked attack direction should be readable.
+	if movement.is_zero_approx() and special_phase == SpecialPhase.WARNING:
+		_update_sprite_facing(special_direction)
+	else:
+		_update_sprite_facing(movement)
 	var closest := Geometry2D.get_closest_point_to_segment(target.global_position, before_move, global_position)
 	if closest.distance_to(target.global_position) < data.radius + 20.0 and contact_timer <= 0.0:
 		var damage := attack_damage if charging else contact_damage
 		contact_timer = 0.8 / overtime_attack_factor()
-		target.take_hit(damage)
+		target.take_hit(damage, inflicted_statuses)
+
+
+func _update_sprite_facing(direction: Vector2) -> void:
+	if data.sprite_facing == EnemyData.SpriteFacing.FRONT:
+		sprite.flip_h = false
+	elif absf(direction.x) > 0.01:
+		sprite.flip_h = direction.x < 0.0 if data.sprite_facing == EnemyData.SpriteFacing.RIGHT else direction.x > 0.0
 
 
 func _process_special(delta: float, direction: Vector2) -> void:
@@ -352,7 +369,7 @@ func _activate_special() -> void:
 			attack_performed.emit(&"boss_charge")
 		else:
 			if global_position.distance_to(target.global_position) <= data.attack_radius:
-				target.take_hit(attack_damage)
+				target.take_hit(attack_damage, inflicted_statuses)
 			pulse_flash_time = PULSE_FLASH_DURATION
 			attack_performed.emit(&"boss_pulse")
 			_reset_special()
@@ -362,33 +379,37 @@ func _activate_special() -> void:
 	elif active_special_attack == EnemyData.SpecialAttack.SHOOT:
 		var root := _projectile_root()
 		if root != null:
-			EnemyProjectilePatterns.fire_aimed_fan(root, global_position, special_direction, WaveController.acid_volley_count(spawn_wave), data.attack_speed, attack_damage, target, EnemyProjectilePatterns.ACID_COLOR, 2.2)
+			EnemyProjectilePatterns.fire_aimed_fan(root, global_position, special_direction, _aimed_projectile_count(), data.attack_speed, attack_damage, target, data.projectile_color, 2.2, inflicted_statuses)
 		attack_performed.emit(&"acid")
 		_reset_special()
 	elif active_special_attack == EnemyData.SpecialAttack.RADIAL:
 		var root := _projectile_root()
 		if root != null:
-			EnemyProjectilePatterns.fire_radial(root, global_position, data.radial_count, special_direction.angle() + PI, data.attack_speed, attack_damage, target, Color(1.0, 0.52, 0.22))
+			EnemyProjectilePatterns.fire_radial(root, global_position, data.radial_count, special_direction.angle() + PI, data.attack_speed, attack_damage, target, Color(1.0, 0.52, 0.22), inflicted_statuses)
 		attack_performed.emit(&"acid")
 		_reset_special()
 	elif active_special_attack == EnemyData.SpecialAttack.LANE:
 		var root := _projectile_root()
 		if root != null:
-			EnemyProjectilePatterns.fire_lane(root, global_position, special_direction, data.lane_projectile_count, data.lane_projectile_spacing, data.attack_speed, attack_damage, target)
+			EnemyProjectilePatterns.fire_lane(root, global_position, special_direction, data.lane_projectile_count, data.lane_projectile_spacing, data.attack_speed, attack_damage, target, data.projectile_color, inflicted_statuses)
 		attack_performed.emit(&"acid")
 		_reset_special()
 	elif active_special_attack == EnemyData.SpecialAttack.SPACE_ORB:
 		var root := _projectile_root()
 		if root != null:
-			EnemyProjectilePatterns.fire_space_orb(root, global_position, special_direction, data.attack_speed, attack_damage, data.space_orb_radius, target)
+			EnemyProjectilePatterns.fire_space_orb(root, global_position, special_direction, data.attack_speed, attack_damage, data.space_orb_radius, target, inflicted_statuses)
 		attack_performed.emit(&"acid")
 		_reset_special()
 	else:
 		if global_position.distance_to(target.global_position) <= data.attack_radius:
-			target.take_hit(attack_damage)
+			target.take_hit(attack_damage, inflicted_statuses)
 		pulse_flash_time = PULSE_FLASH_DURATION
 		_reset_special()
 	queue_redraw()
+
+
+func _aimed_projectile_count() -> int:
+	return data.aimed_projectile_count if data.aimed_projectile_count > 0 else WaveController.acid_volley_count(spawn_wave)
 
 
 func _reset_special() -> void:
@@ -399,7 +420,7 @@ func _reset_special() -> void:
 
 func _dash_impact() -> void:
 	if global_position.distance_to(target.global_position) <= data.dash_impact_radius:
-		target.take_hit(attack_damage)
+		target.take_hit(attack_damage, inflicted_statuses)
 	pulse_flash_time = PULSE_FLASH_DURATION
 	queue_redraw()
 
@@ -415,7 +436,7 @@ func _fire_next_boss_radial_volley() -> void:
 	var root := _projectile_root()
 	var volley_angle := boss_phase_gap_angle + deg_to_rad(data.boss_radial_angle_step_degrees * float(boss_radial_volley_index))
 	if root != null:
-		EnemyProjectilePatterns.fire_radial(root, global_position, data.boss_radial_count + boss_phase * 2, volley_angle, data.boss_projectile_speed * overtime_speed_factor(), attack_damage * 0.55, target)
+		EnemyProjectilePatterns.fire_radial(root, global_position, data.boss_radial_count + boss_phase * 2, volley_angle, data.boss_projectile_speed * overtime_speed_factor(), attack_damage * 0.55, target, EnemyProjectilePatterns.BOSS_COLOR, inflicted_statuses)
 	boss_radial_volley_index += 1
 	boss_radial_volleys_remaining -= 1
 	if boss_radial_volleys_remaining > 0:
@@ -434,13 +455,13 @@ func _fire_boss_signature(charge_direction: Vector2) -> void:
 		return
 	match data.boss_signature:
 		EnemyData.BossSignature.AIMED_FAN:
-			EnemyProjectilePatterns.fire_aimed_fan(root, global_position, target.global_position - global_position, maxi(data.boss_fan_count + difficulty.boss_volley_bonus * 2, 1), data.boss_projectile_speed * overtime_speed_factor(), attack_damage * 0.45, target)
+			EnemyProjectilePatterns.fire_aimed_fan(root, global_position, target.global_position - global_position, maxi(data.boss_fan_count + difficulty.boss_volley_bonus * 2, 1), data.boss_projectile_speed * overtime_speed_factor(), attack_damage * 0.45, target, EnemyProjectilePatterns.BOSS_COLOR, 3.0, inflicted_statuses)
 		EnemyData.BossSignature.TRAIL_FAN:
-			EnemyProjectilePatterns.fire_aimed_fan(root, global_position, -charge_direction, maxi(data.boss_fan_count + difficulty.boss_volley_bonus * 2, 1), data.boss_projectile_speed * overtime_speed_factor(), attack_damage * 0.45, target)
+			EnemyProjectilePatterns.fire_aimed_fan(root, global_position, -charge_direction, maxi(data.boss_fan_count + difficulty.boss_volley_bonus * 2, 1), data.boss_projectile_speed * overtime_speed_factor(), attack_damage * 0.45, target, EnemyProjectilePatterns.BOSS_COLOR, 3.0, inflicted_statuses)
 		EnemyData.BossSignature.LANE:
-			EnemyProjectilePatterns.fire_lane(root, global_position, charge_direction, maxi(data.boss_signature_projectile_count + difficulty.boss_volley_bonus, 1), data.boss_signature_projectile_spacing, data.boss_projectile_speed * overtime_speed_factor(), attack_damage * 0.45, target, EnemyProjectilePatterns.BOSS_COLOR)
+			EnemyProjectilePatterns.fire_lane(root, global_position, charge_direction, maxi(data.boss_signature_projectile_count + difficulty.boss_volley_bonus, 1), data.boss_signature_projectile_spacing, data.boss_projectile_speed * overtime_speed_factor(), attack_damage * 0.45, target, EnemyProjectilePatterns.BOSS_COLOR, inflicted_statuses)
 		EnemyData.BossSignature.SPACE_ORB:
-			EnemyProjectilePatterns.fire_space_orb(root, global_position, charge_direction, data.boss_projectile_speed * overtime_speed_factor(), attack_damage * 0.5, data.boss_signature_orb_radius, target)
+			EnemyProjectilePatterns.fire_space_orb(root, global_position, charge_direction, data.boss_projectile_speed * overtime_speed_factor(), attack_damage * 0.5, data.boss_signature_orb_radius, target, inflicted_statuses)
 
 
 func _projectile_root() -> Node2D:
@@ -550,6 +571,15 @@ func _guard_elite_hit() -> void:
 
 
 func _draw() -> void:
+	if data != null and health > 0.0:
+		for index in inflicted_statuses.size():
+			var kind := int(inflicted_statuses[index]["kind"])
+			var at := Vector2((index - (inflicted_statuses.size() - 1) * 0.5) * 15.0, -data.radius - 7.0)
+			draw_circle(at, 5.0, DentiStatus.COLORS[kind])
+			if kind == DentiStatus.Type.BLEED:
+				draw_line(at + Vector2(-2, 2), at + Vector2(2, -2), Color.WHITE, 2.0)
+			else:
+				draw_circle(at, 2.0, Color(0.13, 0.35, 0.13))
 	if data == null:
 		return
 	if dying:
@@ -621,8 +651,8 @@ func _draw() -> void:
 				draw_arc(dash_path, data.dash_impact_radius, 0.0, TAU, 32, warning_color, 3.0)
 			draw_arc(Vector2.ZERO, data.radius + 7.0, -PI / 2.0, -PI / 2.0 + TAU * warning_progress, 32, Color(1.0, 0.72, 0.27), 4.0)
 		elif active_special_attack == EnemyData.SpecialAttack.SHOOT:
-			var shot_color := Color(0.50, 0.88, 0.14, 0.9)
-			for ray in EnemyProjectilePatterns.fan_directions(special_direction, WaveController.acid_volley_count(spawn_wave)):
+			var shot_color := Color(DentiStatus.COLORS[int(inflicted_statuses[0]["kind"])], 0.9) if not inflicted_statuses.is_empty() else Color(data.projectile_color, 0.9)
+			for ray in EnemyProjectilePatterns.fan_directions(special_direction, _aimed_projectile_count()):
 				draw_line(Vector2.ZERO, ray * 150.0, shot_color, 3.0)
 			draw_arc(Vector2.ZERO, data.radius + 8.0, -PI / 2.0, -PI / 2.0 + TAU * warning_progress, 32, shot_color, 4.0)
 		elif active_special_attack == EnemyData.SpecialAttack.RADIAL:

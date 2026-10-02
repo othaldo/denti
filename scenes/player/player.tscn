@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://dee0i4kel4f6v" path="res://assets/denti/denti_unarmed.png" id="3"]
 [ext_resource type="Script" uid="uid://jajnm4mq2ods" path="res://scripts/weapons/weapon_loadout.gd" id="4"]
 [ext_resource type="Script" path="res://scripts/player/denti_expressions.gd" id="5"]
+[ext_resource type="Script" path="res://scripts/player/player_status_effects.gd" id="6"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 35.014282
@@ -32,3 +33,6 @@ script = ExtResource("2")
 
 [node name="Weapons" type="Node2D" parent="." unique_id=1350583645]
 script = ExtResource("4")
+
+[node name="StatusEffects" type="Node" parent="."]
+script = ExtResource("6")

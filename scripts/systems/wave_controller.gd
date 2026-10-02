@@ -46,6 +46,8 @@ const PLAQUE: EnemyData = preload("res://data/enemies/plaque.tres")
 const BACTERIA: EnemyData = preload("res://data/enemies/bacteria.tres")
 const SUGAR: EnemyData = preload("res://data/enemies/sugar.tres")
 const ACID_SPITTER: EnemyData = preload("res://data/enemies/acid_spitter.tres")
+const POISON_GERM: EnemyData = preload("res://data/enemies/poison_germ.tres")
+const GUM_BITER: EnemyData = preload("res://data/enemies/gum_biter.tres")
 const ACID_CROWN: EnemyData = preload("res://data/enemies/acid_crown.tres")
 const HUNT_GERM: EnemyData = preload("res://data/enemies/hunt_germ.tres")
 const CAVITY_COUNT: EnemyData = preload("res://data/enemies/cavity_count.tres")
@@ -210,6 +212,13 @@ func next_wave_preview() -> String:
 		details.append("Zuckerstück")
 	elif next_wave == 4:
 		details.append("Säurespucker")
+	var difficulty := DifficultyCatalog.by_id(difficulty_id)
+	if next_wave == difficulty.poison_first_wave:
+		details.append("Giftkeim · Gift")
+	if next_wave == difficulty.bleed_first_wave:
+		details.append("Zahnfleischbeißer · Blutung")
+	if next_wave == difficulty.status_trait_first_wave:
+		details.append("Gegner mit Statuseigenschaften")
 	if is_boss_wave(next_wave):
 		details.append(boss_for_wave(next_wave).display_name)
 	var profile := WaveProfileCatalog.by_id(next_profile_id)
@@ -344,6 +353,13 @@ func _choose_enemy() -> EnemyData:
 	if current_wave >= 4 and elapsed >= 15.0:
 		choices.append(ACID_SPITTER)
 		weights.append(1.0 + (current_wave - 4) * 0.12 + late_role_shift * 0.25)
+	if elapsed >= 18.0:
+		var difficulty := DifficultyCatalog.by_id(difficulty_id)
+		for kind in [DentiStatus.Type.POISON, DentiStatus.Type.BLEED]:
+			var weight := EnemyStatusRules.specialist_weight(kind, current_wave, difficulty)
+			if weight > 0.0:
+				choices.append(POISON_GERM if kind == DentiStatus.Type.POISON else GUM_BITER)
+				weights.append(weight)
 	var total_weight := 0.0
 	var profile := WaveProfileCatalog.by_id(current_profile_id)
 	for index in weights.size():

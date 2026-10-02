@@ -20,7 +20,7 @@ Kleine Heilungen werden bis insgesamt 0,5 HP gesammelt, bevor der Ausdruck ausge
 
 ## Statusanzeige und Anschluss
 
-Gift und Blutung sind **Anzeigen für zukünftige Spielzustände**. Diese Änderung fügt weder neue Schadensregeln noch solche Angriffe bei Gegnern hinzu. Die Anzeige kann bereits einzeln oder kombiniert aktiviert werden:
+Gift und Blutung spiegeln jetzt **tatsächliche Statuseffekte** aus `PlayerStatusEffects` wider. Gegner mit passenden Eigenschaften wenden sie über erfolgreiche Treffer an. [Schaden, Verteilung und neue Gegner](PLAYER_STATUS_EFFECTS.md). Die reine Gesichtsanzeige bleibt für Vorschauen einzeln oder kombiniert aufrufbar:
 
 ```gdscript
 player.expressions.set_status(DentiExpressions.Status.POISON, true)
@@ -28,7 +28,7 @@ player.expressions.set_status(DentiExpressions.Status.BLEED, true, 5.0)
 player.expressions.set_status(DentiExpressions.Status.POISON, false)
 ```
 
-Eine Dauer von null bedeutet „bis zum expliziten Entfernen“. Positive Dauern laufen während unpausierter Spielzeit ab. Ein künftiges Statuseffektsystem kann die Anzeige mit seinen eigenen Zustandswechseln aktivieren und entfernen. Die Anzeige selbst verändert niemals HP, Rüstung, Schilde oder Unverwundbarkeit.
+Eine Dauer von null bedeutet „bis zum expliziten Entfernen“. Positive kosmetische Dauern laufen während unpausierter Spielzeit ab. Das Gameplay-System aktiviert und entfernt die Anzeige anhand seiner eigenen Restzeiten; es setzt die Gesichtsdauer auf null, damit keine zweite Uhr den Effekt frühzeitig ausblendet. Die Anzeige selbst verändert niemals HP, Härte, Schilde oder Unverwundbarkeit.
 
 Vergiftet: müde Augen, welliger Mund, grüne Wangen und drei kleine grüne Bläschen neben dem Körper. Blutend: zusammengekniffene Augen, angespannter Mund, kleiner Wangenfleck und zwei kleine rote Tropfen. Beide Hinweise bleiben auch während eines kurzfristigen Treffer- oder Heilungsgesichts sichtbar. Für beide Zustände zusammen gibt es ein eigenes Gesicht. `show_dodge()` reagiert auf das tatsächliche Ausweichsignal von `PlayerStats`; die Mechanik ist unter [Zahnflutsch](DODGE.md) dokumentiert.
 

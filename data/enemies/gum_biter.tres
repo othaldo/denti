@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/enemies/gum_biter.png" id="2"]
+[ext_resource type="Resource" path="res://data/statuses/specialist_bleed.tres" id="3"]
+[resource]
+script = ExtResource("1")
+display_name = "Zahnfleischbeißer"
+max_health = 30.0
+health_per_wave = 7.0
+late_health_acceleration = 1.2
+damage_reduction = 0.02
+move_speed = 118.0
+contact_damage = 5.0
+radius = 17.0
+sprite = ExtResource("2")
+sprite_facing = 1
+inflicted_statuses = Array[StatusAttackData]([ExtResource("3")])
+allow_random_status_trait = false
+special_attack = 1
+special_interval = 3.1
+warning_time = 0.65
+trigger_range = 200.0
+attack_speed = 440.0
+attack_duration = 0.28
+attack_damage = 7.0

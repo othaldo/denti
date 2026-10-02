@@ -1,5 +1,6 @@
 .godot/
 *.import
+!docs/status_distribution.csv.import
 /addons/
 /.codex/
 /.mcp.json

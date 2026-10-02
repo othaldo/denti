@@ -3,6 +3,7 @@ extends Resource
 
 enum SpecialAttack { NONE, DASH, PULSE, SHOOT, BOSS, RADIAL, SPACE_ORB, LANE }
 enum BossSignature { AIMED_FAN, TRAIL_FAN, LANE, SPACE_ORB }
+enum SpriteFacing { FRONT, RIGHT, LEFT }
 
 @export var display_name: String
 @export var max_health: float = 25.0
@@ -18,6 +19,14 @@ enum BossSignature { AIMED_FAN, TRAIL_FAN, LANE, SPACE_ORB }
 @export_range(0.0, 1.0, 0.01) var coin_drop_chance: float = 1.0
 @export var sprite: Texture2D
 @export var sprite_tint: Color = Color.WHITE
+# Direction painted into the source artwork; frontal sprites do not mirror.
+@export var sprite_facing: SpriteFacing = SpriteFacing.FRONT
+@export_group("Inflicted statuses")
+@export var inflicted_statuses: Array[StatusAttackData] = []
+@export var allow_random_status_trait: bool = true
+@export var projectile_color: Color = Color(0.53, 0.88, 0.13)
+@export_range(0, 5) var aimed_projectile_count: int = 0
+@export_group("Role")
 @export var is_boss: bool = false
 @export var is_elite: bool = false
 @export_group("Elite")

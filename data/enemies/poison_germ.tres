@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/enemies/poison_germ.png" id="2"]
+[ext_resource type="Resource" path="res://data/statuses/specialist_poison.tres" id="3"]
+[resource]
+script = ExtResource("1")
+display_name = "Giftkeim"
+max_health = 45.0
+health_per_wave = 8.2
+late_health_acceleration = 1.7
+damage_reduction = 0.04
+move_speed = 85.0
+contact_damage = 4.0
+radius = 20.0
+sprite = ExtResource("2")
+sprite_facing = 1
+inflicted_statuses = Array[StatusAttackData]([ExtResource("3")])
+allow_random_status_trait = false
+projectile_color = Color(0.35, 0.92, 0.31, 1)
+aimed_projectile_count = 3
+special_attack = 3
+special_interval = 3.2
+warning_time = 0.75
+trigger_range = 500.0
+preferred_range = 245.0
+attack_speed = 220.0
+attack_damage = 5.0

@@ -18,9 +18,9 @@ static func radial_directions(count: int, gap_angle: float) -> Array[Vector2]:
 	return directions
 
 
-static func fire_radial(parent: Node2D, at: Vector2, count: int, gap_angle: float, speed: float, damage: float, target: Player, tint: Color = BOSS_COLOR) -> void:
+static func fire_radial(parent: Node2D, at: Vector2, count: int, gap_angle: float, speed: float, damage: float, target: Player, tint: Color = BOSS_COLOR, statuses: Array[Dictionary] = []) -> void:
 	for direction in radial_directions(count, gap_angle):
-		_spawn(parent, at, direction, speed, damage, target, tint, 3.0)
+		_spawn(parent, at, direction, speed, damage, target, tint, 3.0, statuses)
 
 
 static func fan_directions(aim: Vector2, count: int) -> Array[Vector2]:
@@ -34,28 +34,28 @@ static func fan_directions(aim: Vector2, count: int) -> Array[Vector2]:
 	return directions
 
 
-static func fire_aimed_fan(parent: Node2D, at: Vector2, aim: Vector2, count: int, speed: float, damage: float, target: Player, tint: Color = BOSS_COLOR, lifetime: float = 3.0) -> void:
+static func fire_aimed_fan(parent: Node2D, at: Vector2, aim: Vector2, count: int, speed: float, damage: float, target: Player, tint: Color = BOSS_COLOR, lifetime: float = 3.0, statuses: Array[Dictionary] = []) -> void:
 	for direction in fan_directions(aim, count):
-		_spawn(parent, at, direction, speed, damage, target, tint, lifetime)
+		_spawn(parent, at, direction, speed, damage, target, tint, lifetime, statuses)
 
 
-static func fire_lane(parent: Node2D, at: Vector2, aim: Vector2, count: int, spacing: float, speed: float, damage: float, target: Player, tint: Color = ACID_COLOR) -> void:
+static func fire_lane(parent: Node2D, at: Vector2, aim: Vector2, count: int, spacing: float, speed: float, damage: float, target: Player, tint: Color = ACID_COLOR, statuses: Array[Dictionary] = []) -> void:
 	var center := aim.normalized() if aim.length_squared() > 0.01 else Vector2.RIGHT
 	var side := center.orthogonal()
 	for index in count:
 		var offset := (float(index) - float(count - 1) * 0.5) * spacing
-		_spawn(parent, at + side * offset, center, speed, damage, target, tint, 2.8)
+		_spawn(parent, at + side * offset, center, speed, damage, target, tint, 2.8, statuses)
 
 
-static func fire_space_orb(parent: Node2D, at: Vector2, aim: Vector2, speed: float, damage: float, radius: float, target: Player) -> void:
+static func fire_space_orb(parent: Node2D, at: Vector2, aim: Vector2, speed: float, damage: float, radius: float, target: Player, statuses: Array[Dictionary] = []) -> void:
 	var projectile: AcidProjectile = PROJECTILE.instantiate()
 	parent.add_child(projectile)
-	projectile.launch(at, aim, speed * 0.55, damage, target, Color(1.0, 0.43, 0.25), radius, radius * 0.7)
+	projectile.launch(at, aim, speed * 0.55, damage, target, Color(1.0, 0.43, 0.25), radius, radius * 0.7, statuses)
 	projectile.lifetime = 3.8
 
 
-static func _spawn(parent: Node2D, at: Vector2, direction: Vector2, speed: float, damage: float, target: Player, tint: Color, lifetime: float) -> void:
+static func _spawn(parent: Node2D, at: Vector2, direction: Vector2, speed: float, damage: float, target: Player, tint: Color, lifetime: float, statuses: Array[Dictionary] = []) -> void:
 	var projectile: AcidProjectile = PROJECTILE.instantiate()
 	parent.add_child(projectile)
-	projectile.launch(at, direction, speed, damage, target, tint)
+	projectile.launch(at, direction, speed, damage, target, tint, 21.0, 9.0, statuses)
 	projectile.lifetime = lifetime

@@ -4,8 +4,12 @@ Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü an
 
 ## In Entwicklung
 
+- Gerichtete Gegnergrafiken folgen der tatsächlichen Laufrichtung, einschließlich Rückzug und Ansturm; Angriffswarnungen zeigen die angekündigte Richtung. Die Blickrichtung bleibt beim Fortsetzen eines Runs erhalten.
+
+- **Gift und Blutung für Denti:** erfolgreiche Gegnerkontakte und Geschosse können zeitlich begrenzte Effekte übertragen. Gift ignoriert Härte, Blutung wird durch Härte reduziert. Dodge und Schild verhindern die Anwendung; gleiche Effekte stapeln keinen Schaden endlos. Gesichter und HUD zeigen echte Zustände, Save/Resume bewahrt Tickzeiten und Eigenschaften. Effekte enden vor der Beutesammlung. Neu: Giftkeim mit Giftschuss-Fächer und Zahnfleischbeißer mit Blutungsansturm, eigene gemalte Sprites; Einführung, Häufigkeit, Stärke und Dauer skalieren mit Schwierigkeit. Spätere gewöhnliche Gegner und Eliten können eine erkennbare Statuseigenschaft tragen. [Regeln, Messwerte und Vorschau](docs/PLAYER_STATUS_EFFECTS.md).
+
 - **Zahnflutsch:** neues Ausweichattribut mit höchstens 60 % effektiver Chance, eigenem Icon und vier Level-up-Stufen. Erfolgreiches Ausweichen bewahrt Schilde und lässt Denti zwinkern. Gleitwachs, Seidenwurzel, Flutschspülung, Lotusschmelz und das einmalige Mythic Unfassbare Wurzel erweitern den Pool auf 93 Items; Heilungs- und Schildsynergien haben begrenzte Auslösefrequenzen. Shop, Stats, Testmenü, Telemetrie und Save/Resume unterstützen das Attribut. [Werte und Vorschau](docs/DODGE.md).
-- **Gesichtsausdrücke:** Denti reagiert auf Schaden, Heilung, wenig HP, Schildblock, Wellenabschluss und Tod. Gift-/Blutungsanzeigen sind einzeln und kombiniert für spätere Statusmechaniken vorbereitet. [Animation und Anschluss](docs/DENTI_EXPRESSIONS.md).
+- **Gesichtsausdrücke:** Denti reagiert auf Schaden, Heilung, wenig HP, Schildblock, Wellenabschluss und Tod. Gift-/Blutungsanzeigen zeigen die laufenden Effekte einzeln und kombiniert. [Animation und Anschluss](docs/DENTI_EXPRESSIONS.md).
 
 - Goldextraktor-Icon: Armführung überarbeitet, linker Griff zur oberen rechten Backe; keine Klinge zwischen den Münzen. Zwei äußere Backen und vollständige Griffe ohne abgeschnittene Atlasränder. Die Goldsonde bleibt unverändert.
 

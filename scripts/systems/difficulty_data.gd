@@ -13,3 +13,12 @@ extends Resource
 @export var ranged_interval_multiplier: float = 1.0
 @export var boss_volley_bonus: int = 0
 @export var reward_chance_multiplier: float = 1.0
+@export_group("Player ailments")
+@export var poison_first_wave: int = 6
+@export var bleed_first_wave: int = 8
+@export var status_trait_first_wave: int = 9
+@export var status_trait_chance_step: float = 0.012
+@export var status_trait_chance_cap: float = 0.18
+@export var status_damage_multiplier: float = 1.0
+@export var status_duration_multiplier: float = 1.0
+@export var status_specialist_weight: float = 1.0

@@ -11,6 +11,8 @@ static func capture(game) -> Dictionary:
 		enemy_indices[enemy.get_instance_id()] = enemies_data.size()
 		enemies_data.append({
 			"type": enemy.data.resource_path, "position": _vector_data(enemy.position),
+			"sprite_flip_h": enemy.sprite.flip_h,
+			"inflicted_statuses": enemy.inflicted_statuses.duplicate(true),
 			"health": enemy.health, "phase": enemy.special_phase,
 			"timer": enemy.special_timer, "direction": _vector_data(enemy.special_direction),
 			"boss_move": enemy.boss_move, "boss_charge_next": enemy.boss_charge_next,
@@ -44,7 +46,9 @@ static func capture(game) -> Dictionary:
 		loot_data.append({"position": _vector_data(drop.position), "kind": str(drop.kind), "amount": drop.amount, "reward_id": str(drop.reward_id)})
 	var acid_data: Array[Dictionary] = []
 	for projectile: AcidProjectile in game.get_node("EnemyProjectiles").get_children():
-		acid_data.append({"position": _vector_data(projectile.position), "direction": _vector_data(projectile.direction), "speed": projectile.speed, "damage": projectile.damage, "lifetime": projectile.lifetime, "color": projectile.projectile_color.to_html(), "hit_radius": projectile.hit_radius, "visual_radius": projectile.visual_radius})
+		if projectile.is_queued_for_deletion():
+			continue
+		acid_data.append({"position": _vector_data(projectile.position), "direction": _vector_data(projectile.direction), "speed": projectile.speed, "damage": projectile.damage, "lifetime": projectile.lifetime, "color": projectile.projectile_color.to_html(), "hit_radius": projectile.hit_radius, "visual_radius": projectile.visual_radius, "inflicted_statuses": projectile.inflicted_statuses.duplicate(true)})
 	var offer_data: Array[Dictionary] = []
 	for index in game.shop.offers.size():
 		var offer: ShopOfferData = game.shop.offers[index]
@@ -63,7 +67,7 @@ static func capture(game) -> Dictionary:
 		"burst_times": game.wave.burst_times, "burst_index": game.wave.burst_index,
 		"elite_times": game.wave.elite_times.duplicate(), "elite_counts": game.wave.elite_counts.duplicate(), "elite_index": game.wave.elite_index,
 		"current_profile_id": str(game.wave.current_profile_id), "next_profile_id": str(game.wave.next_profile_id),
-		"player": {"position": _vector_data(game.player.position), "stats": game.player.stats.to_save_data(), "hurt_time": game.player.hurt_time, "dodge_time": game.player.dodge_time, "presentation": game.player.expressions.save_data()},
+		"player": {"position": _vector_data(game.player.position), "stats": game.player.stats.to_save_data(), "hurt_time": game.player.hurt_time, "dodge_time": game.player.dodge_time, "presentation": game.player.expressions.save_data(), "status_effects": game.player.status_effects.save_data()},
 		"xp": game.xp, "xp_goal": game.xp_goal, "level": game.level, "coins": game.coins,
 		"weapons": game.player.loadout.save_data(), "starter_pending": game.starter_pending,
 		"weapon_runtime": weapon_runtime,
@@ -129,6 +133,7 @@ static func restore(game, saved: Dictionary) -> void:
 	player.hurt_time = maxf(float(player_data.get("hurt_time", 0.0)), 0.0)
 	player.dodge_time = clampf(float(player_data.get("dodge_time", 0.0)), 0.0, Player.DODGE_IFRAMES)
 	player.expressions.restore(player_data.get("presentation", {}))
+	player.status_effects.restore(player_data.get("status_effects", {}))
 	game.xp = maxi(int(saved.get("xp", 0)), 0)
 	game.xp_goal = maxi(int(saved.get("xp_goal", 5)), 1)
 	game.level = maxi(int(saved.get("level", 1)), 1)
@@ -152,6 +157,10 @@ static func restore(game, saved: Dictionary) -> void:
 			continue
 		game._create_enemy(enemy_data, _read_vector(entry.get("position", [0.0, 0.0])))
 		var enemy: Enemy = game.get_node("Enemies").get_child(-1)
+		enemy.sprite.flip_h = bool(entry.get("sprite_flip_h", enemy.sprite.flip_h)) if enemy.data.sprite_facing != EnemyData.SpriteFacing.FRONT else false
+		# Legacy mobs had no random traits; never reroll traits while resuming.
+		enemy.inflicted_statuses = DentiStatus.sanitize_attacks(entry.get("inflicted_statuses", []))
+		enemy.queue_redraw()
 		enemy.overtime_active = bool(entry.get("overtime_active", saved.get("boss_pending", false))) and enemy.data.is_boss
 		if enemy.overtime_active:
 			enemy.advance_overtime(maxi(int(entry.get("overtime_seconds", 0)), 0))
@@ -214,7 +223,7 @@ static func restore(game, saved: Dictionary) -> void:
 	for entry in saved.get("acid", []):
 		var projectile: AcidProjectile = ACID_PROJECTILE.instantiate()
 		game.get_node("EnemyProjectiles").add_child(projectile)
-		projectile.launch(_read_vector(entry.get("position", [0.0, 0.0])), _read_vector(entry.get("direction", [1.0, 0.0])), float(entry.get("speed", 290.0)), float(entry.get("damage", 8.0)), player, Color(str(entry.get("color", "87e021"))), float(entry.get("hit_radius", 21.0)), float(entry.get("visual_radius", 9.0)))
+		projectile.launch(_read_vector(entry.get("position", [0.0, 0.0])), _read_vector(entry.get("direction", [1.0, 0.0])), float(entry.get("speed", 290.0)), float(entry.get("damage", 8.0)), player, Color(str(entry.get("color", "87e021"))), float(entry.get("hit_radius", 21.0)), float(entry.get("visual_radius", 9.0)), DentiStatus.sanitize_attacks(entry.get("inflicted_statuses", [])))
 		projectile.lifetime = float(entry.get("lifetime", 2.2))
 	shop.reroll_cost = maxi(int(saved.get("reroll_cost", 2)), 2)
 	shop.reroll_step = EndlessRules.shop_reroll_step(wave.current_wave)
@@ -306,6 +315,8 @@ static func _enemy_from_path(path: String) -> EnemyData:
 		WaveController.BACTERIA,
 		WaveController.SUGAR,
 		WaveController.ACID_SPITTER,
+		WaveController.POISON_GERM,
+		WaveController.GUM_BITER,
 		WaveController.ACID_CROWN,
 		WaveController.HUNT_GERM,
 		WaveController.CAVITY_COUNT,

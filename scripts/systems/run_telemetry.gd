@@ -8,6 +8,10 @@ var total_damage: float = 0.0
 var damage_taken: float = 0.0
 var dodges: int = 0
 var wave_dodges: int = 0
+var status_damage: Dictionary = {}
+var status_applications: Dictionary = {}
+var wave_status_damage: Dictionary = {}
+var wave_status_applications: Dictionary = {}
 var kills: int = 0
 var bosses_defeated: int = 0
 var coins_collected: int = 0
@@ -70,6 +74,8 @@ func begin_wave(number: int, profile_id: StringName = &"") -> void:
 	wave_damage = 0.0
 	wave_taken = 0.0
 	wave_dodges = 0
+	wave_status_damage.clear()
+	wave_status_applications.clear()
 	wave_peak_dps = 0.0
 	wave_boss_ttk = 0.0
 	wave_peak_enemies = 0
@@ -140,6 +146,18 @@ func record_boss_death() -> void:
 func record_dodge() -> void:
 	dodges += 1
 	wave_dodges += 1
+
+
+func record_status_applied(kind: DentiStatus.Type) -> void:
+	var key: String = DentiStatus.KEYS[kind]
+	status_applications[key] = int(status_applications.get(key, 0)) + 1
+	wave_status_applications[key] = int(wave_status_applications.get(key, 0)) + 1
+
+
+func record_status_damage(kind: DentiStatus.Type, amount: float) -> void:
+	var key: String = DentiStatus.KEYS[kind]
+	status_damage[key] = float(status_damage.get(key, 0.0)) + amount
+	wave_status_damage[key] = float(wave_status_damage.get(key, 0.0)) + amount
 
 
 func record_taken(amount: float) -> void:
@@ -215,6 +233,7 @@ func current_wave_summary() -> Dictionary:
 		"damage_dealt": wave_damage, "average_dps": wave_damage / maxf(duration, 1.0),
 		"peak_dps": wave_peak_dps, "damage_taken": wave_taken,
 		"dodges": wave_dodges,
+		"status_damage": wave_status_damage.duplicate(), "status_applications": wave_status_applications.duplicate(),
 		"coins_collected": wave_coins, "xp_collected": wave_xp,
 		"gold_sources": wave_gold_sources.duplicate(), "shop_spending": wave_shop_spending.duplicate(),
 		"chests_found": wave_chests_found, "chests_kept": wave_chests_kept, "chests_scrapped": wave_chests_scrapped,
@@ -233,6 +252,8 @@ func save_data() -> Dictionary:
 	return {
 		"elapsed": elapsed, "total_damage": total_damage, "damage_taken": damage_taken,
 		"dodges": dodges, "wave_dodges": wave_dodges,
+		"status_damage": status_damage.duplicate(), "status_applications": status_applications.duplicate(),
+		"wave_status_damage": wave_status_damage.duplicate(), "wave_status_applications": wave_status_applications.duplicate(),
 		"kills": kills, "bosses_defeated": bosses_defeated,
 		"coins_collected": coins_collected, "xp_collected": xp_collected,
 		"chests_found": chests_found, "chests_kept": chests_kept, "chests_scrapped": chests_scrapped,
@@ -263,6 +284,10 @@ func restore(saved: Dictionary, wave_number: int) -> void:
 	damage_taken = maxf(float(saved.get("damage_taken", 0.0)), 0.0)
 	dodges = maxi(int(saved.get("dodges", 0)), 0)
 	wave_dodges = maxi(int(saved.get("wave_dodges", 0)), 0)
+	status_damage = saved.get("status_damage", {}).duplicate()
+	status_applications = saved.get("status_applications", {}).duplicate()
+	wave_status_damage = saved.get("wave_status_damage", {}).duplicate()
+	wave_status_applications = saved.get("wave_status_applications", {}).duplicate()
 	kills = maxi(int(saved.get("kills", 0)), 0)
 	bosses_defeated = maxi(int(saved.get("bosses_defeated", 0)), 0)
 	coins_collected = maxi(int(saved.get("coins_collected", 0)), 0)

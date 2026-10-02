@@ -4,7 +4,7 @@ Denti startet mit **0 % Zahnflutsch**. Level-ups, Items und Mythic erhöhen dies
 
 Bei einem eingehenden Kontakt-, Projektil- oder Flächentreffer gilt: laufender Trefferschutz → Ausweichwurf → Schild → Härte → HP-Schaden. Ein erfolgreiches Ausweichen bewahrt Schildladungen, verhindert Schaden und löst keinen Verletzungs-/Vergeltungseffekt aus. Denti zwinkert, erscheint kurz türkis und zeigt „Zahnflutsch!“. Für 0,15 Sekunden sind weitere Treffer ausgeschlossen; dadurch erzeugt ein dichtes Projektilpaket nicht mehrfach im selben Frame Heilung oder Schilde. Diese Chance ist zufällig und ersetzt keine Bewegung.
 
-`PlayerStats.take_damage(amount, false)` erlaubt späteren Schaden, der ausdrücklich nicht ausweichbar ist, beispielsweise Gift-Ticks. Die bereits vorbereiteten Gift-/Blutungsgesichter führen weiterhin keine Status-Schadensmechanik ein.
+`PlayerStats.take_damage(amount, false)` erlaubt ausdrücklich nicht ausweichbare direkte Treffer. Laufendes Gift und Blutung verwenden den eigenen Pfad `take_status_damage`: Er umgeht auch Schildladungen und Treffer-Unverwundbarkeit. Die Gesichter zeigen jetzt diese tatsächlichen Zustände an. [Effekte, Gegner und Schwierigkeit](PLAYER_STATUS_EFFECTS.md).
 
 ## Items
 
