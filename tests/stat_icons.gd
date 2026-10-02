@@ -48,6 +48,16 @@ func _run() -> void:
 	if selected_pixels != _visible_pixels(source):
 		_fail("stat source regions omit artwork or include the same painted pixel twice")
 		return
+	var dodge_upgrade: UpgradeData = load("res://data/upgrades/zahnflutsch.tres")
+	var dodge_icon := DentiUIIcons.stat(dodge_upgrade.attribute_icon()) as AtlasTexture
+	if dodge_upgrade.stat != &"dodge_chance" or dodge_icon.atlas != DentiUIIcons.DODGE_ATLAS or not dodge_icon.filter_clip or dodge_icon.get_size() != Vector2(512, 512):
+		_fail("Zahnflutsch does not have its own isolated painted icon")
+		return
+	var dodge_image := dodge_icon.atlas.get_image().get_region(Rect2i(dodge_icon.region))
+	var painted_bounds := dodge_image.get_used_rect()
+	if painted_bounds.size.x < 100 or painted_bounds.size.y < 100 or painted_bounds.position.x < 40 or painted_bounds.position.y < 40 or painted_bounds.end.x > 472 or painted_bounds.end.y > 472:
+		_fail("Zahnflutsch motif is clipped or lacks transparent padding")
+		return
 	print("Denti stat icons test passed")
 	quit(0)
 

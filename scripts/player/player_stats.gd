@@ -6,6 +6,7 @@ signal died
 signal shield_blocked
 signal damage_taken(amount: float)
 signal healed(amount: float, overheal: float)
+signal dodged
 
 const STAT_MODEL_VERSION := 3
 const TEMPO_MODEL_VERSION := 2
@@ -17,6 +18,7 @@ const BASE_ATTACK_INTERVAL := 0.65
 const REGEN_INTERVAL_SCALE := 11.25
 const REGEN_POINT_OFFSET := 1.25
 const LEGACY_REGEN_POINT_FACTOR := 2.0
+const MAX_DODGE_CHANCE := 0.60
 
 var max_health: float = 100.0
 var health: float = 100.0
@@ -37,7 +39,13 @@ var regen_progress: float = 0.0
 var crit_chance: float = 0.05
 var luck: float = 0.0
 var shield_charges: int = 0
+var dodge_chance: float = 0.0
+var dodge_rng := RandomNumberGenerator.new()
 var last_roll_critical: bool = false
+
+
+func _init() -> void:
+	dodge_rng.randomize()
 
 
 func to_save_data() -> Dictionary:
@@ -48,6 +56,7 @@ func to_save_data() -> Dictionary:
 		"armor": armor, "speed_bonus": speed_bonus, "attack_speed": attack_speed,
 		"regen": regen, "regen_progress": regen_progress,
 		"crit_chance": crit_chance, "luck": luck, "shield_charges": shield_charges,
+		"dodge_chance": dodge_chance,
 	}
 
 
@@ -79,6 +88,7 @@ func load_save_data(saved: Dictionary) -> void:
 	crit_chance = clampf(float(saved.get("crit_chance", crit_chance)), 0.0, 0.65)
 	luck = maxf(float(saved.get("luck", 0.0)), 0.0)
 	shield_charges = clampi(int(saved.get("shield_charges", 0)), 0, 5)
+	dodge_chance = float(saved.get("dodge_chance", 0.0))
 	changed.emit()
 
 
@@ -133,7 +143,18 @@ func armor_text() -> String:
 	return "%.0f · %+.0f %% Schaden" % [armor, (armor_damage_factor() - 1.0) * 100.0]
 
 
-func take_damage(amount: float) -> float:
+func effective_dodge_chance() -> float:
+	# Keep the raw bonus so later penalties still apply above the effective cap.
+	return clampf(dodge_chance, 0.0, MAX_DODGE_CHANCE)
+
+
+func take_damage(amount: float, can_dodge: bool = true) -> float:
+	if health <= 0.0 or amount <= 0.0:
+		return 0.0
+	var chance := effective_dodge_chance()
+	if can_dodge and chance > 0.0 and dodge_rng.randf() < chance:
+		dodged.emit()
+		return 0.0
 	if shield_charges > 0:
 		shield_charges -= 1
 		changed.emit()
@@ -187,4 +208,6 @@ func apply_upgrade(stat: StringName, amount: float) -> void:
 			crit_chance = clampf(crit_chance + amount, 0.0, 0.65)
 		&"luck":
 			luck = maxf(luck + amount, 0.0)
+		&"dodge_chance":
+			dodge_chance += amount
 	changed.emit()

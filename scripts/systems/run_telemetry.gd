@@ -6,6 +6,8 @@ const WINDOW := 10.0
 var elapsed: float = 0.0
 var total_damage: float = 0.0
 var damage_taken: float = 0.0
+var dodges: int = 0
+var wave_dodges: int = 0
 var kills: int = 0
 var bosses_defeated: int = 0
 var coins_collected: int = 0
@@ -67,6 +69,7 @@ func begin_wave(number: int, profile_id: StringName = &"") -> void:
 	wave_chests_scrapped = 0
 	wave_damage = 0.0
 	wave_taken = 0.0
+	wave_dodges = 0
 	wave_peak_dps = 0.0
 	wave_boss_ttk = 0.0
 	wave_peak_enemies = 0
@@ -132,6 +135,11 @@ func record_boss_death() -> void:
 		last_boss_ttk = elapsed - boss_started_at
 		wave_boss_ttk = last_boss_ttk
 		boss_started_at = -1.0
+
+
+func record_dodge() -> void:
+	dodges += 1
+	wave_dodges += 1
 
 
 func record_taken(amount: float) -> void:
@@ -206,6 +214,7 @@ func current_wave_summary() -> Dictionary:
 		"peak_enemy_projectiles": wave_peak_enemy_projectiles,
 		"damage_dealt": wave_damage, "average_dps": wave_damage / maxf(duration, 1.0),
 		"peak_dps": wave_peak_dps, "damage_taken": wave_taken,
+		"dodges": wave_dodges,
 		"coins_collected": wave_coins, "xp_collected": wave_xp,
 		"gold_sources": wave_gold_sources.duplicate(), "shop_spending": wave_shop_spending.duplicate(),
 		"chests_found": wave_chests_found, "chests_kept": wave_chests_kept, "chests_scrapped": wave_chests_scrapped,
@@ -223,6 +232,7 @@ func wave_summaries() -> Array[Dictionary]:
 func save_data() -> Dictionary:
 	return {
 		"elapsed": elapsed, "total_damage": total_damage, "damage_taken": damage_taken,
+		"dodges": dodges, "wave_dodges": wave_dodges,
 		"kills": kills, "bosses_defeated": bosses_defeated,
 		"coins_collected": coins_collected, "xp_collected": xp_collected,
 		"chests_found": chests_found, "chests_kept": chests_kept, "chests_scrapped": chests_scrapped,
@@ -251,6 +261,8 @@ func restore(saved: Dictionary, wave_number: int) -> void:
 	elapsed = maxf(float(saved.get("elapsed", 0.0)), 0.0)
 	total_damage = maxf(float(saved.get("total_damage", 0.0)), 0.0)
 	damage_taken = maxf(float(saved.get("damage_taken", 0.0)), 0.0)
+	dodges = maxi(int(saved.get("dodges", 0)), 0)
+	wave_dodges = maxi(int(saved.get("wave_dodges", 0)), 0)
 	kills = maxi(int(saved.get("kills", 0)), 0)
 	bosses_defeated = maxi(int(saved.get("bosses_defeated", 0)), 0)
 	coins_collected = maxi(int(saved.get("coins_collected", 0)), 0)

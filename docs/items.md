@@ -1,6 +1,6 @@
 # Items und Builds
 
-Die Zahnklinik bietet **88 Items**: 16 Familien mit je vier Seltenheiten, 16 ergänzende Spezialitems und acht einmalige Mythics. Alle bisherigen 32 Items behalten ihre IDs, Effekte und Icons; 56 neue Items ergänzen den Pool.
+Die Zahnklinik bietet **93 Items**: 17 Familien mit je vier Seltenheiten, 16 ergänzende Spezialitems und neun einmalige Mythics. Alle ursprünglichen 32 Items behalten ihre IDs, Effekte und Icons; 61 neue Items ergänzen den Pool. [Zahnflutsch: Ausweichen und fünf neue Items](DODGE.md).
 
 **Common / Gewöhnlich**, **Uncommon / Ungewöhnlich**, **Rare / Selten** und **Legendary / Legendär** bieten verschiedene Kombinationen aus Bonus, Synergie und Nachteil. Seltenere Varianten sind eigene Items: Sie ersetzen vorhandene Exemplare nicht und fusionieren nicht. Das **Familienlimit gilt über alle vier Seltenheiten zusammen**; unterschiedliche Familien und Spezialitems ergänzen sich weiterhin. Bereits gespeicherte Builds behalten ihren Besitz, auch oberhalb eines neuen Familienlimits; dann sind weitere Käufe dieser Familie gesperrt. Die bisher unbegrenzte Metallkrone teilt jetzt das Rüstungs-Familienlimit von sechs.
 
@@ -188,6 +188,17 @@ Gemeinsames Familienlimit: **2**.
 | Rare | Feenvertrag | Jeder gesammelte XP-Punkt heilt 0,45 Leben. -2 Härte. | 14 |
 | Legendary | Feenbund | Jeder gesammelte XP-Punkt heilt 0,6 Leben. -15 Leben, -4 % Angriffstempo. | 22 |
 
+## Zahnflutsch / Ausweichen
+
+Gemeinsames Familienlimit: **4**.
+
+| Seltenheit | Item | Vollständiger Effekt | Basispreis |
+| --- | --- | --- | ---: |
+| Common | Gleitwachs | +4 % Zahnflutsch, -1 Härte. | 5 |
+| Uncommon | Seidenwurzel | +7 % Zahnflutsch, +3 % Bewegung, -8 Schmelz (HP). | 9 |
+| Rare | Flutschspülung | +10 % Zahnflutsch, -1 Speichel. Ausweichen heilt 1 HP je Exemplar (max. 4; 1,5 s gemeinsame Abklingzeit). Kann Überheilung erzeugen. | 15 |
+| Legendary | Lotusschmelz | +13 % Zahnflutsch, -2 Härte. Jedes 3. Ausweichen gewährt 1 Schildladung (max. 5; 8 s gemeinsame Abklingzeit). Ausweichen während der Abklingzeit zählt nicht; weitere Exemplare erhöhen nur Zahnflutsch. | 24 |
+
 ## Spezialitems
 
 Diese 16 bisherigen Items ergänzen die Familien mit eigenen Regeln. Ihre Stapellimits gelten je Item.
@@ -223,6 +234,7 @@ Je Item einmal pro Run. Keine negativen Stats, keine zusätzlichen Nebeneffekte.
 | Makelloser Glanz | +18 % Krit. Einmalig pro Run. Ohne Nachteil. | 38 |
 | Quelle des Lebens | +8 Regeneration. Einmalig pro Run. Ohne Nachteil. | 38 |
 | Schritte der Zahnfee | +18 % Bewegung. Einmalig pro Run. Ohne Nachteil. | 38 |
+| Unfassbare Wurzel | +15 % Zahnflutsch. | 38 |
 | Unvergänglicher Schmelz | +8 Härte. Einmalig pro Run. Ohne Nachteil. | 38 |
 | Zahnfee-Stern | +50 Glück. Einmalig pro Run. Ohne Nachteil. | 38 |
 

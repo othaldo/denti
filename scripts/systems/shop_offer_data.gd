@@ -7,7 +7,7 @@ extends Resource
 @export_range(1, 5) var rarity_tier: int = 1
 @export_range(1, 4) var weapon_tier: int = 1
 @export var price: int = 3
-@export_range(0, 85) var icon_index: int = 0
+@export_range(0, 90) var icon_index: int = 0
 @export var stat_changes: Dictionary = {}
 @export var weapon_data: WeaponData
 @export var icon_texture: Texture2D

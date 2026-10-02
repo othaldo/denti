@@ -10,6 +10,9 @@ const BURST_RADIUS := 145.0
 const PUDDLE_RADIUS := 72.0
 const PUDDLE_DURATION := 2.0
 const OVERHEAL_SHIELD_THRESHOLD := 20.0
+const DODGE_HEAL_COOLDOWN := 1.5
+const DODGE_GUARD_COOLDOWN := 8.0
+const DODGE_GUARD_THRESHOLD := 3
 
 @onready var player: Player = get_node("../Player")
 @onready var relics: RelicInventory = get_node("../Relics")
@@ -29,6 +32,7 @@ var overheal_bank: float = 0.0
 var sugar_kills_progress: int = 0
 var sugar_rush_time: float = 0.0
 var sugar_crash_time: float = 0.0
+var dodge_guard_progress: int = 0
 
 
 func _process(delta: float) -> void:
@@ -318,6 +322,21 @@ func on_player_hurt(_at: Vector2, amount: float) -> void:
 	_announce("Keramiksplitter!", player.global_position, Color(0.82, 0.78, 1.0))
 
 
+func on_player_dodged() -> void:
+	_announce("Zahnflutsch!", player.global_position, Color(0.50, 0.94, 1.0))
+	var healing := minf(_power(&"dodge_heal"), 4.0)
+	if healing > 0.0 and _ready_proc(&"dodge_heal", DODGE_HEAL_COOLDOWN):
+		player.stats.heal(healing)
+	# Further copies improve the stat, not shield rate or shared cooldown.
+	if _power(&"dodge_guard") > 0.0 and float(cooldowns.get("dodge_guard", 0.0)) <= 0.0:
+		dodge_guard_progress += 1
+		if dodge_guard_progress >= DODGE_GUARD_THRESHOLD:
+			dodge_guard_progress = 0
+			_ready_proc(&"dodge_guard", DODGE_GUARD_COOLDOWN)
+			player.stats.grant_shield(1, 5)
+			_announce("Schild +1", player.global_position, Color(0.45, 0.85, 1.0))
+
+
 func on_shield_blocked() -> void:
 	_announce("BLOCK!", player.global_position, Color(0.45, 0.85, 1.0))
 	_ring(player.global_position, 48.0, Color(0.45, 0.85, 1.0))
@@ -345,7 +364,8 @@ func save_data() -> Dictionary:
 	return {"owned": owned.duplicate(), "cooldowns": cooldowns.duplicate(), "coin_fraction": coin_fraction,
 		"xp_fraction": xp_fraction, "kill_coin": kill_coin_progress, "kill_heal": kill_heal_progress,
 		"kill_burst": kill_burst_progress, "puddles": puddle_data, "overheal_bank": overheal_bank,
-		"sugar_kills": sugar_kills_progress, "sugar_rush": sugar_rush_time, "sugar_crash": sugar_crash_time}
+		"sugar_kills": sugar_kills_progress, "sugar_rush": sugar_rush_time, "sugar_crash": sugar_crash_time,
+		"dodge_guard": dodge_guard_progress}
 
 
 func restore(saved: Dictionary) -> void:
@@ -370,6 +390,7 @@ func restore(saved: Dictionary) -> void:
 	sugar_kills_progress = clampi(int(saved.get("sugar_kills", 0)), 0, 11)
 	sugar_rush_time = clampf(float(saved.get("sugar_rush", 0.0)), 0.0, 4.0)
 	sugar_crash_time = clampf(float(saved.get("sugar_crash", 0.0)), 0.0, 3.0)
+	dodge_guard_progress = clampi(int(saved.get("dodge_guard", 0)), 0, DODGE_GUARD_THRESHOLD - 1)
 	_rebuild_powers()
 	queue_redraw()
 

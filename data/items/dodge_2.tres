@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"dodge_2"
+display_name = "Seidenwurzel"
+description = "+7 % Zahnflutsch, +3 % Bewegung, -8 Schmelz (HP)."
+rarity_tier = 2
+price = 9
+icon_index = 87
+stat_changes = { &"dodge_chance": 0.07, &"speed_bonus": 3.0, &"max_health": -8.0 }
+max_stacks = 4
+family_id = &"dodge"
+family_limit = 4
+tags = Array[StringName]([&"dodge", &"mobility", &"sustain"])

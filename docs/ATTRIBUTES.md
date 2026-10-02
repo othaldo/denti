@@ -14,11 +14,11 @@
 | LUCK | Zahnglück | Glück bei Beute und Seltenheiten | Punkte |
 | MELEE_DAMAGE | Nahschaden | Bonus auf Nahkampf-Waffenskalierung | Punkte |
 | RANGED_DAMAGE | Fernschaden | Bonus auf Fernkampf-Waffenskalierung | Punkte |
-| DODGE | Zahnflutsch (Arbeitsname) | Ausweichchance | Prozent; für nächsten Schritt reserviert |
+| DODGE | Zahnflutsch | Ausweichchance, bewahrt Schildladungen | Prozent; effektiv 0–60 % |
 
 **Härte und Schmelz sind verschiedene Attribute.** Leben/HP bei Heilung und Treffer-/Basisschaden einer Waffe bleiben eigene Größen. Beispielsweise erhöht „+12 Schmelz (HP)“ das Lebensmaximum; „nach einem Kill +1 Leben“ heilt. Die frühere Waffen-Schadensart „Schmelz“ wird als **Schmelzbruch** angezeigt, damit sie nicht wie ein HP-Attribut aussieht. Ihr interner Wert bleibt aus Kompatibilitätsgründen erhalten.
 
-Item-Ressourcen und ältere gespeicherte Texte können weiterhin die früheren Wörter enthalten. `effect_text()` / `resolve_text()` vereinheitlichen sie an der Anzeigegrenze. Die zugrunde liegenden Effekte und gespeicherten Schlüssel werden dadurch nicht geändert. Neue Attribute werden zuerst hier definiert; UI-Code erhält keine eigenen Namenslisten. `ACTIVE` enthält nur die bereits spielbaren Attribute. Dodge hat noch keine Trefferlogik, Items, Level-ups oder Icon und wird deshalb nicht angezeigt.
+Item-Ressourcen und ältere gespeicherte Texte können weiterhin die früheren Wörter enthalten. `effect_text()` / `resolve_text()` vereinheitlichen sie an der Anzeigegrenze. Die zugrunde liegenden Effekte und gespeicherten Schlüssel werden dadurch nicht geändert. Neue Attribute werden zuerst hier definiert; UI-Code erhält keine eigenen Namenslisten. `ACTIVE` enthält die elf spielbaren Attribute. Zahnflutsch verwendet `dodge_chance` als Bruchteil (0,03 = 3 %), ein eigenes gemaltes Icon und vier Level-up-Stufen: +3/+6/+9/+12 %. Die Anzeige zeigt die effektive Chance und kennzeichnet das Maximum; der rohe Bonus bleibt für spätere Nachteile erhalten. [Trefferlogik, Items und Grenzen](DODGE.md).
 
 Die Shopübersicht hört auf `PlayerStats.changed`, auch während der pausierten Zwischenphase. Kauf, direkte Statänderung und Wiederaufnahme eines Spielstands zeigen so aktuelle permanente Werte. Bedingte Itemeffekte, etwa Zusatzschaden beim Laufen, sind weiterhin im Itemtext beschrieben und sind keine dauerhaften Grundstatboni.
 

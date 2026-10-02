@@ -12,6 +12,7 @@ Der Spielcharakter besteht nun aus einer Körperebene und einer transparenten Ge
 | Tatsächliche Heilung | Erleichtertes Lächeln | 0,65 s; höchstens alle 2,5 s |
 | Wenig HP | Besorgtes Gesicht | Bei höchstens 25 % HP, solange kein anderer Ausdruck Vorrang hat |
 | Schildblock | Selbstbewusstes Grinsen | 0,55 s; kein Schadensgesicht bei geblocktem Treffer |
+| Erfolgreiches Ausweichen | Zwinkern | 0,45 s; ausgelöst durch Zahnflutsch |
 | Erfolgreicher Wellenabschluss | Jubel | 1,2 s, zu Beginn der Beutesammlung |
 | Tod | Geschlossene Augen und trauriger Mund | Sofort, auch wenn der Tod im selben Moment das Spiel pausiert |
 
@@ -29,7 +30,7 @@ player.expressions.set_status(DentiExpressions.Status.POISON, false)
 
 Eine Dauer von null bedeutet „bis zum expliziten Entfernen“. Positive Dauern laufen während unpausierter Spielzeit ab. Ein künftiges Statuseffektsystem kann die Anzeige mit seinen eigenen Zustandswechseln aktivieren und entfernen. Die Anzeige selbst verändert niemals HP, Rüstung, Schilde oder Unverwundbarkeit.
 
-Vergiftet: müde Augen, welliger Mund, grüne Wangen und drei kleine grüne Bläschen neben dem Körper. Blutend: zusammengekniffene Augen, angespannter Mund, kleiner Wangenfleck und zwei kleine rote Tropfen. Beide Hinweise bleiben auch während eines kurzfristigen Treffer- oder Heilungsgesichts sichtbar. Für beide Zustände zusammen gibt es ein eigenes Gesicht. `show_dodge()` bereitet ein Zwinkern vor, führt aber keine Ausweichmechanik ein.
+Vergiftet: müde Augen, welliger Mund, grüne Wangen und drei kleine grüne Bläschen neben dem Körper. Blutend: zusammengekniffene Augen, angespannter Mund, kleiner Wangenfleck und zwei kleine rote Tropfen. Beide Hinweise bleiben auch während eines kurzfristigen Treffer- oder Heilungsgesichts sichtbar. Für beide Zustände zusammen gibt es ein eigenes Gesicht. `show_dodge()` reagiert auf das tatsächliche Ausweichsignal von `PlayerStats`; die Mechanik ist unter [Zahnflutsch](DODGE.md) dokumentiert.
 
 Tod hat Vorrang vor allen Reaktionen. Bei vorübergehenden Reaktionen gilt Treffer > Schildblock > Ausweichen > Heilung > Jubel. Danach erscheint wieder der anhaltende Zustand: Gift + Blutung, Gift, Blutung, wenig HP oder normal. Nur das normale Grundgesicht blinzelt zusätzlich. Anhaltende Anzeigen und deren Restdauer werden im Spielstand gespeichert; kurze Reaktionen starten beim Fortsetzen neu. Ältere Spielstände benötigen das neue Feld nicht.
 

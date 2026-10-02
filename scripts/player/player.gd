@@ -8,6 +8,7 @@ const MIN_IFRAMES := 0.2
 const MAX_IFRAMES := 0.4
 const FULL_IFRAMES_DAMAGE_FRACTION := 0.15
 const ATTACK_ANIMATION_DURATION := 0.18
+const DODGE_IFRAMES := 0.15
 
 @onready var stats: PlayerStats = $Stats
 @onready var loadout: WeaponLoadout = $Weapons
@@ -19,6 +20,7 @@ const ATTACK_ANIMATION_DURATION := 0.18
 @onready var mobile_controls: MobileControls = get_node("../MobileControls/Root")
 
 var hurt_time: float = 0.0
+var dodge_time: float = 0.0
 var animation_time: float = 0.0
 var attack_time: float = 0.0
 var attack_direction: Vector2 = Vector2.RIGHT
@@ -27,6 +29,7 @@ var is_moving: bool = false
 
 func _ready() -> void:
 	expressions.configure(stats)
+	stats.dodged.connect(_on_dodged)
 
 
 func _physics_process(delta: float) -> void:
@@ -39,9 +42,9 @@ func _physics_process(delta: float) -> void:
 	global_position = global_position.clamp(Vector2.ONE * DentiArena.PLAYER_MARGIN, arena.arena_size - Vector2.ONE * DentiArena.PLAYER_MARGIN)
 	is_moving = global_position.distance_squared_to(before_move) > 0.01
 	_animate_sprite(direction, delta)
-	if hurt_time > 0.0:
-		hurt_time -= delta
-		sprite.modulate = Color(1.0, 0.55, 0.55) if hurt_time > 0.0 else Color.WHITE
+	hurt_time = maxf(hurt_time - delta, 0.0)
+	dodge_time = maxf(dodge_time - delta, 0.0)
+	sprite.modulate = Color(1.0, 0.55, 0.55) if hurt_time > 0.0 else (Color(0.72, 0.94, 1.0) if dodge_time > 0.0 else Color.WHITE)
 
 
 func _animate_sprite(direction: Vector2, delta: float) -> void:
@@ -64,9 +67,13 @@ func play_attack_animation(aim: Vector2, kind: StringName = &"brush") -> void:
 
 
 func take_hit(amount: float) -> void:
-	if hurt_time > 0.0 or stats.health <= 0.0:
+	if hurt_time > 0.0 or dodge_time > 0.0 or stats.health <= 0.0:
 		return
 	var actual := stats.take_damage(amount)
 	if actual > 0.0:
 		hurt_time = clampf(MAX_IFRAMES * actual / (stats.max_health * FULL_IFRAMES_DAMAGE_FRACTION), MIN_IFRAMES, MAX_IFRAMES)
 		damaged.emit(global_position + Vector2(0.0, -28.0), actual)
+
+
+func _on_dodged() -> void:
+	dodge_time = DODGE_IFRAMES

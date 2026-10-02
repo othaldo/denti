@@ -17,16 +17,16 @@ const MEANINGS: Array[String] = [
 	"Maximale Lebenspunkte (HP)", "Angriffstempo", "Chance auf kritische Treffer",
 	"Regenerationspunkte und Heilung pro Sekunde", "Bewegungstempo", "Glück bei Beute und Seltenheiten",
 	"Zusätzlicher Nahschaden nach Waffenskalierung", "Zusätzlicher Fernschaden nach Waffenskalierung",
-	"Chance, einem Treffer auszuweichen (Dodge)",
+	"Chance, einem Treffer auszuweichen; maximal 60 %. Bewahrt Schildladungen.",
 ]
-const ICONS: Array[int] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1]
-# Dodge is reserved for the next gameplay slice, not yet in the upgrade pool.
+const ICONS: Array[int] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 const ACTIVE: Array[Type] = [Type.DAMAGE, Type.ARMOR, Type.MAX_HEALTH, Type.ATTACK_SPEED,
-	Type.CRIT_CHANCE, Type.REGEN, Type.MOVEMENT, Type.LUCK, Type.MELEE_DAMAGE, Type.RANGED_DAMAGE]
+	Type.CRIT_CHANCE, Type.REGEN, Type.MOVEMENT, Type.LUCK, Type.MELEE_DAMAGE, Type.RANGED_DAMAGE, Type.DODGE]
 const SHOP_ROWS: Array = [
 	[Type.DAMAGE, Type.ARMOR, Type.MAX_HEALTH],
 	[Type.ATTACK_SPEED, Type.CRIT_CHANCE, Type.REGEN],
-	[Type.MOVEMENT, Type.LUCK, Type.MELEE_DAMAGE, Type.RANGED_DAMAGE],
+	[Type.MOVEMENT, Type.LUCK, Type.DODGE],
+	[Type.MELEE_DAMAGE, Type.RANGED_DAMAGE],
 ]
 # Legacy prose in Resources is resolved at presentation boundaries. These aliases
 # never change effect identifiers or damage calculations.
@@ -70,6 +70,7 @@ static func value_text(stats: PlayerStats, type: Type) -> String:
 		Type.ARMOR: return stats.armor_text()
 		Type.REGEN: return stats.regen_text()
 		Type.MAX_HEALTH: return "%.0f HP" % stats.max_health
+		Type.DODGE: return "%s %%" % number(stats.effective_dodge_chance() * 100.0) + (" (max.)" if stats.dodge_chance >= PlayerStats.MAX_DODGE_CHANCE else "")
 	var value: float = float(stats.get(key_for(type)))
 	if is_fraction(type):
 		return "%s %%" % number(value * 100.0)

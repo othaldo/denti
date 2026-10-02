@@ -11,6 +11,7 @@ const ITEM_FAMILIES: Array[Texture2D] = [
 	preload("res://assets/items/item_icons_families_3_packed.png"),
 ]
 const ITEM_MYTHIC: Texture2D = preload("res://assets/items/item_icons_mythic_packed.png")
+const DODGE_ATLAS: Texture2D = preload("res://assets/items/item_icons_dodge_packed.png")
 const RELIC_ATLAS: Texture2D = preload("res://assets/relics/relic_icons_atlas.png")
 const HUD_ATLAS: Texture2D = preload("res://assets/ui/hud_icons_atlas.png")
 const STAT_ATLAS: Texture2D = preload("res://assets/ui/stat_icons_atlas.png")
@@ -31,6 +32,8 @@ const HUD_ROWS := 2
 
 
 static func item(index: int) -> Texture2D:
+	if index >= 86:
+		return _region(DODGE_ATLAS, clampi(index - 86, 0, 4), 3, 2)
 	if index >= 78:
 		return _region(ITEM_MYTHIC, clampi(index - 78, 0, 7), 4, 2)
 	if index >= 30:
@@ -49,6 +52,10 @@ static func hud(index: int) -> Texture2D:
 
 
 static func stat(index: int) -> Texture2D:
+	if index == 10:
+		var dodge := _region(DODGE_ATLAS, 5, 3, 2) as AtlasTexture
+		dodge.filter_clip = true
+		return dodge
 	var texture := AtlasTexture.new()
 	texture.atlas = STAT_ATLAS
 	texture.region = STAT_REGIONS[clampi(index, 0, STAT_REGIONS.size() - 1)]

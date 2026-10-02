@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"dodge_3"
+display_name = "Flutschspülung"
+description = "+10 % Zahnflutsch, -1 Speichel. Ausweichen heilt 1 HP je Exemplar (max. 4; 1,5 s gemeinsame Abklingzeit). Kann Überheilung erzeugen."
+rarity_tier = 3
+price = 15
+icon_index = 88
+stat_changes = { &"dodge_chance": 0.10, &"regen": -1.0 }
+effect_kind = &"dodge_heal"
+effect_value = 1.0
+max_stacks = 4
+family_id = &"dodge"
+family_limit = 4
+tags = Array[StringName]([&"dodge", &"healing", &"sustain", &"shield"])

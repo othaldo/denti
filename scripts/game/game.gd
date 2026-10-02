@@ -17,6 +17,7 @@ const UPGRADES: Array[UpgradeData] = [
 	preload("res://data/upgrades/speichel.tres"),
 	preload("res://data/upgrades/glanz.tres"),
 	preload("res://data/upgrades/zahnglueck.tres"),
+	preload("res://data/upgrades/zahnflutsch.tres"),
 ]
 
 @onready var player: Player = $Player
@@ -65,6 +66,8 @@ func _ready() -> void:
 	player.stats.shield_blocked.connect(items.on_shield_blocked)
 	player.stats.shield_blocked.connect(relics.on_shield_blocked)
 	player.stats.healed.connect(items.on_healed)
+	player.stats.dodged.connect(items.on_player_dodged)
+	player.stats.dodged.connect(telemetry.record_dodge)
 	player.attack_performed.connect(sound.play_attack)
 	player.damaged.connect(_on_player_damaged)
 	player.damaged.connect(items.on_player_hurt)
@@ -778,6 +781,7 @@ func debug_start_wave(number: int) -> void:
 	player.velocity = Vector2.ZERO
 	player.global_position = arena.arena_size / 2.0
 	player.hurt_time = 0.0
+	player.dodge_time = 0.0
 	player.sprite.modulate = Color.WHITE
 	var configured_stats := player.stats.to_save_data()
 	configured_stats["health"] = player.stats.max_health

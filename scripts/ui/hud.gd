@@ -82,6 +82,7 @@ func update_telemetry(stats: RunTelemetry, enemies_alive: int, projectiles_alive
 		stats.wave_spawns_blocked, projectiles_alive, stats.taken_per_minute(), stats.damage_taken,
 		stats.last_boss_ttk, stats.wave_coins, stats.wave_xp, stats.total_damage,
 	]
+	telemetry_label.text += "\nZahnflutsch: %d Welle · %d Run" % [stats.wave_dodges, stats.dodges]
 
 
 func _profile_label(id: StringName, wave_number: int) -> String:

@@ -13,6 +13,7 @@ const STAT_FIELDS := [
 	[DentiAttributes.KEYS[DentiAttributes.Type.REGEN], "", -100.0, 1000.0, 1.0],
 	[DentiAttributes.KEYS[DentiAttributes.Type.CRIT_CHANCE], "", 0.0, 65.0, 1.0],
 	[DentiAttributes.KEYS[DentiAttributes.Type.LUCK], "", 0.0, 10000.0, 1.0],
+	[DentiAttributes.KEYS[DentiAttributes.Type.DODGE], "", -100.0, 200.0, 1.0],
 	["shield_charges", "Schild", 0.0, 5.0, 1.0],
 ]
 
@@ -242,7 +243,7 @@ func refresh() -> void:
 	wave_number.value = maxi(game.wave.current_wave, 1)
 	var saved: Dictionary = game.player.stats.to_save_data()
 	for key in stats:
-		stats[key].value = float(saved[key]) * (100.0 if key == "crit_chance" else 1.0)
+		stats[key].value = float(saved[key]) * (100.0 if DentiAttributes.is_fraction(DentiAttributes.from_key(StringName(key))) else 1.0)
 	for child in equipped_rows.get_children():
 		child.free()
 	var equipped: Array[WeaponInstance] = game.player.loadout.equipped()
@@ -294,7 +295,7 @@ func _add_item() -> void:
 func _apply_stats() -> void:
 	var values := {}
 	for key in stats:
-		values[key] = stats[key].value / (100.0 if key == "crit_chance" else 1.0)
+		values[key] = stats[key].value / (100.0 if DentiAttributes.is_fraction(DentiAttributes.from_key(StringName(key))) else 1.0)
 	controls.set_stats(values)
 	status.text = "Stats übernommen"
 	refresh()

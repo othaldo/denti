@@ -52,12 +52,14 @@ func configure(source: PlayerStats) -> void:
 		stats.damage_taken.disconnect(_on_damage)
 		stats.healed.disconnect(_on_healed)
 		stats.shield_blocked.disconnect(_on_block)
+		stats.dodged.disconnect(show_dodge)
 	stats = source
 	if stats != null:
 		stats.changed.connect(_refresh_face)
 		stats.damage_taken.connect(_on_damage)
 		stats.healed.connect(_on_healed)
 		stats.shield_blocked.connect(_on_block)
+		stats.dodged.connect(show_dodge)
 	_refresh_face()
 
 func _process(delta: float) -> void:

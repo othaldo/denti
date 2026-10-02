@@ -18,7 +18,7 @@ func _run() -> void:
 	_check(DentiAttributes.resolve_text("+1 Regeneration, -3 % Schaden. Alle 8 normalen Kills: +1 Leben.") == "+1 Speichel, -3 % Bisskraft. Alle 8 normalen Kills: +1 Leben.", "healing became max HP or flat damage kept an alias")
 	_check(DentiAttributes.resolve_text("XP heilt 0,35 Leben je Punkt. -8 maximales Leben.").ends_with("-8 Schmelz."), "HP penalty or healing prose was damaged")
 	_check(DentiAttributes.bonus_text(DentiAttributes.Type.CRIT_CHANCE, 0.03) == "+3 % Glanz", "fractional crit displayed in the wrong unit")
-	_check(not DentiAttributes.ACTIVE.has(DentiAttributes.Type.DODGE), "future Dodge accidentally entered the live stat pool")
+	_check(DentiAttributes.ACTIVE.has(DentiAttributes.Type.DODGE), "Zahnflutsch is absent from the live stat pool")
 	var session: Node = root.get_node("GameSession")
 	session.save_path = "user://test_attribute_presentation.json"
 	session.resume_requested = false
@@ -44,7 +44,7 @@ func _run() -> void:
 		card.free()
 	var ui: ShopPanel = game.shop_panel
 	# Buy through the actual UI; every stat delta must appear without reopening.
-	for id in [&"health_1", &"metal_crown", &"mouthwash", &"lucky_molar", &"mythic_regen", &"mythic_bite"]:
+	for id in [&"health_1", &"metal_crown", &"mouthwash", &"lucky_molar", &"mythic_regen", &"mythic_bite", &"dodge_1"]:
 		var offer := ShopController.by_id(id).duplicate() as ShopOfferData
 		game.shop.offers[0] = offer
 		game._update_shop_panel()

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"mythic_dodge"
+display_name = "Unfassbare Wurzel"
+description = "+15 % Zahnflutsch."
+rarity_tier = 5
+price = 38
+icon_index = 90
+stat_changes = { &"dodge_chance": 0.15 }
+max_stacks = 1
+tags = Array[StringName]([&"dodge", &"mobility", &"shield"])

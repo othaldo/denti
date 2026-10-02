@@ -4,6 +4,9 @@ Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü an
 
 ## In Entwicklung
 
+- **Zahnflutsch:** neues Ausweichattribut mit höchstens 60 % effektiver Chance, eigenem Icon und vier Level-up-Stufen. Erfolgreiches Ausweichen bewahrt Schilde und lässt Denti zwinkern. Gleitwachs, Seidenwurzel, Flutschspülung, Lotusschmelz und das einmalige Mythic Unfassbare Wurzel erweitern den Pool auf 93 Items; Heilungs- und Schildsynergien haben begrenzte Auslösefrequenzen. Shop, Stats, Testmenü, Telemetrie und Save/Resume unterstützen das Attribut. [Werte und Vorschau](docs/DODGE.md).
+- **Gesichtsausdrücke:** Denti reagiert auf Schaden, Heilung, wenig HP, Schildblock, Wellenabschluss und Tod. Gift-/Blutungsanzeigen sind einzeln und kombiniert für spätere Statusmechaniken vorbereitet. [Animation und Anschluss](docs/DENTI_EXPRESSIONS.md).
+
 - Goldextraktor-Icon: Armführung überarbeitet, linker Griff zur oberen rechten Backe; keine Klinge zwischen den Münzen. Zwei äußere Backen und vollständige Griffe ohne abgeschnittene Atlasränder. Die Goldsonde bleibt unverändert.
 
 - **Endlosmodus:** nach dem Sieg in Welle 20 mit dem bestehenden Build weiterspielen. Ab Welle 21 dauern Wellen 60 Sekunden; die Brotato-Endloskurve verstärkt Gegner und Shoppreise. Mehr Elite- und Gegnerdruck, Doppelbosse in Welle 30/40/... und vollständiges Save/Resume. Der ursprüngliche Sieg bleibt erhalten. [Kurve, Messungen und Vorschau](docs/ENDLESS_MODE.md).
