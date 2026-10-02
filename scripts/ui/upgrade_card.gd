@@ -100,6 +100,8 @@ func set_mobile_text(enabled: bool) -> void:
 func set_upgrade_layout(narrow: bool, compact: bool) -> void:
 	custom_minimum_size = Vector2(0, 186 if narrow else (174 if compact else 186))
 	icon_rect.custom_minimum_size.y = 40 if compact else 56
+	icon_rect.custom_minimum_size.x = icon_rect.custom_minimum_size.y
+	icon_rect.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	name_label.custom_minimum_size.y = 34 if narrow else 26
 	name_label.add_theme_font_size_override("font_size", 12 if narrow else 18)
 	effect_label.add_theme_font_size_override("font_size", 15 if narrow else 17)
@@ -160,14 +162,11 @@ func _build_content() -> void:
 	effect_label = Label.new()
 	effect_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	effect_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	effect_label.add_theme_color_override("font_color", DentiUIStyle.MUTED)
+	effect_label.add_theme_color_override("font_color", DentiUIStyle.TEXT)
 	effect_label.add_theme_font_size_override("font_size", 14)
 	effect_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	content.add_child(effect_label)
 
 
 func _on_hover(hovered: bool) -> void:
-	if hover_tween != null:
-		hover_tween.kill()
-	hover_tween = create_tween()
-	hover_tween.tween_property(self, "scale", Vector2.ONE * (1.025 if hovered else 1.0), 0.11)
+	DentiUIMotion.hover_art(icon_rect, hovered)

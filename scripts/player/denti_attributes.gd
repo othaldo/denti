@@ -85,6 +85,14 @@ static func shop_text(stats: PlayerStats) -> String:
 		rows.append(" · ".join(entries))
 	return "\n".join(rows)
 
+
+static func compact_value_text(stats: PlayerStats, type: Type) -> String:
+	match type:
+		Type.ARMOR: return number(stats.armor)
+		Type.REGEN: return "%.2f/s" % stats.regen_per_second()
+		Type.MAX_HEALTH: return "%.0f" % stats.max_health
+	return value_text(stats, type).trim_suffix(" (max.)")
+
 static func resolve_text(source: String) -> String:
 	var result := source
 	for alias: String in ALIASES:

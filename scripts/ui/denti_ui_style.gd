@@ -2,22 +2,48 @@ class_name DentiUIStyle
 extends RefCounted
 
 const FONT: FontFile = preload("res://assets/ui/Fredoka.ttf")
-const INK := Color(0.25, 0.13, 0.19)
-const CREAM := Color(1.0, 0.97, 0.88)
-const MUTED := Color(0.47, 0.34, 0.38)
-const GOLD := Color(0.98, 0.77, 0.30)
-const MINT := Color(0.48, 0.80, 0.67)
-const CORAL := Color(0.95, 0.47, 0.42)
+static var _ui_font: FontVariation
+const BACKGROUND := Color("19151f")
+const PANEL := Color("25212d")
+const RAISED := Color("322c3b")
+const LINE := Color("4a4053")
+const INK := Color("fff4df")
+const CREAM := INK
+const TEXT := Color("eee7f1")
+const MUTED := Color("dbd0e1")
+const GOLD := Color("f4c56b")
+const GOLD_INK := Color("2b202b")
+const MINT := Color("9adfc7")
+const CORAL := Color("ff968e")
 const VIOLET := Color(0.52, 0.36, 0.69)
-const PANEL := Color(1.0, 0.98, 0.92, 0.96)
 
 
 static func make_theme() -> Theme:
 	var theme := Theme.new()
-	theme.default_font = FONT
+	if _ui_font == null:
+		_ui_font = FontVariation.new()
+		_ui_font.base_font = FONT
+		var weight_tag := TextServerManager.get_primary_interface().name_to_tag("weight")
+		_ui_font.variation_opentype = {weight_tag: 450.0}
+	theme.default_font = _ui_font
 	theme.default_font_size = 18
-	theme.set_stylebox("panel", "TooltipPanel", _box(PANEL, GOLD, 10, 2))
+	for type in ["Label", "RichTextLabel", "OptionButton", "CheckButton"]:
+		theme.set_color("font_color" if type != "RichTextLabel" else "default_color", type, INK)
+	theme.set_stylebox("panel", "TooltipPanel", _box(BACKGROUND, LINE, 12, 1))
 	theme.set_color("font_color", "TooltipLabel", INK)
+	theme.set_font_size("font_size", "TooltipLabel", 16)
+	theme.set_constant("separation", "TooltipLabel", 6)
+	var option := Button.new()
+	style_button(option)
+	for state in ["normal", "hover", "pressed", "disabled", "focus"]:
+		theme.set_stylebox(state, "OptionButton", option.get_theme_stylebox(state))
+	option.free()
+	theme.set_stylebox("panel", "PopupMenu", _box(PANEL, LINE, 12, 1))
+	theme.set_stylebox("hover", "PopupMenu", _box(RAISED, GOLD, 8, 1))
+	theme.set_color("font_color", "PopupMenu", INK)
+	theme.set_color("font_hover_color", "PopupMenu", INK)
+	theme.set_color("font_disabled_color", "PopupMenu", MUTED)
+	theme.set_color("font_disabled_color", "OptionButton", MUTED)
 	return theme
 
 
@@ -29,7 +55,7 @@ static func style_hud_text(label: Label, color: Color, size: int, outline: int =
 
 
 static func style_dialog(panel: PanelContainer) -> void:
-	var style := _box(PANEL, Color(0.62, 0.45, 0.37), 22, 3)
+	var style := _box(BACKGROUND, LINE, 22, 1)
 	style.shadow_color = Color(0.11, 0.06, 0.12, 0.42)
 	style.shadow_size = 16
 	style.shadow_offset = Vector2(0, 9)
@@ -37,15 +63,15 @@ static func style_dialog(panel: PanelContainer) -> void:
 
 
 static func style_hud_panel(panel: Panel) -> void:
-	var style := _box(PANEL, Color(0.57, 0.41, 0.43, 0.82), 16, 2)
+	var style := _box(PANEL, LINE, 16, 1)
 	style.shadow_color = Color(0.14, 0.09, 0.14, 0.28)
 	style.shadow_size = 7
 	style.shadow_offset = Vector2(0, 3)
 	panel.add_theme_stylebox_override("panel", style)
 
 
-static func style_chip(panel: PanelContainer, fill: Color = Color(0.94, 0.88, 0.75)) -> void:
-	var style := _box(fill, Color(0.64, 0.48, 0.33), 10, 1)
+static func style_chip(panel: PanelContainer, _fill: Color = RAISED) -> void:
+	var style := _box(PANEL, LINE, 12, 1)
 	style.content_margin_left = 8
 	style.content_margin_right = 8
 	style.content_margin_top = 3
@@ -54,28 +80,25 @@ static func style_chip(panel: PanelContainer, fill: Color = Color(0.94, 0.88, 0.
 
 
 static func style_button(button: Button, accent: bool = false, left_align: bool = false) -> void:
-	var normal_color := GOLD if accent else Color(1.0, 0.99, 0.95)
-	var normal := _box(normal_color, Color(0.47, 0.31, 0.36), 12, 2)
-	normal.shadow_color = Color(0.18, 0.10, 0.14, 0.18)
-	normal.shadow_size = 3
-	normal.shadow_offset = Vector2(0, 2)
+	var normal_color := GOLD if accent else RAISED
+	var normal := _box(normal_color, GOLD if accent else LINE, 12, 1)
 	button.add_theme_stylebox_override("normal", normal)
-	var hover := _box(Color(0.89, 0.97, 0.88) if not accent else Color(1.0, 0.85, 0.48), GOLD, 12, 3)
-	hover.shadow_color = Color(0.56, 0.36, 0.11, 0.29)
-	hover.shadow_size = 7
+	var hover := _box(RAISED.lightened(0.08) if not accent else GOLD.lightened(0.10), GOLD, 12, 1)
 	button.add_theme_stylebox_override("hover", hover)
-	button.add_theme_stylebox_override("pressed", _box(Color(0.69, 0.85, 0.68) if not accent else Color(0.91, 0.66, 0.20), INK, 12, 3))
-	button.add_theme_stylebox_override("disabled", _box(Color(0.87, 0.84, 0.80), Color(0.62, 0.55, 0.54), 12, 2))
-	var focus := _box(Color(1.0, 0.80, 0.36, 0.20), GOLD, 12, 3)
+	button.add_theme_stylebox_override("pressed", _box(RAISED.darkened(0.15) if not accent else GOLD.darkened(0.12), GOLD, 12, 1))
+	button.add_theme_stylebox_override("disabled", _box(PANEL, LINE, 12, 1))
+	var focus := _box(Color.TRANSPARENT, GOLD, 12, 3)
+	focus.draw_center = false
 	button.add_theme_stylebox_override("focus", focus)
-	button.add_theme_color_override("font_color", INK)
-	button.add_theme_color_override("font_focus_color", INK)
-	button.add_theme_color_override("font_hover_color", INK)
-	button.add_theme_color_override("font_hover_pressed_color", INK)
-	button.add_theme_color_override("font_pressed_color", INK)
-	button.add_theme_color_override("font_disabled_color", INK)
+	var text_color := GOLD_INK if accent else INK
+	for state in ["font_color", "font_focus_color", "font_hover_color", "font_hover_pressed_color", "font_pressed_color"]:
+		button.add_theme_color_override(state, text_color)
+	button.add_theme_color_override("font_disabled_color", MUTED)
+	for state in ["icon_normal_color", "icon_hover_color", "icon_pressed_color", "icon_focus_color"]:
+		button.add_theme_color_override(state, GOLD_INK if accent else INK)
 	button.add_theme_font_size_override("font_size", 18)
 	button.alignment = HORIZONTAL_ALIGNMENT_LEFT if left_align else HORIZONTAL_ALIGNMENT_CENTER
+	DentiUIMotion.bind_button(button)
 
 
 static func style_check_button(button: CheckButton) -> void:
@@ -84,38 +107,69 @@ static func style_check_button(button: CheckButton) -> void:
 
 
 static func style_rarity_label(label: Label, tier: int) -> void:
-	var badge := _box(DentiRarity.color_for(tier), DentiRarity.color_for(tier).darkened(0.22), 6, 1)
-	badge.content_margin_left = 7.0
-	badge.content_margin_right = 7.0
-	badge.content_margin_top = 2.0
-	badge.content_margin_bottom = 2.0
+	var rarity_color := DentiRarity.color_for(tier).lightened(0.65)
+	var badge := _box(Color.TRANSPARENT, Color.TRANSPARENT, 4, 0)
+	badge.content_margin_left = 0.0
+	badge.content_margin_right = 0.0
+	badge.content_margin_top = 0.0
+	badge.content_margin_bottom = 0.0
 	label.add_theme_stylebox_override("normal", badge)
-	label.add_theme_color_override("font_color", Color.WHITE)
+	label.add_theme_color_override("font_color", rarity_color)
 	label.add_theme_font_size_override("font_size", 13)
 
 
 static func style_card(button: Button, tier: int = 1) -> void:
 	style_button(button)
 	var accent := DentiRarity.color_for(tier)
-	var fill := accent.lerp(Color.WHITE, 0.93)
-	var normal := _box(fill, accent, 16, 3)
-	normal.shadow_color = Color(0.18, 0.10, 0.14, 0.22)
-	normal.shadow_size = 5
-	normal.shadow_offset = Vector2(0, 3)
+	var fill := PANEL.lerp(accent, 0.16)
+	var normal := rarity_surface(tier)
 	button.add_theme_stylebox_override("normal", normal)
-	var hover := _box(fill.lightened(0.02), accent.lightened(0.15), 16, 4)
-	hover.shadow_color = Color(0.73, 0.49, 0.15, 0.35)
-	hover.shadow_size = 10
-	hover.shadow_offset = Vector2(0, 5)
+	var hover := _box(fill.lightened(0.035), accent.lightened(0.35), 14, 2)
 	button.add_theme_stylebox_override("hover", hover)
-	button.add_theme_stylebox_override("pressed", _box(fill.darkened(0.06), accent, 16, 3))
-	button.add_theme_stylebox_override("focus", _box(Color(accent, 0.16), accent, 16, 3))
-	button.add_theme_stylebox_override("disabled", _box(fill.darkened(0.08), accent.darkened(0.2), 16, 2))
+	button.add_theme_stylebox_override("pressed", _box(fill.darkened(0.06), accent, 14, 2))
+	# Focus is an inset cream outline; the rarity border and fill stay visible.
+	button.add_theme_stylebox_override("focus", _rarity_marker(INK))
+	button.add_theme_stylebox_override("disabled", _box(fill.darkened(0.08), accent.darkened(0.15), 14, 2))
+
+
+static func rarity_surface(tier: int) -> StyleBoxFlat:
+	var accent := DentiRarity.color_for(tier)
+	var style := _box(PANEL.lerp(accent, 0.16), accent.lightened(0.20), 14, 2)
+	return style
+
+
+static func style_rarity_panel(panel: PanelContainer, tier: int) -> void:
+	panel.add_theme_stylebox_override("panel", rarity_surface(tier))
+	mark_card(panel)
+
+
+static func mark_card(control: Control, color: Color = Color.TRANSPARENT) -> void:
+	# Selection/fusion markers overlay the surface instead of replacing rarity.
+	control.set_meta("denti_rarity_marker", color)
+	if not control.has_meta("denti_rarity_marker_bound"):
+		control.set_meta("denti_rarity_marker_bound", true)
+		control.draw.connect(func() -> void:
+			var marker: Color = control.get_meta("denti_rarity_marker", Color.TRANSPARENT)
+			if not control is BaseButton and control.has_focus():
+				marker = INK
+			if marker.a > 0:
+				control.draw_style_box(_rarity_marker(marker), Rect2(Vector2.ZERO, control.size))
+		)
+		control.focus_entered.connect(control.queue_redraw)
+		control.focus_exited.connect(control.queue_redraw)
+	control.queue_redraw()
+
+
+static func _rarity_marker(color: Color) -> StyleBoxFlat:
+	var style := _box(Color.TRANSPARENT, color, 9, 2)
+	style.draw_center = false
+	style.set_expand_margin_all(-5.0)
+	return style
 
 
 static func style_progress(bar: ProgressBar, fill_color: Color) -> void:
-	var background := _box(Color(0.77, 0.72, 0.70, 0.92), Color(0.43, 0.31, 0.34), 6, 2)
-	var fill := _box(fill_color, fill_color.darkened(0.30), 5, 1)
+	var background := _box(RAISED, RAISED, 6, 0)
+	var fill := _box(fill_color, fill_color, 5, 0)
 	for style in [background, fill]:
 		style.content_margin_left = 0.0
 		style.content_margin_right = 0.0
@@ -126,7 +180,7 @@ static func style_progress(bar: ProgressBar, fill_color: Color) -> void:
 
 
 static func style_slider(slider: HSlider) -> void:
-	var track := _box(Color(0.53, 0.42, 0.44), INK, 6, 1)
+	var track := _box(RAISED.lightened(0.12), LINE, 6, 0)
 	var filled := _box(MINT.darkened(0.12), MINT.darkened(0.44), 6, 1)
 	var highlighted := _box(GOLD, GOLD.darkened(0.35), 6, 1)
 	for style in [track, filled, highlighted]:

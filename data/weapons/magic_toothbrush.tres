@@ -3,7 +3,7 @@
 [ext_resource type="Texture2D" path="res://assets/weapons/magic_toothbrush.png" id="2"]
 [resource]
 script = ExtResource("1")
-role = "Paste gegen Einzelziele und Gruppen"
+role = "Wirkt gegen Einzelziele und Gruppen"
 id = &"magic_toothbrush"
 display_name = "Zauberbürste"
 description = "2 Wurzeln · Fernkampf · ab Stufe III mehr Pastegeschosse"

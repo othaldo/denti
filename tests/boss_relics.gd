@@ -78,7 +78,8 @@ func _run() -> void:
 	if not game.relics.has_relic(&"shattered_halo"):
 		game.relics.acquire(&"shattered_halo")
 	game.player.stats.grant_shield(1)
-	game.player.stats.take_damage(10.0)
+	# Exercise a shield block, independently of randomly acquired dodge bonuses.
+	game.player.stats.take_damage(10.0, false)
 	if game.relics.damage_factor() != 1.3:
 		_fail("shield block did not trigger the relic damage window")
 		return

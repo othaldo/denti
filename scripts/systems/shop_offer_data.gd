@@ -23,6 +23,40 @@ func effect_text() -> String:
 	return DentiAttributes.resolve_text(description)
 
 
+func card_effect_text() -> String:
+	# Icon values already explain unconditional stats. Keep the first additional
+	# mechanic on the purchase card; the full description stays in hover/details.
+	var stat_clauses: PackedStringArray = []
+	for key: StringName in stat_changes:
+		var type := DentiAttributes.from_key(key)
+		if type >= 0:
+			stat_clauses.append(DentiAttributes.bonus_text(type, float(stat_changes[key])))
+	if effect_kind == &"" and not stat_changes.is_empty() and stat_clauses.size() == stat_changes.size():
+		return ""
+	# Decimal values, ordinal hits ("3.") and "max." belong to their sentence.
+	var source := effect_text()
+	var sentence_break := RegEx.new()
+	sentence_break.compile("(?<!\\d)(?<!max)(?<!bzw)(?<!ca)\\.\\s+")
+	var sentences: PackedStringArray = []
+	var start := 0
+	for found in sentence_break.search_all(source):
+		sentences.append(source.substr(start, found.get_start() - start))
+		start = found.get_end()
+	sentences.append(source.substr(start))
+	for sentence in sentences:
+		var remaining: PackedStringArray = []
+		for clause in sentence.split(", "):
+			var plain := clause.strip_edges().trim_suffix(".")
+			if not stat_clauses.has(plain.trim_suffix(" und Heilung").trim_suffix(" (HP)")):
+				remaining.append(plain)
+		if not remaining.is_empty():
+			var result := ", ".join(remaining)
+			if result.begins_with("+") and result.contains(" % gegen Bosse"):
+				result = result.replace(" % gegen Bosse", " % Schaden gegen Bosse")
+			return result
+	return ""
+
+
 func limit_text() -> String:
 	if rarity_tier == 5:
 		return "Einmalig pro Run"

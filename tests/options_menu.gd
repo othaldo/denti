@@ -14,13 +14,15 @@ func _run() -> void:
 	var previous_music: int = session.music_volume_percent
 	var previous_sfx: int = session.sfx_volume_percent
 	var previous_show_fps: bool = session.show_fps
+	var previous_ui_sounds: bool = session.ui_sounds
+	var previous_motion: bool = session.reduced_ui_motion
 	var menu: GameMenu = load("res://scenes/ui/game_menu.tscn").instantiate()
 	root.add_child(menu)
 	current_scene = menu
 	menu._show_options()
 	await process_frame
 	await process_frame
-	if menu.rows.get_child_count() != 9:
+	if menu.rows.get_child_count() != 10:
 		_fail("options page has duplicate controls")
 		return
 	var master_bus := AudioServer.get_bus_index("Master")
@@ -38,14 +40,21 @@ func _run() -> void:
 		_fail("audio sliders have no visible track")
 		return
 	var fps_toggle: CheckButton = menu.fps_toggle
+	var ui_sound_toggle: CheckButton = menu.ui_sound_toggle
+	var motion_toggle: CheckButton = menu.motion_toggle
+	ui_sound_toggle.button_pressed = false
+	motion_toggle.button_pressed = true
 	var selected_fps: bool = not session.show_fps
 	fps_toggle.button_pressed = selected_fps
 	master_slider.value = 37.0
 	music_slider.value = 62.0
 	sfx_slider.value = 15.0
 	await process_frame
-	if menu.rows.get_child_count() != 9 or menu.fps_toggle != fps_toggle or menu.master_slider != master_slider or menu.music_slider != music_slider or menu.sfx_slider != sfx_slider:
+	if menu.rows.get_child_count() != 10 or menu.fps_toggle != fps_toggle or menu.master_slider != master_slider or menu.music_slider != music_slider or menu.sfx_slider != sfx_slider or menu.ui_sound_toggle != ui_sound_toggle or menu.motion_toggle != motion_toggle:
 		_fail("moving sliders duplicated options")
+		return
+	if session.ui_sounds or not session.reduced_ui_motion:
+		_fail("UI sound and motion controls did not update independently")
 		return
 	if session.show_fps != selected_fps:
 		_fail("FPS toggle did not change the setting")
@@ -70,10 +79,10 @@ func _run() -> void:
 	var fullscreen_button: Button = menu.fullscreen_button
 	fullscreen_button.pressed.emit()
 	await process_frame
-	if menu.rows.get_child_count() != 9 or menu.fullscreen_button != fullscreen_button:
+	if menu.rows.get_child_count() != 10 or menu.fullscreen_button != fullscreen_button:
 		_fail("fullscreen option duplicated controls")
 		return
-	var back_button: Button = menu.rows.get_child(8)
+	var back_button: Button = menu.rows.get_child(9)
 	back_button.pressed.emit()
 	await process_frame
 	if menu.page != &"home" or menu.rows.get_child_count() != 9:
@@ -82,7 +91,7 @@ func _run() -> void:
 	var options_button: Button = menu.rows.get_child(5)
 	options_button.pressed.emit()
 	await process_frame
-	if menu.page != &"options" or menu.rows.get_child_count() != 9 or menu.fps_toggle.button_pressed != selected_fps or int(menu.master_slider.value) != 37 or int(menu.music_slider.value) != 62 or int(menu.sfx_slider.value) != 15:
+	if menu.page != &"options" or menu.rows.get_child_count() != 10 or menu.fps_toggle.button_pressed != selected_fps or int(menu.master_slider.value) != 37 or int(menu.music_slider.value) != 62 or int(menu.sfx_slider.value) != 15 or menu.ui_sound_toggle.button_pressed or not menu.motion_toggle.button_pressed:
 		_fail("opening options again duplicated controls")
 		return
 	session.master_volume_percent = 100
@@ -90,7 +99,7 @@ func _run() -> void:
 	session.sfx_volume_percent = 100
 	session.show_fps = not selected_fps
 	session._ready()
-	if session.master_volume_percent != 37 or session.music_volume_percent != 62 or session.sfx_volume_percent != 15 or session.show_fps != selected_fps:
+	if session.master_volume_percent != 37 or session.music_volume_percent != 62 or session.sfx_volume_percent != 15 or session.show_fps != selected_fps or session.ui_sounds or not session.reduced_ui_motion:
 		_fail("options settings did not load after a restart")
 		return
 	session.save_path = "user://test_options_run.json"
@@ -98,6 +107,7 @@ func _run() -> void:
 	root.add_child(game)
 	current_scene = game
 	menu.queue_free()
+	game.choice_panel.buttons[0].pressed.emit()
 	if game.hud.fps_panel.visible != selected_fps:
 		_fail("HUD did not apply saved FPS visibility")
 		return
@@ -116,7 +126,7 @@ func _run() -> void:
 	var pause_options_button: Button = game.game_menu.rows.get_child(6)
 	pause_options_button.pressed.emit()
 	await process_frame
-	if game.game_menu.page != &"options" or game.game_menu.rows.get_child_count() != 9:
+	if game.game_menu.page != &"options" or game.game_menu.rows.get_child_count() != 10:
 		_fail("pause options did not open cleanly")
 		return
 	var pause_music_slider: HSlider = game.game_menu.music_slider
@@ -135,10 +145,10 @@ func _run() -> void:
 		return
 	pause_music_slider.value = 23.0
 	await process_frame
-	if game.game_menu.rows.get_child_count() != 9 or game.game_menu.music_slider != pause_music_slider or session.music_volume_percent != 23:
+	if game.game_menu.rows.get_child_count() != 10 or game.game_menu.music_slider != pause_music_slider or session.music_volume_percent != 23:
 		_fail("pause options duplicated controls")
 		return
-	(game.game_menu.rows.get_child(8) as Button).pressed.emit()
+	(game.game_menu.rows.get_child(9) as Button).pressed.emit()
 	await process_frame
 	if game.game_menu.page != &"home" or game.game_menu.rows.get_child_count() != 8:
 		_fail("pause options back button failed")
@@ -165,6 +175,8 @@ func _run() -> void:
 	session.set_music_volume(previous_music)
 	session.set_sfx_volume(previous_sfx)
 	session.set_show_fps(previous_show_fps)
+	session.set_ui_sounds(previous_ui_sounds)
+	session.set_reduced_ui_motion(previous_motion)
 	session.set_fullscreen(false)
 	if FileAccess.file_exists(session.settings_path):
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(session.settings_path))

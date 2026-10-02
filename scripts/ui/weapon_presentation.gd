@@ -25,6 +25,29 @@ static func quick_text(data: WeaponData, tier: int, player: Player) -> String:
 	return "%s\n%.1f Treffer · %.2f s · %d Reichweite" % [role(data), current.damage, current.pause, roundi(current.range)]
 
 
+static func card_effect(data: WeaponData, tier: int) -> String:
+	var hints: PackedStringArray = []
+	if data.boss_bonus_tiers.size() > 0:
+		hints.append("+%d %% Schaden gegen Bosse." % roundi(data.boss_bonus_tiers[clampi(tier, 1, 4) - 1] * 100))
+	if data.crit_cycle > 0:
+		hints.append("Jeder %d. Treffer auf dasselbe Ziel ist kritisch." % data.crit_cycle)
+	if data.attack_mode in [&"beam_line", &"thrust"]:
+		hints.append("Trifft alle Gegner entlang der Linie.")
+	if data.wet_duration > 0:
+		hints.append("Macht Gegner %.1f s nass." % data.wet_duration)
+	if data.bleed_dps > 0:
+		hints.append("Blutung: %.1f Schaden/s für %.1f s." % [data.bleed_dps, data.bleed_duration])
+	if data.enamel_exposure > 0:
+		hints.append("+%d %% Schmelzbruch für %.1f s." % [roundi(data.enamel_exposure * 100), data.exposure_duration])
+	if data.focus_cap > 0:
+		hints.append("Ziel-Fokus bis +%d %% Schaden." % roundi(data.focus_cap * 100))
+	if data.splash_at_tier(tier) > 0:
+		hints.append("Explodiert im Radius %d." % roundi(data.splash_at_tier(tier)))
+	if data.projectile_count_at_tier(tier) > 1:
+		hints.append("%d Geschosse pro Angriff." % data.projectile_count_at_tier(tier))
+	return "\n".join(hints.slice(0, 2)) if not hints.is_empty() else role(data) + "."
+
+
 static func comparison(data: WeaponData, tier: int, other: WeaponData, other_tier: int, player: Player) -> String:
 	var before := values(other, other_tier, player)
 	var after := values(data, tier, player)

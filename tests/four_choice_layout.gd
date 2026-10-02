@@ -87,6 +87,8 @@ func _run() -> void:
 			root.get_texture().get_image().save_png(capture_path + "/levelup_%dx%d.png" % [extent.x, extent.y])
 		game.choice_panel.visible = false
 		game._open_shop()
+		game.shop_panel.close_details()
+		game.shop_panel.main_scroll.scroll_vertical = 0
 		if capture and not game.shop.reserved[1]:
 			game._on_shop_reserve(1)
 		for frame in 5:
@@ -100,8 +102,8 @@ func _run() -> void:
 				if icon.texture == null or not button.get_global_rect().encloses(icon.get_global_rect()) or not button.get_global_rect().encloses(tier_label.get_global_rect()):
 					_fail("equipped weapon icon/tier clipped at %s" % extent)
 					return
-				if extent.x >= 1000 and extent.y >= 560 and (button.size.x < 80 or button.size.y < 80):
-					_fail("desktop hand slots remain too small at %s" % extent)
+				if extent.x >= 1000 and extent.y >= 560 and (button.size.x < 44 or button.size.y < 44):
+					_fail("desktop root slots have insufficient click targets at %s" % extent)
 					return
 		if not ui.items_label.is_visible_in_tree() or not ui.items_scroll.is_visible_in_tree() or ui.items_row.get_child_count() != ui.owned_items.size():
 			_fail("collected items or relics disappear at %s" % extent)
@@ -133,8 +135,8 @@ func _run() -> void:
 			return
 		var wide: bool = extent.x >= 1000 and extent.y >= 560
 		if wide:
-			if ui.offers_grid.columns != 4 or ui.offers_section.get_index() >= ui.main_scroll.get_index():
-				_fail("wide shop does not place four offers above the build at %s" % extent)
+			if ui.offers_grid.columns != 4 or ui.offers_section.get_parent() != ui.offer_column or ui.left_scroll.get_global_rect().end.x > ui.offer_scroll.get_global_rect().position.x:
+				_fail("wide shop does not place four offers next to the build at %s" % extent)
 				return
 			var previous_right := -1.0
 			var row_y := ui.offer_buttons[0].get_global_rect().position.y
@@ -151,7 +153,7 @@ func _run() -> void:
 				for frame in 2:
 					await process_frame
 				for control in [card.icon_rect, card.name_label, card.rarity_label, card.effect_label, card.buy_button, card.reserve_button]:
-					if not card.get_global_rect().encloses(control.get_global_rect()):
+					if control.is_visible_in_tree() and not card.get_global_rect().encloses(control.get_global_rect()):
 						_fail("compact catalog content exceeds card at %s: %s" % [extent, template.id])
 						return
 			game._update_shop_panel()
@@ -234,8 +236,8 @@ func _check_stable_actions(ui: ShopPanel, extent: Vector2i) -> bool:
 				_fail("pin or fixed-width price is clipped at %s" % extent)
 				return false
 			for control in [card.icon_rect, card.name_label, card.rarity_label, card.effect_label, card.buy_button, card.reserve_button]:
-				if not card.get_global_rect().encloses(control.get_global_rect()):
-					_fail("fixed card clips its contents at %s" % extent)
+				if control.is_visible_in_tree() and not card.get_global_rect().encloses(control.get_global_rect()):
+					_fail("fixed card clips %s at %s: %s outside %s" % [control.name, extent, control.get_global_rect(), card.get_global_rect()])
 					return false
 	ui.get_parent()._update_shop_panel()
 	for frame in 4:

@@ -35,12 +35,12 @@ func _ready() -> void:
 	ailments_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	ailments_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	$Root.add_child(ailments_label)
-	DentiUIStyle.style_hud_text(ailments_label, DentiUIStyle.INK, 14, 3, DentiUIStyle.CREAM)
+	DentiUIStyle.style_hud_text(ailments_label, DentiUIStyle.INK, 14, 2, DentiUIStyle.BACKGROUND)
 	DentiUIStyle.style_hud_panel($Root/VitalsFrame)
 	DentiUIStyle.style_hud_panel(wave_frame)
 	DentiUIStyle.style_hud_panel(fps_panel)
 	DentiUIStyle.style_hud_panel(telemetry_panel)
-	var light_outline := DentiUIStyle.CREAM
+	var light_outline := DentiUIStyle.BACKGROUND
 	DentiUIStyle.style_hud_text(health_label, DentiUIStyle.INK, 15, 3, light_outline)
 	DentiUIStyle.style_hud_text(xp_label, DentiUIStyle.INK, 14, 3, light_outline)
 	DentiUIStyle.style_hud_text(coins_label, DentiUIStyle.INK, 20, 2, light_outline)
@@ -126,7 +126,7 @@ func update_status(stats: PlayerStats, xp: int, xp_goal: int, level: int, coins:
 	var timer_font_size := 20 if in_shop or boss_pending or collecting_loot else 30
 	if timer_label.get_theme_font_size("font_size") != timer_font_size:
 		timer_label.add_theme_font_size_override("font_size", timer_font_size)
-	timer_label.add_theme_color_override("font_color", DentiUIStyle.CORAL.darkened(0.2) if boss_pending else DentiUIStyle.GOLD.darkened(0.35) if remaining <= 15.0 and not in_shop and not boss_pending and not collecting_loot else DentiUIStyle.INK)
+	timer_label.add_theme_color_override("font_color", DentiUIStyle.CORAL if boss_pending else DentiUIStyle.GOLD if remaining <= 15.0 and not in_shop and not boss_pending and not collecting_loot else DentiUIStyle.INK)
 	$Root/WaveInfo/Timer/ClockIcon.visible = not in_shop and not boss_pending and not collecting_loot
 	xp_bar.max_value = xp_goal
 	xp_bar.value = xp

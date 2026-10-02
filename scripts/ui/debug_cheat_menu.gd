@@ -85,12 +85,12 @@ func _build_ui() -> void:
 	root_control = Control.new()
 	root_control.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root_control.theme = DentiUIStyle.make_theme()
-	root_control.theme.set_stylebox("panel", "TabContainer", DentiUIStyle._box(DentiUIStyle.CREAM, DentiUIStyle.CREAM, 8, 0))
+	root_control.theme.set_stylebox("panel", "TabContainer", DentiUIStyle._box(DentiUIStyle.PANEL, DentiUIStyle.LINE, 8, 1))
 	root_control.theme.set_stylebox("tab_selected", "TabContainer", DentiUIStyle._box(DentiUIStyle.GOLD, DentiUIStyle.GOLD, 8, 1))
-	root_control.theme.set_stylebox("tab_unselected", "TabContainer", DentiUIStyle._box(Color(0.93, 0.88, 0.79), DentiUIStyle.CREAM, 8, 0))
-	root_control.theme.set_color("font_selected_color", "TabContainer", DentiUIStyle.INK)
+	root_control.theme.set_stylebox("tab_unselected", "TabContainer", DentiUIStyle._box(DentiUIStyle.RAISED, DentiUIStyle.LINE, 8, 1))
+	root_control.theme.set_color("font_selected_color", "TabContainer", DentiUIStyle.GOLD_INK)
 	root_control.theme.set_color("font_unselected_color", "TabContainer", DentiUIStyle.MUTED)
-	var input_style := DentiUIStyle._box(Color.WHITE, DentiUIStyle.MUTED, 8, 1)
+	var input_style := DentiUIStyle._box(DentiUIStyle.RAISED, DentiUIStyle.LINE, 8, 1)
 	input_style.content_margin_top = 4
 	input_style.content_margin_bottom = 4
 	root_control.theme.set_stylebox("normal", "LineEdit", input_style)

@@ -27,7 +27,8 @@ func _run() -> void:
 		return
 	game._refresh_hud()
 	for button: Button in [game.choice_panel.buttons[0], game.shop_panel.offer_buttons[0], game.shop_panel.continue_button]:
-		if button.get_theme_color("font_focus_color") != DentiUIStyle.INK or button.get_theme_color("font_hover_pressed_color") != DentiUIStyle.INK or button.get_theme_color("font_disabled_color") != DentiUIStyle.INK:
+		var expected := DentiUIStyle.GOLD_INK if button == game.shop_panel.continue_button else DentiUIStyle.INK
+		if button.get_theme_color("font_focus_color") != expected or button.get_theme_color("font_hover_pressed_color") != expected or _contrast(button.get_theme_color("font_disabled_color"), (button.get_theme_stylebox("disabled") as StyleBoxFlat).bg_color) < 4.5:
 			_fail("menu button text is not readable in every state")
 			return
 	var hud: GameHUD = game.get_node("HUD")
@@ -280,3 +281,19 @@ func _fail(message: String) -> void:
 	paused = false
 	push_error(message)
 	quit(1)
+
+
+func _contrast(first: Color, second: Color) -> float:
+	var a := _luminance(first)
+	var b := _luminance(second)
+	return (maxf(a, b) + 0.05) / (minf(a, b) + 0.05)
+
+
+func _luminance(color: Color) -> float:
+	var value := 0.0
+	var channels := [color.r, color.g, color.b]
+	var weights := [0.2126, 0.7152, 0.0722]
+	for index in 3:
+		var c: float = channels[index]
+		value += (c / 12.92 if c <= 0.04045 else pow((c + 0.055) / 1.055, 2.4)) * weights[index]
+	return value

@@ -42,7 +42,7 @@ func _run() -> void:
 	game._update_shop_panel()
 	var offer: ShopOfferData = game.shop.offers[0]
 	var offer_card := game.shop_panel.offer_buttons[0] as OfferCard
-	if offer.rarity_tier != 2 or offer.price <= drill.price or not offer_card.effect_label.text.contains("Treffer") or not offer_card.name_label.text.contains("MK II"):
+	if offer.rarity_tier != 2 or offer.price <= drill.price or offer_card.summary_row.get_child_count() != 4 or not offer_card.category_label.text.contains("II") or not offer_card.tooltip_text.contains("Basis-Schaden"):
 		_fail("tiered weapon offer did not show its rarity, price and stats")
 		return
 	game._save_run()
@@ -96,6 +96,26 @@ func _run() -> void:
 		if choice.tier != 2:
 			_fail("level 5 did not offer guaranteed tier-II choices")
 			return
+	# Moving keyboard focus must leave the rarity surface unchanged.
+	root.content_scale_size = Vector2i(1280, 720)
+	root.size = Vector2i(1280, 720)
+	for frame in 5:
+		await process_frame
+	var first: UpgradeCard = resumed.choice_panel.buttons[0]
+	var normal := first.get_theme_stylebox("normal") as StyleBoxFlat
+	var focus := first.get_theme_stylebox("focus") as StyleBoxFlat
+	if normal.bg_color != DentiUIStyle.PANEL.lerp(DentiRarity.color_for(2), 0.16) or focus.draw_center or focus.border_color != DentiUIStyle.INK or focus.expand_margin_left >= 0:
+		_fail("rarity surface and keyboard selection use the same visual signal")
+		return
+	first.grab_focus()
+	var right := InputEventAction.new()
+	right.action = &"ui_right"
+	right.pressed = true
+	root.push_input(right, true)
+	await process_frame
+	if not resumed.choice_panel.buttons[1].has_focus() or first.get_theme_stylebox("normal") != normal:
+		_fail("keyboard focus does not move independently of the rarity surface")
+		return
 	resumed._save_run()
 	session.resume_requested = true
 	var upgrade_resumed: Node2D = load("res://scenes/game/game.tscn").instantiate()

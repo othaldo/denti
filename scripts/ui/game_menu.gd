@@ -17,6 +17,10 @@ var fps_toggle: CheckButton
 var master_slider: HSlider
 var music_slider: HSlider
 var sfx_slider: HSlider
+var ui_sound_toggle: CheckButton
+var motion_toggle: CheckButton
+var menu_stage: HBoxContainer
+var hero: TextureRect
 @onready var session: Node = get_node("/root/GameSession")
 
 
@@ -42,7 +46,7 @@ func open_pause() -> void:
 
 func close_pause() -> void:
 	visible = false
-	get_tree().paused = false
+	get_tree().paused = game != null and (game.shop_panel.visible or game.choice_panel.visible)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -62,7 +66,7 @@ func _build_ui() -> void:
 	add_child(root_control)
 	var background := ColorRect.new()
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	background.color = Color(0.10, 0.06, 0.12, 0.84) if overlay else Color(0.99, 0.96, 0.86)
+	background.color = Color(DentiUIStyle.BACKGROUND, 0.88) if overlay else DentiUIStyle.BACKGROUND
 	root_control.add_child(background)
 	var center := CenterContainer.new()
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -71,7 +75,18 @@ func _build_ui() -> void:
 	build_panel = panel
 	panel.custom_minimum_size = Vector2(520, 0)
 	DentiUIStyle.style_dialog(panel)
-	center.add_child(panel)
+	menu_stage = HBoxContainer.new()
+	menu_stage.add_theme_constant_override("separation", 40)
+	center.add_child(menu_stage)
+	menu_stage.add_child(panel)
+	hero = TextureRect.new()
+	hero.texture = preload("res://assets/denti/denti_unarmed.png")
+	hero.custom_minimum_size = Vector2(300, 360)
+	hero.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	hero.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	hero.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	menu_stage.add_child(hero)
+	hero.visible = not overlay
 	var margin := MarginContainer.new()
 	margin.add_theme_constant_override("margin_left", 32)
 	margin.add_theme_constant_override("margin_right", 32)
@@ -98,6 +113,10 @@ func _clear_rows() -> void:
 	master_slider = null
 	music_slider = null
 	sfx_slider = null
+	ui_sound_toggle = null
+	motion_toggle = null
+	hero.visible = not overlay and page == &"home" and root_control.size.x >= 900
+	call_deferred("_update_build_layout")
 
 
 func _title(text_value: String) -> void:
@@ -106,12 +125,13 @@ func _title(text_value: String) -> void:
 	portrait.custom_minimum_size = Vector2(0, 80)
 	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	portrait.visible = overlay and page == &"home"
 	rows.add_child(portrait)
 	var label := Label.new()
-	label.text = text_value
+	label.text = "DENTI" if not overlay and page == &"home" else text_value
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.add_theme_color_override("font_color", DentiUIStyle.INK)
-	label.add_theme_font_size_override("font_size", 34)
+	label.add_theme_font_size_override("font_size", 54 if not overlay and page == &"home" else 34)
 	rows.add_child(label)
 
 
@@ -209,17 +229,17 @@ func _show_home() -> void:
 		_button("Fortsetzen", close_pause, true)
 		_button("Stats", _show_stats)
 		_button("Items", _show_items)
-		_button("Optionen", _show_options)
+		_button("Einstellungen", _show_options)
 		_button("Hauptmenü", _to_main_menu)
 	else:
-		_text("Ein göttlicher Zahn gegen die Karies.")
+		_text("Divine Dentistry")
 		if session.has_run():
 			_button("Fortsetzen", _continue_game, true)
 			_button("Neues Spiel", _new_game)
 		else:
 			_button("Neues Spiel", _new_game, true)
 			_button("Fortsetzen", _continue_game, false, true)
-		_button("Optionen", _show_options)
+		_button("Einstellungen", _show_options)
 		_button("Credits", _show_credits)
 		_button("Beenden", func() -> void: get_tree().quit())
 		_version_info()
@@ -231,9 +251,14 @@ func _compact_title(title: String) -> void:
 
 
 func _update_build_layout() -> void:
-	if page not in [&"stats", &"items"]:
+	if build_panel == null:
 		return
 	var extent := root_control.size
+	hero.visible = not overlay and page == &"home" and extent.x >= 900
+	if page not in [&"stats", &"items"]:
+		build_panel.custom_minimum_size.x = minf(480, extent.x - 32)
+	if page not in [&"stats", &"items"]:
+		return
 	build_panel.custom_minimum_size.x = minf(620, extent.x - 24)
 	if build_grid != null:
 		build_grid.columns = maxi(floori((build_panel.custom_minimum_size.x - 90) / 70), 3)
@@ -258,18 +283,22 @@ func _show_stats() -> void:
 	coin.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	wallet.add_child(coin)
 	var grid := GridContainer.new()
-	grid.columns = 4
+	grid.columns = 3
 	grid.add_theme_constant_override("h_separation", 14)
 	grid.add_theme_constant_override("v_separation", 5)
 	rows.add_child(grid)
 	for type in DentiAttributes.ACTIVE:
-		var key := ShopDetails._label(grid, DentiAttributes.name_for(type), 16)
-		key.tooltip_text = DentiAttributes.meaning_for(type)
-		key.autowrap_mode = TextServer.AUTOWRAP_OFF
-		key.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		var value := ShopDetails._label(grid, DentiAttributes.value_text(stats, type), 16)
-		value.autowrap_mode = TextServer.AUTOWRAP_OFF
-		value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		var chip := Button.new()
+		chip.icon = DentiUIIcons.stat(DentiAttributes.ICONS[type])
+		chip.expand_icon = true
+		chip.add_theme_constant_override("icon_max_width", 26)
+		chip.text = DentiAttributes.compact_value_text(stats, type)
+		chip.tooltip_text = "%s · %s\n%s" % [DentiAttributes.name_for(type), DentiAttributes.value_text(stats, type), DentiAttributes.meaning_for(type)]
+		chip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		DentiUIStyle.style_button(chip, false, true)
+		chip.add_theme_font_size_override("font_size", 14)
+		grid.add_child(chip)
+		chip.pressed.connect(func() -> void: DentiDentikon.open_attribute(chip, type))
 	ShopDetails._label(rows, "Wurzeln · %d/6" % game.player.loadout.used_slots(), 16)
 	var weapons := HBoxContainer.new()
 	weapons.add_theme_constant_override("separation", 4)
@@ -344,7 +373,7 @@ func _show_items() -> void:
 			count.text = "×%d" % int(entry.count)
 			count.add_theme_font_size_override("font_size", 14)
 			count.add_theme_color_override("font_color", DentiUIStyle.INK)
-			count.add_theme_color_override("font_outline_color", Color.WHITE)
+			count.add_theme_color_override("font_outline_color", DentiUIStyle.PANEL)
 			count.add_theme_constant_override("outline_size", 4)
 			count.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			chip.add_child(count)
@@ -360,15 +389,37 @@ func _show_items() -> void:
 func _show_options() -> void:
 	page = &"options"
 	_clear_rows()
-	_title("Optionen")
-	_text("Anzeige und Lautstärke")
+	_title("Einstellungen")
+	_text("")
+	rows.add_theme_constant_override("separation", 6)
 	fullscreen_button = _button("", _toggle_fullscreen)
 	fps_toggle = _fps_option()
 	master_slider = _volume_slider("Gesamt", session.master_volume_percent, Callable(session, "set_master_volume"))
 	music_slider = _volume_slider("Musik", session.music_volume_percent, Callable(session, "set_music_volume"))
 	sfx_slider = _volume_slider("SFX", session.sfx_volume_percent, Callable(session, "set_sfx_volume"))
+	_ui_options()
 	_refresh_option_buttons()
 	_button("Zurück", _show_home, true)
+
+
+func _ui_options() -> void:
+	var panel := PanelContainer.new()
+	DentiUIStyle.style_chip(panel)
+	rows.add_child(panel)
+	var row := VBoxContainer.new()
+	panel.add_child(row)
+	ui_sound_toggle = CheckButton.new()
+	ui_sound_toggle.text = "UI-Klänge"
+	ui_sound_toggle.button_pressed = session.ui_sounds
+	DentiUIStyle.style_check_button(ui_sound_toggle)
+	row.add_child(ui_sound_toggle)
+	ui_sound_toggle.toggled.connect(Callable(session, "set_ui_sounds"))
+	motion_toggle = CheckButton.new()
+	motion_toggle.text = "Reduzierte Bewegung"
+	motion_toggle.button_pressed = session.reduced_ui_motion
+	DentiUIStyle.style_check_button(motion_toggle)
+	row.add_child(motion_toggle)
+	motion_toggle.toggled.connect(Callable(session, "set_reduced_ui_motion"))
 
 
 func _refresh_option_buttons() -> void:

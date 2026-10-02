@@ -15,6 +15,7 @@ const DODGE_ATLAS: Texture2D = preload("res://assets/items/item_icons_dodge_pack
 const RELIC_ATLAS: Texture2D = preload("res://assets/relics/relic_icons_atlas.png")
 const HUD_ATLAS: Texture2D = preload("res://assets/ui/hud_icons_atlas.png")
 const STAT_ATLAS: Texture2D = preload("res://assets/ui/stat_icons_atlas.png")
+const RANGE: Texture2D = preload("res://assets/ui/range.svg")
 # Generated motifs are not exactly aligned to a uniform grid. Select each full
 # motif, then center it in the same transparent frame instead of cutting a cell.
 const STAT_REGIONS: Array[Rect2] = [

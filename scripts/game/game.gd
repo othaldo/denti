@@ -89,6 +89,7 @@ func _ready() -> void:
 	shop_panel.reroll_requested.connect(_on_shop_reroll)
 	shop_panel.reservation_requested.connect(_on_shop_reserve)
 	shop_panel.continue_requested.connect(_on_shop_continue)
+	shop_panel.pause_requested.connect(game_menu.open_pause)
 	mobile_controls.pause_requested.connect(game_menu.open_pause)
 	if DebugRunControls.allowed():
 		var cheat_menu := DebugCheatMenu.new()
@@ -675,9 +676,11 @@ func _on_shop_buy(index: int) -> void:
 	if not acquired:
 		return
 	coins -= offer.price
+	var purchase_source: Rect2 = shop_panel.offer_buttons[index].icon_rect.get_global_rect()
 	telemetry.record_shop_spending(&"weapon" if offer.weapon_data != null else &"item", offer.price)
 	shop.take_offer(index)
 	_update_shop_panel()
+	shop_panel.animate_purchase(purchase_source, offer)
 	_save_run()
 
 
@@ -695,6 +698,7 @@ func _on_shop_merge(index: int) -> void:
 	if not in_shop or not player.loadout.merge(index):
 		return
 	_update_shop_panel()
+	shop_panel.animate_equipment(index)
 	_save_run()
 
 

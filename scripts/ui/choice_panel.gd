@@ -45,7 +45,7 @@ func _ready() -> void:
 	subtitle_label.add_theme_color_override("font_color", DentiUIStyle.MUTED)
 	level_coins.add_theme_color_override("font_color", DentiUIStyle.INK)
 	DentiUIStyle.style_button(reroll_button)
-	reroll_button.icon = preload("res://assets/ui/reload.svg")
+	reroll_button.icon = preload("res://assets/ui/reload_light.svg")
 	reroll_button.add_theme_constant_override("icon_max_width", 18)
 	reroll_button.pressed.connect(func() -> void: level_reroll_requested.emit())
 	for index in buttons.size():
@@ -134,7 +134,7 @@ func show_upgrades(options: Array[UpgradeData]) -> void:
 	dialog_panel.custom_minimum_size = Vector2(900, 440)
 	_update_layout()
 	title_label.text = "Denti steigt auf!"
-	subtitle_label.text = "Ein göttlicher Segen wurde gewährt. Wähle einen für Denti."
+	subtitle_label.text = "Wähle einen Bonus"
 	subtitle_label.custom_minimum_size.y = 40.0
 	for index in buttons.size():
 		buttons[index].visible = index < options.size()
@@ -168,7 +168,7 @@ func show_chest(item: ShopOfferData, scrap_coins: int) -> void:
 	dialog_panel.custom_minimum_size = Vector2(760, 420)
 	_update_layout()
 	title_label.text = "Zahnfee-Kiste!"
-	subtitle_label.text = "Behalte das Fundstück oder tausche es gegen Münzen."
+	subtitle_label.text = item.limit_text()
 	subtitle_label.custom_minimum_size.y = 40.0
 	buttons[0].call("show_item", item)
 	buttons[0].visible = true

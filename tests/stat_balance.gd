@@ -182,7 +182,9 @@ func _test_build_and_resume() -> void:
 
 
 func _contains_label(node: Node, fragment: String) -> bool:
-	if node is Label and (node as Label).text.contains(fragment):
+	if (node is Label or node is Button) and node.text.contains(fragment):
+		return true
+	if node is Control and node.tooltip_text.contains(fragment):
 		return true
 	for child in node.get_children():
 		if _contains_label(child, fragment):

@@ -15,6 +15,10 @@ var master_volume_percent: int = 100
 var music_volume_percent: int = 100
 var sfx_volume_percent: int = 100
 var show_fps: bool = false
+var ui_sounds: bool = true
+var reduced_ui_motion: bool = false
+var ui_voice: AudioStreamPlayer
+var last_ui_cue_ms: int = -1000
 
 
 func _ready() -> void:
@@ -28,10 +32,19 @@ func _ready() -> void:
 		music_volume_percent = clampi(int(config.get_value("audio", "music", 100)), 0, 100)
 		sfx_volume_percent = clampi(int(config.get_value("audio", "sfx", 100)), 0, 100)
 		show_fps = bool(config.get_value("display", "show_fps", false))
+		ui_sounds = bool(config.get_value("ui", "sounds", true))
+		reduced_ui_motion = bool(config.get_value("ui", "reduced_motion", false))
 		if bool(config.get_value("display", "fullscreen", false)):
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	apply_volume()
 	fps_display_changed.emit(show_fps)
+	if ui_voice == null:
+		ui_voice = AudioStreamPlayer.new()
+		ui_voice.process_mode = Node.PROCESS_MODE_ALWAYS
+		ui_voice.bus = &"SFX"
+		ui_voice.stream = preload("res://assets/audio/sfx/pickup.wav")
+		ui_voice.volume_db = -22.0
+		add_child(ui_voice)
 
 
 func _update_mobile_scale() -> void:
@@ -166,4 +179,30 @@ func _save_settings() -> void:
 	config.set_value("audio", "sfx", sfx_volume_percent)
 	config.set_value("display", "fullscreen", is_fullscreen())
 	config.set_value("display", "show_fps", show_fps)
+	config.set_value("ui", "sounds", ui_sounds)
+	config.set_value("ui", "reduced_motion", reduced_ui_motion)
 	config.save(settings_path)
+
+
+func set_ui_sounds(enabled: bool) -> void:
+	ui_sounds = enabled
+	_save_settings()
+
+
+func set_reduced_ui_motion(enabled: bool) -> void:
+	reduced_ui_motion = enabled
+	if enabled:
+		for control in get_tree().get_nodes_in_group("denti_ui_motion"):
+			DentiUIMotion.reset(control)
+	_save_settings()
+
+
+func play_ui_cue(clicked: bool) -> void:
+	if not ui_sounds or ui_voice == null or DisplayServer.get_name() == "headless":
+		return
+	var now := Time.get_ticks_msec()
+	if now - last_ui_cue_ms < 90:
+		return
+	last_ui_cue_ms = now
+	ui_voice.pitch_scale = 1.10 if clicked else 1.55
+	ui_voice.play()

@@ -10,13 +10,13 @@ Ein kleiner 2D-Arena-Survivor über einen göttlichen Backenzahn, der Plaque, Zu
 
 | Bosskampf am Arenarand | Levelaufstieg |
 | --- | --- |
-| [![Denti und der Karies-Graf an der oberen Arenamauer](docs/screenshots/bosskampf.png)](docs/screenshots/bosskampf.png) | [![Drei wählbare Boni beim Levelaufstieg](docs/screenshots/levelaufstieg.png)](docs/screenshots/levelaufstieg.png) |
+| [![Denti und der Karies-Graf an der oberen Arenamauer](docs/screenshots/bosskampf.png)](docs/screenshots/bosskampf.png) | [![Vier wählbare Boni im dunklen Belohnungsscreen](docs/screenshots/nightclinic_upgrade.png)](docs/screenshots/nightclinic_upgrade.png) |
 
 | Shop zwischen den Wellen | Hauptmenü |
 | --- | --- |
-| [![Waffen und Items in der Zahnklinik](docs/screenshots/shop.png)](docs/screenshots/shop.png) | [![Das Hauptmenü von Denti: Divine Dentistry](docs/screenshots/hauptmenue.png)](docs/screenshots/hauptmenue.png) |
+| [![Vier Angebote, Wurzeln und Iconwerte in der Nachtklinik](docs/screenshots/nightclinic_shop_1280x720.png)](docs/screenshots/nightclinic_shop_1280x720.png) | [![Denti im dunklen Hauptmenü](docs/screenshots/nightclinic_menu.png)](docs/screenshots/nightclinic_menu.png) |
 
-Die Bilder sind direkt aus Godot aufgenommen. Für die Kampfbilder wurden Gegner und Beute in einem separaten Testlauf arrangiert. Einige Aufnahmen zeigen ältere Menü- und Shoplayouts; seit 0.2.0 gibt es vier Level-up-Boni und vier Shopangebote.
+Die Bilder sind direkt aus Godot aufgenommen. Für die Kampfbilder wurden Gegner und Beute in einem separaten Testlauf arrangiert. Die Nachtklinik zeigt die aktuelle dunkle Oberfläche mit vier Shopangeboten und vier Level-up-Boni.
 
 [![Die vier Bossränge mit ihren animierten Entzündungs-Auren](docs/screenshots/boss_entzuendung.png)](docs/BOSS_INFLAMMATION.md)
 
@@ -41,7 +41,7 @@ Das Projekt mit **Godot 4.4 oder neuer** öffnen und mit **F5** starten. Unter L
 | Eingabe | Aktion |
 | --- | --- |
 | WASD oder Pfeiltasten | Denti bewegen |
-| Escape | Pause, Stats und Optionen öffnen |
+| Escape | Kartendetails schließen; sonst Pause, Stats und Einstellungen öffnen |
 | F3 (Debug-Build) | Kampf-Telemetrie ein- und ausblenden |
 | F4 (lokaler Debug-Build) | Testmenü: Waffen, Items, Münzen, Stats und Wellen |
 | Maus | Waffen, Boni und Shopangebote wählen |
@@ -65,6 +65,7 @@ Auf Normal fällt Gold in Welle 1–4 garantiert und sinkt bis Welle 20 auf 70 %
 - Eine **scrollende Arena**, größer als der Bildschirm, mit Mauer und dunklem Außenbereich. Das kompakte HUD zeigt Leben, XP, Münzen, Welle und verbleibende Sekunden.
 - Automatisches Speichern während des Laufs. **Fortsetzen** lädt ihn auch nach einem Neustart; ein neues Spiel fragt vor dem Überschreiben nach.
 - Musik für Menü, Wellen und Bosse, Kampfgeräusche sowie Regler für Gesamt-, Musik- und SFX-Lautstärke. Eine FPS-Anzeige lässt sich einschalten.
+- **Nachtklinik:** dunkle Spielansichten, große Objektbilder und kompakte Iconwerte. Hover erklärt Werte, Klick öffnet Details oder das Dentikon. Kurze Hover-, Klick-, Kauf- und Fusionsreaktionen laufen auch in der Shop-Pause. UI-Klänge und reduzierte Bewegung werden unter **Escape → Einstellungen** gespeichert; Kauf, Pins, Preisbindung, Vergleich, Verkauf und Fusion bleiben erhalten. [Gestaltung und Aufnahmen](docs/UI_ART_DIRECTION.md).
 
 Das Spiel ist ein **spielbarer Prototyp**. Balancing, Effekte und weitere Inhalte sind noch in Arbeit.
 
@@ -112,3 +113,5 @@ godot --path . --script res://tools/capture_readme.gd
 Das Aufnahmeskript schreibt nach `docs/screenshots/` und verändert den normalen Spielstand nicht. Hinweise zu Grafiken, Musik, Sound und Schrift stehen in [CREDITS.md](CREDITS.md).
 
 Den responsiven Shop zeigt `Godot_v4.7.2-stable_win64_console.exe --path . --script res://tools/preview_shop_workbench.gd` mit getrenntem Testspielstand in Desktop-, Hoch- und Querformat.
+
+Aktuelle Nachtklinik-Aufnahmen erzeugt `Godot_v4.7.2-stable_win64_console.exe --path . --fixed-fps 60 --script res://tools/preview_nightclinic.gd`: Shop und ausgeklappte Details in vier Größen, Hauptmenü, Einstellungen, HUD und Level-up. Der Testspielstand ist getrennt; Originalreferenzen bleiben erhalten.

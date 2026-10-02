@@ -2,13 +2,14 @@ class_name ShopPanel
 extends CanvasLayer
 
 const ICONS: Script = preload("res://scripts/ui/denti_ui_icons.gd")
-const RELOAD_ICON: Texture2D = preload("res://assets/ui/reload.svg")
+const RELOAD_ICON: Texture2D = preload("res://assets/ui/reload_light.svg")
 signal buy_requested(index: int)
 signal sell_requested(index: int)
 signal merge_requested(index: int)
 signal reroll_requested
 signal reservation_requested(index: int)
 signal continue_requested
+signal pause_requested
 
 @onready var rows: VBoxContainer = $Root/Center/Panel/Margin/Rows
 var title_label: Label
@@ -18,7 +19,7 @@ var offer_buttons: Array[Button] = []
 var reroll_button: Button
 var continue_button: Button
 var inventory_label: Label
-var inventory_row: HBoxContainer
+var inventory_row: Control
 var inventory_scroll: ScrollContainer
 var items_label: Label
 var items_scroll: ScrollContainer
@@ -48,23 +49,33 @@ var selected_kind := "offer"
 var selected_index := 0
 var selected_uid: int = 0
 var compact := false
+var offer_column: VBoxContainer
+var offer_scroll: ScrollContainer
+var stat_grid: GridContainer
+var stat_chips: Array[Button] = []
+var expanded := false
+var detail_buy_button: Button
+var detail_pin_button: Button
+var build_portrait: TextureRect
 
 func _ready() -> void:
 	visible = false
 	$Root.theme = DentiUIStyle.make_theme()
-	$Root/Dim.color = Color(0.12, 0.06, 0.13, 0.78)
+	$Root/Dim.color = DentiUIStyle.BACKGROUND
 	DentiUIStyle.style_dialog($Root/Center/Panel)
 	for child in rows.get_children():
 		rows.remove_child(child)
 		child.queue_free()
-	rows.add_theme_constant_override("separation", 5)
+	rows.add_theme_constant_override("separation", 12)
 	var header := HBoxContainer.new()
+	header.add_theme_constant_override("separation", 12)
 	rows.add_child(header)
 	var titles := VBoxContainer.new()
 	titles.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(titles)
 	title_label = ShopDetails._label(titles, "Zahnklinik", 27)
 	var wallet_box := VBoxContainer.new()
+	wallet_box.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	header.add_child(wallet_box)
 	var coin_row := HBoxContainer.new()
 	coin_row.alignment = BoxContainer.ALIGNMENT_END
@@ -85,6 +96,7 @@ func _ready() -> void:
 	main_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	main_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	rows.add_child(main_scroll)
+	main_scroll.resized.connect(_size_offer_grid)
 	flow = BoxContainer.new()
 	flow.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	flow.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -103,11 +115,7 @@ func _ready() -> void:
 	offers_section = VBoxContainer.new()
 	offers_section.add_theme_constant_override("separation", 4)
 	left.add_child(offers_section)
-	offers_header = HBoxContainer.new()
-	offers_section.add_child(offers_header)
-	var offers_label := ShopDetails._label(offers_header, "Angebote", 16)
-	offers_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	offers_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	offers_header = header
 	reroll_button = _button(offers_header, "2")
 	reroll_button.icon = RELOAD_ICON
 	reroll_button.add_theme_constant_override("icon_max_width", 20)
@@ -131,10 +139,9 @@ func _ready() -> void:
 	inventory_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	inventory_scroll.custom_minimum_size.y = 76
 	left.add_child(inventory_scroll)
-	inventory_row = HBoxContainer.new()
+	inventory_row = Control.new()
 	inventory_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	inventory_row.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
-	inventory_row.add_theme_constant_override("separation", 5)
 	inventory_scroll.add_child(inventory_row)
 	stats_label = ShopDetails._label(left, "", 16)
 	details_panel = PanelContainer.new()
@@ -166,6 +173,14 @@ func _ready() -> void:
 		button.reparent(detail_actions)
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.add_theme_font_size_override("font_size", 16)
+	detail_buy_button = _button(detail_actions, "Kaufen", true)
+	detail_buy_button.icon = ICONS.hud(2)
+	detail_buy_button.add_theme_constant_override("icon_max_width", 23)
+	detail_buy_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	detail_buy_button.pressed.connect(func() -> void: buy_requested.emit(selected_index))
+	detail_pin_button = _button(detail_actions, "")
+	detail_pin_button.add_theme_constant_override("icon_max_width", 23)
+	detail_pin_button.pressed.connect(func() -> void: reservation_requested.emit(selected_index))
 	var actions := BoxContainer.new()
 	shop_actions = actions
 	rows.add_child(actions)
@@ -188,6 +203,9 @@ func _ready() -> void:
 	continue_button.size_flags_vertical = Control.SIZE_SHRINK_END
 	continue_button.pressed.connect(func() -> void: continue_requested.emit())
 	get_viewport().size_changed.connect(_update_layout)
+	left_scroll.resized.connect(_layout_inventory)
+	inventory_scroll.resized.connect(_layout_inventory)
+	_build_night_layout()
 	_update_layout()
 
 func set_build_context(context: Player) -> void:
@@ -209,65 +227,125 @@ func _refresh_stats() -> void:
 	for type in DentiAttributes.ACTIVE:
 		meanings.append("%s: %s" % [DentiAttributes.name_for(type), DentiAttributes.meaning_for(type)])
 	stats_label.tooltip_text = "\n".join(meanings)
+	for index in stat_chips.size():
+		var type: DentiAttributes.Type = DentiAttributes.ACTIVE[index]
+		stat_chips[index].text = DentiAttributes.compact_value_text(player.stats, type)
+		stat_chips[index].tooltip_text = "%s · %s\n%s" % [DentiAttributes.name_for(type), DentiAttributes.value_text(player.stats, type), DentiAttributes.meaning_for(type)]
 
 func _update_layout() -> void:
+	if offer_scroll == null:
+		return
 	var extent: Vector2 = $Root.size
-	var offer_row := extent.x >= 1000 and extent.y >= 560
-	compact = not offer_row
+	var wide := extent.x >= 1000 and extent.y >= 560
+	compact = not wide
 	var narrow := extent.x < 600
+	var short := extent.y < 700
+	rows.add_theme_constant_override("separation", 8 if short else 12)
+	build_portrait.custom_minimum_size = Vector2(40, 40) if short else Vector2(56, 56)
+	for chip in stat_chips:
+		chip.custom_minimum_size.y = 30 if short else 34
+	flow.vertical = compact
 	shop_actions.vertical = narrow and extent.y >= 480
 	detail_actions.vertical = narrow and extent.y >= 480
-	items_label.visible = true
 	title_label.add_theme_font_size_override("font_size", 21 if extent.y < 480 else 27)
 	details.heading.add_theme_font_size_override("font_size", 17 if narrow else 21)
-	details.icon.custom_minimum_size = Vector2(40, 40) if narrow else Vector2(56, 56)
-	flow.vertical = compact
-	# Use the full dialog width for offers; build and comparison stay below.
-	var offer_parent: Node = rows if offer_row else build_column
-	if offers_section.get_parent() != offer_parent:
-		offers_section.reparent(offer_parent)
-	if offer_row:
-		rows.move_child(offers_section, 1)
-	else:
-		build_column.move_child(offers_section, 0)
-	offers_grid.columns = 4 if offer_row else (2 if extent.x >= 760 else 1)
-	detail_column.custom_minimum_size.x = 0 if compact else 380
+	details.icon.custom_minimum_size = Vector2(48, 48) if narrow else Vector2(64, 64)
+	left_scroll.custom_minimum_size.x = 0 if compact else 280
+	left_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL if compact else Control.SIZE_FILL
+	left_scroll.size_flags_vertical = Control.SIZE_SHRINK_BEGIN if compact else Control.SIZE_EXPAND_FILL
+	offer_scroll.size_flags_vertical = Control.SIZE_SHRINK_BEGIN if compact else Control.SIZE_EXPAND_FILL
+	main_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO if compact else ScrollContainer.SCROLL_MODE_DISABLED
+	left_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	offer_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	offers_grid.columns = 4 if wide else (2 if extent.x >= 600 else 1)
+	offers_section.size_flags_vertical = Control.SIZE_SHRINK_BEGIN if compact else Control.SIZE_EXPAND_FILL
+	offers_grid.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	stat_grid.columns = 3 if extent.x >= 600 else 2
+	_sync_detail_layout()
+	detail_column.custom_minimum_size.x = minf(640, extent.x - (344 if wide else 72))
+	detail_column.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	var action_parent: Node = rows if compact else detail_column
 	if detail_actions.get_parent() != action_parent:
 		detail_actions.reparent(action_parent)
 	if compact:
 		rows.move_child(detail_actions, main_scroll.get_index() + 1)
-	main_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO if compact else ScrollContainer.SCROLL_MODE_DISABLED
-	left_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED if compact else ScrollContainer.SCROLL_MODE_AUTO
-	details_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED if compact else ScrollContainer.SCROLL_MODE_AUTO
-	$Root/Center/Panel.custom_minimum_size = Vector2(minf(extent.x - 24, 1180), extent.y - 24)
+	else:
+		detail_column.move_child(detail_actions, details_scroll.get_index() + 1)
+	$Root/Center/Panel.custom_minimum_size = Vector2(minf(extent.x - 24, 1720), extent.y - 24)
 	for edge in ["left", "right"]:
 		$Root/Center/Panel/Margin.add_theme_constant_override("margin_" + edge, 12)
-	items_scroll.custom_minimum_size.y = 52 if extent.y < 480 else 58
-	reroll_button.custom_minimum_size = Vector2(68, 40)
+	items_scroll.custom_minimum_size.y = 52
+	reroll_button.custom_minimum_size = Vector2(72, 40)
 	reroll_button.add_theme_font_size_override("font_size", 14)
 	continue_button.custom_minimum_size = Vector2(148, 44)
 	continue_button.add_theme_font_size_override("font_size", 14)
-	for button in [details.merge_button, details.sell_button, details.confirm_button, details.cancel_button]:
-		button.custom_minimum_size.y = 48 if narrow or extent.y < 480 else (64 if compact else 54)
-		button.add_theme_font_size_override("font_size", 15 if narrow else 16)
-	for chip in items_row.get_children():
-		chip.custom_minimum_size = Vector2(48, 44)
+	for button in [details.merge_button, details.sell_button, details.confirm_button, details.cancel_button, detail_buy_button, detail_pin_button]:
+		button.custom_minimum_size.y = 44
+		button.add_theme_font_size_override("font_size", 15)
 	for card in offer_buttons:
-		card.set_catalog_layout(offer_row or extent.x >= 760 or narrow, offer_row)
+		card.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		card.set_catalog_layout(true, wide and extent.y < 700)
+		if wide and extent.x >= 1500:
+			card.icon_rect.custom_minimum_size = Vector2(152, 152)
 	_layout_inventory()
+	call_deferred("_size_offer_grid")
+
+func _size_offer_grid() -> void:
+	if offers_grid == null:
+		return
+	if compact:
+		offers_grid.custom_minimum_size.y = 0
+		return
+	# Compute the available height from the viewport, not the previous layout's
+	# main-scroll size: a large minimum must not prevent a smaller window reflow.
+	var margins: MarginContainer = $Root/Center/Panel/Margin
+	var required: float = $Root/Center/Panel.get_theme_stylebox("panel").get_minimum_size().y
+	required += margins.get_theme_constant("margin_top") + margins.get_theme_constant("margin_bottom")
+	var visible_rows := 0
+	for child: Control in rows.get_children():
+		if child.visible:
+			visible_rows += 1
+			if child != main_scroll:
+				required += child.get_combined_minimum_size().y
+	required += rows.get_theme_constant("separation") * maxi(visible_rows - 1, 0)
+	offers_grid.custom_minimum_size.y = minf(560, maxf($Root.size.y - 24 - required, 0))
+
 
 func _layout_inventory() -> void:
-	var extent: Vector2 = $Root.size
-	var slot_width := 64.0 if compact else 80.0
-	var slot_height := (72.0 if extent.y >= 480 else 64.0) if compact else 80.0
-	inventory_scroll.custom_minimum_size.y = slot_height + 12.0
+	if inventory_row == null:
+		return
+	var columns := 6 if compact and left_scroll.size.x >= 420 else 2
+	var width := maxf(inventory_scroll.size.x, 180)
+	var gap := 5.0
+	var unit := floorf((width - gap * (columns - 1)) / columns)
+	var slot_height := 44.0 if $Root.size.y < 700 else 56.0
+	var occupied: Array[bool] = []
+	occupied.resize(WeaponLoadout.CAPACITY)
+	occupied.fill(false)
 	for slot in inventory_row.get_children():
 		var button: Button = slot.get_child(0)
-		var hands := int(button.get_meta("hands", 1))
-		button.custom_minimum_size = Vector2(slot_width * hands + 5.0 * (hands - 1), slot_height)
+		var roots := int(button.get_meta("hands", 1))
+		var position_index := 0
+		while position_index < occupied.size():
+			if position_index % columns + roots <= columns and not occupied[position_index] and (roots == 1 or not occupied[position_index + 1]):
+				break
+			position_index += 1
+		for offset in roots:
+			occupied[position_index + offset] = true
+		slot.position = Vector2((position_index % columns) * (unit + gap), (position_index / columns) * (slot_height + gap))
+		var desired := Vector2(unit * roots + gap * (roots - 1), slot_height)
+		button.custom_minimum_size = desired
+		slot.size = desired
+	var height := ceili(float(WeaponLoadout.CAPACITY) / columns) * (slot_height + gap) - gap
+	inventory_row.custom_minimum_size = Vector2(0, height)
+	inventory_scroll.custom_minimum_size.y = height + 4
+
 
 func show_shop(wave_number: int, coins: int, reroll_cost: int, new_offers: Array[ShopOfferData], new_equipment: Array[Dictionary] = [], used_slots: int = 0, capacity: int = 6, buyable: Array[bool] = [], luck: float = 0.0, collected: Array[Dictionary] = [], counts: Dictionary = {}, offer_dps: Array[float] = [], reserved: Array[bool] = []) -> void:
+	if not visible:
+		close_details()
+		main_scroll.scroll_vertical = 0
+		offer_scroll.scroll_vertical = 0
 	offers = new_offers
 	equipment = new_equipment
 	owned_items = collected
@@ -282,7 +360,7 @@ func show_shop(wave_number: int, coins: int, reroll_cost: int, new_offers: Array
 		offer_buttons[index].show_offer(offer, coins, buyable.is_empty() or buyable[index], count, offer_dps[index] if index < offer_dps.size() else 0.0)
 		offer_buttons[index].show_reservation(index < reserved.size() and reserved[index])
 		if offer != null and offer.weapon_data != null:
-			offer_buttons[index].effect_label.text = WeaponPresentation.quick_text(offer.weapon_data, offer.weapon_tier, player)
+			offer_buttons[index].show_weapon_values(offer.weapon_data, offer.weapon_tier, player)
 	_show_inventory(equipment, used_slots, capacity)
 	_show_items(owned_items)
 	_refresh_stats()
@@ -304,25 +382,66 @@ func show_shop(wave_number: int, coins: int, reroll_cost: int, new_offers: Array
 		if found < 0:
 			selected_kind = "offer"
 			selected_index = 0
-	_render_selection()
+	if expanded:
+		_render_selection()
+	else:
+		detail_column.visible = false
+		detail_actions.visible = false
+	if not visible:
+		DentiUIMotion.reveal($Root/Center/Panel)
 	visible = true
 
 func _select(kind: String, index: int) -> void:
+	expanded = true
+	detail_column.visible = true
+	details.close_button.visible = true
 	selected_kind = kind
 	selected_index = index
 	selected_uid = int(equipment[index].get("uid", 0)) if kind == "equipment" else 0
 	_render_selection()
-	if compact:
-		call_deferred("_scroll_to_details")
-	else:
-		details_scroll.scroll_vertical = 0
+	_sync_detail_layout()
+	DentiUIMotion.reveal(details_panel)
+	call_deferred("_scroll_to_details")
+
+func _sync_detail_layout() -> void:
+	# Desktop inspection uses the available offer area instead of appending
+	# another page below it. Small screens retain one continuous scroll.
+	offers_section.visible = compact or not expanded
+	offer_column.size_flags_vertical = Control.SIZE_SHRINK_BEGIN if compact else Control.SIZE_EXPAND_FILL
+	detail_column.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	details_scroll.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 
 func _scroll_to_details() -> void:
-	main_scroll.scroll_vertical = roundi(detail_column.position.y)
+	# Reflow after revealing the card spans several nested containers.
+	await get_tree().process_frame
+	await get_tree().process_frame
+	if not visible or not expanded:
+		return
+	if compact:
+		main_scroll.ensure_control_visible(details_panel if details_panel.size.y < main_scroll.size.y else details.heading)
+	else:
+		offer_scroll.ensure_control_visible(details_panel if details_panel.size.y < offer_scroll.size.y else details.heading)
 
 func _render_selection() -> void:
 	details.clear_actions()
-	detail_actions.visible = selected_kind == "equipment"
+	_highlight_equipment()
+	var tier := 0
+	if selected_kind == "equipment" and selected_index >= 0 and selected_index < equipment.size():
+		tier = int(equipment[selected_index].tier)
+	elif selected_kind == "item" and selected_index >= 0 and selected_index < owned_items.size():
+		tier = int(owned_items[selected_index].get("tier", 1))
+	elif selected_kind == "offer" and selected_index >= 0 and selected_index < offers.size() and offers[selected_index] != null:
+		tier = offers[selected_index].rarity_tier
+	if tier > 0:
+		DentiUIStyle.style_rarity_panel(details_panel, tier)
+		details_panel.tooltip_text = "Seltenheit: " + DentiRarity.name_for(tier)
+	else:
+		DentiUIStyle.style_chip(details_panel)
+		details_panel.tooltip_text = ""
+	var inspect_offer := selected_kind == "offer" and selected_index >= 0 and selected_index < offers.size() and offers[selected_index] != null
+	detail_actions.visible = selected_kind == "equipment" or inspect_offer
+	detail_buy_button.visible = inspect_offer
+	detail_pin_button.visible = inspect_offer
 	if selected_kind == "item":
 		if selected_index < owned_items.size():
 			details.show_item(owned_items[selected_index], true)
@@ -334,7 +453,7 @@ func _render_selection() -> void:
 		var data: WeaponData = entry.get("data")
 		if data == null:
 			return
-		var tier := int(entry.tier)
+		tier = int(entry.tier)
 		details.show_weapon(data, tier, player, true, equipment)
 		details.sell_button.visible = true
 		details.sell_button.text = "Verkaufen · +%d Münzen" % int(entry.refund)
@@ -361,6 +480,13 @@ func _render_selection() -> void:
 	else:
 		details.show_item({"name": offer.display_name, "description": offer.effect_text() + "\n" + offer.limit_text(), "icon": offer.icon_texture if offer.icon_texture != null else ICONS.item(offer.icon_index)}, false)
 	var can_buy := available.is_empty() or available[selected_index]
+	detail_buy_button.text = "Kaufen · %d" % offer.price
+	detail_buy_button.disabled = wallet < offer.price or not can_buy
+	detail_buy_button.tooltip_text = offer_buttons[selected_index].buy_button.tooltip_text
+	var pin: Button = offer_buttons[selected_index].reserve_button
+	detail_pin_button.icon = pin.icon
+	detail_pin_button.tooltip_text = pin.tooltip_text
+	DentiUIStyle.style_button(detail_pin_button, pin.icon == OfferCard.PIN_ICON)
 	var fusion := false
 	for entry in equipment:
 		var data: WeaponData = entry.get("data")
@@ -398,6 +524,7 @@ func _show_inventory(entries: Array[Dictionary], used_slots: int, capacity: int)
 		inventory_row.add_child(slot)
 		var tier: String = ["I", "II", "III", "IV"][int(entry.tier)-1]
 		var button := _button(slot, "")
+		DentiUIStyle.style_card(button, int(entry.tier))
 		button.set_meta("hands", int(entry.get("hands", 1)))
 		var icon := TextureRect.new()
 		icon.name = "WeaponIcon"
@@ -417,8 +544,8 @@ func _show_inventory(entries: Array[Dictionary], used_slots: int, capacity: int)
 		tier_label.add_theme_font_size_override("font_size", 15)
 		tier_label.add_theme_color_override("font_color", DentiUIStyle.INK)
 		var tier_badge := StyleBoxFlat.new()
-		tier_badge.bg_color = DentiUIStyle.GOLD.lightened(0.65)
-		tier_badge.border_color = DentiUIStyle.MUTED
+		tier_badge.bg_color = DentiUIStyle.PANEL.lerp(DentiRarity.color_for(int(entry.tier)), 0.16)
+		tier_badge.border_color = DentiRarity.color_for(int(entry.tier)).lightened(0.20)
 		tier_badge.set_border_width_all(1)
 		tier_badge.set_corner_radius_all(4)
 		tier_badge.content_margin_left = 3
@@ -434,15 +561,16 @@ func _show_inventory(entries: Array[Dictionary], used_slots: int, capacity: int)
 		tier_label.offset_right = -5
 		tier_label.offset_bottom = -3
 		button.tooltip_text = "%s · Stufe %s\n%s\n%s\n%s\nca. %.1f DPS pro Ziel\nAntippen: Details, verkaufen oder fusionieren" % [entry.name, tier, entry.description, entry.combat, entry.stats, entry.dps]
+		button.tooltip_text += "\nSeltenheit: " + DentiRarity.name_for(int(entry.tier))
 		button.pressed.connect(_select.bind("equipment", index))
 		button.gui_input.connect(_on_inventory_input.bind(index))
 	for index in maxi(capacity - used_slots, 0):
 		var slot := HBoxContainer.new()
 		slot.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		inventory_row.add_child(slot)
-		var empty := _button(slot, "+")
+		var empty := _button(slot, "Freie\nWurzel")
 		empty.disabled = true
-		empty.add_theme_font_size_override("font_size", 28)
+		empty.add_theme_font_size_override("font_size", 12)
 		empty.tooltip_text = "Freie Wurzel"
 	_layout_inventory()
 
@@ -450,13 +578,15 @@ func _highlight_equipment() -> void:
 	for index in equipment.size():
 		var button: Button = inventory_row.get_child(index).get_child(0)
 		var partner := false
-		if selected_kind == "equipment" and selected_index >= 0 and selected_index < equipment.size():
+		if expanded and selected_kind == "equipment" and selected_index >= 0 and selected_index < equipment.size():
 			var a: WeaponData = equipment[selected_index].get("data")
 			var b: WeaponData = equipment[index].get("data")
 			partner = a != null and b != null and a.id == b.id and equipment[index].tier == equipment[selected_index].tier and int(equipment[index].tier) < 4
-		DentiUIStyle.style_button(button, partner or (selected_kind == "equipment" and selected_index == index))
-	for index in offer_buttons.size():
-		offer_buttons[index].modulate = Color.WHITE if selected_kind == "offer" and selected_index == index else Color(0.92, 0.92, 0.92)
+		DentiUIStyle.style_card(button, int(equipment[index].tier))
+		var selected := expanded and selected_kind == "equipment" and selected_index == index
+		DentiUIStyle.mark_card(button, DentiUIStyle.INK if selected else (DentiUIStyle.MINT if partner else Color.TRANSPARENT))
+	for index in items_row.get_child_count():
+		DentiUIStyle.mark_card(items_row.get_child(index), DentiUIStyle.INK if expanded and selected_kind == "item" and selected_index == index else Color.TRANSPARENT)
 
 func _show_items(entries: Array[Dictionary]) -> void:
 	owned_items = entries
@@ -474,10 +604,14 @@ func _show_items(entries: Array[Dictionary]) -> void:
 		chip.custom_minimum_size = Vector2(48, 44)
 		chip.focus_mode = Control.FOCUS_ALL
 		chip.tooltip_text = "%s ×%d\n%s" % [entry.name, copies, entry.description]
-		DentiUIStyle.style_chip(chip, Color(0.91, 0.84, 0.97) if bool(entry.get("relic", false)) else Color(0.96, 0.91, 0.78))
+		var tier := int(entry.get("tier", 4 if bool(entry.get("relic", false)) else 1))
+		chip.tooltip_text += "\nSeltenheit: " + DentiRarity.name_for(tier)
+		DentiUIStyle.style_rarity_panel(chip, tier)
 		var chip_style := chip.get_theme_stylebox("panel")
 		chip_style.content_margin_left = 6
 		chip_style.content_margin_right = 6
+		chip_style.content_margin_top = 3
+		chip_style.content_margin_bottom = 3
 		items_row.add_child(chip)
 		chip.gui_input.connect(_on_item_input.bind(index))
 		var holder := Control.new()
@@ -498,7 +632,7 @@ func _show_items(entries: Array[Dictionary]) -> void:
 		count.name = "StackCount"
 		count.text = "×%d" % copies
 		count.add_theme_color_override("font_color", DentiUIStyle.INK)
-		count.add_theme_color_override("font_outline_color", Color.WHITE)
+		count.add_theme_color_override("font_outline_color", DentiUIStyle.PANEL)
 		count.add_theme_constant_override("outline_size", 4)
 		count.add_theme_font_size_override("font_size", 14)
 		count.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -506,6 +640,126 @@ func _show_items(entries: Array[Dictionary]) -> void:
 		count.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
 	items_label.text = "Gesammelt · %d Items · %d Relikte" % [total, relic_count] if total + relic_count > 0 else "Gesammelt · Keine Items"
 	items_scroll.visible = total + relic_count > 0
+
+
+func _build_night_layout() -> void:
+	# The build occupies its own compact column; offers and expanded details share
+	# a separate scroll area. Purchase/reservation signals remain authoritative.
+	var build_panel := PanelContainer.new()
+	build_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	DentiUIStyle.style_chip(build_panel)
+	left_scroll.add_child(build_panel)
+	build_column.reparent(build_panel)
+	var portrait := TextureRect.new()
+	build_portrait = portrait
+	portrait.texture = preload("res://assets/denti/denti_unarmed.png")
+	portrait.custom_minimum_size = Vector2(56, 56)
+	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var identity := HBoxContainer.new()
+	identity.add_theme_constant_override("separation", 12)
+	build_column.add_child(identity)
+	build_column.move_child(identity, 0)
+	identity.add_child(portrait)
+	var name_label := ShopDetails._label(identity, "Denti", 19)
+	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	name_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	inventory_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	stat_grid = GridContainer.new()
+	stat_grid.columns = 2
+	stat_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	stat_grid.add_theme_constant_override("h_separation", 5)
+	stat_grid.add_theme_constant_override("v_separation", 5)
+	build_column.add_child(stat_grid)
+	stats_label.visible = false
+	luck_label.visible = false
+	for type in DentiAttributes.ACTIVE:
+		var chip := Button.new()
+		chip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		chip.custom_minimum_size = Vector2(0, 34)
+		chip.icon = ICONS.stat(DentiAttributes.ICONS[type])
+		chip.expand_icon = true
+		chip.add_theme_constant_override("icon_max_width", 23)
+		chip.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		DentiUIStyle.style_button(chip, false, true)
+		chip.add_theme_font_size_override("font_size", 13)
+		for state in ["normal", "hover", "pressed", "disabled", "focus"]:
+			var box := chip.get_theme_stylebox(state)
+			box.content_margin_left = 5
+			box.content_margin_right = 5
+			box.content_margin_top = 3
+			box.content_margin_bottom = 3
+		stat_grid.add_child(chip)
+		stat_chips.append(chip)
+		chip.pressed.connect(func() -> void: DentiDentikon.open_attribute(chip, type))
+	offer_scroll = ScrollContainer.new()
+	offer_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	offer_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	offer_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	flow.add_child(offer_scroll)
+	offer_column = VBoxContainer.new()
+	offer_column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	offer_column.add_theme_constant_override("separation", 12)
+	offer_scroll.add_child(offer_column)
+	offers_section.reparent(offer_column)
+	detail_column.reparent(offer_column)
+	details_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	details.close_button.pressed.connect(close_details)
+	detail_column.visible = false
+	detail_actions.visible = false
+
+
+func close_details() -> void:
+	var was_expanded := expanded
+	expanded = false
+	detail_column.visible = false
+	detail_actions.visible = false
+	offer_scroll.scroll_vertical = 0
+	_sync_detail_layout()
+	if was_expanded:
+		_highlight_equipment()
+		if selected_kind == "offer" and selected_index >= 0 and selected_index < offer_buttons.size():
+			offer_buttons[selected_index].grab_focus()
+		elif selected_kind == "equipment" and selected_index >= 0 and selected_index < equipment.size():
+			inventory_row.get_child(selected_index).get_child(0).grab_focus()
+		elif selected_kind == "item" and selected_index >= 0 and selected_index < items_row.get_child_count():
+			items_row.get_child(selected_index).grab_focus()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if visible and event.is_action_pressed("ui_cancel"):
+		if expanded:
+			close_details()
+		else:
+			pause_requested.emit()
+		get_viewport().set_input_as_handled()
+
+
+func animate_purchase(source: Rect2, offer: ShopOfferData) -> void:
+	await get_tree().process_frame
+	if not visible:
+		return
+	var target: Control = items_row
+	if offer.weapon_data != null:
+		for index in equipment.size():
+			var data: WeaponData = equipment[index].get("data")
+			if data != null and data.id == offer.weapon_data.id:
+				target = inventory_row.get_child(index).get_child(0)
+	else:
+		for index in owned_items.size():
+			if owned_items[index].name == offer.display_name:
+				target = items_row.get_child(index)
+	var image: Texture2D = offer.weapon_data.sprite if offer.weapon_data != null else (offer.icon_texture if offer.icon_texture != null else ICONS.item(offer.icon_index))
+	DentiUIMotion.fly($Root, image, source, target.get_global_rect())
+	DentiUIMotion.pulse(coins_label)
+
+
+func animate_equipment(index: int) -> void:
+	await get_tree().process_frame
+	if visible and index >= 0 and index < equipment.size():
+		DentiUIMotion.pulse(inventory_row.get_child(index).get_child(0))
 
 func _on_item_input(event: InputEvent, index: int) -> void:
 	if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) or (event is InputEventScreenTouch and event.pressed) or event.is_action_pressed("ui_accept"):

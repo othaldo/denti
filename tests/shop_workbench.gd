@@ -94,7 +94,7 @@ func _run() -> void:
 			_fail("shop or persistent controls exceed viewport %s" % extent)
 			return
 		if extent.x < 1000 or extent.y < 560:
-			if not ui.compact or ui.offers_grid.columns != (2 if extent.x >= 760 else 1) or not ui.main_scroll.get_global_rect().encloses(ui.details.heading.get_global_rect()):
+			if not ui.compact or ui.offers_grid.columns != (2 if extent.x >= 600 else 1) or not ui.main_scroll.get_global_rect().encloses(ui.details.heading.get_global_rect()):
 				_fail("mobile selection did not open reachable stacked details")
 				return
 	ui._select("offer", 0)
@@ -103,6 +103,7 @@ func _run() -> void:
 	ui._select("equipment", 0)
 	for frame in 3:
 		await process_frame
+	ui.close_details()
 	ui.main_scroll.scroll_vertical = 0
 	for frame in 3:
 		await process_frame

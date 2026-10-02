@@ -14,6 +14,8 @@ var sell_button: Button
 var merge_button: Button
 var confirm_button: Button
 var cancel_button: Button
+var close_button: Button
+var terms_row: HFlowContainer
 
 
 func _ready() -> void:
@@ -31,6 +33,14 @@ func _ready() -> void:
 	header.add_child(titles)
 	heading = _label(titles, "", 21)
 	subtitle = _label(titles, "", 15)
+	close_button = Button.new()
+	close_button.text = "×"
+	close_button.custom_minimum_size = Vector2(36, 36)
+	close_button.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	close_button.tooltip_text = "Details schließen"
+	close_button.visible = false
+	DentiUIStyle.style_button(close_button)
+	header.add_child(close_button)
 	values_grid = GridContainer.new()
 	values_grid.columns = 2
 	values_grid.add_theme_constant_override("h_separation", 14)
@@ -38,7 +48,10 @@ func _ready() -> void:
 	add_child(values_grid)
 	effect = _label(self, "", 15)
 	synergy = _label(self, "", 14)
-	synergy.add_theme_color_override("font_color", Color(0.16, 0.42, 0.32))
+	synergy.add_theme_color_override("font_color", DentiUIStyle.MINT)
+	terms_row = HFlowContainer.new()
+	terms_row.add_theme_constant_override("h_separation", 5)
+	add_child(terms_row)
 	compare = OptionButton.new()
 	compare.custom_minimum_size.y = 44
 	compare.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -80,6 +93,7 @@ func show_weapon(data: WeaponData, tier: int, player: Player, equipped: bool, eq
 	synergy.visible = not synergy.text.is_empty()
 	compare.visible = not equipped and not equipment.is_empty()
 	compare_text.visible = compare.visible
+	_terms(effect.text + " " + synergy.text + " Wurzeln " + DentiAttributes.name_for(DentiAttributes.Type.CRIT_CHANCE))
 
 
 func show_item(entry: Dictionary, owned: bool) -> void:
@@ -93,6 +107,7 @@ func show_item(entry: Dictionary, owned: bool) -> void:
 	synergy.visible = false
 	compare.visible = false
 	compare_text.visible = false
+	_terms(effect.text)
 
 
 func clear_actions() -> void:
@@ -103,12 +118,47 @@ func clear_actions() -> void:
 
 
 func _value(key: String, value: String) -> void:
-	var label := _label(values_grid, key, 15)
-	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	label.add_theme_color_override("font_color", DentiUIStyle.MUTED)
+	var type := DentiAttributes.NAMES.find(key)
+	var texture: Texture2D
+	if key == "Treffer":
+		texture = DentiUIIcons.stat(0)
+	elif key == "Angriffspause":
+		texture = DentiUIIcons.hud(5)
+	elif key == "Reichweite":
+		texture = DentiUIIcons.RANGE
+	elif type >= 0:
+		texture = DentiUIIcons.stat(DentiAttributes.ICONS[type])
+	if texture != null:
+		var image := TextureRect.new()
+		image.texture = texture
+		image.tooltip_text = key
+		image.custom_minimum_size = Vector2(26, 26)
+		image.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		values_grid.add_child(image)
+	else:
+		var label := _label(values_grid, key, 15)
+		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		label.add_theme_color_override("font_color", DentiUIStyle.MUTED)
 	var number := _label(values_grid, value, 15)
 	number.autowrap_mode = TextServer.AUTOWRAP_OFF
 	number.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	number.tooltip_text = key + " · " + value
+
+
+func _terms(text: String) -> void:
+	for child in terms_row.get_children():
+		terms_row.remove_child(child)
+		child.queue_free()
+	for term in DentiDentikon.terms_in(text):
+		var link := Button.new()
+		link.text = term
+		link.tooltip_text = "Im Dentikon erklären"
+		DentiUIStyle.style_button(link)
+		link.add_theme_font_size_override("font_size", 13)
+		terms_row.add_child(link)
+		link.pressed.connect(func() -> void: DentiDentikon.open_term(link, term))
 
 
 func _clear_values() -> void:
