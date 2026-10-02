@@ -1,0 +1,6 @@
+Use case: precise-object-edit.
+Asset type: layered 2D game character, body plate.
+Image 1 is the edit target: Denti, the existing ivory tooth mascot.
+Remove ONLY the two eyes, open mouth, pink cheeks, and their face outlines/highlights from the broad central ivory facial surface. Restore that surface with smoothly matching ivory enamel shading and highlights. There must be absolutely NO eyes, eyebrows, mouth, cheeks or facial marks left.
+Preserve exactly the existing body silhouette, ivory shading outside the removed face, crown, arms, hands, roots/feet, pose, orientation, overall proportions, dark outlines, canvas framing and position. Do not redesign or move Denti. Keep the existing crown because this is a layer split of the current gameplay image, not a character redesign.
+Keep the 1280 by 1280 canvas if possible. Produce a genuinely transparent background with clean alpha edges, no background shadow, no text. This is a body UNDERLAY for exchangeable facial expressions.

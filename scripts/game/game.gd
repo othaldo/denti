@@ -483,6 +483,7 @@ func _begin_loot_collection() -> void:
 	if collecting_wave_loot or ended:
 		return
 	collecting_wave_loot = true
+	player.expressions.celebrate()
 	rewards.begin_collection()
 	player.velocity = Vector2.ZERO
 	player.set_physics_process(false)

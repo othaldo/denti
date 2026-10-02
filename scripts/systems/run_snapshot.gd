@@ -63,7 +63,7 @@ static func capture(game) -> Dictionary:
 		"burst_times": game.wave.burst_times, "burst_index": game.wave.burst_index,
 		"elite_times": game.wave.elite_times.duplicate(), "elite_counts": game.wave.elite_counts.duplicate(), "elite_index": game.wave.elite_index,
 		"current_profile_id": str(game.wave.current_profile_id), "next_profile_id": str(game.wave.next_profile_id),
-		"player": {"position": _vector_data(game.player.position), "stats": game.player.stats.to_save_data(), "hurt_time": game.player.hurt_time},
+		"player": {"position": _vector_data(game.player.position), "stats": game.player.stats.to_save_data(), "hurt_time": game.player.hurt_time, "presentation": game.player.expressions.save_data()},
 		"xp": game.xp, "xp_goal": game.xp_goal, "level": game.level, "coins": game.coins,
 		"weapons": game.player.loadout.save_data(), "starter_pending": game.starter_pending,
 		"weapon_runtime": weapon_runtime,
@@ -127,6 +127,7 @@ static func restore(game, saved: Dictionary) -> void:
 	player.position = _read_vector(player_data.get("position", [640.0, 360.0]))
 	player.stats.load_save_data(player_data.get("stats", {}))
 	player.hurt_time = maxf(float(player_data.get("hurt_time", 0.0)), 0.0)
+	player.expressions.restore(player_data.get("presentation", {}))
 	game.xp = maxi(int(saved.get("xp", 0)), 0)
 	game.xp_goal = maxi(int(saved.get("xp_goal", 5)), 1)
 	game.level = maxi(int(saved.get("level", 1)), 1)

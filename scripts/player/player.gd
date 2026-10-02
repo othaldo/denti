@@ -14,6 +14,7 @@ const ATTACK_ANIMATION_DURATION := 0.18
 @onready var items: ItemInventory = get_node("../Items")
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var sprite_base_scale: Vector2 = sprite.scale
+@onready var expressions: DentiExpressions = $Sprite2D/Expressions
 @onready var arena: DentiArena = get_node("../Arena")
 @onready var mobile_controls: MobileControls = get_node("../MobileControls/Root")
 
@@ -22,6 +23,10 @@ var animation_time: float = 0.0
 var attack_time: float = 0.0
 var attack_direction: Vector2 = Vector2.RIGHT
 var is_moving: bool = false
+
+
+func _ready() -> void:
+	expressions.configure(stats)
 
 
 func _physics_process(delta: float) -> void:
