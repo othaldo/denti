@@ -20,8 +20,8 @@ func _run() -> void:
 	for template in ShopController.CATALOG:
 		if template.weapon_data == null:
 			item_count += 1
-	if item_count != 32:
-		_fail("item catalog did not expand to 32 entries")
+	if item_count < 32:
+		_fail("original item batch is missing catalog entries")
 		return
 	for index in ids.size():
 		var item := ShopController.by_id(ids[index])

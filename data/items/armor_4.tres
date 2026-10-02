@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"armor_4"
+display_name = "Bollwerkkrone"
+description = "+6 Härte, -8 % Schaden. Schildblock: 12 Splitterschaden im Umkreis."
+rarity_tier = 4
+price = 22
+icon_index = 35
+stat_changes = { &"armor": 6.0, &"damage_bonus": -8.0 }
+effect_kind = &"shield_shards"
+effect_value = 12.0
+max_stacks = 6
+family_id = &"armor"
+family_limit = 6
+tags = Array[StringName]([&"defense", &"shield", &"area"])

@@ -177,7 +177,7 @@ func _run() -> void:
 		return
 	for button: UpgradeCard in game.choice_panel.buttons:
 		if not _within(button.effect_label.get_global_rect(), button.get_global_rect()):
-			_fail("landscape starter text exceeds its card")
+			_fail("landscape starter text exceeds its card: %s (visible %s), effect %s / card %s" % [button.name_label.text, button.visible, button.effect_label.get_global_rect(), button.get_global_rect()])
 			return
 	game.choice_panel.show_relics(relic_choices)
 	await process_frame

@@ -12,3 +12,7 @@ effect_kind = &"kill_burst"
 effect_value = 25.0
 max_stacks = 2
 tags = Array[StringName]([&"area", &"crit"])
+
+
+family_id = &"burst"
+family_limit = 2

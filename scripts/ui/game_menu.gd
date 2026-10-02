@@ -262,11 +262,12 @@ func _show_stats() -> void:
 	grid.add_theme_constant_override("h_separation", 14)
 	grid.add_theme_constant_override("v_separation", 5)
 	rows.add_child(grid)
-	for pair in [["Bisskraft", "%+.0f %%" % stats.damage_bonus], ["Härte", stats.armor_text()], ["Schmelz", "%.0f HP" % stats.max_health], ["Putzeifer", "%+.0f %%" % stats.attack_speed], ["Glanz", "%.0f %%" % (stats.crit_chance * 100)], ["Speichel", stats.regen_text()], ["Bewegung", "%+.0f %%" % stats.speed_bonus], ["Glück", "%.0f" % stats.luck], ["Nahschaden", "%+.0f" % stats.melee_damage], ["Fernschaden", "%+.0f" % stats.ranged_damage]]:
-		var key := ShopDetails._label(grid, pair[0], 16)
+	for type in DentiAttributes.ACTIVE:
+		var key := ShopDetails._label(grid, DentiAttributes.name_for(type), 16)
+		key.tooltip_text = DentiAttributes.meaning_for(type)
 		key.autowrap_mode = TextServer.AUTOWRAP_OFF
 		key.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		var value := ShopDetails._label(grid, pair[1], 16)
+		var value := ShopDetails._label(grid, DentiAttributes.value_text(stats, type), 16)
 		value.autowrap_mode = TextServer.AUTOWRAP_OFF
 		value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	ShopDetails._label(rows, "Wurzeln · %d/6" % game.player.loadout.used_slots(), 16)
@@ -308,7 +309,7 @@ func _show_items() -> void:
 	for id in game.relics.owned:
 		var relic := RelicCatalog.by_id(StringName(id))
 		if relic != null:
-			owned.append({"name": relic.display_name, "count": 1, "description": relic.description, "icon": DentiUIIcons.relic(relic.icon_index), "relic": true})
+			owned.append({"name": relic.display_name, "count": 1, "description": DentiAttributes.resolve_text(relic.description), "icon": DentiUIIcons.relic(relic.icon_index), "relic": true})
 	if owned.is_empty():
 		ShopDetails._label(rows, "Keine Items oder Relikte", 16)
 	else:

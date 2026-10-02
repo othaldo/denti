@@ -96,7 +96,7 @@ func damage_with_stats(tier: int, stats: PlayerStats, additional_bonus: float = 
 
 
 func scaling_text() -> String:
-	return "%s: %.0f %%" % ["Nahschaden" if damage_stat == "melee" else "Fernschaden", stat_scaling * 100.0]
+	return "%s: %.0f %%" % [DentiAttributes.name_for(DentiAttributes.Type.MELEE_DAMAGE if damage_stat == "melee" else DentiAttributes.Type.RANGED_DAMAGE), stat_scaling * 100.0]
 
 
 func cooldown_at_tier(tier: int, player_interval: float, item_interval_factor: float) -> float:
@@ -137,8 +137,13 @@ func stats_text(tier: int) -> String:
 	return result
 
 
+func damage_type_label() -> String:
+	# Keep the legacy resource/save value; distinguish the label from max HP.
+	return "Schmelzbruch" if damage_type == "Schmelz" else damage_type
+
+
 func combat_text() -> String:
-	var result := "Schadensart: %s · %s" % [damage_type, scaling_text()]
+	var result := "Schadensart: %s · %s" % [damage_type_label(), scaling_text()]
 	if bleed_dps > 0.0:
 		result += " · Blutung %.1f Schaden/s (%.1f s)" % [bleed_dps, bleed_duration]
 	if wet_duration > 0.0:
@@ -150,7 +155,7 @@ func combat_text() -> String:
 	if crit_cycle > 0:
 		result += " · Jeder %d. Treffer auf dasselbe Ziel kritisch" % crit_cycle
 	if enamel_exposure > 0.0:
-		result += " · +%d %% Schmelzschaden für %.1f s (nicht stapelbar)" % [roundi(enamel_exposure * 100.0), exposure_duration]
+		result += " · +%d %% Schmelzbruch-Schaden für %.1f s (nicht stapelbar)" % [roundi(enamel_exposure * 100.0), exposure_duration]
 	if trash_damage_factor < 1.0:
 		result += " · %d %% Schaden gegen normale Gegner" % roundi(trash_damage_factor * 100.0)
 	if elite_damage_bonus > 0.0:

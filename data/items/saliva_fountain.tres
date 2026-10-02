@@ -13,3 +13,7 @@ effect_kind = &"kill_heal"
 effect_value = 3.0
 max_stacks = 3
 tags = Array[StringName]([&"sustain"])
+
+
+family_id = &"regen"
+family_limit = 3

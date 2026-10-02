@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"chain_3"
+display_name = "Gewittersonde"
+description = "+2 Fernschaden, -2 Härte. Wasser/Licht springt mit 50 % Schaden über."
+rarity_tier = 3
+price = 14
+icon_index = 58
+stat_changes = { &"ranged_damage": 2.0, &"armor": -2.0 }
+effect_kind = &"chain"
+effect_value = 0.5
+max_stacks = 3
+family_id = &"chain"
+family_limit = 3
+tags = Array[StringName]([&"ranged", &"area"])

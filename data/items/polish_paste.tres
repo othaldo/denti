@@ -5,7 +5,7 @@ script = ExtResource("1")
 id = &"polish_paste"
 icon_index = 5
 display_name = "Polierpaste"
-description = "+8 % Krit, -1 Rüstung. Kritische Treffer lösen einen Blitz aus."
+description = "+8 % Krit, -1 Härte. Krits: Flächenblitz mit 35 % Trefferschaden (gesamt max. 80 %)."
 rarity_tier = 2
 price = 6
 stat_changes = { &"crit_chance": 0.08, &"armor": -1.0 }
@@ -13,3 +13,7 @@ effect_kind = &"crit_burst"
 effect_value = 0.35
 max_stacks = 3
 tags = Array[StringName]([&"crit", &"area"])
+
+
+family_id = &"crit"
+family_limit = 3

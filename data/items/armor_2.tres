@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"armor_2"
+display_name = "Titankrone"
+description = "+4 Härte, -4 % Angriffstempo."
+rarity_tier = 2
+price = 9
+icon_index = 33
+stat_changes = { &"armor": 4.0, &"attack_speed": -4.0 }
+effect_kind = &""
+effect_value = 0.0
+max_stacks = 6
+family_id = &"armor"
+family_limit = 6
+tags = Array[StringName]([&"defense", &"shield", &"area"])

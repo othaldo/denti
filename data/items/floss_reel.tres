@@ -12,3 +12,7 @@ effect_kind = &"bleed"
 effect_value = 3.0
 max_stacks = 3
 tags = Array[StringName]([&"melee", &"bleed"])
+
+
+family_id = &"bleed"
+family_limit = 3

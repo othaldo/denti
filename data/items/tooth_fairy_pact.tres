@@ -13,3 +13,7 @@ effect_kind = &"xp_heal"
 effect_value = 0.35
 max_stacks = 2
 tags = Array[StringName]([&"sustain", &"economy"])
+
+
+family_id = &"xp_heal"
+family_limit = 2

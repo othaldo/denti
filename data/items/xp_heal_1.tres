@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"xp_heal_1"
+display_name = "Feenquittung"
+description = "Jeder gesammelte XP-Punkt heilt 0,15 Leben. -3 % Schaden."
+rarity_tier = 1
+price = 5
+icon_index = 75
+stat_changes = { &"damage_bonus": -3.0 }
+effect_kind = &"xp_heal"
+effect_value = 0.15
+max_stacks = 2
+family_id = &"xp_heal"
+family_limit = 2
+tags = Array[StringName]([&"sustain", &"economy", &"healing"])

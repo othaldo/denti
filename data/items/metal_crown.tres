@@ -9,3 +9,7 @@ description = "+3 Härte, -8 % Bewegung. Karamell bleibt gefährlich."
 price = 4
 stat_changes = { &"armor": 3.0, &"speed_bonus": -8.0 }
 tags = Array[StringName]([&"defense"])
+
+
+family_id = &"armor"
+family_limit = 6

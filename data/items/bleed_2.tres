@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"bleed_2"
+display_name = "Rasierseide"
+description = "+3 Nahschaden, -1 Härte. Schnitt-Blutung: +4 Schaden/s."
+rarity_tier = 2
+price = 9
+icon_index = 54
+stat_changes = { &"melee_damage": 3.0, &"armor": -1.0 }
+effect_kind = &"bleed"
+effect_value = 4.0
+max_stacks = 3
+family_id = &"bleed"
+family_limit = 3
+tags = Array[StringName]([&"melee", &"bleed"])

@@ -1,0 +1,1077 @@
+[
+  {
+    "id": "health_1",
+    "family": "health",
+    "tier": 1,
+    "name": "Schmelzsplitter",
+    "stats": {
+      "max_health": 12,
+      "speed_bonus": -2
+    },
+    "effect": "",
+    "value": 0,
+    "description": "+12 Leben, -2 % Bewegung.",
+    "cap": 3,
+    "tags": [
+      "defense",
+      "sustain",
+      "area"
+    ],
+    "motif": "ivory enamel chip with pink heart"
+  },
+  {
+    "id": "health_2",
+    "family": "health",
+    "tier": 2,
+    "name": "Porzellanpolster",
+    "stats": {
+      "max_health": 24,
+      "regen": 1,
+      "attack_speed": -3
+    },
+    "effect": "",
+    "value": 0,
+    "description": "+24 Leben, +1 Regeneration, -3 % Angriffstempo.",
+    "cap": 3,
+    "tags": [
+      "defense",
+      "sustain",
+      "area"
+    ],
+    "motif": "porcelain tooth cap with pink cushion"
+  },
+  {
+    "id": "health_4",
+    "family": "health",
+    "tier": 4,
+    "name": "Herzkeramik",
+    "stats": {
+      "max_health": 45,
+      "speed_bonus": -5
+    },
+    "effect": "thorns",
+    "value": 24,
+    "description": "+45 Leben, -5 % Bewegung. Bei Schaden: 24 Splitterschaden im Umkreis.",
+    "cap": 3,
+    "tags": [
+      "defense",
+      "sustain",
+      "area"
+    ],
+    "motif": "ornate ivory dental shell with ruby heart"
+  },
+  {
+    "id": "armor_2",
+    "family": "armor",
+    "tier": 2,
+    "name": "Titankrone",
+    "stats": {
+      "armor": 4,
+      "attack_speed": -4
+    },
+    "effect": "",
+    "value": 0,
+    "description": "+4 Härte, -4 % Angriffstempo.",
+    "cap": 6,
+    "tags": [
+      "defense",
+      "shield",
+      "area"
+    ],
+    "motif": "titanium tooth crown with blue rivet"
+  },
+  {
+    "id": "armor_3",
+    "family": "armor",
+    "tier": 3,
+    "name": "Panzerkeramik",
+    "stats": {
+      "armor": 5,
+      "max_health": 12,
+      "speed_bonus": -6
+    },
+    "effect": "",
+    "value": 0,
+    "description": "+5 Härte, +12 Leben, -6 % Bewegung.",
+    "cap": 6,
+    "tags": [
+      "defense",
+      "shield",
+      "area"
+    ],
+    "motif": "blue ceramic tooth armor cap"
+  },
+  {
+    "id": "armor_4",
+    "family": "armor",
+    "tier": 4,
+    "name": "Bollwerkkrone",
+    "stats": {
+      "armor": 6,
+      "damage_bonus": -8
+    },
+    "effect": "shield_shards",
+    "value": 12,
+    "description": "+6 Härte, -8 % Schaden. Schildblock: 12 Splitterschaden im Umkreis.",
+    "cap": 6,
+    "tags": [
+      "defense",
+      "shield",
+      "area"
+    ],
+    "motif": "gold armored molar cap with turquoise gem"
+  },
+  {
+    "id": "damage_1",
+    "family": "damage",
+    "tier": 1,
+    "name": "Bissschraube",
+    "stats": {
+      "damage_bonus": 5,
+      "max_health": -5
+    },
+    "effect": "",
+    "value": 0,
+    "description": "+5 % Schaden, -5 Leben.",
+    "cap": 2,
+    "tags": [
+      "boss",
+      "melee",
+      "risk"
+    ],
+    "motif": "small steel dental screw"
+  },
+  {
+    "id": "damage_2",
+    "family": "damage",
+    "tier": 2,
+    "name": "Titanstift",
+    "stats": {
+      "damage_bonus": 8,
+      "regen": -1
+    },
+    "effect": "boss_bonus",
+    "value": 0.08,
+    "description": "+8 % Schaden, +8 % gegen Bosse, -1 Regeneration.",
+    "cap": 2,
+    "tags": [
+      "boss",
+      "melee",
+      "risk"
+    ],
+    "motif": "sturdy titanium dental implant"
+  },
+  {
+    "id": "damage_3",
+    "family": "damage",
+    "tier": 3,
+    "name": "Wurzelanker",
+    "stats": {
+      "damage_bonus": 10,
+      "speed_bonus": -4
+    },
+    "effect": "boss_bonus",
+    "value": 0.16,
+    "description": "+10 % Schaden, +16 % gegen Bosse, -4 % Bewegung.",
+    "cap": 2,
+    "tags": [
+      "boss",
+      "melee",
+      "risk"
+    ],
+    "motif": "gold reinforced dental implant with violet ring"
+  },
+  {
+    "id": "tempo_2",
+    "family": "tempo",
+    "tier": 2,
+    "name": "Druckspülung",
+    "stats": {
+      "attack_speed": 14,
+      "max_health": -8
+    },
+    "effect": "splash",
+    "value": 0.28,
+    "description": "+14 % Angriffstempo, -8 Leben. Fern-Projektile: 28 % Spritzschaden.",
+    "cap": 3,
+    "tags": [
+      "ranged",
+      "area"
+    ],
+    "motif": "pressurized turquoise mouthwash flask"
+  },
+  {
+    "id": "tempo_3",
+    "family": "tempo",
+    "tier": 3,
+    "name": "Turbospülung",
+    "stats": {
+      "attack_speed": 18,
+      "armor": -2
+    },
+    "effect": "splash",
+    "value": 0.32,
+    "description": "+18 % Angriffstempo, -2 Härte. Fern-Projektile: 32 % Spritzschaden.",
+    "cap": 3,
+    "tags": [
+      "ranged",
+      "area"
+    ],
+    "motif": "turquoise mouthwash bottle with silver turbo valve"
+  },
+  {
+    "id": "tempo_4",
+    "family": "tempo",
+    "tier": 4,
+    "name": "Orkanspülung",
+    "stats": {
+      "attack_speed": 22,
+      "damage_bonus": -8
+    },
+    "effect": "splash",
+    "value": 0.4,
+    "description": "+22 % Angriffstempo, -8 % Schaden. Fern-Projektile: 40 % Spritzschaden.",
+    "cap": 3,
+    "tags": [
+      "ranged",
+      "area"
+    ],
+    "motif": "gold turquoise mouthwash decanter"
+  },
+  {
+    "id": "crit_1",
+    "family": "crit",
+    "tier": 1,
+    "name": "Glanzpuder",
+    "stats": {
+      "crit_chance": 0.04,
+      "max_health": -5
+    },
+    "effect": "crit_burst",
+    "value": 0.15,
+    "description": "+4 % Krit, -5 Leben. Krits: Blitz mit 15 % Trefferschaden.",
+    "cap": 3,
+    "tags": [
+      "crit",
+      "area"
+    ],
+    "motif": "ivory polishing paste tin with star"
+  },
+  {
+    "id": "crit_3",
+    "family": "crit",
+    "tier": 3,
+    "name": "Diamantpaste",
+    "stats": {
+      "crit_chance": 0.1,
+      "attack_speed": -5
+    },
+    "effect": "crit_burst",
+    "value": 0.45,
+    "description": "+10 % Krit, -5 % Angriffstempo. Krits: Blitz mit 45 % Trefferschaden.",
+    "cap": 3,
+    "tags": [
+      "crit",
+      "area"
+    ],
+    "motif": "violet diamond polishing cream tube"
+  },
+  {
+    "id": "crit_4",
+    "family": "crit",
+    "tier": 4,
+    "name": "Sternpolitur",
+    "stats": {
+      "crit_chance": 0.12,
+      "armor": -2
+    },
+    "effect": "crit_burst",
+    "value": 0.55,
+    "description": "+12 % Krit, -2 Härte. Krits: Blitz mit 55 % Trefferschaden.",
+    "cap": 3,
+    "tags": [
+      "crit",
+      "area"
+    ],
+    "motif": "gold polishing paste jar with crystal star"
+  },
+  {
+    "id": "regen_1",
+    "family": "regen",
+    "tier": 1,
+    "name": "Speicheltropfen",
+    "stats": {
+      "regen": 1,
+      "damage_bonus": -3
+    },
+    "effect": "kill_heal",
+    "value": 1,
+    "description": "+1 Regeneration, -3 % Schaden. Alle 8 normalen Kills: +1 Leben.",
+    "cap": 3,
+    "tags": [
+      "sustain",
+      "healing"
+    ],
+    "motif": "blue saliva droplet in a spoon"
+  },
+  {
+    "id": "regen_3",
+    "family": "regen",
+    "tier": 3,
+    "name": "Speichelbrunnen",
+    "stats": {
+      "regen": 4,
+      "max_health": -10
+    },
+    "effect": "kill_heal",
+    "value": 4,
+    "description": "+4 Regeneration, -10 Leben. Alle 8 normalen Kills: +4 Leben.",
+    "cap": 3,
+    "tags": [
+      "sustain",
+      "healing"
+    ],
+    "motif": "blue saliva fountain with ivory basin"
+  },
+  {
+    "id": "regen_4",
+    "family": "regen",
+    "tier": 4,
+    "name": "Speicheloase",
+    "stats": {
+      "regen": 6,
+      "attack_speed": -6
+    },
+    "effect": "kill_heal",
+    "value": 6,
+    "description": "+6 Regeneration, -6 % Angriffstempo. Alle 8 normalen Kills: +6 Leben.",
+    "cap": 3,
+    "tags": [
+      "sustain",
+      "healing"
+    ],
+    "motif": "gold saliva fountain with turquoise pool"
+  },
+  {
+    "id": "mobility_2",
+    "family": "mobility",
+    "tier": 2,
+    "name": "Minzsohlen",
+    "stats": {
+      "speed_bonus": 7,
+      "armor": -1
+    },
+    "effect": "magnet",
+    "value": 65,
+    "description": "+7 % Bewegung, -1 Härte. +65 Beutereichweite.",
+    "cap": 3,
+    "tags": [
+      "mobility",
+      "economy",
+      "risk"
+    ],
+    "motif": "mint leaf slippers with turquoise soles"
+  },
+  {
+    "id": "mobility_3",
+    "family": "mobility",
+    "tier": 3,
+    "name": "Mentholwirbel",
+    "stats": {
+      "speed_bonus": 9,
+      "max_health": -12
+    },
+    "effect": "magnet",
+    "value": 80,
+    "description": "+9 % Bewegung, -12 Leben. +80 Beutereichweite.",
+    "cap": 3,
+    "tags": [
+      "mobility",
+      "economy",
+      "risk"
+    ],
+    "motif": "mint essence bottle wrapped in whirlwind"
+  },
+  {
+    "id": "mobility_4",
+    "family": "mobility",
+    "tier": 4,
+    "name": "Minzkomet",
+    "stats": {
+      "speed_bonus": 12,
+      "damage_bonus": -6
+    },
+    "effect": "magnet",
+    "value": 100,
+    "description": "+12 % Bewegung, -6 % Schaden. +100 Beutereichweite.",
+    "cap": 3,
+    "tags": [
+      "mobility",
+      "economy",
+      "risk"
+    ],
+    "motif": "mint green comet with tooth charm"
+  },
+  {
+    "id": "luck_1",
+    "family": "luck",
+    "tier": 1,
+    "name": "Milchzahn-Talisman",
+    "stats": {
+      "luck": 8,
+      "damage_bonus": -2
+    },
+    "effect": "xp_bonus",
+    "value": 0.04,
+    "description": "+8 Glück, -2 % Schaden. +4 % gesammelte XP.",
+    "cap": 3,
+    "tags": [
+      "luck",
+      "economy"
+    ],
+    "motif": "small milk tooth charm with clover"
+  },
+  {
+    "id": "luck_3",
+    "family": "luck",
+    "tier": 3,
+    "name": "Kleeblattkrone",
+    "stats": {
+      "luck": 28,
+      "armor": -2
+    },
+    "effect": "xp_bonus",
+    "value": 0.14,
+    "description": "+28 Glück, -2 Härte. +14 % gesammelte XP.",
+    "cap": 3,
+    "tags": [
+      "luck",
+      "economy"
+    ],
+    "motif": "gold tooth crown with emerald clover"
+  },
+  {
+    "id": "luck_4",
+    "family": "luck",
+    "tier": 4,
+    "name": "Schicksalsmolar",
+    "stats": {
+      "luck": 36,
+      "attack_speed": -6
+    },
+    "effect": "xp_bonus",
+    "value": 0.18,
+    "description": "+36 Glück, -6 % Angriffstempo. +18 % gesammelte XP.",
+    "cap": 3,
+    "tags": [
+      "luck",
+      "economy"
+    ],
+    "motif": "ivory lucky molar with violet dice"
+  },
+  {
+    "id": "bleed_2",
+    "family": "bleed",
+    "tier": 2,
+    "name": "Rasierseide",
+    "stats": {
+      "melee_damage": 3,
+      "armor": -1
+    },
+    "effect": "bleed",
+    "value": 4,
+    "description": "+3 Nahschaden, -1 Härte. Schnitt-Blutung: +4 Schaden/s.",
+    "cap": 3,
+    "tags": [
+      "melee",
+      "bleed"
+    ],
+    "motif": "red edged dental floss spool"
+  },
+  {
+    "id": "bleed_3",
+    "family": "bleed",
+    "tier": 3,
+    "name": "Rubinseide",
+    "stats": {
+      "melee_damage": 4,
+      "attack_speed": -5
+    },
+    "effect": "bleed",
+    "value": 5,
+    "description": "+4 Nahschaden, -5 % Angriffstempo. Schnitt-Blutung: +5 Schaden/s.",
+    "cap": 3,
+    "tags": [
+      "melee",
+      "bleed"
+    ],
+    "motif": "ruby dental floss reel with droplet"
+  },
+  {
+    "id": "bleed_4",
+    "family": "bleed",
+    "tier": 4,
+    "name": "Henkerseide",
+    "stats": {
+      "melee_damage": 6,
+      "max_health": -15
+    },
+    "effect": "bleed",
+    "value": 7,
+    "description": "+6 Nahschaden, -15 Leben. Schnitt-Blutung: +7 Schaden/s.",
+    "cap": 3,
+    "tags": [
+      "melee",
+      "bleed"
+    ],
+    "motif": "gold bladed dental floss spool"
+  },
+  {
+    "id": "chain_1",
+    "family": "chain",
+    "tier": 1,
+    "name": "Funkenclip",
+    "stats": {
+      "damage_bonus": -2
+    },
+    "effect": "chain",
+    "value": 0.2,
+    "description": "Wasser/Licht springt mit 20 % Trefferschaden auf ein nahes Ziel. -2 % Schaden.",
+    "cap": 3,
+    "tags": [
+      "ranged",
+      "area"
+    ],
+    "motif": "small dental electric clip with blue spark"
+  },
+  {
+    "id": "chain_3",
+    "family": "chain",
+    "tier": 3,
+    "name": "Gewittersonde",
+    "stats": {
+      "ranged_damage": 2,
+      "armor": -2
+    },
+    "effect": "chain",
+    "value": 0.5,
+    "description": "+2 Fernschaden, -2 Härte. Wasser/Licht springt mit 50 % Schaden über.",
+    "cap": 3,
+    "tags": [
+      "ranged",
+      "area"
+    ],
+    "motif": "silver dental probe with lightning coil"
+  },
+  {
+    "id": "chain_4",
+    "family": "chain",
+    "tier": 4,
+    "name": "Blitzableiter",
+    "stats": {
+      "ranged_damage": 3,
+      "attack_speed": -6
+    },
+    "effect": "chain",
+    "value": 0.6,
+    "description": "+3 Fernschaden, -6 % Angriffstempo. Wasser/Licht springt mit 60 % Schaden über.",
+    "cap": 3,
+    "tags": [
+      "ranged",
+      "area"
+    ],
+    "motif": "gold dental lightning rod with blue crystal"
+  },
+  {
+    "id": "shield_2",
+    "family": "shield",
+    "tier": 2,
+    "name": "Fluoridmantel",
+    "stats": {
+      "max_health": 28,
+      "speed_bonus": -3
+    },
+    "effect": "wave_shield",
+    "value": 1,
+    "description": "+28 Leben, -3 % Bewegung. Wellenbeginn: +1 Schild.",
+    "cap": 3,
+    "tags": [
+      "defense",
+      "sustain",
+      "shield"
+    ],
+    "motif": "turquoise fluoride tube with protective cape"
+  },
+  {
+    "id": "shield_3",
+    "family": "shield",
+    "tier": 3,
+    "name": "Fluoridpanzer",
+    "stats": {
+      "max_health": 30,
+      "armor": -1
+    },
+    "effect": "wave_shield",
+    "value": 2,
+    "description": "+30 Leben, -1 Härte. Wellenbeginn: +2 Schilde (gesamt max. 5).",
+    "cap": 3,
+    "tags": [
+      "defense",
+      "sustain",
+      "shield"
+    ],
+    "motif": "armored fluoride gel tube with shield"
+  },
+  {
+    "id": "shield_4",
+    "family": "shield",
+    "tier": 4,
+    "name": "Fluoridbastion",
+    "stats": {
+      "max_health": 35,
+      "attack_speed": -6
+    },
+    "effect": "wave_shield",
+    "value": 2,
+    "description": "+35 Leben, -6 % Angriffstempo. Wellenbeginn: +2 Schilde (gesamt max. 5).",
+    "cap": 3,
+    "tags": [
+      "defense",
+      "sustain",
+      "shield"
+    ],
+    "motif": "gold fluoride vial inside turquoise shield"
+  },
+  {
+    "id": "coins_1",
+    "family": "coins",
+    "tier": 1,
+    "name": "Kupferfüllung",
+    "stats": {
+      "luck": 3,
+      "max_health": -5
+    },
+    "effect": "coin_bonus",
+    "value": 0.05,
+    "description": "+3 Glück, -5 Leben. +5 % Münzen beim Sammeln.",
+    "cap": 3,
+    "tags": [
+      "economy",
+      "luck",
+      "defense"
+    ],
+    "motif": "copper dental filling with coin"
+  },
+  {
+    "id": "coins_2",
+    "family": "coins",
+    "tier": 2,
+    "name": "Silberfüllung",
+    "stats": {
+      "armor": 1,
+      "speed_bonus": -3
+    },
+    "effect": "coin_bonus",
+    "value": 0.1,
+    "description": "+1 Härte, -3 % Bewegung. +10 % Münzen beim Sammeln.",
+    "cap": 3,
+    "tags": [
+      "economy",
+      "luck",
+      "defense"
+    ],
+    "motif": "silver dental filling with coin stack"
+  },
+  {
+    "id": "coins_4",
+    "family": "coins",
+    "tier": 4,
+    "name": "Platinfüllung",
+    "stats": {
+      "luck": 12,
+      "damage_bonus": -6
+    },
+    "effect": "coin_bonus",
+    "value": 0.22,
+    "description": "+12 Glück, -6 % Schaden. +22 % Münzen beim Sammeln.",
+    "cap": 3,
+    "tags": [
+      "economy",
+      "luck",
+      "defense"
+    ],
+    "motif": "platinum tooth filling with gold coins"
+  },
+  {
+    "id": "return_1",
+    "family": "return",
+    "tier": 1,
+    "name": "Rückholfeder",
+    "stats": {
+      "ranged_damage": 1,
+      "damage_bonus": -3
+    },
+    "effect": "projectile_return",
+    "value": 0.15,
+    "description": "+1 Fernschaden, -3 % Schaden. Direkte Projektile kehren mit 15 % Schaden zurück.",
+    "cap": 2,
+    "tags": [
+      "ranged",
+      "projectile"
+    ],
+    "motif": "dental spring with turquoise return arrow"
+  },
+  {
+    "id": "return_2",
+    "family": "return",
+    "tier": 2,
+    "name": "Rücklaufspindel",
+    "stats": {
+      "ranged_damage": 2,
+      "attack_speed": -4
+    },
+    "effect": "projectile_return",
+    "value": 0.25,
+    "description": "+2 Fernschaden, -4 % Angriffstempo. Direkte Projektile kehren mit 25 % Schaden zurück.",
+    "cap": 2,
+    "tags": [
+      "ranged",
+      "projectile"
+    ],
+    "motif": "silver dental spindle with blue circular arrow"
+  },
+  {
+    "id": "return_4",
+    "family": "return",
+    "tier": 4,
+    "name": "Bumerangbohrer",
+    "stats": {
+      "ranged_damage": 3,
+      "armor": -2
+    },
+    "effect": "projectile_return",
+    "value": 0.5,
+    "description": "+3 Fernschaden, -2 Härte. Direkte Projektile kehren mit 50 % Schaden zurück (gesamt max. 70 %).",
+    "cap": 2,
+    "tags": [
+      "ranged",
+      "projectile"
+    ],
+    "motif": "gold boomerang dental drill with turquoise arrow"
+  },
+  {
+    "id": "burst_1",
+    "family": "burst",
+    "tier": 1,
+    "name": "Blitzampulle",
+    "stats": {
+      "crit_chance": 0.02,
+      "regen": -1
+    },
+    "effect": "kill_burst",
+    "value": 10,
+    "description": "+2 % Krit, -1 Regeneration. Alle 10 normalen Kills: Zahnblitz mit 10 Basisschaden.",
+    "cap": 2,
+    "tags": [
+      "area",
+      "crit"
+    ],
+    "motif": "small turquoise ampoule with golden spark"
+  },
+  {
+    "id": "burst_2",
+    "family": "burst",
+    "tier": 2,
+    "name": "Zahnblitzflasche",
+    "stats": {
+      "crit_chance": 0.03,
+      "speed_bonus": -3
+    },
+    "effect": "kill_burst",
+    "value": 18,
+    "description": "+3 % Krit, -3 % Bewegung. Alle 10 normalen Kills: Zahnblitz mit 18 Basisschaden.",
+    "cap": 2,
+    "tags": [
+      "area",
+      "crit"
+    ],
+    "motif": "ivory lightning potion bottle with tooth seal"
+  },
+  {
+    "id": "burst_4",
+    "family": "burst",
+    "tier": 4,
+    "name": "Heilige Nova",
+    "stats": {
+      "crit_chance": 0.05,
+      "max_health": -15
+    },
+    "effect": "kill_burst",
+    "value": 36,
+    "description": "+5 % Krit, -15 Leben. Alle 10 normalen Kills: Zahnblitz mit 36 Basisschaden.",
+    "cap": 2,
+    "tags": [
+      "area",
+      "crit"
+    ],
+    "motif": "gold elixir decanter with radiant tooth nova"
+  },
+  {
+    "id": "sugar_1",
+    "family": "sugar",
+    "tier": 1,
+    "name": "Zuckerwürfel",
+    "stats": {
+      "max_health": -6
+    },
+    "effect": "moving_damage",
+    "value": 0.08,
+    "description": "Beim tatsächlichen Laufen: +8 % Waffenschaden. -6 Leben.",
+    "cap": 2,
+    "tags": [
+      "mobility",
+      "risk"
+    ],
+    "motif": "pink sugar cube with tooth bite"
+  },
+  {
+    "id": "sugar_2",
+    "family": "sugar",
+    "tier": 2,
+    "name": "Kariesbonbon",
+    "stats": {
+      "armor": -1,
+      "regen": -1
+    },
+    "effect": "moving_damage",
+    "value": 0.14,
+    "description": "Beim tatsächlichen Laufen: +14 % Waffenschaden. -1 Härte, -1 Regeneration.",
+    "cap": 2,
+    "tags": [
+      "mobility",
+      "risk"
+    ],
+    "motif": "pink striped candy with dental crack"
+  },
+  {
+    "id": "sugar_4",
+    "family": "sugar",
+    "tier": 4,
+    "name": "Sündenlolli",
+    "stats": {
+      "max_health": -20,
+      "armor": -3
+    },
+    "effect": "moving_damage",
+    "value": 0.28,
+    "description": "Beim tatsächlichen Laufen: +28 % Waffenschaden (gesamt max. 40 %). -20 Leben, -3 Härte.",
+    "cap": 2,
+    "tags": [
+      "mobility",
+      "risk"
+    ],
+    "motif": "ornate forbidden golden pink lollipop"
+  },
+  {
+    "id": "xp_heal_1",
+    "family": "xp_heal",
+    "tier": 1,
+    "name": "Feenquittung",
+    "stats": {
+      "damage_bonus": -3
+    },
+    "effect": "xp_heal",
+    "value": 0.15,
+    "description": "Jeder gesammelte XP-Punkt heilt 0,15 Leben. -3 % Schaden.",
+    "cap": 2,
+    "tags": [
+      "sustain",
+      "economy",
+      "healing"
+    ],
+    "motif": "small fairy receipt scroll with tooth wax seal"
+  },
+  {
+    "id": "xp_heal_3",
+    "family": "xp_heal",
+    "tier": 3,
+    "name": "Feenvertrag",
+    "stats": {
+      "armor": -2
+    },
+    "effect": "xp_heal",
+    "value": 0.45,
+    "description": "Jeder gesammelte XP-Punkt heilt 0,45 Leben. -2 Härte.",
+    "cap": 2,
+    "tags": [
+      "sustain",
+      "economy",
+      "healing"
+    ],
+    "motif": "violet fairy contract with glowing saliva droplet"
+  },
+  {
+    "id": "xp_heal_4",
+    "family": "xp_heal",
+    "tier": 4,
+    "name": "Feenbund",
+    "stats": {
+      "max_health": -15,
+      "attack_speed": -4
+    },
+    "effect": "xp_heal",
+    "value": 0.6,
+    "description": "Jeder gesammelte XP-Punkt heilt 0,6 Leben. -15 Leben, -4 % Angriffstempo.",
+    "cap": 2,
+    "tags": [
+      "sustain",
+      "economy",
+      "healing"
+    ],
+    "motif": "gold fairy pact scroll with turquoise heart seal"
+  },
+  {
+    "id": "mythic_heart",
+    "family": "",
+    "tier": 5,
+    "name": "Herz des Urmolars",
+    "stats": {
+      "max_health": 60
+    },
+    "effect": "",
+    "value": 0,
+    "description": "+60 Leben. Einmalig pro Run. Ohne Nachteil.",
+    "cap": 1,
+    "tags": [
+      "defense",
+      "sustain"
+    ],
+    "motif": "winged ivory molar heart with rose gemstone"
+  },
+  {
+    "id": "mythic_armor",
+    "family": "",
+    "tier": 5,
+    "name": "Unvergänglicher Schmelz",
+    "stats": {
+      "armor": 8
+    },
+    "effect": "",
+    "value": 0,
+    "description": "+8 Härte. Einmalig pro Run. Ohne Nachteil.",
+    "cap": 1,
+    "tags": [
+      "defense",
+      "shield"
+    ],
+    "motif": "iridescent ivory tooth armor with halo"
+  },
+  {
+    "id": "mythic_bite",
+    "family": "",
+    "tier": 5,
+    "name": "Biss der Zahnheit",
+    "stats": {
+      "damage_bonus": 20
+    },
+    "effect": "",
+    "value": 0,
+    "description": "+20 % Schaden. Einmalig pro Run. Ohne Nachteil.",
+    "cap": 1,
+    "tags": [
+      "melee",
+      "ranged"
+    ],
+    "motif": "golden divine molar fang emblem"
+  },
+  {
+    "id": "mythic_tempo",
+    "family": "",
+    "tier": 5,
+    "name": "Ewiger Putzeifer",
+    "stats": {
+      "attack_speed": 30
+    },
+    "effect": "",
+    "value": 0,
+    "description": "+30 % Angriffstempo. Einmalig pro Run. Ohne Nachteil.",
+    "cap": 1,
+    "tags": [
+      "melee",
+      "ranged"
+    ],
+    "motif": "celestial turquoise dental hourglass with brush"
+  },
+  {
+    "id": "mythic_crit",
+    "family": "",
+    "tier": 5,
+    "name": "Makelloser Glanz",
+    "stats": {
+      "crit_chance": 0.18
+    },
+    "effect": "",
+    "value": 0,
+    "description": "+18 % Krit. Einmalig pro Run. Ohne Nachteil.",
+    "cap": 1,
+    "tags": [
+      "crit",
+      "area"
+    ],
+    "motif": "radiant iridescent diamond on ivory tooth pedestal"
+  },
+  {
+    "id": "mythic_regen",
+    "family": "",
+    "tier": 5,
+    "name": "Quelle des Lebens",
+    "stats": {
+      "regen": 8
+    },
+    "effect": "",
+    "value": 0,
+    "description": "+8 Regeneration. Einmalig pro Run. Ohne Nachteil.",
+    "cap": 1,
+    "tags": [
+      "sustain",
+      "healing"
+    ],
+    "motif": "divine turquoise saliva spring with golden halo"
+  },
+  {
+    "id": "mythic_speed",
+    "family": "",
+    "tier": 5,
+    "name": "Schritte der Zahnfee",
+    "stats": {
+      "speed_bonus": 18
+    },
+    "effect": "",
+    "value": 0,
+    "description": "+18 % Bewegung. Einmalig pro Run. Ohne Nachteil.",
+    "cap": 1,
+    "tags": [
+      "mobility",
+      "risk"
+    ],
+    "motif": "winged mint slippers with gold tooth clasp"
+  },
+  {
+    "id": "mythic_luck",
+    "family": "",
+    "tier": 5,
+    "name": "Zahnfee-Stern",
+    "stats": {
+      "luck": 50
+    },
+    "effect": "",
+    "value": 0,
+    "description": "+50 Glück. Einmalig pro Run. Ohne Nachteil.",
+    "cap": 1,
+    "tags": [
+      "luck",
+      "economy"
+    ],
+    "motif": "golden fairy star with emerald tooth clover"
+  }
+]

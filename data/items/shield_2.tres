@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"shield_2"
+display_name = "Fluoridmantel"
+description = "+28 Leben, -3 % Bewegung. Wellenbeginn: +1 Schild."
+rarity_tier = 2
+price = 9
+icon_index = 60
+stat_changes = { &"max_health": 28.0, &"speed_bonus": -3.0 }
+effect_kind = &"wave_shield"
+effect_value = 1.0
+max_stacks = 3
+family_id = &"shield"
+family_limit = 3
+tags = Array[StringName]([&"defense", &"sustain", &"shield"])

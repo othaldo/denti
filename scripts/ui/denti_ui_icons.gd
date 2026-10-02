@@ -5,6 +5,12 @@ const ITEM_ATLAS: Texture2D = preload("res://assets/items/item_icons_atlas.png")
 const ITEM_EXPANSION: Texture2D = preload("res://assets/items/item_icons_expansion.png")
 const ITEM_EXPANSION_2: Texture2D = preload("res://assets/items/item_icons_expansion_2.png")
 const ITEM_ECONOMY: Texture2D = preload("res://assets/items/item_icons_economy.png")
+const ITEM_FAMILIES: Array[Texture2D] = [
+	preload("res://assets/items/item_icons_families_1_packed.png"),
+	preload("res://assets/items/item_icons_families_2_packed.png"),
+	preload("res://assets/items/item_icons_families_3_packed.png"),
+]
+const ITEM_MYTHIC: Texture2D = preload("res://assets/items/item_icons_mythic_packed.png")
 const RELIC_ATLAS: Texture2D = preload("res://assets/relics/relic_icons_atlas.png")
 const HUD_ATLAS: Texture2D = preload("res://assets/ui/hud_icons_atlas.png")
 const STAT_ATLAS: Texture2D = preload("res://assets/ui/stat_icons_atlas.png")
@@ -25,6 +31,10 @@ const HUD_ROWS := 2
 
 
 static func item(index: int) -> Texture2D:
+	if index >= 78:
+		return _region(ITEM_MYTHIC, clampi(index - 78, 0, 7), 4, 2)
+	if index >= 30:
+		return _region(ITEM_FAMILIES[(index - 30) / 16], (index - 30) % 16, 4, 4)
 	if index >= 28:
 		return _region(ITEM_ECONOMY, clampi(index - 28, 0, 1), 2, 1)
 	if index >= 20:

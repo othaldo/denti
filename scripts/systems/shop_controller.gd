@@ -34,6 +34,62 @@ const CATALOG: Array[ShopOfferData] = [
 	preload("res://data/items/sugar_shock.tres"),
 	preload("res://data/items/gold_probe.tres"),
 	preload("res://data/items/gold_extractor.tres"),
+	preload("res://data/items/health_1.tres"),
+	preload("res://data/items/health_2.tres"),
+	preload("res://data/items/health_4.tres"),
+	preload("res://data/items/armor_2.tres"),
+	preload("res://data/items/armor_3.tres"),
+	preload("res://data/items/armor_4.tres"),
+	preload("res://data/items/damage_1.tres"),
+	preload("res://data/items/damage_2.tres"),
+	preload("res://data/items/damage_3.tres"),
+	preload("res://data/items/tempo_2.tres"),
+	preload("res://data/items/tempo_3.tres"),
+	preload("res://data/items/tempo_4.tres"),
+	preload("res://data/items/crit_1.tres"),
+	preload("res://data/items/crit_3.tres"),
+	preload("res://data/items/crit_4.tres"),
+	preload("res://data/items/regen_1.tres"),
+	preload("res://data/items/regen_3.tres"),
+	preload("res://data/items/regen_4.tres"),
+	preload("res://data/items/mobility_2.tres"),
+	preload("res://data/items/mobility_3.tres"),
+	preload("res://data/items/mobility_4.tres"),
+	preload("res://data/items/luck_1.tres"),
+	preload("res://data/items/luck_3.tres"),
+	preload("res://data/items/luck_4.tres"),
+	preload("res://data/items/bleed_2.tres"),
+	preload("res://data/items/bleed_3.tres"),
+	preload("res://data/items/bleed_4.tres"),
+	preload("res://data/items/chain_1.tres"),
+	preload("res://data/items/chain_3.tres"),
+	preload("res://data/items/chain_4.tres"),
+	preload("res://data/items/shield_2.tres"),
+	preload("res://data/items/shield_3.tres"),
+	preload("res://data/items/shield_4.tres"),
+	preload("res://data/items/coins_1.tres"),
+	preload("res://data/items/coins_2.tres"),
+	preload("res://data/items/coins_4.tres"),
+	preload("res://data/items/return_1.tres"),
+	preload("res://data/items/return_2.tres"),
+	preload("res://data/items/return_4.tres"),
+	preload("res://data/items/burst_1.tres"),
+	preload("res://data/items/burst_2.tres"),
+	preload("res://data/items/burst_4.tres"),
+	preload("res://data/items/sugar_1.tres"),
+	preload("res://data/items/sugar_2.tres"),
+	preload("res://data/items/sugar_4.tres"),
+	preload("res://data/items/xp_heal_1.tres"),
+	preload("res://data/items/xp_heal_3.tres"),
+	preload("res://data/items/xp_heal_4.tres"),
+	preload("res://data/items/mythic_heart.tres"),
+	preload("res://data/items/mythic_armor.tres"),
+	preload("res://data/items/mythic_bite.tres"),
+	preload("res://data/items/mythic_tempo.tres"),
+	preload("res://data/items/mythic_crit.tres"),
+	preload("res://data/items/mythic_regen.tres"),
+	preload("res://data/items/mythic_speed.tres"),
+	preload("res://data/items/mythic_luck.tres"),
 	preload("res://data/weapons/shop_magic_toothbrush.tres"),
 	preload("res://data/weapons/shop_turbo_drill.tres"),
 	preload("res://data/weapons/shop_floss_whip.tres"),
@@ -133,13 +189,17 @@ func _roll_offers(wave_number: int, luck: float, loadout: WeaponLoadout, items: 
 	for index in OFFER_COUNT:
 		if offers[index] != null or (preserve_existing and index < previous.size()):
 			continue
-		var tier := DentiRarity.roll(wave_number, luck, rng)
+		var tier := DentiRarity.roll_item(wave_number, luck, rng)
 		var wants_weapon := index < (2 if wave_number <= 2 else 1) or rng.randf() < WEAPON_CHANCE
-		var offer: ShopOfferData = _pick_weapon(tier, loadout) if wants_weapon else null
+		var offer: ShopOfferData = _pick_weapon(mini(tier, WeaponLoadout.MAX_TIER), loadout) if wants_weapon else null
 		if offer == null:
 			offer = _pick_item(tier, items, loadout)
 		if offer == null:
-			offer = _pick_weapon(tier, loadout)
+			offer = _pick_weapon(mini(tier, WeaponLoadout.MAX_TIER), loadout)
+		if offer == null:
+			# A full build and exhausted item pool are not a sold offer. Show a
+			# weapon the player can inspect/reserve and buy after making room.
+			offer = _pick_weapon(mini(tier, WeaponLoadout.MAX_TIER), loadout, true)
 		if offer != null:
 			offer = offer.duplicate() as ShopOfferData
 			offer.price = EconomyRules.shop_price(offer.price, wave_number)
@@ -164,10 +224,10 @@ func _pick_item(tier: int, items: ItemInventory, loadout: WeaponLoadout) -> Shop
 	return null
 
 
-func _pick_weapon(tier: int, loadout: WeaponLoadout) -> ShopOfferData:
+func _pick_weapon(tier: int, loadout: WeaponLoadout, allow_unavailable: bool = false) -> ShopOfferData:
 	var candidates: Array[ShopOfferData] = []
 	for template in CATALOG:
-		if template.weapon_data != null and loadout.can_acquire(template.weapon_data, tier) and not _already_offered(template.id, tier):
+		if template.weapon_data != null and (allow_unavailable or loadout.can_acquire(template.weapon_data, tier)) and not _already_offered(template.id, tier):
 			candidates.append(template)
 	if candidates.is_empty():
 		return null

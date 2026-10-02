@@ -191,7 +191,24 @@ func _ready() -> void:
 	_update_layout()
 
 func set_build_context(context: Player) -> void:
+	if player != context:
+		if is_instance_valid(player) and player.stats.changed.is_connected(_refresh_stats):
+			player.stats.changed.disconnect(_refresh_stats)
+		if context != null and not context.stats.changed.is_connected(_refresh_stats):
+			context.stats.changed.connect(_refresh_stats)
 	player = context
+	_refresh_stats()
+
+
+func _refresh_stats() -> void:
+	if not is_instance_valid(player) or stats_label == null:
+		return
+	stats_label.text = DentiAttributes.shop_text(player.stats)
+	luck_label.text = "%s %s" % [DentiAttributes.value_text(player.stats, DentiAttributes.Type.LUCK), DentiAttributes.name_for(DentiAttributes.Type.LUCK)]
+	var meanings: PackedStringArray = []
+	for type in DentiAttributes.ACTIVE:
+		meanings.append("%s: %s" % [DentiAttributes.name_for(type), DentiAttributes.meaning_for(type)])
+	stats_label.tooltip_text = "\n".join(meanings)
 
 func _update_layout() -> void:
 	var extent: Vector2 = $Root.size
@@ -258,7 +275,7 @@ func show_shop(wave_number: int, coins: int, reroll_cost: int, new_offers: Array
 	wallet = coins
 	title_label.text = "Zahnklinik · Welle %d" % wave_number
 	coins_label.text = str(coins)
-	luck_label.text = "%d Glück" % roundi(luck)
+	luck_label.text = "%d %s" % [roundi(luck), DentiAttributes.name_for(DentiAttributes.Type.LUCK)]
 	for index in offer_buttons.size():
 		var offer := offers[index]
 		var count := int(counts.get(str(offer.id), 0)) if offer != null else 0
@@ -268,9 +285,7 @@ func show_shop(wave_number: int, coins: int, reroll_cost: int, new_offers: Array
 			offer_buttons[index].effect_label.text = WeaponPresentation.quick_text(offer.weapon_data, offer.weapon_tier, player)
 	_show_inventory(equipment, used_slots, capacity)
 	_show_items(owned_items)
-	if player != null:
-		var s := player.stats
-		stats_label.text = "Bisskraft %+.0f %% · Härte %s · Schmelz %.0f HP\nPutzeifer %+.0f %% · Glanz %d %% Crit · Speichel %s\nBewegung %+.0f %% · Zahnglück %.0f · Nah %+.0f · Fern %+.0f" % [s.damage_bonus, s.armor_text(), s.max_health, s.attack_speed, roundi(s.crit_chance * 100), s.regen_text(), s.speed_bonus, s.luck, s.melee_damage, s.ranged_damage]
+	_refresh_stats()
 	reroll_button.text = str(reroll_cost)
 	reroll_button.disabled = coins < reroll_cost
 	if reserved.size() == ShopController.OFFER_COUNT and reserved.all(func(value: bool) -> bool: return value):
@@ -344,7 +359,7 @@ func _render_selection() -> void:
 			details.compare.add_item("Vergleichen: %s · %s" % [entry.name, ["I", "II", "III", "IV"][int(entry.tier)-1]])
 		_compare(0)
 	else:
-		details.show_item({"name": offer.display_name, "description": offer.description, "icon": offer.icon_texture if offer.icon_texture != null else ICONS.item(offer.icon_index)}, false)
+		details.show_item({"name": offer.display_name, "description": offer.effect_text() + "\n" + offer.limit_text(), "icon": offer.icon_texture if offer.icon_texture != null else ICONS.item(offer.icon_index)}, false)
 	var can_buy := available.is_empty() or available[selected_index]
 	var fusion := false
 	for entry in equipment:

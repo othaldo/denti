@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"regen_1"
+display_name = "Speicheltropfen"
+description = "+1 Regeneration, -3 % Schaden. Alle 8 normalen Kills: +1 Leben."
+rarity_tier = 1
+price = 5
+icon_index = 45
+stat_changes = { &"regen": 1.0, &"damage_bonus": -3.0 }
+effect_kind = &"kill_heal"
+effect_value = 1.0
+max_stacks = 3
+family_id = &"regen"
+family_limit = 3
+tags = Array[StringName]([&"sustain", &"healing"])

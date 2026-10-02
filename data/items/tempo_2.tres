@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"tempo_2"
+display_name = "Druckspülung"
+description = "+14 % Angriffstempo, -8 Leben. Fern-Projektile: 28 % Spritzschaden."
+rarity_tier = 2
+price = 9
+icon_index = 39
+stat_changes = { &"attack_speed": 14.0, &"max_health": -8.0 }
+effect_kind = &"splash"
+effect_value = 0.28
+max_stacks = 3
+family_id = &"tempo"
+family_limit = 3
+tags = Array[StringName]([&"ranged", &"area"])

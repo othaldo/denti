@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"xp_heal_4"
+display_name = "Feenbund"
+description = "Jeder gesammelte XP-Punkt heilt 0,6 Leben. -15 Leben, -4 % Angriffstempo."
+rarity_tier = 4
+price = 22
+icon_index = 77
+stat_changes = { &"max_health": -15.0, &"attack_speed": -4.0 }
+effect_kind = &"xp_heal"
+effect_value = 0.6
+max_stacks = 2
+family_id = &"xp_heal"
+family_limit = 2
+tags = Array[StringName]([&"sustain", &"economy", &"healing"])

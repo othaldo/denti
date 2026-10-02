@@ -21,15 +21,21 @@ func with_tier(new_tier: int) -> UpgradeData:
 
 
 func effect_text() -> String:
-	match stat:
-		&"damage_bonus": return "+%d %% Schaden" % roundi(amount)
-		&"melee_damage": return "+%d Nahschaden (Waffenskalierung)" % roundi(amount)
-		&"ranged_damage": return "+%d Fernschaden (Waffenskalierung)" % roundi(amount)
-		&"armor": return "+%d Rüstung" % roundi(amount)
-		&"max_health": return "+%d maximales Leben und Heilung" % roundi(amount)
-		&"speed_bonus": return "+%d %% Bewegung" % roundi(amount)
-		&"attack_speed": return "+%d %% Angriffstempo" % roundi(amount)
-		&"regen": return "+%d Regeneration" % roundi(amount)
-		&"crit_chance": return "+%d %% kritische Chance" % roundi(amount * 100.0)
-		&"luck": return "+%d Glück" % roundi(amount)
+	var type := DentiAttributes.from_key(stat)
+	if type >= 0:
+		var text := DentiAttributes.bonus_text(type, amount)
+		if type == DentiAttributes.Type.MAX_HEALTH:
+			text += " (HP) + Heilung"
+		elif type in [DentiAttributes.Type.MELEE_DAMAGE, DentiAttributes.Type.RANGED_DAMAGE]:
+			text += " (Waffenskalierung)"
+		return text
 	return description
+
+
+func attribute_name() -> String:
+	return DentiAttributes.name_for_key(stat) if DentiAttributes.from_key(stat) >= 0 else display_name
+
+
+func attribute_icon() -> int:
+	var type := DentiAttributes.from_key(stat)
+	return DentiAttributes.ICONS[type] if type >= 0 else icon_index

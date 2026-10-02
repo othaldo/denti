@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"burst_1"
+display_name = "Blitzampulle"
+description = "+2 % Krit, -1 Regeneration. Alle 10 normalen Kills: Zahnblitz mit 10 Basisschaden."
+rarity_tier = 1
+price = 5
+icon_index = 69
+stat_changes = { &"crit_chance": 0.02, &"regen": -1.0 }
+effect_kind = &"kill_burst"
+effect_value = 10.0
+max_stacks = 2
+family_id = &"burst"
+family_limit = 2
+tags = Array[StringName]([&"area", &"crit"])

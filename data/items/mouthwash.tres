@@ -5,10 +5,14 @@ script = ExtResource("1")
 id = &"mouthwash"
 icon_index = 3
 display_name = "Mundspülung"
-description = "+10 % Angriffstempo, -4 % Bewegung. Fern-Treffer spritzen 25 % Flächenschaden."
+description = "+10 % Angriffstempo, -4 % Bewegung. Fern-Projektile: 25 % Spritzschaden (gesamt max. 80 %)."
 price = 4
 stat_changes = { &"attack_speed": 10.0, &"speed_bonus": -4.0 }
 effect_kind = &"splash"
 effect_value = 0.25
 max_stacks = 3
 tags = Array[StringName]([&"ranged", &"area"])
+
+
+family_id = &"tempo"
+family_limit = 3

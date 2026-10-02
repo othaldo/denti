@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"health_4"
+display_name = "Herzkeramik"
+description = "+45 Leben, -5 % Bewegung. Bei Schaden: 24 Splitterschaden im Umkreis."
+rarity_tier = 4
+price = 22
+icon_index = 32
+stat_changes = { &"max_health": 45.0, &"speed_bonus": -5.0 }
+effect_kind = &"thorns"
+effect_value = 24.0
+max_stacks = 3
+family_id = &"health"
+family_limit = 3
+tags = Array[StringName]([&"defense", &"sustain", &"area"])

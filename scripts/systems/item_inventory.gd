@@ -82,7 +82,23 @@ func count(id: StringName) -> int:
 
 
 func can_acquire(item: ShopOfferData) -> bool:
-	return item != null and item.weapon_data == null and (item.max_stacks == 0 or count(item.id) < item.max_stacks)
+	if item == null or item.weapon_data != null:
+		return false
+	if item.rarity_tier == 5 and count(item.id) > 0:
+		return false
+	if item.max_stacks > 0 and count(item.id) >= item.max_stacks:
+		return false
+	return item.family_limit == 0 or family_count(item.family_id) < item.family_limit
+
+
+func family_count(family_id: StringName) -> int:
+	var total := 0
+	if family_id == &"":
+		return total
+	for template in ShopController.CATALOG:
+		if template.weapon_data == null and template.family_id == family_id:
+			total += count(template.id)
+	return total
 
 
 func acquire(item: ShopOfferData) -> bool:
@@ -101,7 +117,7 @@ func all_items() -> Array[Dictionary]:
 	for template in ShopController.CATALOG:
 		var copies := count(template.id)
 		if template.weapon_data == null and copies > 0:
-			result.append({"name": template.display_name, "count": copies, "description": template.description, "tier": template.rarity_tier, "icon": template.icon_texture if template.icon_texture != null else DentiUIIcons.item(template.icon_index)})
+			result.append({"name": template.display_name, "count": copies, "description": template.effect_text() + "\n" + template.limit_text(), "tier": template.rarity_tier, "icon": template.icon_texture if template.icon_texture != null else DentiUIIcons.item(template.icon_index)})
 	return result
 
 

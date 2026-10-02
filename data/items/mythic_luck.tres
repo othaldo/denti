@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"mythic_luck"
+display_name = "Zahnfee-Stern"
+description = "+50 Glück. Einmalig pro Run. Ohne Nachteil."
+rarity_tier = 5
+price = 38
+icon_index = 85
+stat_changes = { &"luck": 50.0 }
+effect_kind = &""
+effect_value = 0.0
+max_stacks = 1
+family_id = &""
+family_limit = 0
+tags = Array[StringName]([&"luck", &"economy"])

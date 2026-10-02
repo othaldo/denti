@@ -15,3 +15,7 @@ effect_kind = &"moving_damage"
 effect_value = 0.20
 max_stacks = 2
 tags = Array[StringName]([&"mobility", &"risk"])
+
+
+family_id = &"sugar"
+family_limit = 2

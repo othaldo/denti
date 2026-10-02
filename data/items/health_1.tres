@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"health_1"
+display_name = "Schmelzsplitter"
+description = "+12 Leben, -2 % Bewegung."
+rarity_tier = 1
+price = 5
+icon_index = 30
+stat_changes = { &"max_health": 12.0, &"speed_bonus": -2.0 }
+effect_kind = &""
+effect_value = 0.0
+max_stacks = 3
+family_id = &"health"
+family_limit = 3
+tags = Array[StringName]([&"defense", &"sustain", &"area"])

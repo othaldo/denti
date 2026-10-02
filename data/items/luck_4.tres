@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"luck_4"
+display_name = "Schicksalsmolar"
+description = "+36 Glück, -6 % Angriffstempo. +18 % gesammelte XP."
+rarity_tier = 4
+price = 22
+icon_index = 53
+stat_changes = { &"luck": 36.0, &"attack_speed": -6.0 }
+effect_kind = &"xp_bonus"
+effect_value = 0.18
+max_stacks = 3
+family_id = &"luck"
+family_limit = 3
+tags = Array[StringName]([&"luck", &"economy"])

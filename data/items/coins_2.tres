@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"coins_2"
+display_name = "Silberfüllung"
+description = "+1 Härte, -3 % Bewegung. +10 % Münzen beim Sammeln."
+rarity_tier = 2
+price = 9
+icon_index = 64
+stat_changes = { &"armor": 1.0, &"speed_bonus": -3.0 }
+effect_kind = &"coin_bonus"
+effect_value = 0.1
+max_stacks = 3
+family_id = &"coins"
+family_limit = 3
+tags = Array[StringName]([&"economy", &"luck", &"defense"])

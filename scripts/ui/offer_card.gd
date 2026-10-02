@@ -90,9 +90,9 @@ func show_offer(offer: ShopOfferData, coins: int, available: bool = true, owned_
 	name_label.text = "%s MK %s" % [offer.display_name, ["I", "II", "III", "IV"][offer.weapon_tier - 1]] if offer.weapon_data != null else offer.display_name + (" · ×%d" % owned_count if owned_count > 0 else "")
 	rarity_label.text = "%s" % DentiRarity.name_for(offer.rarity_tier)
 	if offer.weapon_data != null:
-		rarity_label.text += " · %s" % offer.weapon_data.damage_type.to_upper()
+		rarity_label.text += " · %s" % offer.weapon_data.damage_type_label().to_upper()
 	DentiUIStyle.style_rarity_label(rarity_label, offer.rarity_tier)
-	effect_label.text = offer.weapon_data.stats_text(offer.weapon_tier) if offer.weapon_data != null else offer.description
+	effect_label.text = offer.weapon_data.stats_text(offer.weapon_tier) if offer.weapon_data != null else offer.effect_text()
 	price_label.text = "%d" % offer.price
 	buy_button.disabled = coins < offer.price or not available
 	buy_button.get_child(0).modulate = Color(1, 1, 1, 0.45) if buy_button.disabled else Color.WHITE
@@ -104,9 +104,9 @@ func show_offer(offer: ShopOfferData, coins: int, available: bool = true, owned_
 		if not available:
 			tooltip_text += "\nAusrüstung voll: Platz schaffen oder passende Waffe verschmelzen"
 	else:
-		tooltip_text = "%s\n%s" % [offer.display_name, offer.description]
+		tooltip_text = "%s\n%s\n%s" % [offer.display_name, offer.effect_text(), offer.limit_text()]
 		if not available:
-			tooltip_text += "\nLimit erreicht: %d Stück" % offer.max_stacks
+			tooltip_text += "\nLimit erreicht"
 	DentiUIStyle.style_card(self, offer.rarity_tier)
 	call_deferred("_fit_content")
 

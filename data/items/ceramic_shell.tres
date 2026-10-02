@@ -5,7 +5,7 @@ script = ExtResource("1")
 id = &"ceramic_shell"
 icon_index = 7
 display_name = "Keramikschale"
-description = "+35 Leben, -5 % Schaden. Bei Treffern Keramiksplitter im Umkreis."
+description = "+35 Leben, -5 % Schaden. Bei erlittenem Schaden: 16 Basis-Splitterschaden im Umkreis."
 rarity_tier = 3
 price = 12
 stat_changes = { &"max_health": 35.0, &"damage_bonus": -5.0 }
@@ -13,3 +13,7 @@ effect_kind = &"thorns"
 effect_value = 16.0
 max_stacks = 3
 tags = Array[StringName]([&"defense", &"area"])
+
+
+family_id = &"health"
+family_limit = 3

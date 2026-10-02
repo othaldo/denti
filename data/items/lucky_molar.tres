@@ -5,7 +5,7 @@ script = ExtResource("1")
 id = &"lucky_molar"
 icon_index = 9
 display_name = "Glücks-Molar"
-description = "+20 Glück, +3 % Krit. +10 % XP beim Sammeln."
+description = "+20 Glück, +3 % Krit. +10 % gesammelte XP."
 rarity_tier = 2
 price = 8
 stat_changes = { &"luck": 20.0, &"crit_chance": 0.03 }
@@ -13,3 +13,7 @@ effect_kind = &"xp_bonus"
 effect_value = 0.10
 max_stacks = 3
 tags = Array[StringName]([&"luck", &"economy"])
+
+
+family_id = &"luck"
+family_limit = 3

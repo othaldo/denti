@@ -58,13 +58,13 @@ func show_weapon(data: WeaponData, tier: int, player: Player, equipped: bool, eq
 	clear_actions()
 	heading.text = data.display_name
 	icon.texture = data.sprite
-	subtitle.text = "%s · Stufe %s · %s · %s" % ["Ausgerüstet" if equipped else "Angebot", ["I", "II", "III", "IV"][tier - 1], data.roots_text(), data.damage_type]
+	subtitle.text = "%s · Stufe %s · %s · %s" % ["Ausgerüstet" if equipped else "Angebot", ["I", "II", "III", "IV"][tier - 1], data.roots_text(), data.damage_type_label()]
 	var current := WeaponPresentation.values(data, tier, player)
 	_clear_values()
 	_value("Treffer", "%.1f" % current.damage)
 	_value("Angriffspause", "%.2f s" % current.pause)
 	_value("Reichweite", "%d" % roundi(current.range))
-	_value("Kritisch", "%d %% · ×%.1f" % [roundi(current.crit * 100.0), current.multiplier])
+	_value(DentiAttributes.name_for(DentiAttributes.Type.CRIT_CHANCE), "%d %% · ×%.1f" % [roundi(current.crit * 100.0), current.multiplier])
 	if data.knockback_at_tier(tier) > 0:
 		_value("Rückstoß", "%d" % roundi(data.knockback_at_tier(tier)))
 	if data.splash_at_tier(tier) > 0:
@@ -88,7 +88,7 @@ func show_item(entry: Dictionary, owned: bool) -> void:
 	icon.texture = entry.get("icon")
 	subtitle.text = "×%d" % int(entry.get("count", 1)) if owned else "Item"
 	_clear_values()
-	effect.text = str(entry.get("description", ""))
+	effect.text = DentiAttributes.resolve_text(str(entry.get("description", "")))
 	effect.visible = not effect.text.is_empty()
 	synergy.visible = false
 	compare.visible = false

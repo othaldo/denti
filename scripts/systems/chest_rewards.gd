@@ -13,7 +13,7 @@ static func drop_chance(luck: float, is_elite: bool = false) -> float:
 
 
 static func roll_item(wave_number: int, luck: float, inventory: ItemInventory, rng: RandomNumberGenerator = null) -> Dictionary:
-	var tier := DentiRarity.roll(wave_number, luck, rng)
+	var tier := DentiRarity.roll_item(wave_number, luck, rng)
 	for candidate_tier in range(tier, 0, -1):
 		var pool: Array[ShopOfferData] = []
 		for item in ShopController.CATALOG:

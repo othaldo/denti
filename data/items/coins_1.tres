@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"coins_1"
+display_name = "Kupferfüllung"
+description = "+3 Glück, -5 Leben. +5 % Münzen beim Sammeln."
+rarity_tier = 1
+price = 5
+icon_index = 63
+stat_changes = { &"luck": 3.0, &"max_health": -5.0 }
+effect_kind = &"coin_bonus"
+effect_value = 0.05
+max_stacks = 3
+family_id = &"coins"
+family_limit = 3
+tags = Array[StringName]([&"economy", &"luck", &"defense"])

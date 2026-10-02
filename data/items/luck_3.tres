@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"luck_3"
+display_name = "Kleeblattkrone"
+description = "+28 Glück, -2 Härte. +14 % gesammelte XP."
+rarity_tier = 3
+price = 14
+icon_index = 52
+stat_changes = { &"luck": 28.0, &"armor": -2.0 }
+effect_kind = &"xp_bonus"
+effect_value = 0.14
+max_stacks = 3
+family_id = &"luck"
+family_limit = 3
+tags = Array[StringName]([&"luck", &"economy"])

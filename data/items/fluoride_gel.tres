@@ -12,3 +12,7 @@ effect_kind = &"wave_shield"
 effect_value = 1.0
 max_stacks = 3
 tags = Array[StringName]([&"defense", &"sustain"])
+
+
+family_id = &"shield"
+family_limit = 3

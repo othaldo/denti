@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"tempo_4"
+display_name = "Orkanspülung"
+description = "+22 % Angriffstempo, -8 % Schaden. Fern-Projektile: 40 % Spritzschaden."
+rarity_tier = 4
+price = 22
+icon_index = 41
+stat_changes = { &"attack_speed": 22.0, &"damage_bonus": -8.0 }
+effect_kind = &"splash"
+effect_value = 0.4
+max_stacks = 3
+family_id = &"tempo"
+family_limit = 3
+tags = Array[StringName]([&"ranged", &"area"])

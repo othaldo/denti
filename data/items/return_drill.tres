@@ -13,3 +13,7 @@ effect_kind = &"projectile_return"
 effect_value = 0.35
 max_stacks = 2
 tags = Array[StringName]([&"ranged", &"projectile"])
+
+
+family_id = &"return"
+family_limit = 2

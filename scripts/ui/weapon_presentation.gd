@@ -40,7 +40,7 @@ static func synergy(data: WeaponData, equipment: Array[Dictionary], player: Play
 		if other == null or other == data:
 			continue
 		if data.damage_type == "Schmelz" and other.enamel_exposure > 0.0:
-			hints.append("%s: Bonus für Schmelztreffer." % other.display_name)
+			hints.append("%s: Bonus für Schmelzbruch-Treffer." % other.display_name)
 			break
 		if data.enamel_exposure > 0.0 and other.damage_type == "Schmelz":
 			hints.append("Verstärkt %s." % other.display_name)

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"shield_4"
+display_name = "Fluoridbastion"
+description = "+35 Leben, -6 % Angriffstempo. Wellenbeginn: +2 Schilde (gesamt max. 5)."
+rarity_tier = 4
+price = 22
+icon_index = 62
+stat_changes = { &"max_health": 35.0, &"attack_speed": -6.0 }
+effect_kind = &"wave_shield"
+effect_value = 2.0
+max_stacks = 3
+family_id = &"shield"
+family_limit = 3
+tags = Array[StringName]([&"defense", &"sustain", &"shield"])

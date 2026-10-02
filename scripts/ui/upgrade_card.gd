@@ -25,16 +25,17 @@ func _ready() -> void:
 
 func show_upgrade(upgrade: UpgradeData) -> void:
 	upgrade_tier = upgrade.tier
-	upgrade_description = upgrade.description
+	upgrade_description = upgrade.effect_text()
 	custom_minimum_size.y = 186.0
 	text = ""
 	content.visible = true
-	icon_rect.texture = ICONS.stat(upgrade.icon_index)
-	name_label.text = upgrade.display_name.to_upper()
+	icon_rect.texture = ICONS.stat(upgrade.attribute_icon())
+	name_label.text = upgrade.attribute_name().to_upper()
 	rarity_label.text = "STUFE %d · %s" % [upgrade.tier, DentiRarity.name_for(upgrade.tier).to_upper()]
 	DentiUIStyle.style_rarity_label(rarity_label, upgrade.tier)
-	effect_label.text = upgrade.description
-	tooltip_text = upgrade.description
+	effect_label.text = upgrade_description
+	var attribute := DentiAttributes.from_key(upgrade.stat)
+	tooltip_text = upgrade_description + ("\n" + DentiAttributes.meaning_for(attribute) if attribute >= 0 else "")
 	disabled = false
 	DentiUIStyle.style_card(self, upgrade.tier)
 
@@ -47,7 +48,8 @@ func show_weapon(weapon: WeaponData) -> void:
 	content.visible = true
 	icon_rect.texture = weapon.sprite
 	name_label.text = weapon.display_name.to_upper()
-	rarity_label.text = "STUFE I · GEWÖHNLICH · %s" % weapon.damage_type.to_upper()
+	# All starters are tier I; keep the badge short enough for landscape cards.
+	rarity_label.text = "%s · %s" % [DentiRarity.name_for(1).to_upper(), weapon.damage_type_label().to_upper()]
 	DentiUIStyle.style_rarity_label(rarity_label, 1)
 	effect_label.text = "%s\n%d Schaden · %.2f s\n%d Reichweite" % [weapon.description, roundi(weapon.damage_at_tier(1)), weapon.interval_at_tier(1), roundi(weapon.attack_range)]
 	tooltip_text = "%s\n%s" % [weapon.description, weapon.combat_text()]
@@ -63,7 +65,7 @@ func show_item(item: ShopOfferData) -> void:
 	name_label.text = item.display_name.to_upper()
 	rarity_label.text = "STUFE %d · %s" % [item.rarity_tier, DentiRarity.name_for(item.rarity_tier).to_upper()]
 	DentiUIStyle.style_rarity_label(rarity_label, item.rarity_tier)
-	effect_label.text = "BEHALTEN\n%s" % item.description
+	effect_label.text = "BEHALTEN\n%s" % item.effect_text()
 	disabled = false
 	DentiUIStyle.style_card(self, item.rarity_tier)
 
@@ -76,7 +78,7 @@ func show_relic(relic: RelicData) -> void:
 	name_label.text = relic.display_name.to_upper()
 	rarity_label.text = "GÖTTLICHES RELIKT"
 	DentiUIStyle.style_rarity_label(rarity_label, 4)
-	effect_label.text = relic.description
+	effect_label.text = DentiAttributes.resolve_text(relic.description)
 	disabled = false
 	DentiUIStyle.style_card(self, 4)
 
@@ -101,9 +103,9 @@ func set_upgrade_layout(narrow: bool, compact: bool) -> void:
 	name_label.custom_minimum_size.y = 34 if narrow else 26
 	name_label.add_theme_font_size_override("font_size", 12 if narrow else 18)
 	effect_label.add_theme_font_size_override("font_size", 15 if narrow else 17)
-	effect_label.text = upgrade_description.replace(" (Waffenskalierung)", "").replace("maximales Leben und Heilung", "Leben + Heilung").replace("kritische Chance", "Crit") if compact or narrow else upgrade_description
+	effect_label.text = upgrade_description.replace(" (Waffenskalierung)", "") if compact or narrow else upgrade_description
 	if narrow:
-		effect_label.text = effect_label.text.replace("Angriffstempo", "Tempo")
+		effect_label.text = effect_label.text.replace(" (HP) + Heilung", " + Heilung")
 	rarity_label.text = DentiRarity.name_for(upgrade_tier).to_upper()
 	rarity_label.clip_text = true
 	rarity_label.size_flags_horizontal = Control.SIZE_FILL

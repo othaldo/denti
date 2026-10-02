@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"crit_3"
+display_name = "Diamantpaste"
+description = "+10 % Krit, -5 % Angriffstempo. Krits: Blitz mit 45 % Trefferschaden."
+rarity_tier = 3
+price = 14
+icon_index = 43
+stat_changes = { &"crit_chance": 0.1, &"attack_speed": -5.0 }
+effect_kind = &"crit_burst"
+effect_value = 0.45
+max_stacks = 3
+family_id = &"crit"
+family_limit = 3
+tags = Array[StringName]([&"crit", &"area"])

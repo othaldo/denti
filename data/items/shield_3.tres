@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"shield_3"
+display_name = "Fluoridpanzer"
+description = "+30 Leben, -1 Härte. Wellenbeginn: +2 Schilde (gesamt max. 5)."
+rarity_tier = 3
+price = 14
+icon_index = 61
+stat_changes = { &"max_health": 30.0, &"armor": -1.0 }
+effect_kind = &"wave_shield"
+effect_value = 2.0
+max_stacks = 3
+family_id = &"shield"
+family_limit = 3
+tags = Array[StringName]([&"defense", &"sustain", &"shield"])

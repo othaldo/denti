@@ -13,3 +13,7 @@ effect_kind = &"boss_bonus"
 effect_value = 0.25
 max_stacks = 2
 tags = Array[StringName]([&"boss", &"melee"])
+
+
+family_id = &"damage"
+family_limit = 2

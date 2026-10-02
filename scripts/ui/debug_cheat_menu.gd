@@ -3,16 +3,16 @@ extends CanvasLayer
 
 const STAT_FIELDS := [
 	["health", "Leben", 1.0, 100000.0, 1.0],
-	["max_health", "Max. Leben", 1.0, 100000.0, 1.0],
-	["damage_bonus", "Bisskraft · %", -1000.0, 10000.0, 1.0],
-	["melee_damage", "Nahschaden", -1000.0, 10000.0, 1.0],
-	["ranged_damage", "Fernschaden", -1000.0, 10000.0, 1.0],
-	["armor", "Härte", -1000.0, 10000.0, 1.0],
-	["attack_speed", "Putzeifer · %", -1000.0, 10000.0, 1.0],
-	["speed_bonus", "Bewegung · %", -100.0, 1000.0, 1.0],
-	["regen", "Speichel · Punkte", -100.0, 1000.0, 1.0],
-	["crit_chance", "Glanz · %", 0.0, 65.0, 1.0],
-	["luck", "Glück", 0.0, 10000.0, 1.0],
+	[DentiAttributes.KEYS[DentiAttributes.Type.MAX_HEALTH], "", 1.0, 100000.0, 1.0],
+	[DentiAttributes.KEYS[DentiAttributes.Type.DAMAGE], "", -1000.0, 10000.0, 1.0],
+	[DentiAttributes.KEYS[DentiAttributes.Type.MELEE_DAMAGE], "", -1000.0, 10000.0, 1.0],
+	[DentiAttributes.KEYS[DentiAttributes.Type.RANGED_DAMAGE], "", -1000.0, 10000.0, 1.0],
+	[DentiAttributes.KEYS[DentiAttributes.Type.ARMOR], "", -1000.0, 10000.0, 1.0],
+	[DentiAttributes.KEYS[DentiAttributes.Type.ATTACK_SPEED], "", -1000.0, 10000.0, 1.0],
+	[DentiAttributes.KEYS[DentiAttributes.Type.MOVEMENT], "", -100.0, 1000.0, 1.0],
+	[DentiAttributes.KEYS[DentiAttributes.Type.REGEN], "", -100.0, 1000.0, 1.0],
+	[DentiAttributes.KEYS[DentiAttributes.Type.CRIT_CHANCE], "", 0.0, 65.0, 1.0],
+	[DentiAttributes.KEYS[DentiAttributes.Type.LUCK], "", 0.0, 10000.0, 1.0],
 	["shield_charges", "Schild", 0.0, 5.0, 1.0],
 ]
 
@@ -160,7 +160,11 @@ func _build_ui() -> void:
 	grid.columns = 2
 	stat_tab.add_child(grid)
 	for field in STAT_FIELDS:
-		grid.add_child(_label(str(field[1])))
+		var type := DentiAttributes.from_key(StringName(field[0]))
+		var label := _label(DentiAttributes.name_for(type) + (" · %" if DentiAttributes.is_percent(type) else "") if type >= 0 else str(field[1]))
+		if type >= 0:
+			label.tooltip_text = DentiAttributes.meaning_for(type)
+		grid.add_child(label)
 		stats[field[0]] = _spin(grid, field[2], field[3], field[4], 0)
 	_button(stat_tab, "Übernehmen", _apply_stats)
 	var run := _tab(tabs, "Run")
@@ -273,7 +277,7 @@ func _refresh_weapon_button() -> void:
 func _refresh_item_detail() -> void:
 	var item := item_list[item_select.selected]
 	var count: int = controls.game.items.count(item.id)
-	item_detail.text = "%s\n%d%s" % [item.description, count, "/%d" % item.max_stacks if item.max_stacks > 0 else ""]
+	item_detail.text = "%s\n%d%s" % [item.effect_text(), count, "/%d" % item.max_stacks if item.max_stacks > 0 else ""]
 
 
 func _add_weapon() -> void:

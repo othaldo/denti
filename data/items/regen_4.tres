@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"regen_4"
+display_name = "Speicheloase"
+description = "+6 Regeneration, -6 % Angriffstempo. Alle 8 normalen Kills: +6 Leben."
+rarity_tier = 4
+price = 22
+icon_index = 47
+stat_changes = { &"regen": 6.0, &"attack_speed": -6.0 }
+effect_kind = &"kill_heal"
+effect_value = 6.0
+max_stacks = 3
+family_id = &"regen"
+family_limit = 3
+tags = Array[StringName]([&"sustain", &"healing"])
