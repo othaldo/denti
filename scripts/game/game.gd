@@ -51,10 +51,21 @@ var autosave_timer: float = 0.0
 var camera_shake_time: float = 0.0
 var telemetry := RunTelemetry.new()
 var rewards := PostWaveRewards.new()
+var story := StoryProgress.new()
+var story_dialogue: StoryDialogue
+var story_travel: StoryTravel
 
 
 func _ready() -> void:
 	randomize()
+	story_dialogue = StoryDialogue.new()
+	add_child(story_dialogue)
+	story_dialogue.advance_requested.connect(_on_story_advance)
+	story_travel = StoryTravel.new()
+	add_child(story_travel)
+	story_travel.arrived.connect(_on_story_arrived)
+	story_travel.finished.connect(_on_story_travel_finished)
+	story_travel.reveal_finished.connect(_save_run)
 	wave.difficulty_id = session.selected_difficulty_id
 	wave.enemy_requested.connect(_spawn_enemy)
 	wave.boss_requested.connect(_spawn_enemy)
@@ -103,10 +114,90 @@ func _ready() -> void:
 			_restore_run(saved)
 			return
 	player.global_position = arena.arena_size / 2.0
+	if session.selected_story_mode:
+		story.start()
+		arena.set_story_chapter(StoryCatalog.chapter(0))
+		_show_story_line()
+		return
+	_show_starters()
+
+
+func _show_starters() -> void:
 	starter_pending = true
 	choice_panel.show_starters(WeaponCatalog.STARTERS)
 	get_tree().paused = true
 	_save_run()
+
+
+func _show_story_line() -> void:
+	var lines := StoryCatalog.dialogue(story.dialogue_id)
+	if lines.is_empty():
+		return
+	choice_panel.visible = false
+	shop_panel.visible = false
+	hud.visible = false
+	var line := lines[story.dialogue_line]
+	story_dialogue.show_line(line, StoryCatalog.chapter(story.chapter_index), story.dialogue_line, lines.size())
+	get_tree().paused = true
+	_save_run()
+
+
+func _on_story_advance() -> void:
+	if not story_dialogue.visible or story.dialogue_id == &"":
+		return
+	var lines := StoryCatalog.dialogue(story.dialogue_id)
+	var line := lines[story.dialogue_line]
+	if line.has("enter") and story.chapter_index < int(line.enter):
+		story.travel_target = int(line.enter)
+		story.travel_progress = 0
+		_show_story_travel()
+		return
+	if story.dialogue_line + 1 < lines.size():
+		story.dialogue_line += 1
+		_show_story_line()
+		return
+	var next := story.followup
+	story.dialogue_id = &""
+	story.dialogue_line = 0
+	story.followup = &""
+	story_dialogue.visible = false
+	hud.visible = true
+	if next == &"starter":
+		_show_starters()
+	elif next == &"wave":
+		story.greeted_boss_wave = wave.current_wave + 1
+		_start_combat_wave()
+	else:
+		rewards.resolve_story()
+		_advance_post_wave_rewards()
+
+
+func _show_story_travel() -> void:
+	story_dialogue.visible = false
+	choice_panel.visible = false
+	shop_panel.visible = false
+	hud.visible = false
+	get_tree().paused = true
+	story_travel.present(story)
+	_save_run()
+
+
+func _on_story_arrived(index: int) -> void:
+	story.arrive(index)
+	arena.set_story_chapter(StoryCatalog.chapter(index))
+	player.global_position = arena.arena_size / 2.0
+	var camera: Camera2D = player.get_node("Camera2D")
+	camera.reset_smoothing()
+	camera.force_update_scroll()
+	_save_run()
+
+
+func _on_story_travel_finished() -> void:
+	story.travel_target = -1
+	story.travel_progress = 0
+	story_travel.visible = false
+	story.dialogue_line += 1
+	_show_story_line()
 
 
 func _on_starter_chosen(weapon: WeaponData) -> void:
@@ -114,6 +205,10 @@ func _on_starter_chosen(weapon: WeaponData) -> void:
 		return
 	player.loadout.acquire(weapon)
 	starter_pending = false
+	_start_combat_wave()
+
+
+func _start_combat_wave() -> void:
 	rewards.begin_wave()
 	var profile_id := wave.prepare_next_wave_profile()
 	telemetry.begin_wave(wave.current_wave + 1, profile_id)
@@ -122,11 +217,12 @@ func _on_starter_chosen(weapon: WeaponData) -> void:
 	relics.on_wave_start()
 	_sync_music()
 	get_tree().paused = false
+	_refresh_hud()
 	_save_run()
 
 
 func _process(delta: float) -> void:
-	mobile_controls.set_combat_active(not ended and not in_shop and not starter_pending and not collecting_wave_loot and not choice_panel.visible and not shop_panel.visible and not game_menu.visible and (wave.active or boss_pending))
+	mobile_controls.set_combat_active(not ended and not in_shop and not starter_pending and not collecting_wave_loot and not choice_panel.visible and not shop_panel.visible and not story_dialogue.visible and not story_travel.visible and not game_menu.visible and (wave.active or boss_pending))
 	if not ended and (wave.active or boss_pending):
 		telemetry.tick(delta, $Enemies.get_child_count(), $EnemyProjectiles.get_child_count())
 	_refresh_hud()
@@ -149,7 +245,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		hud.toggle_telemetry()
 		get_viewport().set_input_as_handled()
 		return
-	if event.is_action_pressed("ui_cancel") and not ended and not collecting_wave_loot and not choice_panel.visible and not shop_panel.visible and not game_menu.visible:
+	if event.is_action_pressed("ui_cancel") and not ended and not collecting_wave_loot and not choice_panel.visible and not shop_panel.visible and not story_dialogue.visible and not story_travel.visible and not game_menu.visible:
 		get_viewport().set_input_as_handled()
 		game_menu.open_pause()
 
@@ -528,6 +624,11 @@ func _finish_loot_collection() -> void:
 	telemetry.record_loot(&"coin", interest, &"interest")
 	if (wave.current_wave < WaveController.MAX_WAVES or wave.current_wave > WaveController.MAX_WAVES and wave.current_wave % 10 == 0) and WaveController.is_boss_wave(wave.current_wave) and rewards.pending_relics.is_empty():
 		rewards.queue_relics(RelicCatalog.choices(relics.owned))
+	if story.enabled and wave.current_wave > story.completed_boss_wave:
+		var dialogue_id := StoryCatalog.after_boss(wave.current_wave)
+		if dialogue_id != &"":
+			rewards.queue_story(dialogue_id)
+			story.completed_boss_wave = wave.current_wave
 	rewards.finish_collection(wave.current_wave >= WaveController.MAX_WAVES and not wave.endless_enabled)
 	_advance_post_wave_rewards()
 
@@ -559,6 +660,10 @@ func _advance_post_wave_rewards() -> void:
 			choice_panel.show_relics(options)
 			get_tree().paused = true
 			_save_run()
+		PostWaveRewards.Step.STORY:
+			if story.dialogue_id == &"":
+				story.begin_dialogue(rewards.pending_story, &"rewards")
+			_show_story_line()
 		PostWaveRewards.Step.SHOP:
 			_open_shop()
 		PostWaveRewards.Step.END:
@@ -639,6 +744,7 @@ func _open_shop() -> void:
 
 
 func _update_shop_panel() -> void:
+	shop_panel.story_timeline.show_progress(story, wave.current_wave)
 	var equipment: Array[Dictionary] = []
 	var weapons := player.loadout.equipped()
 	for index in weapons.size():
@@ -740,16 +846,14 @@ func _on_shop_continue() -> void:
 	boss_pending = false
 	_clear_arena(false)
 	player.global_position = arena.arena_size / 2.0
-	rewards.begin_wave()
-	var profile_id := wave.prepare_next_wave_profile()
-	telemetry.begin_wave(wave.current_wave + 1, profile_id)
-	wave.start_next_wave()
-	items.on_wave_start()
-	relics.on_wave_start()
-	_sync_music()
-	get_tree().paused = false
-	_refresh_hud()
-	_save_run()
+	var next_wave := wave.current_wave + 1
+	var boss_dialogue := StoryCatalog.before_boss(next_wave)
+	if story.enabled and not wave.endless_enabled and boss_dialogue != &"" and story.greeted_boss_wave < next_wave:
+		player.get_node("Camera2D").force_update_scroll()
+		story.begin_dialogue(boss_dialogue, &"wave")
+		_show_story_line()
+		return
+	_start_combat_wave()
 
 
 func _on_player_died() -> void:
@@ -860,7 +964,7 @@ func _restore_run(saved: Dictionary) -> void:
 
 
 func _sync_music() -> void:
-	if ended or starter_pending:
+	if ended or starter_pending or story.dialogue_id == &"intro":
 		music.fade_out_and_stop()
 	elif boss_pending:
 		music.play_boss_overtime(wave.current_wave)

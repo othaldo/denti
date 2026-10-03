@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="StoryChapter" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/story_chapter.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/environment/story/acid.png" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/cavity_king.tres" id="3"]
+
+[resource]
+script = ExtResource("1")
+boss = ExtResource("3")
+boss_dialogue = Array[Dictionary]([{"speaker":"Karies-König","text":"Ein unbeschädigter Backenzahn. Selten. Dich stelle ich zu meinen besten Stücken."},
+{"speaker":"Denti","text":"Du sammelst Zähne? Ich sammle Portalfragmente. Deins fehlt noch."},
+{"speaker":"Karies-König","text":"Dafür müsste von dir erst etwas übrig bleiben."},
+{"speaker":"Denti","text":"Schmelz ist das härteste Material im Körper. Du bist nur Säure mit Selbstbewusstsein.","action":"Kämpfen"}])
+id = &"acid"
+title = "Tief im Säurestrom"
+objective = "Befreie das dritte Portalfragment."
+floor_texture = ExtResource("2")
+wall_color = Color(0.2627450980392157, 0.3607843137254902, 0.3568627450980392, 1)
+void_color = Color(0.12549019607843137, 0.1803921568627451, 0.19215686274509805, 1)
+trim_color = Color(0.5882352941176471, 0.7254901960784313, 0.6509803921568628, 1)
+arrival_dialogue = Array[Dictionary]([{"speaker":"Denti","text":"Zwei Fragmente. Und Zucker zwischen allen Wurzeln."},
+{"speaker":"Zahnfee","text":"Das nächste Portal ist offen. Lass die Süßigkeiten liegen."},
+{"speaker":"Denti","text":"Keine Sorge. Ich habe genug davon.","enter":2},
+{"speaker":"Denti","text":"Mundspülung? Das riecht eher nach Rohrreiniger."}])

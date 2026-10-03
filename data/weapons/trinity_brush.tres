@@ -31,7 +31,7 @@ price = 9
 held_style = "aimed"
 upright_at_rest = true
 attack_animation = "shoot"
-tip_anchor = Vector2(0.84, 0.15)
+tip_anchor = Vector2(0.72, 0.08)
 visual_size = 70.0
 animation_duration = 0.28
 

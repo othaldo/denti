@@ -62,6 +62,8 @@ var build_portrait: TextureRect
 var detail_overlay: Control
 var detail_popup: PanelContainer
 var popup_layout_queued := false
+var story_timeline: StoryTimeline
+var displayed_wave: int = 0
 
 func _ready() -> void:
 	visible = false
@@ -79,6 +81,8 @@ func _ready() -> void:
 	titles.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(titles)
 	title_label = ShopDetails._label(titles, "Zahnklinik", 27)
+	title_label.clip_text = true
+	title_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	var wallet_box := VBoxContainer.new()
 	wallet_box.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	header.add_child(wallet_box)
@@ -97,6 +101,9 @@ func _ready() -> void:
 	luck_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	coins_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	coins_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	story_timeline = StoryTimeline.new()
+	rows.add_child(story_timeline)
+	story_timeline.visible = false
 	main_scroll = ScrollContainer.new()
 	main_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	main_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -258,7 +265,7 @@ func _update_layout() -> void:
 	flow.vertical = compact
 	shop_actions.vertical = narrow and extent.y >= 480
 	detail_actions.vertical = narrow and extent.y >= 480
-	title_label.add_theme_font_size_override("font_size", 21 if extent.y < 480 else 27)
+	_refresh_header()
 	details.heading.add_theme_font_size_override("font_size", 17 if narrow else 21)
 	details.icon.custom_minimum_size = Vector2(48, 48) if narrow else Vector2(64, 64)
 	left_scroll.custom_minimum_size.x = 0 if compact else 280
@@ -296,6 +303,14 @@ func _update_layout() -> void:
 			card.icon_rect.custom_minimum_size = Vector2(152, 152)
 	_layout_inventory()
 	call_deferred("_size_offer_grid")
+
+func _refresh_header() -> void:
+	var extent: Vector2 = $Root.size
+	var narrow := extent.x < 600
+	title_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	title_label.text = ("Klinik · %d" if narrow else "Zahnklinik · Welle %d") % displayed_wave
+	title_label.add_theme_font_size_override("font_size", 18 if narrow else (21 if extent.y < 480 else 27))
+
 
 func _size_offer_grid() -> void:
 	if offers_grid == null:
@@ -349,6 +364,7 @@ func _layout_inventory() -> void:
 
 
 func show_shop(wave_number: int, coins: int, reroll_cost: int, new_offers: Array[ShopOfferData], new_equipment: Array[Dictionary] = [], used_slots: int = 0, capacity: int = 6, buyable: Array[bool] = [], luck: float = 0.0, collected: Array[Dictionary] = [], counts: Dictionary = {}, offer_dps: Array[float] = [], reserved: Array[bool] = []) -> void:
+	displayed_wave = wave_number
 	if not visible:
 		close_details()
 		main_scroll.scroll_vertical = 0
@@ -358,7 +374,7 @@ func show_shop(wave_number: int, coins: int, reroll_cost: int, new_offers: Array
 	owned_items = collected
 	available = buyable
 	wallet = coins
-	title_label.text = "Zahnklinik · Welle %d" % wave_number
+	_refresh_header()
 	coins_label.text = str(coins)
 	luck_label.text = "%d %s" % [roundi(luck), DentiAttributes.name_for(DentiAttributes.Type.LUCK)]
 	for index in offer_buttons.size():

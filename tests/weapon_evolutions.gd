@@ -120,7 +120,7 @@ func _run() -> void:
 		var weapon: WeaponInstance = game.player.loadout.equipped()[0]
 		weapon.set_physics_process(false)
 		var effects: WeaponEvolutionEffects = weapon.evolution
-		var a := enemy(game.player.global_position + Vector2(65, 0))
+		var a := enemy(game.player.global_position + Vector2(230, 0))
 		var b := enemy(a.global_position + Vector2(45, 0))
 		var targets: Array[Enemy] = [a, b]
 		match recipe.result.evolution_kind:

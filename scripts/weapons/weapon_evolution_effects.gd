@@ -23,7 +23,7 @@ func on_attack(targets: Array[Enemy], damage: float, critical: bool) -> bool:
 	if weapon.data.evolution_kind != &"revelation":
 		return false
 	charge_time = weapon.data.evolution_duration
-	charge_origin = weapon.player.global_position
+	charge_origin = weapon.muzzle_position()
 	charge_direction = weapon.aim
 	charge_damage = damage
 	charge_critical = critical
@@ -53,11 +53,11 @@ func on_hit(enemy: Enemy, amount: float, _critical: bool) -> void:
 			drill_charge += 1
 			if drill_charge >= data.evolution_threshold:
 				drill_charge = 0
-				var origin := weapon.player.global_position
+				var origin := weapon.muzzle_position()
 				var aim := origin.direction_to(enemy.global_position)
 				var end := origin + aim * data.evolution_radius
 				_line_damage(origin, end, amount * data.evolution_damage_factor, data.attack_width * 1.5, false)
-				_flash(origin, end)
+				_flash(origin, end, true, aim, data.evolution_radius)
 		&"trinity":
 			var id := enemy.get_instance_id()
 			if marks.has(id):
@@ -111,12 +111,17 @@ func _physics_process(delta: float) -> void:
 			_flash(a.global_position, b.global_position)
 			threads.remove_at(index)
 	if charge_time > 0:
+		weapon._track_beam()
+		charge_origin = weapon.muzzle_position()
+		charge_direction = weapon.aim
 		charge_time = maxf(charge_time - delta, 0)
 		if charge_time <= 0:
 			_release_beam()
 	queue_redraw()
 
 func _release_beam() -> void:
+	charge_origin = weapon.muzzle_position()
+	charge_direction = weapon.aim
 	var directions: Array[Vector2] = [charge_direction]
 	if charge_critical:
 		directions.append(charge_direction.rotated(-0.35))
@@ -128,7 +133,7 @@ func _release_beam() -> void:
 			var closest := Geometry2D.get_closest_point_to_segment(enemy.global_position, charge_origin, end)
 			if closest.distance_to(enemy.global_position) <= weapon.data.attack_width * 0.5 + enemy.data.radius:
 				WeaponAttackShapes.hit(enemy, weapon.data, weapon.tier, damage, charge_critical, weapon.player.items, directions[index])
-		_flash(charge_origin, end)
+		_flash(charge_origin, end, true, directions[index], weapon.data.range_at_tier(weapon.tier), directions[index].angle() - charge_direction.angle())
 
 func _line_damage(start: Vector2, end: Vector2, amount: float, width: float, bleed: bool) -> void:
 	for enemy in _enemies():
@@ -156,8 +161,8 @@ func _nearest(excluded: Enemy, radius: float) -> Enemy:
 			result = enemy
 	return result
 
-func _flash(start: Vector2, end: Vector2) -> void:
-	flashes.append({"a": start, "b": end, "life": 0.22})
+func _flash(start: Vector2, end: Vector2, mounted: bool = false, direction: Vector2 = Vector2.ZERO, reach: float = 0.0, angle: float = 0.0) -> void:
+	flashes.append({"a": start, "b": end, "life": 0.22, "mounted": mounted, "direction": direction, "reach": reach, "angle": angle})
 	if flashes.size() > 32:
 		flashes.pop_front()
 
@@ -178,11 +183,29 @@ func _draw() -> void:
 		if is_instance_valid(enemy):
 			draw_arc(to_local(enemy.global_position), enemy.data.radius + 5, 0, TAU, 16, Color(color, 0.65), 2)
 	for flash in flashes:
-		draw_line(to_local(flash.a), to_local(flash.b), Color(color, float(flash.life) / 0.22), 3)
+		var line := flash_segment(flash)
+		var width := weapon.data.attack_width if weapon.data.evolution_kind == &"revelation" and flash.get("mounted", false) else 3.0
+		draw_line(to_local(line[0]), to_local(line[1]), Color(color, float(flash.life) / 0.22 * 0.18), width)
+		draw_line(to_local(line[0]), to_local(line[1]), Color(color, float(flash.life) / 0.22), 3)
 	if charge_time > 0:
-		draw_line(to_local(charge_origin), to_local(charge_origin + charge_direction * weapon.data.range_at_tier(weapon.tier)), Color(color, 0.4), 2)
+		var start := weapon.muzzle_position()
+		draw_line(to_local(start), to_local(start + weapon.aim * weapon.data.range_at_tier(weapon.tier)), Color(color, 0.4), 2)
+		var pulse := 6.0 + (1.0 - charge_time / weapon.data.evolution_duration) * 7.0
+		draw_arc(to_local(weapon.muzzle_position()), pulse, 0, TAU, 24, Color(color, 0.8), 2)
+
+func flash_segment(flash: Dictionary) -> PackedVector2Array:
+	if not flash.get("mounted", false):
+		return PackedVector2Array([flash.a, flash.b])
+	var start := weapon.muzzle_position()
+	var direction: Vector2 = weapon.aim.rotated(float(flash.angle)) if weapon.data.evolution_kind == &"revelation" else flash.direction
+	return PackedVector2Array([start, start + direction * float(flash.reach)])
 
 func save_state(indices: Dictionary) -> Dictionary:
+	var saved_flashes: Array[Dictionary] = []
+	for flash in flashes:
+		saved_flashes.append({"ax": flash.a.x, "ay": flash.a.y, "bx": flash.b.x, "by": flash.b.y,
+			"life": flash.life, "mounted": flash.get("mounted", false), "dx": flash.direction.x,
+			"dy": flash.direction.y, "reach": flash.reach, "angle": flash.angle})
 	var saved_pools: Array[Dictionary] = []
 	for pool in pools:
 		saved_pools.append({"x": pool.at.x, "y": pool.at.y, "life": pool.life, "tick": pool.tick, "damage": pool.damage})
@@ -194,12 +217,18 @@ func save_state(indices: Dictionary) -> Dictionary:
 	for id in marks:
 		if indices.has(id):
 			saved_marks.append({"enemy": indices[id], "life": marks[id]})
-	return {"pools": saved_pools, "threads": saved_threads, "marks": saved_marks, "wait": proc_wait, "drill": drill_charge, "target": indices.get(drill_target, -1), "charge": charge_time, "x": charge_origin.x, "y": charge_origin.y, "dx": charge_direction.x, "dy": charge_direction.y, "damage": charge_damage, "critical": charge_critical}
+	return {"flashes": saved_flashes, "pools": saved_pools, "threads": saved_threads, "marks": saved_marks, "wait": proc_wait, "drill": drill_charge, "target": indices.get(drill_target, -1), "charge": charge_time, "x": charge_origin.x, "y": charge_origin.y, "dx": charge_direction.x, "dy": charge_direction.y, "damage": charge_damage, "critical": charge_critical}
 
 func restore_state(saved: Dictionary, enemies: Array[Node]) -> void:
 	pools.clear()
 	threads.clear()
 	marks.clear()
+	flashes.clear()
+	for entry in saved.get("flashes", []):
+		if flashes.size() < 32:
+			flashes.append({"a": Vector2(entry.ax, entry.ay), "b": Vector2(entry.bx, entry.by), "life": clampf(entry.life, 0, 0.22),
+				"mounted": bool(entry.get("mounted", false)), "direction": Vector2(entry.get("dx", 1), entry.get("dy", 0)),
+				"reach": maxf(entry.get("reach", 0), 0), "angle": float(entry.get("angle", 0))})
 	proc_wait = clampf(float(saved.get("wait", 0)), 0, weapon.data.evolution_interval)
 	drill_charge = clampi(int(saved.get("drill", 0)), 0, weapon.data.evolution_threshold - 1)
 	drill_target = _restored_id(int(saved.get("target", -1)), enemies)

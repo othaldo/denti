@@ -59,6 +59,12 @@ func _run() -> void:
 	along = _enemy(Vector2(450, 0))
 	side = _enemy(Vector2(0, 150))
 	var uv := _equip(&"uv_lamp")
+	# A piercing ray follows the offset barrel, not an invisible line from Denti.
+	uv.hold_position = WeaponMotion.hand_position(uv.home_position, Vector2.RIGHT)
+	uv.attack_time = uv.attack_duration
+	uv.aim_at(front.global_position)
+	along.global_position = uv.muzzle_position() + uv.aim * 450
+	uv.attack_time = 0
 	uv._physics_process(0.01)
 	if front.health >= 10000.0 or along.health >= 10000.0 or side.health != 10000.0:
 		_fail("UV did not pierce along the whole beam")

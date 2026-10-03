@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="StoryChapter" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/story_chapter.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/environment/story/sugar.png" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/cavity_prince.tres" id="3"]
+
+[resource]
+script = ExtResource("1")
+boss = ExtResource("3")
+boss_dialogue = Array[Dictionary]([{"speaker":"Karies-Prinz","text":"Willkommen in meinem Reich! Möchtest du in Karamell oder Zuckerguss untergehen?"},
+{"speaker":"Denti","text":"Ich kaue Brotkrusten. Deinen Zuckerguss bekomme ich auch klein."},
+{"speaker":"Karies-Prinz","text":"Schade. Hier bleibt jeder kleben."},
+{"speaker":"Denti","text":"Zucker ist nur Karies im Kostüm. Ich seh durch.","action":"Kämpfen"}])
+id = &"sugar"
+title = "Das süße Verderben"
+objective = "Finde das zweite Portalfragment."
+floor_texture = ExtResource("2")
+wall_color = Color(0.4588235294117647, 0.3137254901960784, 0.2980392156862745, 1)
+void_color = Color(0.2, 0.13725490196078433, 0.15294117647058825, 1)
+trim_color = Color(0.8352941176470589, 0.6431372549019608, 0.43137254901960786, 1)
+arrival_dialogue = Array[Dictionary]([{"speaker":"Denti","text":"Ein Fragment. Das Portal hat wieder einen Zahn."},
+{"speaker":"Zahnfee","text":"Es führt weiter. Ich kann dich noch nicht nach Hause holen."},
+{"speaker":"Denti","text":"Na gut. Wurzeln einziehen und durch.","enter":1},
+{"speaker":"Denti","text":"Alles klebt. Sogar der Boden. Das wird teuer für die Zahnfee."}])

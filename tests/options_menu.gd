@@ -85,10 +85,10 @@ func _run() -> void:
 	var back_button: Button = menu.rows.get_child(9)
 	back_button.pressed.emit()
 	await process_frame
-	if menu.page != &"home" or menu.rows.get_child_count() != 10:
+	if menu.page != &"home" or menu.rows.get_child_count() != 11:
 		_fail("options back button failed")
 		return
-	var options_button: Button = menu.rows.get_child(5)
+	var options_button: Button = menu.rows.get_child(6)
 	options_button.pressed.emit()
 	await process_frame
 	if menu.page != &"options" or menu.rows.get_child_count() != 10 or menu.fps_toggle.button_pressed != selected_fps or int(menu.master_slider.value) != 37 or int(menu.music_slider.value) != 62 or int(menu.sfx_slider.value) != 15 or menu.ui_sound_toggle.button_pressed or not menu.motion_toggle.button_pressed:

@@ -22,6 +22,7 @@ var motion_toggle: CheckButton
 var menu_stage: HBoxContainer
 var hero: TextureRect
 var dentipedia: Dentipedia
+var title_logo: TextureRect
 @onready var session: Node = get_node("/root/GameSession")
 
 
@@ -47,7 +48,7 @@ func open_pause() -> void:
 
 func close_pause() -> void:
 	visible = false
-	get_tree().paused = game != null and (game.shop_panel.visible or game.choice_panel.visible)
+	get_tree().paused = game != null and (game.shop_panel.visible or game.choice_panel.visible or game.story_dialogue.visible or game.story_travel.visible)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -108,6 +109,7 @@ func _clear_rows() -> void:
 	build_grid = null
 	item_details = null
 	dentipedia = null
+	title_logo = null
 	build_panel.custom_minimum_size = Vector2(520, 0)
 	rows.add_theme_constant_override("separation", 10)
 	fullscreen_button = null
@@ -129,6 +131,15 @@ func _title(text_value: String) -> void:
 	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	portrait.visible = overlay and page == &"home"
 	rows.add_child(portrait)
+	if not overlay and page == &"home":
+		title_logo = TextureRect.new()
+		title_logo.texture = preload("res://assets/story/title.png")
+		title_logo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		title_logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		title_logo.custom_minimum_size = Vector2(0, 120)
+		title_logo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		rows.add_child(title_logo)
+		return
 	var label := Label.new()
 	label.text = "DENTI" if not overlay and page == &"home" else text_value
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -242,6 +253,7 @@ func _show_home() -> void:
 		else:
 			_button("Neues Spiel", _new_game, true)
 			_button("Fortsetzen", _continue_game, false, true)
+		_button("Story-Modus", _new_story_game)
 		_button("Einstellungen", _show_options)
 		_button("Credits", _show_credits)
 		_button("Dentipedia", _show_dentipedia)
@@ -269,6 +281,13 @@ func _update_build_layout() -> void:
 		return
 	var extent := root_control.size
 	hero.visible = not overlay and page == &"home" and extent.x >= 900
+	if title_logo != null:
+		var compact := extent.y < 650
+		title_logo.custom_minimum_size.y = 72 if compact else 120
+		rows.add_theme_constant_override("separation", 6 if compact else 10)
+		for child in rows.get_children():
+			if child is Button:
+				child.custom_minimum_size.y = 44 if compact else 48
 	if page == &"dentipedia":
 		build_panel.custom_minimum_size.x = minf(960, extent.x - 24)
 		if dentipedia != null:
@@ -459,6 +478,16 @@ func _toggle_fullscreen() -> void:
 
 
 func _new_game() -> void:
+	session.selected_story_mode = false
+	_choose_new_run()
+
+
+func _new_story_game() -> void:
+	session.selected_story_mode = true
+	_choose_new_run()
+
+
+func _choose_new_run() -> void:
 	if session.has_run():
 		_show_new_game_confirmation()
 		return

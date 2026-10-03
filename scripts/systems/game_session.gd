@@ -10,6 +10,7 @@ var settings_path: String = "user://settings.cfg"
 var progression_path: String = "user://progression.cfg"
 var resume_requested: bool = false
 var selected_difficulty_id: StringName = &"normal"
+var selected_story_mode: bool = false
 var hell_unlocked: bool = false
 var discovered_fusions: Array[String] = []
 var master_volume_percent: int = 100

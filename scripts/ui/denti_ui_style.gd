@@ -193,6 +193,16 @@ static func style_slider(slider: HSlider) -> void:
 	slider.add_theme_stylebox_override("grabber_area_highlight", highlighted)
 
 
+static func rounded_image_surface(radius: int) -> Panel:
+	var surface := Panel.new()
+	surface.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# Rectangular Control.clip_contents does not follow the rounded frame.
+	# A separate, shadow-free alpha mask clips the actual image and overlays.
+	surface.clip_children = CanvasItem.CLIP_CHILDREN_ONLY
+	surface.add_theme_stylebox_override("panel", _box(Color.WHITE, Color.TRANSPARENT, radius, 0))
+	return surface
+
+
 static func _box(fill: Color, border: Color, radius: int, border_width: int) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
 	style.bg_color = fill

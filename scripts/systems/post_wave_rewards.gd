@@ -2,7 +2,7 @@ class_name PostWaveRewards
 extends RefCounted
 
 # Keep old numeric values stable because saved runs store this enum as an integer.
-enum Step { COMBAT, COLLECTING, LEVELS, CHESTS, SHOP, END, RELICS }
+enum Step { COMBAT, COLLECTING, LEVELS, CHESTS, SHOP, END, RELICS, STORY }
 
 var step: Step = Step.COMBAT
 var pending_levels: int = 0
@@ -11,6 +11,7 @@ var pending_chests: Array[Dictionary] = []
 var pending_relics: Array[String] = []
 var chest_spawned: bool = false
 var final_wave: bool = false
+var pending_story: StringName = &""
 
 
 func begin_wave() -> void:
@@ -21,6 +22,7 @@ func begin_wave() -> void:
 	pending_relics.clear()
 	chest_spawned = false
 	final_wave = false
+	pending_story = &""
 
 
 func earn_level() -> void:
@@ -80,13 +82,28 @@ func current_chest() -> Dictionary:
 	return pending_chests[0] if not pending_chests.is_empty() else {}
 
 
+func queue_story(id: StringName) -> void:
+	if not StoryCatalog.dialogue(id).is_empty():
+		pending_story = id
+
+
+func resolve_story() -> void:
+	if step != Step.STORY:
+		return
+	pending_story = &""
+	_advance()
+
+
 func save_data() -> Dictionary:
 	return {"step": step, "pending_levels": pending_levels, "level_rerolls": level_rerolls, "pending_chests": pending_chests.duplicate(true),
-		"pending_relics": pending_relics.duplicate(), "chest_spawned": chest_spawned, "final_wave": final_wave}
+		"pending_relics": pending_relics.duplicate(), "chest_spawned": chest_spawned, "final_wave": final_wave, "pending_story": str(pending_story)}
 
 
 func restore(saved: Dictionary) -> void:
-	step = clampi(int(saved.get("step", Step.COMBAT)), Step.COMBAT, Step.RELICS) as Step
+	step = clampi(int(saved.get("step", Step.COMBAT)), Step.COMBAT, Step.STORY) as Step
+	pending_story = StringName(str(saved.get("pending_story", "")))
+	if StoryCatalog.dialogue(pending_story).is_empty():
+		pending_story = &""
 	pending_levels = maxi(int(saved.get("pending_levels", 0)), 0)
 	level_rerolls = maxi(int(saved.get("level_rerolls", 0)), 0) if step == Step.LEVELS and pending_levels > 0 else 0
 	pending_chests.clear()
@@ -103,7 +120,7 @@ func restore(saved: Dictionary) -> void:
 			pending_relics.append(id)
 	chest_spawned = bool(saved.get("chest_spawned", false))
 	final_wave = bool(saved.get("final_wave", false))
-	if step == Step.LEVELS and pending_levels == 0 or step == Step.CHESTS and pending_chests.is_empty() or step == Step.RELICS and pending_relics.is_empty():
+	if step == Step.LEVELS and pending_levels == 0 or step == Step.CHESTS and pending_chests.is_empty() or step == Step.RELICS and pending_relics.is_empty() or step == Step.STORY and pending_story == &"":
 		_advance()
 
 
@@ -114,5 +131,7 @@ func _advance() -> void:
 		step = Step.CHESTS
 	elif not pending_relics.is_empty():
 		step = Step.RELICS
+	elif pending_story != &"":
+		step = Step.STORY
 	else:
 		step = Step.END if final_wave else Step.SHOP

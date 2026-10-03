@@ -1,0 +1,23 @@
+# Story-Mode – Konzeptblatt
+
+Erstellt mit dem integrierten Imagegen-Tool. Neues Konzeptbild; die Referenzen werden nicht verändert.
+
+Referenzen: `assets/denti/reference/denti-initial.png` (Figur), `assets/enemies/cavity_emperor.png` (Gegnerstil).
+
+## Prompt
+
+Use case: stylized-concept.
+Asset type: a polished game art-direction concept sheet for the existing 2D arena survivor "Denti: Divine Dentistry".
+Create ONE high-resolution LANDSCAPE concept board titled "DENTI · DIE VERSCHWUNDENE ZAHNFEE".
+Reference image 1 is the canonical Denti CHARACTER reference, not an edit target. Preserve this cute ivory MOLAR silhouette, friendly large brown eyes, little arms and root feet, pink cheeks, glossy hand-painted shading and dark warm outlines. Denti begins unarmed, without a crown. Reference image 2 is the existing Karies-Imperator ENEMY style reference, not an edit target: gold, purple decay and tooth-shaped ornate armor. Preserve the established game art family rather than replacing it with generic medieval fantasy.
+The story: a tooth fairy accidentally summons Denti out of a human mouth into her fairy realm. She intended to summon a mighty guardian, got a tiny tooth. The Karies-Imperator stole her portal magic and imprisoned her. Four chapter bosses guard the stolen fragments; Denti wants to get home and rescue her.
+
+Composition: top ~70% of board = FOUR equally sized atmospheric, lush painted environment vignettes side by side, each with the small recognizable Denti in the foreground for scale. Clear visual separation and consistent illustration language. These are explorable game-world concept paintings, not photographic scenes, not UI cards with giant whitespace.
+I — "Unter dem Kissen": moonlit giant pillow folds, quilted lavender fabric as landscape, scattered gold coins, lost little teeth, crumbs, a luminous turquoise tooth-shaped summoning portal. Warm whimsical nighttime bedroom miniature realm, Denti bewildered beside the portal.
+II — "Das süße Verderben": caramel and pink candy landscape, twisted lollipop trees, gummy ruins, sugary crystals, sticky paths toward a sinister candy refinery. Cheerful candy saturated colors turning slightly corrupted; clear pathways, sugar-creature silhouettes.
+III — "Tief im Säurestrom": abandoned dental mouthwash pumping plant, turquoise green acidic waterways, walkways made of ivory tooth tiles, brass pipes, luminous vats; tiny captive tooth characters behind a gate. Ominous mint-green light contrasted with warm safe islands.
+IV — "Die letzte Krone": towering dark violet dental palace, gold tooth-shaped arches and crown motifs, glowing purple fissures. The Karies-Imperator, recognizable from the second reference, looms in the distant throne doorway. A tiny tooth-fairy light is trapped above the throne. Denti small but determined in foreground. Dramatic gold-violet final confrontation, no gore.
+Short readable German chapter captions under each painted vignette, no lengthy lore paragraphs. Painterly cartoon fantasy, readable game shapes, rich ambient light, glossy warm dental materials. No realism, no pixel art, no photoreal rendering.
+
+BOTTOM ~25% = a convincing compact DARK GAME INTERMISSION UI concept, full-width panel in charcoal aubergine (#191520) with creamy high-contrast type, warm muted gold accents, thin coherent borders. It belongs inside a game, not a website: NO navbar, sidebar, browser chrome, settings gear, homepage links or ESC button. No cards filling most of the screen. Label "Kapitel II · Das süße Verderben". Small status "Welle 8 · Boss in 2 Wellen".
+Below: a HORIZONTAL STORY TIMELINE with exactly TWENTY wave positions from left to right. Positions 5,10,15,20 are FOUR LARGER boss nodes; all other positions are small dots. The first seven wave positions are completed in muted gold, wave 8 is the current bright gold point with a miniature Denti indicator and subtle halo, positions 9 through 20 subdued purple-gray. First boss (5) completed with a check; the upcoming three boss nodes are BLACK SILHOUETTES with small lock symbols, no revealed enemy names. Label only the four major boss nodes "5", "10", "15", "20". Thin connecting line; rhythm and spacing carefully aligned; clearly distinguish big boss nodes from small normal wave dots. The entire compact timeline should show all four chapters at once and feel tactile and game-like. A modest gold "Weiter" button at lower right; nothing else. Avoid excessive empty space, decorative illegible text, repeated paragraphs, generic app-dashboard styling or additional copy. Deliver a beautifully finished cohesive concept art board showing the four-world journey and this practical post-wave story-progress UI.

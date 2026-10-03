@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="StoryChapter" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/story_chapter.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/environment/story/pillow.png" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/cavity_count.tres" id="3"]
+
+[resource]
+script = ExtResource("1")
+boss = ExtResource("3")
+boss_dialogue = Array[Dictionary]([{"speaker":"Karies-Graf","text":"Unter diesem Kissen gehört alles mir. Die Münzen, die Krümel — und jetzt auch du."},
+{"speaker":"Denti","text":"Ich bin kein Wechselgeld. Gib das Portalfragment her."},
+{"speaker":"Karies-Graf","text":"Ein Zahn ohne Mund. Wer soll vor dir Angst haben?"},
+{"speaker":"Denti","text":"Jeder, der seit Jahren keinen Bohrer gesehen hat.","action":"Kämpfen"}])
+id = &"pillow"
+title = "Unter dem Kissen"
+objective = "Hol das erste Portalfragment."
+floor_texture = ExtResource("2")
+wall_color = Color(0.30980392156862746, 0.27450980392156865, 0.35294117647058826, 1)
+void_color = Color(0.1568627450980392, 0.13725490196078433, 0.19215686274509805, 1)
+trim_color = Color(0.6549019607843137, 0.6, 0.7254901960784313, 1)
+arrival_dialogue = Array[Dictionary]([])

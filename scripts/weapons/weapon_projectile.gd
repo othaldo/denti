@@ -92,14 +92,17 @@ func _physics_process(delta: float) -> void:
 			_explode()
 			return
 		hit_ids.append(enemy.get_instance_id())
+		var collision_point := Geometry2D.get_closest_point_to_segment(enemy.global_position, previous_position, global_position)
 		WeaponAttackShapes.hit(enemy, data, tier, damage, critical, items, direction)
 		if returning:
 			return_hits_left -= 1
 			if return_hits_left <= 0:
+				global_position = collision_point
 				impact_time = IMPACT_DURATION
 				break
 			continue
 		if pierces_left <= 0:
+			global_position = collision_point
 			if return_factor > 0.0:
 				_start_return()
 			else:

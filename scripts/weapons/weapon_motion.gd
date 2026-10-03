@@ -33,7 +33,7 @@ static func pose(data: WeaponData, tier: int, home: Vector2, aim: Vector2, progr
 	var pulse := sin(clampf(progress, 0.0, 1.0) * PI) if active else 0.0
 	if data.held_style == "aimed":
 		scale.y *= side
-		rotation = aim.angle() + deg_to_rad(data.visual_angle_degrees) * side
+		rotation = aim.angle() - (tip_local(data) * scale).angle()
 		if not is_contact(data) and active:
 			var nozzle := home + aim * minf(24.0, maxf(target_distance - home.length() - 12.0, 8.0))
 			if data.attack_mode in [&"projectile", &"beam"]:
@@ -77,7 +77,7 @@ static func pose(data: WeaponData, tier: int, home: Vector2, aim: Vector2, progr
 		if data.held_style == "aimed":
 			# Powered tools keep their handle below the working head while advancing.
 			scale.y *= side
-			rotation = angle + deg_to_rad(data.visual_angle_degrees) * side
+			rotation = angle - (tip_local(data) * scale).angle()
 			var head_distance := length + lerpf(12.0, hand_distance, extension)
 			attack_grip = aim * head_distance - (tip_local(data) * scale).rotated(rotation)
 		var weight := clampf(progress / ACTIVE_START, 0.0, 1.0)
@@ -95,6 +95,8 @@ static func pose(data: WeaponData, tier: int, home: Vector2, aim: Vector2, progr
 				grip -= aim * pulse * 2.0
 			"spray":
 				rotation += sin(progress * TAU * 2.0) * 0.045
+			"beam":
+				grip -= aim * pulse * 3.0
 	return {"position": grip, "rotation": rotation, "scale": scale}
 
 

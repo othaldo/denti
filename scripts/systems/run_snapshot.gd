@@ -81,6 +81,7 @@ static func capture(game) -> Dictionary:
 		"relics": game.relics.save_data(),
 		"telemetry": game.telemetry.save_data(),
 		"rewards": game.rewards.save_data(),
+		"story": game.story.save_data(),
 		"enemies": enemies_data, "loot": loot_data, "acid": acid_data,
 		"shop": game.in_shop,
 		"collecting_wave_loot": game.collecting_wave_loot,
@@ -94,9 +95,14 @@ static func restore(game, saved: Dictionary) -> void:
 	wave.difficulty_id = DifficultyCatalog.by_id(StringName(str(saved.get("difficulty_id", "normal")))).id
 	var player: Player = game.player
 	var shop: ShopController = game.shop
+	game.story.restore(saved.get("story", {}))
+	game.session.selected_story_mode = game.story.enabled
+	game.arena.set_story_chapter(StoryCatalog.chapter(game.story.chapter_index) if game.story.enabled else null)
 	wave.endless_enabled = bool(saved.get("endless_enabled", false))
 	game.base_victory = bool(saved.get("base_victory", wave.endless_enabled))
 	wave.current_wave = maxi(int(saved.get("wave", 1)), 1) if wave.endless_enabled else clampi(int(saved.get("wave", 1)), 1, WaveController.MAX_WAVES)
+	if game.story.enabled and int(saved.get("wave", 1)) == 0:
+		wave.current_wave = 0
 	wave.duration = clampf(float(saved.get("duration", WaveController.DURATION)), 1.0, 120.0)
 	wave.remaining = clampf(float(saved.get("remaining", wave.duration)), 0.0, wave.duration)
 	wave.spawn_cooldown = maxf(float(saved.get("spawn_cooldown", 0.0)), 0.0)
@@ -287,6 +293,12 @@ static func restore(game, saved: Dictionary) -> void:
 		game.get_tree().paused = true
 		game._refresh_hud()
 		return
+	if game.story.enabled and game.story.travel_target >= 1:
+		game._show_story_travel()
+		return
+	if game.story.enabled and game.story.dialogue_id != &"":
+		game._show_story_line()
+		return
 	if game.rewards.step == PostWaveRewards.Step.LEVELS and upgrade_data.size() in [3, ChoicePanel.UPGRADE_COUNT]:
 		var options: Array[UpgradeData] = []
 		for value in upgrade_data:
@@ -312,7 +324,7 @@ static func restore(game, saved: Dictionary) -> void:
 			game.get_tree().paused = true
 		else:
 			game._advance_post_wave_rewards()
-	elif game.rewards.step == PostWaveRewards.Step.CHESTS or game.rewards.step == PostWaveRewards.Step.RELICS:
+	elif game.rewards.step == PostWaveRewards.Step.CHESTS or game.rewards.step == PostWaveRewards.Step.RELICS or game.rewards.step == PostWaveRewards.Step.STORY:
 		game._advance_post_wave_rewards()
 	elif game.rewards.step == PostWaveRewards.Step.LEVELS:
 		game._advance_post_wave_rewards()

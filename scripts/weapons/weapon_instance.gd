@@ -18,6 +18,9 @@ var attack_phase: float = 0.0
 var engagement_pending: bool = true
 var aim_distance: float = 1000.0
 var hit_point: Vector2 = Vector2.ZERO
+var beam_target_id: int = 0
+var beam_hit_world: Vector2 = Vector2.ZERO
+var beam_tracking: bool = false
 var sprite: Sprite2D
 var working_head: WeaponWorkingHead
 var elastic: WeaponElastic
@@ -66,6 +69,28 @@ func muzzle_position() -> Vector2:
 	return sprite.to_global(WeaponMotion.tip_local(data))
 
 
+func aim_at(point: Vector2) -> void:
+	# Keep the hand lane stable, then align the real emission point with the target.
+	aim = (point - player.global_position - hold_position).normalized()
+	update_visual()
+	if data.held_style == "upright":
+		aim = muzzle_position().direction_to(point)
+		update_visual()
+
+
+func beam_segment() -> PackedVector2Array:
+	var start := muzzle_position()
+	return PackedVector2Array([start, beam_hit_world if data.attack_mode == &"beam" else start + aim * data.range_at_tier(tier)])
+
+
+func _track_beam() -> void:
+	var target := instance_from_id(beam_target_id) as Enemy if beam_target_id != 0 else null
+	if is_instance_valid(target):
+		beam_hit_world = target.global_position
+	if beam_tracking:
+		aim_at(beam_hit_world)
+
+
 func update_visual() -> void:
 	if sprite == null:
 		return
@@ -87,6 +112,8 @@ func _physics_process(delta: float) -> void:
 	focus_time = maxf(focus_time - delta, 0.0)
 	cooldown = maxf(cooldown - delta, 0.0)
 	if attack_time > 0.0:
+		if data.attack_mode in [&"beam", &"beam_line"]:
+			_track_beam()
 		var previous := progress()
 		attack_time = maxf(attack_time - delta, 0.0)
 		if WeaponMotion.is_contact(data):
@@ -138,6 +165,9 @@ func _begin_attack(targets: Array[Enemy]) -> void:
 	if not WeaponMotion.is_contact(data):
 		hold_position = WeaponMotion.hand_position(home_position, aim)
 	hit_point = to_local(nearest.global_position)
+	beam_target_id = nearest.get_instance_id() if data.attack_mode in [&"beam", &"beam_line"] else 0
+	beam_tracking = beam_target_id != 0
+	beam_hit_world = nearest.global_position
 	if focus_target_id != nearest.get_instance_id() or focus_time <= 0.0:
 		focus_target_id = nearest.get_instance_id()
 		focus_hits = 0
@@ -148,20 +178,17 @@ func _begin_attack(targets: Array[Enemy]) -> void:
 	cooldown = attack_interval()
 	focus_time = maxf(cooldown * 1.5, 0.6)
 	attack_duration = maxf(minf(data.animation_duration, cooldown * 0.85), 0.035)
+	if data.evolution_kind == &"revelation":
+		attack_duration = data.evolution_duration + 0.22
 	attack_time = attack_duration
 	var critical := player.stats.last_roll_critical
 	update_visual()
+	if not WeaponMotion.is_contact(data):
+		aim_at(nearest.global_position)
 	var evolution_attack := evolution != null and evolution.on_attack(targets, damage, critical)
 	if WeaponMotion.is_contact(data):
 		strike.begin(damage, critical, nearest)
 	elif not evolution_attack:
-		# Aim the actual barrel at the target, including its offset from the hand.
-		if data.held_style == "aimed" and data.attack_mode in [&"projectile", &"beam"]:
-			aim = (nearest.global_position - player.global_position - hold_position).normalized()
-			update_visual()
-		elif data.held_style == "upright":
-			aim = muzzle_position().direction_to(nearest.global_position)
-			update_visual()
 		_fire(targets, damage, critical)
 	var sound_kind: StringName = &"brush"
 	if data.attack_mode in [&"area", &"sweep"]:
@@ -185,8 +212,12 @@ func _fire(targets: Array[Enemy], damage: float, critical: bool) -> void:
 		&"beam":
 			WeaponAttackShapes.hit(targets[0], data, tier, damage, critical, player.items, aim)
 		&"beam_line", &"cone":
-			for enemy in targets:
-				if WeaponAttackShapes.contains(data, tier, player.global_position, aim, enemy.global_position, enemy.data.radius):
+			# Acquisition uses Denti's range; the emitted shape uses the barrel's range.
+			for node in get_tree().get_nodes_in_group("enemies"):
+				var enemy := node as Enemy
+				if enemy == null or enemy.health <= 0:
+					continue
+				if WeaponAttackShapes.contains(data, tier, muzzle, aim, enemy.global_position, enemy.data.radius):
 					WeaponAttackShapes.hit(enemy, data, tier, damage, critical, player.items, aim)
 
 
@@ -196,6 +227,7 @@ func save_motion(enemy_indices: Dictionary) -> Dictionary:
 		if enemy_indices.has(id):
 			hit_enemies.append(enemy_indices[id])
 	return {"remaining": attack_time, "duration": attack_duration, "damage": strike.damage,
+		"beam_target": enemy_indices.get(beam_target_id, -1), "beam_hit": [beam_hit_world.x, beam_hit_world.y], "beam_tracking": beam_tracking,
 		"critical": strike.critical, "target": enemy_indices.get(strike.target_id, -1), "hits": hit_enemies,
 		"aim": [aim.x, aim.y], "hit_point": [hit_point.x, hit_point.y], "idle_time": idle_time, "aim_distance": aim_distance,
 		"hold": [hold_position.x, hold_position.y], "engagement_pending": engagement_pending,
@@ -207,6 +239,15 @@ func restore_motion(saved: Dictionary, enemies: Array[Node]) -> void:
 		evolution.restore_state(saved.get("evolution", {}), enemies)
 	attack_duration = clampf(float(saved.get("duration", data.animation_duration)), 0.035, 0.8)
 	attack_time = clampf(float(saved.get("remaining", 0.0)), 0.0, attack_duration)
+	var beam_index := int(saved.get("beam_target", -1))
+	beam_target_id = enemies[beam_index].get_instance_id() if beam_index >= 0 and beam_index < enemies.size() else 0
+	beam_tracking = bool(saved.get("beam_tracking", attack_time > 0 and data.attack_mode in [&"beam", &"beam_line"]))
+	var beam_hit: Array = saved.get("beam_hit", [])
+	if beam_hit.size() == 2:
+		beam_hit_world = Vector2(float(beam_hit[0]), float(beam_hit[1]))
+	else:
+		var old_point: Array = saved.get("hit_point", [0.0, 0.0])
+		beam_hit_world = to_global(Vector2(float(old_point[0]), float(old_point[1])))
 	strike.damage = maxf(float(saved.get("damage", 0.0)), 0.0)
 	strike.critical = bool(saved.get("critical", false))
 	engagement_pending = bool(saved.get("engagement_pending", false))
@@ -259,15 +300,16 @@ func _draw() -> void:
 			if fraction < 0.25:
 				draw_circle(muzzle, (1.0 - fraction / 0.25) * 7.0, color)
 		&"beam":
-			draw_line(muzzle, hit_point, color, 4.0)
-			draw_circle(hit_point, 6.0, Color(1, 1, 1, fade))
+			var end := to_local(beam_segment()[1])
+			draw_line(muzzle, end, color, 4.0)
+			draw_circle(end, 6.0, Color(1, 1, 1, fade))
 		&"beam_line":
-			var end := aim * data.range_at_tier(tier)
+			var end := to_local(beam_segment()[1])
 			draw_line(muzzle, end, Color(color, fade * 0.2), data.attack_width)
 			draw_line(muzzle, end, color, 4.0)
 		&"cone":
 			var half_angle := deg_to_rad(data.arc_degrees * 0.5)
-			var reach := maxf(data.range_at_tier(tier) - muzzle.length(), 10.0)
+			var reach := data.range_at_tier(tier)
 			var points := PackedVector2Array([muzzle])
 			for index in 13:
 				points.append(muzzle + aim.rotated(-half_angle + float(index) / 12.0 * half_angle * 2.0) * reach)
