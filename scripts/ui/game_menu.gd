@@ -244,6 +244,7 @@ func _show_home() -> void:
 			_button("Fortsetzen", _continue_game, false, true)
 		_button("Einstellungen", _show_options)
 		_button("Credits", _show_credits)
+		_button("Dentipedia", _show_dentipedia)
 		_button("Beenden", func() -> void: get_tree().quit())
 		_version_info()
 

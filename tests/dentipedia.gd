@@ -93,6 +93,15 @@ func _run() -> void:
 	session.clear_run()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(session.progression_path))
 	paused = false
+	var main_menu: GameMenu = load("res://scenes/ui/game_menu.tscn").instantiate()
+	root.add_child(main_menu)
+	var main_entry := false
+	for child in main_menu.rows.get_children():
+		if child is Button and child.text == "Dentipedia":
+			main_entry = true
+			child.pressed.emit()
+			break
+	check(main_entry and main_menu.page == &"dentipedia", "main menu Dentipedia entry missing")
 	if failures.is_empty():
 		print("Denti Dentipedia test passed")
 	quit(0 if failures.is_empty() else 1)
