@@ -4,6 +4,8 @@ Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü an
 
 ## In Entwicklung
 
+- Mobiler Pause-Button sitzt unter der FPS-Anzeige, damit sich beide im Hochkant- und Querformat nicht überdecken.
+
 - **Performance:** räumliche Gegnerabfragen für Waffen und Synergien, gemeinsame
   Projektil-/Beuteatlanten, laufende Telemetrie-Summen, weniger HUD-Arbeit und
   Treffer-Tweens sowie begrenzte kosmetische Schadenszahlen. Neue Grafikoptionen
