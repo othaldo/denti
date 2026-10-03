@@ -14,6 +14,7 @@ var item_details: ShopDetails
 var menu_music: MusicController
 var fullscreen_button: Button
 var fps_toggle: CheckButton
+var graphics_option: OptionButton
 var master_slider: HSlider
 var music_slider: HSlider
 var sfx_slider: HSlider
@@ -114,6 +115,7 @@ func _clear_rows() -> void:
 	rows.add_theme_constant_override("separation", 10)
 	fullscreen_button = null
 	fps_toggle = null
+	graphics_option = null
 	master_slider = null
 	music_slider = null
 	sfx_slider = null
@@ -224,12 +226,24 @@ func _fps_option() -> CheckButton:
 	panel.custom_minimum_size.y = 46.0
 	DentiUIStyle.style_chip(panel, Color(0.96, 0.92, 0.83))
 	rows.add_child(panel)
+	var row := HBoxContainer.new()
+	panel.add_child(row)
 	var toggle := CheckButton.new()
 	toggle.text = "FPS anzeigen"
 	toggle.button_pressed = session.show_fps
 	DentiUIStyle.style_check_button(toggle)
-	panel.add_child(toggle)
+	toggle.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(toggle)
 	toggle.toggled.connect(Callable(session, "set_show_fps"))
+	graphics_option = OptionButton.new()
+	graphics_option.add_item("Grafik: Automatisch", 0)
+	graphics_option.add_item("Grafik: Sparsam", 1)
+	graphics_option.add_item("Grafik: Voll", 2)
+	graphics_option.selected = session.graphics_mode
+	graphics_option.tooltip_text = "Automatisch nutzt auf Touch-Geräten den sparsamen Modus. Sparsam senkt die Renderauflösung und begrenzt Schadenszahlen. Voll nutzt die Bildschirmauflösung."
+	DentiUIStyle.style_button(graphics_option)
+	row.add_child(graphics_option)
+	graphics_option.item_selected.connect(Callable(session, "set_graphics_mode"))
 	return toggle
 
 

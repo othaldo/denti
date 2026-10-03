@@ -4,7 +4,8 @@ extends RefCounted
 # The scene owns the bosses. Do not keep a second, unsaved ownership list.
 static func remaining(enemies: Node, include_dying: bool = true) -> Array[Enemy]:
 	var result: Array[Enemy] = []
-	for child in enemies.get_children():
+	var candidates: Array = enemies.bosses if enemies is EnemySpatialIndex else enemies.get_children()
+	for child in candidates:
 		if child is Enemy and child.data.is_boss and not child.is_queued_for_deletion() and (include_dying or not child.dying):
 			result.append(child)
 	return result

@@ -23,20 +23,63 @@ var orbit_time: float = 0.0
 var orbit_center: Vector2
 var orbit_finished: bool = false
 var orbit_hits: Array[int] = []
+var enemy_index: EnemySpatialIndex
+var body_sprite: Sprite2D
+var tail_sprite: Sprite2D
+var outline_sprite: Sprite2D
 
 
 func launch(start: Vector2, aim: Vector2, attack_damage: float, weapon: WeaponData, inventory: ItemInventory = null, is_critical: bool = false, weapon_tier: int = 1) -> void:
 	global_position = start
+	items = inventory
+	enemy_index = items.player.enemy_index if items != null else null
+	if enemy_index == null and get_parent() != null and get_parent().get_parent() != null:
+		enemy_index = get_parent().get_parent().get_node_or_null("Enemies") as EnemySpatialIndex
 	direction = aim.normalized()
 	damage = attack_damage
 	data = weapon
 	tier = weapon_tier
-	items = inventory
 	critical = is_critical
 	pierces_left = weapon.pierce_at_tier(tier)
 	return_factor = inventory.projectile_return_factor() if inventory != null and weapon.splash_at_tier(tier) <= 0.0 else 0.0
 	if data.evolution_kind == &"halo":
 		return_factor += 1.0
+	_create_visuals()
+	_sync_visuals()
+
+
+func _create_visuals() -> void:
+	if body_sprite != null:
+		return
+	var radius := 11.0 if data.splash_at_tier(tier) > 0.0 or data.pierce_at_tier(tier) > 0 else 7.0
+	if data.projectile_shape != &"rocket":
+		tail_sprite = _visual_sprite(CombatSpriteTextures.projectile_tail(data.projectile_color, radius))
+		outline_sprite = _visual_sprite(CombatSpriteTextures.projectile_outline(data.projectile_color, radius))
+		body_sprite = _visual_sprite(CombatSpriteTextures.projectile_body(data.projectile_color, radius))
+	else:
+		body_sprite = _visual_sprite(CombatSpriteTextures.rocket(data.projectile_color))
+
+
+func _visual_sprite(texture: Texture2D) -> Sprite2D:
+	var visual := Sprite2D.new()
+	visual.texture = texture
+	visual.scale = Vector2.ONE / CombatSpriteTextures.RESOLUTION
+	add_child(visual)
+	return visual
+
+
+func _sync_visuals() -> void:
+	if body_sprite == null:
+		return
+	body_sprite.visible = impact_time <= 0.0
+	if tail_sprite != null:
+		tail_sprite.visible = body_sprite.visible
+		tail_sprite.rotation = direction.angle()
+		outline_sprite.visible = body_sprite.visible
+		var radius := 11.0 if data.splash_at_tier(tier) > 0.0 or data.pierce_at_tier(tier) > 0 else 7.0
+		outline_sprite.scale = Vector2.ONE * (radius + sin(animation_time * 20.0)) / (radius + 1.0) / CombatSpriteTextures.RESOLUTION
+	else:
+		body_sprite.rotation = direction.angle()
 
 
 func _physics_process(delta: float) -> void:
@@ -44,16 +87,16 @@ func _physics_process(delta: float) -> void:
 		orbit_time = maxf(orbit_time - delta, 0)
 		animation_time += delta
 		global_position = orbit_center + Vector2.from_angle(animation_time * 9) * data.evolution_radius
-		for node in get_tree().get_nodes_in_group("enemies"):
-			var enemy := node as Enemy
+		for enemy in EnemySpatialIndex.circle(get_tree(), enemy_index, orbit_center, data.evolution_radius):
 			if enemy != null and enemy.health > 0 and not orbit_hits.has(enemy.get_instance_id()) and orbit_center.distance_to(enemy.global_position) <= data.evolution_radius + enemy.data.radius:
 				orbit_hits.append(enemy.get_instance_id())
 				enemy.take_damage(damage * data.evolution_damage_factor, null, false, &"evolution")
-		queue_redraw()
+		_sync_visuals()
 		if orbit_time <= 0:
 			_start_return()
 		return
 	if impact_time > 0.0:
+		_sync_visuals()
 		impact_time -= delta
 		queue_redraw()
 		if impact_time <= 0.0:
@@ -74,12 +117,11 @@ func _physics_process(delta: float) -> void:
 		hit_ids.clear()
 		return_rearmed = true
 	var collisions: Array[Enemy] = []
-	for node in get_tree().get_nodes_in_group("enemies"):
-		var enemy := node as Enemy
+	for enemy in EnemySpatialIndex.segment(get_tree(), enemy_index, previous_position, global_position, HIT_RADIUS):
 		if enemy == null or hit_ids.has(enemy.get_instance_id()):
 			continue
 		var closest := Geometry2D.get_closest_point_to_segment(enemy.global_position, previous_position, global_position)
-		if closest.distance_to(enemy.global_position) > enemy.data.radius + HIT_RADIUS:
+		if closest.distance_squared_to(enemy.global_position) > (enemy.data.radius + HIT_RADIUS) * (enemy.data.radius + HIT_RADIUS):
 			continue
 		collisions.append(enemy)
 	collisions.sort_custom(func(a: Enemy, b: Enemy) -> bool:
@@ -116,7 +158,9 @@ func _physics_process(delta: float) -> void:
 			_start_return()
 		else:
 			queue_free()
-	queue_redraw()
+	_sync_visuals()
+	if impact_time > 0.0:
+		queue_redraw()
 
 
 func _start_return() -> void:
@@ -134,12 +178,12 @@ func _start_return() -> void:
 
 
 func _explode() -> void:
-	for node in get_tree().get_nodes_in_group("enemies"):
-		var enemy := node as Enemy
-		if enemy != null and global_position.distance_to(enemy.global_position) <= data.splash_at_tier(tier) + enemy.data.radius:
+	for enemy in EnemySpatialIndex.circle(get_tree(), enemy_index, global_position, data.splash_at_tier(tier)):
+		if enemy != null and global_position.distance_squared_to(enemy.global_position) <= pow(data.splash_at_tier(tier) + enemy.data.radius, 2):
 			var push_direction := global_position.direction_to(enemy.global_position)
 			WeaponAttackShapes.hit(enemy, data, tier, damage, critical, items, direction if push_direction.is_zero_approx() else push_direction)
 	impact_time = IMPACT_DURATION
+	_sync_visuals()
 	queue_redraw()
 
 
@@ -181,6 +225,10 @@ func restore_state(saved: Dictionary, inventory: ItemInventory, enemies: Array[N
 		if index >= 0 and index < enemies.size():
 			orbit_hits.append(enemies[index].get_instance_id())
 
+	_sync_visuals()
+	if impact_time > 0.0:
+		queue_redraw()
+
 
 func _draw() -> void:
 	if data == null:
@@ -190,17 +238,3 @@ func _draw() -> void:
 		var radius := data.splash_at_tier(tier) if data.splash_at_tier(tier) > 0.0 else 20.0
 		draw_arc(Vector2.ZERO, radius * progress, 0.0, TAU, 40, Color(data.projectile_color, 1.0 - progress), 4.0)
 		return
-	var color := data.projectile_color
-	if data.projectile_shape == &"rocket":
-		var side := direction.orthogonal()
-		draw_line(-direction * 16.0, direction * 6.0, Color(0.98, 0.94, 0.82), 10.0)
-		draw_colored_polygon(PackedVector2Array([direction * 17.0, direction * 5.0 + side * 7.0, direction * 5.0 - side * 7.0]), color)
-		draw_line(-direction * 20.0, -direction * 34.0, Color(1.0, 0.78, 0.28, 0.65), 5.0)
-		return
-	var radius := 11.0 if data.splash_at_tier(tier) > 0.0 or data.pierce_at_tier(tier) > 0 else 7.0
-	for index in 3:
-		var tail := -direction * (float(index) + 1.0) * 8.0
-		draw_circle(tail, radius * (0.75 - float(index) * 0.16), Color(color, 0.34 - float(index) * 0.08))
-	draw_circle(Vector2.ZERO, radius + sin(animation_time * 20.0) * 1.0, Color(0.11, 0.24, 0.27, 0.42))
-	draw_circle(Vector2.ZERO, radius, color)
-	draw_circle(Vector2(-2.5, -2.5), radius * 0.32, Color.WHITE)

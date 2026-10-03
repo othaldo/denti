@@ -22,8 +22,14 @@ func tick(weapon: WeaponInstance, from_progress: float, to_progress: float) -> v
 	# Sample the swept weapon path, including skipped physics frames/high attack speed.
 	var steps := maxi(ceili((end - start) / 0.025), 1)
 	var enemies: Array[Enemy] = []
-	for node in weapon.get_tree().get_nodes_in_group("enemies"):
-		var enemy := node as Enemy
+	var candidates: Array[Enemy] = []
+	if weapon.data.attack_mode == &"melee":
+		var target := instance_from_id(target_id) as Enemy if target_id != 0 else null
+		if is_instance_valid(target) and not target.is_queued_for_deletion():
+			candidates.append(target)
+	else:
+		candidates = weapon.player.nearby_enemies(weapon.player.global_position, weapon.data.range_at_tier(weapon.tier))
+	for enemy in candidates:
 		if enemy == null or enemy.health <= 0.0 or hit_ids.has(enemy.get_instance_id()):
 			continue
 		if weapon.data.attack_mode == &"melee" and enemy.get_instance_id() != target_id:

@@ -64,7 +64,7 @@ func on_hit(enemy: Enemy, amount: float, _critical: bool) -> void:
 				marks.erase(id)
 				if proc_wait <= 0:
 					proc_wait = data.evolution_interval
-					for target in _enemies():
+					for target in weapon.player.nearby_enemies(enemy.global_position, data.evolution_radius):
 						if target.global_position.distance_to(enemy.global_position) <= data.evolution_radius + target.data.radius:
 							target.take_damage(amount * data.evolution_damage_factor, null, false, &"evolution")
 					_flash(enemy.global_position - Vector2(30, 0), enemy.global_position + Vector2(30, 0))
@@ -72,6 +72,7 @@ func on_hit(enemy: Enemy, amount: float, _critical: bool) -> void:
 				marks[id] = data.evolution_duration
 
 func _physics_process(delta: float) -> void:
+	var had_visuals := not pools.is_empty() or not threads.is_empty() or not marks.is_empty() or not flashes.is_empty() or charge_time > 0
 	proc_wait = maxf(proc_wait - delta, 0)
 	for id in marks.keys():
 		marks[id] = float(marks[id]) - delta
@@ -91,7 +92,7 @@ func _physics_process(delta: float) -> void:
 		if pool.tick <= 0:
 			pool.tick = weapon.data.evolution_interval
 			var last: Enemy
-			for enemy in _enemies():
+			for enemy in weapon.player.nearby_enemies(pool.at, weapon.data.evolution_radius):
 				if enemy.global_position.distance_to(pool.at) <= weapon.data.evolution_radius + enemy.data.radius:
 					enemy.apply_wet(1.0)
 					enemy.take_damage(pool.damage, null, false, &"evolution")
@@ -117,7 +118,8 @@ func _physics_process(delta: float) -> void:
 		charge_time = maxf(charge_time - delta, 0)
 		if charge_time <= 0:
 			_release_beam()
-	queue_redraw()
+	if had_visuals or not flashes.is_empty():
+		queue_redraw()
 
 func _release_beam() -> void:
 	charge_origin = weapon.muzzle_position()
@@ -129,32 +131,24 @@ func _release_beam() -> void:
 	for index in directions.size():
 		var end := charge_origin + directions[index] * weapon.data.range_at_tier(weapon.tier)
 		var damage := charge_damage * (1.0 if index == 0 else weapon.data.evolution_damage_factor)
-		for enemy in _enemies():
+		for enemy in weapon.player.enemies_on_segment(charge_origin, end, weapon.data.attack_width * 0.5):
 			var closest := Geometry2D.get_closest_point_to_segment(enemy.global_position, charge_origin, end)
 			if closest.distance_to(enemy.global_position) <= weapon.data.attack_width * 0.5 + enemy.data.radius:
 				WeaponAttackShapes.hit(enemy, weapon.data, weapon.tier, damage, charge_critical, weapon.player.items, directions[index])
 		_flash(charge_origin, end, true, directions[index], weapon.data.range_at_tier(weapon.tier), directions[index].angle() - charge_direction.angle())
 
 func _line_damage(start: Vector2, end: Vector2, amount: float, width: float, bleed: bool) -> void:
-	for enemy in _enemies():
+	for enemy in weapon.player.enemies_on_segment(start, end, width * 0.5):
 		var closest := Geometry2D.get_closest_point_to_segment(enemy.global_position, start, end)
 		if closest.distance_to(enemy.global_position) <= width * 0.5 + enemy.data.radius:
 			enemy.take_damage(amount, null, false, &"evolution")
 			if bleed and enemy.health > 0:
 				enemy.apply_bleed(weapon.data.bleed_dps * weapon.player.stats.damage_factor(), weapon.data.bleed_duration, 3)
 
-func _enemies() -> Array[Enemy]:
-	var result: Array[Enemy] = []
-	for node in get_tree().get_nodes_in_group("enemies"):
-		var enemy := node as Enemy
-		if enemy != null and enemy.health > 0:
-			result.append(enemy)
-	return result
-
 func _nearest(excluded: Enemy, radius: float) -> Enemy:
 	var result: Enemy
 	var best := radius * radius
-	for enemy in _enemies():
+	for enemy in weapon.player.nearby_enemies(excluded.global_position, radius, false):
 		var distance := enemy.global_position.distance_squared_to(excluded.global_position)
 		if enemy != excluded and distance < best:
 			best = distance

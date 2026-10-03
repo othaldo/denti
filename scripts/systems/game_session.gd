@@ -1,8 +1,10 @@
 extends Node
 
 signal fps_display_changed(enabled: bool)
+signal graphics_changed
 
 const SAVE_VERSION := 1
+enum GraphicsMode { AUTOMATIC, ECONOMY, FULL }
 
 var save_path: String = "user://run_save.json"
 var report_dir: String = "user://run_reports"
@@ -19,6 +21,7 @@ var sfx_volume_percent: int = 100
 var show_fps: bool = false
 var ui_sounds: bool = true
 var reduced_ui_motion: bool = false
+var graphics_mode: GraphicsMode = GraphicsMode.AUTOMATIC
 var ui_voice: AudioStreamPlayer
 var last_ui_cue_ms: int = -1000
 
@@ -36,9 +39,11 @@ func _ready() -> void:
 		show_fps = bool(config.get_value("display", "show_fps", false))
 		ui_sounds = bool(config.get_value("ui", "sounds", true))
 		reduced_ui_motion = bool(config.get_value("ui", "reduced_motion", false))
+		graphics_mode = clampi(int(config.get_value("display", "graphics_mode", 0)), 0, 2) as GraphicsMode
 		if bool(config.get_value("display", "fullscreen", false)):
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	apply_volume()
+	apply_graphics()
 	fps_display_changed.emit(show_fps)
 	if ui_voice == null:
 		ui_voice = AudioStreamPlayer.new()
@@ -57,6 +62,26 @@ func _update_mobile_scale() -> void:
 
 static func mobile_base_size(window_size: Vector2i) -> Vector2i:
 	return Vector2i(720, 1280) if window_size.y > window_size.x else Vector2i(1040, 600)
+
+
+func economy_graphics() -> bool:
+	return use_economy_graphics(graphics_mode, DisplayServer.is_touchscreen_available())
+
+
+static func use_economy_graphics(mode: int, touchscreen: bool) -> bool:
+	return mode == GraphicsMode.ECONOMY or mode == GraphicsMode.AUTOMATIC and touchscreen
+
+
+func set_graphics_mode(mode: int) -> void:
+	graphics_mode = clampi(mode, 0, 2) as GraphicsMode
+	apply_graphics()
+	_save_settings()
+
+
+func apply_graphics() -> void:
+	# Viewport stretching caps 2D pixel work; logical UI/input dimensions stay intact.
+	get_tree().root.content_scale_mode = Window.CONTENT_SCALE_MODE_VIEWPORT if economy_graphics() else Window.CONTENT_SCALE_MODE_CANVAS_ITEMS
+	graphics_changed.emit()
 
 
 func has_run() -> bool:
@@ -200,6 +225,7 @@ func _save_settings() -> void:
 	config.set_value("audio", "sfx", sfx_volume_percent)
 	config.set_value("display", "fullscreen", is_fullscreen())
 	config.set_value("display", "show_fps", show_fps)
+	config.set_value("display", "graphics_mode", graphics_mode)
 	config.set_value("ui", "sounds", ui_sounds)
 	config.set_value("ui", "reduced_motion", reduced_ui_motion)
 	config.save(settings_path)

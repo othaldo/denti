@@ -1,0 +1,44 @@
+{
+	"adapter": "NVIDIA GeForce RTX 4070",
+	"display": "Windows",
+	"label": "sustained_full",
+	"renderer": "gl_compatibility",
+	"samples": [
+		{
+			"draw_calls_mean": 163.2548018478,
+			"enemies": 54,
+			"frame_ms_max": 9.367,
+			"frame_ms_mean": 1.21566374908826,
+			"frame_ms_p95": 2.127,
+			"frames": 16452,
+			"loot": 25,
+			"physics_ms_mean": 2.01814484561137,
+			"player_projectiles": 5,
+			"process_ms_mean": 2.45597690250432,
+			"scenario": "sustained_wave_19_hard_full"
+		},
+		{
+			"bytes": 76098,
+			"damage": 26056.8051690016,
+			"damage_buckets": 413,
+			"kills": 87,
+			"owned_items": {
+				"chain_1": 1,
+				"conductive_varnish": 1,
+				"mint_essence": 1,
+				"mobility_2": 1,
+				"mouthwash": 1,
+				"radiant_filling": 1,
+				"rinse_valve": 1,
+				"tempo_2": 1
+			},
+			"peak_enemies": 55,
+			"pending_levels": 3,
+			"save_ms": 4.564,
+			"saved_enemies": 54,
+			"saved_loot": 25,
+			"scenario": "sustained_save"
+		}
+	],
+	"viewport": "(2400, 1080)"
+}

@@ -6,6 +6,8 @@ const DAMAGE_NUMBER_SCENE: PackedScene = preload("res://scenes/ui/damage_number.
 const RUN_SNAPSHOT: Script = preload("res://scripts/systems/run_snapshot.gd")
 const SPAWN_PADDING := 32.0
 const MAX_ACTIVE_ENEMIES := 110
+const MAX_DAMAGE_NUMBERS := 120
+const MAX_ECONOMY_DAMAGE_NUMBERS := 40
 const UPGRADES: Array[UpgradeData] = [
 	preload("res://data/upgrades/bisskraft.tres"),
 	preload("res://data/upgrades/nahschaden.tres"),
@@ -49,6 +51,7 @@ var collecting_wave_loot: bool = false
 var wave_loot_remaining: int = 0
 var autosave_timer: float = 0.0
 var camera_shake_time: float = 0.0
+var hud_refresh_time: float = 0.0
 var telemetry := RunTelemetry.new()
 var rewards := PostWaveRewards.new()
 var story := StoryProgress.new()
@@ -225,7 +228,10 @@ func _process(delta: float) -> void:
 	mobile_controls.set_combat_active(not ended and not in_shop and not starter_pending and not collecting_wave_loot and not choice_panel.visible and not shop_panel.visible and not story_dialogue.visible and not story_travel.visible and not game_menu.visible and (wave.active or boss_pending))
 	if not ended and (wave.active or boss_pending):
 		telemetry.tick(delta, $Enemies.get_child_count(), $EnemyProjectiles.get_child_count())
-	_refresh_hud()
+	hud_refresh_time -= delta
+	if hud_refresh_time <= 0.0:
+		hud_refresh_time = 0.1
+		_refresh_hud()
 	var camera: Camera2D = player.get_node("Camera2D")
 	if camera_shake_time > 0.0:
 		camera_shake_time = maxf(camera_shake_time - delta, 0.0)
@@ -482,6 +488,10 @@ func _show_item_feedback(message: String, at: Vector2, color: Color) -> void:
 
 
 func _show_damage_number(at: Vector2, amount: float, player_hit: bool = false) -> void:
+	# Cosmetic budget only; damage, loot and important feedback are never dropped.
+	var limit := MAX_ECONOMY_DAMAGE_NUMBERS if session.economy_graphics() else MAX_DAMAGE_NUMBERS
+	if not player_hit and $DamageNumbers.get_child_count() >= limit:
+		return
 	var number: DamageNumber = DAMAGE_NUMBER_SCENE.instantiate()
 	$DamageNumbers.add_child(number)
 	number.show_amount(at, amount, player_hit)

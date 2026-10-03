@@ -74,6 +74,9 @@ var active_special_attack: int = EnemyData.SpecialAttack.NONE
 var active_trigger_range: float = 0.0
 var inflammation_aura: BossInflammationAura
 var inflicted_statuses: Array[Dictionary] = []
+var spatial_index: EnemySpatialIndex
+var hit_flash_time: float = 0.0
+var spatial_order: int = 0
 
 
 func configure(enemy_data: EnemyData, player: Player, wave_number: int = 1, difficulty_id: StringName = &"normal") -> void:
@@ -106,6 +109,10 @@ func configure(enemy_data: EnemyData, player: Player, wave_number: int = 1, diff
 
 func _ready() -> void:
 	add_to_group("enemies")
+	spatial_index = get_parent() as EnemySpatialIndex
+	if spatial_index != null:
+		spatial_index.register(self)
+		set_notify_local_transform(true)
 	sprite.texture = data.sprite
 	sprite.modulate = data.sprite_tint
 	var side := maxf(float(data.sprite.get_width()), float(data.sprite.get_height()))
@@ -120,7 +127,20 @@ func _ready() -> void:
 		add_child(inflammation_aura)
 
 
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_LOCAL_TRANSFORM_CHANGED and is_instance_valid(spatial_index):
+		spatial_index.update(self)
+
+
+func _exit_tree() -> void:
+	if is_instance_valid(spatial_index):
+		spatial_index.unregister(self)
+
+
 func _process(delta: float) -> void:
+	if hit_flash_time > 0.0:
+		hit_flash_time = maxf(hit_flash_time - delta, 0.0)
+		modulate = Color.WHITE.lerp(Color(1.6, 1.6, 1.6), hit_flash_time / 0.12)
 	boss_guard_feedback_time = maxf(boss_guard_feedback_time - delta, 0.0)
 	if dying:
 		death_elapsed += delta
@@ -212,7 +232,8 @@ func _physics_process(delta: float) -> void:
 	else:
 		_update_sprite_facing(movement)
 	var closest := Geometry2D.get_closest_point_to_segment(target.global_position, before_move, global_position)
-	if closest.distance_to(target.global_position) < data.radius + 20.0 and contact_timer <= 0.0:
+	var contact_radius := data.radius + 20.0
+	if contact_timer <= 0.0 and closest.distance_squared_to(target.global_position) < contact_radius * contact_radius:
 		var damage := attack_damage if charging else contact_damage
 		contact_timer = 0.8 / overtime_attack_factor()
 		target.take_hit(damage, inflicted_statuses)
@@ -346,8 +367,7 @@ func apply_haste(bonus: float, duration: float) -> void:
 
 func _pulse_aura() -> void:
 	var radius_squared := data.aura_radius * data.aura_radius
-	for node in get_tree().get_nodes_in_group("enemies"):
-		var ally := node as Enemy
+	for ally in EnemySpatialIndex.circle(get_tree(), spatial_index, global_position, data.aura_radius, false):
 		if ally == null or ally == self or ally.data.is_boss or ally.data.is_elite:
 			continue
 		if global_position.distance_squared_to(ally.global_position) <= radius_squared:
@@ -533,7 +553,7 @@ func take_damage(amount: float, weapon: WeaponData = null, critical: bool = fals
 	else:
 		queue_redraw()
 		modulate = Color(1.6, 1.6, 1.6)
-		create_tween().tween_property(self, "modulate", Color.WHITE, 0.12)
+		hit_flash_time = 0.12
 
 
 func _boss_phase_floor() -> float:

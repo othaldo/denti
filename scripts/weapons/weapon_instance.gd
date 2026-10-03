@@ -126,9 +126,8 @@ func _physics_process(delta: float) -> void:
 		return
 	var targets: Array[Enemy] = []
 	var reach := data.range_at_tier(tier)
-	for node in get_tree().get_nodes_in_group("enemies"):
-		var enemy := node as Enemy
-		if enemy != null and enemy.health > 0.0 and player.global_position.distance_squared_to(enemy.global_position) <= pow(reach + enemy.data.radius, 2):
+	for enemy in player.nearby_enemies(player.global_position, reach):
+		if enemy != null and enemy.health > 0.0 and player.global_position.distance_squared_to(enemy.global_position) <= (reach + enemy.data.radius) * (reach + enemy.data.radius):
 			targets.append(enemy)
 	if targets.is_empty():
 		focus_target_id = 0
@@ -213,8 +212,7 @@ func _fire(targets: Array[Enemy], damage: float, critical: bool) -> void:
 			WeaponAttackShapes.hit(targets[0], data, tier, damage, critical, player.items, aim)
 		&"beam_line", &"cone":
 			# Acquisition uses Denti's range; the emitted shape uses the barrel's range.
-			for node in get_tree().get_nodes_in_group("enemies"):
-				var enemy := node as Enemy
+			for enemy in player.nearby_enemies(muzzle, data.range_at_tier(tier)):
 				if enemy == null or enemy.health <= 0:
 					continue
 				if WeaponAttackShapes.contains(data, tier, muzzle, aim, enemy.global_position, enemy.data.radius):

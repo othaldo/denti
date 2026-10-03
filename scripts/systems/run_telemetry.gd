@@ -51,6 +51,11 @@ var last_boss_ttk: float = 0.0
 var damage_events: Array[Dictionary] = []
 var kill_events: Array[float] = []
 var taken_events: Array[Dictionary] = []
+var recent_damage: float = 0.0
+var recent_taken: float = 0.0
+var damage_head: int = 0
+var kill_head: int = 0
+var taken_head: int = 0
 
 
 func begin_wave(number: int, profile_id: StringName = &"") -> void:
@@ -84,6 +89,11 @@ func begin_wave(number: int, profile_id: StringName = &"") -> void:
 	damage_events.clear()
 	kill_events.clear()
 	taken_events.clear()
+	recent_damage = 0.0
+	recent_taken = 0.0
+	damage_head = 0
+	kill_head = 0
+	taken_head = 0
 
 
 func tick(delta: float, enemies_alive: int = 0, enemy_projectiles: int = 0) -> void:
@@ -92,8 +102,9 @@ func tick(delta: float, enemies_alive: int = 0, enemy_projectiles: int = 0) -> v
 	wave_enemy_seconds += float(enemies_alive) * delta
 	wave_peak_enemy_projectiles = maxi(wave_peak_enemy_projectiles, enemy_projectiles)
 	_prune_events()
-	peak_dps = maxf(peak_dps, recent_dps())
-	wave_peak_dps = maxf(wave_peak_dps, recent_dps())
+	var dps := recent_dps()
+	peak_dps = maxf(peak_dps, dps)
+	wave_peak_dps = maxf(wave_peak_dps, dps)
 
 
 func record_spawn(is_boss: bool, is_elite: bool = false) -> void:
@@ -113,7 +124,8 @@ func record_damage(amount: float, weapon_id: StringName = &"", proc_id: StringNa
 		return
 	total_damage += amount
 	wave_damage += amount
-	damage_events.append({"at": elapsed, "amount": amount})
+	recent_damage += amount
+	_append_amount(damage_events, amount)
 	if weapon_id != &"":
 		var key := str(weapon_id)
 		weapon_damage[key] = float(weapon_damage.get(key, 0.0)) + amount
@@ -122,8 +134,9 @@ func record_damage(amount: float, weapon_id: StringName = &"", proc_id: StringNa
 		proc_damage[key] = float(proc_damage.get(key, 0.0)) + amount
 	else:
 		other_damage += amount
-	peak_dps = maxf(peak_dps, recent_dps())
-	wave_peak_dps = maxf(wave_peak_dps, recent_dps())
+	var dps := recent_dps()
+	peak_dps = maxf(peak_dps, dps)
+	wave_peak_dps = maxf(wave_peak_dps, dps)
 
 
 func record_kill(is_boss: bool, is_elite: bool = false) -> void:
@@ -165,7 +178,8 @@ func record_taken(amount: float) -> void:
 		return
 	damage_taken += amount
 	wave_taken += amount
-	taken_events.append({"at": elapsed, "amount": amount})
+	recent_taken += amount
+	_append_amount(taken_events, amount)
 
 
 func record_loot(kind: StringName, amount: int, source: StringName = &"drop") -> void:
@@ -200,14 +214,11 @@ func record_chest_scrapped() -> void:
 
 
 func recent_dps() -> float:
-	var damage := 0.0
-	for event in damage_events:
-		damage += float(event["amount"])
-	return damage / maxf(minf(elapsed - wave_started_at, WINDOW), 1.0)
+	return recent_damage / maxf(minf(elapsed - wave_started_at, WINDOW), 1.0)
 
 
 func recent_kps() -> float:
-	return float(kill_events.size()) / maxf(minf(elapsed - wave_started_at, WINDOW), 1.0)
+	return float(kill_events.size() - kill_head) / maxf(minf(elapsed - wave_started_at, WINDOW), 1.0)
 
 
 func spawns_per_minute() -> float:
@@ -215,10 +226,7 @@ func spawns_per_minute() -> float:
 
 
 func taken_per_minute() -> float:
-	var amount := 0.0
-	for event in taken_events:
-		amount += float(event["amount"])
-	return amount * 60.0 / maxf(minf(elapsed - wave_started_at, WINDOW), 1.0)
+	return recent_taken * 60.0 / maxf(minf(elapsed - wave_started_at, WINDOW), 1.0)
 
 
 func current_wave_summary() -> Dictionary:
@@ -273,8 +281,8 @@ func save_data() -> Dictionary:
 		"wave_peak_enemies": wave_peak_enemies, "wave_enemy_seconds": wave_enemy_seconds,
 		"wave_peak_enemy_projectiles": wave_peak_enemy_projectiles,
 		"boss_started_at": boss_started_at, "last_boss_ttk": last_boss_ttk,
-		"damage_events": damage_events.duplicate(true), "kill_events": kill_events.duplicate(),
-		"taken_events": taken_events.duplicate(true),
+		"damage_events": damage_events.slice(damage_head).duplicate(true), "kill_events": kill_events.slice(kill_head),
+		"taken_events": taken_events.slice(taken_head).duplicate(true),
 	}
 
 
@@ -327,13 +335,45 @@ func restore(saved: Dictionary, wave_number: int) -> void:
 	damage_events.assign(saved.get("damage_events", []))
 	kill_events.assign(saved.get("kill_events", []))
 	taken_events.assign(saved.get("taken_events", []))
+	damage_head = 0
+	kill_head = 0
+	taken_head = 0
+	recent_damage = 0.0
+	recent_taken = 0.0
+	for event in damage_events:
+		recent_damage += float(event["amount"])
+	for event in taken_events:
+		recent_taken += float(event["amount"])
 	_prune_events()
 
 
+# Hits in one frame share a timestamp and expiration; keep one bucket per frame.
+# Old saves with one entry per hit remain valid.
+func _append_amount(events: Array[Dictionary], amount: float) -> void:
+	if not events.is_empty() and float(events[-1]["at"]) == elapsed:
+		events[-1]["amount"] = float(events[-1]["amount"]) + amount
+	else:
+		events.append({"at": elapsed, "amount": amount})
+
+
 func _prune_events() -> void:
-	while not damage_events.is_empty() and elapsed - float(damage_events[0]["at"]) >= WINDOW:
-		damage_events.pop_front()
-	while not kill_events.is_empty() and elapsed - kill_events[0] >= WINDOW:
-		kill_events.pop_front()
-	while not taken_events.is_empty() and elapsed - float(taken_events[0]["at"]) >= WINDOW:
-		taken_events.pop_front()
+	while damage_head < damage_events.size() and elapsed - float(damage_events[damage_head]["at"]) >= WINDOW:
+		recent_damage -= float(damage_events[damage_head]["amount"])
+		damage_head += 1
+	while kill_head < kill_events.size() and elapsed - kill_events[kill_head] >= WINDOW:
+		kill_head += 1
+	while taken_head < taken_events.size() and elapsed - float(taken_events[taken_head]["at"]) >= WINDOW:
+		recent_taken -= float(taken_events[taken_head]["amount"])
+		taken_head += 1
+	# Amortized compaction instead of shifting the whole array per expired hit.
+	if damage_head > 0 and damage_head * 2 >= damage_events.size():
+		damage_events = damage_events.slice(damage_head)
+		damage_head = 0
+	if kill_head > 0 and kill_head * 2 >= kill_events.size():
+		kill_events = kill_events.slice(kill_head)
+		kill_head = 0
+	if taken_head > 0 and taken_head * 2 >= taken_events.size():
+		taken_events = taken_events.slice(taken_head)
+		taken_head = 0
+	recent_damage = maxf(recent_damage, 0.0)
+	recent_taken = maxf(recent_taken, 0.0)

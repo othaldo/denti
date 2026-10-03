@@ -19,6 +19,7 @@ const DODGE_IFRAMES := 0.15
 @onready var status_effects: PlayerStatusEffects = $StatusEffects
 @onready var arena: DentiArena = get_node("../Arena")
 @onready var mobile_controls: MobileControls = get_node("../MobileControls/Root")
+@onready var enemy_index: EnemySpatialIndex = get_node("../Enemies") as EnemySpatialIndex
 
 var hurt_time: float = 0.0
 var dodge_time: float = 0.0
@@ -26,6 +27,14 @@ var animation_time: float = 0.0
 var attack_time: float = 0.0
 var attack_direction: Vector2 = Vector2.RIGHT
 var is_moving: bool = false
+
+
+func nearby_enemies(at: Vector2, radius: float, include_radius: bool = true) -> Array[Enemy]:
+	return EnemySpatialIndex.circle(get_tree(), enemy_index, at, radius, include_radius)
+
+
+func enemies_on_segment(start: Vector2, end: Vector2, radius: float) -> Array[Enemy]:
+	return EnemySpatialIndex.segment(get_tree(), enemy_index, start, end, radius)
 
 
 func _ready() -> void:

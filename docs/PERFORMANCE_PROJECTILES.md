@@ -66,6 +66,10 @@ ist erforderlich; `--headless` eignet sich hier nicht zur Performance-Messung.
 
 ## Prüfung und nächste Kandidaten
 
+Update vom 03.10.2026: Die unten genannten vollständigen Spielerprojektil-Abfragen
+sowie Telemetrie und Beutezeichnung wurden im [Performance-Audit](PERFORMANCE_AUDIT.md)
+optimiert. Dort stehen aktuelle Messwerte, Grafikmodi und die Prüfung mit 77 Tests.
+
 Alle **36 automatisierten Tests** bestehen. Der neue Projektil-Test prüft gemeinsame
 Texturen, Bewegung, Ablauf, Trefferschaden, feste Orb-Warnringe und Save/Resume.
 Der [Bildvergleich](screenshots/projectile_rendering_comparison.png) zeigt die

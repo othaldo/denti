@@ -4,6 +4,13 @@ Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü an
 
 ## In Entwicklung
 
+- **Performance:** räumliche Gegnerabfragen für Waffen und Synergien, gemeinsame
+  Projektil-/Beuteatlanten, laufende Telemetrie-Summen, weniger HUD-Arbeit und
+  Treffer-Tweens sowie begrenzte kosmetische Schadenszahlen. Neue Grafikoptionen
+  Automatisch / Sparsam / Voll; Touch-Geräte nutzen automatisch die sparsame
+  Renderauflösung. Kampfwerte und Gegnerdruck bleiben erhalten.
+  [Messungen und Prüfungen](docs/PERFORMANCE_AUDIT.md).
+
 - Gerichtete Gegnergrafiken folgen der tatsächlichen Laufrichtung, einschließlich Rückzug und Ansturm; Angriffswarnungen zeigen die angekündigte Richtung. Die Blickrichtung bleibt beim Fortsetzen eines Runs erhalten.
 
 - **Gift und Blutung für Denti:** erfolgreiche Gegnerkontakte und Geschosse können zeitlich begrenzte Effekte übertragen. Gift ignoriert Härte, Blutung wird durch Härte reduziert. Dodge und Schild verhindern die Anwendung; gleiche Effekte stapeln keinen Schaden endlos. Gesichter und HUD zeigen echte Zustände, Save/Resume bewahrt Tickzeiten und Eigenschaften. Effekte enden vor der Beutesammlung. Neu: Giftkeim mit Giftschuss-Fächer und Zahnfleischbeißer mit Blutungsansturm, eigene gemalte Sprites; Einführung, Häufigkeit, Stärke und Dauer skalieren mit Schwierigkeit. Spätere gewöhnliche Gegner und Eliten können eine erkennbare Statuseigenschaft tragen. [Regeln, Messwerte und Vorschau](docs/PLAYER_STATUS_EFFECTS.md).

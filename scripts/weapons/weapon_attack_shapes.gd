@@ -5,17 +5,19 @@ extends RefCounted
 static func contains(weapon: WeaponData, tier: int, origin: Vector2, direction: Vector2, target: Vector2, radius: float) -> bool:
 	var offset := target - origin
 	var reach := weapon.range_at_tier(tier)
-	if offset.length() > reach + radius:
+	if offset.length_squared() > (reach + radius) * (reach + radius):
 		return false
 	match weapon.attack_mode:
 		&"thrust", &"beam_line":
 			var closest := Geometry2D.get_closest_point_to_segment(target, origin, origin + direction * reach)
-			return closest.distance_to(target) <= weapon.attack_width * 0.5 + radius
+			var hit_radius := weapon.attack_width * 0.5 + radius
+			return closest.distance_squared_to(target) <= hit_radius * hit_radius
 		&"cone", &"sweep":
 			# Include enemy circles touching a cone edge; large bosses stay hittable.
-			if offset.length() <= radius:
+			var distance := offset.length()
+			if distance <= radius:
 				return true
-			var allowance := asin(clampf(radius / offset.length(), 0.0, 1.0))
+			var allowance := asin(clampf(radius / distance, 0.0, 1.0))
 			return absf(direction.angle_to(offset)) <= deg_to_rad(weapon.arc_degrees * 0.5) + allowance
 	return true
 

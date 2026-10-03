@@ -126,7 +126,9 @@ func update_status(stats: PlayerStats, xp: int, xp_goal: int, level: int, coins:
 	var timer_font_size := 20 if in_shop or boss_pending or collecting_loot else 30
 	if timer_label.get_theme_font_size("font_size") != timer_font_size:
 		timer_label.add_theme_font_size_override("font_size", timer_font_size)
-	timer_label.add_theme_color_override("font_color", DentiUIStyle.CORAL if boss_pending else DentiUIStyle.GOLD if remaining <= 15.0 and not in_shop and not boss_pending and not collecting_loot else DentiUIStyle.INK)
+	var timer_color := DentiUIStyle.CORAL if boss_pending else DentiUIStyle.GOLD if remaining <= 15.0 and not in_shop and not boss_pending and not collecting_loot else DentiUIStyle.INK
+	if timer_label.get_theme_color("font_color") != timer_color:
+		timer_label.add_theme_color_override("font_color", timer_color)
 	$Root/WaveInfo/Timer/ClockIcon.visible = not in_shop and not boss_pending and not collecting_loot
 	xp_bar.max_value = xp_goal
 	xp_bar.value = xp

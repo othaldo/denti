@@ -33,6 +33,7 @@ var sugar_kills_progress: int = 0
 var sugar_rush_time: float = 0.0
 var sugar_crash_time: float = 0.0
 var dodge_guard_progress: int = 0
+var cached_pickup_range: float = Loot.MAGNET_DISTANCE
 
 
 func _process(delta: float) -> void:
@@ -145,7 +146,7 @@ func preferred_tags(loadout: WeaponLoadout) -> Array[StringName]:
 
 
 func pickup_range() -> float:
-	return Loot.MAGNET_DISTANCE + _power(&"magnet")
+	return cached_pickup_range
 
 
 func coin_double_chance() -> float:
@@ -419,6 +420,7 @@ func _rebuild_powers() -> void:
 			continue
 		var effect_key := str(item.effect_kind)
 		powers[effect_key] = float(powers.get(effect_key, 0.0)) + item.effect_value * int(owned[key])
+	cached_pickup_range = Loot.MAGNET_DISTANCE + _power(&"magnet")
 
 
 func _power(effect_kind: StringName) -> float:
@@ -436,8 +438,7 @@ func _ready_proc(effect_kind: StringName, wait: float) -> bool:
 func _nearest_other(at: Vector2, excluded: Enemy, radius: float) -> Enemy:
 	var result: Enemy = null
 	var best := radius * radius
-	for node in get_tree().get_nodes_in_group("enemies"):
-		var enemy := node as Enemy
+	for enemy in player.nearby_enemies(at, radius, false):
 		if enemy == null or enemy == excluded or enemy.health <= 0.0:
 			continue
 		var distance := at.distance_squared_to(enemy.global_position)
@@ -448,16 +449,14 @@ func _nearest_other(at: Vector2, excluded: Enemy, radius: float) -> Enemy:
 
 
 func _area_damage(at: Vector2, radius: float, amount: float, excluded: Enemy, proc_id: StringName) -> void:
-	for node in get_tree().get_nodes_in_group("enemies"):
-		var enemy := node as Enemy
-		if enemy != null and enemy != excluded and enemy.health > 0.0 and at.distance_to(enemy.global_position) <= radius + enemy.data.radius:
+	for enemy in player.nearby_enemies(at, radius):
+		if enemy != null and enemy != excluded and enemy.health > 0.0 and at.distance_squared_to(enemy.global_position) <= (radius + enemy.data.radius) * (radius + enemy.data.radius):
 			enemy.take_damage(amount, null, false, proc_id)
 
 
 func _puddle_tick(at: Vector2) -> void:
-	for node in get_tree().get_nodes_in_group("enemies"):
-		var enemy := node as Enemy
-		if enemy != null and enemy.health > 0.0 and at.distance_to(enemy.global_position) <= PUDDLE_RADIUS + enemy.data.radius:
+	for enemy in player.nearby_enemies(at, PUDDLE_RADIUS):
+		if enemy != null and enemy.health > 0.0 and at.distance_squared_to(enemy.global_position) <= (PUDDLE_RADIUS + enemy.data.radius) * (PUDDLE_RADIUS + enemy.data.radius):
 			enemy.apply_wet(1.1)
 			enemy.take_damage(player.stats.scale_damage(_power(&"water_puddle")), null, false, &"water_puddle")
 

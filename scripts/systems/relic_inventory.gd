@@ -92,9 +92,8 @@ func on_weapon_hit(enemy: Enemy, amount: float, weapon: WeaponData, critical: bo
 
 func _blood_burst(enemy: Enemy, amount: float) -> void:
 	var at := enemy.global_position
-	for node in get_tree().get_nodes_in_group("enemies"):
-		var other := node as Enemy
-		if other == null or other == enemy or other.health <= 0.0 or at.distance_to(other.global_position) > BLOOD_RADIUS + other.data.radius:
+	for other in player.nearby_enemies(at, BLOOD_RADIUS):
+		if other == null or other == enemy or other.health <= 0.0 or at.distance_squared_to(other.global_position) > (BLOOD_RADIUS + other.data.radius) * (BLOOD_RADIUS + other.data.radius):
 			continue
 		other.apply_bleed(enemy.bleed_dps, 2.5, 3)
 		other.take_damage(minf(amount * 0.5, 75.0), null, false, &"blood_moon_tooth")
@@ -103,9 +102,8 @@ func _blood_burst(enemy: Enemy, amount: float) -> void:
 
 func _tidal_wave(enemy: Enemy, amount: float) -> void:
 	var at := enemy.global_position
-	for node in get_tree().get_nodes_in_group("enemies"):
-		var other := node as Enemy
-		if other == null or other == enemy or other.health <= 0.0 or at.distance_to(other.global_position) > TIDE_RADIUS + other.data.radius:
+	for other in player.nearby_enemies(at, TIDE_RADIUS):
+		if other == null or other == enemy or other.health <= 0.0 or at.distance_squared_to(other.global_position) > (TIDE_RADIUS + other.data.radius) * (TIDE_RADIUS + other.data.radius):
 			continue
 		other.apply_wet(3.0)
 		other.take_damage(minf(amount * 0.55, 75.0), null, false, &"tidal_seal")
@@ -113,17 +111,15 @@ func _tidal_wave(enemy: Enemy, amount: float) -> void:
 
 
 func _area_damage(at: Vector2, radius: float, amount: float, excluded: Enemy, proc_id: StringName) -> void:
-	for node in get_tree().get_nodes_in_group("enemies"):
-		var other := node as Enemy
-		if other != null and other != excluded and other.health > 0.0 and at.distance_to(other.global_position) <= radius + other.data.radius:
+	for other in player.nearby_enemies(at, radius):
+		if other != null and other != excluded and other.health > 0.0 and at.distance_squared_to(other.global_position) <= (radius + other.data.radius) * (radius + other.data.radius):
 			other.take_damage(amount, null, false, proc_id)
 
 
 func _nearest_other(at: Vector2, excluded: Enemy, radius: float) -> Enemy:
 	var nearest: Enemy = null
 	var distance := radius * radius
-	for node in get_tree().get_nodes_in_group("enemies"):
-		var other := node as Enemy
+	for other in player.nearby_enemies(at, radius, false):
 		if other == null or other == excluded or other.health <= 0.0:
 			continue
 		var candidate := at.distance_squared_to(other.global_position)
