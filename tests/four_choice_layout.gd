@@ -190,6 +190,10 @@ func _run() -> void:
 	var fourth: UpgradeData = game.choice_panel.current_upgrades[3]
 	var before: float = game.player.stats.get(fourth.stat)
 	RunSnapshot.restore(game, saved)
+	var restored_fourth: UpgradeData = game.choice_panel.current_upgrades[3]
+	if restored_fourth.resource_path != fourth.resource_path or restored_fourth.tier != fourth.tier or not is_equal_approx(restored_fourth.amount, fourth.amount):
+		_fail("fourth level-up offer changed identity or tier after resume")
+		return
 	game.choice_panel.buttons[3].pressed.emit()
 	if not is_equal_approx(float(game.player.stats.get(fourth.stat)), before + fourth.amount):
 		_fail("fourth level-up choice lost its effect after resume")

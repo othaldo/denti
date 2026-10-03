@@ -61,7 +61,9 @@ static func capture(game) -> Dictionary:
 	var upgrades: Array[Dictionary] = []
 	if game.choice_panel.visible and game.choice_panel.mode == &"upgrade":
 		for upgrade in game.choice_panel.current_upgrades:
-			upgrades.append({"stat": str(upgrade.stat), "tier": upgrade.tier})
+			# Save the actual offer identity. Several upgrades may eventually affect
+			# the same stat while carrying different effects or scaling.
+			upgrades.append({"resource": upgrade.resource_path, "stat": str(upgrade.stat), "tier": upgrade.tier})
 	return {
 		"difficulty_id": str(game.wave.difficulty_id),
 		"endless_enabled": game.wave.endless_enabled,
@@ -311,8 +313,9 @@ static func restore(game, saved: Dictionary) -> void:
 					value["stat"] = "attack_speed"
 				elif str(value.get("stat", "")) == "damage":
 					value["stat"] = "damage_bonus"
+			var resource_path := str(value.get("resource", "")) if value is Dictionary else ""
 			for upgrade in game.UPGRADES:
-				if value is Dictionary and str(upgrade.stat) == str(value.get("stat", "")):
+				if value is Dictionary and (upgrade.resource_path == resource_path if resource_path != "" else str(upgrade.stat) == str(value.get("stat", ""))):
 					options.append(upgrade.with_tier(int(value.get("tier", 1))))
 					break
 				if value is String and upgrade.resource_path == value:
