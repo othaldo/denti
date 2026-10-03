@@ -5,6 +5,7 @@ signal graphics_changed
 
 const SAVE_VERSION := 1
 const ADAPTIVE_GRAPHICS: Script = preload("res://scripts/systems/adaptive_graphics.gd")
+const BOSS_PROJECTILE_WARMUP: Script = preload("res://scripts/enemies/boss_projectile_warmup.gd")
 enum GraphicsMode { AUTOMATIC, ECONOMY, FULL }
 
 var save_path: String = "user://run_save.json"
@@ -48,6 +49,8 @@ func _ready() -> void:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	apply_volume()
 	apply_graphics()
+	if DisplayServer.get_name() != "headless":
+		add_child(BOSS_PROJECTILE_WARMUP.new())
 	fps_display_changed.emit(show_fps)
 	if ui_voice == null:
 		ui_voice = AudioStreamPlayer.new()

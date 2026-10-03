@@ -4,6 +4,8 @@ Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü an
 
 ## In Entwicklung
 
+- Bossgeschosse werden beim Laden als gemeinsame Texturen vorbereitet und zusammen mit Charge-Zeichenpfaden einmal in einem kleinen separaten Viewport gerendert. Dadurch entfällt ihre erstmalige Bilderzeugung am Ende des ersten Charge.
+
 - Flaky Save/Resume-Test korrigiert: Die Prüfung berücksichtigt die Obergrenze von 65 % Krit-Chance, statt bei einer zufälligen Glanz-Karte einen höheren Wert zu erwarten. Neue gezielte Prüfungen decken alle elf Level-up-Typen und vier Seltenheiten sowie Glanz unter, nahe und an der Obergrenze ab.
 
 - Mobiler Pause-Button sitzt unter der FPS-Anzeige, damit sich beide im Hochkant- und Querformat nicht überdecken.
