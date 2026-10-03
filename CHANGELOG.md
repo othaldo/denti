@@ -4,6 +4,8 @@ Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü an
 
 ## In Entwicklung
 
+- Flaky Save/Resume-Test korrigiert: Die Prüfung berücksichtigt die Obergrenze von 65 % Krit-Chance, statt bei einer zufälligen Glanz-Karte einen höheren Wert zu erwarten. Neue gezielte Prüfungen decken alle elf Level-up-Typen und vier Seltenheiten sowie Glanz unter, nahe und an der Obergrenze ab.
+
 - Mobiler Pause-Button sitzt unter der FPS-Anzeige, damit sich beide im Hochkant- und Querformat nicht überdecken.
 
 - **Performance:** räumliche Gegnerabfragen für Waffen und Synergien, gemeinsame

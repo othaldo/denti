@@ -191,12 +191,16 @@ func _run() -> void:
 	var before: float = game.player.stats.get(fourth.stat)
 	RunSnapshot.restore(game, saved)
 	var restored_fourth: UpgradeData = game.choice_panel.current_upgrades[3]
-	if restored_fourth.resource_path != fourth.resource_path or restored_fourth.tier != fourth.tier or not is_equal_approx(restored_fourth.amount, fourth.amount):
+	if restored_fourth.stat != fourth.stat or restored_fourth.resource_path != fourth.resource_path or restored_fourth.tier != fourth.tier or not is_equal_approx(restored_fourth.amount, fourth.amount):
 		_fail("fourth level-up offer changed identity or tier after resume")
 		return
 	game.choice_panel.buttons[3].pressed.emit()
-	if not is_equal_approx(float(game.player.stats.get(fourth.stat)), before + fourth.amount):
-		_fail("fourth level-up choice lost its effect after resume")
+	# This late-run build already reaches the crit cap. A random Glanz offer
+	# remains valid, but cannot raise the chance past 65%.
+	var expected := minf(before + fourth.amount, 0.65) if fourth.stat == &"crit_chance" else before + fourth.amount
+	var actual := float(game.player.stats.get(fourth.stat))
+	if not is_equal_approx(actual, expected):
+		_fail("fourth level-up choice lost its effect after resume: stat=%s tier=%d before=%.4f amount=%.4f expected=%.4f actual=%.4f" % [fourth.stat, fourth.tier, before, fourth.amount, expected, actual])
 		return
 	session.clear_run()
 	paused = false
