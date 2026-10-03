@@ -240,7 +240,7 @@ func _fps_option() -> CheckButton:
 	graphics_option.add_item("Grafik: Sparsam", 1)
 	graphics_option.add_item("Grafik: Voll", 2)
 	graphics_option.selected = session.graphics_mode
-	graphics_option.tooltip_text = "Automatisch nutzt auf Touch-Geräten den sparsamen Modus. Sparsam senkt die Renderauflösung und begrenzt Schadenszahlen. Voll nutzt die Bildschirmauflösung."
+	graphics_option.tooltip_text = "Automatisch startet mit voller Auflösung und wechselt im Kampf bei anhaltend unter 20 FPS für diesen Run auf Sparsam. Sparsam senkt die Renderauflösung und begrenzt Schadenszahlen. Voll nutzt die Bildschirmauflösung."
 	DentiUIStyle.style_button(graphics_option)
 	row.add_child(graphics_option)
 	graphics_option.item_selected.connect(Callable(session, "set_graphics_mode"))

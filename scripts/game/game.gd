@@ -61,6 +61,7 @@ var story_travel: StoryTravel
 
 func _ready() -> void:
 	randomize()
+	session.begin_graphics_run()
 	story_dialogue = StoryDialogue.new()
 	add_child(story_dialogue)
 	story_dialogue.advance_requested.connect(_on_story_advance)
@@ -225,7 +226,9 @@ func _start_combat_wave() -> void:
 
 
 func _process(delta: float) -> void:
-	mobile_controls.set_combat_active(not ended and not in_shop and not starter_pending and not collecting_wave_loot and not choice_panel.visible and not shop_panel.visible and not story_dialogue.visible and not story_travel.visible and not game_menu.visible and (wave.active or boss_pending))
+	var combat_active := not ended and not in_shop and not starter_pending and not collecting_wave_loot and not choice_panel.visible and not shop_panel.visible and not story_dialogue.visible and not story_travel.visible and not game_menu.visible and (wave.active or boss_pending)
+	mobile_controls.set_combat_active(combat_active)
+	session.update_graphics_performance(combat_active)
 	if not ended and (wave.active or boss_pending):
 		telemetry.tick(delta, $Enemies.get_child_count(), $EnemyProjectiles.get_child_count())
 	hud_refresh_time -= delta

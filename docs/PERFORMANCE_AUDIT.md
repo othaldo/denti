@@ -8,13 +8,20 @@ Zeichenaufrufen für Beute. Diese Pfade sind optimiert. Gegnerlimits, Spawnraten
 Schaden, Beute und Bossmuster wurden für diese Arbeit nicht reduziert.
 
 Unter **Einstellungen → Grafik** stehen **Automatisch**, **Sparsam** und **Voll**.
-Automatisch wählt auf Touch-Geräten Sparsam, auf Desktop-Geräten Voll. Sparsam
+Automatisch startet auf allen Geräten in Voll. Nach drei Sekunden Anlaufzeit
+misst es im aktiven Kampf die echte Zeit zwischen gerenderten Frames. Liegt der
+Durchschnitt in drei aufeinanderfolgenden Fenstern von je mindestens einer
+Sekunde unter 20 FPS, wechselt es für den restlichen Run auf Sparsam. Einzelne
+Ruckler lösen den Wechsel nicht aus. Pausen, Menüs und Hintergrund-Tabs setzen
+die Messung zurück; sie schalten die Auflösung nicht herunter. Ein neuer oder
+fortgesetzter Run und eine neue manuelle Moduswahl starten die Automatik erneut.
+Die automatische Absenkung wird nicht als Einstellung gespeichert. Sparsam
 rendert in der logischen Spielauflösung und skaliert das fertige Bild hoch; Voll
 zeichnet in Bildschirmauflösung. Die vorhandenen mobilen Basisgrößen bleiben
 720 × 1280 im Hochformat und 1040 × 600 im Querformat; breite Displays erweitern
 weiterhin den sichtbaren Bereich. Touch-Koordinaten und UI-Layout bleiben gleich.
-Die Auswahl wird in den Einstellungen gespeichert. Bei fehlender Touch-Erkennung
-im Browser lässt sich Sparsam ausdrücklich auswählen.
+Die manuelle Auswahl wird in den Einstellungen gespeichert. Sparsam und Voll
+lassen sich jederzeit ausdrücklich auswählen und übersteuern die Automatik.
 
 Das nutzt Godots [Viewport-Stretching](https://docs.godotengine.org/en/stable/tutorials/rendering/multiple_resolutions.html#stretch-mode)
 zur Begrenzung der Pixelarbeit. Es kann insbesondere auf hochauflösenden
@@ -117,6 +124,13 @@ Schadenszahlenbudgets, Grafikumschaltung, Persistenz und mobiles Layout ab.
 Post-wave rewards, Touchsteuerung, Bosse, Items und Save/Resume bleiben durch
 die vorhandenen Tests abgedeckt. Einige Godot-Testprozesse melden beim Beenden
 noch ObjectDB-/Resource-Cleanup-Meldungen; alle Assertions und Exitcodes bestehen.
+
+Die Grafiktests prüfen Anlaufzeit, kurze Einbrüche, die Grenze von genau 20 FPS,
+Erholung zwischen Messfenstern, Pause/Fokusverlust, manuelle Übersteuerung und
+Reset beim nächsten Run. Ein zusätzlicher Kampf mit echtem OpenGL-Rendering und
+absichtlich auf 16 FPS begrenzter Bildrate wechselte nach 6,20 Sekunden von Voll
+auf Sparsam. Das logische Hochkant-HUD blieb dabei 720 × 1280; Pause-Button und
+FPS-Anzeige überlappten auch nach der Umschaltung nicht.
 
 ```powershell
 & Godot_v4.7.2-stable_win64_console.exe --path . --script res://tools/combat_performance_probe.gd -- --label=local

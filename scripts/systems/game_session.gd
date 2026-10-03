@@ -4,6 +4,7 @@ signal fps_display_changed(enabled: bool)
 signal graphics_changed
 
 const SAVE_VERSION := 1
+const ADAPTIVE_GRAPHICS: Script = preload("res://scripts/systems/adaptive_graphics.gd")
 enum GraphicsMode { AUTOMATIC, ECONOMY, FULL }
 
 var save_path: String = "user://run_save.json"
@@ -22,6 +23,9 @@ var show_fps: bool = false
 var ui_sounds: bool = true
 var reduced_ui_motion: bool = false
 var graphics_mode: GraphicsMode = GraphicsMode.AUTOMATIC
+var adaptive_graphics: AdaptiveGraphics = ADAPTIVE_GRAPHICS.new()
+var graphics_sample_us: int = -1
+var application_focused: bool = true
 var ui_voice: AudioStreamPlayer
 var last_ui_cue_ms: int = -1000
 
@@ -65,16 +69,47 @@ static func mobile_base_size(window_size: Vector2i) -> Vector2i:
 
 
 func economy_graphics() -> bool:
-	return use_economy_graphics(graphics_mode, DisplayServer.is_touchscreen_available())
+	return use_economy_graphics(graphics_mode, adaptive_graphics.economy)
 
 
-static func use_economy_graphics(mode: int, touchscreen: bool) -> bool:
-	return mode == GraphicsMode.ECONOMY or mode == GraphicsMode.AUTOMATIC and touchscreen
+static func use_economy_graphics(mode: int, automatic_economy: bool) -> bool:
+	return mode == GraphicsMode.ECONOMY or mode == GraphicsMode.AUTOMATIC and automatic_economy
+
+
+func begin_graphics_run() -> void:
+	adaptive_graphics.reset()
+	graphics_sample_us = -1
+	apply_graphics()
+
+
+func suspend_graphics_sampling() -> void:
+	graphics_sample_us = -1
+	adaptive_graphics.suspend()
+
+
+func update_graphics_performance(combat_active: bool) -> void:
+	if graphics_mode != GraphicsMode.AUTOMATIC or not combat_active or get_tree().paused or not application_focused:
+		suspend_graphics_sampling()
+		return
+	var now := Time.get_ticks_usec()
+	var previous := graphics_sample_us
+	graphics_sample_us = now
+	if previous >= 0 and adaptive_graphics.observe_frame(float(now - previous) / 1000000.0):
+		apply_graphics()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
+		application_focused = false
+	elif what == NOTIFICATION_APPLICATION_FOCUS_IN:
+		application_focused = true
+	if what in [NOTIFICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT, NOTIFICATION_APPLICATION_FOCUS_IN]:
+		suspend_graphics_sampling()
 
 
 func set_graphics_mode(mode: int) -> void:
 	graphics_mode = clampi(mode, 0, 2) as GraphicsMode
-	apply_graphics()
+	begin_graphics_run()
 	_save_settings()
 
 

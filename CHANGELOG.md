@@ -9,8 +9,9 @@ Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü an
 - **Performance:** räumliche Gegnerabfragen für Waffen und Synergien, gemeinsame
   Projektil-/Beuteatlanten, laufende Telemetrie-Summen, weniger HUD-Arbeit und
   Treffer-Tweens sowie begrenzte kosmetische Schadenszahlen. Neue Grafikoptionen
-  Automatisch / Sparsam / Voll; Touch-Geräte nutzen automatisch die sparsame
-  Renderauflösung. Kampfwerte und Gegnerdruck bleiben erhalten.
+  Automatisch / Sparsam / Voll; Automatisch startet in voller Auflösung und
+  senkt sie bei anhaltend unter 20 FPS im Kampf für den Run ab.
+  Kampfwerte und Gegnerdruck bleiben erhalten.
   [Messungen und Prüfungen](docs/PERFORMANCE_AUDIT.md).
 
 - Gerichtete Gegnergrafiken folgen der tatsächlichen Laufrichtung, einschließlich Rückzug und Ansturm; Angriffswarnungen zeigen die angekündigte Richtung. Die Blickrichtung bleibt beim Fortsetzen eines Runs erhalten.
