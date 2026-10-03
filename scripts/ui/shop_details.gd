@@ -16,6 +16,8 @@ var confirm_button: Button
 var cancel_button: Button
 var close_button: Button
 var terms_row: HFlowContainer
+var evolution_options: VBoxContainer
+signal evolution_requested(recipe_id: StringName)
 
 
 func _ready() -> void:
@@ -49,6 +51,9 @@ func _ready() -> void:
 	effect = _label(self, "", 15)
 	synergy = _label(self, "", 14)
 	synergy.add_theme_color_override("font_color", DentiUIStyle.MINT)
+	evolution_options = VBoxContainer.new()
+	evolution_options.add_theme_constant_override("separation", 5)
+	add_child(evolution_options)
 	terms_row = HFlowContainer.new()
 	terms_row.add_theme_constant_override("h_separation", 5)
 	add_child(terms_row)
@@ -72,6 +77,8 @@ func show_weapon(data: WeaponData, tier: int, player: Player, equipped: bool, eq
 	heading.text = data.display_name
 	icon.texture = data.sprite
 	subtitle.text = "%s · Stufe %s · %s · %s" % ["Ausgerüstet" if equipped else "Angebot", ["I", "II", "III", "IV"][tier - 1], data.roots_text(), data.damage_type_label()]
+	if data.evolution_kind != &"":
+		subtitle.text = "Spezialwaffe · %s · %s" % [data.roots_text(), data.damage_type_label()]
 	var current := WeaponPresentation.values(data, tier, player)
 	_clear_values()
 	_value("Treffer", "%.1f" % current.damage)
@@ -88,6 +95,8 @@ func show_weapon(data: WeaponData, tier: int, player: Player, equipped: bool, eq
 			continue
 		mechanics.append(part)
 	effect.text = " · ".join(mechanics)
+	if data.evolution_kind != &"":
+		effect.text = data.description
 	effect.visible = not effect.text.is_empty()
 	synergy.text = WeaponPresentation.synergy(data, equipment, player)
 	synergy.visible = not synergy.text.is_empty()
@@ -111,10 +120,33 @@ func show_item(entry: Dictionary, owned: bool) -> void:
 
 
 func clear_actions() -> void:
+	if evolution_options != null:
+		for child in evolution_options.get_children():
+			child.free()
 	for button in [sell_button, merge_button, confirm_button, cancel_button]:
 		button.visible = false
 	action_hint.text = ""
 	action_hint.visible = false
+
+
+func show_evolutions(recipes: Array[WeaponEvolutionRecipe]) -> void:
+	for recipe in recipes:
+		_label(evolution_options, recipe.result.description, 14)
+		var consumed := WeaponCatalog.by_id(recipe.base_weapon).display_name
+		if recipe.partner_weapon != &"":
+			consumed += " + " + WeaponCatalog.by_id(recipe.partner_weapon).display_name
+		_label(evolution_options, "Ersetzt %s · %s\nItems bleiben erhalten" % [consumed, recipe.result.roots_text()], 13)
+		var button := Button.new()
+		button.text = "Fusionieren · " + recipe.result.display_name
+		button.icon = recipe.result.sprite
+		button.expand_icon = true
+		button.add_theme_constant_override("icon_max_width", 32)
+		button.custom_minimum_size.y = 44
+		button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		DentiUIStyle.style_button(button, true)
+		DentiUIMotion.bind_action(button)
+		evolution_options.add_child(button)
+		button.pressed.connect(func() -> void: evolution_requested.emit(recipe.id))
 
 
 func _value(key: String, value: String) -> void:

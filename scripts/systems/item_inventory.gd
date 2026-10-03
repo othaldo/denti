@@ -290,6 +290,7 @@ func armor_damage_explanation() -> String:
 
 
 func on_weapon_hit(enemy: Enemy, amount: float, weapon: WeaponData, critical: bool) -> void:
+	player.loadout.evolution_hit(enemy, amount, weapon, critical)
 	# Copies scale damage, not proc frequency. Secondary damage has no weapon,
 	# so it cannot recursively trigger these on-hit effects.
 	if enemy.health > 0.0 and weapon.enamel_exposure > 0.0:

@@ -120,10 +120,10 @@ func _run() -> void:
 			return
 	game.wave.active = false
 	game.game_menu.open_pause()
-	if not paused or game.game_menu.rows.get_child_count() != 8:
+	if not paused or game.game_menu.rows.get_child_count() != 9:
 		_fail("pause menu did not open")
 		return
-	var pause_options_button: Button = game.game_menu.rows.get_child(6)
+	var pause_options_button: Button = game.game_menu.rows.get_child(7)
 	pause_options_button.pressed.emit()
 	await process_frame
 	if game.game_menu.page != &"options" or game.game_menu.rows.get_child_count() != 10:
@@ -150,7 +150,7 @@ func _run() -> void:
 		return
 	(game.game_menu.rows.get_child(9) as Button).pressed.emit()
 	await process_frame
-	if game.game_menu.page != &"home" or game.game_menu.rows.get_child_count() != 8:
+	if game.game_menu.page != &"home" or game.game_menu.rows.get_child_count() != 9:
 		_fail("pause options back button failed")
 		return
 	game.game_menu.close_pause()

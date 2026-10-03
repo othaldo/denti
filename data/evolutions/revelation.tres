@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="WeaponEvolutionRecipe" load_steps=3 format=3]
+[ext_resource type="Script" path="res://scripts/weapons/weapon_evolution_recipe.gd" id="1"]
+[ext_resource type="Resource" path="res://data/weapons/revelation.tres" id="2"]
+[resource]
+script = ExtResource("1")
+id = &"revelation"
+base_weapon = &"uv_lamp"
+partner_weapon = &"enamel_mirror"
+result = ExtResource("2")

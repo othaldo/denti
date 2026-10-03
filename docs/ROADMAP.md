@@ -1,6 +1,6 @@
 # Denti v0.2 Roadmap — Pressure + Build Depth
 
-Version **0.2.0** bundles the implemented changes on 2026-10-01; see the [patch history](../CHANGELOG.md). This document keeps the design rationale, progress notes and remaining plans. Weapon evolutions, meta progression and other unfinished stages below are still future work.
+Version **0.2.0** bundles the implemented changes on 2026-10-01; see the [patch history](../CHANGELOG.md). This document keeps the design rationale, progress notes and remaining plans. The six secret weapon evolutions are implemented as a first playable iteration; meta progression and other unfinished stages below remain future work.
 
 This roadmap captures the current player feedback and the intended next development loop for Denti: Divine Dentistry.
 
@@ -489,6 +489,8 @@ Keep the relic pool small and distinctive before expanding it.
 ---
 
 ## Phase 9 — Weapon evolutions
+
+Implemented: six optional, secret recipes, special attacks, generated weapon art and save/resume. Recipes are revealed only when fully satisfied. See [weapon evolutions](WEAPON_EVOLUTIONS.md) for developer-only recipes, values and tests. The first balance pass still needs run playtests.
 
 Only after core balance and pressure are healthy.
 

@@ -48,6 +48,14 @@ const MIN_ATTACK_COOLDOWN := 0.05
 @export var exposure_duration: float = 0.0
 @export var projectile_shape: StringName = &"orb"
 
+@export_group("Evolution")
+@export var evolution_kind: StringName = &""
+@export var evolution_damage_factor: float = 1.0
+@export var evolution_radius: float = 110.0
+@export var evolution_duration: float = 3.0
+@export var evolution_interval: float = 0.8
+@export var evolution_threshold: int = 4
+
 @export_group("Held animation")
 @export_enum("aimed", "upright", "staff") var held_style: String = "aimed"
 @export_enum("shoot", "lob", "pull", "thrust", "slash", "spin", "drill", "polish", "spray", "beam") var attack_animation: String = "shoot"

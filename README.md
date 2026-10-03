@@ -45,7 +45,7 @@ Das Projekt mit **Godot 4.4 oder neuer** öffnen und mit **F5** starten. Unter L
 | F3 (Debug-Build) | Kampf-Telemetrie ein- und ausblenden |
 | F4 (lokaler Debug-Build) | Testmenü: Waffen, Items, Münzen, Stats und Wellen |
 | Maus | Waffen, Boni und Shopangebote wählen |
-| Touchscreen | Auf der freien Spielfläche ziehen, um Denti zu bewegen; Loslassen stoppt. Pause, Menüs und Shop per Tippen bedienen. |
+| Touchscreen | Auf der freien Spielfläche kurz in die gewünschte Richtung ziehen und den Finger halten: Denti läuft weiter. Nachziehen ändert die Richtung, Loslassen stoppt. Pause, Menüs und Shop per Tippen bedienen. |
 
 Vor einem neuen Run wählst du **Easy, Normal oder Hard**; **Hell** wird nach einem Sieg auf Hard freigeschaltet. Der Grad bleibt beim Fortsetzen erhalten. Normal entspricht der bisherigen Balance, während die anderen Grade vor allem Gegnerdichte, Horden, Eliten und Projektilmuster verändern.
 

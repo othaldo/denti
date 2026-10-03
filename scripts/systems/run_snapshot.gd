@@ -2,6 +2,7 @@ class_name RunSnapshot
 extends RefCounted
 
 const ACID_PROJECTILE: PackedScene = preload("res://scenes/enemies/acid_projectile.tscn")
+const PLAYER_PROJECTILE: PackedScene = preload("res://scenes/game/weapon_projectile.tscn")
 
 
 static func capture(game) -> Dictionary:
@@ -35,6 +36,10 @@ static func capture(game) -> Dictionary:
 			"boss_radial_volley_index": enemy.boss_radial_volley_index,
 		})
 	var weapon_runtime: Array[Dictionary] = []
+	var player_projectiles: Array[Dictionary] = []
+	for projectile in game.get_node("Projectiles").get_children():
+		if projectile is WeaponProjectile and not projectile.is_queued_for_deletion():
+			player_projectiles.append(projectile.save_state(enemy_indices))
 	for weapon: WeaponInstance in game.player.loadout.equipped():
 		weapon_runtime.append({"cooldown": weapon.cooldown, "focus_hits": weapon.focus_hits,
 			"focus_time": weapon.focus_time, "focus_target": enemy_indices.get(weapon.focus_target_id, -1),
@@ -71,6 +76,7 @@ static func capture(game) -> Dictionary:
 		"xp": game.xp, "xp_goal": game.xp_goal, "level": game.level, "coins": game.coins,
 		"weapons": game.player.loadout.save_data(), "starter_pending": game.starter_pending,
 		"weapon_runtime": weapon_runtime,
+		"player_projectiles": player_projectiles,
 		"items": game.items.save_data(),
 		"relics": game.relics.save_data(),
 		"telemetry": game.telemetry.save_data(),
@@ -140,6 +146,11 @@ static func restore(game, saved: Dictionary) -> void:
 	game.coins = maxi(int(saved.get("coins", 0)), 0)
 	if saved.has("weapons"):
 		player.loadout.restore(saved.get("weapons", []))
+		# Existing saves with a successfully fused weapon also earn its encyclopedia entry.
+		for weapon in player.loadout.equipped():
+			for recipe in WeaponEvolutions.ALL:
+				if weapon.data.id == recipe.result.id:
+					game.get_node("/root/GameSession").discover_fusion(recipe.id)
 	else:
 		player.loadout.acquire(WeaponCatalog.by_id(&"magic_toothbrush"))
 		for id_value in saved.get("owned_weapons", []):
@@ -204,6 +215,11 @@ static func restore(game, saved: Dictionary) -> void:
 	var runtime: Array = saved.get("weapon_runtime", [])
 	var weapons := player.loadout.equipped()
 	var restored_enemies: Array[Node] = game.get_node("Enemies").get_children()
+	for entry in saved.get("player_projectiles", []):
+		if entry is Dictionary and WeaponCatalog.by_id(StringName(entry.get("id", ""))) != null:
+			var projectile: WeaponProjectile = PLAYER_PROJECTILE.instantiate()
+			game.get_node("Projectiles").add_child(projectile)
+			projectile.restore_state(entry, game.items, restored_enemies)
 	for index in mini(runtime.size(), weapons.size()):
 		if not runtime[index] is Dictionary:
 			continue

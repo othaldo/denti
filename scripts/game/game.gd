@@ -86,6 +86,7 @@ func _ready() -> void:
 	shop_panel.buy_requested.connect(_on_shop_buy)
 	shop_panel.sell_requested.connect(_on_shop_sell)
 	shop_panel.merge_requested.connect(_on_shop_merge)
+	shop_panel.evolution_requested.connect(_on_shop_evolve)
 	shop_panel.reroll_requested.connect(_on_shop_reroll)
 	shop_panel.reservation_requested.connect(_on_shop_reserve)
 	shop_panel.continue_requested.connect(_on_shop_continue)
@@ -699,6 +700,16 @@ func _on_shop_merge(index: int) -> void:
 		return
 	_update_shop_panel()
 	shop_panel.animate_equipment(index)
+	_save_run()
+
+
+func _on_shop_evolve(index: int, recipe_id: StringName) -> void:
+	if not in_shop or not player.loadout.evolve(index, WeaponEvolutions.by_id(recipe_id), items):
+		return
+	get_node("/root/GameSession").discover_fusion(recipe_id)
+	shop_panel.close_details()
+	_update_shop_panel()
+	shop_panel.animate_equipment(player.loadout.equipped().size() - 1)
 	_save_run()
 
 

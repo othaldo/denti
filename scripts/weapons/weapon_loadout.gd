@@ -5,6 +5,58 @@ const CAPACITY := 6
 const MAX_TIER := 4
 
 
+func evolution_ready(index: int, recipe: WeaponEvolutionRecipe, items: ItemInventory) -> bool:
+	var weapons := equipped()
+	if recipe == null or index < 0 or index >= weapons.size():
+		return false
+	var selected := weapons[index]
+	if selected.tier != MAX_TIER or selected.data.id not in [recipe.base_weapon, recipe.partner_weapon]:
+		return false
+	var other_id := recipe.partner_weapon if selected.data.id == recipe.base_weapon else recipe.base_weapon
+	var partner := _find_tier(other_id, MAX_TIER, selected) if other_id != &"" else null
+	if other_id != &"" and partner == null:
+		return false
+	for family in recipe.families:
+		if items.family_count(family) < 1:
+			return false
+	for id in recipe.items:
+		if items.count(id) < 1:
+			return false
+	return used_slots() - selected.data.hands - (partner.data.hands if partner != null else 0) + recipe.result.hands <= CAPACITY
+
+
+func ready_evolutions(index: int, items: ItemInventory) -> Array[WeaponEvolutionRecipe]:
+	var result: Array[WeaponEvolutionRecipe] = []
+	for recipe in WeaponEvolutions.ALL:
+		if evolution_ready(index, recipe, items):
+			result.append(recipe)
+	return result
+
+
+func evolve(index: int, recipe: WeaponEvolutionRecipe, items: ItemInventory) -> bool:
+	if not evolution_ready(index, recipe, items):
+		return false
+	var selected := equipped()[index]
+	var other_id := recipe.partner_weapon if selected.data.id == recipe.base_weapon else recipe.base_weapon
+	var partner := _find_tier(other_id, MAX_TIER, selected) if other_id != &"" else null
+	var invested := selected.invested_coins + (partner.invested_coins if partner != null else 0)
+	if partner != null:
+		partner.free()
+	selected.free()
+	_add(recipe.result, MAX_TIER, invested)
+	_refresh_positions()
+	return true
+
+
+func evolution_hit(enemy: Enemy, amount: float, data: WeaponData, critical: bool) -> void:
+	if data.evolution_kind == &"":
+		return
+	for weapon in equipped():
+		if weapon.data.id == data.id and weapon.evolution != null:
+			weapon.evolution.on_hit(enemy, amount, critical)
+			return
+
+
 func equipped() -> Array[WeaponInstance]:
 	var result: Array[WeaponInstance] = []
 	for child in get_children():
@@ -21,6 +73,8 @@ func used_slots() -> int:
 
 
 func can_acquire(data: WeaponData, tier: int = 1) -> bool:
+	if data.evolution_kind != &"":
+		return false
 	return used_slots() + data.hands <= CAPACITY or (tier < MAX_TIER and _find_tier(data.id, tier) != null)
 
 

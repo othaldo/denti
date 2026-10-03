@@ -33,4 +33,4 @@ static func by_id(id: StringName) -> WeaponData:
 	for weapon in ALL:
 		if weapon.id == id:
 			return weapon
-	return null
+	return WeaponEvolutions.weapon_by_id(id)

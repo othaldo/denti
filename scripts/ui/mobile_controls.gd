@@ -3,14 +3,16 @@ extends Control
 
 signal pause_requested
 
+const TOUCH_DEADZONE := 10.0
+const TOUCH_RADIUS := 64.0
+
 @onready var pause_button: Button = $Pause
 
 var touch_index: int = -1
 var combat_active: bool = false
 var player: Player
 var touch_origin: Vector2
-var player_origin: Vector2
-var target: Vector2
+var held_direction: Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
@@ -44,7 +46,7 @@ func _input(event: InputEvent) -> void:
 		_release_touch()
 		get_viewport().set_input_as_handled()
 	elif event is InputEventScreenDrag and event.index == touch_index:
-		_update_target(event.position)
+		_update_direction(event.position)
 		get_viewport().set_input_as_handled()
 
 
@@ -58,25 +60,25 @@ func _unhandled_input(event: InputEvent) -> void:
 			return
 		touch_index = event.index
 		touch_origin = event.position
-		player_origin = player.global_position
-		target = player_origin
+		held_direction = Vector2.ZERO
 		get_viewport().set_input_as_handled()
 
 
-func _update_target(screen_position: Vector2) -> void:
-	var canvas_inverse := player.get_canvas_transform().affine_inverse()
-	var offset := canvas_inverse.basis_xform(screen_position - touch_origin)
-	target = (player_origin + offset).clamp(Vector2.ONE * DentiArena.PLAYER_MARGIN,
-		player.arena.arena_size - Vector2.ONE * DentiArena.PLAYER_MARGIN)
+func _update_direction(screen_position: Vector2) -> void:
+	var offset := screen_position - touch_origin
+	# Let the gesture origin follow long drags so reversing stays within reach.
+	if offset.length() > TOUCH_RADIUS:
+		offset = offset.normalized() * TOUCH_RADIUS
+		touch_origin = screen_position - offset
+	held_direction = Vector2.ZERO if offset.length() <= TOUCH_DEADZONE else player.get_canvas_transform().affine_inverse().basis_xform(offset).normalized()
 
 
-func movement_direction(delta: float) -> Vector2:
+func movement_direction(_delta: float) -> Vector2:
 	if touch_index < 0 or not visible or not combat_active or not is_instance_valid(player):
 		return Vector2.ZERO
-	var distance := target - player.global_position
-	# Keep movement stats meaningful and avoid overshooting a nearby target.
-	return distance / maxf(player.stats.move_speed * delta, 0.001) if distance.length() < player.stats.move_speed * delta else distance.normalized()
+	return held_direction
 
 
 func _release_touch() -> void:
 	touch_index = -1
+	held_direction = Vector2.ZERO

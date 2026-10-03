@@ -19,6 +19,10 @@ var returning: bool = false
 var return_rearmed: bool = false
 var return_hits_left: int = 0
 var tier: int = 1
+var orbit_time: float = 0.0
+var orbit_center: Vector2
+var orbit_finished: bool = false
+var orbit_hits: Array[int] = []
 
 
 func launch(start: Vector2, aim: Vector2, attack_damage: float, weapon: WeaponData, inventory: ItemInventory = null, is_critical: bool = false, weapon_tier: int = 1) -> void:
@@ -31,9 +35,24 @@ func launch(start: Vector2, aim: Vector2, attack_damage: float, weapon: WeaponDa
 	critical = is_critical
 	pierces_left = weapon.pierce_at_tier(tier)
 	return_factor = inventory.projectile_return_factor() if inventory != null and weapon.splash_at_tier(tier) <= 0.0 else 0.0
+	if data.evolution_kind == &"halo":
+		return_factor += 1.0
 
 
 func _physics_process(delta: float) -> void:
+	if orbit_time > 0:
+		orbit_time = maxf(orbit_time - delta, 0)
+		animation_time += delta
+		global_position = orbit_center + Vector2.from_angle(animation_time * 9) * data.evolution_radius
+		for node in get_tree().get_nodes_in_group("enemies"):
+			var enemy := node as Enemy
+			if enemy != null and enemy.health > 0 and not orbit_hits.has(enemy.get_instance_id()) and orbit_center.distance_to(enemy.global_position) <= data.evolution_radius + enemy.data.radius:
+				orbit_hits.append(enemy.get_instance_id())
+				enemy.take_damage(damage * data.evolution_damage_factor, null, false, &"evolution")
+		queue_redraw()
+		if orbit_time <= 0:
+			_start_return()
+		return
 	if impact_time > 0.0:
 		impact_time -= delta
 		queue_redraw()
@@ -98,6 +117,11 @@ func _physics_process(delta: float) -> void:
 
 
 func _start_return() -> void:
+	if data.evolution_kind == &"halo" and not orbit_finished:
+		orbit_finished = true
+		orbit_time = data.evolution_duration
+		orbit_center = global_position
+		return
 	returning = true
 	traveled = 0.0
 	damage *= return_factor
@@ -114,6 +138,45 @@ func _explode() -> void:
 			WeaponAttackShapes.hit(enemy, data, tier, damage, critical, items, direction if push_direction.is_zero_approx() else push_direction)
 	impact_time = IMPACT_DURATION
 	queue_redraw()
+
+
+func save_state(indices: Dictionary) -> Dictionary:
+	var hits: Array[int] = []
+	var orbit: Array[int] = []
+	for id in hit_ids:
+		if indices.has(id):
+			hits.append(indices[id])
+	for id in orbit_hits:
+		if indices.has(id):
+			orbit.append(indices[id])
+	return {"id": str(data.id), "tier": tier, "x": global_position.x, "y": global_position.y,
+		"dx": direction.x, "dy": direction.y, "damage": damage, "critical": critical,
+		"traveled": traveled, "animation": animation_time, "impact": impact_time, "pierce": pierces_left,
+		"hits": hits, "factor": return_factor, "returning": returning, "rearmed": return_rearmed,
+		"return_hits": return_hits_left, "orbit": orbit_time, "cx": orbit_center.x, "cy": orbit_center.y,
+		"orbit_finished": orbit_finished, "orbit_hits": orbit}
+
+
+func restore_state(saved: Dictionary, inventory: ItemInventory, enemies: Array[Node]) -> void:
+	launch(Vector2(saved.x, saved.y), Vector2(saved.dx, saved.dy), maxf(saved.damage, 0),
+		WeaponCatalog.by_id(StringName(saved.id)), inventory, bool(saved.get("critical", false)), clampi(saved.get("tier", 1), 1, 4))
+	traveled = maxf(saved.get("traveled", 0), 0)
+	animation_time = maxf(saved.get("animation", 0), 0)
+	impact_time = clampf(saved.get("impact", 0), 0, IMPACT_DURATION)
+	pierces_left = maxi(saved.get("pierce", 0), 0)
+	return_factor = maxf(saved.get("factor", 0), 0)
+	returning = bool(saved.get("returning", false))
+	return_rearmed = bool(saved.get("rearmed", false))
+	return_hits_left = maxi(saved.get("return_hits", 0), 0)
+	orbit_time = clampf(saved.get("orbit", 0), 0, data.evolution_duration)
+	orbit_center = Vector2(saved.get("cx", 0), saved.get("cy", 0))
+	orbit_finished = bool(saved.get("orbit_finished", false))
+	for index in saved.get("hits", []):
+		if index >= 0 and index < enemies.size():
+			hit_ids.append(enemies[index].get_instance_id())
+	for index in saved.get("orbit_hits", []):
+		if index >= 0 and index < enemies.size():
+			orbit_hits.append(enemies[index].get_instance_id())
 
 
 func _draw() -> void:

@@ -26,9 +26,11 @@ Originalbilder bleiben erhalten.
 
 Shop, Hauptmenü, Kampf, Belohnungen und ESC-Menü bleiben getrennte Ansichten.
 Es gibt keine Website-Navigation oder zusätzliche ESC-Schaltfläche im Shop.
-Auf Touchscreens folgt Denti der Fingerbewegung auf der freien Spielfläche,
-ohne sichtbares Steuerpad. Der Startpunkt behält den Abstand zum Finger;
-Bewegungstempo und Arenagrenzen gelten weiterhin. Loslassen, Pause oder
+Auf Touchscreens gibt kurzes Ziehen auf der freien Spielfläche die Laufrichtung vor,
+ohne sichtbares Steuerpad. Solange der Finger liegen bleibt, läuft Denti weiter;
+Nachziehen ändert die Richtung. Bei langen Gesten wandert der Bezugspunkt mit,
+damit Richtungswechsel erreichbar bleiben. Kleine Fingerbewegungen liegen im
+Toleranzbereich. Bewegungstempo und Arenagrenzen gelten weiterhin. Loslassen, Pause oder
 Fokusverlust beendet die Geste. UI-Buttons übernehmen ihre eigenen Berührungen.
 Die dunkle Gestaltung gilt auch für Tooltips, Auswahllisten, deaktivierte Buttons und Dialoge.
 

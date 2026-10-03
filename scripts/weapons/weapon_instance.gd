@@ -26,6 +26,7 @@ var strike := WeaponStrike.new()
 var focus_target_id: int = 0
 var focus_hits: int = 0
 var focus_time: float = 0.0
+var evolution: WeaponEvolutionEffects
 
 
 func configure(weapon: WeaponData, weapon_tier: int = 1) -> void:
@@ -40,6 +41,11 @@ func _ready() -> void:
 	sprite.texture = data.held_texture()
 	sprite.offset = (Vector2(0.5, 0.5) - data.grip_anchor) * data.held_texture().get_size()
 	add_child(sprite)
+	if data.evolution_kind != &"":
+		evolution = WeaponEvolutionEffects.new()
+		evolution.weapon = self
+		add_child(evolution)
+		sprite.modulate = Color(1.12, 1.04, 1.18)
 	if data.working_head_texture != null:
 		working_head = WeaponWorkingHead.new()
 		working_head.configure(data)
@@ -88,6 +94,8 @@ func _physics_process(delta: float) -> void:
 		queue_redraw()
 	update_visual()
 	if cooldown > 0.0 or attack_time > 0.0:
+		return
+	if evolution != null and evolution.charge_time > 0:
 		return
 	var targets: Array[Enemy] = []
 	var reach := data.range_at_tier(tier)
@@ -143,9 +151,10 @@ func _begin_attack(targets: Array[Enemy]) -> void:
 	attack_time = attack_duration
 	var critical := player.stats.last_roll_critical
 	update_visual()
+	var evolution_attack := evolution != null and evolution.on_attack(targets, damage, critical)
 	if WeaponMotion.is_contact(data):
 		strike.begin(damage, critical, nearest)
-	else:
+	elif not evolution_attack:
 		# Aim the actual barrel at the target, including its offset from the hand.
 		if data.held_style == "aimed" and data.attack_mode in [&"projectile", &"beam"]:
 			aim = (nearest.global_position - player.global_position - hold_position).normalized()
@@ -189,10 +198,13 @@ func save_motion(enemy_indices: Dictionary) -> Dictionary:
 	return {"remaining": attack_time, "duration": attack_duration, "damage": strike.damage,
 		"critical": strike.critical, "target": enemy_indices.get(strike.target_id, -1), "hits": hit_enemies,
 		"aim": [aim.x, aim.y], "hit_point": [hit_point.x, hit_point.y], "idle_time": idle_time, "aim_distance": aim_distance,
-		"hold": [hold_position.x, hold_position.y], "engagement_pending": engagement_pending}
+		"hold": [hold_position.x, hold_position.y], "engagement_pending": engagement_pending,
+		"evolution": evolution.save_state(enemy_indices) if evolution != null else {}}
 
 
 func restore_motion(saved: Dictionary, enemies: Array[Node]) -> void:
+	if evolution != null:
+		evolution.restore_state(saved.get("evolution", {}), enemies)
 	attack_duration = clampf(float(saved.get("duration", data.animation_duration)), 0.035, 0.8)
 	attack_time = clampf(float(saved.get("remaining", 0.0)), 0.0, attack_duration)
 	strike.damage = maxf(float(saved.get("damage", 0.0)), 0.0)
@@ -220,7 +232,12 @@ func restore_motion(saved: Dictionary, enemies: Array[Node]) -> void:
 
 
 func _draw() -> void:
+	if data != null and data.evolution_kind != &"" and sprite != null:
+		var center := to_local(muzzle_position())
+		draw_arc(center, 10, idle_time * 2, idle_time * 2 + TAU * 0.8, 24, Color(data.projectile_color, 0.6), 2)
 	if attack_time <= 0.0 or sprite == null:
+		return
+	if data.evolution_kind == &"revelation":
 		return
 	var fraction := progress()
 	var fade := 1.0 - fraction

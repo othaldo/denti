@@ -11,6 +11,7 @@ var progression_path: String = "user://progression.cfg"
 var resume_requested: bool = false
 var selected_difficulty_id: StringName = &"normal"
 var hell_unlocked: bool = false
+var discovered_fusions: Array[String] = []
 var master_volume_percent: int = 100
 var music_volume_percent: int = 100
 var sfx_volume_percent: int = 100
@@ -89,7 +90,29 @@ func clear_run() -> void:
 
 func load_progression() -> void:
 	var config := ConfigFile.new()
-	hell_unlocked = config.load(progression_path) == OK and bool(config.get_value("difficulty", "hell_unlocked", false))
+	var loaded := config.load(progression_path) == OK
+	hell_unlocked = loaded and bool(config.get_value("difficulty", "hell_unlocked", false))
+	discovered_fusions.clear()
+	if loaded:
+		for id in config.get_value("dentipedia", "fusions", []):
+			if WeaponEvolutions.by_id(StringName(str(id))) != null and not discovered_fusions.has(str(id)):
+				discovered_fusions.append(str(id))
+
+
+func discover_fusion(id: StringName) -> void:
+	if WeaponEvolutions.by_id(id) == null or discovered_fusions.has(str(id)):
+		return
+	discovered_fusions.append(str(id))
+	_save_progression()
+
+
+func _save_progression() -> void:
+	var config := ConfigFile.new()
+	config.load(progression_path)
+	config.set_value("difficulty", "hell_unlocked", hell_unlocked)
+	config.set_value("dentipedia", "fusions", discovered_fusions)
+	if config.save(progression_path) != OK:
+		push_warning("Fortschritt konnte nicht gespeichert werden: %s" % progression_path)
 
 
 func can_select_difficulty(id: StringName) -> bool:
@@ -107,10 +130,7 @@ func unlock_hell() -> bool:
 	if hell_unlocked:
 		return false
 	hell_unlocked = true
-	var config := ConfigFile.new()
-	config.set_value("difficulty", "hell_unlocked", true)
-	if config.save(progression_path) != OK:
-		push_warning("Hell-Freischaltung konnte nicht gespeichert werden: %s" % progression_path)
+	_save_progression()
 	return true
 
 

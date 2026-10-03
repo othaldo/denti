@@ -6,6 +6,7 @@ const RELOAD_ICON: Texture2D = preload("res://assets/ui/reload_light.svg")
 signal buy_requested(index: int)
 signal sell_requested(index: int)
 signal merge_requested(index: int)
+signal evolution_requested(index: int, recipe_id: StringName)
 signal reroll_requested
 signal reservation_requested(index: int)
 signal continue_requested
@@ -167,6 +168,7 @@ func _ready() -> void:
 	details = ShopDetails.new()
 	margin.add_child(details)
 	details.merge_button.pressed.connect(func() -> void: merge_requested.emit(selected_index))
+	details.evolution_requested.connect(func(id: StringName) -> void: evolution_requested.emit(selected_index, id))
 	details.sell_button.pressed.connect(_confirm_sale)
 	details.confirm_button.pressed.connect(func() -> void: sell_requested.emit(selected_index))
 	details.cancel_button.pressed.connect(_render_selection)
@@ -481,6 +483,8 @@ func _render_selection() -> void:
 			return
 		tier = int(entry.tier)
 		details.show_weapon(data, tier, player, true, equipment)
+		if player != null:
+			details.show_evolutions(player.loadout.ready_evolutions(selected_index, player.items))
 		details.sell_button.visible = true
 		details.sell_button.text = "Verkaufen · +%d Münzen" % int(entry.refund)
 		details.merge_button.visible = true

@@ -1,5 +1,7 @@
 # Dentis Waffen
 
+Zusätzlich gibt es sechs geheime Mk-IV-Evolutionen. Ihre Option erscheint erst, wenn alle Voraussetzungen erfüllt sind; normale Angebote verraten keine Rezepte. Mehrere freiwillige Evolutionen pro Run sind möglich, auch vom gleichen Typ. [Entwicklungsdokumentation mit Rezepten und Tests](WEAPON_EVOLUTIONS.md).
+
 Denti beginnt ohne fest ins Charakterbild eingebaute Waffe. Vor Welle 1 wählt man Zauberbürste, Turbo-Bohrer oder Wasserflosser. Die übrigen Waffen sowie weitere Exemplare gibt es im Shop.
 
 Bisskraft verstärkt alle Waffen prozentual. Nah- oder Fernschaden ergänzt ihren Basisschaden mit einem individuellen Gewicht; die Waffenkarte zeigt den passenden Stat und seine Skalierung. Schnelle Flächenwaffen erhalten kleinere Gewichte als schwere Einzelangriffe. Fusion erhöht die Waffenbasis, ohne die rohen Stat-Beiträge zusätzlich zu vervielfachen. Die vollständigen Faktoren und Messungen stehen im [Schadens- und Verteidigungsbericht](DAMAGE_DEFENSE_BALANCE.md).

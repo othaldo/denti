@@ -21,6 +21,7 @@ var ui_sound_toggle: CheckButton
 var motion_toggle: CheckButton
 var menu_stage: HBoxContainer
 var hero: TextureRect
+var dentipedia: Dentipedia
 @onready var session: Node = get_node("/root/GameSession")
 
 
@@ -106,6 +107,7 @@ func _clear_rows() -> void:
 	build_scroll = null
 	build_grid = null
 	item_details = null
+	dentipedia = null
 	build_panel.custom_minimum_size = Vector2(520, 0)
 	rows.add_theme_constant_override("separation", 10)
 	fullscreen_button = null
@@ -229,6 +231,7 @@ func _show_home() -> void:
 		_button("Fortsetzen", close_pause, true)
 		_button("Stats", _show_stats)
 		_button("Items", _show_items)
+		_button("Dentipedia", _show_dentipedia)
 		_button("Einstellungen", _show_options)
 		_button("Hauptmenü", _to_main_menu)
 	else:
@@ -250,11 +253,26 @@ func _compact_title(title: String) -> void:
 	rows.add_theme_constant_override("separation", 6)
 
 
+func _show_dentipedia() -> void:
+	page = &"dentipedia"
+	_clear_rows()
+	_compact_title("Dentipedia")
+	dentipedia = Dentipedia.new()
+	rows.add_child(dentipedia)
+	_button("Zurück", _show_home)
+	_update_build_layout()
+
+
 func _update_build_layout() -> void:
 	if build_panel == null:
 		return
 	var extent := root_control.size
 	hero.visible = not overlay and page == &"home" and extent.x >= 900
+	if page == &"dentipedia":
+		build_panel.custom_minimum_size.x = minf(960, extent.x - 24)
+		if dentipedia != null:
+			dentipedia.custom_minimum_size.y = maxf(80, minf(570, extent.y - 180))
+		return
 	if page not in [&"stats", &"items"]:
 		build_panel.custom_minimum_size.x = minf(480, extent.x - 32)
 	if page not in [&"stats", &"items"]:
