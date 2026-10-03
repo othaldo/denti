@@ -10,9 +10,9 @@ price = 5
 stat_changes = { &"max_health": 25.0 }
 effect_kind = &"wave_shield"
 effect_value = 1.0
-max_stacks = 3
+max_stacks = 12
 tags = Array[StringName]([&"defense", &"sustain"])
 
 
 family_id = &"shield"
-family_limit = 3
+family_limit = 12

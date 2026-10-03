@@ -10,9 +10,9 @@ rarity_tier = 2
 price = 8
 effect_kind = &"chain"
 effect_value = 0.40
-max_stacks = 3
+max_stacks = 12
 tags = Array[StringName]([&"ranged", &"area"])
 
 
 family_id = &"chain"
-family_limit = 3
+family_limit = 12

@@ -63,7 +63,7 @@ func _run() -> void:
 	if offer_card.name_label.text != screw.display_name or not offer_card.category_label.text.is_empty() or not offer_card.effect_label.text.is_empty() or offer_card.summary_row.get_child_count() != 2:
 		_fail("purchase card shows owned count or repeats unconditional stat values")
 		return
-	for sample in [{"id": &"polish_paste", "mechanic": "35 % Trefferschaden (gesamt max. 80 %)"}, {"id": &"dodge_4", "mechanic": "Jedes 3. Ausweichen gewährt 1 Schildladung"}, {"id": &"damage_2", "mechanic": "Schaden gegen Bosse"}, {"id": &"fluoride_gel", "mechanic": "Schild"}, {"id": &"cavity_bounty", "mechanic": "Alle 12 Kills"}]:
+	for sample in [{"id": &"polish_paste", "mechanic": "35 % Trefferschaden"}, {"id": &"dodge_4", "mechanic": "Jedes 3. Ausweichen gewährt 1 Schildladung"}, {"id": &"damage_2", "mechanic": "Schaden gegen Bosse"}, {"id": &"fluoride_gel", "mechanic": "Schild"}, {"id": &"cavity_bounty", "mechanic": "Alle 12 Kills"}]:
 		var item := ShopController.by_id(sample.id)
 		offer_card.show_offer(item, 100, true, 2)
 		if not offer_card.effect_label.text.contains(sample.mechanic) or not offer_card.tooltip_text.contains(item.effect_text()):

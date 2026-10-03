@@ -7,15 +7,15 @@ id = &"forbidden_lollipop"
 icon_index = 14
 icon_texture = ExtResource("2")
 display_name = "Verbotener Lolli"
-description = "Laufen: +20 % Waffenschaden. -15 Leben, -2 Härte."
+description = "Während du dich bewegst: +20 % Waffenschaden. -15 Leben, -2 Härte."
 rarity_tier = 3
 price = 13
 stat_changes = { &"max_health": -15.0, &"armor": -2.0 }
 effect_kind = &"moving_damage"
 effect_value = 0.20
-max_stacks = 2
+max_stacks = 12
 tags = Array[StringName]([&"mobility", &"risk"])
 
 
 family_id = &"sugar"
-family_limit = 2
+family_limit = 12

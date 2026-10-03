@@ -121,7 +121,10 @@ func all_items() -> Array[Dictionary]:
 	for template in ShopController.CATALOG:
 		var copies := count(template.id)
 		if template.weapon_data == null and copies > 0:
-			result.append({"name": template.display_name, "count": copies, "description": template.effect_text() + "\n" + template.limit_text(), "tier": template.rarity_tier, "icon": template.icon_texture if template.icon_texture != null else DentiUIIcons.item(template.icon_index)})
+			var description := template.effect_text() + "\n" + template.limit_text()
+			if template.effect_kind == &"armor_damage":
+				description += "\n\n" + armor_damage_explanation()
+			result.append({"name": template.display_name, "count": copies, "description": description, "tier": template.rarity_tier, "icon": template.icon_texture if template.icon_texture != null else DentiUIIcons.item(template.icon_index)})
 	return result
 
 
@@ -169,7 +172,7 @@ func scrap_value(base_coins: int) -> int:
 
 
 func projectile_return_factor() -> float:
-	return minf(_power(&"projectile_return"), 0.70)
+	return _power(&"projectile_return")
 
 
 func attack_interval_factor() -> float:
@@ -266,17 +269,29 @@ func modify_damage(enemy: Enemy, weapon: WeaponData, base: float) -> float:
 	if enemy.bleed_stacks > 0:
 		bonus += _power(&"bleed_bonus") * 100.0
 	if enemy.wet_time > 0.0 and (weapon.damage_type == "Wasser" or weapon.damage_type == "Licht"):
-		bonus += minf(_power(&"conductive_wet"), 0.36) * 100.0
+		bonus += _power(&"conductive_wet") * 100.0
 	if player.is_moving:
-		bonus += minf(_power(&"moving_damage"), 0.40) * 100.0
+		bonus += _power(&"moving_damage") * 100.0
 	return player.stats.scale_damage(base, bonus)
 
 
 func base_weapon_damage_bonus() -> float:
-	return (relics.damage_factor() - 1.0 + minf(maxf(player.stats.armor, 0.0) * _power(&"armor_damage"), 0.60)) * 100.0
+	return (relics.damage_factor() - 1.0) * 100.0 + armor_damage_bonus()
+
+
+func armor_damage_bonus() -> float:
+	return minf(maxf(player.stats.armor, 0.0) * _power(&"armor_damage"), 0.60) * 100.0
+
+
+func armor_damage_explanation() -> String:
+	return "Aktuell: +%s %% Waffenschaden\n%s Härte × %s %% je Härte\nMaximal +60 %%. Negative Härte gibt keinen Bonus.\nAddiert sich zu Bisskraft; ist bereits in den Waffenwerten enthalten." % [
+		("%.1f" % armor_damage_bonus()).trim_suffix(".0"), ("%.1f" % player.stats.armor).trim_suffix(".0"),
+		("%.1f" % (_power(&"armor_damage") * 100.0)).trim_suffix(".0")]
 
 
 func on_weapon_hit(enemy: Enemy, amount: float, weapon: WeaponData, critical: bool) -> void:
+	# Copies scale damage, not proc frequency. Secondary damage has no weapon,
+	# so it cannot recursively trigger these on-hit effects.
 	if enemy.health > 0.0 and weapon.enamel_exposure > 0.0:
 		enemy.apply_enamel_exposure(weapon.enamel_exposure, weapon.exposure_duration)
 	if enemy.health > 0.0 and weapon.bleed_dps > 0.0:
@@ -298,18 +313,18 @@ func on_weapon_hit(enemy: Enemy, amount: float, weapon: WeaponData, critical: bo
 		var chain_range := CHAIN_RANGE + (85.0 if enemy.wet_time > 0.0 else 0.0)
 		var next := _nearest_other(enemy.global_position, enemy, chain_range)
 		if next != null and _ready_proc(&"chain", 0.45):
-			next.take_damage(amount * minf(_power(&"chain"), 0.9), null, false, &"chain")
+			next.take_damage(amount * _power(&"chain"), null, false, &"chain")
 			_line(enemy.global_position, next.global_position, Color(0.40, 0.94, 1.0))
 	if _power(&"splash") > 0.0 and weapon.attack_mode == &"projectile" and _ready_proc(&"splash", 0.65):
-		_area_damage(enemy.global_position, SPLASH_RADIUS, amount * minf(_power(&"splash"), 0.8), enemy, &"splash")
+		_area_damage(enemy.global_position, SPLASH_RADIUS, amount * _power(&"splash"), enemy, &"splash")
 		_ring(enemy.global_position, SPLASH_RADIUS, Color(0.44, 0.96, 0.78))
 	if critical and _power(&"crit_burst") > 0.0 and _ready_proc(&"crit_burst", 0.8):
-		_area_damage(enemy.global_position, 72.0, amount * minf(_power(&"crit_burst"), 0.8), enemy, &"crit_burst")
+		_area_damage(enemy.global_position, 72.0, amount * _power(&"crit_burst"), enemy, &"crit_burst")
 		_ring(enemy.global_position, 72.0, Color(1.0, 0.68, 0.97))
 	if critical and _power(&"crit_beam") > 0.0:
 		var beam_target := _nearest_other(enemy.global_position, enemy, 240.0)
 		if beam_target != null and _ready_proc(&"crit_beam", 0.65):
-			var beam_factor := minf(_power(&"crit_beam"), 0.60) * (1.5 if weapon.damage_type == "Licht" else 1.0)
+			var beam_factor := _power(&"crit_beam") * (1.5 if weapon.damage_type == "Licht" else 1.0)
 			beam_target.take_damage(amount * beam_factor, null, false, &"crit_beam")
 			_line(enemy.global_position, beam_target.global_position, Color(1.0, 0.88, 0.42))
 

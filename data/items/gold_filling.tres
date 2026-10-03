@@ -11,9 +11,9 @@ price = 12
 stat_changes = { &"damage_bonus": 5.0, &"armor": 1.0 }
 effect_kind = &"coin_bonus"
 effect_value = 0.15
-max_stacks = 3
+max_stacks = 12
 tags = Array[StringName]([&"economy", &"defense"])
 
 
 family_id = &"coins"
-family_limit = 3
+family_limit = 12

@@ -4,6 +4,7 @@ extends Button
 const ICONS: Script = preload("res://scripts/ui/denti_ui_icons.gd")
 const PIN_ICON: Texture2D = preload("res://assets/ui/pin.svg")
 const PIN_LIGHT: Texture2D = preload("res://assets/ui/pin_light.svg")
+const INFO_ICON: Texture2D = preload("res://assets/ui/info.svg")
 
 signal purchase_requested
 signal reservation_requested
@@ -22,14 +23,19 @@ var name_label: Label
 var rarity_label: Label
 var effect_label: Label
 var price_label: Label
+var buy_caption: Label
+var info_badge: TextureRect
 var hover_tween: Tween
 var catalog_minimum_height := 100.0
 var summary_row: GridContainer
 var category_label: Label
 var stat_font_size := 17
 var secondary_font_size := 14
+var compact_catalog := false
+var fit_queued := false
 
-func set_catalog_layout(vertical: bool, dense: bool = false) -> void:
+func set_catalog_layout(vertical: bool, dense: bool = false, compact_grid: bool = false) -> void:
+	compact_catalog = compact_grid
 	content.vertical = vertical
 	action_box.vertical = not vertical
 	action_spacer.visible = vertical
@@ -44,11 +50,11 @@ func set_catalog_layout(vertical: bool, dense: bool = false) -> void:
 	reserve_button.size_flags_horizontal = Control.SIZE_SHRINK_END
 	buy_button.size_flags_vertical = Control.SIZE_SHRINK_END
 	reserve_button.size_flags_vertical = Control.SIZE_SHRINK_END
-	catalog_minimum_height = 356.0 if dense else 436.0
+	catalog_minimum_height = 272.0 if compact_grid else (356.0 if dense else 436.0)
 	custom_minimum_size.y = catalog_minimum_height
-	icon_rect.custom_minimum_size = Vector2(88, 88) if dense else Vector2(112, 112)
+	icon_rect.custom_minimum_size = Vector2(88, 88) if dense or compact_grid else Vector2(112, 112)
 	icon_rect.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	name_label.add_theme_font_size_override("font_size", 17 if dense else 20)
+	name_label.add_theme_font_size_override("font_size", 18 if compact_grid else (17 if dense else 20))
 	effect_label.add_theme_font_size_override("font_size", 13 if dense else 14)
 	stat_font_size = 14 if dense else 17
 	secondary_font_size = 13 if dense else 14
@@ -58,14 +64,14 @@ func set_catalog_layout(vertical: bool, dense: bool = false) -> void:
 			for child in cell.get_children():
 				if child is Label:
 					child.add_theme_font_size_override("font_size", stat_font_size if bool(cell.get_meta("primary", true)) else secondary_font_size)
-	# Reserve identical text slots; text never determines the action baseline.
+	# Desktop cards reserve common text slots; compact rows remove empty fields.
 	name_label.custom_minimum_size.y = 2.0 * ceilf(name_label.get_theme_font("font").get_height(name_label.get_theme_font_size("font_size")))
 	effect_label.custom_minimum_size.y = (2.0 if dense else 3.0) * ceilf(effect_label.get_theme_font("font").get_height(effect_label.get_theme_font_size("font_size")))
 	name_label.vertical_alignment = VERTICAL_ALIGNMENT_TOP
 	catalog_header.custom_minimum_size.y = name_label.custom_minimum_size.y if dense else 0.0
 	effect_label.max_lines_visible = 2 if dense else 3
-	info_box.add_theme_constant_override("separation", 8)
-	content.add_theme_constant_override("separation", 8)
+	info_box.add_theme_constant_override("separation", 6 if compact_grid else 8)
+	content.add_theme_constant_override("separation", 6 if compact_grid else 8)
 	action_box.add_theme_constant_override("separation", 4)
 	if summary_row != null:
 		summary_row.custom_minimum_size.y = 56 if dense else 60
@@ -74,7 +80,8 @@ func set_catalog_layout(vertical: bool, dense: bool = false) -> void:
 	for edge in ["left", "right"]:
 		card_margin.add_theme_constant_override("margin_" + edge, 10 if dense else 14)
 	for edge in ["top", "bottom"]:
-		card_margin.add_theme_constant_override("margin_" + edge, 10 if dense else 16)
+		card_margin.add_theme_constant_override("margin_" + edge, 10 if dense or compact_grid else 16)
+	_sync_catalog_slots()
 
 
 
@@ -83,7 +90,9 @@ func _ready() -> void:
 	_build_content()
 	DentiUIStyle.style_card(self)
 	resized.connect(func() -> void: pivot_offset = size / 2.0)
-	resized.connect(func() -> void: call_deferred("_fit_content"))
+	resized.connect(_queue_fit)
+	card_margin.minimum_size_changed.connect(_queue_fit)
+	name_label.resized.connect(_queue_fit)
 	mouse_entered.connect(_on_hover.bind(true))
 	mouse_exited.connect(_on_hover.bind(false))
 
@@ -91,12 +100,14 @@ func _ready() -> void:
 func show_offer(offer: ShopOfferData, coins: int, available: bool = true, _owned_count: int = 0, dps: float = 0.0) -> void:
 	if offer == null:
 		content.visible = false
+		info_badge.visible = false
 		text = "Ausverkauft"
 		disabled = true
 		tooltip_text = ""
 		DentiUIStyle.style_button(self)
 		return
 	content.visible = true
+	info_badge.visible = selection_only
 	text = ""
 	icon_rect.texture = offer.weapon_data.sprite if offer.weapon_data != null else (offer.icon_texture if offer.icon_texture != null else ICONS.item(offer.icon_index))
 	name_label.text = offer.display_name
@@ -112,8 +123,17 @@ func show_offer(offer: ShopOfferData, coins: int, available: bool = true, _owned
 	price_label.text = "%d" % offer.price
 	buy_button.disabled = coins < offer.price or not available
 	buy_button.get_child(0).modulate = Color.WHITE
-	price_label.add_theme_color_override("font_color", DentiUIStyle.MUTED if buy_button.disabled else DentiUIStyle.GOLD)
-	buy_button.tooltip_text = "Zu wenig Münzen" if coins < offer.price else ("Nicht verfügbar" if not available else "Kaufen")
+	buy_caption.text = "Zu teuer" if coins < offer.price else (("Belegt" if offer.weapon_data != null else "Limit") if not available else "Kaufen")
+	var price_color := DentiUIStyle.CORAL if coins < offer.price else (DentiUIStyle.MUTED if not available else DentiUIStyle.GOLD_INK)
+	price_label.add_theme_color_override("font_color", price_color)
+	buy_caption.add_theme_color_override("font_color", price_color)
+	buy_button.mouse_default_cursor_shape = Control.CURSOR_ARROW if buy_button.disabled else Control.CURSOR_POINTING_HAND
+	if buy_button.disabled:
+		DentiUIMotion.reset(buy_button)
+		buy_button.set_meta("denti_action_hovered", false)
+	buy_button.tooltip_text = "Es fehlen %d Münzen" % (offer.price - coins) if coins < offer.price else (("Alle Wurzeln belegt" if offer.weapon_data != null else "Stapellimit erreicht") if not available else "Kaufen")
+	var blocked := buy_button.get_theme_stylebox("disabled") as StyleBoxFlat
+	blocked.border_color = DentiUIStyle.CORAL if coins < offer.price else DentiUIStyle.LINE
 	reserve_button.disabled = false
 	reserve_button.visible = selection_only
 	disabled = (coins < offer.price or not available) and not selection_only
@@ -127,7 +147,7 @@ func show_offer(offer: ShopOfferData, coins: int, available: bool = true, _owned
 			tooltip_text += "\nLimit erreicht"
 	tooltip_text += "\nSeltenheit: " + DentiRarity.name_for(offer.rarity_tier)
 	DentiUIStyle.style_card(self, offer.rarity_tier)
-	call_deferred("_fit_content")
+	_queue_fit()
 
 
 func show_reservation(reserved: bool) -> void:
@@ -145,9 +165,42 @@ func show_reservation(reserved: bool) -> void:
 		style.content_margin_bottom = 6
 
 
+func _queue_fit() -> void:
+	if fit_queued:
+		return
+	fit_queued = true
+	call_deferred("_fit_content")
+
+
 func _fit_content() -> void:
+	fit_queued = false
 	if selection_only:
-		custom_minimum_size.y = maxf(catalog_minimum_height, card_margin.get_combined_minimum_size().y)
+		if compact_catalog:
+			# Clipped labels report no automatic height. Reserve exactly their
+			# visible wrapped lines rather than a blank two-line slot on each item.
+			var line_height := ceilf(name_label.get_theme_font("font").get_height(name_label.get_theme_font_size("font_size")))
+			name_label.custom_minimum_size.y = line_height * clampi(name_label.get_line_count(), 1, 2)
+		var height := maxf(catalog_minimum_height, card_margin.get_combined_minimum_size().y)
+		if not is_equal_approx(custom_minimum_size.y, height):
+			custom_minimum_size.y = height
+
+
+func _sync_catalog_slots() -> void:
+	if not selection_only:
+		return
+	# Desktop columns share text baselines. Compact rows use only the fields
+	# present on the offer; empty metadata/stats must not create vertical gaps.
+	category_label.visible = not compact_catalog or not category_label.text.is_empty()
+	effect_label.visible = not compact_catalog or not effect_label.text.is_empty()
+	if compact_catalog:
+		name_label.custom_minimum_size.y = ceilf(name_label.get_theme_font("font").get_height(name_label.get_theme_font_size("font_size")))
+		category_label.custom_minimum_size.y = 0
+		effect_label.custom_minimum_size.y = 0
+		effect_label.max_lines_visible = 2
+	if summary_row != null:
+		summary_row.visible = not compact_catalog or summary_row.get_child_count() > 0
+		if compact_catalog:
+			summary_row.custom_minimum_size.y = 0
 
 
 func set_compact(compact: bool) -> void:
@@ -158,6 +211,19 @@ func set_compact(compact: bool) -> void:
 
 
 func _build_content() -> void:
+	var info := TextureRect.new()
+	info_badge = info
+	info.visible = selection_only
+	info.texture = INFO_ICON
+	info.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	info.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	info.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(info)
+	info.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	info.offset_left = -32
+	info.offset_right = -12
+	info.offset_top = 10
+	info.offset_bottom = 30
 	card_margin = MarginContainer.new()
 	card_margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	card_margin.add_theme_constant_override("margin_left", 13)
@@ -221,7 +287,8 @@ func _build_content() -> void:
 	price_chip.custom_minimum_size.x = 76.0
 	price_chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	price_chip.custom_minimum_size.y = 48
-	DentiUIStyle.style_button(price_chip)
+	DentiUIStyle.style_button(price_chip, true)
+	DentiUIMotion.bind_action(price_chip)
 	var actions := BoxContainer.new()
 	action_box = actions
 	actions.vertical = true
@@ -241,13 +308,27 @@ func _build_content() -> void:
 	reserve_button.add_theme_constant_override("icon_max_width", 18)
 	reserve_button.pressed.connect(func() -> void: reservation_requested.emit())
 	actions.add_child(reserve_button)
+	reserve_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	DentiUIMotion.bind_action(reserve_button)
 	show_reservation(false)
+	var buy_content := VBoxContainer.new()
+	buy_content.alignment = BoxContainer.ALIGNMENT_CENTER
+	buy_content.add_theme_constant_override("separation", 0)
+	buy_content.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	price_chip.add_child(buy_content)
+	buy_content.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	buy_caption = Label.new()
+	buy_caption.text = "Kaufen"
+	buy_caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	buy_caption.add_theme_font_size_override("font_size", 12)
+	buy_caption.add_theme_color_override("font_color", DentiUIStyle.GOLD_INK)
+	buy_caption.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	buy_content.add_child(buy_caption)
 	var price_row := HBoxContainer.new()
 	price_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	price_row.add_theme_constant_override("separation", 3)
 	price_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	price_chip.add_child(price_row)
-	price_row.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	buy_content.add_child(price_row)
 	var coin_icon := TextureRect.new()
 	coin_icon.custom_minimum_size = Vector2(22, 22)
 	coin_icon.texture = ICONS.hud(2)
@@ -294,6 +375,7 @@ func _show_summary(offer: ShopOfferData) -> void:
 		var number: Label = row.get_child(1)
 		number.add_theme_color_override("font_color", DentiUIStyle.CORAL if value < 0 else DentiUIStyle.INK)
 	effect_label.text = offer.card_effect_text()
+	_sync_catalog_slots()
 
 
 func show_weapon_values(data: WeaponData, tier: int, player: Player) -> void:
@@ -306,6 +388,7 @@ func show_weapon_values(data: WeaponData, tier: int, player: Player) -> void:
 		_stat_cell(entry[0], entry[1], entry[2], true)
 	_stat_cell(ICONS.stat(4), "%d %%" % roundi(values.crit * 100), "Krit-Chance", false)
 	_stat_cell(ICONS.RANGE, "%d" % roundi(values.range), "Reichweite", false)
+	_sync_catalog_slots()
 
 
 func _stat_cell(texture: Texture2D, value: String, meaning: String, primary: bool) -> HBoxContainer:

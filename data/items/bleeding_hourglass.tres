@@ -11,5 +11,5 @@ price = 9
 stat_changes = { &"damage_bonus": -6.0 }
 effect_kind = &"bleed_clock"
 effect_value = 1.0
-max_stacks = 2
+max_stacks = 6
 tags = Array[StringName]([&"bleed", &"melee"])

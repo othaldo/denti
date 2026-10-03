@@ -4,7 +4,7 @@
 script = ExtResource("1")
 id = &"mythic_luck"
 display_name = "Zahnfee-Stern"
-description = "+50 Glück. Einmalig pro Run. Ohne Nachteil."
+description = "+50 Glück."
 rarity_tier = 5
 price = 38
 icon_index = 85

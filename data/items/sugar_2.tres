@@ -4,14 +4,14 @@
 script = ExtResource("1")
 id = &"sugar_2"
 display_name = "Kariesbonbon"
-description = "Beim tatsächlichen Laufen: +14 % Waffenschaden. -1 Härte, -1 Regeneration."
+description = "Während du dich bewegst: +14 % Waffenschaden. -1 Härte, -1 Regeneration."
 rarity_tier = 2
 price = 9
 icon_index = 73
 stat_changes = { &"armor": -1.0, &"regen": -1.0 }
 effect_kind = &"moving_damage"
 effect_value = 0.14
-max_stacks = 2
+max_stacks = 12
 family_id = &"sugar"
-family_limit = 2
+family_limit = 12
 tags = Array[StringName]([&"mobility", &"risk"])

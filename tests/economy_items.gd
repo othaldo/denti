@@ -27,7 +27,7 @@ func _run() -> void:
 			return
 	game.items.acquire(extractor)
 	game.items.acquire(extractor)
-	if game.items.acquire(extractor) or game.items.coin_drop_value(1) != 1 or game.items.coin_drop_value(2) != 4 or game.items.coin_drop_value(4) != 6 or game.items.coin_drop_value(0) != 0:
+	if not game.items.can_acquire(extractor) or game.items.coin_drop_value(1) != 1 or game.items.coin_drop_value(2) != 4 or game.items.coin_drop_value(4) != 6 or game.items.coin_drop_value(0) != 0:
 		_fail("extractor stack cap or base-value condition is incorrect")
 		return
 	game.items.acquire(probe)

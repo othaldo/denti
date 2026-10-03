@@ -11,5 +11,5 @@ price = 10
 stat_changes = { &"speed_bonus": -3.0 }
 effect_kind = &"shield_shards"
 effect_value = 18.0
-max_stacks = 2
+max_stacks = 6
 tags = Array[StringName]([&"armor", &"shield", &"area"])

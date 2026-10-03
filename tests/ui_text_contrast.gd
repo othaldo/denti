@@ -43,6 +43,16 @@ func _run() -> void:
 		if not shop.buy_button.disabled or _contrast(price, price_background) < 7.0:
 			_fail("unaffordable price disappears into the disabled button")
 			return
+		if _contrast(shop.buy_caption.get_theme_color("font_color"), price_background) < 7.0:
+			_fail("purchase blocker caption lacks contrast")
+			return
+		shop.show_offer(item, 10000)
+		for state in ["normal", "hover", "pressed"]:
+			var background := (shop.buy_button.get_theme_stylebox(state) as StyleBoxFlat).bg_color
+			for label in [shop.buy_caption, shop.price_label]:
+				if _contrast(label.get_theme_color("font_color"), background) < 7.0:
+					_fail("purchase action or price lacks contrast in %s" % state)
+					return
 	var button := Button.new()
 	root.add_child(button)
 	for primary in [false, true]:

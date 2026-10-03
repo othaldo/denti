@@ -3,15 +3,14 @@ extends Control
 
 signal pause_requested
 
-const STICK_RADIUS := 70.0
-const THUMB_RADIUS := 29.0
-const EDGE_MARGIN := 32.0
-
 @onready var pause_button: Button = $Pause
 
-var direction: Vector2 = Vector2.ZERO
 var touch_index: int = -1
 var combat_active: bool = false
+var player: Player
+var touch_origin: Vector2
+var player_origin: Vector2
+var target: Vector2
 
 
 func _ready() -> void:
@@ -21,53 +20,63 @@ func _ready() -> void:
 	pause_button.custom_minimum_size = Vector2(96, 52)
 	DentiUIStyle.style_button(pause_button)
 	pause_button.pressed.connect(func() -> void: pause_requested.emit())
+	get_viewport().size_changed.connect(_release_touch)
 
 
 func set_combat_active(active: bool) -> void:
-	if combat_active == active:
-		return
 	combat_active = active
 	if not active:
-		touch_index = -1
-		direction = Vector2.ZERO
+		_release_touch()
 	pause_button.visible = active
-	queue_redraw()
+
+
+func _notification(what: int) -> void:
+	if what in [NOTIFICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT]:
+		_release_touch()
 
 
 func _input(event: InputEvent) -> void:
+	# Finish an owned gesture even when the finger crosses a UI control.
 	if not visible or not combat_active or get_tree().paused:
+		_release_touch()
 		return
-	if event is InputEventScreenTouch:
-		if event.pressed and touch_index == -1 and event.position.distance_to(_stick_center()) <= STICK_RADIUS + 35.0:
-			touch_index = event.index
-			_set_direction(event.position)
-			get_viewport().set_input_as_handled()
-		elif not event.pressed and event.index == touch_index:
-			touch_index = -1
-			direction = Vector2.ZERO
-			queue_redraw()
-			get_viewport().set_input_as_handled()
+	if event is InputEventScreenTouch and event.index == touch_index and not event.pressed:
+		_release_touch()
+		get_viewport().set_input_as_handled()
 	elif event is InputEventScreenDrag and event.index == touch_index:
-		_set_direction(event.position)
+		_update_target(event.position)
 		get_viewport().set_input_as_handled()
 
 
-func _set_direction(position: Vector2) -> void:
-	direction = ((position - _stick_center()) / STICK_RADIUS).limit_length()
-	if direction.length() < 0.12:
-		direction = Vector2.ZERO
-	queue_redraw()
-
-
-func _stick_center() -> Vector2:
-	return Vector2(STICK_RADIUS + EDGE_MARGIN, size.y - STICK_RADIUS - EDGE_MARGIN)
-
-
-func _draw() -> void:
-	if not combat_active:
+func _unhandled_input(event: InputEvent) -> void:
+	# Buttons get the first chance to consume a touch; only the free playfield
+	# starts movement. The first finger owns it until release.
+	if not visible or not combat_active or get_tree().paused or not is_instance_valid(player):
 		return
-	var center := _stick_center()
-	draw_circle(center, STICK_RADIUS, Color(0.18, 0.12, 0.17, 0.42))
-	draw_arc(center, STICK_RADIUS, 0.0, TAU, 64, Color(1.0, 0.94, 0.75, 0.72), 3.0, true)
-	draw_circle(center + direction * STICK_RADIUS, THUMB_RADIUS, Color(1.0, 0.94, 0.75, 0.88))
-	draw_arc(center + direction * STICK_RADIUS, THUMB_RADIUS, 0.0, TAU, 48, Color(0.43, 0.25, 0.25, 0.85), 2.0, true)
+	if event is InputEventScreenTouch and event.pressed and touch_index == -1:
+		if pause_button.get_global_rect().has_point(event.position):
+			return
+		touch_index = event.index
+		touch_origin = event.position
+		player_origin = player.global_position
+		target = player_origin
+		get_viewport().set_input_as_handled()
+
+
+func _update_target(screen_position: Vector2) -> void:
+	var canvas_inverse := player.get_canvas_transform().affine_inverse()
+	var offset := canvas_inverse.basis_xform(screen_position - touch_origin)
+	target = (player_origin + offset).clamp(Vector2.ONE * DentiArena.PLAYER_MARGIN,
+		player.arena.arena_size - Vector2.ONE * DentiArena.PLAYER_MARGIN)
+
+
+func movement_direction(delta: float) -> Vector2:
+	if touch_index < 0 or not visible or not combat_active or not is_instance_valid(player):
+		return Vector2.ZERO
+	var distance := target - player.global_position
+	# Keep movement stats meaningful and avoid overshooting a nearby target.
+	return distance / maxf(player.stats.move_speed * delta, 0.001) if distance.length() < player.stats.move_speed * delta else distance.normalized()
+
+
+func _release_touch() -> void:
+	touch_index = -1

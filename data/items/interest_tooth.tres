@@ -11,5 +11,5 @@ price = 9
 stat_changes = { &"max_health": -8.0 }
 effect_kind = &"wave_interest"
 effect_value = 0.08
-max_stacks = 2
+max_stacks = 6
 tags = Array[StringName]([&"economy", &"luck", &"risk"])

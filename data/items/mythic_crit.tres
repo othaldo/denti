@@ -4,7 +4,7 @@
 script = ExtResource("1")
 id = &"mythic_crit"
 display_name = "Makelloser Glanz"
-description = "+18 % Krit. Einmalig pro Run. Ohne Nachteil."
+description = "+18 % Krit."
 rarity_tier = 5
 price = 38
 icon_index = 82

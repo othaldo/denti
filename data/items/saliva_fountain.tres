@@ -11,9 +11,9 @@ price = 6
 stat_changes = { &"regen": 2.0, &"speed_bonus": -3.0 }
 effect_kind = &"kill_heal"
 effect_value = 3.0
-max_stacks = 3
+max_stacks = 12
 tags = Array[StringName]([&"sustain"])
 
 
 family_id = &"regen"
-family_limit = 3
+family_limit = 12

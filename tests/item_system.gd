@@ -23,7 +23,11 @@ func _run() -> void:
 	if game.items.count(&"fluoride_gel") != 1 or game.player.stats.max_health != 125.0:
 		_fail("shop purchase did not grant item and stats")
 		return
-	if not game.items.acquire(fluoride) or not game.items.acquire(fluoride) or game.items.acquire(fluoride):
+	for copy in 11:
+		if not game.items.acquire(fluoride):
+			_fail("item stopped stacking before twelve copies")
+			return
+	if game.items.acquire(fluoride):
 		_fail("item stack limit was ignored")
 		return
 	game.shop.offers[0] = fluoride
@@ -40,12 +44,12 @@ func _run() -> void:
 			return
 	game.shop.offers = original_offers
 	game.items.on_wave_start()
-	if game.player.stats.shield_charges != 3:
+	if game.player.stats.shield_charges != 5:
 		_fail("wave-start shield did not stack")
 		return
 	var health_before: float = game.player.stats.health
 	game.player.take_hit(25.0)
-	if game.player.stats.health != health_before or game.player.stats.shield_charges != 2:
+	if game.player.stats.health != health_before or game.player.stats.shield_charges != 4:
 		_fail("shield did not block contact damage")
 		return
 	game.items.acquire(ShopController.by_id(&"mint_essence"))
@@ -145,14 +149,14 @@ func _run() -> void:
 	game.player.stats.grant_shield(2)
 	game._save_run()
 	var saved: Dictionary = session.load_run()
-	if not saved.has("items") or int(saved["items"]["owned"].get("fluoride_gel", 0)) != 3 or int(saved["player"]["stats"]["shield_charges"]) != 2:
+	if not saved.has("items") or int(saved["items"]["owned"].get("fluoride_gel", 0)) != 12 or int(saved["player"]["stats"]["shield_charges"]) != 2:
 		_fail("item state was not saved")
 		return
 	session.resume_requested = true
 	var resumed: Node2D = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(resumed)
 	current_scene = resumed
-	if resumed.items.count(&"fluoride_gel") != 3 or resumed.player.stats.shield_charges != 2 or resumed.items.pickup_range() <= Loot.MAGNET_DISTANCE:
+	if resumed.items.count(&"fluoride_gel") != 12 or resumed.player.stats.shield_charges != 2 or resumed.items.pickup_range() <= Loot.MAGNET_DISTANCE:
 		_fail("item effects or shield did not survive continue")
 		return
 	if resumed.player.stats.max_health != game.player.stats.max_health:

@@ -33,6 +33,30 @@ static func cue(control: Node, clicked: bool) -> void:
 		session.play_ui_cue(clicked)
 
 
+static func bind_action(button: Button) -> void:
+	if button.has_meta("denti_action_motion"):
+		return
+	button.set_meta("denti_action_motion", true)
+	button.resized.connect(func() -> void: button.pivot_offset = button.size * 0.5)
+	button.mouse_entered.connect(func() -> void: _hover_button(button, true))
+	button.mouse_exited.connect(func() -> void: _hover_button(button, button.has_focus()))
+	button.focus_entered.connect(func() -> void: _hover_button(button, true))
+	button.focus_exited.connect(func() -> void: _hover_button(button, button.is_hovered()))
+
+
+static func _hover_button(button: Button, hovered: bool) -> void:
+	_cancel(button)
+	button.set_meta("denti_action_hovered", hovered and not button.disabled)
+	button.pivot_offset = button.size * 0.5
+	if not enabled(button) or button.disabled:
+		button.scale = Vector2.ONE
+		return
+	var tween := button.create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	button.set_meta("denti_tween", tween)
+	tween.tween_property(button, "scale", Vector2.ONE * (1.04 if hovered else 1.0), 0.12).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	button.add_to_group("denti_ui_motion")
+
+
 static func pulse(control: Control) -> void:
 	if not enabled(control) or not control.is_inside_tree():
 		return
@@ -41,7 +65,8 @@ static func pulse(control: Control) -> void:
 	control.scale = Vector2.ONE * 0.97
 	var tween := control.create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	control.set_meta("denti_tween", tween)
-	tween.tween_property(control, "scale", Vector2.ONE, 0.16).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	var target := Vector2.ONE * (1.04 if bool(control.get_meta("denti_action_hovered", false)) else 1.0)
+	tween.tween_property(control, "scale", target, 0.16).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	control.add_to_group("denti_ui_motion")
 
 

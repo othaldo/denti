@@ -29,6 +29,7 @@ var is_moving: bool = false
 
 
 func _ready() -> void:
+	mobile_controls.player = self
 	expressions.configure(stats)
 	status_effects.configure(self)
 	stats.dodged.connect(_on_dodged)
@@ -36,8 +37,8 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	var direction := Input.get_vector("move_left", "move_right", "move_up", "move_down")
-	if mobile_controls.visible and mobile_controls.combat_active and mobile_controls.direction != Vector2.ZERO:
-		direction = mobile_controls.direction
+	if mobile_controls.visible and mobile_controls.combat_active and mobile_controls.touch_index >= 0:
+		direction = mobile_controls.movement_direction(delta)
 	var before_move := global_position
 	velocity = direction * stats.move_speed
 	move_and_slide()

@@ -226,10 +226,20 @@ func _check_stable_actions(ui: ShopPanel, extent: Vector2i) -> bool:
 			var card: OfferCard = ui.offer_buttons[index]
 			var buy := Rect2(card.buy_button.global_position - card.global_position, card.buy_button.size)
 			var pin := Rect2(card.reserve_button.global_position - card.global_position, card.reserve_button.size)
-			if not buy.is_equal_approx(buys[index]) or not pin.is_equal_approx(pins[index]) or not card.size.is_equal_approx(card_sizes[index]) or not card.scale.is_equal_approx(Vector2.ONE):
+			# Desktop fields keep fixed baselines. Compact rows may shrink with
+			# their content, but price/pin stay anchored to the bottom corners.
+			var buy_anchor := Rect2(Vector2(buy.position.x, buy.position.y - card.size.y), buy.size)
+			var old_buy_anchor := Rect2(Vector2(buys[index].position.x, buys[index].position.y - card_sizes[index].y), buys[index].size)
+			var pin_anchor := Rect2(Vector2(pin.position.x, pin.position.y - card.size.y), pin.size)
+			var old_pin_anchor := Rect2(Vector2(pins[index].position.x, pins[index].position.y - card_sizes[index].y), pins[index].size)
+			var stable_actions := buy.is_equal_approx(buys[index]) and pin.is_equal_approx(pins[index]) and card.size.is_equal_approx(card_sizes[index])
+			if ui.compact:
+				stable_actions = buy_anchor.is_equal_approx(old_buy_anchor) and pin_anchor.is_equal_approx(old_pin_anchor)
+			if not stable_actions or not card.scale.is_equal_approx(Vector2.ONE):
 				_fail("text, price or reservation moved/resized actions at %s: buy %s -> %s, pin %s -> %s" % [extent, buys[index], buy, pins[index], pin])
 				return false
-			if not card.buy_button.size.is_equal_approx(ui.offer_buttons[0].buy_button.size) or not card.reserve_button.size.is_equal_approx(ui.offer_buttons[0].reserve_button.size) or absf(buy.position.y - buys[0].position.y) > 0.5 or absf(pin.position.y - pins[0].position.y) > 0.5:
+			var row_first: OfferCard = ui.offer_buttons[index - index % ui.offers_grid.columns]
+			if not card.buy_button.size.is_equal_approx(row_first.buy_button.size) or not card.reserve_button.size.is_equal_approx(row_first.reserve_button.size) or absf(card.buy_button.global_position.y - row_first.buy_button.global_position.y) > 0.5 or absf(card.reserve_button.global_position.y - row_first.reserve_button.global_position.y) > 0.5:
 				_fail("offer actions differ in size or baseline between cards at %s" % extent)
 				return false
 			if card.reserve_button.icon == null or not card.buy_button.get_global_rect().encloses(card.price_label.get_global_rect()):

@@ -11,9 +11,9 @@ price = 12
 stat_changes = { &"max_health": 35.0, &"damage_bonus": -5.0 }
 effect_kind = &"thorns"
 effect_value = 16.0
-max_stacks = 3
+max_stacks = 12
 tags = Array[StringName]([&"defense", &"area"])
 
 
 family_id = &"health"
-family_limit = 3
+family_limit = 12

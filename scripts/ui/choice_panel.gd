@@ -61,6 +61,9 @@ func _update_layout() -> void:
 	if mode == &"end":
 		_layout_end(viewport_size)
 		return
+	if mode == &"chest":
+		_layout_chest(viewport_size)
+		return
 	if mode == &"upgrade":
 		var narrow := viewport_size.x < 600.0 or viewport_size.y < 480.0
 		reroll_button.custom_minimum_size = Vector2(80, 32 if narrow else 40)
@@ -85,6 +88,7 @@ func _update_layout() -> void:
 	subtitle_label.visible = true
 	$Root/Center/Panel/Margin/Rows/Portrait.custom_minimum_size.y = 80.0 if mode == &"end" else 108.0
 	title_label.add_theme_font_size_override("font_size", 32)
+	subtitle_label.add_theme_font_size_override("font_size", 17)
 	for edge in ["left", "right"]:
 		$Root/Center/Panel/Margin.add_theme_constant_override("margin_" + edge, 28)
 	$Root/Center/Panel/Margin.add_theme_constant_override("margin_top", 18)
@@ -97,6 +101,33 @@ func _update_layout() -> void:
 		(button as UpgradeCard).set_mobile_text(portrait or viewport_size.y <= 620.0)
 		if mode == &"starter":
 			button.custom_minimum_size.y = 285.0 if portrait or viewport_size.y <= 620.0 else 250.0
+
+
+func _layout_chest(viewport_size: Vector2) -> void:
+	var compact := viewport_size.x < 600.0 or viewport_size.y < 480.0
+	var padding := 12 if compact else 16
+	var width := minf(viewport_size.x - 24.0, 600.0)
+	dialog_panel.custom_minimum_size = Vector2(width, 0)
+	# The reward itself carries the art. A second large mascot and an equally
+	# tall scrap card leave less room for the effect, especially in landscape.
+	$Root/Center/Panel/Margin/Rows/Portrait.visible = false
+	title_label.add_theme_font_size_override("font_size", 22 if compact else 26)
+	subtitle_label.visible = true
+	subtitle_label.custom_minimum_size = Vector2.ZERO
+	subtitle_label.add_theme_font_size_override("font_size", 13 if compact else 14)
+	for edge in ["left", "right", "top", "bottom"]:
+		$Root/Center/Panel/Margin.add_theme_constant_override("margin_" + edge, padding)
+	cards.columns = 1
+	cards.add_theme_constant_override("v_separation", 8)
+	var panel_style := dialog_panel.get_theme_stylebox("panel")
+	var card_width := width - panel_style.get_minimum_size().x - padding * 2
+	(buttons[0] as UpgradeCard).set_chest_layout(card_width, compact)
+	buttons[1].custom_minimum_size = Vector2(0, 44 if compact else 48)
+	buttons[1].add_theme_font_size_override("font_size", 14 if compact else 16)
+	buttons[1].icon = DentiUIIcons.hud(2)
+	buttons[1].add_theme_constant_override("icon_max_width", 18)
+	buttons[0].focus_neighbor_bottom = buttons[1].get_path()
+	buttons[1].focus_neighbor_top = buttons[0].get_path()
 
 
 func _layout_end(viewport_size: Vector2) -> void:
@@ -165,17 +196,15 @@ func show_starters(options: Array[WeaponData]) -> void:
 func show_chest(item: ShopOfferData, scrap_coins: int) -> void:
 	mode = &"chest"
 	chest_item = item
-	dialog_panel.custom_minimum_size = Vector2(760, 420)
-	_update_layout()
 	title_label.text = "Zahnfee-Kiste!"
 	subtitle_label.text = item.limit_text()
-	subtitle_label.custom_minimum_size.y = 40.0
 	buttons[0].call("show_item", item)
 	buttons[0].visible = true
 	buttons[1].call("show_action", "Für %d Münzen zerlegen" % scrap_coins)
 	buttons[1].visible = true
 	buttons[2].visible = false
 	buttons[3].visible = false
+	_update_layout()
 	visible = true
 	buttons[0].grab_focus()
 

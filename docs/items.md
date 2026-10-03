@@ -2,19 +2,19 @@
 
 Die Zahnklinik bietet **93 Items**: 17 Familien mit je vier Seltenheiten, 16 ergänzende Spezialitems und neun einmalige Mythics. Alle ursprünglichen 32 Items behalten ihre IDs, Effekte und Icons; 61 neue Items ergänzen den Pool. [Zahnflutsch: Ausweichen und fünf neue Items](DODGE.md).
 
-**Common / Gewöhnlich**, **Uncommon / Ungewöhnlich**, **Rare / Selten** und **Legendary / Legendär** bieten verschiedene Kombinationen aus Bonus, Synergie und Nachteil. Seltenere Varianten sind eigene Items: Sie ersetzen vorhandene Exemplare nicht und fusionieren nicht. Das **Familienlimit gilt über alle vier Seltenheiten zusammen**; unterschiedliche Familien und Spezialitems ergänzen sich weiterhin. Bereits gespeicherte Builds behalten ihren Besitz, auch oberhalb eines neuen Familienlimits; dann sind weitere Käufe dieser Familie gesperrt. Die bisher unbegrenzte Metallkrone teilt jetzt das Rüstungs-Familienlimit von sechs.
+**Common / Gewöhnlich**, **Uncommon / Ungewöhnlich**, **Rare / Selten** und **Legendary / Legendär** bieten verschiedene Kombinationen aus Bonus, Synergie und Nachteil. Seltenere Varianten sind eigene Items: Sie ersetzen vorhandene Exemplare nicht und fusionieren nicht. Das **Familienlimit liegt bei zwölf Exemplaren über alle vier Seltenheiten zusammen**. Frühe Käufe lassen damit Platz für spätere, seltenere Varianten. Spezialitems lassen sich in der Regel sechsmal stapeln. Goldsonde, Zahnfee-Pfand, Speichelkelch, Amalgamkern und Zuckerschock behalten wegen ihrer begrenzten Spezialeffekte zwei Exemplare; Göttliches Siegel und Mythics bleiben einmalig. Gespeicherte Builds behalten ihren Besitz.
 
 **Mythic / Mythisch** ist eine neue, pink markierte Itemstufe. Jedes Mythic ist höchstens einmal pro Run erhältlich und gewährt genau einen positiven Statbonus ohne Nachteil oder zusätzlichen Proc. Die Stufe kann ab Welle 12 in Itemangeboten und Kisten erscheinen: `min((Welle - 11) × 0,00035 × max(1 + Glück/100, 0), 0,01)`, vorher 0. Das sind auf Welle 20 ohne Glück 0,315 % je Itemwurf, maximal 1 %. Waffen und Level-ups bleiben auf Stufe I–IV. Ein erschöpfter seltener Pool fällt auf verfügbare niedrigere Stufen zurück; besessene Mythics werden nicht erneut angeboten.
 
 Ein Kauf gewährt den Effekt sofort. Alle Preise unten sind **Basispreise vor der Welleninflation**. Shopangebote haben vier Plätze; „Merken“ bindet Angebot und Preis kostenlos über Rerolls und Wellen. Details: [Economy](ECONOMY_BALANCE.md). Itemangebote werden zu 28 % aus passenden Build-Tags gewählt, wenn solche Items in der gewürfelten Stufe vorhanden sind. Das ändert die Seltenheitschance nicht.
 
-Bisskraft und Item-Prozentboni werden addiert; Folgeeffekte skalieren einen bereits berechneten Treffer nicht erneut. Proc-Abklingzeiten und vorhandene Obergrenzen bleiben bestehen. Details: [Schaden und Verteidigung](DAMAGE_DEFENSE_BALANCE.md). Die Werte dieser Erweiterung sind ein Ausgangspunkt für Playtests, keine gemessene finale Balance.
+Bisskraft und Item-Prozentboni werden addiert; Folgeeffekte skalieren einen bereits berechneten Treffer nicht erneut. Proc-Abklingzeiten und Schutzobergrenzen bleiben bestehen; additive Schadenseffekte wachsen mit weiteren Kopien. Details: [Schaden und Verteidigung](DAMAGE_DEFENSE_BALANCE.md). Die Werte dieser Erweiterung sind ein Ausgangspunkt für Playtests, keine gemessene finale Balance.
 
-Die [Designnotizen mit Brotato-Recherche](ITEM_RARITY_EXPANSION.md) erklären Auswahl und Limits. Die [Attributübersicht](ATTRIBUTES.md) definiert die einheitlichen Namen: Härte ist Rüstung, Schmelz sind maximale HP. Die Tabellen geben die Ressourcentexte wieder; im Spiel werden deren ältere Bezeichnungen zentral aufgelöst. [Alle 56 neuen Icons in Kartengröße](screenshots/item_families_icons_48px.png).
+Die [ursprünglichen Designnotizen](ITEM_RARITY_EXPANSION.md) erklären die Auswahl; ihre niedrigeren Limits sind durch diese Stapelregeln ersetzt. Die [Attributübersicht](ATTRIBUTES.md) definiert die einheitlichen Namen: Härte ist Rüstung, Schmelz sind maximale HP. Die Tabellen geben die Ressourcentexte wieder; im Spiel werden deren ältere Bezeichnungen zentral aufgelöst. [Alle 56 neuen Icons in Kartengröße](screenshots/item_families_icons_48px.png).
 
 ## Schmelz / HP
 
-Gemeinsames Familienlimit: **3**.
+Gemeinsames Familienlimit: **12**.
 
 | Seltenheit | Item | Vollständiger Effekt | Basispreis |
 | --- | --- | --- | ---: |
@@ -25,18 +25,18 @@ Gemeinsames Familienlimit: **3**.
 
 ## Härte / Rüstung
 
-Gemeinsames Familienlimit: **6**.
+Gemeinsames Familienlimit: **12**.
 
 | Seltenheit | Item | Vollständiger Effekt | Basispreis |
 | --- | --- | --- | ---: |
-| Common | Metallkrone | +3 Härte, -8 % Bewegung. Karamell bleibt gefährlich. | 4 |
+| Common | Metallkrone | +3 Härte, -8 % Bewegung. | 4 |
 | Uncommon | Titankrone | +4 Härte, -4 % Angriffstempo. | 9 |
 | Rare | Panzerkeramik | +5 Härte, +12 Leben, -6 % Bewegung. | 14 |
 | Legendary | Bollwerkkrone | +6 Härte, -8 % Schaden. Schildblock: 12 Splitterschaden im Umkreis. | 22 |
 
 ## Bisskraft / Bossjagd
 
-Gemeinsames Familienlimit: **2**.
+Gemeinsames Familienlimit: **12**.
 
 | Seltenheit | Item | Vollständiger Effekt | Basispreis |
 | --- | --- | --- | ---: |
@@ -47,29 +47,29 @@ Gemeinsames Familienlimit: **2**.
 
 ## Putzeifer / Spritzer
 
-Gemeinsames Familienlimit: **3**.
+Gemeinsames Familienlimit: **12**.
 
 | Seltenheit | Item | Vollständiger Effekt | Basispreis |
 | --- | --- | --- | ---: |
-| Common | Mundspülung | +10 % Angriffstempo, -4 % Bewegung. Fern-Projektile: 25 % Spritzschaden (gesamt max. 80 %). | 4 |
+| Common | Mundspülung | +10 % Angriffstempo, -4 % Bewegung. Fern-Projektile: 25 % Spritzschaden. | 4 |
 | Uncommon | Druckspülung | +14 % Angriffstempo, -8 Leben. Fern-Projektile: 28 % Spritzschaden. | 9 |
 | Rare | Turbospülung | +18 % Angriffstempo, -2 Härte. Fern-Projektile: 32 % Spritzschaden. | 14 |
 | Legendary | Orkanspülung | +22 % Angriffstempo, -8 % Schaden. Fern-Projektile: 40 % Spritzschaden. | 22 |
 
 ## Glanz / Krit
 
-Gemeinsames Familienlimit: **3**.
+Gemeinsames Familienlimit: **12**.
 
 | Seltenheit | Item | Vollständiger Effekt | Basispreis |
 | --- | --- | --- | ---: |
 | Common | Glanzpuder | +4 % Krit, -5 Leben. Krits: Blitz mit 15 % Trefferschaden. | 5 |
-| Uncommon | Polierpaste | +8 % Krit, -1 Härte. Krits: Flächenblitz mit 35 % Trefferschaden (gesamt max. 80 %). | 6 |
+| Uncommon | Polierpaste | +8 % Krit, -1 Härte. Krits: Flächenblitz mit 35 % Trefferschaden. | 6 |
 | Rare | Diamantpaste | +10 % Krit, -5 % Angriffstempo. Krits: Blitz mit 45 % Trefferschaden. | 14 |
 | Legendary | Sternpolitur | +12 % Krit, -2 Härte. Krits: Blitz mit 55 % Trefferschaden. | 22 |
 
 ## Speichel / Regeneration
 
-Gemeinsames Familienlimit: **3**.
+Gemeinsames Familienlimit: **12**.
 
 | Seltenheit | Item | Vollständiger Effekt | Basispreis |
 | --- | --- | --- | ---: |
@@ -80,7 +80,7 @@ Gemeinsames Familienlimit: **3**.
 
 ## Bewegung / Beutemagnet
 
-Gemeinsames Familienlimit: **3**.
+Gemeinsames Familienlimit: **12**.
 
 | Seltenheit | Item | Vollständiger Effekt | Basispreis |
 | --- | --- | --- | ---: |
@@ -91,7 +91,7 @@ Gemeinsames Familienlimit: **3**.
 
 ## Zahnglück / XP
 
-Gemeinsames Familienlimit: **3**.
+Gemeinsames Familienlimit: **12**.
 
 | Seltenheit | Item | Vollständiger Effekt | Basispreis |
 | --- | --- | --- | ---: |
@@ -102,7 +102,7 @@ Gemeinsames Familienlimit: **3**.
 
 ## Schnitt / Blutung
 
-Gemeinsames Familienlimit: **3**.
+Gemeinsames Familienlimit: **12**.
 
 | Seltenheit | Item | Vollständiger Effekt | Basispreis |
 | --- | --- | --- | ---: |
@@ -113,7 +113,7 @@ Gemeinsames Familienlimit: **3**.
 
 ## Wasser / Licht / Ketten
 
-Gemeinsames Familienlimit: **3**.
+Gemeinsames Familienlimit: **12**.
 
 | Seltenheit | Item | Vollständiger Effekt | Basispreis |
 | --- | --- | --- | ---: |
@@ -124,7 +124,7 @@ Gemeinsames Familienlimit: **3**.
 
 ## Schilde / Schutz
 
-Gemeinsames Familienlimit: **3**.
+Gemeinsames Familienlimit: **12**.
 
 | Seltenheit | Item | Vollständiger Effekt | Basispreis |
 | --- | --- | --- | ---: |
@@ -135,7 +135,7 @@ Gemeinsames Familienlimit: **3**.
 
 ## Münzen / Economy
 
-Gemeinsames Familienlimit: **3**.
+Gemeinsames Familienlimit: **12**.
 
 | Seltenheit | Item | Vollständiger Effekt | Basispreis |
 | --- | --- | --- | ---: |
@@ -146,18 +146,18 @@ Gemeinsames Familienlimit: **3**.
 
 ## Projektile / Rücklauf
 
-Gemeinsames Familienlimit: **2**.
+Gemeinsames Familienlimit: **12**.
 
 | Seltenheit | Item | Vollständiger Effekt | Basispreis |
 | --- | --- | --- | ---: |
 | Common | Rückholfeder | +1 Fernschaden, -3 % Schaden. Direkte Projektile kehren mit 15 % Schaden zurück. | 5 |
 | Uncommon | Rücklaufspindel | +2 Fernschaden, -4 % Angriffstempo. Direkte Projektile kehren mit 25 % Schaden zurück. | 9 |
 | Rare | Rücklaufbohrer | Direkte Projektile kehren mit 35 % Schaden zurück. -5 % Schaden. | 13 |
-| Legendary | Bumerangbohrer | +3 Fernschaden, -2 Härte. Direkte Projektile kehren mit 50 % Schaden zurück (gesamt max. 70 %). | 22 |
+| Legendary | Bumerangbohrer | +3 Fernschaden, -2 Härte. Direkte Projektile kehren mit 50 % Schaden zurück. | 22 |
 
 ## Fläche / Zahnblitz
 
-Gemeinsames Familienlimit: **2**.
+Gemeinsames Familienlimit: **12**.
 
 | Seltenheit | Item | Vollständiger Effekt | Basispreis |
 | --- | --- | --- | ---: |
@@ -168,18 +168,18 @@ Gemeinsames Familienlimit: **2**.
 
 ## Zucker / Bewegungsschaden
 
-Gemeinsames Familienlimit: **2**.
+Gemeinsames Familienlimit: **12**.
 
 | Seltenheit | Item | Vollständiger Effekt | Basispreis |
 | --- | --- | --- | ---: |
-| Common | Zuckerwürfel | Beim tatsächlichen Laufen: +8 % Waffenschaden. -6 Leben. | 5 |
-| Uncommon | Kariesbonbon | Beim tatsächlichen Laufen: +14 % Waffenschaden. -1 Härte, -1 Regeneration. | 9 |
-| Rare | Verbotener Lolli | Laufen: +20 % Waffenschaden. -15 Leben, -2 Härte. | 13 |
-| Legendary | Sündenlolli | Beim tatsächlichen Laufen: +28 % Waffenschaden (gesamt max. 40 %). -20 Leben, -3 Härte. | 22 |
+| Common | Zuckerwürfel | Während du dich bewegst: +8 % Waffenschaden. -6 Leben. | 5 |
+| Uncommon | Kariesbonbon | Während du dich bewegst: +14 % Waffenschaden. -1 Härte, -1 Regeneration. | 9 |
+| Rare | Verbotener Lolli | Während du dich bewegst: +20 % Waffenschaden. -15 Leben, -2 Härte. | 13 |
+| Legendary | Sündenlolli | Während du dich bewegst: +28 % Waffenschaden. -20 Leben, -3 Härte. | 22 |
 
 ## XP / Heilung
 
-Gemeinsames Familienlimit: **2**.
+Gemeinsames Familienlimit: **12**.
 
 | Seltenheit | Item | Vollständiger Effekt | Basispreis |
 | --- | --- | --- | ---: |
@@ -190,7 +190,7 @@ Gemeinsames Familienlimit: **2**.
 
 ## Zahnflutsch / Ausweichen
 
-Gemeinsames Familienlimit: **4**.
+Gemeinsames Familienlimit: **12**.
 
 | Seltenheit | Item | Vollständiger Effekt | Basispreis |
 | --- | --- | --- | ---: |
@@ -205,22 +205,22 @@ Diese 16 bisherigen Items ergänzen die Familien mit eigenen Regeln. Ihre Stapel
 
 | Item | Seltenheit | Effekt | Max. | Basispreis |
 | --- | --- | --- | ---: | ---: |
-| Karies-Kopfgeld | Common | Alle 12 Kills +1 Münze. Jeder Belag hat seinen Preis. | 2 | 6 |
-| Ansteckende Zahnseide | Uncommon | Kill auf blutendem Ziel: Blutung springt über. -5 % Schaden. | 2 | 8 |
-| Blutungsuhr | Uncommon | Blutung hält +1 s und stapelt einmal mehr. -6 % Schaden. | 2 | 9 |
-| Goldextraktor | Uncommon | +1 Münze bei Drops mit mindestens 2 Basis-Münzen (Zucker und Eliten). -3 % Bewegung. | 2 | 10 |
+| Karies-Kopfgeld | Common | Alle 12 Kills +1 Münze. | 6 | 6 |
+| Ansteckende Zahnseide | Uncommon | Besiegte blutende Gegner übertragen Blutung auf ein nahes Ziel. -5 % Schaden. | 6 | 8 |
+| Blutungsuhr | Uncommon | Blutung hält +1 s und stapelt einmal mehr. -6 % Schaden. | 6 | 9 |
+| Goldextraktor | Uncommon | +1 Münze bei Drops mit mindestens 2 Basis-Münzen (Zucker und Eliten). -3 % Bewegung. | 6 | 10 |
 | Goldsonde | Uncommon | 20 % Chance auf doppelten Münz-Drop. +1 Prozentpunkt je 10 Glück (max. +10). -5 % Schaden. | 2 | 10 |
-| Leitlack | Uncommon | Nass hält länger: +18 % Wasser/Licht, längere Ketten. -3 % Bewegung. | 2 | 9 |
+| Leitlack | Uncommon | Nasse Gegner: +18 % Wasser- und Lichtschaden, längere Nassdauer und größere Kettenreichweite. -3 % Bewegung. | 6 | 9 |
 | Speichelkelch | Uncommon | 50 % Überheilung ansparen (gesamt max. 100 %): je 20 Punkte +1 Schild (max. 5). -12 Leben. | 2 | 10 |
-| Splitterkrone | Uncommon | Schildblock: 18 Splitterschaden im Umkreis. -3 % Bewegung. | 2 | 10 |
-| Spülventil | Uncommon | Wassertreffer: 2 s Pfütze, nass und 4 Basisschaden je 0,5 s. -3 % Bewegung. | 2 | 9 |
+| Splitterkrone | Uncommon | Schildblock: 18 Splitterschaden im Umkreis. -3 % Bewegung. | 6 | 10 |
+| Spülventil | Uncommon | Wassertreffer erzeugen für 2 s eine Pfütze: macht Gegner nass und verursacht 4 Schaden alle 0,5 s. -3 % Bewegung. | 6 | 9 |
 | Zahnfee-Pfand | Uncommon | +10 Glück, +50 % Kisten-Zerlegewert. -10 Leben. | 2 | 9 |
-| Zinszahn | Uncommon | Wellenende: 8 % Zins auf Erspartes, höchstens 6 Münzen pro Exemplar. -8 Leben. | 2 | 9 |
+| Zinszahn | Uncommon | Wellenende: 8 % Zins auf Erspartes, höchstens 6 Münzen pro Exemplar. -8 Leben. | 6 | 9 |
 | Amalgamkern | Rare | Je Härte +2,5 % Waffenschaden (gesamt max. 60 %). -5 % Bewegung. | 2 | 13 |
-| Glanzprisma | Rare | Krits: Strahl zu einem nahen Ziel mit 30 % Trefferschaden, bei Licht 45 %. -1 Härte. | 2 | 13 |
-| Skalpellwachs | Rare | +35 % Schaden gegen blutende Gegner. Schnitt trifft tiefer. | 2 | 12 |
+| Glanzprisma | Rare | Krits: Strahl zu einem nahen Ziel mit 30 % Trefferschaden, bei Licht 45 %. -1 Härte. | 6 | 13 |
+| Skalpellwachs | Rare | +35 % Schaden gegen blutende Gegner. | 6 | 12 |
 | Zuckerschock | Rare | Alle 12 Kills: 4 s +30 % Angriffstempo (max. +50 %), dann 3 s -25 %. -10 Leben. | 2 | 13 |
-| Göttliches Siegel | Legendary | Zu jeder Welle +2 Schild. Einmalig. Alle huldigen Denti. | 1 | 22 |
+| Göttliches Siegel | Legendary | Zu Wellenbeginn +2 Schilde. | 1 | 22 |
 
 ## Mythics
 
@@ -228,17 +228,21 @@ Je Item einmal pro Run. Keine negativen Stats, keine zusätzlichen Nebeneffekte.
 
 | Item | Reiner Bonus | Basispreis |
 | --- | --- | ---: |
-| Biss der Zahnheit | +20 % Schaden. Einmalig pro Run. Ohne Nachteil. | 38 |
-| Ewiger Putzeifer | +30 % Angriffstempo. Einmalig pro Run. Ohne Nachteil. | 38 |
-| Herz des Urmolars | +60 Leben. Einmalig pro Run. Ohne Nachteil. | 38 |
-| Makelloser Glanz | +18 % Krit. Einmalig pro Run. Ohne Nachteil. | 38 |
-| Quelle des Lebens | +8 Regeneration. Einmalig pro Run. Ohne Nachteil. | 38 |
-| Schritte der Zahnfee | +18 % Bewegung. Einmalig pro Run. Ohne Nachteil. | 38 |
+| Biss der Zahnheit | +20 % Schaden. | 38 |
+| Ewiger Putzeifer | +30 % Angriffstempo. | 38 |
+| Herz des Urmolars | +60 Leben. | 38 |
+| Makelloser Glanz | +18 % Krit. | 38 |
+| Quelle des Lebens | +8 Regeneration. | 38 |
+| Schritte der Zahnfee | +18 % Bewegung. | 38 |
 | Unfassbare Wurzel | +15 % Zahnflutsch. | 38 |
-| Unvergänglicher Schmelz | +8 Härte. Einmalig pro Run. Ohne Nachteil. | 38 |
-| Zahnfee-Stern | +50 Glück. Einmalig pro Run. Ohne Nachteil. | 38 |
+| Unvergänglicher Schmelz | +8 Härte. | 38 |
+| Zahnfee-Stern | +50 Glück. | 38 |
 
 ## Effekte und Beispielbuilds
+
+Ketten-, Spritz-, Krit-Burst-, Krit-Strahl-, Rückflug-, Nass- und Bewegungsschaden stapeln additiv ohne den bisherigen frühen Schadensdeckel. Zusätzliche Kopien erzeugen keine zusätzlichen Effektketten; gemeinsame Cooldowns und Pfützenanzahl bleiben bestehen. Schilde bleiben auf fünf, Doppel-Münz-Chance auf 50 % und Ausweichen auf 60 % begrenzt. Nachteile jeder Kopie stapeln ebenfalls.
+
+Beim Besitz eines Amalgamkerns zeigt die Zahnklinik dessen aktuellen Waffenschadensbonus als Icon-Wert neben den Stats. Hover/Klick und die Details des besessenen Items erklären `max(Härte, 0) × 2,5 % × Exemplare`, begrenzt auf +60 %. Dieser Beitrag addiert sich zur Bisskraft und ist bereits im angezeigten Waffenschaden enthalten.
 
 Peitsche und Kratzer verursachen auch ohne Items Blutung; der Wasserflosser macht Ziele auch ohne Leitlack nass. Blutung stapelt sich normalerweise auf Gegnern bis zu dreimal und läuft nach 2,5 Sekunden ohne erneuten Schnitt aus; die Blutungsuhr erhöht Dauer und Stapelgrenze. Wet läuft nach 2,5 Sekunden ab, mit Leitlack nach 3 Sekunden. Schilde fangen jeweils einen Treffer ab und sind insgesamt auf fünf Ladungen begrenzt. Kettenblitze, Blutungsübertragung, Spritzer, kritische Blitze, Lichtstrahlen und Keramiksplitter haben kurze interne Abklingzeiten, damit dichte Gegnergruppen das Spiel nicht mit Effekten überfluten. Laufende Effekte, Schildladungen, Stapel und Fortschritte zu Kill-Boni werden mit dem Spielstand gespeichert. Bei Kisten steht der normale Zerlegewert schon beim Drop fest; das Zahnfee-Pfand erhöht den angezeigten und ausgezahlten Wert bei der Entscheidung.
 

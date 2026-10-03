@@ -63,10 +63,10 @@ func _run() -> void:
 			ui._select("equipment", 0)
 			for frame in 5:
 				await process_frame
-			if ui.offers_section.visible or not bounds.encloses(ui.details_panel.get_global_rect()):
-				_fail("expanded desktop card does not use the free offer area")
+			if not ui.offers_section.visible or not ui.detail_overlay.visible or not bounds.encloses(ui.detail_popup.get_global_rect()):
+				_fail("inspection hides the offers or exceeds the viewport")
 				return
-			if ui.details_panel.size.x > 640 or ui.detail_actions.get_parent() != ui.detail_column:
+			if ui.detail_popup.size.x > 520 or ui.detail_actions.get_parent() != ui.detail_column:
 				_fail("desktop details stretch beyond the compact card or detach actions")
 				return
 			ui.close_details()

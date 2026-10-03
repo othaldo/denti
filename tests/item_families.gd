@@ -66,8 +66,11 @@ func _run() -> void:
 	for id in [&"health_1", &"health_2", &"ceramic_shell"]:
 		_check(game.items.acquire(ShopController.by_id(id)), "could not mix health tiers")
 	_check(game.player.stats.max_health == 171.0 and game.player.stats.regen == 1.0, "variant stat effects differ from their cards")
-	_check(not game.items.acquire(ShopController.by_id(&"health_4")), "rarity variants bypass family cap")
-	_check(game.items.family_count(&"health") == 3, "family count lost mixed tiers")
+	_check(game.items.acquire(ShopController.by_id(&"health_4")), "early health items blocked legendary upgrade")
+	for copy in 8:
+		_check(game.items.acquire(ShopController.by_id(&"health_1")), "could not build twelve mixed health stacks")
+	_check(not game.items.acquire(ShopController.by_id(&"health_4")), "rarity variants bypass twelve-item family cap")
+	_check(game.items.family_count(&"health") == 12, "family count lost mixed tiers")
 	game.shop.offers.clear()
 	for draw in 200:
 		var offer: ShopOfferData = game.shop._pick_item(4, game.items, game.player.loadout)
@@ -111,7 +114,7 @@ func _run() -> void:
 	game.shop.offers[1] = mythic.duplicate()
 	game.shop.reserved[1] = true
 	game.shop.take_offer(2)
-	# Legacy unlimited crowns are retained, rather than silently deleting power.
+	# Existing crown builds retain their power and can now buy later variants.
 	game.items.owned["metal_crown"] = 8
 	game._update_shop_panel()
 	game._save_run()
@@ -119,8 +122,8 @@ func _run() -> void:
 	var resumed: Node2D = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(resumed)
 	current_scene = resumed
-	_check(resumed.items.family_count(&"health") == 3 and not resumed.items.can_acquire(ShopController.by_id(&"health_4")), "resume lost family limit")
-	_check(resumed.items.count(&"metal_crown") == 8 and not resumed.items.can_acquire(ShopController.by_id(&"armor_4")), "legacy over-limit crowns were removed or allowed more purchases")
+	_check(resumed.items.family_count(&"health") == 12 and not resumed.items.can_acquire(ShopController.by_id(&"health_4")), "resume lost family limit")
+	_check(resumed.items.count(&"metal_crown") == 8 and resumed.items.can_acquire(ShopController.by_id(&"armor_4")), "saved crowns were removed or still blocked upgraded armor")
 	_check(resumed.items.count(mythic.id) == 1 and resumed.player.stats.max_health == before + 60.0, "resume lost or reapplied mythic bonus")
 	_check(resumed.shop.offers[1].rarity_tier == 5 and resumed.shop.reserved[1], "resume lost mythic offer/reservation")
 	_check(resumed.shop.offers[2] == null, "resume refilled a sold slot for free")

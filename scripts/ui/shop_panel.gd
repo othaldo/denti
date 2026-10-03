@@ -53,10 +53,14 @@ var offer_column: VBoxContainer
 var offer_scroll: ScrollContainer
 var stat_grid: GridContainer
 var stat_chips: Array[Button] = []
+var amalgam_chip: Button
 var expanded := false
 var detail_buy_button: Button
 var detail_pin_button: Button
 var build_portrait: TextureRect
+var detail_overlay: Control
+var detail_popup: PanelContainer
+var popup_layout_queued := false
 
 func _ready() -> void:
 	visible = false
@@ -231,6 +235,10 @@ func _refresh_stats() -> void:
 		var type: DentiAttributes.Type = DentiAttributes.ACTIVE[index]
 		stat_chips[index].text = DentiAttributes.compact_value_text(player.stats, type)
 		stat_chips[index].tooltip_text = "%s · %s\n%s" % [DentiAttributes.name_for(type), DentiAttributes.value_text(player.stats, type), DentiAttributes.meaning_for(type)]
+	if amalgam_chip != null:
+		amalgam_chip.visible = player.items.count(&"amalgam_core") > 0
+		amalgam_chip.text = "+%s %%" % ("%.1f" % player.items.armor_damage_bonus()).trim_suffix(".0")
+		amalgam_chip.tooltip_text = "Amalgamkern\n" + player.items.armor_damage_explanation()
 
 func _update_layout() -> void:
 	if offer_scroll == null:
@@ -244,6 +252,7 @@ func _update_layout() -> void:
 	build_portrait.custom_minimum_size = Vector2(40, 40) if short else Vector2(56, 56)
 	for chip in stat_chips:
 		chip.custom_minimum_size.y = 30 if short else 34
+	amalgam_chip.custom_minimum_size.y = 30 if short else 34
 	flow.vertical = compact
 	shop_actions.vertical = narrow and extent.y >= 480
 	detail_actions.vertical = narrow and extent.y >= 480
@@ -262,15 +271,9 @@ func _update_layout() -> void:
 	offers_grid.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	stat_grid.columns = 3 if extent.x >= 600 else 2
 	_sync_detail_layout()
-	detail_column.custom_minimum_size.x = minf(640, extent.x - (344 if wide else 72))
-	detail_column.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	var action_parent: Node = rows if compact else detail_column
-	if detail_actions.get_parent() != action_parent:
-		detail_actions.reparent(action_parent)
-	if compact:
-		rows.move_child(detail_actions, main_scroll.get_index() + 1)
-	else:
-		detail_column.move_child(detail_actions, details_scroll.get_index() + 1)
+	detail_column.custom_minimum_size.x = 0
+	detail_column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_queue_popup_layout()
 	$Root/Center/Panel.custom_minimum_size = Vector2(minf(extent.x - 24, 1720), extent.y - 24)
 	for edge in ["left", "right"]:
 		$Root/Center/Panel/Margin.add_theme_constant_override("margin_" + edge, 12)
@@ -282,9 +285,11 @@ func _update_layout() -> void:
 	for button in [details.merge_button, details.sell_button, details.confirm_button, details.cancel_button, detail_buy_button, detail_pin_button]:
 		button.custom_minimum_size.y = 44
 		button.add_theme_font_size_override("font_size", 15)
+		DentiUIMotion.bind_action(button)
+		button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	for card in offer_buttons:
 		card.size_flags_vertical = Control.SIZE_EXPAND_FILL
-		card.set_catalog_layout(true, wide and extent.y < 700)
+		card.set_catalog_layout(true, wide and extent.y < 700, compact)
 		if wide and extent.x >= 1500:
 			card.icon_rect.custom_minimum_size = Vector2(152, 152)
 	_layout_inventory()
@@ -382,8 +387,11 @@ func show_shop(wave_number: int, coins: int, reroll_cost: int, new_offers: Array
 		if found < 0:
 			selected_kind = "offer"
 			selected_index = 0
+	if expanded and selected_kind == "offer" and selected_index < offers.size() and offers[selected_index] == null:
+		close_details()
 	if expanded:
 		_render_selection()
+		_queue_popup_layout()
 	else:
 		detail_column.visible = false
 		detail_actions.visible = false
@@ -393,34 +401,52 @@ func show_shop(wave_number: int, coins: int, reroll_cost: int, new_offers: Array
 
 func _select(kind: String, index: int) -> void:
 	expanded = true
+	details_scroll.scroll_vertical = 0
 	detail_column.visible = true
+	detail_overlay.visible = true
 	details.close_button.visible = true
 	selected_kind = kind
 	selected_index = index
 	selected_uid = int(equipment[index].get("uid", 0)) if kind == "equipment" else 0
 	_render_selection()
 	_sync_detail_layout()
-	DentiUIMotion.reveal(details_panel)
-	call_deferred("_scroll_to_details")
+	DentiUIMotion.reveal(detail_popup)
+	details.close_button.grab_focus()
 
 func _sync_detail_layout() -> void:
-	# Desktop inspection uses the available offer area instead of appending
-	# another page below it. Small screens retain one continuous scroll.
-	offers_section.visible = compact or not expanded
+	# Inspection floats above the shop. Opening it never removes/reflows offers.
+	offers_section.visible = true
 	offer_column.size_flags_vertical = Control.SIZE_SHRINK_BEGIN if compact else Control.SIZE_EXPAND_FILL
-	detail_column.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
-	details_scroll.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	detail_column.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	details_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_queue_popup_layout()
 
-func _scroll_to_details() -> void:
-	# Reflow after revealing the card spans several nested containers.
-	await get_tree().process_frame
-	await get_tree().process_frame
-	if not visible or not expanded:
+
+func _queue_popup_layout() -> void:
+	if detail_popup == null or popup_layout_queued:
 		return
-	if compact:
-		main_scroll.ensure_control_visible(details_panel if details_panel.size.y < main_scroll.size.y else details.heading)
-	else:
-		offer_scroll.ensure_control_visible(details_panel if details_panel.size.y < offer_scroll.size.y else details.heading)
+	popup_layout_queued = true
+	call_deferred("_size_detail_popup")
+
+
+func _size_detail_popup() -> void:
+	popup_layout_queued = false
+	if not expanded:
+		return
+	var extent: Vector2 = $Root.size
+	var width := minf(520, extent.x - 32)
+	var icon_values := true
+	for index in range(0, details.values_grid.get_child_count(), 2):
+		if not details.values_grid.get_child(index) is TextureRect:
+			icon_values = false
+	details.values_grid.columns = 4 if width >= 480 and icon_values else 2
+	var style_size := detail_popup.get_theme_stylebox("panel").get_minimum_size()
+	var height := details_panel.get_combined_minimum_size().y + style_size.y
+	if detail_actions.visible:
+		height += detail_actions.get_combined_minimum_size().y + detail_column.get_theme_constant("separation")
+	detail_popup.custom_minimum_size = Vector2(width, 0)
+	detail_popup.size = Vector2(width, minf(height, extent.y - 32))
+	detail_popup.position = (extent - detail_popup.size) * 0.5
 
 func _render_selection() -> void:
 	details.clear_actions()
@@ -459,6 +485,7 @@ func _render_selection() -> void:
 		details.sell_button.text = "Verkaufen · +%d Münzen" % int(entry.refund)
 		details.merge_button.visible = true
 		details.merge_button.disabled = not bool(entry.mergeable)
+		details.merge_button.mouse_default_cursor_shape = Control.CURSOR_ARROW if details.merge_button.disabled else Control.CURSOR_POINTING_HAND
 		details.merge_button.text = "Maximale Stufe IV" if tier == 4 else "Fusionieren · Stufe %s" % ["I", "II", "III", "IV"][tier]
 		if bool(entry.mergeable):
 			details.action_hint.text = "%s frei\n%s" % [data.roots_text(), WeaponPresentation.comparison(data, tier + 1, data, tier, player)]
@@ -482,6 +509,7 @@ func _render_selection() -> void:
 	var can_buy := available.is_empty() or available[selected_index]
 	detail_buy_button.text = "Kaufen · %d" % offer.price
 	detail_buy_button.disabled = wallet < offer.price or not can_buy
+	detail_buy_button.mouse_default_cursor_shape = Control.CURSOR_ARROW if detail_buy_button.disabled else Control.CURSOR_POINTING_HAND
 	detail_buy_button.tooltip_text = offer_buttons[selected_index].buy_button.tooltip_text
 	var pin: Button = offer_buttons[selected_index].reserve_button
 	detail_pin_button.icon = pin.icon
@@ -493,9 +521,11 @@ func _render_selection() -> void:
 		if data != null and offer.weapon_data != null and data.id == offer.weapon_data.id and int(entry.tier) == offer.weapon_tier and offer.weapon_tier < 4:
 			fusion = player != null and player.loadout.used_slots() + offer.weapon_data.hands > WeaponLoadout.CAPACITY
 	offer_buttons[selected_index].buy_button.tooltip_text = "Kaufen & fusionieren" if fusion and can_buy and wallet >= offer.price else offer_buttons[selected_index].buy_button.tooltip_text
-	details.action_hint.text = "Zu wenig Münzen" if wallet < offer.price else (("Alle Wurzeln belegt" if offer.weapon_data != null else "Stapellimit erreicht") if not can_buy else ("Kauf fusioniert zu Stufe %s" % ["I", "II", "III", "IV"][offer.weapon_tier] if fusion else ""))
+	details.action_hint.text = "Es fehlen %d Münzen" % (offer.price - wallet) if wallet < offer.price else (("Alle Wurzeln belegt" if offer.weapon_data != null else "Stapellimit erreicht") if not can_buy else ("Kauf fusioniert zu Stufe %s" % ["I", "II", "III", "IV"][offer.weapon_tier] if fusion else ""))
 	details.action_hint.visible = not details.action_hint.text.is_empty()
+	details.action_hint.add_theme_color_override("font_color", DentiUIStyle.CORAL if detail_buy_button.disabled else DentiUIStyle.MINT)
 	_highlight_equipment()
+	_queue_popup_layout()
 
 func _compare(index: int) -> void:
 	if selected_kind != "offer" or equipment.is_empty() or offers[selected_index] == null or offers[selected_index].weapon_data == null:
@@ -512,6 +542,7 @@ func _confirm_sale() -> void:
 	details.cancel_button.visible = true
 	details.action_hint.text = "Verkaufen? +%d Münzen" % int(equipment[selected_index].refund)
 	details.action_hint.visible = true
+	_queue_popup_layout()
 
 func _show_inventory(entries: Array[Dictionary], used_slots: int, capacity: int) -> void:
 	inventory_label.text = "Wurzeln · %d/%d" % [used_slots, capacity]
@@ -694,6 +725,26 @@ func _build_night_layout() -> void:
 		stat_grid.add_child(chip)
 		stat_chips.append(chip)
 		chip.pressed.connect(func() -> void: DentiDentikon.open_attribute(chip, type))
+	amalgam_chip = Button.new()
+	amalgam_chip.visible = false
+	amalgam_chip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	amalgam_chip.custom_minimum_size.y = 34
+	amalgam_chip.icon = ICONS.item(ShopController.by_id(&"amalgam_core").icon_index)
+	amalgam_chip.expand_icon = true
+	amalgam_chip.add_theme_constant_override("icon_max_width", 23)
+	amalgam_chip.add_theme_font_size_override("font_size", 13)
+	DentiUIStyle.style_button(amalgam_chip, false, true)
+	for state in ["normal", "hover", "pressed", "disabled", "focus"]:
+		var box := amalgam_chip.get_theme_stylebox(state)
+		box.content_margin_left = 5
+		box.content_margin_right = 5
+		box.content_margin_top = 3
+		box.content_margin_bottom = 3
+	stat_grid.add_child(amalgam_chip)
+	amalgam_chip.pressed.connect(func() -> void:
+		if is_instance_valid(player):
+			DentiDentikon.open(amalgam_chip, "Amalgamkern", player.items.armor_damage_explanation(), amalgam_chip.icon)
+	)
 	offer_scroll = ScrollContainer.new()
 	offer_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	offer_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -704,8 +755,32 @@ func _build_night_layout() -> void:
 	offer_column.add_theme_constant_override("separation", 12)
 	offer_scroll.add_child(offer_column)
 	offers_section.reparent(offer_column)
-	detail_column.reparent(offer_column)
-	details_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	detail_overlay = Control.new()
+	detail_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	detail_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	$Root.add_child(detail_overlay)
+	var outside := ColorRect.new()
+	outside.color = Color(0, 0, 0, 0.16)
+	outside.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	detail_overlay.add_child(outside)
+	outside.gui_input.connect(func(event: InputEvent) -> void:
+		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			close_details()
+			outside.accept_event()
+		elif event is InputEventScreenTouch and event.pressed:
+			close_details()
+			outside.accept_event()
+	)
+	detail_popup = PanelContainer.new()
+	DentiUIStyle.style_dialog(detail_popup)
+	detail_overlay.add_child(detail_popup)
+	detail_column.reparent(detail_popup)
+	detail_actions.add_theme_constant_override("separation", 6)
+	detail_column.add_theme_constant_override("separation", 8)
+	details_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	details_panel.minimum_size_changed.connect(_queue_popup_layout)
+	detail_actions.minimum_size_changed.connect(_queue_popup_layout)
+	detail_overlay.visible = false
 	details.close_button.pressed.connect(close_details)
 	detail_column.visible = false
 	detail_actions.visible = false
@@ -714,6 +789,7 @@ func _build_night_layout() -> void:
 func close_details() -> void:
 	var was_expanded := expanded
 	expanded = false
+	detail_overlay.visible = false
 	detail_column.visible = false
 	detail_actions.visible = false
 	offer_scroll.scroll_vertical = 0

@@ -13,10 +13,10 @@ extends Resource
 @export var icon_texture: Texture2D
 @export var effect_kind: StringName = &""
 @export var effect_value: float = 0.0
-@export_range(0, 9) var max_stacks: int = 0
+@export_range(0, 99) var max_stacks: int = 0
 @export var tags: Array[StringName] = []
 @export var family_id: StringName = &""
-@export_range(0, 9) var family_limit: int = 0
+@export_range(0, 99) var family_limit: int = 0
 
 
 func effect_text() -> String:

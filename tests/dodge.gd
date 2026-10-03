@@ -87,7 +87,7 @@ func _run() -> void:
 	for index in 3:
 		_check(game.items.acquire(ShopController.by_id(&"dodge_3")), "cannot acquire healing dodge stack")
 	_check(game.items.acquire(ShopController.by_id(&"dodge_4")), "cannot mix shield variant")
-	_check(not game.items.acquire(ShopController.by_id(&"dodge_1")), "mixed dodge variants bypass family limit")
+	_check(game.items.can_acquire(ShopController.by_id(&"dodge_1")), "four dodge items prematurely blocked additional stacks")
 	_check(is_equal_approx(stats.dodge_chance, 0.43), "dodge item bonuses not additive")
 	_seed_for(stats, true)
 	player.take_hit(30.0)

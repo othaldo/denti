@@ -10,9 +10,9 @@ price = 5
 stat_changes = { &"melee_damage": 2.0 }
 effect_kind = &"bleed"
 effect_value = 3.0
-max_stacks = 3
+max_stacks = 12
 tags = Array[StringName]([&"melee", &"bleed"])
 
 
 family_id = &"bleed"
-family_limit = 3
+family_limit = 12

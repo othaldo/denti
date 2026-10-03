@@ -4,14 +4,14 @@
 script = ExtResource("1")
 id = &"sugar_4"
 display_name = "Sündenlolli"
-description = "Beim tatsächlichen Laufen: +28 % Waffenschaden (gesamt max. 40 %). -20 Leben, -3 Härte."
+description = "Während du dich bewegst: +28 % Waffenschaden. -20 Leben, -3 Härte."
 rarity_tier = 4
 price = 22
 icon_index = 74
 stat_changes = { &"max_health": -20.0, &"armor": -3.0 }
 effect_kind = &"moving_damage"
 effect_value = 0.28
-max_stacks = 2
+max_stacks = 12
 family_id = &"sugar"
-family_limit = 2
+family_limit = 12
 tags = Array[StringName]([&"mobility", &"risk"])

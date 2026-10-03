@@ -11,9 +11,9 @@ price = 8
 stat_changes = { &"luck": 20.0, &"crit_chance": 0.03 }
 effect_kind = &"xp_bonus"
 effect_value = 0.10
-max_stacks = 3
+max_stacks = 12
 tags = Array[StringName]([&"luck", &"economy"])
 
 
 family_id = &"luck"
-family_limit = 3
+family_limit = 12

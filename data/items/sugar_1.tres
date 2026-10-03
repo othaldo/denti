@@ -4,14 +4,14 @@
 script = ExtResource("1")
 id = &"sugar_1"
 display_name = "Zuckerwürfel"
-description = "Beim tatsächlichen Laufen: +8 % Waffenschaden. -6 Leben."
+description = "Während du dich bewegst: +8 % Waffenschaden. -6 Leben."
 rarity_tier = 1
 price = 5
 icon_index = 72
 stat_changes = { &"max_health": -6.0 }
 effect_kind = &"moving_damage"
 effect_value = 0.08
-max_stacks = 2
+max_stacks = 12
 family_id = &"sugar"
-family_limit = 2
+family_limit = 12
 tags = Array[StringName]([&"mobility", &"risk"])

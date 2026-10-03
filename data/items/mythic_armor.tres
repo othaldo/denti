@@ -4,7 +4,7 @@
 script = ExtResource("1")
 id = &"mythic_armor"
 display_name = "Unvergänglicher Schmelz"
-description = "+8 Härte. Einmalig pro Run. Ohne Nachteil."
+description = "+8 Härte."
 rarity_tier = 5
 price = 38
 icon_index = 79

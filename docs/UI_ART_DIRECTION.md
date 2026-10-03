@@ -26,8 +26,11 @@ Originalbilder bleiben erhalten.
 
 Shop, Hauptmenü, Kampf, Belohnungen und ESC-Menü bleiben getrennte Ansichten.
 Es gibt keine Website-Navigation oder zusätzliche ESC-Schaltfläche im Shop.
-Die bestehende Touch-Steuerung bleibt erhalten. Die dunkle Gestaltung gilt
-auch für Tooltips, Auswahllisten, deaktivierte Buttons und Dialoge.
+Auf Touchscreens folgt Denti der Fingerbewegung auf der freien Spielfläche,
+ohne sichtbares Steuerpad. Der Startpunkt behält den Abstand zum Finger;
+Bewegungstempo und Arenagrenzen gelten weiterhin. Loslassen, Pause oder
+Fokusverlust beendet die Geste. UI-Buttons übernehmen ihre eigenen Berührungen.
+Die dunkle Gestaltung gilt auch für Tooltips, Auswahllisten, deaktivierte Buttons und Dialoge.
 
 ## Informationen und Interaktionen
 
@@ -56,19 +59,26 @@ auch für Tooltips, Auswahllisten, deaktivierte Buttons und Dialoge.
   belegen ganze Zeilen; Einzelwaffen füllen freie Plätze. Die letzte freie
   Wurzel rutscht nicht in eine zusätzliche vierte Zeile. Im Hochformat passen
   alle sechs Wurzeln in eine Reihe, wenn die Breite reicht.
+- Kompakte Shopkarten reservieren keine Leerzeilen für fehlende Kategorien,
+  Werte oder Effekte. Ihre Höhe folgt dem Inhalt; Preis und Pin bleiben an den
+  unteren Ecken und innerhalb einer Rasterzeile auf gleicher Höhe.
+- Kisten zeigen eine breite Itemkarte mit vollständigem Effekt neben dem Bild.
+  Die Karte bestimmt die Dialoghöhe; Zerlegen ist eine kleinere Aktion darunter.
+  Das gilt auch für kurze Querformate.
 - Klick auf Angebot, Waffe, Item oder Relikt öffnet die vollständigen Details.
   Waffenvergleich, Synergiehinweise, Stapelzahlen, Verkauf mit Bestätigung,
   Fusion und Auto-Fusion verwenden weiterhin die bestehenden Systeme.
 - Klick auf einen Stat oder einen Begriff in den Details öffnet das Dentikon.
   Statdefinitionen stammen aus `DentiAttributes`; aktuelle Werte weiterhin
   aus den vorhandenen Präsentationsfunktionen. Keine zweite Balancequelle.
-  Das Infofenster passt seine Höhe dem Text an. Ausgeklappte Shopkarten sind
-  höchstens 640 Pixel breit; ihre Aktionen stehen auf Desktop direkt darunter.
+  Das Infofenster passt seine Höhe dem Text an. Shopdetails öffnen als höchstens
+  520 Pixel breites Popup über dem Raster; Kauf, Pin und Ausrüstungsaktionen
+  stehen darunter. ESC, Schließen oder Klick außerhalb schließen das Popup.
 - ESC schließt zuerst die Details und stellt den Fokus wieder her. Danach
   öffnet ESC das Pausenmenü auch im Shop. Zurückkehren erhält dessen Pause.
 - Alle gesammelten Items und Relikte bleiben per Icon, Anzahl und Details
-  zugänglich. Desktop-Details ersetzen die Angebotsfläche statt darunter eine
-  zweite Seite zu erzeugen. Wurzeln und Werte passen ohne eigene Scrollleisten.
+  zugänglich. Details entfernen oder verschieben keine Angebote. Wurzeln und
+  Werte passen ohne eigene Scrollleisten.
   Kleine Formate scrollen; Kauf- und Abschlussaktionen bleiben
   erreichbar. Es gibt keine Hoverpflicht auf Touchscreens.
 
@@ -79,6 +89,10 @@ enge Raster und Scrollbereiche keine farbigen Schattenflächen abschneiden.
 Hover hellt Rand und Fläche auf. Freistehende Dialoge behalten ihren Schatten.
 
 Hover vergrößert und dreht das Objektbild leicht; Klicks federn kurz zurück.
+Kauf- und Pinbuttons reagieren zusätzlich selbst auf Hover und Fokus. Der
+goldene Kaufbutton nennt die Aktion; bei fehlenden Münzen zeigt er „Zu teuer“
+mit korallenfarbenem Preis und Rand. Der genaue Fehlbetrag steht im Tooltip
+und im Detailfenster. Die Karte trägt ein Infozeichen für den Detailaufruf.
 Geöffnete Karten erscheinen in 180 ms. Beim Kauf fliegt das Motiv in 360 ms
 zur Sammlung beziehungsweise Ausrüstung. Fusion markiert den Wurzelplatz.
 Diese Rückmeldungen sperren keine Eingaben und verändern keine Spielregeln.
@@ -110,6 +124,11 @@ auch bei deaktiviertem Kauf vollständig lesbar. Fokusrahmen tönen Text nicht.
 `tests/shop_grid_layout.gd` prüft gemischte Wurzelkosten einschließlich 5/6,
 die gemeinsamen Kartenlinien und das Fehlen einer separaten Rerollzeile bei
 1920×1080, 1280×720 und 1040×600.
+`tests/mobile_shop_spacing.gd` prüft das kompakte Shopraster und alle Angebote
+im Hochformat. `tests/chest_layout.gd` prüft sämtliche Kisten-Items in neun
+Fenstergrößen und den anschließenden Wechsel zu anderen Belohnungen.
+`tests/shop_interaction.gd` prüft Popupgröße, unveränderte Angebotspositionen,
+Kaufhindernisse, eigenes Buttonfeedback und echte Klicks auf Karte/Kaufbutton.
 
 Echte Godot-Aufnahmen erzeugt:
 

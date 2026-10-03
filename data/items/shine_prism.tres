@@ -11,5 +11,5 @@ price = 13
 stat_changes = { &"armor": -1.0 }
 effect_kind = &"crit_beam"
 effect_value = 0.30
-max_stacks = 2
+max_stacks = 6
 tags = Array[StringName]([&"crit", &"ranged", &"area"])

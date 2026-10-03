@@ -5,11 +5,11 @@ script = ExtResource("1")
 id = &"metal_crown"
 icon_index = 0
 display_name = "Metallkrone"
-description = "+3 Härte, -8 % Bewegung. Karamell bleibt gefährlich."
+description = "+3 Härte, -8 % Bewegung."
 price = 4
 stat_changes = { &"armor": 3.0, &"speed_bonus": -8.0 }
 tags = Array[StringName]([&"defense"])
 
 
 family_id = &"armor"
-family_limit = 6
+family_limit = 12

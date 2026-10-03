@@ -11,5 +11,5 @@ price = 10
 stat_changes = { &"speed_bonus": -3.0 }
 effect_kind = &"rich_coin_bonus"
 effect_value = 1.0
-max_stacks = 2
+max_stacks = 6
 tags = Array[StringName]([&"economy", &"defense"])
