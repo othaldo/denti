@@ -1,0 +1,46 @@
+{
+	"adapter": "NVIDIA GeForce RTX 4070",
+	"display": "Windows",
+	"label": "dense_trinity_after",
+	"renderer": "gl_compatibility",
+	"samples": [
+		{
+			"draw_calls_mean": 334.238756529494,
+			"enemies": 110,
+			"frame_ms_max": 22.637,
+			"frame_ms_mean": 2.54824436233916,
+			"frame_ms_p95": 4.556,
+			"frames": 7849,
+			"loot": 1035,
+			"physics_ms_mean": 15.8359993629763,
+			"player_projectiles": 6,
+			"process_ms_mean": 4.74995859345146,
+			"scenario": "dense_wave_17_trinity_full"
+		},
+		{
+			"bytes": 190615,
+			"damage": 517507.473550214,
+			"damage_buckets": 112,
+			"kills": 0,
+			"owned_items": {
+				"chain_1": 1,
+				"conductive_varnish": 1,
+				"crit_1": 1,
+				"mint_essence": 1,
+				"mobility_2": 1,
+				"mouthwash": 1,
+				"polish_paste": 1,
+				"radiant_filling": 1,
+				"rinse_valve": 1,
+				"tempo_2": 1
+			},
+			"peak_enemies": 110,
+			"pending_levels": 6,
+			"save_ms": 11.477,
+			"saved_enemies": 110,
+			"saved_loot": 1035,
+			"scenario": "sustained_save"
+		}
+	],
+	"viewport": "(2400, 1080)"
+}

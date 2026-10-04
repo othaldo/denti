@@ -27,6 +27,9 @@ var enemy_index: EnemySpatialIndex
 var body_sprite: Sprite2D
 var tail_sprite: Sprite2D
 var outline_sprite: Sprite2D
+var visual_radius: float = 7.0
+var flight_range: float = 0.0
+var splash_radius: float = 0.0
 
 
 func launch(start: Vector2, aim: Vector2, attack_damage: float, weapon: WeaponData, inventory: ItemInventory = null, is_critical: bool = false, weapon_tier: int = 1) -> void:
@@ -40,6 +43,9 @@ func launch(start: Vector2, aim: Vector2, attack_damage: float, weapon: WeaponDa
 	data = weapon
 	tier = weapon_tier
 	critical = is_critical
+	splash_radius = weapon.splash_at_tier(tier)
+	flight_range = weapon.range_at_tier(tier) + 40.0
+	visual_radius = 11.0 if splash_radius > 0 or weapon.pierce_at_tier(tier) > 0 else 7.0
 	pierces_left = weapon.pierce_at_tier(tier)
 	return_factor = inventory.projectile_return_factor() if inventory != null and weapon.splash_at_tier(tier) <= 0.0 else 0.0
 	if data.evolution_kind == &"halo":
@@ -51,7 +57,7 @@ func launch(start: Vector2, aim: Vector2, attack_damage: float, weapon: WeaponDa
 func _create_visuals() -> void:
 	if body_sprite != null:
 		return
-	var radius := 11.0 if data.splash_at_tier(tier) > 0.0 or data.pierce_at_tier(tier) > 0 else 7.0
+	var radius := visual_radius
 	if data.projectile_shape != &"rocket":
 		tail_sprite = _visual_sprite(CombatSpriteTextures.projectile_tail(data.projectile_color, radius))
 		outline_sprite = _visual_sprite(CombatSpriteTextures.projectile_outline(data.projectile_color, radius))
@@ -76,7 +82,7 @@ func _sync_visuals() -> void:
 		tail_sprite.visible = body_sprite.visible
 		tail_sprite.rotation = direction.angle()
 		outline_sprite.visible = body_sprite.visible
-		var radius := 11.0 if data.splash_at_tier(tier) > 0.0 or data.pierce_at_tier(tier) > 0 else 7.0
+		var radius := visual_radius
 		outline_sprite.scale = Vector2.ONE * (radius + sin(animation_time * 20.0)) / (radius + 1.0) / CombatSpriteTextures.RESOLUTION
 	else:
 		body_sprite.rotation = direction.angle()
@@ -88,7 +94,7 @@ func _physics_process(delta: float) -> void:
 		animation_time += delta
 		global_position = orbit_center + Vector2.from_angle(animation_time * 9) * data.evolution_radius
 		for enemy in EnemySpatialIndex.circle(get_tree(), enemy_index, orbit_center, data.evolution_radius):
-			if enemy != null and enemy.health > 0 and not orbit_hits.has(enemy.get_instance_id()) and orbit_center.distance_to(enemy.global_position) <= data.evolution_radius + enemy.data.radius:
+			if enemy.health > 0 and not orbit_hits.has(enemy.get_instance_id()):
 				orbit_hits.append(enemy.get_instance_id())
 				enemy.take_damage(damage * data.evolution_damage_factor, null, false, &"evolution")
 		_sync_visuals()
@@ -96,7 +102,6 @@ func _physics_process(delta: float) -> void:
 			_start_return()
 		return
 	if impact_time > 0.0:
-		_sync_visuals()
 		impact_time -= delta
 		queue_redraw()
 		if impact_time <= 0.0:
@@ -108,7 +113,7 @@ func _physics_process(delta: float) -> void:
 			queue_free()
 			return
 		direction = global_position.direction_to(items.player.global_position)
-	var travel_left := maxf(data.range_at_tier(tier) + 40.0 - traveled, 0.0)
+	var travel_left := maxf(flight_range - traveled, 0.0)
 	var step := direction * minf(data.projectile_speed * delta, travel_left)
 	var previous_position := global_position
 	global_position += step
@@ -116,20 +121,16 @@ func _physics_process(delta: float) -> void:
 	if returning and not return_rearmed and traveled >= 32.0:
 		hit_ids.clear()
 		return_rearmed = true
-	var collisions: Array[Enemy] = []
-	for enemy in EnemySpatialIndex.segment(get_tree(), enemy_index, previous_position, global_position, HIT_RADIUS):
-		if enemy == null or hit_ids.has(enemy.get_instance_id()):
-			continue
-		var closest := Geometry2D.get_closest_point_to_segment(enemy.global_position, previous_position, global_position)
-		if closest.distance_squared_to(enemy.global_position) > (enemy.data.radius + HIT_RADIUS) * (enemy.data.radius + HIT_RADIUS):
-			continue
-		collisions.append(enemy)
-	collisions.sort_custom(func(a: Enemy, b: Enemy) -> bool:
-		return (a.global_position - previous_position).dot(direction) < (b.global_position - previous_position).dot(direction))
+	var collisions := EnemySpatialIndex.segment(get_tree(), enemy_index, previous_position, global_position, HIT_RADIUS, false, hit_ids)
+	if collisions.size() > 1:
+		collisions.sort_custom(func(a: Enemy, b: Enemy) -> bool:
+			var a_distance := (a.global_position - previous_position).dot(direction)
+			var b_distance := (b.global_position - previous_position).dot(direction)
+			return a.spatial_order < b.spatial_order if a_distance == b_distance else a_distance < b_distance)
 	for enemy in collisions:
 		if enemy.health <= 0.0:
 			continue
-		if data.splash_at_tier(tier) > 0.0:
+		if splash_radius > 0.0:
 			global_position = Geometry2D.get_closest_point_to_segment(enemy.global_position, previous_position, global_position)
 			_explode()
 			return
@@ -151,8 +152,8 @@ func _physics_process(delta: float) -> void:
 				impact_time = IMPACT_DURATION
 			break
 		pierces_left -= 1
-	if impact_time <= 0.0 and traveled >= data.range_at_tier(tier) + 40.0:
-		if data.splash_at_tier(tier) > 0.0:
+	if impact_time <= 0.0 and traveled >= flight_range:
+		if splash_radius > 0.0:
 			_explode()
 		elif return_factor > 0.0 and not returning:
 			_start_return()
@@ -178,8 +179,8 @@ func _start_return() -> void:
 
 
 func _explode() -> void:
-	for enemy in EnemySpatialIndex.circle(get_tree(), enemy_index, global_position, data.splash_at_tier(tier)):
-		if enemy != null and global_position.distance_squared_to(enemy.global_position) <= pow(data.splash_at_tier(tier) + enemy.data.radius, 2):
+	for enemy in EnemySpatialIndex.circle(get_tree(), enemy_index, global_position, splash_radius):
+		if enemy.health > 0:
 			var push_direction := global_position.direction_to(enemy.global_position)
 			WeaponAttackShapes.hit(enemy, data, tier, damage, critical, items, direction if push_direction.is_zero_approx() else push_direction)
 	impact_time = IMPACT_DURATION

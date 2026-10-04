@@ -65,7 +65,7 @@ func on_hit(enemy: Enemy, amount: float, _critical: bool) -> void:
 				if proc_wait <= 0:
 					proc_wait = data.evolution_interval
 					for target in weapon.player.nearby_enemies(enemy.global_position, data.evolution_radius):
-						if target.global_position.distance_to(enemy.global_position) <= data.evolution_radius + target.data.radius:
+						if target.health > 0:
 							target.take_damage(amount * data.evolution_damage_factor, null, false, &"evolution")
 					_flash(enemy.global_position - Vector2(30, 0), enemy.global_position + Vector2(30, 0))
 			else:
@@ -93,7 +93,7 @@ func _physics_process(delta: float) -> void:
 			pool.tick = weapon.data.evolution_interval
 			var last: Enemy
 			for enemy in weapon.player.nearby_enemies(pool.at, weapon.data.evolution_radius):
-				if enemy.global_position.distance_to(pool.at) <= weapon.data.evolution_radius + enemy.data.radius:
+				if enemy.health > 0:
 					enemy.apply_wet(1.0)
 					enemy.take_damage(pool.damage, null, false, &"evolution")
 					if last != null:
@@ -146,14 +146,8 @@ func _line_damage(start: Vector2, end: Vector2, amount: float, width: float, ble
 				enemy.apply_bleed(weapon.data.bleed_dps * weapon.player.stats.damage_factor(), weapon.data.bleed_duration, 3)
 
 func _nearest(excluded: Enemy, radius: float) -> Enemy:
-	var result: Enemy
-	var best := radius * radius
-	for enemy in weapon.player.nearby_enemies(excluded.global_position, radius, false):
-		var distance := enemy.global_position.distance_squared_to(excluded.global_position)
-		if enemy != excluded and distance < best:
-			best = distance
-			result = enemy
-	return result
+	var result := EnemySpatialIndex.nearest(get_tree(), weapon.player.enemy_index, excluded.global_position, radius, false, excluded)
+	return result if result != null and excluded.global_position.distance_squared_to(result.global_position) < radius * radius else null
 
 func _flash(start: Vector2, end: Vector2, mounted: bool = false, direction: Vector2 = Vector2.ZERO, reach: float = 0.0, angle: float = 0.0) -> void:
 	flashes.append({"a": start, "b": end, "life": 0.22, "mounted": mounted, "direction": direction, "reach": reach, "angle": angle})

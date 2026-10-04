@@ -1,0 +1,25 @@
+{
+	"display": "headless",
+	"label": "before",
+	"samples": [
+		{
+			"cpu_us_per_tick_max": 2019.89,
+			"cpu_us_per_tick_median": 1989.63,
+			"cpu_us_per_tick_min": 1967.27666666667,
+			"scenario": "nearest_6_searches_per_tick"
+		},
+		{
+			"cpu_us_per_tick_max": 4648.85,
+			"cpu_us_per_tick_median": 4406.32666666667,
+			"cpu_us_per_tick_min": 4314.12,
+			"scenario": "400_enemies_360_projectile_ticks"
+		},
+		{
+			"cpu_us_per_tick_max": 894.766666666667,
+			"cpu_us_per_tick_median": 890.613333333333,
+			"cpu_us_per_tick_min": 870.053333333333,
+			"scenario": "1800_distant_loot_ticks"
+		}
+	],
+	"ticks_per_sample": 300
+}

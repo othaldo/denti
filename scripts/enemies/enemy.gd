@@ -719,7 +719,8 @@ func _draw() -> void:
 		draw_arc(Vector2.ZERO, data.aura_radius, 0.0, TAU, 48, Color(1.0, 0.46, 0.73, 0.45), 2.0)
 	if is_enraged and not overtime_active:
 		draw_arc(Vector2.ZERO, data.radius + 12.0, 0.0, TAU, 40, Color(1.0, 0.26, 0.23, 0.85), 4.0)
-	draw_circle(Vector2(0.0, data.radius * 0.7), data.radius * 0.7, Color(0.17, 0.13, 0.17, 0.17))
+	if spatial_index == null:
+		draw_circle(Vector2(0.0, data.radius * 0.7), data.radius * 0.7, Color(0.17, 0.13, 0.17, 0.17))
 	if data.is_boss:
 		draw_rect(Rect2(Vector2(-data.radius, data.radius + 11.0), Vector2(data.radius * 2.0, 8.0)), Color(0.18, 0.13, 0.2))
 		draw_rect(Rect2(Vector2(-data.radius + 1.0, data.radius + 12.0), Vector2((data.radius * 2.0 - 2.0) * health / max_health, 6.0)), Color(0.92, 0.49, 0.25))

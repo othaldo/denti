@@ -5,6 +5,13 @@ extends RefCounted
 const RESOLUTION := 2.0
 static var textures: Dictionary[String, Texture2D] = {}
 
+static func enemy_shadow() -> Texture2D:
+	if not textures.has("enemy_shadow"):
+		var image := _image(16)
+		_circle(image, Vector2(16, 16), 15, Color(0.17, 0.13, 0.17, 0.17))
+		_store("enemy_shadow", image)
+	return textures["enemy_shadow"]
+
 static func projectile_body(tint: Color, radius: float) -> Texture2D:
 	_ensure_orb(tint, radius)
 	return textures["body:%s:%s" % [tint.to_html(), radius]]

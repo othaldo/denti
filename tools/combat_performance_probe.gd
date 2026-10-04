@@ -104,18 +104,38 @@ func _sustained() -> void:
 	game.wave.difficulty_id = &"hard"
 	game.wave.current_wave = 18
 	var loadout: Array[Dictionary] = []
-	for index in 6:
-		loadout.append({"id": "water_jet", "tier": 4})
+	var trinity := OS.get_cmdline_user_args().has("--trinity")
+	if trinity:
+		game.wave.difficulty_id = &"normal"
+		game.wave.current_wave = 16
+		loadout.append({"id": "trinity_brush", "tier": 4})
+		for index in 3:
+			loadout.append({"id": "magic_toothbrush", "tier": 4})
+	else:
+		for index in 6:
+			loadout.append({"id": "water_jet", "tier": 4})
 	game.player.loadout.restore(loadout)
 	for item in ShopController.CATALOG:
-		if item.weapon_data == null and item.rarity_tier <= 2 and item.effect_kind in [&"chain", &"water_puddle", &"conductive_wet", &"splash", &"magnet"]:
+		var wanted := item.effect_kind in [&"chain", &"water_puddle", &"conductive_wet", &"splash", &"magnet"] or trinity and item.effect_kind in [&"crit_beam", &"crit_burst"]
+		if item.weapon_data == null and item.rarity_tier <= 2 and wanted:
 			game.items.acquire(item)
 	game.player.stats.damage_bonus = 100
 	game.player.stats.ranged_damage = 35
 	game.player.stats.attack_speed = 80
 	game.player.stats.crit_chance = 0.35
 	game._start_combat_wave()
-	await _measure("sustained_wave_19_hard_%s" % ("economy" if session.economy_graphics() else "full"), 20000000)
+	if trinity:
+		# Keep the arena crowded rather than benchmarking an already-cleared wave.
+		for number in 110:
+			var data: EnemyData = WaveController.ACID_SPITTER if number % 4 == 0 else WaveController.PLAQUE
+			game._create_enemy(data, game.player.global_position + Vector2.RIGHT.rotated(number * TAU / 110) * (280 + number % 5 * 40))
+			var enemy: Enemy = game.get_node("Enemies").get_child(-1)
+			enemy.health = 1e9
+			enemy.max_health = 1e9
+		for number in 1200:
+			game._spawn_loot(game.player.global_position + Vector2(-750 + number % 60 * 25, -400 + number / 60 * 40), &"xp" if number % 2 == 0 else &"coin", 1)
+	var scenario := "dense_wave_17_trinity" if trinity else "sustained_wave_19_hard"
+	await _measure("%s_%s" % [scenario, "economy" if session.economy_graphics() else "full"], 20000000)
 	var started := Time.get_ticks_usec()
 	game._save_run()
 	var save_ms := (Time.get_ticks_usec() - started) / 1000.0

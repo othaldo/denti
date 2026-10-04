@@ -1,0 +1,67 @@
+{
+	"adapter": "NVIDIA GeForce RTX 4070",
+	"display": "Windows",
+	"label": "dense_before",
+	"renderer": "gl_compatibility",
+	"samples": [
+		{
+			"draw_calls_mean": 33.0,
+			"enemies": 0,
+			"frame_ms_max": 1.415,
+			"frame_ms_mean": 0.611348616842427,
+			"frame_ms_p95": 0.788,
+			"frames": 6543,
+			"loot": 0,
+			"physics_ms_mean": 0.0537539355035982,
+			"player_projectiles": 0,
+			"process_ms_mean": 1.42806816445052,
+			"scenario": "idle"
+		},
+		{
+			"draw_calls_mean": 879.602919708029,
+			"enemies": 400,
+			"frame_ms_max": 11.766,
+			"frame_ms_mean": 5.84245401459854,
+			"frame_ms_p95": 10.208,
+			"frames": 685,
+			"loot": 0,
+			"physics_ms_mean": 10.7422277372263,
+			"player_projectiles": 360,
+			"process_ms_mean": 10.3864102189782,
+			"scenario": "400_enemies_360_player_projectiles"
+		},
+		{
+			"draw_calls_mean": 35.0,
+			"enemies": 0,
+			"frame_ms_max": 2.581,
+			"frame_ms_mean": 0.940754938852302,
+			"frame_ms_p95": 1.799,
+			"frames": 4252,
+			"loot": 1703,
+			"physics_ms_mean": 2.72120413922851,
+			"player_projectiles": 0,
+			"process_ms_mean": 8.2709419096903,
+			"scenario": "1800_loot"
+		},
+		{
+			"draw_calls_mean": 825.315739868049,
+			"enemies": 200,
+			"frame_ms_max": 27.319,
+			"frame_ms_mean": 3.771027332705,
+			"frame_ms_p95": 5.831,
+			"frames": 1061,
+			"loot": 0,
+			"physics_ms_mean": 10.8100603204524,
+			"player_projectiles": 0,
+			"process_ms_mean": 6.06836757775691,
+			"scenario": "200_moving_enemies_6_contact_weapons"
+		},
+		{
+			"cpu_ms": 3.904,
+			"damage": 4000.0,
+			"remaining_dps": 0.0,
+			"scenario": "telemetry_4000_hits_and_expiration"
+		}
+	],
+	"viewport": "(1280, 720)"
+}

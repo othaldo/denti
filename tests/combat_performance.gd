@@ -32,6 +32,19 @@ func _run() -> void:
 		var at := Vector2(randf_range(-500, 2000), randf_range(-400, 1400))
 		var radius := randf_range(0, 400)
 		_compare_circle(index, at, radius, query % 2 == 0)
+		var origin := at + Vector2(28, -17)
+		var excluded: Enemy = index.get_child(query % index.get_child_count())
+		var include_radius := query % 2 == 0
+		var nearest: Enemy
+		var best := INF
+		for enemy: Enemy in index.get_children():
+			var reach := radius + (enemy.data.radius if include_radius else 0.0)
+			var distance := origin.distance_squared_to(enemy.global_position)
+			if enemy != excluded and at.distance_squared_to(enemy.global_position) <= reach * reach and distance < best:
+				best = distance
+				nearest = enemy
+		_check(index.closest(at, radius, include_radius, excluded, origin) == nearest, "nearest query changed collider reach, excluded target or hand-origin ordering")
+		_check(EnemySpatialIndex.nearest(self, null, at, radius, include_radius, excluded, origin) == nearest, "nearest fallback differs from the indexed query")
 		var end := at + Vector2(randf_range(-900, 900), randf_range(-900, 900))
 		var actual := index.along_segment(at, end, 10)
 		var expected: Array[Enemy] = []
@@ -40,6 +53,13 @@ func _run() -> void:
 			if closest.distance_squared_to(enemy.global_position) <= pow(enemy.data.radius + 10, 2):
 				expected.append(enemy)
 		_check(actual == expected, "segment query omitted a collider or changed spawn order")
+		_check(EnemySpatialIndex.segment(self, null, at, end, 10) == expected, "segment fallback returned broad-phase false positives")
+		var excluded_ids: Array[int] = [excluded.get_instance_id()]
+		expected.erase(excluded)
+		var unordered := index.along_segment(at, end, 10, false, excluded_ids)
+		_check(unordered.size() == expected.size(), "unordered segment lost a collider or ignored an already-hit enemy")
+		for enemy in expected:
+			_check(unordered.has(enemy), "unordered segment changed precise collision geometry")
 	var moved: Enemy = index.get_child(0)
 	moved.global_position = Vector2(-129, 128)
 	_compare_circle(index, moved.global_position, 0, true)
@@ -79,6 +99,7 @@ func _compare_circle(index: EnemySpatialIndex, at: Vector2, radius: float, inclu
 		if enemy.health > 0 and not enemy.is_queued_for_deletion() and at.distance_squared_to(enemy.global_position) <= reach * reach:
 			expected.append(enemy)
 	_check(index.in_circle(at, radius, include_radius) == expected, "circle query differs from brute-force range/collider test")
+	_check(EnemySpatialIndex.circle(self, null, at, radius, include_radius) == expected, "circle fallback returned broad-phase false positives")
 
 func _check_projectile_order() -> void:
 	var at: Vector2 = game.player.global_position

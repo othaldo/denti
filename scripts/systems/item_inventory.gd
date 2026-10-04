@@ -306,7 +306,7 @@ func on_weapon_hit(enemy: Enemy, amount: float, weapon: WeaponData, critical: bo
 		if puddles.size() > 4:
 			puddles.pop_front()
 		queue_redraw()
-	if enemy.health <= 0.0 and enemy.bleed_stacks > 0 and _power(&"bleed_spread") > 0.0:
+	if enemy.health <= 0.0 and enemy.bleed_stacks > 0 and _power(&"bleed_spread") > 0.0 and float(cooldowns.get("bleed_spread", 0.0)) <= 0.0:
 		var nearby := _nearest_other(enemy.global_position, enemy, 110.0 + _power(&"bleed_spread"))
 		if nearby != null and _ready_proc(&"bleed_spread", 0.4):
 			nearby.apply_bleed(enemy.bleed_dps, 2.5 + _power(&"bleed_clock"), 3 + roundi(_power(&"bleed_clock")))
@@ -323,7 +323,7 @@ func on_weapon_hit(enemy: Enemy, amount: float, weapon: WeaponData, critical: bo
 	if critical and _power(&"crit_burst") > 0.0 and _ready_proc(&"crit_burst", 0.8):
 		_area_damage(enemy.global_position, 72.0, amount * _power(&"crit_burst"), enemy, &"crit_burst")
 		_ring(enemy.global_position, 72.0, Color(1.0, 0.68, 0.97))
-	if critical and _power(&"crit_beam") > 0.0:
+	if critical and _power(&"crit_beam") > 0.0 and float(cooldowns.get("crit_beam", 0.0)) <= 0.0:
 		var beam_target := _nearest_other(enemy.global_position, enemy, 240.0)
 		if beam_target != null and _ready_proc(&"crit_beam", 0.65):
 			var beam_factor := _power(&"crit_beam") * (1.5 if weapon.damage_type == "Licht" else 1.0)
@@ -436,27 +436,20 @@ func _ready_proc(effect_kind: StringName, wait: float) -> bool:
 
 
 func _nearest_other(at: Vector2, excluded: Enemy, radius: float) -> Enemy:
-	var result: Enemy = null
-	var best := radius * radius
-	for enemy in player.nearby_enemies(at, radius, false):
-		if enemy == null or enemy == excluded or enemy.health <= 0.0:
-			continue
-		var distance := at.distance_squared_to(enemy.global_position)
-		if distance < best:
-			best = distance
-			result = enemy
-	return result
+	var result := EnemySpatialIndex.nearest(get_tree(), player.enemy_index, at, radius, false, excluded)
+	# These item procs have always used a strict range boundary.
+	return result if result != null and at.distance_squared_to(result.global_position) < radius * radius else null
 
 
 func _area_damage(at: Vector2, radius: float, amount: float, excluded: Enemy, proc_id: StringName) -> void:
 	for enemy in player.nearby_enemies(at, radius):
-		if enemy != null and enemy != excluded and enemy.health > 0.0 and at.distance_squared_to(enemy.global_position) <= (radius + enemy.data.radius) * (radius + enemy.data.radius):
+		if enemy != excluded and enemy.health > 0.0:
 			enemy.take_damage(amount, null, false, proc_id)
 
 
 func _puddle_tick(at: Vector2) -> void:
 	for enemy in player.nearby_enemies(at, PUDDLE_RADIUS):
-		if enemy != null and enemy.health > 0.0 and at.distance_squared_to(enemy.global_position) <= (PUDDLE_RADIUS + enemy.data.radius) * (PUDDLE_RADIUS + enemy.data.radius):
+		if enemy.health > 0.0:
 			enemy.apply_wet(1.1)
 			enemy.take_damage(player.stats.scale_damage(_power(&"water_puddle")), null, false, &"water_puddle")
 

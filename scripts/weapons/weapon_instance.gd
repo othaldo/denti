@@ -124,12 +124,9 @@ func _physics_process(delta: float) -> void:
 		return
 	if evolution != null and evolution.charge_time > 0:
 		return
-	var targets: Array[Enemy] = []
 	var reach := data.range_at_tier(tier)
-	for enemy in player.nearby_enemies(player.global_position, reach):
-		if enemy != null and enemy.health > 0.0 and player.global_position.distance_squared_to(enemy.global_position) <= (reach + enemy.data.radius) * (reach + enemy.data.radius):
-			targets.append(enemy)
-	if targets.is_empty():
+	var nearest := EnemySpatialIndex.nearest(get_tree(), player.enemy_index, player.global_position, reach, true, null, player.global_position + home_position)
+	if nearest == null:
 		focus_target_id = 0
 		focus_hits = 0
 		engagement_pending = true
@@ -139,18 +136,7 @@ func _physics_process(delta: float) -> void:
 		cooldown = attack_interval() * attack_phase
 		if cooldown > 0.0:
 			return
-	var origin := player.global_position + home_position
-	var closest := 0
-	var distance := INF
-	for index in targets.size():
-		var candidate := origin.distance_squared_to(targets[index].global_position)
-		if candidate < distance:
-			distance = candidate
-			closest = index
-	var first := targets[0]
-	targets[0] = targets[closest]
-	targets[closest] = first
-	_begin_attack(targets)
+	_begin_attack([nearest])
 
 
 func attack_interval() -> float:
