@@ -160,7 +160,7 @@ func _draw() -> void:
 	var color := weapon.data.projectile_color
 	for pool in pools:
 		draw_circle(to_local(pool.at), weapon.data.evolution_radius, Color(color, 0.08))
-		draw_arc(to_local(pool.at), weapon.data.evolution_radius, 0, TAU, 32, Color(color, 0.4), 2)
+		CombatDrawCache.arc(self, to_local(pool.at), weapon.data.evolution_radius, 0, TAU, 32, Color(color, 0.4), 2)
 	for thread in threads:
 		var a := instance_from_id(thread.a) as Enemy
 		var b := instance_from_id(thread.b) as Enemy
@@ -169,7 +169,7 @@ func _draw() -> void:
 	for id in marks:
 		var enemy := instance_from_id(id) as Enemy
 		if is_instance_valid(enemy):
-			draw_arc(to_local(enemy.global_position), enemy.data.radius + 5, 0, TAU, 16, Color(color, 0.65), 2)
+			CombatDrawCache.arc(self, to_local(enemy.global_position), enemy.data.radius + 5, 0, TAU, 16, Color(color, 0.65), 2)
 	for flash in flashes:
 		var line := flash_segment(flash)
 		var width := weapon.data.attack_width if weapon.data.evolution_kind == &"revelation" and flash.get("mounted", false) else 3.0
@@ -179,7 +179,7 @@ func _draw() -> void:
 		var start := weapon.muzzle_position()
 		draw_line(to_local(start), to_local(start + weapon.aim * weapon.data.range_at_tier(weapon.tier)), Color(color, 0.4), 2)
 		var pulse := 6.0 + (1.0 - charge_time / weapon.data.evolution_duration) * 7.0
-		draw_arc(to_local(weapon.muzzle_position()), pulse, 0, TAU, 24, Color(color, 0.8), 2)
+		CombatDrawCache.arc(self, to_local(weapon.muzzle_position()), pulse, 0, TAU, 24, Color(color, 0.8), 2)
 
 func flash_segment(flash: Dictionary) -> PackedVector2Array:
 	if not flash.get("mounted", false):

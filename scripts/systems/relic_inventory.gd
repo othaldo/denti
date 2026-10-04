@@ -36,7 +36,7 @@ func _draw() -> void:
 		if flash["kind"] == &"line":
 			draw_line(flash["from"], flash["at"], Color(flash["color"] as Color, alpha), 4.0)
 		else:
-			draw_arc(flash["at"], float(flash["radius"]) * (1.0 - alpha * 0.2), 0.0, TAU, 36, Color(flash["color"] as Color, alpha), 4.0)
+			CombatDrawCache.arc(self, flash["at"], float(flash["radius"]) * (1.0 - alpha * 0.2), 0.0, TAU, 36, Color(flash["color"] as Color, alpha), 4.0)
 
 
 func has_relic(id: StringName) -> bool:

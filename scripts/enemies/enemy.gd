@@ -78,6 +78,10 @@ var inflicted_statuses: Array[Dictionary] = []
 var spatial_index: EnemySpatialIndex
 var hit_flash_time: float = 0.0
 var spatial_order: int = 0
+var warning_ray_direction := Vector2.INF
+var warning_ray_count := -1
+var warning_rays: Array[Vector2] = []
+var warning_ray_mode := -1
 
 
 func configure(enemy_data: EnemyData, player: Player, wave_number: int = 1, difficulty_id: StringName = &"normal") -> void:
@@ -182,7 +186,10 @@ func _physics_process(delta: float) -> void:
 		if wet_time <= 0.0:
 			queue_redraw()
 	if data.is_boss and data.boss_guard_recharge_seconds > 0.0:
+		var was_low_guard := boss_damage_budget <= max_health * 0.01
 		boss_damage_budget = minf(boss_damage_budget + max_health * delta / data.boss_guard_recharge_seconds, max_health * data.boss_guard_burst_fraction)
+		if was_low_guard != (boss_damage_budget <= max_health * 0.01):
+			queue_redraw()
 		if boss_phase_timer > 0.0:
 			boss_phase_timer = maxf(boss_phase_timer - delta, 0.0)
 			if not boss_phase_burst_fired and boss_phase_timer <= data.boss_phase_duration * 0.5:
@@ -195,8 +202,10 @@ func _physics_process(delta: float) -> void:
 		if boss_phase_timer > 0.0 or boss_radial_volleys_remaining > 0:
 			queue_redraw()
 	if data.is_elite and data.elite_guard_recharge_seconds > 0.0 and health > 0.0:
+		var before_guard := elite_damage_budget
 		elite_damage_budget = minf(elite_damage_budget + max_health * data.elite_guard_fraction * delta / data.elite_guard_recharge_seconds, max_health * data.elite_guard_fraction)
-		queue_redraw()
+		if elite_damage_budget != before_guard:
+			queue_redraw()
 	if bleed_time > 0.0 and health > 0.0:
 		bleed_time = maxf(bleed_time - delta, 0.0)
 		bleed_tick -= delta
@@ -216,7 +225,7 @@ func _physics_process(delta: float) -> void:
 		if aura_timer <= 0.0:
 			aura_timer = AURA_PULSE_INTERVAL
 			_pulse_aura()
-	var direction := global_position.direction_to(target.global_position)
+	var direction := global_position.direction_to(target.global_position) if active_special_attack == EnemyData.SpecialAttack.NONE or special_phase == SpecialPhase.COOLDOWN else special_direction
 	var before_move := global_position
 	var charging := special_phase == SpecialPhase.ACTIVE and (active_special_attack == EnemyData.SpecialAttack.DASH or active_special_attack == EnemyData.SpecialAttack.BOSS and boss_move == BossMove.CHARGE)
 	contact_timer = maxf(contact_timer - delta, 0.0)
@@ -232,12 +241,17 @@ func _physics_process(delta: float) -> void:
 		_update_sprite_facing(special_direction)
 	else:
 		_update_sprite_facing(movement)
-	var closest := Geometry2D.get_closest_point_to_segment(target.global_position, before_move, global_position)
 	var contact_radius := data.radius + 20.0
-	if contact_timer <= 0.0 and closest.distance_squared_to(target.global_position) < contact_radius * contact_radius:
-		var damage := attack_damage if charging else contact_damage
-		contact_timer = 0.8 / overtime_attack_factor()
-		target.take_hit(damage, inflicted_statuses)
+	if contact_timer <= 0.0:
+		# Reject distant sweeps before computing the exact closest point. Fast
+		# charges still test their whole traveled segment, including crossings.
+		var player_at := target.global_position
+		if player_at.x >= minf(before_move.x, global_position.x) - contact_radius and player_at.x <= maxf(before_move.x, global_position.x) + contact_radius and player_at.y >= minf(before_move.y, global_position.y) - contact_radius and player_at.y <= maxf(before_move.y, global_position.y) + contact_radius:
+			var closest := Geometry2D.get_closest_point_to_segment(player_at, before_move, global_position)
+			if closest.distance_squared_to(player_at) < contact_radius * contact_radius:
+				var damage := attack_damage if charging else contact_damage
+				contact_timer = 0.8 / overtime_attack_factor()
+				target.take_hit(damage, inflicted_statuses)
 
 
 func _update_sprite_facing(direction: Vector2) -> void:
@@ -254,13 +268,13 @@ func _process_special(delta: float, direction: Vector2) -> void:
 	match special_phase:
 		SpecialPhase.COOLDOWN:
 			special_timer = maxf(special_timer - delta * overtime_attack_factor(), 0.0)
-			var distance := global_position.distance_to(target.global_position)
-			if special_timer <= 0.0 and distance <= active_trigger_range:
+			var distance_squared := global_position.distance_squared_to(target.global_position)
+			if special_timer <= 0.0 and distance_squared <= active_trigger_range * active_trigger_range:
 				special_phase = SpecialPhase.WARNING
 				special_timer = data.warning_time
 				special_direction = direction
 				if active_special_attack == EnemyData.SpecialAttack.BOSS:
-					boss_move = BossMove.CHARGE if distance > data.attack_radius + 45.0 or boss_charge_next else BossMove.PULSE
+					boss_move = BossMove.CHARGE if distance_squared > (data.attack_radius + 45.0) * (data.attack_radius + 45.0) or boss_charge_next else BossMove.PULSE
 					boss_charge_next = boss_move != BossMove.CHARGE
 					if boss_move == BossMove.CHARGE:
 						boss_dash_end = _boss_dash_target(direction)
@@ -268,9 +282,9 @@ func _process_special(delta: float, direction: Vector2) -> void:
 				queue_redraw()
 			else:
 				if active_special_attack == EnemyData.SpecialAttack.SHOOT:
-					if distance > data.preferred_range + 30.0:
+					if distance_squared > (data.preferred_range + 30.0) * (data.preferred_range + 30.0):
 						global_position += direction * chase_speed * delta
-					elif distance < data.preferred_range - 50.0:
+					elif data.preferred_range > 50.0 and distance_squared < (data.preferred_range - 50.0) * (data.preferred_range - 50.0):
 						global_position -= direction * chase_speed * 0.7 * delta
 					else:
 						global_position += direction.orthogonal() * chase_speed * 0.4 * delta
@@ -278,7 +292,8 @@ func _process_special(delta: float, direction: Vector2) -> void:
 					global_position += direction * chase_speed * (1.25 if is_enraged else 1.0) * delta
 		SpecialPhase.WARNING:
 			special_timer -= delta
-			queue_redraw()
+			if spatial_index == null:
+				queue_redraw()
 			if special_timer <= 0.0:
 				_activate_special()
 		SpecialPhase.ACTIVE:
@@ -289,8 +304,11 @@ func _process_special(delta: float, direction: Vector2) -> void:
 				var margin := DentiArena.WALL_WIDTH + data.radius + 6.0
 				global_position = global_position.clamp(Vector2.ONE * margin, target.arena.arena_size - Vector2.ONE * margin)
 			special_timer -= delta
-			queue_redraw()
-			if special_timer <= 0.0 or active_special_attack == EnemyData.SpecialAttack.BOSS and global_position.distance_to(boss_dash_end) < 1.0:
+			# The local trail of an ordinary dash is constant; moving the node
+			# already moves it. Boss trails have a fixed world origin.
+			if active_special_attack == EnemyData.SpecialAttack.BOSS and spatial_index == null:
+				queue_redraw()
+			if special_timer <= 0.0 or active_special_attack == EnemyData.SpecialAttack.BOSS and global_position.distance_squared_to(boss_dash_end) < 1.0:
 				if active_special_attack == EnemyData.SpecialAttack.BOSS:
 					_fire_boss_fan()
 				elif active_special_attack == EnemyData.SpecialAttack.DASH and data.dash_impact_radius > 0.0:
@@ -407,7 +425,7 @@ func _activate_special() -> void:
 	elif active_special_attack == EnemyData.SpecialAttack.RADIAL:
 		var root := _projectile_root()
 		if root != null:
-			EnemyProjectilePatterns.fire_radial(root, global_position, data.radial_count, special_direction.angle() + PI, data.attack_speed, attack_damage, target, Color(1.0, 0.52, 0.22), inflicted_statuses)
+			EnemyProjectilePatterns.fire_radial(root, global_position, data.radial_count, special_direction.angle() + PI, data.attack_speed, attack_damage, target, EnemyProjectilePatterns.RADIAL_COLOR, inflicted_statuses)
 		attack_performed.emit(&"acid")
 		_reset_special()
 	elif active_special_attack == EnemyData.SpecialAttack.LANE:
@@ -616,7 +634,7 @@ func _draw() -> void:
 		var progress := clampf(death_elapsed / BOSS_DEATH_DURATION, 0.0, 1.0)
 		var fade := 1.0 - progress
 		draw_circle(Vector2.ZERO, data.radius * (1.0 + progress * 3.0), Color(0.56, 0.15, 0.42, 0.18 * fade))
-		draw_arc(Vector2.ZERO, data.radius * (0.8 + progress * 3.4), 0.0, TAU, 48, Color(1.0, 0.78, 0.38, 0.95 * fade), 11.0 * fade + 2.0)
+		CombatDrawCache.arc(self, Vector2.ZERO, data.radius * (0.8 + progress * 3.4), 0.0, TAU, 48, Color(1.0, 0.78, 0.38, 0.95 * fade), 11.0 * fade + 2.0)
 		for index in 12:
 			var ray := Vector2.RIGHT.rotated(TAU * float(index) / 12.0 + 0.2)
 			var shard_at := ray * (data.radius * 0.7 + progress * 180.0)
@@ -624,7 +642,7 @@ func _draw() -> void:
 		return
 	if data.is_boss and data.boss_guard_recharge_seconds > 0.0:
 		if boss_phase_timer > 0.0 or boss_radial_volleys_remaining > 0:
-			draw_arc(Vector2.ZERO, data.radius + 19.0, 0.0, TAU, 48, Color(0.95, 0.32, 0.63, 0.9), 7.0)
+			CombatDrawCache.arc(self, Vector2.ZERO, data.radius + 19.0, 0.0, TAU, 48, Color(0.95, 0.32, 0.63, 0.9), 7.0)
 			if not boss_phase_burst_fired or boss_radial_volleys_remaining > 0:
 				var first_preview_index := boss_radial_volley_index if boss_phase_burst_fired else 0
 				var preview_count := boss_radial_volleys_remaining if boss_phase_burst_fired else data.boss_radial_volley_count
@@ -634,7 +652,7 @@ func _draw() -> void:
 				for volley_offset in preview_count:
 					var preview_angle := boss_phase_gap_angle + deg_to_rad(data.boss_radial_angle_step_degrees * float(first_preview_index + volley_offset))
 					var gap_marker := Vector2.RIGHT.rotated(preview_angle) * 290.0
-					draw_arc(gap_marker, 10.0, 0.0, TAU, 20, Color(1.0, 0.78, 0.3, 0.88), 3.0)
+					CombatDrawCache.arc(self, gap_marker, 10.0, 0.0, TAU, 20, Color(1.0, 0.78, 0.3, 0.88), 3.0)
 				if boss_phase >= 2:
 					var phase_aim := Vector2.RIGHT.rotated(boss_phase_gap_angle)
 					match data.boss_signature:
@@ -653,14 +671,52 @@ func _draw() -> void:
 						EnemyData.BossSignature.SPACE_ORB:
 							var orb_end := phase_aim * 520.0
 							draw_line(Vector2.ZERO, orb_end, Color(0.95, 0.32, 0.63, 0.24), data.boss_signature_orb_radius * 1.4)
-							draw_arc(orb_end, data.boss_signature_orb_radius, 0.0, TAU, 40, Color(1.0, 0.78, 0.3, 0.75), 4.0)
+							CombatDrawCache.arc(self, orb_end, data.boss_signature_orb_radius, 0.0, TAU, 40, Color(1.0, 0.78, 0.3, 0.75), 4.0)
 		elif boss_damage_budget <= max_health * 0.01:
-			draw_arc(Vector2.ZERO, data.radius + 19.0, 0.0, TAU, 48, Color(0.43, 0.84, 0.94, 0.8), 5.0)
+			CombatDrawCache.arc(self, Vector2.ZERO, data.radius + 19.0, 0.0, TAU, 48, Color(0.43, 0.84, 0.94, 0.8), 5.0)
 	if data.is_elite and data.elite_guard_fraction > 0.0:
 		var guard_ratio := clampf(elite_damage_budget / (max_health * data.elite_guard_fraction), 0.0, 1.0)
-		draw_arc(Vector2.ZERO, data.radius + 18.0, 0.0, TAU, 40, Color(0.43, 0.84, 0.94, 0.22), 4.0)
+		CombatDrawCache.arc(self, Vector2.ZERO, data.radius + 18.0, 0.0, TAU, 40, Color(0.43, 0.84, 0.94, 0.22), 4.0)
 		if guard_ratio > 0.0:
-			draw_arc(Vector2.ZERO, data.radius + 18.0, -PI / 2.0, -PI / 2.0 + TAU * guard_ratio, 40, Color(0.43, 0.84, 0.94, 0.85), 4.0)
+			CombatDrawCache.arc(self, Vector2.ZERO, data.radius + 18.0, -PI / 2.0, -PI / 2.0 + TAU * guard_ratio, 40, Color(0.43, 0.84, 0.94, 0.85), 4.0)
+	if spatial_index == null:
+		draw_attack_visuals(self)
+	if pulse_flash_time > 0.0:
+		var flash_radius := data.dash_impact_radius if active_special_attack == EnemyData.SpecialAttack.DASH and data.dash_impact_radius > 0.0 else data.attack_radius
+		CombatDrawCache.arc(self, Vector2.ZERO, flash_radius, 0.0, TAU, 64, Color(1.0, 0.72, 0.27, pulse_flash_time / PULSE_FLASH_DURATION), 8.0)
+	if bleed_stacks > 0:
+		CombatDrawCache.arc(self, Vector2.ZERO, data.radius + 4.0, 0.0, TAU, 24, Color(0.78, 0.25, 0.48, 0.85), 2.5 + bleed_stacks)
+	if wet_time > 0.0:
+		CombatDrawCache.arc(self, Vector2.ZERO, data.radius + 8.0, 0.0, TAU, 24, Color(0.36, 0.86, 1.0, 0.88), 3.0)
+	if exposure_time > 0.0:
+		CombatDrawCache.arc(self, Vector2.ZERO, data.radius + 6.0, 0.0, TAU, 24, Color(0.65, 1.0, 0.70, 0.8), 2.0)
+	if haste_time > 0.0:
+		CombatDrawCache.arc(self, Vector2.ZERO, data.radius + 8.0, 0.0, TAU, 24, Color(1.0, 0.46, 0.73, 0.9), 3.0)
+	if data.is_elite:
+		CombatDrawCache.arc(self, Vector2.ZERO, data.radius + 12.0, 0.0, TAU, 40, Color(1.0, 0.73, 0.24, 0.95), 4.0)
+	if data.aura_radius > 0.0:
+		CombatDrawCache.arc(self, Vector2.ZERO, data.aura_radius, 0.0, TAU, 48, Color(1.0, 0.46, 0.73, 0.45), 2.0)
+	if is_enraged and not overtime_active:
+		CombatDrawCache.arc(self, Vector2.ZERO, data.radius + 12.0, 0.0, TAU, 40, Color(1.0, 0.26, 0.23, 0.85), 4.0)
+	if spatial_index == null:
+		draw_circle(Vector2(0.0, data.radius * 0.7), data.radius * 0.7, Color(0.17, 0.13, 0.17, 0.17))
+	if data.is_boss:
+		draw_rect(Rect2(Vector2(-data.radius, data.radius + 11.0), Vector2(data.radius * 2.0, 8.0)), Color(0.18, 0.13, 0.2))
+		draw_rect(Rect2(Vector2(-data.radius + 1.0, data.radius + 12.0), Vector2((data.radius * 2.0 - 2.0) * health / max_health, 6.0)), Color(0.92, 0.49, 0.25))
+
+
+
+func _warning_rays(mode: int, count: int) -> Array[Vector2]:
+	if mode != warning_ray_mode or count != warning_ray_count or special_direction != warning_ray_direction:
+		warning_rays = EnemyProjectilePatterns.fan_directions(special_direction, count) if mode == EnemyData.SpecialAttack.SHOOT else EnemyProjectilePatterns.radial_directions(count, special_direction.angle() + PI)
+		warning_ray_mode = mode
+		warning_ray_count = count
+		warning_ray_direction = special_direction
+	return warning_rays
+
+
+func draw_attack_visuals(canvas: CanvasItem, base: Transform2D = Transform2D.IDENTITY) -> void:
+	var visual_tint := modulate * self_modulate if canvas != self else Color.WHITE
 	if special_phase == SpecialPhase.WARNING:
 		var warning_color := Color(0.73, 0.20, 0.19, 0.85)
 		var warning_progress := 1.0 - clampf(special_timer / maxf(data.warning_time, 0.01), 0.0, 1.0)
@@ -672,65 +728,43 @@ func _draw() -> void:
 			if active_special_attack == EnemyData.SpecialAttack.BOSS:
 				var side := special_direction.orthogonal() * (data.radius + 19.0)
 				var start := special_direction * data.radius * 0.5
-				draw_colored_polygon(PackedVector2Array([start - side, dash_path - side, dash_path + side, start + side]), Color(0.95, 0.20, 0.29, 0.18 + warning_progress * 0.22))
-				draw_line(start - side, dash_path - side, warning_color, 3.0 + warning_progress * 3.0)
-				draw_line(start + side, dash_path + side, warning_color, 3.0 + warning_progress * 3.0)
-			draw_line(Vector2.ZERO, dash_path, warning_color, 5.0)
-			draw_circle(dash_path, data.dash_impact_radius if active_special_attack == EnemyData.SpecialAttack.DASH and data.dash_impact_radius > 0.0 else (data.radius * 0.55 if data.is_boss else 6.0), Color(0.95, 0.20, 0.29, 0.20 + warning_progress * 0.25))
+				canvas.draw_colored_polygon(PackedVector2Array([start - side, dash_path - side, dash_path + side, start + side]), Color(0.95, 0.20, 0.29, 0.18 + warning_progress * 0.22) * visual_tint)
+				CombatDrawCache.line(canvas, start - side, dash_path - side, warning_color, 3.0 + warning_progress * 3.0, base, visual_tint)
+				CombatDrawCache.line(canvas, start + side, dash_path + side, warning_color, 3.0 + warning_progress * 3.0, base, visual_tint)
+			CombatDrawCache.line(canvas, Vector2.ZERO, dash_path, warning_color, 5.0, base, visual_tint)
+			CombatDrawCache.circle(canvas, dash_path, data.dash_impact_radius if active_special_attack == EnemyData.SpecialAttack.DASH and data.dash_impact_radius > 0.0 else (data.radius * 0.55 if data.is_boss else 6.0), Color(0.95, 0.20, 0.29, 0.20 + warning_progress * 0.25), visual_tint)
 			if active_special_attack == EnemyData.SpecialAttack.DASH and data.dash_impact_radius > 0.0:
-				draw_arc(dash_path, data.dash_impact_radius, 0.0, TAU, 32, warning_color, 3.0)
-			draw_arc(Vector2.ZERO, data.radius + 7.0, -PI / 2.0, -PI / 2.0 + TAU * warning_progress, 32, Color(1.0, 0.72, 0.27), 4.0)
+				CombatDrawCache.arc(canvas, dash_path, data.dash_impact_radius, 0.0, TAU, 32, warning_color, 3.0, base, visual_tint)
+			CombatDrawCache.arc(canvas, Vector2.ZERO, data.radius + 7.0, -PI / 2.0, -PI / 2.0 + TAU * warning_progress, 32, Color(1.0, 0.72, 0.27), 4.0, base, visual_tint)
 		elif active_special_attack == EnemyData.SpecialAttack.SHOOT:
 			var shot_color := Color(DentiStatus.COLORS[int(inflicted_statuses[0]["kind"])], 0.9) if not inflicted_statuses.is_empty() else Color(data.projectile_color, 0.9)
-			for ray in EnemyProjectilePatterns.fan_directions(special_direction, _aimed_projectile_count()):
-				draw_line(Vector2.ZERO, ray * 150.0, shot_color, 3.0)
-			draw_arc(Vector2.ZERO, data.radius + 8.0, -PI / 2.0, -PI / 2.0 + TAU * warning_progress, 32, shot_color, 4.0)
+			for ray in _warning_rays(EnemyData.SpecialAttack.SHOOT, _aimed_projectile_count()):
+				CombatDrawCache.line(canvas, Vector2.ZERO, ray * 150.0, shot_color, 3.0, base, visual_tint)
+			CombatDrawCache.arc(canvas, Vector2.ZERO, data.radius + 8.0, -PI / 2.0, -PI / 2.0 + TAU * warning_progress, 32, shot_color, 4.0, base, visual_tint)
 		elif active_special_attack == EnemyData.SpecialAttack.RADIAL:
 			var shot_color := Color(1.0, 0.48, 0.19, 0.9)
-			for ray in EnemyProjectilePatterns.radial_directions(data.radial_count, special_direction.angle() + PI):
-				draw_line(ray * data.radius, ray * 235.0, Color(shot_color, 0.3 + warning_progress * 0.35), 3.0)
-			draw_arc(Vector2.ZERO, data.radius + 9.0, -PI / 2.0, -PI / 2.0 + TAU * warning_progress, 32, shot_color, 5.0)
+			for ray in _warning_rays(EnemyData.SpecialAttack.RADIAL, data.radial_count):
+				CombatDrawCache.line(canvas, ray * data.radius, ray * 235.0, Color(shot_color, 0.3 + warning_progress * 0.35), 3.0, base, visual_tint)
+			CombatDrawCache.arc(canvas, Vector2.ZERO, data.radius + 9.0, -PI / 2.0, -PI / 2.0 + TAU * warning_progress, 32, shot_color, 5.0, base, visual_tint)
 		elif active_special_attack == EnemyData.SpecialAttack.LANE:
 			var lane_color := Color(0.50, 0.88, 0.14, 0.9)
 			var lane_direction := special_direction.normalized()
 			var lane_side := lane_direction.orthogonal() * (data.lane_projectile_spacing * float(data.lane_projectile_count - 1) * 0.5 + 21.0)
 			var lane_end := lane_direction * 550.0
-			draw_colored_polygon(PackedVector2Array([-lane_side, lane_end - lane_side, lane_end + lane_side, lane_side]), Color(lane_color, 0.10 + warning_progress * 0.12))
-			draw_line(-lane_side, lane_end - lane_side, lane_color, 3.0)
-			draw_line(lane_side, lane_end + lane_side, lane_color, 3.0)
-			draw_arc(Vector2.ZERO, data.radius + 8.0, -PI / 2.0, -PI / 2.0 + TAU * warning_progress, 32, lane_color, 4.0)
+			canvas.draw_colored_polygon(PackedVector2Array([-lane_side, lane_end - lane_side, lane_end + lane_side, lane_side]), Color(lane_color, 0.10 + warning_progress * 0.12) * visual_tint)
+			CombatDrawCache.line(canvas, -lane_side, lane_end - lane_side, lane_color, 3.0, base, visual_tint)
+			CombatDrawCache.line(canvas, lane_side, lane_end + lane_side, lane_color, 3.0, base, visual_tint)
+			CombatDrawCache.arc(canvas, Vector2.ZERO, data.radius + 8.0, -PI / 2.0, -PI / 2.0 + TAU * warning_progress, 32, lane_color, 4.0, base, visual_tint)
 		elif active_special_attack == EnemyData.SpecialAttack.SPACE_ORB:
 			var orb_color := Color(1.0, 0.43, 0.25, 0.88)
 			var orb_direction := special_direction.normalized()
 			var orb_end := orb_direction * 550.0
-			draw_line(Vector2.ZERO, orb_end, Color(orb_color, 0.42), data.space_orb_radius * 1.4)
-			draw_arc(orb_end, data.space_orb_radius, 0.0, TAU, 40, orb_color, 4.0)
-			draw_arc(Vector2.ZERO, data.radius + 8.0, -PI / 2.0, -PI / 2.0 + TAU * warning_progress, 32, orb_color, 4.0)
+			CombatDrawCache.line(canvas, Vector2.ZERO, orb_end, Color(orb_color, 0.42), data.space_orb_radius * 1.4, base, visual_tint)
+			CombatDrawCache.arc(canvas, orb_end, data.space_orb_radius, 0.0, TAU, 40, orb_color, 4.0, base, visual_tint)
+			CombatDrawCache.arc(canvas, Vector2.ZERO, data.radius + 8.0, -PI / 2.0, -PI / 2.0 + TAU * warning_progress, 32, orb_color, 4.0, base, visual_tint)
 		else:
-			draw_circle(Vector2.ZERO, data.attack_radius, Color(0.95, 0.36, 0.28, 0.13))
-			draw_arc(Vector2.ZERO, data.attack_radius, 0.0, TAU, 64, warning_color, 4.0)
-			draw_arc(Vector2.ZERO, data.attack_radius - 8.0, -PI / 2.0, -PI / 2.0 + TAU * warning_progress, 64, Color(1.0, 0.72, 0.27), 4.0)
+			CombatDrawCache.circle(canvas, Vector2.ZERO, data.attack_radius, Color(0.95, 0.36, 0.28, 0.13), visual_tint)
+			CombatDrawCache.arc(canvas, Vector2.ZERO, data.attack_radius, 0.0, TAU, 64, warning_color, 4.0, base, visual_tint)
+			CombatDrawCache.arc(canvas, Vector2.ZERO, data.attack_radius - 8.0, -PI / 2.0, -PI / 2.0 + TAU * warning_progress, 64, Color(1.0, 0.72, 0.27), 4.0, base, visual_tint)
 	elif special_phase == SpecialPhase.ACTIVE and (active_special_attack == EnemyData.SpecialAttack.DASH or active_special_attack == EnemyData.SpecialAttack.BOSS and boss_move == BossMove.CHARGE):
-		draw_line(boss_dash_origin - global_position if data.is_boss else -special_direction * data.radius, Vector2.ZERO, Color(1.0, 0.72, 0.27, 0.7), 15.0 if data.is_boss else 7.0)
-	if pulse_flash_time > 0.0:
-		var flash_radius := data.dash_impact_radius if active_special_attack == EnemyData.SpecialAttack.DASH and data.dash_impact_radius > 0.0 else data.attack_radius
-		draw_arc(Vector2.ZERO, flash_radius, 0.0, TAU, 64, Color(1.0, 0.72, 0.27, pulse_flash_time / PULSE_FLASH_DURATION), 8.0)
-	if bleed_stacks > 0:
-		draw_arc(Vector2.ZERO, data.radius + 4.0, 0.0, TAU, 24, Color(0.78, 0.25, 0.48, 0.85), 2.5 + bleed_stacks)
-	if wet_time > 0.0:
-		draw_arc(Vector2.ZERO, data.radius + 8.0, 0.0, TAU, 24, Color(0.36, 0.86, 1.0, 0.88), 3.0)
-	if exposure_time > 0.0:
-		draw_arc(Vector2.ZERO, data.radius + 6.0, 0.0, TAU, 24, Color(0.65, 1.0, 0.70, 0.8), 2.0)
-	if haste_time > 0.0:
-		draw_arc(Vector2.ZERO, data.radius + 8.0, 0.0, TAU, 24, Color(1.0, 0.46, 0.73, 0.9), 3.0)
-	if data.is_elite:
-		draw_arc(Vector2.ZERO, data.radius + 12.0, 0.0, TAU, 40, Color(1.0, 0.73, 0.24, 0.95), 4.0)
-	if data.aura_radius > 0.0:
-		draw_arc(Vector2.ZERO, data.aura_radius, 0.0, TAU, 48, Color(1.0, 0.46, 0.73, 0.45), 2.0)
-	if is_enraged and not overtime_active:
-		draw_arc(Vector2.ZERO, data.radius + 12.0, 0.0, TAU, 40, Color(1.0, 0.26, 0.23, 0.85), 4.0)
-	if spatial_index == null:
-		draw_circle(Vector2(0.0, data.radius * 0.7), data.radius * 0.7, Color(0.17, 0.13, 0.17, 0.17))
-	if data.is_boss:
-		draw_rect(Rect2(Vector2(-data.radius, data.radius + 11.0), Vector2(data.radius * 2.0, 8.0)), Color(0.18, 0.13, 0.2))
-		draw_rect(Rect2(Vector2(-data.radius + 1.0, data.radius + 12.0), Vector2((data.radius * 2.0 - 2.0) * health / max_health, 6.0)), Color(0.92, 0.49, 0.25))
+		CombatDrawCache.line(canvas, boss_dash_origin - global_position if data.is_boss else -special_direction * data.radius, Vector2.ZERO, Color(1.0, 0.72, 0.27, 0.7), 15.0 if data.is_boss else 7.0, base, visual_tint)

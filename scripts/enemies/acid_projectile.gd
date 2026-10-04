@@ -13,10 +13,13 @@ var visual_radius: float = 9.0
 var body_sprite: Sprite2D
 var halo_sprite: Sprite2D
 var inflicted_statuses: Array[Dictionary] = []
+var pool: EnemyProjectilePool
 
 
 func launch(at: Vector2, aim: Vector2, projectile_speed: float, amount: float, player: Player, tint: Color = Color(0.53, 0.88, 0.13), collision_radius: float = 21.0, draw_radius: float = 9.0, statuses: Array[Dictionary] = []) -> void:
 	global_position = at
+	lifetime = 2.2
+	animation_time = 0.0
 	direction = aim.normalized() if aim.length_squared() > 0.01 else Vector2.RIGHT
 	speed = projectile_speed
 	damage = amount
@@ -31,14 +34,15 @@ func launch(at: Vector2, aim: Vector2, projectile_speed: float, amount: float, p
 		add_child(body_sprite)
 	body_sprite.texture = EnemyProjectileVisuals.body(projectile_color, draw_radius)
 	body_sprite.scale = Vector2.ONE / EnemyProjectileVisuals.RESOLUTION
-	if halo_sprite != null:
-		halo_sprite.queue_free()
-		halo_sprite = null
 	if draw_radius > 13.0:
-		halo_sprite = Sprite2D.new()
+		if halo_sprite == null:
+			halo_sprite = Sprite2D.new()
+			add_child(halo_sprite)
 		halo_sprite.texture = EnemyProjectileVisuals.halo(projectile_color, collision_radius)
 		halo_sprite.scale = Vector2.ONE / EnemyProjectileVisuals.RESOLUTION
-		add_child(halo_sprite)
+		halo_sprite.visible = true
+	elif halo_sprite != null:
+		halo_sprite.visible = false
 
 
 func _physics_process(delta: float) -> void:
@@ -49,8 +53,16 @@ func _physics_process(delta: float) -> void:
 		body_sprite.scale = Vector2.ONE * (1.0 + sin(animation_time) * 1.5 / maxf(visual_radius, 1.0)) / EnemyProjectileVisuals.RESOLUTION
 	if target != null and global_position.distance_squared_to(target.global_position) < hit_radius * hit_radius:
 		var hit_target := target
-		queue_free()
-		hit_target.take_hit(damage, inflicted_statuses)
+		var hit_statuses := inflicted_statuses
+		var hit_damage := damage
+		_retire()
+		hit_target.take_hit(hit_damage, hit_statuses)
 		return
 	elif lifetime <= 0.0:
+		_retire()
+
+func _retire() -> void:
+	if is_instance_valid(pool) and get_parent() == pool:
+		pool.recycle(self)
+	else:
 		queue_free()

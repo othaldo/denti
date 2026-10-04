@@ -1,0 +1,32 @@
+{
+	"adapter": "NVIDIA GeForce RTX 4070",
+	"renderer": "gl_compatibility",
+	"samples": [
+		{
+			"draw_calls_mean": 36.0,
+			"frame_ms_mean": 1.58967213983051,
+			"frame_ms_p95": 1.918,
+			"frames": 1888,
+			"scenario": "110_bacteria_warning"
+		},
+		{
+			"draw_calls_mean": 36.0,
+			"frame_ms_mean": 1.48442878338279,
+			"frame_ms_p95": 1.77,
+			"frames": 2022,
+			"scenario": "110_bacteria_active"
+		},
+		{
+			"elapsed_ms": 119.024,
+			"scenario": "100_nine_shot_volleys"
+		},
+		{
+			"elapsed_ms": 320.148,
+			"scenario": "250_volleys_allocated"
+		},
+		{
+			"elapsed_ms": 303.283,
+			"scenario": "250_volleys_pooled"
+		}
+	]
+}

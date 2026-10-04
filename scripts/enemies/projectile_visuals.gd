@@ -60,7 +60,7 @@ static func halo_image(tint: Color, radius: float) -> Image:
 
 static func standard_specs() -> Array[Dictionary]:
 	var specs: Array[Dictionary] = []
-	for tint in [EnemyProjectilePatterns.BOSS_COLOR, EnemyProjectilePatterns.ACID_COLOR, EnemyProjectilePatterns.SPACE_ORB_COLOR, DentiStatus.COLORS[0], DentiStatus.COLORS[1]]:
+	for tint in [EnemyProjectilePatterns.BOSS_COLOR, EnemyProjectilePatterns.ACID_COLOR, EnemyProjectilePatterns.SPACE_ORB_COLOR, EnemyProjectilePatterns.RADIAL_COLOR, DentiStatus.COLORS[0], DentiStatus.COLORS[1]]:
 		specs.append({"kind": "body", "tint": tint, "radius": 9.0})
 	var defaults := EnemyData.new()
 	for radius in [defaults.space_orb_radius, ORB_CROWN.space_orb_radius, defaults.boss_signature_orb_radius, ORB_EMPEROR.boss_signature_orb_radius]:

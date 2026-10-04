@@ -1,0 +1,24 @@
+{
+	"adapter": "NVIDIA GeForce RTX 4070",
+	"renderer": "gl_compatibility",
+	"samples": [
+		{
+			"draw_calls_mean": 474.0,
+			"frame_ms_mean": 4.83019935691318,
+			"frame_ms_p95": 5.399,
+			"frames": 622,
+			"scenario": "110_bacteria_warning"
+		},
+		{
+			"draw_calls_mean": 254.0,
+			"frame_ms_mean": 1.97368113083497,
+			"frame_ms_p95": 2.623,
+			"frames": 1521,
+			"scenario": "110_bacteria_active"
+		},
+		{
+			"elapsed_ms": 146.731,
+			"scenario": "100_nine_shot_volleys"
+		}
+	]
+}

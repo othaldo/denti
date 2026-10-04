@@ -71,7 +71,7 @@ func _draw() -> void:
 		var at: Vector2 = puddle["at"]
 		var fade := clampf(float(puddle["life"]) / PUDDLE_DURATION, 0.0, 1.0)
 		draw_circle(at, PUDDLE_RADIUS, Color(0.18, 0.79, 0.87, 0.14 * fade))
-		draw_arc(at, PUDDLE_RADIUS, 0.0, TAU, 32, Color(0.28, 0.94, 1.0, 0.50 * fade), 3.0)
+		CombatDrawCache.arc(self, at, PUDDLE_RADIUS, 0.0, TAU, 32, Color(0.28, 0.94, 1.0, 0.50 * fade), 3.0)
 	for flash in flashes:
 		var alpha := clampf(float(flash["life"]) / 0.25, 0.0, 1.0)
 		var color := Color(flash["color"] as Color, alpha)
@@ -79,7 +79,7 @@ func _draw() -> void:
 			draw_line(flash["from"], flash["to"], color, 5.0 * alpha + 1.0)
 			draw_circle(flash["to"], 7.0 * alpha, color)
 		else:
-			draw_arc(flash["to"], float(flash["radius"]) * (1.0 - alpha * 0.35), 0.0, TAU, 32, color, 4.0)
+			CombatDrawCache.arc(self, flash["to"], float(flash["radius"]) * (1.0 - alpha * 0.35), 0.0, TAU, 32, color, 4.0)
 
 
 func count(id: StringName) -> int:

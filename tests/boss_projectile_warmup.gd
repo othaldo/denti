@@ -18,7 +18,8 @@ func _run() -> void:
 	var warmup: SubViewport = load("res://scripts/enemies/boss_projectile_warmup.gd").new()
 	root.add_child(warmup)
 	_check(warmup.size == Vector2i(8, 8) and warmup.world_2d != null and warmup.world_2d != root.world_2d and warmup.gui_disable_input, "warmup is not isolated from the game viewport/input")
-	_check(warmup.render_target_update_mode == SubViewport.UPDATE_ONCE and warmup.get_child_count() == EnemyProjectileVisuals.standard_specs().size() + 1, "warmup did not schedule all projectile textures and charge primitives for rendering")
+	_check(warmup.render_target_update_mode == SubViewport.UPDATE_ONCE and warmup.get_child_count() == EnemyProjectileVisuals.standard_specs().size() + CombatSpriteTextures.PREPARED.REGIONS.size() + BossProjectileWarmup.art_textures().size() + 4, "warmup did not schedule enemy/player/loot textures, art, warning atlas and charge primitives for rendering")
+	_check(warmup.has_node("CombatFontWarmup") and warmup.get_node("CombatFontWarmup").text == "0123456789-+!", "combat number font was omitted from warmup")
 	var cache_size := EnemyProjectileVisuals.textures.size()
 	_check(cache_size == EnemyProjectileVisuals.standard_specs().size(), "warmup did not prepare acid, status and orb textures")
 	paused = true

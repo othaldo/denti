@@ -4,6 +4,8 @@ Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü an
 
 ## In Entwicklung
 
+- **Angriffe vorbereiten:** gebündelte Warnungen/Ansturmspuren, vorbereitete Warnsymbole und Spieler-/Beutegrafiken, erweiterter App-Warmup sowie wiederverwendete Gegnergeschosse. Entfernte Kontaktprüfungen werden früh abgewiesen. Bakterien-Warntest: 4,83 → 1,59 ms und 474 → 36 Zeichenaufrufe. `bacteria charge` isoliert Bakterien; Testanzeigen zeigen einzelne Framespitzen. [Prüfung und Grenzen](docs/ATTACK_PERFORMANCE.md).
+
 - **Geschosse und Trefferupdates:** vorbereiteter gemeinsamer Atlas für alle 29 Säure-/Gift-/Blutungs-/Bossvarianten und weniger Zeichenupdates bei wiederholten Treffern/Statuseffekten. Isolierter 600-Geschoss-Test: 600 → 1 Zeichenaufruf. Neuer Vergleichscode `debug enemies` ohne eigenen Build. [Messung und Grenzen](docs/PROJECTILE_PRESSURE_PERFORMANCE.md).
 
 - **Schnellere Tests:** vollständige Suite mit bis zu vier parallelen Godot-Prozessen, getrennten Benutzerdaten, Zeitlimits und Einzelzeit-/Log-Berichten. Lokal 84 Tests in 96 statt 325 Sekunden; CI verwendet denselben Runner. [Laufzeitvergleich](docs/TEST_RUNTIME.md).

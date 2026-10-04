@@ -237,5 +237,5 @@ func _draw() -> void:
 	if impact_time > 0.0:
 		var progress := 1.0 - impact_time / IMPACT_DURATION
 		var radius := data.splash_at_tier(tier) if data.splash_at_tier(tier) > 0.0 else 20.0
-		draw_arc(Vector2.ZERO, radius * progress, 0.0, TAU, 40, Color(data.projectile_color, 1.0 - progress), 4.0)
+		CombatDrawCache.arc(self, Vector2.ZERO, radius * progress, 0.0, TAU, 40, Color(data.projectile_color, 1.0 - progress), 4.0)
 		return

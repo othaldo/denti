@@ -245,8 +245,7 @@ static func restore(game, saved: Dictionary) -> void:
 		if kind == &"xp" or kind == &"coin" or kind == &"chest" and ShopController.by_id(StringName(str(entry.get("reward_id", "")))) != null:
 			game._spawn_loot(_read_vector(entry.get("position", [0.0, 0.0])), kind, maxi(int(entry.get("amount", 1)), 1), StringName(str(entry.get("reward_id", ""))))
 	for entry in saved.get("acid", []):
-		var projectile: AcidProjectile = ACID_PROJECTILE.instantiate()
-		game.get_node("EnemyProjectiles").add_child(projectile)
+		var projectile := EnemyProjectilePatterns.acquire(game.get_node("EnemyProjectiles"))
 		projectile.launch(_read_vector(entry.get("position", [0.0, 0.0])), _read_vector(entry.get("direction", [1.0, 0.0])), float(entry.get("speed", 290.0)), float(entry.get("damage", 8.0)), player, Color(str(entry.get("color", "87e021"))), float(entry.get("hit_radius", 21.0)), float(entry.get("visual_radius", 9.0)), DentiStatus.sanitize_attacks(entry.get("inflicted_statuses", [])))
 		projectile.lifetime = float(entry.get("lifetime", 2.2))
 	shop.reroll_cost = maxi(int(saved.get("reroll_cost", 2)), 2)

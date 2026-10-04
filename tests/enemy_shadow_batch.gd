@@ -37,6 +37,11 @@ func _run() -> void:
 	batch.update()
 	# The dummy headless renderer does not store GPU instance transforms.
 	if DisplayServer.get_name() != "headless":
+		var atlas := batch.texture as AtlasTexture
+		var coordinates: PackedVector2Array = batch.multimesh.mesh.surface_get_arrays(0)[Mesh.ARRAY_TEX_UV]
+		var bounds := Rect2(atlas.region.position / atlas.atlas.get_size(), atlas.region.size / atlas.atlas.get_size()).grow(0.00001)
+		for coordinate in coordinates:
+			_check(bounds.has_point(coordinate), "shadow mesh samples outside its packed atlas region")
 		var transform := batch.multimesh.get_instance_transform_2d(0)
 		_check(transform.origin.is_equal_approx(moved.transform * Vector2(0, moved.data.radius * 0.7)), "shadow lost the enemy's transform")
 		var color := batch.multimesh.get_instance_color(0)

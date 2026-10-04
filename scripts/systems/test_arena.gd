@@ -9,6 +9,9 @@ var frames: int = 0
 var minimum_fps: float = INF
 var last_sample_us: int = -1
 var sample_frames: int = 0
+var previous_frame_us: int = -1
+var maximum_frame_ms: float = 0.0
+var slow_frames: int = 0
 
 func _ready() -> void:
 	seed(data.random_seed)
@@ -69,10 +72,19 @@ func _notification(what: int) -> void:
 		started_us = -1
 		frames = 0
 		minimum_fps = INF
+		previous_frame_us = -1
+		maximum_frame_ms = 0.0
+		slow_frames = 0
 
 func _process(_delta: float) -> void:
 	# Native wall time avoids interpreting capped game delta as FPS on slow phones.
 	var now := Time.get_ticks_usec()
+	if previous_frame_us >= 0:
+		var frame_ms := float(now - previous_frame_us) / 1000.0
+		maximum_frame_ms = maxf(maximum_frame_ms, frame_ms)
+		if frame_ms > 25.0:
+			slow_frames += 1
+	previous_frame_us = now
 	if started_us < 0:
 		started_us = now
 		last_sample_us = now
@@ -85,7 +97,7 @@ func _process(_delta: float) -> void:
 	minimum_fps = minf(minimum_fps, fps)
 	var average := float(frames) * 1000000.0 / (now - started_us)
 	var shots: int = game.get_node("Projectiles").get_child_count() + game.get_node("EnemyProjectiles").get_child_count()
-	information.text = "TEST · %s\nGegner %d · Geschosse %d · Beute %d\nFPS Ø %.1f · Minimum %.1f · %s" % [data.display_name, game.get_node("Enemies").get_child_count(), shots, game.get_node("Loot").get_child_count(), average, minimum_fps, str(ProjectSettings.get_setting("denti/build", "dev"))]
+	information.text = "TEST · %s\nGegner %d · Geschosse %d · Beute %d\nFPS Ø %.1f · Minimum %.1f · %s\nFrame max %.1f ms · >25 ms: %d" % [data.display_name, game.get_node("Enemies").get_child_count(), shots, game.get_node("Loot").get_child_count(), average, minimum_fps, str(ProjectSettings.get_setting("denti/build", "dev")), maximum_frame_ms, slow_frames]
 	game.hud.timer_label.text = "TEST"
 	last_sample_us = now
 	sample_frames = 0

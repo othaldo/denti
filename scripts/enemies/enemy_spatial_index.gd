@@ -9,16 +9,29 @@ var bosses: Array[Enemy] = []
 var maximum_radius: float = 0.0
 var next_order: int = 0
 var shadow_batch := EnemyShadowBatch.new()
+var had_attack_visuals := false
 
 func _ready() -> void:
 	process_priority = 1
 	set_process(not membership.is_empty())
 
 func _process(_delta: float) -> void:
-	shadow_batch.update()
+	var has_attack_visuals := shadow_batch.update()
+	if has_attack_visuals or had_attack_visuals:
+		queue_redraw()
+	had_attack_visuals = has_attack_visuals
 
 func _draw() -> void:
 	draw_multimesh(shadow_batch.multimesh, shadow_batch.texture)
+	# Draw telegraphs together below all sprites instead of alternating between
+	# each enemy's primitive geometry and texture. No extra gameplay children.
+	for enemy in shadow_batch.enemies:
+		if enemy.health <= 0.0 or not enemy.visible or enemy.is_queued_for_deletion():
+			continue
+		if enemy.special_phase != Enemy.SpecialPhase.COOLDOWN:
+			draw_set_transform_matrix(enemy.transform)
+			enemy.draw_attack_visuals(self, enemy.transform)
+	draw_set_transform_matrix(Transform2D.IDENTITY)
 
 func register(enemy: Enemy) -> void:
 	var id := enemy.get_instance_id()
@@ -59,6 +72,7 @@ func unregister(enemy: Enemy) -> void:
 		membership.erase(id)
 	bosses.erase(enemy)
 	shadow_batch.enemies.erase(enemy)
+	queue_redraw()
 	if membership.is_empty():
 		maximum_radius = 0.0
 		next_order = 0

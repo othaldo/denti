@@ -5,6 +5,7 @@ const PROJECTILE: PackedScene = preload("res://scenes/enemies/acid_projectile.ts
 const BOSS_COLOR := Color(0.95, 0.32, 0.63)
 const ACID_COLOR := Color(0.53, 0.88, 0.13)
 const SPACE_ORB_COLOR := Color(1.0, 0.43, 0.25)
+const RADIAL_COLOR := Color(1.0, 0.52, 0.22)
 
 
 static func radial_directions(count: int, gap_angle: float) -> Array[Vector2]:
@@ -49,14 +50,19 @@ static func fire_lane(parent: Node2D, at: Vector2, aim: Vector2, count: int, spa
 
 
 static func fire_space_orb(parent: Node2D, at: Vector2, aim: Vector2, speed: float, damage: float, radius: float, target: Player, statuses: Array[Dictionary] = []) -> void:
-	var projectile: AcidProjectile = PROJECTILE.instantiate()
-	parent.add_child(projectile)
+	var projectile := acquire(parent)
 	projectile.launch(at, aim, speed * 0.55, damage, target, SPACE_ORB_COLOR, radius, radius * 0.7, statuses)
 	projectile.lifetime = 3.8
 
 
 static func _spawn(parent: Node2D, at: Vector2, direction: Vector2, speed: float, damage: float, target: Player, tint: Color, lifetime: float, statuses: Array[Dictionary] = []) -> void:
-	var projectile: AcidProjectile = PROJECTILE.instantiate()
-	parent.add_child(projectile)
+	var projectile := acquire(parent)
 	projectile.launch(at, direction, speed, damage, target, tint, 21.0, 9.0, statuses)
 	projectile.lifetime = lifetime
+
+static func acquire(parent: Node2D) -> AcidProjectile:
+	if parent is EnemyProjectilePool:
+		return parent.acquire()
+	var projectile: AcidProjectile = PROJECTILE.instantiate()
+	parent.add_child(projectile)
+	return projectile

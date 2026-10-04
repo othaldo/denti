@@ -6,6 +6,7 @@ Die Testarenen sind Bestandteil des normalen Web-Releases. Im Hauptmenü **siebe
 | --- | --- |
 | `debug map` | Volle Welle-17-Arena: 110 Gegner, anfangs 1200 XP-/Münzdrops, eine Dreifaltigkeitsbürste und zwei magische Zahnbürsten auf Tier IV, On-hit-Items |
 | `debug enemies` | Gleiche 110 Gegnerarten und Welle 17, aber ohne eigene Waffen, Items oder Beute; Gegner bewegen sich und greifen weiterhin an |
+| `bacteria charge` | 60 Bakterien in Welle 17 ohne eigene Waffen, Items oder Beute; isolierter Ansturmtest |
 | `boss charge` | Ein Karieskönig in Welle 15 mit einer Tier-IV-Zahnbürste; zum Prüfen des ersten Charge und späterer Attacken |
 
 Groß-/Kleinschreibung und zusätzliche Leerzeichen zwischen den Wörtern sind egal. Unbekannte Codes zeigen eine Meldung und starten keinen Run.
@@ -14,7 +15,7 @@ Der Web-Export aktiviert Godots [virtuelle Tastatur](https://docs.godotengine.or
 
 Die Gegner erhalten sehr viel Lebensenergie, damit die Arena für wiederholbare Performancevergleiche gefüllt bleibt. Denti erhält ebenfalls hohe Lebensenergie. Angriffe, Bewegung, Geschosse, Item-Procs und Markierungsdetonationen laufen über die normalen Spielsysteme. Der normale Wellen-Timer ist ausgesetzt: keine automatische Folgewelle, kein Shop und keine Level-up-Unterbrechung. Denti kann auch per Touch normal bewegt werden.
 
-Die Testanzeige zeigt Gegner, Geschosse, Beute, durchschnittliche FPS und das niedrigste gemessene Einsekunden-FPS-Fenster. Die Messung verwendet echte verstrichene Zeit. Pause/Fokuswechsel setzen die Messung zurück. Die Build-ID steht daneben, damit Handy-Ergebnisse einem Deployment zugeordnet werden können. Die normale FPS-Anzeige ist während des Tests ebenfalls sichtbar; gespeicherte FPS- und Grafikoptionen werden dafür nicht geändert.
+Die Testanzeige zeigt Gegner, Geschosse, Beute, durchschnittliche FPS und das niedrigste gemessene Einsekunden-FPS-Fenster. Zusätzlich zeigt sie die längste einzelne Framezeit und die Zahl der Frames über 25 ms. Die Messung verwendet echte verstrichene Zeit. Pause/Fokuswechsel setzen die Messung zurück. Die Build-ID steht daneben, damit Handy-Ergebnisse einem Deployment zugeordnet werden können. Die normale FPS-Anzeige ist während des Tests ebenfalls sichtbar; gespeicherte FPS- und Grafikoptionen werden dafür nicht geändert.
 
 **Pause → Test neu starten** setzt die Arena auf das feste Preset zurück. **Pause → Hauptmenü** verlässt den Test. Die Testarenen speichern ausschließlich in `user://test_arena_run.json`; dieser temporäre Stand wird beim Verlassen entfernt. Der normale Run bleibt unverändert und kann danach mit **Fortsetzen** gespielt werden. Testläufe schreiben keine normalen Run-Berichte, schalten keine Schwierigkeit frei und entdecken keine normalen Fusionen.
 
