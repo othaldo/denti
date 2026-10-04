@@ -107,10 +107,18 @@ func _ready() -> void:
 	shop_panel.continue_requested.connect(_on_shop_continue)
 	shop_panel.pause_requested.connect(game_menu.open_pause)
 	mobile_controls.pause_requested.connect(game_menu.open_pause)
-	if DebugRunControls.allowed():
+	if DebugRunControls.allowed() and session.test_scenario_id == &"":
 		var cheat_menu := DebugCheatMenu.new()
 		cheat_menu.name = "DebugCheatMenu"
 		add_child(cheat_menu)
+	if session.test_scenario_id != &"":
+		player.global_position = arena.arena_size / 2.0
+		var test_arena := TestArena.new()
+		test_arena.game = self
+		test_arena.data = TestArenaCatalog.by_id(session.test_scenario_id)
+		test_arena.name = "TestArena"
+		add_child(test_arena)
+		return
 	if session.resume_requested:
 		session.resume_requested = false
 		var saved: Dictionary = session.load_run()
@@ -282,6 +290,10 @@ func _refresh_hud() -> void:
 		hud.boss_bar.max_value = encounter_max_health
 		hud.boss_bar.value = encounter_health
 	hud.update_telemetry(telemetry, $Enemies.get_child_count(), $Projectiles.get_child_count() + $EnemyProjectiles.get_child_count())
+	if session.test_scenario_id != &"":
+		hud.timer_label.text = "TEST"
+		if visible_boss != null:
+			hud.boss_label.text = "%s · Test" % visible_boss.data.display_name
 
 
 func _spawn_enemy(data: EnemyData) -> void:

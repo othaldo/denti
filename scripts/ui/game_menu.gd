@@ -24,6 +24,8 @@ var menu_stage: HBoxContainer
 var hero: TextureRect
 var dentipedia: Dentipedia
 var title_logo: TextureRect
+var code_input: LineEdit
+var code_error: Label
 @onready var session: Node = get_node("/root/GameSession")
 
 
@@ -32,6 +34,8 @@ func _ready() -> void:
 	_build_ui()
 	visible = not overlay
 	if not overlay:
+		session.end_test_run()
+		session.settings_visit_streak = 0
 		menu_music = MusicController.new()
 		add_child(menu_music)
 		menu_music.play_menu()
@@ -103,6 +107,8 @@ func _build_ui() -> void:
 
 
 func _clear_rows() -> void:
+	if not overlay and page not in [&"home", &"options"] and not session.code_entry_unlocked:
+		session.settings_visit_streak = 0
 	for child in rows.get_children():
 		rows.remove_child(child)
 		child.queue_free()
@@ -111,6 +117,8 @@ func _clear_rows() -> void:
 	item_details = null
 	dentipedia = null
 	title_logo = null
+	code_input = null
+	code_error = null
 	build_panel.custom_minimum_size = Vector2(520, 0)
 	rows.add_theme_constant_override("separation", 10)
 	fullscreen_button = null
@@ -254,6 +262,8 @@ func _show_home() -> void:
 	if overlay:
 		_text("Welle %d · Level %d · %s" % [game.wave.current_wave, game.level, DifficultyCatalog.by_id(game.wave.difficulty_id).display_name])
 		_button("Fortsetzen", close_pause, true)
+		if session.test_scenario_id != &"":
+			_button("Test neu starten", game._restart)
 		_button("Stats", _show_stats)
 		_button("Items", _show_items)
 		_button("Dentipedia", _show_dentipedia)
@@ -270,6 +280,8 @@ func _show_home() -> void:
 		_button("Story-Modus", _new_story_game)
 		_button("Einstellungen", _show_options)
 		_button("Credits", _show_credits)
+		if session.code_entry_unlocked:
+			_button("Code eingeben", _show_code_entry)
 		_button("Dentipedia", _show_dentipedia)
 		_button("Beenden", func() -> void: get_tree().quit())
 		_version_info()
@@ -293,15 +305,19 @@ func _show_dentipedia() -> void:
 func _update_build_layout() -> void:
 	if build_panel == null:
 		return
+	# Shrink back after a taller page; the centered HBox can retain its old size.
+	menu_stage.reset_size()
+	(menu_stage.get_parent() as Container).queue_sort()
 	var extent := root_control.size
 	hero.visible = not overlay and page == &"home" and extent.x >= 900
 	if title_logo != null:
 		var compact := extent.y < 650
-		title_logo.custom_minimum_size.y = 72 if compact else 120
+		var short_screen := extent.y < 600
+		title_logo.custom_minimum_size.y = 64 if short_screen else (72 if compact else 120)
 		rows.add_theme_constant_override("separation", 6 if compact else 10)
 		for child in rows.get_children():
 			if child is Button:
-				child.custom_minimum_size.y = 44 if compact else 48
+				child.custom_minimum_size.y = 40 if short_screen else (44 if compact else 48)
 	if page == &"dentipedia":
 		build_panel.custom_minimum_size.x = minf(960, extent.x - 24)
 		if dentipedia != null:
@@ -439,6 +455,8 @@ func _show_items() -> void:
 
 
 func _show_options() -> void:
+	if not overlay and page == &"home":
+		session.visit_settings_for_code_entry()
 	page = &"options"
 	_clear_rows()
 	_title("Einstellungen")
@@ -452,6 +470,46 @@ func _show_options() -> void:
 	_ui_options()
 	_refresh_option_buttons()
 	_button("Zurück", _show_home, true)
+
+
+func _show_code_entry() -> void:
+	if overlay or not session.code_entry_unlocked:
+		return
+	page = &"code_entry"
+	_clear_rows()
+	_title("Code eingeben")
+	_text("Code für eine Testarena eingeben.")
+	code_input = LineEdit.new()
+	code_input.name = "TestCode"
+	code_input.placeholder_text = "Code"
+	code_input.max_length = 48
+	code_input.clear_button_enabled = true
+	code_input.custom_minimum_size = Vector2(0, 52)
+	code_input.add_theme_stylebox_override("normal", DentiUIStyle._box(DentiUIStyle.RAISED, DentiUIStyle.LINE, 12, 1))
+	code_input.add_theme_stylebox_override("focus", DentiUIStyle._box(Color.TRANSPARENT, DentiUIStyle.GOLD, 12, 2))
+	code_input.add_theme_color_override("font_color", DentiUIStyle.INK)
+	code_input.add_theme_color_override("caret_color", DentiUIStyle.INK)
+	rows.add_child(code_input)
+	code_input.text_submitted.connect(_activate_test_code)
+	code_error = Label.new()
+	code_error.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	code_error.add_theme_color_override("font_color", DentiUIStyle.CORAL)
+	rows.add_child(code_error)
+	_button("Test starten", func() -> void: _activate_test_code(code_input.text), true)
+	_button("Zurück", _show_home)
+	code_input.grab_focus()
+
+
+func _activate_test_code(code: String) -> void:
+	if overlay or not session.code_entry_unlocked or code_input == null:
+		return
+	var scenario := TestArenaCatalog.by_code(code)
+	if scenario == null or not session.begin_test_run(scenario.id):
+		code_error.text = "Code nicht erkannt."
+		return
+	code_input.release_focus()
+	get_tree().paused = false
+	get_tree().change_scene_to_file("res://scenes/game/game.tscn")
 
 
 func _ui_options() -> void:

@@ -36,7 +36,7 @@ Die mittlere Framezeit verbessert sich in den beiden Kampfszenarien um rund 28 b
 
 Rohdaten: [vorher](combat_performance_dense_before.json), [nachher](combat_performance_dense_after.json).
 
-Zusätzlich läuft mit `--sustained --trinity` ein 20-sekündiger Test bei 2400×1080 und voller Auflösung: eine Dreifaltigkeitsbürste plus drei Tier-IV-Zahnbürsten, On-hit-Items, 110 Gegner mit künstlich hoher Lebensenergie und anfangs 1200 Drops. Gegner bleiben dadurch im Bild; es wird keine bereits leere Welle gemessen. Ergebnis: 2,55 ms mittlere Framezeit, 4,56 ms P95, 22,64 ms Maximum. Der abschließende Save mit 110 Gegnern und 1035 Drops dauert 11,48 ms. [Rohdaten](combat_performance_dense_trinity_after.json). Für dieses neue Szenario gibt es keine Vorhermessung.
+Zusätzlich läuft mit `--sustained --trinity` ein 20-sekündiger Test bei 2400×1080 und voller Auflösung: eine Dreifaltigkeitsbürste plus zwei Tier-IV-Zahnbürsten (sechs Wurzeln), On-hit-Items, 110 Gegner mit künstlich hoher Lebensenergie und anfangs 1200 Drops. Gegner bleiben dadurch im Bild; es wird keine bereits leere Welle gemessen. Ergebnis: 2,55 ms mittlere Framezeit, 4,56 ms P95, 22,64 ms Maximum. Der abschließende Save mit 110 Gegnern und 1035 Drops dauert 11,48 ms. [Rohdaten](combat_performance_dense_trinity_after.json). Für dieses neue Szenario gibt es keine Vorhermessung.
 
 Die Desktopwerte sind nicht auf das Handy übertragbar. Ob der gemeldete 7-FPS-Einbruch damit ausreichend behoben ist, braucht einen erneuten Test auf dem Gerät bei voller Auflösung.
 

@@ -30,6 +30,8 @@ Die vier Farbstufen der Boss-Entzündung. Die Vorschau zeigt einen Frame der Ani
 
 ## Spielen
 
+Für Performance-Tests im Web-Build: Im Hauptmenü siebenmal **Einstellungen → Zurück**, dann **Code eingeben**. `debug map` startet die volle Welle-17-Testarena, `boss charge` den Boss-Test. Der normale Spielstand bleibt erhalten. [Testarenen und Messwerte](docs/TEST_ARENAS.md).
+
 Das Projekt mit **Godot 4.4 oder neuer** öffnen und mit **F5** starten. Unter Linux geht es auch im Projektordner:
 
 ```bash

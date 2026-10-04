@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="TestArenaData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/test_arena_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/enemies/cavity_king.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"boss_charge"
+code = "boss charge"
+display_name = "Boss-Charge · Karieskönig"
+wave_number = 15
+enemy_count = 0
+loot_count = 0
+boss = ExtResource("2")
+weapons = Array[StringName]([&"magic_toothbrush"])

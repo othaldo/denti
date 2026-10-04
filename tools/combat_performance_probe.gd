@@ -109,7 +109,7 @@ func _sustained() -> void:
 		game.wave.difficulty_id = &"normal"
 		game.wave.current_wave = 16
 		loadout.append({"id": "trinity_brush", "tier": 4})
-		for index in 3:
+		for index in 2:
 			loadout.append({"id": "magic_toothbrush", "tier": 4})
 	else:
 		for index in 6:

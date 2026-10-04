@@ -29,6 +29,11 @@ var graphics_sample_us: int = -1
 var application_focused: bool = true
 var ui_voice: AudioStreamPlayer
 var last_ui_cue_ms: int = -1000
+var code_entry_unlocked: bool = false
+var settings_visit_streak: int = 0
+var test_scenario_id: StringName = &""
+var test_save_path: String = "user://test_arena_run.json"
+var protected_run_context: Dictionary = {}
 
 
 func _ready() -> void:
@@ -45,6 +50,7 @@ func _ready() -> void:
 		ui_sounds = bool(config.get_value("ui", "sounds", true))
 		reduced_ui_motion = bool(config.get_value("ui", "reduced_motion", false))
 		graphics_mode = clampi(int(config.get_value("display", "graphics_mode", 0)), 0, 2) as GraphicsMode
+		code_entry_unlocked = bool(config.get_value("debug", "code_entry_unlocked", false))
 		if bool(config.get_value("display", "fullscreen", false)):
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	apply_volume()
@@ -126,6 +132,41 @@ func has_run() -> bool:
 	return load_run() != {}
 
 
+func visit_settings_for_code_entry() -> void:
+	if code_entry_unlocked:
+		return
+	settings_visit_streak += 1
+	if settings_visit_streak >= 7:
+		code_entry_unlocked = true
+		_save_settings()
+
+
+func begin_test_run(id: StringName) -> bool:
+	if not code_entry_unlocked or TestArenaCatalog.by_id(id) == null:
+		return false
+	end_test_run()
+	protected_run_context = {"save_path": save_path, "difficulty": selected_difficulty_id, "story": selected_story_mode}
+	test_scenario_id = id
+	save_path = test_save_path
+	clear_run()
+	selected_difficulty_id = &"normal"
+	selected_story_mode = false
+	resume_requested = false
+	return true
+
+
+func end_test_run() -> void:
+	if test_scenario_id == &"":
+		return
+	clear_run()
+	save_path = protected_run_context["save_path"]
+	selected_difficulty_id = protected_run_context["difficulty"]
+	selected_story_mode = protected_run_context["story"]
+	test_scenario_id = &""
+	protected_run_context.clear()
+	resume_requested = false
+
+
 func load_run() -> Dictionary:
 	if not FileAccess.file_exists(save_path):
 		return {}
@@ -164,7 +205,7 @@ func load_progression() -> void:
 
 
 func discover_fusion(id: StringName) -> void:
-	if WeaponEvolutions.by_id(id) == null or discovered_fusions.has(str(id)):
+	if test_scenario_id != &"" or WeaponEvolutions.by_id(id) == null or discovered_fusions.has(str(id)):
 		return
 	discovered_fusions.append(str(id))
 	_save_progression()
@@ -191,7 +232,7 @@ func select_difficulty(id: StringName) -> bool:
 
 
 func unlock_hell() -> bool:
-	if hell_unlocked:
+	if test_scenario_id != &"" or hell_unlocked:
 		return false
 	hell_unlocked = true
 	_save_progression()
@@ -199,6 +240,8 @@ func unlock_hell() -> bool:
 
 
 func save_run_report(report: Dictionary) -> String:
+	if test_scenario_id != &"":
+		return ""
 	var directory := ProjectSettings.globalize_path(report_dir)
 	if DirAccess.make_dir_recursive_absolute(directory) != OK:
 		push_warning("Run-Bericht konnte nicht gespeichert werden: %s" % directory)
@@ -266,6 +309,7 @@ func _save_settings() -> void:
 	config.set_value("display", "graphics_mode", graphics_mode)
 	config.set_value("ui", "sounds", ui_sounds)
 	config.set_value("ui", "reduced_motion", reduced_ui_motion)
+	config.set_value("debug", "code_entry_unlocked", code_entry_unlocked)
 	config.save(settings_path)
 
 
