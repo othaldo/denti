@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3]
+[gd_scene load_steps=19 format=3]
 
 [ext_resource type="Script" path="res://scripts/game/game.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/game/arena.gd" id="2"]
@@ -17,6 +17,7 @@
 [ext_resource type="Script" path="res://scripts/enemies/enemy_spatial_index.gd" id="15"]
 [ext_resource type="Script" path="res://scripts/systems/loot_spatial_index.gd" id="16"]
 [ext_resource type="Script" path="res://scripts/enemies/enemy_projectile_pool.gd" id="17"]
+[ext_resource type="Script" path="res://scripts/ui/damage_number_batch.gd" id="18"]
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1")
@@ -38,6 +39,7 @@ script = ExtResource("16")
 [node name="DamageNumbers" type="Node2D" parent="."]
 process_mode = 3
 z_index = 20
+script = ExtResource("18")
 
 [node name="Player" parent="." instance=ExtResource("3")]
 position = Vector2(640, 360)

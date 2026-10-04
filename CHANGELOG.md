@@ -4,6 +4,8 @@ Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü an
 
 ## In Entwicklung
 
+- **Schadenszahlen bündeln:** gemeinsam gezeichnete Schriftumrandungen/-füllungen, vorbereiteter Text, gemeinsame Animation und wiederverwendete Labels. Volle Testarena auf Desktop: 408 → 221 Zeichenaufrufe und etwa 7 % weniger mittlere Framezeit. Spieler-Schaden und wichtige Meldungen bleiben sichtbar. [Messung und Grenzen](docs/DAMAGE_TEXT_PERFORMANCE.md).
+
 - **Angriffe vorbereiten:** gebündelte Warnungen/Ansturmspuren, vorbereitete Warnsymbole und Spieler-/Beutegrafiken, erweiterter App-Warmup sowie wiederverwendete Gegnergeschosse. Entfernte Kontaktprüfungen werden früh abgewiesen. Bakterien-Warntest: 4,83 → 1,59 ms und 474 → 36 Zeichenaufrufe. `bacteria charge` isoliert Bakterien; Testanzeigen zeigen einzelne Framespitzen. [Prüfung und Grenzen](docs/ATTACK_PERFORMANCE.md).
 
 - **Geschosse und Trefferupdates:** vorbereiteter gemeinsamer Atlas für alle 29 Säure-/Gift-/Blutungs-/Bossvarianten und weniger Zeichenupdates bei wiederholten Treffern/Statuseffekten. Isolierter 600-Geschoss-Test: 600 → 1 Zeichenaufruf. Neuer Vergleichscode `debug enemies` ohne eigenen Build. [Messung und Grenzen](docs/PROJECTILE_PRESSURE_PERFORMANCE.md).

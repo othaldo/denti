@@ -497,8 +497,7 @@ func _on_status_damage_taken(kind: DentiStatus.Type, amount: float) -> void:
 
 
 func _show_item_feedback(message: String, at: Vector2, color: Color) -> void:
-	var number: DamageNumber = DAMAGE_NUMBER_SCENE.instantiate()
-	$DamageNumbers.add_child(number)
+	var number: DamageNumber = $DamageNumbers.acquire(DAMAGE_NUMBER_SCENE)
 	number.show_message(at, message, color)
 
 
@@ -507,8 +506,7 @@ func _show_damage_number(at: Vector2, amount: float, player_hit: bool = false) -
 	var limit := MAX_ECONOMY_DAMAGE_NUMBERS if session.economy_graphics() else MAX_DAMAGE_NUMBERS
 	if not player_hit and $DamageNumbers.get_child_count() >= limit:
 		return
-	var number: DamageNumber = DAMAGE_NUMBER_SCENE.instantiate()
-	$DamageNumbers.add_child(number)
+	var number: DamageNumber = $DamageNumbers.acquire(DAMAGE_NUMBER_SCENE)
 	number.show_amount(at, amount, player_hit)
 
 

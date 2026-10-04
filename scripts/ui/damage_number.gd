@@ -2,6 +2,20 @@ class_name DamageNumber
 extends Label
 
 const LIFETIME := 0.58
+var batch: DamageNumberBatch
+var elapsed := 0.0
+var origin: Vector2
+var travel: Vector2
+var baseline: Vector2
+var render_font: Font
+var render_size := 25
+var render_color: Color
+var render_outline_color: Color
+var render_outline_size := 5
+var render_line := TextLine.new()
+var render_transform: Transform2D
+var render_alpha := 1.0
+var render_extent: Vector2
 
 
 func show_amount(at: Vector2, amount: float, player_hit: bool = false) -> void:
@@ -17,6 +31,9 @@ func show_message(at: Vector2, message: String, color: Color) -> void:
 
 
 func _animate(at: Vector2) -> void:
+	if batch != null:
+		batch.begin(self, at)
+		return
 	global_position = at + Vector2(randf_range(-12.0, 12.0) - size.x / 2.0, -size.y / 2.0)
 	scale = Vector2(0.85, 0.85)
 	var tween := create_tween()

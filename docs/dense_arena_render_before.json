@@ -1,0 +1,29 @@
+{
+	"adapter": "NVIDIA GeForce RTX 4070",
+	"samples": [
+		{
+			"draw_calls_mean": 407.508268059182,
+			"frame_ms_mean": 2.61263968668407,
+			"frame_ms_p95": 4.034,
+			"scenario": "full"
+		},
+		{
+			"draw_calls_mean": 378.445116681072,
+			"frame_ms_mean": 2.59626015557476,
+			"frame_ms_p95": 4.142,
+			"scenario": "no_enemy_overlays"
+		},
+		{
+			"draw_calls_mean": 400.829973707274,
+			"frame_ms_mean": 2.63192287467134,
+			"frame_ms_p95": 4.008,
+			"scenario": "no_item_evolution_visuals"
+		},
+		{
+			"draw_calls_mean": 218.534931506849,
+			"frame_ms_mean": 2.05545342465754,
+			"frame_ms_p95": 3.332,
+			"scenario": "no_damage_text"
+		}
+	]
+}
