@@ -492,21 +492,27 @@ func _projectile_root() -> Node2D:
 
 
 func apply_bleed(dps: float, duration: float, stack_cap: int = 3) -> void:
+	var previous_stacks := bleed_stacks
 	bleed_stacks = mini(bleed_stacks + 1, stack_cap)
 	bleed_dps = maxf(bleed_dps, dps)
 	bleed_time = maxf(bleed_time, duration)
-	queue_redraw()
+	if bleed_stacks != previous_stacks:
+		queue_redraw()
 
 
 func apply_wet(duration: float) -> void:
+	var was_wet := wet_time > 0.0
 	wet_time = maxf(wet_time, duration)
-	queue_redraw()
+	if not was_wet and wet_time > 0.0:
+		queue_redraw()
 
 
 func apply_enamel_exposure(bonus: float, duration: float) -> void:
+	var was_exposed := exposure_time > 0.0
 	enamel_exposure = maxf(enamel_exposure, clampf(bonus, 0.0, 0.30))
 	exposure_time = maxf(exposure_time, duration)
-	queue_redraw()
+	if not was_exposed and exposure_time > 0.0:
+		queue_redraw()
 
 
 func take_damage(amount: float, weapon: WeaponData = null, critical: bool = false, proc_id: StringName = &"") -> void:
@@ -553,7 +559,9 @@ func take_damage(amount: float, weapon: WeaponData = null, critical: bool = fals
 			defeated.emit(global_position, data)
 			queue_free()
 	else:
-		queue_redraw()
+		# Ordinary enemies have no health/guard bar; hit flash uses modulate.
+		if data.is_boss or data.is_elite:
+			queue_redraw()
 		modulate = Color(1.6, 1.6, 1.6)
 		hit_flash_time = 0.12
 

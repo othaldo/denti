@@ -122,6 +122,17 @@ func _run() -> void:
 	await process_frame
 	await process_frame
 	menu = current_scene
+	menu._show_code_entry()
+	menu._activate_test_code("debug enemies")
+	await process_frame
+	await process_frame
+	game = current_scene
+	_check(session.test_scenario_id == &"enemies_only" and game.get_node("Enemies").get_child_count() == 110, "enemy comparison code did not retain full enemy density")
+	_check(game.get_node("Loot").get_child_count() == 0 and game.player.loadout.equipped().is_empty() and game.items.owned.is_empty(), "enemy comparison includes loot, player weapons or item procs")
+	game.game_menu._to_main_menu()
+	await process_frame
+	await process_frame
+	menu = current_scene
 	menu._continue_game()
 	await process_frame
 	await process_frame

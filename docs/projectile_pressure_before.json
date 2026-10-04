@@ -1,0 +1,10 @@
+{
+	"adapter": "NVIDIA GeForce RTX 4070",
+	"draw_calls_mean": 600.0,
+	"frame_ms_mean": 1.77437327552227,
+	"frame_ms_p95": 2.366,
+	"frames": 2537,
+	"renderer": "gl_compatibility",
+	"scenario": "600_stationary_enemy_projectiles_3_status_colors",
+	"spawn_cpu_ms": 10.659
+}

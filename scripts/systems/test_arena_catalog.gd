@@ -3,6 +3,7 @@ extends RefCounted
 
 const ALL: Array[TestArenaData] = [
 	preload("res://data/test_arenas/dense_combat.tres"),
+	preload("res://data/test_arenas/enemies_only.tres"),
 	preload("res://data/test_arenas/boss_charge.tres"),
 ]
 

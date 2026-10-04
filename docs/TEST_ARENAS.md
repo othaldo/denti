@@ -5,6 +5,7 @@ Die Testarenen sind Bestandteil des normalen Web-Releases. Im Hauptmenü **siebe
 | Code | Test |
 | --- | --- |
 | `debug map` | Volle Welle-17-Arena: 110 Gegner, anfangs 1200 XP-/Münzdrops, eine Dreifaltigkeitsbürste und zwei magische Zahnbürsten auf Tier IV, On-hit-Items |
+| `debug enemies` | Gleiche 110 Gegnerarten und Welle 17, aber ohne eigene Waffen, Items oder Beute; Gegner bewegen sich und greifen weiterhin an |
 | `boss charge` | Ein Karieskönig in Welle 15 mit einer Tier-IV-Zahnbürste; zum Prüfen des ersten Charge und späterer Attacken |
 
 Groß-/Kleinschreibung und zusätzliche Leerzeichen zwischen den Wörtern sind egal. Unbekannte Codes zeigen eine Meldung und starten keinen Run.
@@ -19,8 +20,10 @@ Die Testanzeige zeigt Gegner, Geschosse, Beute, durchschnittliche FPS und das ni
 
 Für einen Kaltstart-Test von `boss charge` zuerst die Seite neu laden. Ein Neustart der Testarena setzt den Boss zurück, behält aber bereits geladene GPU-Ressourcen.
 
+Für den Performancevergleich auf dem Handy zunächst `debug map`, anschließend `debug enemies` jeweils mindestens 20 Sekunden spielen. Gleiche Grafikoption und ähnliche Position verwenden; FPS Ø/Minimum und Build-ID vergleichen. Der zweite Code isoliert Gegnerarbeit und gegnerische Geschosse, während der erste auch Waffen, Trefferprüfungen, Statuseffekte und Item-Procs enthält. Die Angriffstimer können sich unterscheiden. Die FPS der Testarenen mit dauerhaft 110 nahezu unsterblichen Gegnern sind keine Aussage über die durchschnittliche FPS eines normalen Runs.
+
 ## Weitere Presets
 
 Die Presets liegen unter `data/test_arenas/`, als `TestArenaData`-Resources. Sie definieren Code, Welle, Gegner-/Beutezahl, Boss, Waffen, Tier und Items. Neue Resources in `TestArenaCatalog.ALL` eintragen; der zentrale Controller `scripts/systems/test_arena.gd` verwendet die bestehenden Kampfsysteme. Es gibt keine Eingabe beliebiger Befehle oder separaten Editor-Cheat-Menüs im Testlauf.
 
-`tests/test_arenas.gd` deckt die Freischaltung über echte Menübuttons, Persistenz, unbekannte Codes, Desktop-/Handy-Layouts, beide Presets, Test-Neustart, Autosave-Isolation, Progressionsschutz und die Rückkehr zum ursprünglichen Run ab.
+`tests/test_arenas.gd` deckt die Freischaltung über echte Menübuttons, Persistenz, unbekannte Codes, Desktop-/Handy-Layouts, alle Presets, Test-Neustart, Autosave-Isolation, Progressionsschutz und die Rückkehr zum ursprünglichen Run ab.

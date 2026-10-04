@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="TestArenaData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/test_arena_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/enemies/plaque.tres" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/acid_spitter.tres" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/bacteria.tres" id="4"]
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="5"]
+
+[resource]
+script = ExtResource("1")
+id = &"enemies_only"
+code = "debug enemies"
+display_name = "Gegner ohne Build · Welle 17"
+loot_count = 0
+enemies = Array[ExtResource("5")]([ExtResource("2"), ExtResource("3"), ExtResource("4")])

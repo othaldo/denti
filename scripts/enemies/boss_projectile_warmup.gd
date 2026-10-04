@@ -1,8 +1,6 @@
 class_name BossProjectileWarmup
 extends SubViewport
 
-const EMPEROR: EnemyData = preload("res://data/enemies/cavity_emperor.tres")
-
 class ChargePreview extends Node2D:
 	func _draw() -> void:
 		# Exercise the same built-in canvas draw paths as the lane warning/trail.
@@ -23,11 +21,7 @@ func _ready() -> void:
 	render_target_update_mode = SubViewport.UPDATE_ONCE
 	# Preparing the images alone leaves their first rendered use in combat.
 	# Draw them once in an isolated tiny viewport during the initial menu load.
-	var textures: Array[Texture2D] = [
-		EnemyProjectileVisuals.body(EnemyProjectilePatterns.BOSS_COLOR, 9.0),
-		EnemyProjectileVisuals.body(EnemyProjectilePatterns.SPACE_ORB_COLOR, EMPEROR.boss_signature_orb_radius * 0.7),
-		EnemyProjectileVisuals.halo(EnemyProjectilePatterns.SPACE_ORB_COLOR, EMPEROR.boss_signature_orb_radius),
-	]
+	var textures := EnemyProjectileVisuals.standard_textures()
 	for texture in textures:
 		var sprite := Sprite2D.new()
 		sprite.texture = texture
