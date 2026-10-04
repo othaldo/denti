@@ -41,6 +41,12 @@ func _run() -> void:
 		var full: PackedVector2Array = CombatDrawCache.arcs[points][64]
 		_check(full.size() == points and full[0].is_equal_approx(Vector2.RIGHT) and full[-1].is_equal_approx(Vector2.RIGHT), "cached full circle has incorrect point count or seam")
 	var glyph_image := Image.load_from_file("res://assets/vfx/combat_glyphs.png")
+	var solid := CombatGlyphs.region("solid")
+	_check(solid.atlas == CombatGlyphs.ATLAS and solid.region == CombatGlyphs.region("line").region.grow(-1.0), "lane fill does not reuse the opaque atlas interior")
+	var solid_image := glyph_image.get_region(Rect2i(solid.region))
+	for y in solid_image.get_height():
+		for x in solid_image.get_width():
+			_check(solid_image.get_pixel(x, y).is_equal_approx(Color.WHITE), "lane atlas fill contains transparent/colored edges")
 	for radius in [20, 24, 26, 31]:
 		var texture := CombatGlyphs.region("%s:64" % radius)
 		var image := glyph_image.get_region(Rect2i(texture.region))

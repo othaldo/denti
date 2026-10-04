@@ -15,6 +15,11 @@ static func prepare() -> void:
 		texture.atlas = ATLAS
 		texture.region = PREPARED.REGIONS[key]
 		regions[key] = texture
+	# The white line tile's interior stays opaque even on very wide lane fills.
+	var solid := AtlasTexture.new()
+	solid.atlas = ATLAS
+	solid.region = PREPARED.REGIONS["line"].grow(-1.0)
+	regions["solid"] = solid
 
 static func region(key: String) -> AtlasTexture:
 	prepare()

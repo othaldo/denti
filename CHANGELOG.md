@@ -4,6 +4,8 @@ Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü an
 
 ## In Entwicklung
 
+- **Lane-Warnflächen im Atlas:** rechteckige Warnflächen wechseln nicht mehr zwischen Polygon- und Atlaszeichnung. Darstellung im nativen Pixelvergleich identisch; isoliert 60 Lanes: 120 → 1 Zeichenaufruf. Keine zusätzlichen Bilddaten oder weniger Angriffe. [Vergleich und Grenzen](docs/WARNING_LANE_PERFORMANCE.md).
+
 - **Dreifaltigkeits-Markierungen vorbereiten:** gemeinsame Atlasringe statt erneut aufgebauter Polygonlinien, dazu weniger temporäre Arbeit im Trefferpfad. Isolierter Desktop-Test mit 100 Ringen: 100 → 1 Zeichenaufruf und 0,75 → 0,21 ms Zeichenzeit. Handy-Auswirkung noch zu prüfen. [Messwerte und Grenzen](docs/MOBILE_PROFILE_FINDINGS.md).
 
 - **Mobile Kampfdiagnose:** sechs Vergleichscodes für die volle Arena, CPU-Stichproben, P95/P99-Framezeiten und ein kopierbarer Messbericht. Varianten isolieren Text, zusätzliche Effektzeichnungen, eigene Angriffe, Trefferfolgen und Zeichnen. Messskripte laufen ausschließlich in Diagnosearenen. [Codes und Messgrenzen](docs/TEST_ARENAS.md#diagnose-der-vollen-arena).

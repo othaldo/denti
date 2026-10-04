@@ -752,7 +752,9 @@ func draw_attack_visuals(canvas: CanvasItem, base: Transform2D = Transform2D.IDE
 			var lane_direction := special_direction.normalized()
 			var lane_side := lane_direction.orthogonal() * (data.lane_projectile_spacing * float(data.lane_projectile_count - 1) * 0.5 + 21.0)
 			var lane_end := lane_direction * 550.0
-			canvas.draw_colored_polygon(PackedVector2Array([-lane_side, lane_end - lane_side, lane_end + lane_side, lane_side]), Color(lane_color, 0.10 + warning_progress * 0.12) * visual_tint)
+			# This lane is a rectangle. Use the shared white atlas glyph rather
+			# than switching to untextured polygons between every enemy's rings.
+			CombatDrawCache.line(canvas, Vector2.ZERO, lane_end, Color(lane_color, 0.10 + warning_progress * 0.12), lane_side.length() * 2.0, base, visual_tint, true)
 			CombatDrawCache.line(canvas, -lane_side, lane_end - lane_side, lane_color, 3.0, base, visual_tint)
 			CombatDrawCache.line(canvas, lane_side, lane_end + lane_side, lane_color, 3.0, base, visual_tint)
 			CombatDrawCache.arc(canvas, Vector2.ZERO, data.radius + 8.0, -PI / 2.0, -PI / 2.0 + TAU * warning_progress, 32, lane_color, 4.0, base, visual_tint)

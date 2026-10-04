@@ -50,13 +50,13 @@ static func arc(canvas: CanvasItem, at: Vector2, radius: float, start: float, en
 	canvas.draw_polyline(arcs[count][step], tint, width / radius)
 	canvas.draw_set_transform_matrix(base)
 
-static func line(canvas: CanvasItem, start: Vector2, end: Vector2, tint: Color, width: float, base: Transform2D = Transform2D.IDENTITY, visual_tint: Color = Color.WHITE) -> void:
+static func line(canvas: CanvasItem, start: Vector2, end: Vector2, tint: Color, width: float, base: Transform2D = Transform2D.IDENTITY, visual_tint: Color = Color.WHITE, solid: bool = false) -> void:
 	tint *= visual_tint
 	var difference := end - start
 	if difference.is_zero_approx():
 		return
 	canvas.draw_set_transform_matrix(base * Transform2D(difference.angle(), start))
-	canvas.draw_texture_rect(CombatGlyphs.region("line"), Rect2(Vector2(0, -width * 0.5), Vector2(difference.length(), width)), false, tint)
+	canvas.draw_texture_rect(CombatGlyphs.region("solid" if solid else "line"), Rect2(Vector2(0, -width * 0.5), Vector2(difference.length(), width)), false, tint)
 	canvas.draw_set_transform_matrix(base)
 
 static func circle(canvas: CanvasItem, at: Vector2, radius: float, tint: Color, visual_tint: Color = Color.WHITE) -> void:
