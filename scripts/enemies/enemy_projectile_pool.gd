@@ -17,6 +17,7 @@ func prepare(count: int = PREPARE_COUNT) -> void:
 
 func _create() -> AcidProjectile:
 	var projectile := AcidProjectile.new()
+	CombatDiagnostics.instrument(projectile, "enemy_projectile", self)
 	created += 1
 	projectile.pool = self
 	# Prepare both sprite nodes before combat. Launch selects the real data.

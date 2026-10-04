@@ -4,6 +4,8 @@ Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü an
 
 ## In Entwicklung
 
+- **Mobile Kampfdiagnose:** sechs Vergleichscodes für die volle Arena, CPU-Stichproben, P95/P99-Framezeiten und ein kopierbarer Messbericht. Varianten isolieren Text, zusätzliche Effektzeichnungen, eigene Angriffe, Trefferfolgen und Zeichnen. Messskripte laufen ausschließlich in Diagnosearenen. [Codes und Messgrenzen](docs/TEST_ARENAS.md#diagnose-der-vollen-arena).
+
 - **Schadenszahlen bündeln:** gemeinsam gezeichnete Schriftumrandungen/-füllungen, vorbereiteter Text, gemeinsame Animation und wiederverwendete Labels. Volle Testarena auf Desktop: 408 → 221 Zeichenaufrufe und etwa 7 % weniger mittlere Framezeit. Spieler-Schaden und wichtige Meldungen bleiben sichtbar. [Messung und Grenzen](docs/DAMAGE_TEXT_PERFORMANCE.md).
 
 - **Angriffe vorbereiten:** gebündelte Warnungen/Ansturmspuren, vorbereitete Warnsymbole und Spieler-/Beutegrafiken, erweiterter App-Warmup sowie wiederverwendete Gegnergeschosse. Entfernte Kontaktprüfungen werden früh abgewiesen. Bakterien-Warntest: 4,83 → 1,59 ms und 474 → 36 Zeichenaufrufe. `bacteria charge` isoliert Bakterien; Testanzeigen zeigen einzelne Framespitzen. [Prüfung und Grenzen](docs/ATTACK_PERFORMANCE.md).

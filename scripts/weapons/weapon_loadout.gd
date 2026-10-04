@@ -153,6 +153,7 @@ func refund_for(index: int) -> int:
 
 func _add(data: WeaponData, tier: int, value: int) -> void:
 	var weapon := WeaponInstance.new()
+	CombatDiagnostics.instrument(weapon, "weapon", self)
 	weapon.configure(data, tier)
 	weapon.invested_coins = value
 	add_child(weapon)

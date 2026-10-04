@@ -46,6 +46,7 @@ func _ready() -> void:
 	add_child(sprite)
 	if data.evolution_kind != &"":
 		evolution = WeaponEvolutionEffects.new()
+		CombatDiagnostics.instrument(evolution, "evolution", self)
 		evolution.weapon = self
 		add_child(evolution)
 		sprite.modulate = Color(1.12, 1.04, 1.18)
@@ -192,6 +193,7 @@ func _fire(targets: Array[Enemy], damage: float, critical: bool) -> void:
 			for index in count:
 				var angle := 0.0 if index == 0 else (-0.12 if index == 1 else 0.12)
 				var projectile: WeaponProjectile = PROJECTILE_SCENE.instantiate()
+				CombatDiagnostics.instrument(projectile, "player_projectile", self)
 				player.get_parent().get_node("Projectiles").add_child(projectile)
 				projectile.launch(muzzle, aim.rotated(angle), damage if is_zero_approx(angle) else damage * 0.55, data, player.items, critical, tier)
 		&"beam":

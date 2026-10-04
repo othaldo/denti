@@ -1,6 +1,8 @@
 class_name TestArenaData
 extends Resource
 
+enum Diagnostic { NONE, FULL, NO_TEXT, NO_EFFECTS, NO_WEAPONS, NO_HITS, NO_DRAW }
+
 @export var id: StringName
 @export var code: String
 @export var display_name: String
@@ -14,3 +16,4 @@ extends Resource
 @export var weapons: Array[StringName] = []
 @export var weapon_tier: int = 4
 @export var items: Array[StringName] = []
+@export var diagnostic: Diagnostic = Diagnostic.NONE

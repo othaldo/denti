@@ -59,6 +59,14 @@ var story_dialogue: StoryDialogue
 var story_travel: StoryTravel
 
 
+func _enter_tree() -> void:
+	var run: Node = get_node("/root/GameSession")
+	if run.test_scenario_id != &"":
+		var preset := TestArenaCatalog.by_id(run.test_scenario_id)
+		if preset != null and preset.diagnostic != TestArenaData.Diagnostic.NONE:
+			CombatDiagnostics.configure(self, preset)
+
+
 func _ready() -> void:
 	randomize()
 	session.begin_graphics_run()
@@ -370,6 +378,7 @@ func _spawn_position(edge: int) -> Vector2:
 
 func _create_enemy(data: EnemyData, at: Vector2) -> void:
 	var enemy: Enemy = ENEMY_SCENE.instantiate()
+	CombatDiagnostics.instrument(enemy, "enemy", self)
 	enemy.position = at
 	enemy.configure(data, player, wave.current_wave, wave.difficulty_id)
 	enemy.defeated.connect(_on_enemy_defeated)
@@ -977,7 +986,11 @@ func _on_end_main_menu() -> void:
 func _save_run() -> void:
 	if ended or not is_node_ready():
 		return
+	var profiler := get_node_or_null("CombatDiagnostics") as CombatDiagnostics
+	var started := Time.get_ticks_usec() if profiler != null else 0
 	session.save_run(RUN_SNAPSHOT.capture(self))
+	if profiler != null:
+		profiler.save_ms = float(Time.get_ticks_usec() - started) / 1000.0
 
 
 func _restore_run(saved: Dictionary) -> void:
