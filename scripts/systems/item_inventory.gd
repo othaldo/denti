@@ -418,13 +418,13 @@ func _rebuild_powers() -> void:
 		var item := ShopController.by_id(StringName(str(key)))
 		if item == null or item.effect_kind == &"":
 			continue
-		var effect_key := str(item.effect_kind)
+		var effect_key: StringName = item.effect_kind
 		powers[effect_key] = float(powers.get(effect_key, 0.0)) + item.effect_value * int(owned[key])
 	cached_pickup_range = Loot.MAGNET_DISTANCE + _power(&"magnet")
 
 
 func _power(effect_kind: StringName) -> float:
-	return float(powers.get(str(effect_kind), 0.0))
+	return float(powers.get(effect_kind, 0.0))
 
 
 func _ready_proc(effect_kind: StringName, wait: float) -> bool:

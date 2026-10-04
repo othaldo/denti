@@ -47,6 +47,17 @@ func _run() -> void:
 		var middle := image.get_width() / 2
 		_check(image.get_pixel(middle, middle - radius * 2).a > 0.9 and image.get_pixel(middle, middle).a == 0.0, "warning ring lost its physical radius or clear center")
 	_check(CombatDrawCache.arcs.size() == arc_count, "standard geometry cache grew during use")
+	for path in DirAccess.get_files_at("res://data/enemies"):
+		if not path.ends_with(".tres"):
+			continue
+		var enemy := load("res://data/enemies/" + path) as EnemyData
+		var radius := int(enemy.radius + 5)
+		var texture := CombatGlyphs.region("mark:%s" % radius)
+		_check(texture != null and texture.atlas == CombatGlyphs.ATLAS, "evolution mark missing from shared atlas: " + path)
+		if texture != null:
+			var image := glyph_image.get_region(Rect2i(texture.region))
+			var middle := image.get_width() / 2
+			_check(image.get_pixel(middle + radius * 2, middle).a > 0.9 and image.get_pixel(middle, middle).a == 0.0, "evolution mark lost radius/stroke or clear center")
 	if failures == 0:
 		print("Denti prepared combat textures and geometry test passed")
 	quit(0 if failures == 0 else 1)

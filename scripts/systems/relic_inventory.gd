@@ -67,6 +67,8 @@ func on_shield_blocked() -> void:
 
 
 func on_weapon_hit(enemy: Enemy, amount: float, weapon: WeaponData, critical: bool) -> void:
+	if owned.is_empty():
+		return
 	if has_relic(&"blood_moon_tooth") and enemy.health <= 0.0 and enemy.bleed_stacks > 0:
 		_blood_burst(enemy, amount)
 	if has_relic(&"tidal_seal") and weapon.damage_type == "Wasser":

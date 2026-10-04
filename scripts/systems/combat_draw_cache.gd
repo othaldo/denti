@@ -32,6 +32,12 @@ static func arc(canvas: CanvasItem, at: Vector2, radius: float, start: float, en
 	var step := clampi(roundi((end - start) / TAU * PROGRESS_STEPS), 0, PROGRESS_STEPS)
 	if step == 0:
 		return
+	if count == 16 and step == PROGRESS_STEPS and is_zero_approx(start) and is_equal_approx(width, 2.0) and radius == float(int(radius)):
+		var mark := CombatGlyphs.region("mark:%s" % int(radius))
+		if mark != null:
+			var extent := radius + 3.0
+			canvas.draw_texture_rect(mark, Rect2(at - Vector2.ONE * extent, Vector2.ONE * extent * 2.0), false, tint)
+			return
 	# These ordinary warning rings share a pre-rendered atlas. Larger boss
 	# rings retain precise stroke widths through the cached geometry path.
 	if count == 32 and is_equal_approx(width, 4.0) and is_equal_approx(start, -PI / 2.0):

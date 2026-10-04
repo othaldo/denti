@@ -580,7 +580,8 @@ func take_damage(amount: float, weapon: WeaponData = null, critical: bool = fals
 		# Ordinary enemies have no health/guard bar; hit flash uses modulate.
 		if data.is_boss or data.is_elite:
 			queue_redraw()
-		modulate = Color(1.6, 1.6, 1.6)
+		if hit_flash_time < 0.12:
+			modulate = Color(1.6, 1.6, 1.6)
 		hit_flash_time = 0.12
 
 

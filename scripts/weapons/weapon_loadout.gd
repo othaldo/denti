@@ -51,8 +51,10 @@ func evolve(index: int, recipe: WeaponEvolutionRecipe, items: ItemInventory) -> 
 func evolution_hit(enemy: Enemy, amount: float, data: WeaponData, critical: bool) -> void:
 	if data.evolution_kind == &"":
 		return
-	for weapon in equipped():
-		if weapon.data.id == data.id and weapon.evolution != null:
+	# Preserve first-equipped dispatch without allocating two arrays per hit.
+	for index in get_child_count():
+		var weapon := get_child(index) as WeaponInstance
+		if weapon != null and weapon.data.id == data.id and weapon.evolution != null:
 			weapon.evolution.on_hit(enemy, amount, critical)
 			return
 

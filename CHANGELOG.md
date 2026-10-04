@@ -4,6 +4,8 @@ Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü an
 
 ## In Entwicklung
 
+- **Dreifaltigkeits-Markierungen vorbereiten:** gemeinsame Atlasringe statt erneut aufgebauter Polygonlinien, dazu weniger temporäre Arbeit im Trefferpfad. Isolierter Desktop-Test mit 100 Ringen: 100 → 1 Zeichenaufruf und 0,75 → 0,21 ms Zeichenzeit. Handy-Auswirkung noch zu prüfen. [Messwerte und Grenzen](docs/MOBILE_PROFILE_FINDINGS.md).
+
 - **Mobile Kampfdiagnose:** sechs Vergleichscodes für die volle Arena, CPU-Stichproben, P95/P99-Framezeiten und ein kopierbarer Messbericht. Varianten isolieren Text, zusätzliche Effektzeichnungen, eigene Angriffe, Trefferfolgen und Zeichnen. Messskripte laufen ausschließlich in Diagnosearenen. [Codes und Messgrenzen](docs/TEST_ARENAS.md#diagnose-der-vollen-arena).
 
 - **Schadenszahlen bündeln:** gemeinsam gezeichnete Schriftumrandungen/-füllungen, vorbereiteter Text, gemeinsame Animation und wiederverwendete Labels. Volle Testarena auf Desktop: 408 → 221 Zeichenaufrufe und etwa 7 % weniger mittlere Framezeit. Spieler-Schaden und wichtige Meldungen bleiben sichtbar. [Messung und Grenzen](docs/DAMAGE_TEXT_PERFORMANCE.md).
