@@ -32,3 +32,20 @@ Isolierter nativer Test mit 100 gleichzeitig neu gezeichneten Markierungsringen 
 In einer einzelnen vollen Desktop-Diagnosemessung sank die Momentaufnahme der Zeichenaufrufe von 271 auf 221. Der FPS-Schnitt verbesserte sich dort nicht (238 gegenüber 232 FPS); diese kurze Messung ist kein Beleg für eine Verbesserung der gesamten Arena. Der größere Atlas erhöhte den gemeldeten Desktop-Texturspeicher um etwa 4,5 MiB. Der isolierte Gewinn muss auf dem Handy anhand derselben Diagnosecodes erneut geprüft werden. Es gibt keine Zusage konstanter 60 FPS.
 
 Die Ringdarstellung wurde mit nativen Grafikframes visuell geprüft. `tests/prepared_combat_textures.gd` prüft die gemeinsamen Atlasregionen, Radien und freien Ringmitten aller aktuellen Gegner; vorhandene Tests prüfen Evolutionen, Item-Synergien, Relikte und Hit-Flash-Verhalten.
+
+## Beuteabfragen nach dem Handybericht zu fb65b09
+
+Der Volltest auf dem Snapdragon 888 erreichte mit `fb65b09` 30,53 FPS im Schnitt, mindestens 23,88 FPS und P95/P99 von 57/81 ms. Die Beuteverwaltung benötigte geschätzt 1,754 ms pro dargestelltem Frame, obwohl Denti stand und 1115 Drops liegen blieben. Gegnerphysik mit 8,866 ms und Treffer mit 4,571 ms bleiben größere Kosten; die Kategorien sind weiterhin inklusive und nicht addierbar.
+
+Die Beuteverwaltung speichert jetzt die nach Entstehungsreihenfolge sortierte Liste der nahen Drops. Sie baut diese erst bei Änderungen der Zellmenge beziehungsweise ihrer Mitgliedschaft neu auf. Solange weder Denti noch Drops, Magnetreichweite oder Welttransform verändert werden und keine Anziehung läuft, entfallen auch die wiederholten Distanzprüfungen. Neue Drops und Teleports innerhalb derselben Zelle wecken die Prüfung. Aktive Magnetbewegung und der Wellenabschluss laufen weiterhin mit jedem Physikschritt. Belohnungen werden weder zusammengefasst noch verzögert.
+
+Ein nativer Vorher/Nachher-Volltest auf der RTX 4070 mit deaktiviertem VSync, festem Simulationsschritt 1/60 s, 300 Frames zum Aufwärmen und anschließend 1800 gemessenen Frames ergab:
+
+| Messung | vorher | nachher |
+| --- | ---: | ---: |
+| geschätzte Beutezeit pro Frame | 0,222 ms | 0,003 ms |
+| FPS im Schnitt | 241,31 | 261,98 |
+| Minimum (1 s) | 216,98 | 247,82 |
+| Beuteobjekte | 1115 | 1115 |
+
+Die Messung verwendet `profile_full`, volle Auflösung und eine stehende Figur; sie belegt keine entsprechende FPS-Steigerung auf Android oder beim Bewegen. Die bestehende Referenzsimulation in `tests/loot_spatial_index.gd` vergleicht über 100 Schritte die exakten Pickup-Ereignisse und Positionen von 800 Drops einschließlich Welttransformationen, Reichweitenänderung und Wellenabschluss. Zusätzliche Prüfungen zählen tatsächliche Abfragen beim Schlafen und kontrollieren das Aufwecken durch Bewegung, neue Drops und Teleports innerhalb einer Zelle.

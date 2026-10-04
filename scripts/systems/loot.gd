@@ -59,9 +59,10 @@ func _physics_process(delta: float) -> void:
 	advance_collection(delta, target.global_position, target.items.cached_pickup_range * target.items.cached_pickup_range)
 
 
-func advance_collection(delta: float, at: Vector2, magnet_squared: float) -> void:
+# Return whether movement needs another tick while Denti stands still.
+func advance_collection(delta: float, at: Vector2, magnet_squared: float) -> bool:
 	if is_queued_for_deletion():
-		return
+		return false
 	var distance_squared := global_position.distance_squared_to(at)
 	if distance_squared <= PICKUP_DISTANCE * PICKUP_DISTANCE:
 		queue_free()
@@ -69,5 +70,8 @@ func advance_collection(delta: float, at: Vector2, magnet_squared: float) -> voi
 	elif wave_collecting:
 		var distance := sqrt(distance_squared)
 		global_position = global_position.move_toward(at, maxf(WAVE_COLLECTION_SPEED, distance * 3.0) * delta)
+		return true
 	elif distance_squared <= magnet_squared:
 		global_position = global_position.move_toward(at, 200.0 * delta)
+		return true
+	return false

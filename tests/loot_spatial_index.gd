@@ -4,6 +4,12 @@ var failures: Array[String] = []
 var events: Array[int] = []
 var game: Node2D
 
+class CountingLoot extends Loot:
+	var checks: int = 0
+	func advance_collection(delta: float, at: Vector2, magnet_squared: float) -> bool:
+		checks += 1
+		return super.advance_collection(delta, at, magnet_squared)
+
 func _initialize() -> void:
 	call_deferred("_run")
 
@@ -96,6 +102,40 @@ func _run() -> void:
 	game.scale = Vector2.ONE
 	game.position = Vector2.ZERO
 	game.player.global_position = Vector2(640, 360)
+	game.items.cached_pickup_range = 110
+	var sleeping := CountingLoot.new()
+	sleeping.position = Vector2(750, 470)
+	sleeping.configure(&"coin", 1, game.player)
+	grid.add_child(sleeping)
+	grid._physics_process(1.0 / 60)
+	for tick in 60:
+		grid._physics_process(1.0 / 60)
+	_check(sleeping.checks == 1, "stationary ground loot keeps repeating distance checks")
+	game.player.position.x += 1
+	grid._physics_process(1.0 / 60)
+	_check(sleeping.checks == 2, "player movement did not wake nearby loot")
+	game.items.cached_pickup_range = 235
+	var before := sleeping.position
+	grid._physics_process(1.0 / 60)
+	grid._physics_process(1.0 / 60)
+	_check(sleeping.checks == 4 and sleeping.position.distance_to(before) > 6, "magnet change did not wake loot or attraction stopped while standing")
+	game.items.cached_pickup_range = 110
+	sleeping.position = Vector2(750, 470)
+	grid._physics_process(1.0 / 60)
+	grid._physics_process(1.0 / 60)
+	var checks_before_teleport := sleeping.checks
+	# Same-cell movement changes distance without changing grid membership.
+	sleeping.position = Vector2(649, 387)
+	grid._physics_process(1.0 / 60)
+	_check(sleeping.checks == checks_before_teleport + 1 and sleeping.position.y < 387, "same-cell teleport did not wake collection")
+	sleeping.free()
+	var added := CountingLoot.new()
+	added.position = game.player.position
+	added.configure(&"coin", 1, game.player)
+	grid.add_child(added)
+	grid._physics_process(1.0 / 60)
+	_check(added.checks == 1 and added.is_queued_for_deletion(), "new loot did not wake a stationary query")
+	await process_frame
 	game._spawn_loot(Vector2(-10000, 20000), &"chest", 7, &"metal_crown")
 	var chest: Loot = grid.get_child(0)
 	grid._physics_process(1.0 / 60)
