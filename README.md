@@ -96,20 +96,17 @@ Putzeifer und Bewegung verwenden additive Prozentboni; Speichel zählt Regenerat
 Nach dem ersten Godot-Import lassen sich die Tests so ausführen:
 
 ```bash
-for test in tests/*.gd; do
-  godot --headless --fixed-fps 60 --path . --script "res://$test" || exit 1
-done
+python3 tools/run_tests.py --godot godot
 ```
 
 Unter Windows können die Tests mit dem Godot-Konsolenprogramm ausgeführt werden
 (Namen bei anderer Godot-Version anpassen):
 
 ```powershell
-Get-ChildItem tests -Filter *.gd | ForEach-Object {
-  & Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . --script ("res://tests/" + $_.Name)
-  if ($LASTEXITCODE -ne 0) { throw "Test fehlgeschlagen: $($_.Name)" }
-}
+python tools/run_tests.py --godot Godot_v4.7.2-stable_win64_console.exe
 ```
+
+Der Runner benötigt Python 3.10+ (keine Zusatzpakete). Er führt bis zu vier Tests parallel aus, mit getrennten Godot-Benutzerdaten und unverändertem Simulationsschritt von 1/60 Sekunde. `--jobs 1` läuft seriell; `--filter 'weapon_*'` wählt eine Teilmenge. Alle Tests bleiben Bestandteil des CI-Laufs. Fehlercodes, `SCRIPT ERROR:` und Zeitüberschreitungen lassen den Lauf fehlschlagen. Laufzeiten und Logs stehen unter `.godot/test_results.json` und `.godot/test_runs/`; CI zeigt die langsamsten Tests und lädt Logs als Artefakt hoch. [Details und Laufzeitvergleich](docs/TEST_RUNTIME.md).
 
 Eine Vorschau aller neuen Waffen im Shop und ihrer Effekte im Kampf erstellt
 `Godot_v4.7.2-stable_win64_console.exe --path . --script res://tools/preview_weapon_expansion.gd`

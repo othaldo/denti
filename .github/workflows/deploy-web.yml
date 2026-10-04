@@ -25,10 +25,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Install fontconfig for headless Godot
+      - name: Install test dependencies
         run: |
           apt-get update -qq
-          apt-get install -y -qq --no-install-recommends libfontconfig1
+          apt-get install -y -qq --no-install-recommends libfontconfig1 python3
 
       - name: Prepare Godot export templates
         run: |
@@ -50,17 +50,21 @@ jobs:
 
       - name: Run test suite
         run: |
-          for test in tests/*.gd; do
-            echo "Running $test"
-            if ! godot --headless --fixed-fps 60 --path . --script "res://$test" > /tmp/denti-test.log 2>&1; then
-              cat /tmp/denti-test.log
-              exit 1
-            fi
-            cat /tmp/denti-test.log
-            if grep -q "SCRIPT ERROR:" /tmp/denti-test.log; then
-              exit 1
-            fi
-          done
+          python3 -m unittest discover -s tools/tests -v
+          python3 tools/run_tests.py --godot godot --jobs 4
+
+      - name: Upload test logs and timings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: godot-test-results
+          path: |
+            .godot/test_results.json
+            .godot/test_runs/**/*.log
+            .godot/test_runs/**/results.json
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Export Web
         run: |

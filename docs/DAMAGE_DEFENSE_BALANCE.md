@@ -2,6 +2,8 @@
 
 Gemessen am 1. Oktober 2026 mit Godot 4.7.2. Die vollständige Waffenmatrix und die Bossmessungen stehen in [den Messdaten](balance_damage_defense.json).
 
+Historischer Bericht zum Schadensmodell. Aktuelle Waffenwerte, Nahschaden-Gewichte und erneute Bossmessungen nach dem Balancepass vom 4. Oktober stehen im [DPS-Vergleich](WEAPON_DPS_BALANCE.md); die untenstehenden Werte dokumentieren den damaligen Stand.
+
 ## Schadensmodell
 
 `Trefferschaden = (Waffenbasis der Stufe + passender Nah-/Fernschaden * Waffenskalierung) * (1 + Schadensboni / 100)`.

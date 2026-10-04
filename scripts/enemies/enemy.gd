@@ -20,6 +20,7 @@ const PULSE_FLASH_DURATION := 0.18
 const BOSS_DEATH_DURATION := 0.9
 const AURA_PULSE_INTERVAL := 0.4
 const AURA_HASTE_DURATION := 0.65
+const WET_STATUS = preload("res://data/statuses/wet.tres")
 
 @onready var sprite: Sprite2D = $Sprite2D
 
@@ -352,7 +353,8 @@ func overtime_defense_factor() -> float:
 
 
 func _movement_speed() -> float:
-	return move_speed * overtime_speed_factor() * (1.0 + haste_bonus if haste_time > 0.0 else 1.0)
+	var wet_factor: float = WET_STATUS.speed_factor(data) if wet_time > 0.0 else 1.0
+	return move_speed * overtime_speed_factor() * (1.0 + haste_bonus if haste_time > 0.0 else 1.0) * wet_factor
 
 
 func apply_haste(bonus: float, duration: float) -> void:

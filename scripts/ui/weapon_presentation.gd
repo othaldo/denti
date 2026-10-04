@@ -34,7 +34,7 @@ static func card_effect(data: WeaponData, tier: int) -> String:
 	if data.attack_mode in [&"beam_line", &"thrust"]:
 		hints.append("Trifft alle Gegner entlang der Linie.")
 	if data.wet_duration > 0:
-		hints.append("Macht Gegner %.1f s nass." % data.wet_duration)
+		hints.append("Nass %.1f s: %s." % [data.wet_duration, WeaponData.WET_STATUS.short_text()])
 	if data.bleed_dps > 0:
 		hints.append("Blutung: %.1f Schaden/s für %.1f s." % [data.bleed_dps, data.bleed_duration])
 	if data.enamel_exposure > 0:

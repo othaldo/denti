@@ -119,7 +119,7 @@ func _run() -> void:
 	# Compact art must retain real contact at close range and the range boundary,
 	# in every direction/tier, including the shrink applied to six-weapon builds.
 	game.player.attack_performed.disconnect(game.sound.play_attack)
-	for id in [&"turbo_drill", &"plaque_scaler", &"floss_whip", &"floss_garrote", &"toothpick_spear", &"cavity_grinder", &"prophylaxis_polisher"]:
+	for id in [&"turbo_drill", &"plaque_scaler", &"floss_whip", &"interdental_brush", &"floss_garrote", &"toothpick_spear", &"cavity_grinder", &"prophylaxis_polisher"]:
 		for tier in range(1, 5):
 			var data := WeaponCatalog.by_id(id)
 			for direction in [Vector2.RIGHT, Vector2.LEFT, Vector2.UP, Vector2.DOWN]:

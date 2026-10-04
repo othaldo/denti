@@ -136,7 +136,7 @@ func _test_live_build() -> void:
 	_check(is_equal_approx(game.items.modify_damage(boss, water, 40.0), 109.2), "global + armor + halo + movement + wet + bleed + boss bonuses compound multiplicatively")
 	game.player.is_moving = false
 	var shown := WeaponPresentation.values(water, 1, game.player)
-	_check(is_equal_approx(shown.damage, 15.75), "weapon card does not add global, armor and halo bonuses")
+	_check(is_equal_approx(shown.damage, 19.25), "weapon card does not add global, armor and halo bonuses")
 	game.player.loadout.acquire(water)
 	game._clear_combat()
 	# All-ranged loadouts should not spend post-wave choices on dead melee stats.

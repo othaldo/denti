@@ -9,6 +9,8 @@ Die Testarenen sind Bestandteil des normalen Web-Releases. Im Hauptmenü **siebe
 
 Groß-/Kleinschreibung und zusätzliche Leerzeichen zwischen den Wörtern sind egal. Unbekannte Codes zeigen eine Meldung und starten keinen Run.
 
+Der Web-Export aktiviert Godots [virtuelle Tastatur](https://docs.godotengine.org/en/stable/classes/class_editorexportplatformweb.html#class-editorexportplatformweb-property-html-experimental-virtual-keyboard), damit das Codefeld auf Touch-Geräten die Bildschirmtastatur öffnen kann.
+
 Die Gegner erhalten sehr viel Lebensenergie, damit die Arena für wiederholbare Performancevergleiche gefüllt bleibt. Denti erhält ebenfalls hohe Lebensenergie. Angriffe, Bewegung, Geschosse, Item-Procs und Markierungsdetonationen laufen über die normalen Spielsysteme. Der normale Wellen-Timer ist ausgesetzt: keine automatische Folgewelle, kein Shop und keine Level-up-Unterbrechung. Denti kann auch per Touch normal bewegt werden.
 
 Die Testanzeige zeigt Gegner, Geschosse, Beute, durchschnittliche FPS und das niedrigste gemessene Einsekunden-FPS-Fenster. Die Messung verwendet echte verstrichene Zeit. Pause/Fokuswechsel setzen die Messung zurück. Die Build-ID steht daneben, damit Handy-Ergebnisse einem Deployment zugeordnet werden können. Die normale FPS-Anzeige ist während des Tests ebenfalls sichtbar; gespeicherte FPS- und Grafikoptionen werden dafür nicht geändert.

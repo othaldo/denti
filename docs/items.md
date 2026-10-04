@@ -246,10 +246,12 @@ Beim Besitz eines Amalgamkerns zeigt die Zahnklinik dessen aktuellen Waffenschad
 
 Peitsche und Kratzer verursachen auch ohne Items Blutung; der Wasserflosser macht Ziele auch ohne Leitlack nass. Blutung stapelt sich normalerweise auf Gegnern bis zu dreimal und läuft nach 2,5 Sekunden ohne erneuten Schnitt aus; die Blutungsuhr erhöht Dauer und Stapelgrenze. Wet läuft nach 2,5 Sekunden ab, mit Leitlack nach 3 Sekunden. Schilde fangen jeweils einen Treffer ab und sind insgesamt auf fünf Ladungen begrenzt. Kettenblitze, Blutungsübertragung, Spritzer, kritische Blitze, Lichtstrahlen und Keramiksplitter haben kurze interne Abklingzeiten, damit dichte Gegnergruppen das Spiel nicht mit Effekten überfluten. Laufende Effekte, Schildladungen, Stapel und Fortschritte zu Kill-Boni werden mit dem Spielstand gespeichert. Bei Kisten steht der normale Zerlegewert schon beim Drop fest; das Zahnfee-Pfand erhöht den angezeigten und ausgezahlten Wert bei der Entscheidung.
 
+Nass senkt auch ohne Items das Lauftempo: normale Gegner -20 %, Eliten -10 %, Bosse -5 %. Mehrere Nassquellen frischen nur die Dauer auf; der Slow stapelt sich nicht. Angekündigte Anstürme behalten ihre Geschwindigkeit. [Nassregeln und Tests](WET_STATUS.md).
+
 Beispiel-Builds:
 
 - **Schnittpraxis:** Zahnseide-Peitsche oder Plaque-Schaber, Zahnseide-Spule, Skalpellwachs, Ansteckende Zahnseide und Blutungsuhr. Blutende Ziele fördern Flächendruck beim Kill.
-- **Wasserwerk:** Wasserflosser oder Mundspülungs-Mörser mit Funkensonde, Leitlack, Spülventil und Mundspülung. Pfützen halten Ziele nass; Ketten erreichen weitere Gegner.
+- **Wasserwerk:** Wasserflosser oder Mundduschen-Turbine mit Funkensonde, Leitlack und Spülventil. Nass verlangsamt, Pfützen halten Ziele nass und Ketten erreichen weitere Gegner. Der Mundspülungs-Mörser verursacht Minzschaden und löst die Wasser-/Licht-Effekte nicht aus.
 - **Unzerstörbarer Molar:** Metallkrone, Fluoridgel, Göttliches Siegel, Amalgamkern, Keramikschale und Splitterkrone. Geblockte Treffer geben Flächendruck zurück.
 - **Zahnfee-Ökonomie:** Glücks-Molar, Goldsonde, Goldextraktor, Goldfüllung, Karies-Kopfgeld, Zahnfee-Pfand und Zinszahn. Wertvolle Drops, Zerlegen und gesparte Münzen zahlen sich aus, aber Denti wird langsamer, schwächer und fragiler. Goldfüllung wirkt beim Einsammeln auf den bereits erhöhten Dropwert.
 - **Zuckerrausch:** Verbotener Lolli, Zuckerschock und Heil- oder Schilditems. Tempo nach Killserien kostet Leben und führt anschließend ins Zuckertief.

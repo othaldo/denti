@@ -1,0 +1,787 @@
+{
+	"armor": [
+		{
+			"armor": 0.0,
+			"effective_hp_100": 100.0,
+			"new_received_10": 10.0,
+			"new_received_30": 30.0,
+			"old_received_10": 10.0,
+			"old_received_30": 30.0
+		},
+		{
+			"armor": 5.0,
+			"effective_hp_100": 133.333333333333,
+			"new_received_10": 7.5,
+			"new_received_30": 22.5,
+			"old_received_10": 5.0,
+			"old_received_30": 25.0
+		},
+		{
+			"armor": 10.0,
+			"effective_hp_100": 166.666666666667,
+			"new_received_10": 6.0,
+			"new_received_30": 18.0,
+			"old_received_10": 1.0,
+			"old_received_30": 20.0
+		},
+		{
+			"armor": 15.0,
+			"effective_hp_100": 200.0,
+			"new_received_10": 5.0,
+			"new_received_30": 15.0,
+			"old_received_10": 1.0,
+			"old_received_30": 15.0
+		},
+		{
+			"armor": 30.0,
+			"effective_hp_100": 300.0,
+			"new_received_10": 3.33333333333333,
+			"new_received_30": 10.0,
+			"old_received_10": 1.0,
+			"old_received_30": 1.0
+		},
+		{
+			"armor": -15.0,
+			"effective_hp_100": 66.6666666666667,
+			"new_received_10": 15.0,
+			"new_received_30": 45.0,
+			"old_received_10": 25.0,
+			"old_received_30": 45.0
+		}
+	],
+	"bosses": [
+		{
+			"boss_alive": false,
+			"boss_hp": 1560.0,
+			"damage_taken": 290.904000000446,
+			"phases_reached": 2,
+			"seconds": 18.2,
+			"wave": 5
+		},
+		{
+			"boss_alive": false,
+			"boss_hp": 3087.0,
+			"damage_taken": 355.267800000031,
+			"phases_reached": 2,
+			"seconds": 23.55,
+			"wave": 10
+		},
+		{
+			"boss_alive": false,
+			"boss_hp": 15325.0,
+			"damage_taken": 1198.9370000005,
+			"phases_reached": 2,
+			"seconds": 47.55,
+			"wave": 20
+		}
+	],
+	"damage_choices_1": {
+		"new_factor": 1.04,
+		"old_factor": 1.27777777777778
+	},
+	"damage_choices_10": {
+		"new_factor": 1.4,
+		"old_factor": 3.77777777777778
+	},
+	"damage_choices_6": {
+		"new_factor": 1.24,
+		"old_factor": 2.66666666666667
+	},
+	"method": "fixed-fps 60; seed 13579; stationary immortal Denti; six hands; no shop items/relics; boss phases/adds enabled; theoretical DPS is single-target per hand",
+	"profiles": [
+		{
+			"armor": 0.0,
+			"attack_speed": 0.0,
+			"crit_chance": 0.05,
+			"damage_bonus": 0.0,
+			"melee_damage": 0.0,
+			"name": "Start",
+			"ranged_damage": 0.0,
+			"tier": 1,
+			"wave": 1
+		},
+		{
+			"armor": 5.0,
+			"attack_speed": 15.0,
+			"crit_chance": 0.1,
+			"damage_bonus": 12.0,
+			"melee_damage": 4.0,
+			"name": "Welle 5",
+			"ranged_damage": 2.0,
+			"tier": 1,
+			"wave": 5
+		},
+		{
+			"armor": 10.0,
+			"attack_speed": 25.0,
+			"crit_chance": 0.15,
+			"damage_bonus": 24.0,
+			"melee_damage": 8.0,
+			"name": "Welle 10",
+			"ranged_damage": 4.0,
+			"tier": 2,
+			"wave": 10
+		},
+		{
+			"armor": 15.0,
+			"attack_speed": 40.0,
+			"crit_chance": 0.25,
+			"damage_bonus": 40.0,
+			"melee_damage": 12.0,
+			"name": "Welle 20",
+			"ranged_damage": 6.0,
+			"tier": 4,
+			"wave": 20
+		}
+	],
+	"weapons": [
+		{
+			"dps_per_hand": 15.7692307692308,
+			"family": "ranged",
+			"hit": 20.0,
+			"profile": "Start",
+			"scaling": 0.8,
+			"tier": 1,
+			"weapon": "magic_toothbrush"
+		},
+		{
+			"dps_per_hand": 44.84375,
+			"family": "melee",
+			"hit": 28.0,
+			"profile": "Start",
+			"scaling": 1.0,
+			"tier": 1,
+			"weapon": "turbo_drill"
+		},
+		{
+			"dps_per_hand": 19.4210526315789,
+			"family": "melee",
+			"hit": 18.0,
+			"profile": "Start",
+			"scaling": 0.7,
+			"tier": 1,
+			"weapon": "floss_whip"
+		},
+		{
+			"dps_per_hand": 25.625,
+			"family": "ranged",
+			"hit": 11.0,
+			"profile": "Start",
+			"scaling": 0.35,
+			"tier": 1,
+			"weapon": "water_jet"
+		},
+		{
+			"dps_per_hand": 15.7692307692308,
+			"family": "ranged",
+			"hit": 40.0,
+			"profile": "Start",
+			"scaling": 1.25,
+			"tier": 1,
+			"weapon": "crown_launcher"
+		},
+		{
+			"dps_per_hand": 28.0526315789474,
+			"family": "ranged",
+			"hit": 26.0,
+			"profile": "Start",
+			"scaling": 0.9,
+			"tier": 1,
+			"weapon": "enamel_mirror"
+		},
+		{
+			"dps_per_hand": 35.6521739130435,
+			"family": "melee",
+			"hit": 16.0,
+			"profile": "Start",
+			"scaling": 0.7,
+			"tier": 1,
+			"weapon": "plaque_scaler"
+		},
+		{
+			"dps_per_hand": 12.7241379310345,
+			"family": "ranged",
+			"hit": 36.0,
+			"profile": "Start",
+			"scaling": 1.2,
+			"tier": 1,
+			"weapon": "mouthwash_mortar"
+		},
+		{
+			"dps_per_hand": 33.7647058823529,
+			"family": "melee",
+			"hit": 28.0,
+			"profile": "Start",
+			"scaling": 1.0,
+			"tier": 1,
+			"weapon": "toothpick_spear"
+		},
+		{
+			"dps_per_hand": 23.0625,
+			"family": "melee",
+			"hit": 12.0,
+			"profile": "Start",
+			"scaling": 0.45,
+			"tier": 1,
+			"weapon": "cavity_grinder"
+		},
+		{
+			"dps_per_hand": 25.625,
+			"family": "melee",
+			"hit": 6.0,
+			"profile": "Start",
+			"scaling": 0.25,
+			"tier": 1,
+			"weapon": "interdental_brush"
+		},
+		{
+			"dps_per_hand": 14.35,
+			"family": "ranged",
+			"hit": 7.0,
+			"profile": "Start",
+			"scaling": 0.2,
+			"tier": 1,
+			"weapon": "fluoride_sprayer"
+		},
+		{
+			"dps_per_hand": 9.96527777777778,
+			"family": "ranged",
+			"hit": 7.0,
+			"profile": "Start",
+			"scaling": 0.15,
+			"tier": 1,
+			"weapon": "water_turbine"
+		},
+		{
+			"dps_per_hand": 16.1,
+			"family": "ranged",
+			"hit": 42.0,
+			"profile": "Start",
+			"scaling": 1.5,
+			"tier": 1,
+			"weapon": "uv_lamp"
+		},
+		{
+			"dps_per_hand": 24.9565217391304,
+			"family": "ranged",
+			"hit": 28.0,
+			"profile": "Start",
+			"scaling": 1.0,
+			"tier": 1,
+			"weapon": "amalgam_slingshot"
+		},
+		{
+			"dps_per_hand": 18.7916666666667,
+			"family": "melee",
+			"hit": 44.0,
+			"profile": "Start",
+			"scaling": 1.5,
+			"tier": 1,
+			"weapon": "floss_garrote"
+		},
+		{
+			"dps_per_hand": 43.4523809523809,
+			"family": "melee",
+			"hit": 10.0,
+			"profile": "Start",
+			"scaling": 0.45,
+			"tier": 1,
+			"weapon": "prophylaxis_polisher"
+		},
+		{
+			"dps_per_hand": 14.9479166666667,
+			"family": "ranged",
+			"hit": 70.0,
+			"profile": "Start",
+			"scaling": 1.6,
+			"tier": 1,
+			"weapon": "fluoride_rocket"
+		},
+		{
+			"dps_per_hand": 22.4706461538462,
+			"family": "ranged",
+			"hit": 24.192,
+			"profile": "Welle 5",
+			"scaling": 0.8,
+			"tier": 1,
+			"weapon": "magic_toothbrush"
+		},
+		{
+			"dps_per_hand": 67.62,
+			"family": "melee",
+			"hit": 35.84,
+			"profile": "Welle 5",
+			"scaling": 1.0,
+			"tier": 1,
+			"weapon": "turbo_drill"
+		},
+		{
+			"dps_per_hand": 29.6104421052632,
+			"family": "melee",
+			"hit": 23.296,
+			"profile": "Welle 5",
+			"scaling": 0.7,
+			"tier": 1,
+			"weapon": "floss_whip"
+		},
+		{
+			"dps_per_hand": 35.9615454545455,
+			"family": "ranged",
+			"hit": 13.104,
+			"profile": "Welle 5",
+			"scaling": 0.35,
+			"tier": 1,
+			"weapon": "water_jet"
+		},
+		{
+			"dps_per_hand": 22.1065384615385,
+			"family": "ranged",
+			"hit": 47.6,
+			"profile": "Welle 5",
+			"scaling": 1.25,
+			"tier": 1,
+			"weapon": "crown_launcher"
+		},
+		{
+			"dps_per_hand": 39.5754947368421,
+			"family": "ranged",
+			"hit": 31.136,
+			"profile": "Welle 5",
+			"scaling": 0.9,
+			"tier": 1,
+			"weapon": "enamel_mirror"
+		},
+		{
+			"dps_per_hand": 55.272,
+			"family": "melee",
+			"hit": 21.056,
+			"profile": "Welle 5",
+			"scaling": 0.7,
+			"tier": 1,
+			"weapon": "plaque_scaler"
+		},
+		{
+			"dps_per_hand": 17.9076413793103,
+			"family": "ranged",
+			"hit": 43.008,
+			"profile": "Welle 5",
+			"scaling": 1.2,
+			"tier": 1,
+			"weapon": "mouthwash_mortar"
+		},
+		{
+			"dps_per_hand": 50.9138823529412,
+			"family": "melee",
+			"hit": 35.84,
+			"profile": "Welle 5",
+			"scaling": 1.0,
+			"tier": 1,
+			"weapon": "toothpick_spear"
+		},
+		{
+			"dps_per_hand": 34.99335,
+			"family": "melee",
+			"hit": 15.456,
+			"profile": "Welle 5",
+			"scaling": 0.45,
+			"tier": 1,
+			"weapon": "cavity_grinder"
+		},
+		{
+			"dps_per_hand": 39.445,
+			"family": "melee",
+			"hit": 7.84,
+			"profile": "Welle 5",
+			"scaling": 0.25,
+			"tier": 1,
+			"weapon": "interdental_brush"
+		},
+		{
+			"dps_per_hand": 20.01552,
+			"family": "ranged",
+			"hit": 8.288,
+			"profile": "Welle 5",
+			"scaling": 0.2,
+			"tier": 1,
+			"weapon": "fluoride_sprayer"
+		},
+		{
+			"dps_per_hand": 13.7118333333333,
+			"family": "ranged",
+			"hit": 8.176,
+			"profile": "Welle 5",
+			"scaling": 0.15,
+			"tier": 1,
+			"weapon": "water_turbine"
+		},
+		{
+			"dps_per_hand": 23.184,
+			"family": "ranged",
+			"hit": 50.4,
+			"profile": "Welle 5",
+			"scaling": 1.5,
+			"tier": 1,
+			"weapon": "uv_lamp"
+		},
+		{
+			"dps_per_hand": 35.28,
+			"family": "ranged",
+			"hit": 33.6,
+			"profile": "Welle 5",
+			"scaling": 1.0,
+			"tier": 1,
+			"weapon": "amalgam_slingshot"
+		},
+		{
+			"dps_per_hand": 28.175,
+			"family": "melee",
+			"hit": 56.0,
+			"profile": "Welle 5",
+			"scaling": 1.5,
+			"tier": 1,
+			"weapon": "floss_garrote"
+		},
+		{
+			"dps_per_hand": 66.9453333333333,
+			"family": "melee",
+			"hit": 13.216,
+			"profile": "Welle 5",
+			"scaling": 0.45,
+			"tier": 1,
+			"weapon": "prophylaxis_polisher"
+		},
+		{
+			"dps_per_hand": 20.6241,
+			"family": "ranged",
+			"hit": 81.984,
+			"profile": "Welle 5",
+			"scaling": 1.6,
+			"tier": 1,
+			"weapon": "fluoride_rocket"
+		},
+		{
+			"dps_per_hand": 38.4519230769231,
+			"family": "ranged",
+			"hit": 34.968,
+			"profile": "Welle 10",
+			"scaling": 0.8,
+			"tier": 2,
+			"weapon": "magic_toothbrush"
+		},
+		{
+			"dps_per_hand": 130.729718895708,
+			"family": "melee",
+			"hit": 58.5279991722107,
+			"profile": "Welle 10",
+			"scaling": 1.0,
+			"tier": 2,
+			"weapon": "turbo_drill"
+		},
+		{
+			"dps_per_hand": 57.469764036868,
+			"family": "melee",
+			"hit": 38.1919994678497,
+			"profile": "Welle 10",
+			"scaling": 0.7,
+			"tier": 2,
+			"weapon": "floss_whip"
+		},
+		{
+			"dps_per_hand": 65.4655777006563,
+			"family": "ranged",
+			"hit": 20.1500003252029,
+			"profile": "Welle 10",
+			"scaling": 0.35,
+			"tier": 2,
+			"weapon": "water_jet"
+		},
+		{
+			"dps_per_hand": 41.5880721812358,
+			"family": "ranged",
+			"hit": 75.6399988174439,
+			"profile": "Welle 10",
+			"scaling": 1.25,
+			"tier": 2,
+			"weapon": "crown_launcher"
+		},
+		{
+			"dps_per_hand": 74.6360570740326,
+			"family": "ranged",
+			"hit": 49.5999992313385,
+			"profile": "Welle 10",
+			"scaling": 0.9,
+			"tier": 2,
+			"weapon": "enamel_mirror"
+		},
+		{
+			"dps_per_hand": 107.897778363497,
+			"family": "melee",
+			"hit": 34.7199995269775,
+			"profile": "Welle 10",
+			"scaling": 0.7,
+			"tier": 2,
+			"weapon": "plaque_scaler"
+		},
+		{
+			"dps_per_hand": 32.6404077146566,
+			"family": "ranged",
+			"hit": 66.2160010643005,
+			"profile": "Welle 10",
+			"scaling": 1.2,
+			"tier": 2,
+			"weapon": "mouthwash_mortar"
+		},
+		{
+			"dps_per_hand": 98.4317883450039,
+			"family": "melee",
+			"hit": 58.5279991722107,
+			"profile": "Welle 10",
+			"scaling": 1.0,
+			"tier": 2,
+			"weapon": "toothpick_spear"
+		},
+		{
+			"dps_per_hand": 67.802193198036,
+			"family": "melee",
+			"hit": 25.2959996452332,
+			"profile": "Welle 10",
+			"scaling": 0.45,
+			"tier": 2,
+			"weapon": "cavity_grinder"
+		},
+		{
+			"dps_per_hand": 74.5971863402437,
+			"family": "melee",
+			"hit": 12.5240001773834,
+			"profile": "Welle 10",
+			"scaling": 0.25,
+			"tier": 2,
+			"weapon": "interdental_brush"
+		},
+		{
+			"dps_per_hand": 36.338431442735,
+			"family": "ranged",
+			"hit": 12.7100002069473,
+			"profile": "Welle 10",
+			"scaling": 0.2,
+			"tier": 2,
+			"weapon": "fluoride_sprayer"
+		},
+		{
+			"dps_per_hand": 24.7426311732941,
+			"family": "ranged",
+			"hit": 12.4620002069473,
+			"profile": "Welle 10",
+			"scaling": 0.15,
+			"tier": 2,
+			"weapon": "water_turbine"
+		},
+		{
+			"dps_per_hand": 44.5212759077549,
+			"family": "ranged",
+			"hit": 80.351998758316,
+			"profile": "Welle 10",
+			"scaling": 1.5,
+			"tier": 2,
+			"weapon": "uv_lamp"
+		},
+		{
+			"dps_per_hand": 66.588343096816,
+			"family": "ranged",
+			"hit": 53.5679991722107,
+			"profile": "Welle 10",
+			"scaling": 1.0,
+			"tier": 2,
+			"weapon": "amalgam_slingshot"
+		},
+		{
+			"dps_per_hand": 54.3599283032066,
+			"family": "melee",
+			"hit": 91.2639986991882,
+			"profile": "Welle 10",
+			"scaling": 1.5,
+			"tier": 2,
+			"weapon": "floss_garrote"
+		},
+		{
+			"dps_per_hand": 129.559268761641,
+			"family": "melee",
+			"hit": 21.823999704361,
+			"profile": "Welle 10",
+			"scaling": 0.45,
+			"tier": 2,
+			"weapon": "prophylaxis_polisher"
+		},
+		{
+			"dps_per_hand": 38.5541882134631,
+			"family": "ranged",
+			"hit": 129.455997930527,
+			"profile": "Welle 10",
+			"scaling": 1.6,
+			"tier": 2,
+			"weapon": "fluoride_rocket"
+		},
+		{
+			"dps_per_hand": 174.969007519465,
+			"family": "ranged",
+			"hit": 57.1199986648559,
+			"profile": "Welle 20",
+			"scaling": 0.8,
+			"tier": 4,
+			"weapon": "magic_toothbrush"
+		},
+		{
+			"dps_per_hand": 357.562807253664,
+			"family": "melee",
+			"hit": 120.680003738403,
+			"profile": "Welle 20",
+			"scaling": 1.0,
+			"tier": 4,
+			"weapon": "turbo_drill"
+		},
+		{
+			"dps_per_hand": 149.225376995362,
+			"family": "melee",
+			"hit": 74.76,
+			"profile": "Welle 20",
+			"scaling": 0.7,
+			"tier": 4,
+			"weapon": "floss_whip"
+		},
+		{
+			"dps_per_hand": 185.229740013333,
+			"family": "ranged",
+			"hit": 42.9799985313416,
+			"profile": "Welle 20",
+			"scaling": 0.35,
+			"tier": 4,
+			"weapon": "water_jet"
+		},
+		{
+			"dps_per_hand": 126.10103642155,
+			"family": "ranged",
+			"hit": 172.900005340576,
+			"profile": "Welle 20",
+			"scaling": 1.25,
+			"tier": 4,
+			"weapon": "crown_launcher"
+		},
+		{
+			"dps_per_hand": 218.528544869498,
+			"family": "ranged",
+			"hit": 109.479998264313,
+			"profile": "Welle 20",
+			"scaling": 0.9,
+			"tier": 4,
+			"weapon": "enamel_mirror"
+		},
+		{
+			"dps_per_hand": 279.326772278405,
+			"family": "melee",
+			"hit": 67.76,
+			"profile": "Welle 20",
+			"scaling": 0.7,
+			"tier": 4,
+			"weapon": "plaque_scaler"
+		},
+		{
+			"dps_per_hand": 95.5713104336448,
+			"family": "ranged",
+			"hit": 146.160002403259,
+			"profile": "Welle 20",
+			"scaling": 1.2,
+			"tier": 4,
+			"weapon": "mouthwash_mortar"
+		},
+		{
+			"dps_per_hand": 256.10612178759,
+			"family": "melee",
+			"hit": 114.8,
+			"profile": "Welle 20",
+			"scaling": 1.0,
+			"tier": 4,
+			"weapon": "toothpick_spear"
+		},
+		{
+			"dps_per_hand": 185.169416617003,
+			"family": "melee",
+			"hit": 52.0800016021729,
+			"profile": "Welle 20",
+			"scaling": 0.45,
+			"tier": 4,
+			"weapon": "cavity_grinder"
+		},
+		{
+			"dps_per_hand": 192.470003343587,
+			"family": "melee",
+			"hit": 24.3600008010864,
+			"profile": "Welle 20",
+			"scaling": 0.25,
+			"tier": 4,
+			"weapon": "interdental_brush"
+		},
+		{
+			"dps_per_hand": 95.5713124066833,
+			"family": "ranged",
+			"hit": 25.2000009346008,
+			"profile": "Welle 20",
+			"scaling": 0.2,
+			"tier": 4,
+			"weapon": "fluoride_sprayer"
+		},
+		{
+			"dps_per_hand": 65.2628175409583,
+			"family": "ranged",
+			"hit": 24.7800009346008,
+			"profile": "Welle 20",
+			"scaling": 0.15,
+			"tier": 4,
+			"weapon": "water_turbine"
+		},
+		{
+			"dps_per_hand": 138.89697313311,
+			"family": "ranged",
+			"hit": 183.120005607605,
+			"profile": "Welle 20",
+			"scaling": 1.5,
+			"tier": 4,
+			"weapon": "uv_lamp"
+		},
+		{
+			"dps_per_hand": 188.372437940986,
+			"family": "ranged",
+			"hit": 114.240001869202,
+			"profile": "Welle 20",
+			"scaling": 1.0,
+			"tier": 4,
+			"weapon": "amalgam_slingshot"
+		},
+		{
+			"dps_per_hand": 148.887714975521,
+			"family": "melee",
+			"hit": 188.440005874634,
+			"profile": "Welle 20",
+			"scaling": 1.5,
+			"tier": 4,
+			"weapon": "floss_garrote"
+		},
+		{
+			"dps_per_hand": 328.796766291348,
+			"family": "melee",
+			"hit": 42.56,
+			"profile": "Welle 20",
+			"scaling": 0.45,
+			"tier": 4,
+			"weapon": "prophylaxis_polisher"
+		},
+		{
+			"dps_per_hand": 117.583685776103,
+			"family": "ranged",
+			"hit": 297.640009346008,
+			"profile": "Welle 20",
+			"scaling": 1.6,
+			"tier": 4,
+			"weapon": "fluoride_rocket"
+		}
+	]
+}

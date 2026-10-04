@@ -2,6 +2,7 @@ class_name WeaponData
 extends Resource
 
 const MIN_ATTACK_COOLDOWN := 0.05
+const WET_STATUS = preload("res://data/statuses/wet.tres")
 
 @export var id: StringName
 @export var display_name: String
@@ -155,7 +156,7 @@ func combat_text() -> String:
 	if bleed_dps > 0.0:
 		result += " · Blutung %.1f Schaden/s (%.1f s)" % [bleed_dps, bleed_duration]
 	if wet_duration > 0.0:
-		result += " · Nass %.1f s" % wet_duration
+		result += " · Nass %.1f s · %s" % [wet_duration, WET_STATUS.effect_text()]
 	if crit_bonus > 0.0 or crit_multiplier > 1.5:
 		result += " · +%d %% Waffen-Crit · ×%.1f Crit" % [roundi(crit_bonus * 100.0), crit_multiplier]
 	if focus_cap > 0.0:

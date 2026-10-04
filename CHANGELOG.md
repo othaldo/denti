@@ -4,6 +4,16 @@ Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü an
 
 ## In Entwicklung
 
+- **Schnellere Tests:** vollständige Suite mit bis zu vier parallelen Godot-Prozessen, getrennten Benutzerdaten, Zeitlimits und Einzelzeit-/Log-Berichten. Lokal 84 Tests in 96 statt 325 Sekunden; CI verwendet denselben Runner. [Laufzeitvergleich](docs/TEST_RUNTIME.md).
+
+- **Testarenen im Web:** siebenmal Einstellungen → Zurück schaltet die Code-Eingabe frei. `debug map` startet eine volle Welle-17-Arena, `boss charge` den isolierten Karieskönig. FPS-/Objektanzeige und Neustart im Pausemenü; der normale Spielstand bleibt erhalten. Der Web-Export unterstützt die Bildschirmtastatur. [Testcodes](docs/TEST_ARENAS.md).
+
+- **Performance bei vielen Objekten:** gezielte Rasterabfragen, weniger doppelte Trefferprüfungen, gemeinsame Verarbeitung entfernter Beute und gebündelte Gegnerschatten. Keine verringerte Gegnerdichte oder Kampfwerte. [Messungen](docs/DENSE_COMBAT_PERFORMANCE.md).
+
+- **Nass verlangsamt:** Wasserwaffen, Pfützen und andere Nassquellen senken das Lauftempo um 20 %, bei Eliten um 10 % und bei Bossen um 5 %. Erneutes Durchnässen verlängert nur die Dauer; Verlangsamung stapelt sich nicht. Angekündigte Anstürme bleiben unverändert. Karten/Details erklären den Effekt, Save/Resume erhält die verbleibende Nassdauer. [Regeln und Tests](docs/WET_STATUS.md).
+
+- **Waffenbalance:** mehr Nahkampfschaden als Ausgleich für Reichweite und verlorene Angriffszeit, stärkere Fusion bis IV und gezielte Buffs für schwache Fernwaffen. Die Zauberbürste bleibt unverändert. Karies-Fräse verursacht 75 statt 55 % Schaden gegen normale Gegner; bestehende Evolutionen übernehmen die verbesserten Grundwerte. Reproduzierbare echte DPS-Messungen für alle 18 Waffen und vier Stufen, getrennt nach Einzelziel, Gruppe, Linie und Boss. [Vergleich und Tests](docs/WEAPON_DPS_BALANCE.md).
+
 - Bossgeschosse werden beim Laden als gemeinsame Texturen vorbereitet und zusammen mit Charge-Zeichenpfaden einmal in einem kleinen separaten Viewport gerendert. Dadurch entfällt ihre erstmalige Bilderzeugung am Ende des ersten Charge.
 
 - Flaky Save/Resume-Test korrigiert: Die Prüfung berücksichtigt die Obergrenze von 65 % Krit-Chance, statt bei einer zufälligen Glanz-Karte einen höheren Wert zu erwarten. Neue gezielte Prüfungen decken alle elf Level-up-Typen und vier Seltenheiten sowie Glanz unter, nahe und an der Obergrenze ab.

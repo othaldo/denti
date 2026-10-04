@@ -31,6 +31,9 @@ func _run() -> void:
 	session.discovered_fusions.clear()
 	var original_fps: bool = session.show_fps
 	var original_graphics: int = session.graphics_mode
+	var web_export := ConfigFile.new()
+	web_export.load("res://export_presets.cfg")
+	_check(bool(web_export.get_value("preset.0.options", "html/experimental_virtual_keyboard", false)), "web code entry cannot open the touchscreen keyboard")
 	var normal: Node2D = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(normal)
 	current_scene = normal

@@ -49,7 +49,11 @@ func _run() -> void:
 		print("Wave %d: boss %.1fs, damage taken %.0f, alive=%s" % [profile.wave, encounter.seconds, encounter.damage_taken, encounter.boss_alive])
 		if encounter.boss_alive or encounter.seconds < 8.0:
 			failed = true
-	var file := FileAccess.open(REPORT_PATH, FileAccess.WRITE)
+	var output := REPORT_PATH
+	for argument in OS.get_cmdline_user_args():
+		if argument.begins_with("--output="):
+			output = argument.trim_prefix("--output=")
+	var file := FileAccess.open(output, FileAccess.WRITE)
 	if file == null:
 		push_error("Cannot write damage/defense benchmark")
 		quit(1)
@@ -57,7 +61,7 @@ func _run() -> void:
 	file.store_string(JSON.stringify(report, "\t") + "\n")
 	file.close()
 	root.get_node("GameSession").clear_run()
-	print("Damage/defense report: " + REPORT_PATH)
+	print("Damage/defense report: " + output)
 	quit(1 if failed else 0)
 
 
