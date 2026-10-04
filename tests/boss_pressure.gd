@@ -21,7 +21,7 @@ func _run() -> void:
 	game.telemetry.begin_wave(15)
 	game._create_enemy(WaveController.BOSS, game.player.global_position + Vector2(300.0, 0.0))
 	var boss: Enemy = game.boss
-	boss.set_physics_process(false)
+	boss.set_simulation_enabled(false)
 	var max_health := boss.max_health
 	boss.take_damage(99999.0)
 	if boss.dying or boss.boss_phase != 0 or boss.health < max_health * 0.89:
@@ -66,7 +66,7 @@ func _run() -> void:
 			if boss == null or boss.boss_phase != 1 or not boss.boss_phase_burst_fired or absf(boss.boss_phase_timer - phase_time) > 0.1 or game.get_node("EnemyProjectiles").get_child_count() == 0:
 				_fail("save/resume lost the boss phase or its projectiles")
 				return
-			boss.set_physics_process(false)
+			boss.set_simulation_enabled(false)
 			phase_saved = true
 		if boss.dying:
 			break
@@ -80,7 +80,7 @@ func _run() -> void:
 	game.telemetry.begin_wave(20)
 	game._create_enemy(WaveController.FINAL_BOSS, game.player.global_position + Vector2(300.0, 0.0))
 	boss = game.boss
-	boss.set_physics_process(false)
+	boss.set_simulation_enabled(false)
 	seconds = 0.0
 	for step in 650:
 		game.telemetry.tick(0.1)

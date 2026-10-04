@@ -84,6 +84,7 @@ Ein reproduzierbarer Boss-/Projektil-Benchmark und der Vorher/Nachher-Vergleich
 stehen im [Performance-Bericht](docs/PERFORMANCE_PROJECTILES.md).
 Der [Performance-Audit vom 03.10.2026](docs/PERFORMANCE_AUDIT.md) optimiert zusätzlich
 Gegnerabfragen, Spielerprojektile, Beute, Telemetrie und Trefferfeedback.
+Die [zentrale Gegnerbewegung](docs/CENTRAL_ENEMY_MOTION.md) beschreibt den gemeinsamen Physikschritt, den Referenztest und Messungen mit sowie ohne Diagnoseinstrumentierung.
 Unter **Einstellungen → Grafik** startet **Automatisch** mit voller Auflösung und
 wechselt bei drei aufeinanderfolgenden Messfenstern von je mindestens einer
 Sekunde mit durchschnittlich unter 20 FPS im Kampf für den Run auf Sparsam.

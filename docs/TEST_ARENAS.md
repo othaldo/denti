@@ -44,6 +44,8 @@ P95/P99 sind näherungsweise obere Millisekundengrenzen aus einem Histogramm; di
 
 Nur Diagnosearenen ersetzen die betroffenen Skripte beim Erzeugen durch abgeleitete Messskripte unter `scripts/debug/`. Normale Runs und die bisherigen Testcodes führen keine zusätzlichen Timer in ihren Kampfcallbacks aus. Die Grafikoptionen und der normale Spielstand bleiben erhalten. `tests/combat_diagnostics.gd` prüft die Varianten, Messberichte, Histogrammwerte, Pause-Reset, Speicherisolation und die Rückkehr zu normalen Skripten.
 
+Seit der [zentralen Gegnerbewegung](CENTRAL_ENEMY_MOTION.md) erfasst `enemy_physics` den gesamten gemeinsamen Besitzerschritt, einschließlich der komplexen Gegner. Es gibt einen Messcallback pro Stichproben-Physikschritt statt einen pro Gegner; Trefferzeiten bleiben inklusive und überlappend. Der geänderte Messaufwand beeinflusst auch die FPS der Diagnosearena. `debug map` bleibt für den Vergleich ohne Instrumentierung verfügbar.
+
 ## Weitere Presets
 
 Die Presets liegen unter `data/test_arenas/`, als `TestArenaData`-Resources. Sie definieren Code, Welle, Gegner-/Beutezahl, Boss, Waffen, Tier und Items. Neue Resources in `TestArenaCatalog.ALL` eintragen; der zentrale Controller `scripts/systems/test_arena.gd` verwendet die bestehenden Kampfsysteme. Es gibt keine Eingabe beliebiger Befehle oder separaten Editor-Cheat-Menüs im Testlauf.

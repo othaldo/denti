@@ -18,7 +18,7 @@ func _run() -> void:
 	game._spawn_enemy(enemy_data)
 	var enemy: Enemy = game.get_node("Enemies").get_child(-1)
 	enemy.global_position = game.player.global_position + Vector2(100.0, 0.0)
-	enemy.set_physics_process(false)
+	enemy.set_simulation_enabled(false)
 	for frame in 3:
 		await physics_frame
 	if not _has_sound(game.sound, SoundController.SHOOT):
@@ -58,7 +58,7 @@ func _run() -> void:
 		return
 	game._spawn_enemy(WaveController.ACID_SPITTER)
 	var acid_enemy: Enemy = game.get_node("Enemies").get_child(-1)
-	acid_enemy.set_physics_process(false)
+	acid_enemy.set_simulation_enabled(false)
 	acid_enemy.special_direction = Vector2.RIGHT
 	acid_enemy._activate_special()
 	if not _has_sound(game.sound, SoundController.ACID):

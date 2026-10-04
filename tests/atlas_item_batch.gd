@@ -44,8 +44,8 @@ func _run() -> void:
 	first.max_health = 1000.0
 	second.health = 1000.0
 	second.max_health = 1000.0
-	first.set_physics_process(false)
-	second.set_physics_process(false)
+	first.set_simulation_enabled(false)
+	second.set_simulation_enabled(false)
 	for index in 4:
 		first.take_damage(1.0, floss)
 	if first.bleed_stacks != 4 or first.bleed_time < 3.49:
@@ -97,7 +97,7 @@ func _run() -> void:
 	first = game.get_node("Enemies").get_child(0)
 	first.health = 1000.0
 	first.max_health = 1000.0
-	first.set_physics_process(false)
+	first.set_simulation_enabled(false)
 	var projectile: WeaponProjectile = load("res://scenes/game/weapon_projectile.tscn").instantiate()
 	game.get_node("Projectiles").add_child(projectile)
 	projectile.launch(game.player.global_position + Vector2(20.0, 0.0), Vector2.RIGHT, 20.0, water, game.items)
@@ -113,7 +113,7 @@ func _run() -> void:
 	second = game.get_node("Enemies").get_child(1)
 	second.health = 1000.0
 	second.max_health = 1000.0
-	second.set_physics_process(false)
+	second.set_simulation_enabled(false)
 	second_before = second.health
 	for index in 12:
 		projectile._physics_process(0.02)

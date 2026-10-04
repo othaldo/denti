@@ -78,6 +78,8 @@ var inflicted_statuses: Array[Dictionary] = []
 var spatial_index: EnemySpatialIndex
 var hit_flash_time: float = 0.0
 var spatial_order: int = 0
+var motion_slot: int = -1
+var simulation_enabled: bool = true
 var warning_ray_direction := Vector2.INF
 var warning_ray_count := -1
 var warning_rays: Array[Vector2] = []
@@ -118,6 +120,7 @@ func _ready() -> void:
 	if spatial_index != null:
 		spatial_index.register(self)
 		set_notify_local_transform(true)
+		set_physics_process(false)
 	sprite.texture = data.sprite
 	sprite.modulate = data.sprite_tint
 	var side := maxf(float(data.sprite.get_width()), float(data.sprite.get_height()))
@@ -134,12 +137,18 @@ func _ready() -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_LOCAL_TRANSFORM_CHANGED and is_instance_valid(spatial_index):
-		spatial_index.update(self)
+		if not spatial_index.motion.applying:
+			spatial_index.update(self)
 
 
 func _exit_tree() -> void:
 	if is_instance_valid(spatial_index):
 		spatial_index.unregister(self)
+
+
+func set_simulation_enabled(enabled: bool) -> void:
+	simulation_enabled = enabled
+	set_physics_process(enabled and spatial_index == null)
 
 
 func _process(delta: float) -> void:

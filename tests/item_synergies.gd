@@ -27,8 +27,8 @@ func _run() -> void:
 	first.max_health = 1000.0
 	second.health = 1000.0
 	second.max_health = 1000.0
-	first.set_physics_process(false)
-	second.set_physics_process(false)
+	first.set_simulation_enabled(false)
+	second.set_simulation_enabled(false)
 	var water := WeaponCatalog.by_id(&"water_jet")
 	var light := WeaponCatalog.by_id(&"enamel_mirror")
 	if not game.items.acquire(ShopController.by_id(&"radiant_filling")) or not game.items.acquire(ShopController.by_id(&"conductive_varnish")):

@@ -30,7 +30,7 @@ func _run() -> void:
 	game._create_enemy(WaveController.BACTERIA, game.player.global_position + Vector2(150, 0))
 	var enemy: Enemy = index.get_child(0)
 	enemy.set_process(false)
-	enemy.set_physics_process(false)
+	enemy.set_simulation_enabled(false)
 	enemy.special_timer = 0
 	enemy._physics_process(0.0)
 	_check(enemy.special_phase == Enemy.SpecialPhase.WARNING, "batch test did not enter warning")

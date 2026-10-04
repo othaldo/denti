@@ -16,7 +16,7 @@ func _run() -> void:
 	game.wave.active = false
 	game._create_enemy(WaveController.PLAQUE, game.player.global_position + Vector2(100.0, 0.0))
 	var enemy: Enemy = game.get_node("Enemies").get_child(-1)
-	enemy.set_physics_process(false)
+	enemy.set_simulation_enabled(false)
 	var weapon := WeaponCatalog.by_id(&"magic_toothbrush")
 	enemy.take_damage(8.0, weapon)
 	enemy.take_damage(6.0, null, false, &"chain")

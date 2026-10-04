@@ -3,6 +3,10 @@ extends Enemy
 var diagnostics: CombatDiagnostics
 
 func _physics_process(delta: float) -> void:
+	# The central owner measures its whole step, including complex enemies.
+	if spatial_index != null and spatial_index.motion.stepping:
+		super._physics_process(delta)
+		return
 	var measured := diagnostics.should_sample(true)
 	var started := Time.get_ticks_usec() if measured else 0
 	super._physics_process(delta)

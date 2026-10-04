@@ -47,7 +47,7 @@ func _run() -> void:
 	for wave in [5, 10, 15, 20]:
 		game._create_enemy(WaveController.boss_for_wave(wave), game.player.global_position + Vector2(500, 0))
 		var boss: Enemy = game.boss
-		boss.set_physics_process(false)
+		boss.set_simulation_enabled(false)
 		boss.is_enraged = true
 		boss.sync_inflammation_aura()
 		var aura: BossInflammationAura = boss.inflammation_aura

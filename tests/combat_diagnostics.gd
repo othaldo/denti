@@ -51,10 +51,10 @@ func _run() -> void:
 		check((enemy.health == prior_health) == (preset.diagnostic == TestArenaData.Diagnostic.NO_HITS), "damage comparison failed to isolate enemy hit consequences")
 		check(weapon.is_physics_processing() == (preset.diagnostic != TestArenaData.Diagnostic.NO_WEAPONS), "weapon comparison did not disable attack callbacks")
 		check(weapon.evolution.is_physics_processing() == (preset.diagnostic != TestArenaData.Diagnostic.NO_WEAPONS), "disabled weapon still advances evolution attacks")
-		check(game.get_node("Enemies").visible == (preset.diagnostic != TestArenaData.Diagnostic.NO_DRAW) and enemy.is_physics_processing(), "simulation-only comparison changed enemy physics callbacks")
+		check(game.get_node("Enemies").visible == (preset.diagnostic != TestArenaData.Diagnostic.NO_DRAW) and enemy.simulation_enabled and not enemy.is_physics_processing() and game.get_node("Enemies").is_physics_processing(), "simulation-only comparison changed enemy physics callbacks")
 		for frame in 35:
 			await physics_frame
-		check(profile.sampled_us.has(&"enemy_physics") and profile.calls[&"enemy_physics"] >= 110, "enemy timings do not aggregate sampled callbacks")
+		check(profile.sampled_us.has(&"enemy_physics") and profile.calls[&"enemy_physics"] >= 2, "enemy timings do not include the central fixed-step owner")
 		check(profile.sampled_us.has(&"loot") and profile.sampled_us.has(&"effects"), "loot/item timing categories are missing")
 		if preset.diagnostic != TestArenaData.Diagnostic.NO_WEAPONS:
 			check(profile.sampled_us.has(&"weapons") and game.get_node("Projectiles").get_child_count() > 0, "weapon timings or real player shots are missing")

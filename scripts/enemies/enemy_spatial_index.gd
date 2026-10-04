@@ -10,10 +10,15 @@ var maximum_radius: float = 0.0
 var next_order: int = 0
 var shadow_batch := EnemyShadowBatch.new()
 var had_attack_visuals := false
+var motion := EnemyMotion.new()
 
 func _ready() -> void:
 	process_priority = 1
 	set_process(not membership.is_empty())
+	set_physics_process(not membership.is_empty())
+
+func _physics_process(delta: float) -> void:
+	motion.step(self, delta)
 
 func _process(_delta: float) -> void:
 	var has_attack_visuals := shadow_batch.update()
@@ -42,11 +47,13 @@ func register(enemy: Enemy) -> void:
 	maximum_radius = maxf(maximum_radius, enemy.data.radius)
 	var cell := _cell(enemy.position)
 	membership[id] = cell
+	motion.register(enemy, cell)
 	if not cells.has(cell):
 		cells[cell] = []
 	cells[cell].append(enemy)
 	shadow_batch.enemies.append(enemy)
 	set_process(true)
+	set_physics_process(true)
 	queue_redraw()
 	if enemy.data.is_boss:
 		bosses.append(enemy)
@@ -56,6 +63,7 @@ func update(enemy: Enemy) -> void:
 	if not membership.has(id):
 		return
 	var cell := _cell(enemy.position)
+	motion.track(enemy, cell)
 	var previous := membership[id]
 	if cell == previous:
 		return
@@ -68,6 +76,7 @@ func update(enemy: Enemy) -> void:
 func unregister(enemy: Enemy) -> void:
 	var id := enemy.get_instance_id()
 	if membership.has(id):
+		motion.unregister(enemy)
 		_remove_from_cell(enemy, membership[id])
 		membership.erase(id)
 	bosses.erase(enemy)
@@ -78,6 +87,7 @@ func unregister(enemy: Enemy) -> void:
 		next_order = 0
 		shadow_batch.multimesh.visible_instance_count = 0
 		set_process(false)
+		set_physics_process(false)
 
 func _remove_from_cell(enemy: Enemy, cell: Vector2i) -> void:
 	cells[cell].erase(enemy)

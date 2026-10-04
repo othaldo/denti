@@ -23,7 +23,7 @@ func _enemy(data: EnemyData, counter: Dictionary) -> Enemy:
 	enemy.configure(data, null, 17)
 	root.add_child(enemy)
 	enemy.set_process(false)
-	enemy.set_physics_process(false)
+	enemy.set_simulation_enabled(false)
 	enemy.draw.connect(func(): counter.count += 1)
 	return enemy
 
