@@ -174,6 +174,12 @@ func _legacy_value(data: WeaponData, tier: int) -> int:
 
 func _refresh_positions() -> void:
 	var weapons := equipped()
+	# Prepare after every equipment change, including an in-place tier fusion.
+	var pool: PlayerProjectilePool
+	if DisplayServer.get_name() != "headless":
+		pool = get_parent().get_parent().get_node_or_null("Projectiles") as PlayerProjectilePool
+	if pool != null:
+		pool.prepare_loadout(weapons)
 	for index in weapons.size():
 		weapons[index].position = Vector2.ZERO
 		weapons[index].home_position = WeaponLayout.home(index, weapons.size())

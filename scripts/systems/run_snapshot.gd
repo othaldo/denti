@@ -2,7 +2,6 @@ class_name RunSnapshot
 extends RefCounted
 
 const ACID_PROJECTILE: PackedScene = preload("res://scenes/enemies/acid_projectile.tscn")
-const PLAYER_PROJECTILE: PackedScene = preload("res://scenes/game/weapon_projectile.tscn")
 
 
 static func capture(game) -> Dictionary:
@@ -223,10 +222,13 @@ static func restore(game, saved: Dictionary) -> void:
 	var runtime: Array = saved.get("weapon_runtime", [])
 	var weapons := player.loadout.equipped()
 	var restored_enemies: Array[Node] = game.get_node("Enemies").get_children()
+	var projectiles := game.get_node("Projectiles") as PlayerProjectilePool
 	for entry in saved.get("player_projectiles", []):
-		if entry is Dictionary and WeaponCatalog.by_id(StringName(entry.get("id", ""))) != null:
-			var projectile: WeaponProjectile = PLAYER_PROJECTILE.instantiate()
-			game.get_node("Projectiles").add_child(projectile)
+		if not entry is Dictionary:
+			continue
+		var data := WeaponCatalog.by_id(StringName(entry.get("id", "")))
+		if data != null:
+			var projectile := projectiles.acquire(data, clampi(entry.get("tier", 1), 1, 4))
 			projectile.restore_state(entry, game.items, restored_enemies)
 	for index in mini(runtime.size(), weapons.size()):
 		if not runtime[index] is Dictionary:

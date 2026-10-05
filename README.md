@@ -85,6 +85,7 @@ stehen im [Performance-Bericht](docs/PERFORMANCE_PROJECTILES.md).
 Der [Performance-Audit vom 03.10.2026](docs/PERFORMANCE_AUDIT.md) optimiert zusätzlich
 Gegnerabfragen, Spielerprojektile, Beute, Telemetrie und Trefferfeedback.
 Die [zentrale Gegnerbewegung](docs/CENTRAL_ENEMY_MOTION.md) beschreibt den gemeinsamen Physikschritt, den Referenztest und Messungen mit sowie ohne Diagnoseinstrumentierung.
+Der [Spielerprojektil-Pool](docs/PLAYER_PROJECTILE_POOL.md) bereitet Geschosse vor dem Kampf vor und verwendet deren Nodes und Sprites erneut; der Bericht enthält Lebenszyklus-Benchmark und Save/Resume-Prüfungen.
 Unter **Einstellungen → Grafik** startet **Automatisch** mit voller Auflösung und
 wechselt bei drei aufeinanderfolgenden Messfenstern von je mindestens einer
 Sekunde mit durchschnittlich unter 20 FPS im Kampf für den Run auf Sparsam.

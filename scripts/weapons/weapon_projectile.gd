@@ -30,9 +30,23 @@ var outline_sprite: Sprite2D
 var visual_radius: float = 7.0
 var flight_range: float = 0.0
 var splash_radius: float = 0.0
+var pool: PlayerProjectilePool
+var retired: bool = false
 
 
 func launch(start: Vector2, aim: Vector2, attack_damage: float, weapon: WeaponData, inventory: ItemInventory = null, is_critical: bool = false, weapon_tier: int = 1) -> void:
+	retired = false
+	traveled = 0.0
+	animation_time = 0.0
+	impact_time = 0.0
+	hit_ids.clear()
+	returning = false
+	return_rearmed = false
+	return_hits_left = 0
+	orbit_time = 0.0
+	orbit_center = Vector2.ZERO
+	orbit_finished = false
+	orbit_hits.clear()
 	global_position = start
 	items = inventory
 	enemy_index = items.player.enemy_index if items != null else null
@@ -52,6 +66,18 @@ func launch(start: Vector2, aim: Vector2, attack_damage: float, weapon: WeaponDa
 		return_factor += 1.0
 	_create_visuals()
 	_sync_visuals()
+	# A recycled shot must discard the previous impact's cached draw commands.
+	queue_redraw()
+
+
+func retire() -> void:
+	if retired or is_queued_for_deletion():
+		return
+	retired = true
+	if is_instance_valid(pool) and get_parent() == pool:
+		pool.recycle(self)
+	else:
+		queue_free()
 
 
 func _create_visuals() -> void:
@@ -89,6 +115,8 @@ func _sync_visuals() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if retired:
+		return
 	if orbit_time > 0:
 		orbit_time = maxf(orbit_time - delta, 0)
 		animation_time += delta
@@ -105,12 +133,12 @@ func _physics_process(delta: float) -> void:
 		impact_time -= delta
 		queue_redraw()
 		if impact_time <= 0.0:
-			queue_free()
+			retire()
 		return
 	animation_time += delta
 	if returning:
 		if items == null or global_position.distance_to(items.player.global_position) <= 24.0:
-			queue_free()
+			retire()
 			return
 		direction = global_position.direction_to(items.player.global_position)
 	var travel_left := maxf(flight_range - traveled, 0.0)
@@ -158,7 +186,8 @@ func _physics_process(delta: float) -> void:
 		elif return_factor > 0.0 and not returning:
 			_start_return()
 		else:
-			queue_free()
+			retire()
+			return
 	_sync_visuals()
 	if impact_time > 0.0:
 		queue_redraw()

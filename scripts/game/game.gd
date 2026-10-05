@@ -730,7 +730,10 @@ func _clear_combat(keep_boss: bool = false) -> void:
 	if not keep_boss:
 		boss = null
 	for projectile in $Projectiles.get_children():
-		projectile.queue_free()
+		if projectile is WeaponProjectile:
+			projectile.retire()
+		else:
+			projectile.queue_free()
 	for projectile in $EnemyProjectiles.get_children():
 		projectile.queue_free()
 

@@ -190,11 +190,10 @@ func _fire(targets: Array[Enemy], damage: float, critical: bool) -> void:
 	match data.attack_mode:
 		&"projectile":
 			var count := data.projectile_count_at_tier(tier)
+			var pool := player.get_parent().get_node("Projectiles") as PlayerProjectilePool
 			for index in count:
 				var angle := 0.0 if index == 0 else (-0.12 if index == 1 else 0.12)
-				var projectile: WeaponProjectile = PROJECTILE_SCENE.instantiate()
-				CombatDiagnostics.instrument(projectile, "player_projectile", self)
-				player.get_parent().get_node("Projectiles").add_child(projectile)
+				var projectile := pool.acquire(data, tier)
 				projectile.launch(muzzle, aim.rotated(angle), damage if is_zero_approx(angle) else damage * 0.55, data, player.items, critical, tier)
 		&"beam":
 			WeaponAttackShapes.hit(targets[0], data, tier, damage, critical, player.items, aim)

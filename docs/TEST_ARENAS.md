@@ -46,6 +46,8 @@ Nur Diagnosearenen ersetzen die betroffenen Skripte beim Erzeugen durch abgeleit
 
 Seit der [zentralen Gegnerbewegung](CENTRAL_ENEMY_MOTION.md) erfasst `enemy_physics` den gesamten gemeinsamen Besitzerschritt, einschließlich der komplexen Gegner. Es gibt einen Messcallback pro Stichproben-Physikschritt statt einen pro Gegner; Trefferzeiten bleiben inklusive und überlappend. Der geänderte Messaufwand beeinflusst auch die FPS der Diagnosearena. `debug map` bleibt für den Vergleich ohne Instrumentierung verfügbar.
 
+Der [Spielerprojektil-Pool](PLAYER_PROJECTILE_POOL.md) bereitet ausgerüstete Geschossarten beim Ausrüstungswechsel vor. Die Reserve liegt außerhalb des Szenenbaums; Geschosszahlen und Saves zählen weiterhin ausschließlich aktive Schüsse. Diagnosegeschosse behalten auch nach Wiederverwendung ihre Messskripte. Für den Handyvergleich nach einem neuen Build jeweils etwa 60 Sekunden stehend und anschließend in einem frisch gestarteten Test etwa 60 Sekunden mit Bewegung messen. `debug map` ergänzt den instrumentierten Bericht um einen Vergleich ohne Messaufwand. Durchschnitt, Minimum und P95/P99 gemeinsam betrachten; gleiche Auflösung und Ausrichtung verwenden.
+
 ## Weitere Presets
 
 Die Presets liegen unter `data/test_arenas/`, als `TestArenaData`-Resources. Sie definieren Code, Welle, Gegner-/Beutezahl, Boss, Waffen, Tier und Items. Neue Resources in `TestArenaCatalog.ALL` eintragen; der zentrale Controller `scripts/systems/test_arena.gd` verwendet die bestehenden Kampfsysteme. Es gibt keine Eingabe beliebiger Befehle oder separaten Editor-Cheat-Menüs im Testlauf.
