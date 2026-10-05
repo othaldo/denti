@@ -70,12 +70,15 @@ func step(index: EnemySpatialIndex, delta: float) -> void:
 			player = enemy.target
 			player_at = player.global_position
 		var data := enemy.data
-		if not ordinary_space or enemy.target != player or player == null or data.is_boss or data.is_elite or data.aura_radius > 0.0 or enemy.overtime_active or enemy.bleed_time > 0.0 or enemy.wet_time > 0.0 or enemy.exposure_time > 0.0 or enemy.haste_time > 0.0 or enemy.special_phase != Enemy.SpecialPhase.COOLDOWN:
+		if not ordinary_space or enemy.target != player or player == null or data.is_boss or data.is_elite or data.aura_radius > 0.0 or enemy.overtime_active or enemy.bleed_time > 0.0 or enemy.special_phase != Enemy.SpecialPhase.COOLDOWN:
 			enemy._physics_process(delta)
 			if player != null:
 				player_at = player.global_position
 			continue
 		if enemy.health <= 0.0 or player.stats.health <= 0.0:
+			# Status clocks still expire when movement/contact is disabled by death.
+			if enemy.wet_time > 0.0 or enemy.exposure_time > 0.0 or enemy.haste_time > 0.0:
+				enemy._physics_process(delta)
 			continue
 		var before := positions[slot]
 		var direction := before.direction_to(player_at)
@@ -90,7 +93,28 @@ func step(index: EnemySpatialIndex, delta: float) -> void:
 				player_at = player.global_position
 				continue
 			enemy.special_timer = timer
+		# Wet/exposure/haste alone do not require the general per-enemy path.
+		# Tick after attack admission so a warning-start step is handled exactly
+		# once by Enemy._physics_process. Expiry precedes this step's movement.
+		if enemy.exposure_time > 0.0:
+			enemy.exposure_time = maxf(enemy.exposure_time - delta, 0.0)
+			if enemy.exposure_time <= 0.0:
+				enemy.enamel_exposure = 0.0
+				enemy.queue_redraw()
+		if enemy.haste_time > 0.0:
+			enemy.haste_time = maxf(enemy.haste_time - delta, 0.0)
+			if enemy.haste_time <= 0.0:
+				enemy.haste_bonus = 0.0
+				enemy.queue_redraw()
+		if enemy.wet_time > 0.0:
+			enemy.wet_time = maxf(enemy.wet_time - delta, 0.0)
+			if enemy.wet_time <= 0.0:
+				enemy.queue_redraw()
 		var speed := enemy.move_speed
+		if enemy.haste_time > 0.0:
+			speed *= 1.0 + enemy.haste_bonus
+		if enemy.wet_time > 0.0:
+			speed *= Enemy.WET_STATUS.speed_factor(data)
 		var movement := direction * speed * delta
 		if attack == EnemyData.SpecialAttack.SHOOT:
 			var distance := before.distance_squared_to(player_at)

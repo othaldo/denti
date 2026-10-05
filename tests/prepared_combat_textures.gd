@@ -42,12 +42,15 @@ func _run() -> void:
 		_check(full.size() == points and full[0].is_equal_approx(Vector2.RIGHT) and full[-1].is_equal_approx(Vector2.RIGHT), "cached full circle has incorrect point count or seam")
 	var glyph_image := Image.load_from_file("res://assets/vfx/combat_glyphs.png")
 	var solid := CombatGlyphs.region("solid")
+	_check(CombatGlyphs.solid_texture == solid and CombatGlyphs.line_texture == CombatGlyphs.region("line") and CombatGlyphs.circle_texture == CombatGlyphs.region("circle"), "direct glyph references differ from the prepared artwork")
 	_check(solid.atlas == CombatGlyphs.ATLAS and solid.region == CombatGlyphs.region("line").region.grow(-1.0), "lane fill does not reuse the opaque atlas interior")
 	var solid_image := glyph_image.get_region(Rect2i(solid.region))
 	for y in solid_image.get_height():
 		for x in solid_image.get_width():
 			_check(solid_image.get_pixel(x, y).is_equal_approx(Color.WHITE), "lane atlas fill contains transparent/colored edges")
 	for radius in [20, 24, 26, 31]:
+		for step in 65:
+			_check(CombatGlyphs.warning_rings[radius][step] == CombatGlyphs.region("%s:%s" % [radius, step]), "numeric warning cache selects the wrong radius/progress cell")
 		var texture := CombatGlyphs.region("%s:64" % radius)
 		var image := glyph_image.get_region(Rect2i(texture.region))
 		var middle := image.get_width() / 2
@@ -59,6 +62,7 @@ func _run() -> void:
 		var enemy := load("res://data/enemies/" + path) as EnemyData
 		var radius := int(enemy.radius + 5)
 		var texture := CombatGlyphs.region("mark:%s" % radius)
+		_check(CombatGlyphs.marks.get(radius) == texture, "numeric evolution mark cache selects the wrong glyph")
 		_check(texture != null and texture.atlas == CombatGlyphs.ATLAS, "evolution mark missing from shared atlas: " + path)
 		if texture != null:
 			var image := glyph_image.get_region(Rect2i(texture.region))

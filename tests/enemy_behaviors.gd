@@ -115,12 +115,28 @@ func _run() -> void:
 		return
 	var first: AcidProjectile = projectiles.get_child(0)
 	var last: AcidProjectile = projectiles.get_child(2)
-	if first.direction.distance_to(last.direction) < 0.25 or first.projectile_color.g < 0.8:
+	var expected_color := spitter.data.projectile_color if spitter.inflicted_statuses.is_empty() else DentiStatus.COLORS[int(spitter.inflicted_statuses[0]["kind"])]
+	if first.direction.distance_to(last.direction) < 0.25 or first.projectile_color != expected_color:
 		_fail("late fan lacks spread or visible enemy projectile color")
 		return
 	if not is_equal_approx(first.damage, spitter.data.attack_damage * WaveController.enemy_damage_multiplier(spitter.data, 12)) or first.damage <= 8.0 * WaveController.enemy_damage_multiplier(spitter.data, 12):
 		_fail("normal ranged projectile damage did not increase")
 		return
+	# Random late-wave traits legitimately change the projectile color. Exercise
+	# ordinary, poison and bleed fans explicitly instead of requiring green.
+	for statuses in [[], [EnemyStatusRules.POISON.payload()], [EnemyStatusRules.BLEED.payload()]]:
+		for projectile in projectiles.get_children():
+			projectile.free()
+		spitter.inflicted_statuses.assign(statuses)
+		spitter._activate_special()
+		expected_color = spitter.data.projectile_color if statuses.is_empty() else DentiStatus.COLORS[int(statuses[0]["kind"])]
+		if projectiles.get_child_count() != 3:
+			_fail("status fan changed the projectile count")
+			return
+		for projectile: AcidProjectile in projectiles.get_children():
+			if projectile.projectile_color != expected_color or projectile.inflicted_statuses != spitter.inflicted_statuses:
+				_fail("fan projectile lost its ordinary/status color or payload")
+				return
 	for projectile in projectiles.get_children():
 		projectile.queue_free()
 	await process_frame

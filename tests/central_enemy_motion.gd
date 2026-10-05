@@ -45,6 +45,17 @@ func _inputs(game: Node2D, tick: int) -> void:
 	if tick == 65:
 		var enemy: Enemy = index.get_child(0)
 		WeaponAttackShapes.hit(enemy, WeaponCatalog.by_id(&"water_jet"), 4, 1, false, game.items, Vector2.RIGHT)
+	if tick in [30, 75, 190]:
+		# Frequent water hits must retain the central path, including overlapping
+		# clocks, refreshes, expiry and a warning starting on the same step.
+		for number in index.get_child_count():
+			var enemy: Enemy = index.get_child(number)
+			if not enemy.data.is_boss and not enemy.data.is_elite:
+				enemy.apply_wet(0.01 if number % 3 == 0 else 0.42)
+				enemy.apply_haste(0.25, 0.3)
+				enemy.apply_enamel_exposure(0.15, 0.2)
+				if number % 4 == 0:
+					enemy.special_timer = 0.0
 	if tick == 80:
 		index.get_child(1).global_position = Vector2(-129, 128)
 	if tick == 95:
@@ -63,6 +74,13 @@ func _inputs(game: Node2D, tick: int) -> void:
 		index.get_child(0).set_simulation_enabled(false)
 	if tick == 220:
 		index.get_child(0).set_simulation_enabled(true)
+	if tick == 225:
+		game.player.stats.health = 0.0
+		index.get_child(0).apply_wet(0.035)
+		index.get_child(0).apply_haste(0.25, 0.025)
+		index.get_child(0).apply_enamel_exposure(0.15, 0.015)
+	if tick == 230:
+		game.player.stats.health = 100000.0
 	if tick == 235:
 		index.get_child(4).take_damage(1e9)
 	if tick == 245:

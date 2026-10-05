@@ -33,12 +33,14 @@ func _run() -> void:
 		enemies.append(index.get_child(-1))
 	game.player.hurt_time = 1000000
 	var reference := PackedVector2Array()
+	var wet := "--wet" in OS.get_cmdline_user_args()
 	for pass_index in 8:
 		for number in COUNT:
 			enemies[number].position = Vector2(640, 360) + Vector2.from_angle(float(number) * TAU / COUNT) * 280
 			enemies[number].special_phase = Enemy.SpecialPhase.COOLDOWN
 			enemies[number].special_timer = 1000000
 			enemies[number].contact_timer = 0
+			enemies[number].wet_time = 1000000.0 if wet else 0.0
 		var started := Time.get_ticks_usec()
 		for tick in TICKS:
 			game.player.position = Vector2(640, 360) + Vector2.from_angle(float(tick) * 0.014) * 190
@@ -63,7 +65,7 @@ func _run() -> void:
 			var checksum := Vector2.ZERO
 			for enemy in enemies:
 				checksum += enemy.position
-			print(JSON.stringify({"path": "central" if pass_index % 2 else "individual", "pass": pass_index, "ms_per_tick": float(elapsed) / TICKS / 1000, "position_checksum": checksum}))
+			print(JSON.stringify({"path": "central" if pass_index % 2 else "individual", "wet": wet, "pass": pass_index, "ms_per_tick": float(elapsed) / TICKS / 1000, "position_checksum": checksum}))
 	game.free()
 	await process_frame
 	quit()

@@ -28,12 +28,13 @@ static func arc(canvas: CanvasItem, at: Vector2, radius: float, start: float, en
 	tint *= visual_tint
 	if radius <= 0.0 or end <= start:
 		return
-	_prepare_count(count)
 	var step := clampi(roundi((end - start) / TAU * PROGRESS_STEPS), 0, PROGRESS_STEPS)
 	if step == 0:
 		return
 	if count == 16 and step == PROGRESS_STEPS and is_zero_approx(start) and is_equal_approx(width, 2.0) and radius == float(int(radius)):
-		var mark := CombatGlyphs.region("mark:%s" % int(radius))
+		if CombatGlyphs.regions.is_empty():
+			CombatGlyphs.prepare()
+		var mark: AtlasTexture = CombatGlyphs.marks.get(int(radius))
 		if mark != null:
 			var extent := radius + 3.0
 			canvas.draw_texture_rect(mark, Rect2(at - Vector2.ONE * extent, Vector2.ONE * extent * 2.0), false, tint)
@@ -41,11 +42,15 @@ static func arc(canvas: CanvasItem, at: Vector2, radius: float, start: float, en
 	# These ordinary warning rings share a pre-rendered atlas. Larger boss
 	# rings retain precise stroke widths through the cached geometry path.
 	if count == 32 and is_equal_approx(width, 4.0) and is_equal_approx(start, -PI / 2.0):
-		var texture := CombatGlyphs.region("%s:%s" % [int(radius), step]) if radius == float(int(radius)) else null
+		if CombatGlyphs.regions.is_empty():
+			CombatGlyphs.prepare()
+		var variants: Array = CombatGlyphs.warning_rings.get(int(radius), CombatGlyphs.NO_RING) if radius == float(int(radius)) else CombatGlyphs.NO_RING
+		var texture: AtlasTexture = variants[step] if not variants.is_empty() else null
 		if texture != null:
 			var extent := radius + 4.0
 			canvas.draw_texture_rect(texture, Rect2(at - Vector2.ONE * extent, Vector2.ONE * extent * 2.0), false, tint)
 			return
+	_prepare_count(count)
 	canvas.draw_set_transform_matrix(base * Transform2D(start, Vector2.ONE * radius, 0.0, at))
 	canvas.draw_polyline(arcs[count][step], tint, width / radius)
 	canvas.draw_set_transform_matrix(base)
@@ -56,7 +61,11 @@ static func line(canvas: CanvasItem, start: Vector2, end: Vector2, tint: Color, 
 	if difference.is_zero_approx():
 		return
 	canvas.draw_set_transform_matrix(base * Transform2D(difference.angle(), start))
-	canvas.draw_texture_rect(CombatGlyphs.region("solid" if solid else "line"), Rect2(Vector2(0, -width * 0.5), Vector2(difference.length(), width)), false, tint)
+	var texture := CombatGlyphs.solid_texture if solid else CombatGlyphs.line_texture
+	if texture == null:
+		CombatGlyphs.prepare()
+		texture = CombatGlyphs.solid_texture if solid else CombatGlyphs.line_texture
+	canvas.draw_texture_rect(texture, Rect2(Vector2(0, -width * 0.5), Vector2(difference.length(), width)), false, tint)
 	canvas.draw_set_transform_matrix(base)
 
 static func circle(canvas: CanvasItem, at: Vector2, radius: float, tint: Color, visual_tint: Color = Color.WHITE) -> void:
@@ -64,4 +73,6 @@ static func circle(canvas: CanvasItem, at: Vector2, radius: float, tint: Color, 
 	if radius <= 0.0:
 		return
 	var extent := radius * CombatGlyphs.EXTENT / CombatGlyphs.RADIUS
-	canvas.draw_texture_rect(CombatGlyphs.region("circle"), Rect2(at - Vector2.ONE * extent, Vector2.ONE * extent * 2.0), false, tint)
+	if CombatGlyphs.circle_texture == null:
+		CombatGlyphs.prepare()
+	canvas.draw_texture_rect(CombatGlyphs.circle_texture, Rect2(at - Vector2.ONE * extent, Vector2.ONE * extent * 2.0), false, tint)

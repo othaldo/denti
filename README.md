@@ -87,6 +87,7 @@ Gegnerabfragen, Spielerprojektile, Beute, Telemetrie und Trefferfeedback.
 Die [zentrale Gegnerbewegung](docs/CENTRAL_ENEMY_MOTION.md) beschreibt den gemeinsamen Physikschritt, den Referenztest und Messungen mit sowie ohne Diagnoseinstrumentierung.
 Der [Spielerprojektil-Pool](docs/PLAYER_PROJECTILE_POOL.md) bereitet Geschosse vor dem Kampf vor und verwendet deren Nodes und Sprites erneut; der Bericht enthält Lebenszyklus-Benchmark und Save/Resume-Prüfungen.
 Der [gemeinsame Gegner-Atlas](docs/ENEMY_SPRITE_ATLAS.md) reduziert Texturwechsel mit den bisherigen Sprites; Bildvergleich und Messungen prüfen Darstellung und Renderaufwand.
+Die [häufigen Kampfpfade](docs/COMBAT_HOT_PATHS.md) verwenden zentrale Statusbewegung und vorbereitete Text-/Grafikabfragen; der Bericht enthält gezielte CPU-Vergleiche und ihre Grenzen.
 Unter **Einstellungen → Grafik** startet **Automatisch** mit voller Auflösung und
 wechselt bei drei aufeinanderfolgenden Messfenstern von je mindestens einer
 Sekunde mit durchschnittlich unter 20 FPS im Kampf für den Run auf Sparsam.

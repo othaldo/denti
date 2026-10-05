@@ -20,6 +20,13 @@ func _run() -> void:
 	var id := number.get_instance_id()
 	check(number.text == "123" and not number.visible and number.render_line.get_line_width() > 0, "damage text was not prepared for shared drawing")
 	check(number.render_color == Color(1.0, 0.88, 0.37) and number.render_outline_size == 5, "enemy damage text lost its color or outline")
+	var same := batch.acquire(SCENE)
+	same.show_amount(Vector2(220, 180), 123)
+	check(number.render_line == same.render_line, "repeated damage still reshapes the same font/size/text")
+	var shared_line := number.render_line
+	same.show_message(Vector2.ZERO, "Andere Meldung", Color.CYAN)
+	check(number.render_line == shared_line and number.render_line.get_line_width() != same.render_line.get_line_width(), "reused popup mutated another active number's shared layout")
+	same.free()
 	var origin := number.origin
 	var travel := number.travel
 	batch._process(0.29)
@@ -38,7 +45,7 @@ func _run() -> void:
 	batch._process(0.67)
 	reused = batch.acquire(SCENE)
 	reused.show_message(Vector2.ZERO, "Schild!", Color.CYAN)
-	check(reused.text == "Schild!" and reused.render_color == Color.CYAN and batch.created == 1, "important feedback lost its text/color or bypassed reuse")
+	check(reused.text == "Schild!" and reused.render_color == Color.CYAN and batch.created == 2, "important feedback lost its text/color or bypassed reuse")
 	batch._process(0.67)
 	reused = batch.acquire(SCENE)
 	reused.show_message(Vector2.ZERO, "Sehr lange wichtige Meldung!", Color.WHITE)
@@ -46,6 +53,16 @@ func _run() -> void:
 	reused = batch.acquire(SCENE)
 	reused.show_amount(Vector2.ZERO, 2)
 	check(reused.render_extent.x == reused.custom_minimum_size.x and absf(reused.origin.x + reused.render_extent.x * 0.5) <= 12.0, "reusing a long message shifted the next damage number")
+	var small_layout := reused.render_line
+	reused.add_theme_font_size_override("font_size", 32)
+	reused.show_amount(Vector2.ZERO, 2)
+	check(reused.render_line != small_layout and reused.render_line.get_line_width() > small_layout.get_line_width(), "text cache confused different font sizes")
+	var font := reused.render_font
+	font.emit_changed()
+	check(batch.text_layouts.is_empty(), "font changes leave stale cached glyph layout")
+	for value in batch.MAX_TEXT_LAYOUTS + 20:
+		reused.show_amount(Vector2.ZERO, 1000 + value)
+	check(batch.text_layouts.size() == batch.MAX_TEXT_LAYOUTS, "unique damage values create an unbounded text cache")
 	batch._process(0.67)
 	for index in 150:
 		batch.acquire(SCENE).show_amount(Vector2.ZERO, index + 1)

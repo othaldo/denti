@@ -52,6 +52,8 @@ Der [gemeinsame Gegner-Atlas](ENEMY_SPRITE_ATLAS.md) bündelt die Texturen der n
 
 ## Weitere Presets
 
+Die [Optimierung häufiger Kampfpfade](COMBAT_HOT_PATHS.md) reduziert Statusbewegung, Textaufbereitung und Warn-Grafikabfragen. Die bisherigen Testcodes und Messcallbacks bleiben gleich.
+
 Die Presets liegen unter `data/test_arenas/`, als `TestArenaData`-Resources. Sie definieren Code, Welle, Gegner-/Beutezahl, Boss, Waffen, Tier und Items. Neue Resources in `TestArenaCatalog.ALL` eintragen; der zentrale Controller `scripts/systems/test_arena.gd` verwendet die bestehenden Kampfsysteme. Es gibt keine Eingabe beliebiger Befehle oder separaten Editor-Cheat-Menüs im Testlauf.
 
 `tests/test_arenas.gd` deckt die Freischaltung über echte Menübuttons, Persistenz, unbekannte Codes, Desktop-/Handy-Layouts, alle Presets, Test-Neustart, Autosave-Isolation, Progressionsschutz und die Rückkehr zum ursprünglichen Run ab.

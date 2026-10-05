@@ -12,7 +12,7 @@ var render_size := 25
 var render_color: Color
 var render_outline_color: Color
 var render_outline_size := 5
-var render_line := TextLine.new()
+var render_line: TextLine
 var render_transform: Transform2D
 var render_alpha := 1.0
 var render_extent: Vector2

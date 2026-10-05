@@ -4,8 +4,11 @@ extends Node2D
 # All outlines, then all fills: avoid alternating font textures per label.
 # Labels retain their public feedback API, but have no individual draw/tween.
 const MAX_IDLE := 128
+const MAX_TEXT_LAYOUTS := 256
 var idle: Array[DamageNumber] = []
 var created := 0
+var text_layouts: Dictionary[Array, TextLine] = {}
+var layout_fonts: Array[Font] = []
 
 func _ready() -> void:
 	# Arena/test cleanup can free children without going through retirement.
@@ -32,8 +35,7 @@ func begin(number: DamageNumber, at: Vector2) -> void:
 	number.render_color = number.get_theme_color("font_color")
 	number.render_outline_color = number.get_theme_color("font_outline_color")
 	number.render_outline_size = number.get_theme_constant("outline_size")
-	number.render_line.clear()
-	number.render_line.add_string(number.text, number.render_font, number.render_size)
+	number.render_line = _text_layout(number.text, number.render_font, number.render_size)
 	var text_size := number.render_line.get_size()
 	number.render_extent = number.custom_minimum_size.max(text_size)
 	number.baseline = (number.render_extent - text_size) * 0.5
@@ -46,6 +48,25 @@ func begin(number: DamageNumber, at: Vector2) -> void:
 	number.render_transform = number.get_transform()
 	number.render_alpha = 1.0
 	queue_redraw()
+
+func _text_layout(text: String, font: Font, font_size: int) -> TextLine:
+	# Layout is immutable after shaping and independent of popup color/position.
+	# Repeated damage values share glyph placement, including cached kerning.
+	var key := [font, font_size, text]
+	if text_layouts.has(key):
+		return text_layouts[key]
+	if not layout_fonts.has(font):
+		layout_fonts.append(font)
+		font.changed.connect(_clear_text_layouts)
+	var line := TextLine.new()
+	line.add_string(text, font, font_size)
+	if text_layouts.size() >= MAX_TEXT_LAYOUTS:
+		text_layouts.erase(text_layouts.keys()[0])
+	text_layouts[key] = line
+	return line
+
+func _clear_text_layouts() -> void:
+	text_layouts.clear()
 
 func _process(delta: float) -> void:
 	if get_child_count() == 0:
@@ -70,8 +91,9 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 func _draw() -> void:
+	var numbers := get_children()
 	for outline in [true, false]:
-		for number: DamageNumber in get_children():
+		for number: DamageNumber in numbers:
 			if number.render_font == null or number.is_queued_for_deletion():
 				continue
 			draw_set_transform_matrix(number.render_transform)
@@ -86,3 +108,7 @@ func _exit_tree() -> void:
 	for number in idle:
 		number.free()
 	idle.clear()
+	for font in layout_fonts:
+		font.changed.disconnect(_clear_text_layouts)
+	layout_fonts.clear()
+	text_layouts.clear()
