@@ -11,6 +11,8 @@ func check(ok: bool, message: String) -> void:
 		push_error(message)
 
 func _run() -> void:
+	# Godot 4.7 scroll containers use emulated mouse events for touch scrolling.
+	Input.emulate_touch_from_mouse = true
 	var session: Node = root.get_node("GameSession")
 	session.progression_path = "user://test_dentipedia_progression.cfg"
 	session.save_path = "user://test_dentipedia_run.json"
@@ -53,6 +55,7 @@ func _run() -> void:
 	check(session.discovered_fusions.has(str(recipe.id)), "sale or new run erased discovery")
 	var revealed := DentipediaData.entries(0, session.discovered_fusions)
 	check(revealed[WeaponCatalog.ALL.size()].title == recipe.result.display_name and revealed[WeaponCatalog.ALL.size()].has("recipe"), "discovered entry lacks recipe")
+	check(revealed[WeaponCatalog.ALL.size()].body.contains("Mk V:") and not revealed[WeaponCatalog.ALL.size()].body.contains("Mk IV:"), "Dentipedia special weapon has wrong tier")
 	check(DentipediaData.ingredients(recipe).size() == 1 + recipe.families.size() + recipe.items.size(), "recipe ingredients incomplete")
 	game.game_menu.open_pause()
 	var found := false
@@ -62,7 +65,7 @@ func _run() -> void:
 			child.pressed.emit()
 			break
 	check(found and game.game_menu.page == &"dentipedia", "pause menu entry missing")
-	for extent in [Vector2i(1280, 720), Vector2i(720, 1280), Vector2i(568, 320)]:
+	for extent in [Vector2i(1280, 720), Vector2i(720, 1280), Vector2i(320, 568), Vector2i(568, 320)]:
 		root.content_scale_size = extent
 		root.size = extent
 		for frame in 15:
@@ -86,6 +89,34 @@ func _run() -> void:
 			root.get_texture().get_image().save_png("res://.godot/dentipedia-%d.png" % extent.x)
 		pedia.category.selected = 4
 		pedia._refresh()
+		pedia.category.selected = 1
+		pedia._refresh()
+		for frame in 5:
+			await process_frame
+		pedia.list_scroll.scroll_vertical = 0
+		for frame in 5:
+			await process_frame
+		var start: Vector2 = pedia.listing.get_child(1).get_global_rect().get_center()
+		var touch := InputEventMouseButton.new()
+		touch.button_index = MOUSE_BUTTON_LEFT
+		touch.position = start
+		touch.pressed = true
+		root.push_input(touch, true)
+		await process_frame
+		for step in 5:
+			var drag := InputEventMouseMotion.new()
+			drag.button_mask = MOUSE_BUTTON_MASK_LEFT
+			drag.position = start - Vector2(0, (step + 1) * 12)
+			drag.relative = Vector2(0, -12)
+			root.push_input(drag, true)
+			await process_frame
+		touch.position = start - Vector2(0, 60)
+		touch.pressed = false
+		root.push_input(touch, true)
+		await process_frame
+		check(pedia.list_scroll.scroll_vertical > 0, "item list cannot be swiped %s" % extent)
+		for frame in 90:
+			await process_frame
 		pedia.category.selected = 0
 		pedia._refresh()
 	game.game_menu._show_home()

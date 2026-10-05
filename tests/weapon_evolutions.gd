@@ -59,6 +59,10 @@ func _run() -> void:
 		game.player.loadout.equipped()[0].tier = 4
 		var owned: Dictionary = game.items.owned.duplicate()
 		game._update_shop_panel()
+		var base_card: Button = game.shop_panel.inventory_row.get_child(0).get_child(0)
+		check(base_card.get_node_or_null("UpgradeReady") != null, "ready evolution has no visible upgrade indicator")
+		if recipe.partner_weapon != &"":
+			check(game.shop_panel.inventory_row.get_child(1).get_child(0).get_node_or_null("UpgradeReady") != null, "evolution partner has no upgrade indicator")
 		game.shop_panel._select("equipment", 0)
 		check(game.shop_panel.details.evolution_options.get_child_count() == 3, "fulfilled recipe not revealed")
 		var button: Button = game.shop_panel.details.evolution_options.get_child(2)
@@ -77,6 +81,13 @@ func _run() -> void:
 		check(game.player.loadout.equipped().size() == 1 and game.player.loadout.equipped()[0].data.id == recipe.result.id, "evolution failed or left ingredient weapon: " + str(recipe.id))
 		check(game.player.loadout.used_slots() == recipe.result.hands and game.items.owned == owned, "evolution changed items or root cost")
 		check(game.player.loadout.refund_for(0) == (75 if recipe.partner_weapon != &"" else 40), "evolution lost invested coin value")
+		var evolved_card: Button = game.shop_panel.inventory_row.get_child(0).get_child(0)
+		check(evolved_card.get_node("WeaponTier").text == "Mk V", "special weapon still displays Mk IV")
+		check(evolved_card.get_theme_stylebox("normal").border_color == WeaponPresentation.EVOLUTION_COLOR, "special weapon card is not bright red")
+		check(evolved_card.get_node_or_null("UpgradeReady") == null, "maxed special weapon still advertises an upgrade")
+		game.shop_panel._select("equipment", 0)
+		check(game.shop_panel.details.subtitle.text.contains("Mk V") and game.shop_panel.details.merge_button.text == "Maximale Stufe V", "special weapon details retain IV")
+		check(game.shop_panel.details_panel.get_theme_stylebox("panel").border_color == WeaponPresentation.EVOLUTION_COLOR, "special weapon details lose red color")
 		var saved: Dictionary = RunSnapshot.capture(game)
 		RunSnapshot.restore(game, saved)
 		check(game.player.loadout.equipped()[0].data.id == recipe.result.id, "resume lost evolved weapon")
@@ -110,6 +121,7 @@ func _run() -> void:
 		game._update_shop_panel()
 		game.shop_panel._select("equipment", 0)
 		check(game.shop_panel.details.evolution_options.get_child_count() == 0, "incomplete recipe leaked a hint")
+		check(game.shop_panel.inventory_row.get_child(0).get_child(0).get_node_or_null("UpgradeReady") == null, "incomplete recipe advertises an upgrade")
 		check(not game.player.loadout.evolve(0, recipe, game.items), "incomplete recipe evolved")
 	# Combat mechanics are exercised using actual enemies and damage.
 	for recipe in WeaponEvolutions.ALL:

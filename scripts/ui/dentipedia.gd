@@ -8,33 +8,36 @@ var listing: VBoxContainer
 var detail: VBoxContainer
 var split: BoxContainer
 var list_scroll: ScrollContainer
+var toolbar: BoxContainer
 var entries: Array[Dictionary] = []
 var selected: Dictionary = {}
 
 func _ready() -> void:
 	session = get_node("/root/GameSession")
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var tools := HBoxContainer.new()
-	add_child(tools)
+	toolbar = BoxContainer.new()
+	add_child(toolbar)
 	category = OptionButton.new()
 	category.custom_minimum_size.y = 42
 	for title in DentipediaData.CATEGORIES:
 		category.add_item(title)
-	tools.add_child(category)
+	toolbar.add_child(category)
 	search = LineEdit.new()
 	search.placeholder_text = "Suchen …"
 	search.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	tools.add_child(search)
+	toolbar.add_child(search)
 	split = BoxContainer.new()
 	split.add_theme_constant_override("separation", 14)
 	split.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	add_child(split)
 	list_scroll = _scroll(split)
 	listing = VBoxContainer.new()
+	listing.mouse_filter = Control.MOUSE_FILTER_PASS
 	listing.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	list_scroll.add_child(listing)
 	var detail_scroll := _scroll(split)
 	detail = VBoxContainer.new()
+	detail.mouse_filter = Control.MOUSE_FILTER_PASS
 	detail.add_theme_constant_override("separation", 10)
 	detail.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	detail_scroll.add_child(detail)
@@ -53,6 +56,7 @@ func _scroll(parent: Node) -> ScrollContainer:
 	return scroll
 
 func _layout() -> void:
+	toolbar.vertical = size.x < 400
 	split.vertical = size.x < 620 and get_viewport_rect().size.y >= 420
 	list_scroll.custom_minimum_size = Vector2(0 if split.vertical else (160 if size.x < 620 else 210), 115 if split.vertical else 0)
 	list_scroll.size_flags_stretch_ratio = 0.55 if split.vertical else 0.65
@@ -74,11 +78,15 @@ func _refresh() -> void:
 		if first.is_empty():
 			first = entry
 		var button := Button.new()
+		button.mouse_filter = Control.MOUSE_FILTER_PASS
 		button.text = entry.title
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.clip_text = true
 		button.custom_minimum_size.y = 48
 		DentiUIStyle.style_button(button, false, true)
+		if entry.get("evolved", false):
+			DentiUIStyle.style_card(button, 4, WeaponPresentation.EVOLUTION_COLOR)
+			button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.toggle_mode = true
 		button.button_group = group
 		button.set_meta("entry", entry)
@@ -128,7 +136,10 @@ func _show(entry: Dictionary) -> void:
 	var compact := get_viewport_rect().size.y < 420
 	if entry.has("icon"):
 		_image(header, entry.icon, entry.get("locked", false), 40 if compact else 80)
-	ShopDetails._label(header, entry.title, 18 if compact else 22).size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var title := ShopDetails._label(header, entry.title, 18 if compact else 22)
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	if entry.get("evolved", false):
+		title.add_theme_color_override("font_color", WeaponPresentation.EVOLUTION_COLOR)
 	ShopDetails._label(detail, entry.body, 16)
 	if entry.has("recipe"):
 		ShopDetails._label(detail, "Fusion", 20)

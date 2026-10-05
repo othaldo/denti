@@ -1,6 +1,21 @@
 class_name WeaponPresentation
 extends RefCounted
 
+const EVOLUTION_COLOR := Color("ff3038")
+
+
+# Evolutions keep tier IV internally for combat values and legacy saves.
+static func tier_text(data: WeaponData, tier: int) -> String:
+	return "Mk V" if data != null and data.evolution_kind != &"" else "Mk " + ["I", "II", "III", "IV"][clampi(tier, 1, 4) - 1]
+
+
+static func tier_color(data: WeaponData, tier: int) -> Color:
+	return EVOLUTION_COLOR if data != null and data.evolution_kind != &"" else DentiRarity.color_for(tier)
+
+
+static func special_color(data: WeaponData) -> Color:
+	return EVOLUTION_COLOR if data != null and data.evolution_kind != &"" else Color.TRANSPARENT
+
 
 static func role(data: WeaponData) -> String:
 	if not data.role.is_empty():

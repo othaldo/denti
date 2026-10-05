@@ -118,11 +118,11 @@ static func style_rarity_label(label: Label, tier: int) -> void:
 	label.add_theme_font_size_override("font_size", 13)
 
 
-static func style_card(button: Button, tier: int = 1) -> void:
+static func style_card(button: Button, tier: int = 1, color: Color = Color.TRANSPARENT) -> void:
 	style_button(button)
-	var accent := DentiRarity.color_for(tier)
+	var accent := color if color.a > 0 else DentiRarity.color_for(tier)
 	var fill := PANEL.lerp(accent, 0.16)
-	var normal := rarity_surface(tier)
+	var normal := rarity_surface(tier, color)
 	button.add_theme_stylebox_override("normal", normal)
 	var hover := _box(fill.lightened(0.035), accent.lightened(0.35), 14, 2)
 	button.add_theme_stylebox_override("hover", hover)
@@ -132,14 +132,14 @@ static func style_card(button: Button, tier: int = 1) -> void:
 	button.add_theme_stylebox_override("disabled", _box(fill.darkened(0.08), accent.darkened(0.15), 14, 2))
 
 
-static func rarity_surface(tier: int) -> StyleBoxFlat:
-	var accent := DentiRarity.color_for(tier)
-	var style := _box(PANEL.lerp(accent, 0.16), accent.lightened(0.20), 14, 2)
+static func rarity_surface(tier: int, color: Color = Color.TRANSPARENT) -> StyleBoxFlat:
+	var accent := color if color.a > 0 else DentiRarity.color_for(tier)
+	var style := _box(PANEL.lerp(accent, 0.16), accent if color.a > 0 else accent.lightened(0.20), 14, 2)
 	return style
 
 
-static func style_rarity_panel(panel: PanelContainer, tier: int) -> void:
-	panel.add_theme_stylebox_override("panel", rarity_surface(tier))
+static func style_rarity_panel(panel: PanelContainer, tier: int, color: Color = Color.TRANSPARENT) -> void:
+	panel.add_theme_stylebox_override("panel", rarity_surface(tier, color))
 	mark_card(panel)
 
 

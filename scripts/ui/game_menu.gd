@@ -373,7 +373,7 @@ func _show_stats() -> void:
 	rows.add_child(weapons)
 	for weapon in game.player.loadout.equipped():
 		var chip := Button.new()
-		chip.text = ["I", "II", "III", "IV"][weapon.tier - 1]
+		chip.text = WeaponPresentation.tier_text(weapon.data, weapon.tier)
 		chip.icon = weapon.data.sprite
 		chip.expand_icon = true
 		chip.add_theme_constant_override("icon_max_width", 32)
@@ -381,7 +381,7 @@ func _show_stats() -> void:
 		chip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		chip.size_flags_stretch_ratio = float(weapon.data.hands)
 		chip.tooltip_text = "%s\n%s\n%s" % [weapon.data.display_name, weapon.data.stats_text(weapon.tier), weapon.data.combat_text()]
-		DentiUIStyle.style_button(chip)
+		DentiUIStyle.style_card(chip, weapon.tier, WeaponPresentation.special_color(weapon.data))
 		weapons.add_child(chip)
 		chip.pressed.connect(_show_weapon_details.bind(weapon.data, weapon.tier))
 	_button("Zurück", _show_home, true)

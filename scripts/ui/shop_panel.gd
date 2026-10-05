@@ -3,6 +3,7 @@ extends CanvasLayer
 
 const ICONS: Script = preload("res://scripts/ui/denti_ui_icons.gd")
 const RELOAD_ICON: Texture2D = preload("res://assets/ui/reload_light.svg")
+const UPGRADE_ICON: Texture2D = preload("res://assets/ui/upgrade_ready.svg")
 signal buy_requested(index: int)
 signal sell_requested(index: int)
 signal merge_requested(index: int)
@@ -479,6 +480,11 @@ func _render_selection() -> void:
 	if tier > 0:
 		DentiUIStyle.style_rarity_panel(details_panel, tier)
 		details_panel.tooltip_text = "Seltenheit: " + DentiRarity.name_for(tier)
+		if selected_kind == "equipment":
+			var data: WeaponData = equipment[selected_index].get("data")
+			if data != null and data.evolution_kind != &"":
+				DentiUIStyle.style_rarity_panel(details_panel, tier, WeaponPresentation.EVOLUTION_COLOR)
+				details_panel.tooltip_text = "Spezialwaffe · Mk V"
 	else:
 		DentiUIStyle.style_chip(details_panel)
 		details_panel.tooltip_text = ""
@@ -507,6 +513,8 @@ func _render_selection() -> void:
 		details.merge_button.disabled = not bool(entry.mergeable)
 		details.merge_button.mouse_default_cursor_shape = Control.CURSOR_ARROW if details.merge_button.disabled else Control.CURSOR_POINTING_HAND
 		details.merge_button.text = "Maximale Stufe IV" if tier == 4 else "Fusionieren · Stufe %s" % ["I", "II", "III", "IV"][tier]
+		if data.evolution_kind != &"":
+			details.merge_button.text = "Maximale Stufe V"
 		if bool(entry.mergeable):
 			details.action_hint.text = "%s frei\n%s" % [data.roots_text(), WeaponPresentation.comparison(data, tier + 1, data, tier, player)]
 		else:
@@ -522,7 +530,7 @@ func _render_selection() -> void:
 		details.show_weapon(offer.weapon_data, offer.weapon_tier, player, false, equipment)
 		details.compare.clear()
 		for entry in equipment:
-			details.compare.add_item("Vergleichen: %s · %s" % [entry.name, ["I", "II", "III", "IV"][int(entry.tier)-1]])
+			details.compare.add_item("Vergleichen: %s · %s" % [entry.name, WeaponPresentation.tier_text(entry.get("data"), int(entry.tier))])
 		_compare(0)
 	else:
 		details.show_item({"name": offer.display_name, "description": offer.effect_text() + "\n" + offer.limit_text(), "icon": offer.icon_texture if offer.icon_texture != null else ICONS.item(offer.icon_index)}, false)
@@ -573,9 +581,11 @@ func _show_inventory(entries: Array[Dictionary], used_slots: int, capacity: int)
 		slot.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		slot.size_flags_stretch_ratio = float(entry.get("hands", 1))
 		inventory_row.add_child(slot)
-		var tier: String = ["I", "II", "III", "IV"][int(entry.tier)-1]
+		var data: WeaponData = entry.get("data")
+		var tier := WeaponPresentation.tier_text(data, int(entry.tier))
+		var color := WeaponPresentation.tier_color(data, int(entry.tier))
 		var button := _button(slot, "")
-		DentiUIStyle.style_card(button, int(entry.tier))
+		DentiUIStyle.style_card(button, int(entry.tier), WeaponPresentation.special_color(data))
 		button.set_meta("hands", int(entry.get("hands", 1)))
 		var icon := TextureRect.new()
 		icon.name = "WeaponIcon"
@@ -592,11 +602,11 @@ func _show_inventory(entries: Array[Dictionary], used_slots: int, capacity: int)
 		var tier_label := Label.new()
 		tier_label.name = "WeaponTier"
 		tier_label.text = tier
-		tier_label.add_theme_font_size_override("font_size", 15)
-		tier_label.add_theme_color_override("font_color", DentiUIStyle.INK)
+		tier_label.add_theme_font_size_override("font_size", 12)
+		tier_label.add_theme_color_override("font_color", DentiUIStyle.GOLD_INK if data != null and data.evolution_kind != &"" else DentiUIStyle.INK)
 		var tier_badge := StyleBoxFlat.new()
-		tier_badge.bg_color = DentiUIStyle.PANEL.lerp(DentiRarity.color_for(int(entry.tier)), 0.16)
-		tier_badge.border_color = DentiRarity.color_for(int(entry.tier)).lightened(0.20)
+		tier_badge.bg_color = color if data != null and data.evolution_kind != &"" else DentiUIStyle.PANEL.lerp(color, 0.16)
+		tier_badge.border_color = color
 		tier_badge.set_border_width_all(1)
 		tier_badge.set_corner_radius_all(4)
 		tier_badge.content_margin_left = 3
@@ -607,12 +617,33 @@ func _show_inventory(entries: Array[Dictionary], used_slots: int, capacity: int)
 		tier_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		button.add_child(tier_label)
 		tier_label.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
-		tier_label.offset_left = -33
+		tier_label.offset_left = -51
 		tier_label.offset_top = -27
 		tier_label.offset_right = -5
 		tier_label.offset_bottom = -3
-		button.tooltip_text = "%s · Stufe %s\n%s\n%s\n%s\nca. %.1f DPS pro Ziel\nAntippen: Details, verkaufen oder fusionieren" % [entry.name, tier, entry.description, entry.combat, entry.stats, entry.dps]
-		button.tooltip_text += "\nSeltenheit: " + DentiRarity.name_for(int(entry.tier))
+		button.tooltip_text = "%s · %s\n%s\n%s\n%s\nca. %.1f DPS pro Ziel\nAntippen: Details, verkaufen oder fusionieren" % [entry.name, tier, entry.description, entry.combat, entry.stats, entry.dps]
+		button.tooltip_text += "\n" + ("Spezialwaffe" if data != null and data.evolution_kind != &"" else "Seltenheit: " + DentiRarity.name_for(int(entry.tier)))
+		var evolution_ready := player != null and not player.loadout.ready_evolutions(index, player.items).is_empty()
+		if bool(entry.get("mergeable", false)) or evolution_ready:
+			var indicator := PanelContainer.new()
+			indicator.name = "UpgradeReady"
+			indicator.custom_minimum_size = Vector2(28, 28)
+			var badge := DentiUIStyle._box(DentiUIStyle.MINT, DentiUIStyle.MINT, 7, 0)
+			badge.content_margin_left = 4
+			badge.content_margin_right = 4
+			badge.content_margin_top = 4
+			badge.content_margin_bottom = 4
+			indicator.add_theme_stylebox_override("panel", badge)
+			indicator.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			button.add_child(indicator)
+			indicator.position = Vector2(5, 3)
+			var arrow := TextureRect.new()
+			arrow.texture = UPGRADE_ICON
+			arrow.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			arrow.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			arrow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			indicator.add_child(arrow)
+			button.tooltip_text += "\n" + ("Evolution zu Mk V möglich" if evolution_ready else "Fusion zur nächsten Stufe möglich")
 		button.pressed.connect(_select.bind("equipment", index))
 		button.gui_input.connect(_on_inventory_input.bind(index))
 	for index in maxi(capacity - used_slots, 0):
@@ -633,7 +664,7 @@ func _highlight_equipment() -> void:
 			var a: WeaponData = equipment[selected_index].get("data")
 			var b: WeaponData = equipment[index].get("data")
 			partner = a != null and b != null and a.id == b.id and equipment[index].tier == equipment[selected_index].tier and int(equipment[index].tier) < 4
-		DentiUIStyle.style_card(button, int(equipment[index].tier))
+		DentiUIStyle.style_card(button, int(equipment[index].tier), WeaponPresentation.special_color(equipment[index].get("data")))
 		var selected := expanded and selected_kind == "equipment" and selected_index == index
 		DentiUIStyle.mark_card(button, DentiUIStyle.INK if selected else (DentiUIStyle.MINT if partner else Color.TRANSPARENT))
 	for index in items_row.get_child_count():

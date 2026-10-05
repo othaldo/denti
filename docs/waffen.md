@@ -72,6 +72,11 @@ Die Ausrüstung fasst sechs Wurzelplätze. Waffen mit einer Wurzel belegen einen
 
 Bohrung verursacht je nach Stufe 25–40 % mehr Schaden gegen Bosse. Schnitt verursacht 15 % mehr Schaden gegen nahezu unverletzte Gegner und baut Blutung auf. Wasserflosser-Treffer machen Gegner nass. Nass senkt das Lauftempo um 20 %, bei Eliten um 10 % und bei Bossen um 5 %; angekündigte Anstürme bleiben unverändert. Erneute Treffer frischen die Dauer auf, ohne den Slow zu stapeln. [Nassregeln und Tests](WET_STATUS.md). Die anderen Schadensarten unterscheiden sich über Reichweite, Projektiltempo, Durchschlag, Rückstoß, Strahl oder Flächentreffer. Gegner haben derzeit keine elementaren Resistenzen. Die Waffen haben individuelle Schadensmultiplikatoren und ausgewählte Eigenschaften, die mit ihrer Stufe wachsen.
 
+Weiterentwickelte Spezialwaffen werden als **Mk V** mit kräftig rotem Rahmen und
+Stufenabzeichen angezeigt. Ein grüner Aufwärtspfeil direkt auf der ausgerüsteten
+Waffe im Shop zeigt eine verfügbare Fusion oder Evolution an. Er erscheint nur,
+wenn der passende Fusionspartner beziehungsweise alle Evolutionszutaten vorliegen.
+
 ## Haltung und Angriffe
 
 Alle 18 Waffen haben einen Griffpunkt und einen eigenen Abschuss- beziehungsweise

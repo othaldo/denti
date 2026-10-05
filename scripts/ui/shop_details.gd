@@ -76,9 +76,10 @@ func show_weapon(data: WeaponData, tier: int, player: Player, equipped: bool, eq
 	clear_actions()
 	heading.text = data.display_name
 	icon.texture = data.sprite
-	subtitle.text = "%s · Stufe %s · %s · %s" % ["Ausgerüstet" if equipped else "Angebot", ["I", "II", "III", "IV"][tier - 1], data.roots_text(), data.damage_type_label()]
+	subtitle.text = "%s · %s · %s · %s" % ["Ausgerüstet" if equipped else "Angebot", WeaponPresentation.tier_text(data, tier), data.roots_text(), data.damage_type_label()]
+	subtitle.add_theme_color_override("font_color", WeaponPresentation.EVOLUTION_COLOR if data.evolution_kind != &"" else DentiUIStyle.INK)
 	if data.evolution_kind != &"":
-		subtitle.text = "Spezialwaffe · %s · %s" % [data.roots_text(), data.damage_type_label()]
+		subtitle.text = "Spezialwaffe · Mk V · %s · %s" % [data.roots_text(), data.damage_type_label()]
 	var current := WeaponPresentation.values(data, tier, player)
 	_clear_values()
 	_value("Treffer", "%.1f" % current.damage)
@@ -110,6 +111,7 @@ func show_item(entry: Dictionary, owned: bool) -> void:
 	heading.text = str(entry.get("name", "Item"))
 	icon.texture = entry.get("icon")
 	subtitle.text = "×%d" % int(entry.get("count", 1)) if owned else "Item"
+	subtitle.add_theme_color_override("font_color", DentiUIStyle.INK)
 	_clear_values()
 	effect.text = DentiAttributes.resolve_text(str(entry.get("description", "")))
 	effect.visible = not effect.text.is_empty()

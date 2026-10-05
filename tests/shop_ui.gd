@@ -96,6 +96,14 @@ func _run() -> void:
 	game._update_shop_panel()
 	await process_frame
 	game.shop_panel.inventory_row.get_child(0).get_child(0).pressed.emit()
+	for index in 2:
+		if game.shop_panel.inventory_row.get_child(index).get_child(0).get_node_or_null("UpgradeReady") == null:
+			_fail("matching weapons have no visible fusion indicator")
+			return
+		var indicator: PanelContainer = game.shop_panel.inventory_row.get_child(index).get_child(0).get_node("UpgradeReady")
+		if indicator.get_child(0).texture == null or indicator.mouse_filter != Control.MOUSE_FILTER_IGNORE:
+			_fail("fusion indicator lacks artwork or blocks inspection")
+			return
 	var merge_button: Button = game.shop_panel.details.merge_button
 	if merge_button.disabled or not merge_button.visible or not _inside(panel.get_global_rect(), Vector2(1280, 720)):
 		_fail("touch merge button or shop layout missing: %s / %s" % [merge_button.text, panel.get_global_rect()])
@@ -105,6 +113,9 @@ func _run() -> void:
 		_fail("touch merge button did not fuse matching weapons")
 		return
 	var fused_button: Button = game.shop_panel.inventory_row.get_child(0).get_child(0)
+	if fused_button.get_node_or_null("UpgradeReady") != null:
+		_fail("fusion indicator remains after consuming partner")
+		return
 	if not _rarity_matches(fused_button.get_theme_stylebox("normal"), 2) or not _rarity_matches(game.shop_panel.details_panel.get_theme_stylebox("panel"), 2):
 		_fail("fusion did not update inventory and expanded detail rarity together")
 		return
