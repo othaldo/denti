@@ -72,7 +72,7 @@ Auf Normal fällt Gold in Welle 1–4 garantiert und sinkt bis Welle 20 auf 70 %
 
 Das Spiel ist ein **spielbarer Prototyp**. Balancing, Effekte und weitere Inhalte sind noch in Arbeit.
 
-**0.3.0** bündelt die Änderungen seit 0.2.0: unter anderem Endlosmodus, zusätzliche Waffen und Items, mobile Bedienung und Performance-Arbeit. Gewöhnliche Gegner starten mit 35 % weniger HP; die Erleichterung läuft sanft bis Welle 10 aus, danach gilt die bisherige Kurve. Bosse und Eliten behalten ihre Kampfwerte. Die [Patchnotes](CHANGELOG.md) dokumentieren den Stand.
+**0.3.0** bündelt die Änderungen seit 0.2.0: unter anderem Endlosmodus, zusätzliche Waffen und Items, mobile Bedienung und Performance-Arbeit. Gewöhnliche Gegner starten mit 65 % weniger HP; die Erleichterung läuft sanft bis Welle 10 aus, danach gilt die bisherige Kurve. Bosse und Eliten behalten ihre Kampfwerte. Die [Patchnotes](CHANGELOG.md) dokumentieren den Stand.
 
 **0.2.0 · Pressure + Build Depth** bündelte mehr Gegnerdruck, häufigere Horden, Bullet-Hell-Muster, neue Bossmechaniken, seltene Item-Kisten mit Behalten/Scrappen und mehr Synergien. Die [Patchnotes](CHANGELOG.md) beschreiben die Änderungen gegenüber 0.1.0. Weitere Balance-Arbeit und geplante Ausbaustufen stehen in der [Roadmap](docs/ROADMAP.md).
 

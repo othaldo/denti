@@ -196,7 +196,9 @@ func _run() -> void:
 		return
 	game._spawn_enemy(load("res://data/enemies/plaque.tres"))
 	var wave_two_enemy: Enemy = game.get_node("Enemies").get_child(-1)
-	if wave_two_enemy.health <= wave_two_enemy.data.max_health:
+	var wave_one_health := wave_two_enemy.data.max_health * WaveController.health_multiplier(wave_two_enemy.data, 1)
+	var wave_two_health := wave_two_enemy.data.max_health * WaveController.health_multiplier(wave_two_enemy.data, 2)
+	if wave_two_enemy.max_health <= wave_one_health or not is_equal_approx(wave_two_enemy.max_health, wave_two_health):
 		_fail("enemy health did not scale in wave two")
 		return
 	game._spawn_loot(player.position + Vector2(50.0, 0.0), &"xp", game.xp_goal)

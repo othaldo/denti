@@ -63,6 +63,10 @@ func _run() -> void:
 	game._create_enemy(WaveController.PLAQUE, game.player.position + Vector2(180.0, 0.0))
 	var first: Enemy = game.get_node("Enemies").get_child(0)
 	var second: Enemy = game.get_node("Enemies").get_child(1)
+	# Test repeated item effects on living targets, independent of opening HP balance.
+	for enemy in [first, second]:
+		enemy.max_health = 1000.0
+		enemy.health = enemy.max_health
 	var second_before := second.health
 	first.take_damage(5.0, water)
 	if second.health >= second_before:
