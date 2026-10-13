@@ -57,9 +57,12 @@ func _run() -> void:
 		_fail("dodging during the windup did not avoid the spear")
 		return
 	_clear()
-	target = _enemy(Vector2(100, 0))
-	var far := _enemy(Vector2(180, 0))
-	var behind := _enemy(Vector2(-100, 0))
+	# Real wave-10 HP survives the thrust and is preserved by save/resume.
+	game.wave.current_wave = 10
+	target = _enemy(Vector2(100, 0), true)
+	var far := _enemy(Vector2(180, 0), true)
+	var behind := _enemy(Vector2(-100, 0), true)
+	var snapshot_health := target.health
 	spear = _equip(&"toothpick_spear")
 	spear._physics_process(0.01)
 	# Save while winding up; then restore and cross the entire active stroke in one frame.
@@ -73,11 +76,17 @@ func _run() -> void:
 	far = game.get_node("Enemies").get_child(1)
 	behind = game.get_node("Enemies").get_child(2)
 	var restored_health := target.health
+	if not is_equal_approx(restored_health, snapshot_health):
+		_fail("windup restore changed the target's health")
+		return
 	spear._physics_process(spear.attack_duration * 0.55)
 	if target.health >= restored_health or far.health >= restored_health or behind.health != restored_health:
 		_fail("restored swept thrust missed its line or hit behind Denti")
 		return
 	var after_contact := target.health
+	if target.dying or after_contact <= 0.0:
+		_fail("save/resume fixture died before the second snapshot")
+		return
 	snapshot = RunSnapshot.capture(game)
 	_clear()
 	RunSnapshot.restore(game, snapshot)
@@ -85,11 +94,15 @@ func _run() -> void:
 	spear = game.player.loadout.equipped()[0]
 	spear.set_physics_process(false)
 	target = game.get_node("Enemies").get_child(0)
+	if not is_equal_approx(target.health, after_contact):
+		_fail("contact restore changed the target's health")
+		return
 	spear._physics_process(spear.attack_time)
 	if target.health != after_contact:
 		_fail("resume hit an enemy twice in the same stroke")
 		return
 	_clear()
+	game.wave.current_wave = 1
 	target = _enemy(Vector2(85, 0))
 	var slash := _equip(&"plaque_scaler")
 	slash._physics_process(0.01)
@@ -149,11 +162,12 @@ func _equip(id: StringName) -> WeaponInstance:
 	weapon.set_physics_process(false)
 	return weapon
 
-func _enemy(offset: Vector2) -> Enemy:
+func _enemy(offset: Vector2, use_scaled_health: bool = false) -> Enemy:
 	game._create_enemy(WaveController.PLAQUE, game.player.global_position + offset)
 	var enemy: Enemy = game.get_node("Enemies").get_child(-1)
-	enemy.health = 10000
-	enemy.max_health = 10000
+	if not use_scaled_health:
+		enemy.health = 10000
+		enemy.max_health = 10000
 	enemy.set_physics_process(false)
 	return enemy
 

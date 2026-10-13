@@ -48,17 +48,13 @@ func _run() -> void:
 	game.wave.current_wave = 1
 	game._create_enemy(plaque, game.player.global_position + Vector2(300.0, 0.0))
 	var opening_mob: Enemy = game.get_node("Enemies").get_child(0)
-	if not is_equal_approx(opening_mob.max_health, 23.4):
+	if not is_equal_approx(opening_mob.max_health, 12.6):
 		_fail("opening enemy instance did not receive reduced health")
 		return
 	var starter: WeaponData = WeaponCatalog.by_id(&"plaque_scaler")
 	opening_mob.take_damage(starter.base_damage)
-	if opening_mob.health <= 0.0:
-		_fail("opening plaque should still survive one scaler hit")
-		return
-	opening_mob.take_damage(starter.base_damage)
 	if opening_mob.health > 0.0:
-		_fail("opening plaque survives two starter scaler hits")
+		_fail("opening plaque survives one starter scaler hit")
 		return
 	await process_frame
 	game.wave.current_wave = 12
@@ -92,7 +88,7 @@ func _check_opening_curve() -> bool:
 			if wave_number >= 10 and not is_equal_approx(health, original_health):
 				_fail("opening adjustment changed middle/late health: %s, wave %d" % [data.display_name, wave_number])
 				return false
-			if wave_number == 1 and not is_equal_approx(health, data.max_health * 0.65):
+			if wave_number == 1 and not is_equal_approx(health, data.max_health * 0.35):
 				_fail("opening health reduction missing: %s" % data.display_name)
 				return false
 			previous_health = health
