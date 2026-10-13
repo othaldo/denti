@@ -2,7 +2,7 @@
 
 Ein kleiner 2D-Arena-Survivor über einen göttlichen Backenzahn, der Plaque, Zucker und Karies den Kampf ansagt. Du steuerst Denti direkt; seine Waffen greifen automatisch an. Zwischen den Wellen entscheiden Levelaufstiege und Einkäufe, wie der nächste Kampf läuft.
 
-**Aktuelle Version: 0.2.0 · Pressure + Build Depth.** Alle Änderungen seit 0.1 stehen in der [Patchnote-Historie](CHANGELOG.md).
+**Aktuelle Version: 0.3.0.** Alle Änderungen seit 0.1 stehen in der [Patchnote-Historie](CHANGELOG.md).
 
 ![Denti kämpft in Welle 4 gegen Plaque, Bakterien, Zucker und Säurespucker](docs/screenshots/kampf.png)
 
@@ -38,7 +38,7 @@ Das Projekt mit **Godot 4.4 oder neuer** öffnen und mit **F5** starten. Unter L
 ./play.sh
 ```
 
-`play.sh` nutzt `/usr/local/bin/godot`, falls vorhanden, sonst `godot` aus dem `PATH`. Mit `DENTI_GODOT_BIN=/pfad/zu/godot ./play.sh` lässt sich eine andere Installation wählen. `./play.sh --probe` misst die Bildrate im Fenster, im Vollbild und mit 100 Gegnern.
+`play.sh` aktualisiert vor jedem Start den Godot-Klassen-Cache und die Asset-Imports, damit neue Dateien nach Git-Updates erkannt werden. Es nutzt `/usr/local/bin/godot`, falls vorhanden, sonst `godot` aus dem `PATH`. Mit `DENTI_GODOT_BIN=/pfad/zu/godot ./play.sh` lässt sich eine andere Installation wählen. `./play.sh --probe` misst die Bildrate im Fenster, im Vollbild und mit 100 Gegnern.
 
 | Eingabe | Aktion |
 | --- | --- |
@@ -72,7 +72,9 @@ Auf Normal fällt Gold in Welle 1–4 garantiert und sinkt bis Welle 20 auf 70 %
 
 Das Spiel ist ein **spielbarer Prototyp**. Balancing, Effekte und weitere Inhalte sind noch in Arbeit.
 
-**0.2.0 · Pressure + Build Depth** bündelt mehr Gegnerdruck, häufigere Horden, Bullet-Hell-Muster, neue Bossmechaniken, seltene Item-Kisten mit Behalten/Scrappen und mehr Synergien. Die [Patchnotes](CHANGELOG.md) beschreiben die Änderungen gegenüber 0.1.0. Weitere Balance-Arbeit und geplante Ausbaustufen stehen in der [Roadmap](docs/ROADMAP.md).
+**0.3.0** bündelt die Änderungen seit 0.2.0: unter anderem Endlosmodus, zusätzliche Waffen und Items, mobile Bedienung und Performance-Arbeit. Gewöhnliche Gegner starten mit 35 % weniger HP; die Erleichterung läuft sanft bis Welle 10 aus, danach gilt die bisherige Kurve. Bosse und Eliten behalten ihre Kampfwerte. Die [Patchnotes](CHANGELOG.md) dokumentieren den Stand.
+
+**0.2.0 · Pressure + Build Depth** bündelte mehr Gegnerdruck, häufigere Horden, Bullet-Hell-Muster, neue Bossmechaniken, seltene Item-Kisten mit Behalten/Scrappen und mehr Synergien. Die [Patchnotes](CHANGELOG.md) beschreiben die Änderungen gegenüber 0.1.0. Weitere Balance-Arbeit und geplante Ausbaustufen stehen in der [Roadmap](docs/ROADMAP.md).
 
 ## Entwicklung
 

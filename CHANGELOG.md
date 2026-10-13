@@ -2,7 +2,9 @@
 
 Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü angezeigt. 0.1.0 wurde rückblickend anhand der Git-Historie dokumentiert; 0.2.0 bündelt die seitdem entstandenen Änderungen. Die Einträge beschreiben implementierte Funktionen. Weitere Pläne stehen in der [Roadmap](docs/ROADMAP.md).
 
-## In Entwicklung
+## 0.3.0 — 08.10.2026
+
+- **Sanfterer Einstieg:** gewöhnliche Gegner beginnen mit 65 % ihrer bisherigen HP. Ein weicher Übergang bringt sie bis Welle 10 auf die bisherige Kurve zurück. Gegnerrollen, Rüstung, Schaden, Spawn-Dichte, Bosse, Eliten und Endlosskalierung bleiben unverändert. Mehr frühe Kills können entsprechend mehr frühe Beute ermöglichen.
 
 - **Lane-Warnflächen im Atlas:** rechteckige Warnflächen wechseln nicht mehr zwischen Polygon- und Atlaszeichnung. Darstellung im nativen Pixelvergleich identisch; isoliert 60 Lanes: 120 → 1 Zeichenaufruf. Keine zusätzlichen Bilddaten oder weniger Angriffe. [Vergleich und Grenzen](docs/WARNING_LANE_PERFORMANCE.md).
 

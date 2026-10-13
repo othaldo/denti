@@ -15,8 +15,7 @@ func _run() -> void:
 		if normal.health_per_wave <= 0.0 or normal.late_health_acceleration <= 0.0:
 			_fail("normal enemy lacks its own health curve: %s" % normal.display_name)
 			return
-	if not is_equal_approx(plaque.max_health * WaveController.health_multiplier(plaque, 6), plaque.max_health + 5.0 * plaque.health_per_wave):
-		_fail("early-wave plaque health does not use its own curve")
+	if not _check_opening_curve():
 		return
 	var plaque_20 := plaque.max_health * WaveController.health_multiplier(plaque, 20)
 	var sugar_20 := sugar.max_health * WaveController.health_multiplier(sugar, 20)
@@ -46,6 +45,22 @@ func _run() -> void:
 	root.add_child(game)
 	current_scene = game
 	game.wave.active = false
+	game.wave.current_wave = 1
+	game._create_enemy(plaque, game.player.global_position + Vector2(300.0, 0.0))
+	var opening_mob: Enemy = game.get_node("Enemies").get_child(0)
+	if not is_equal_approx(opening_mob.max_health, 23.4):
+		_fail("opening enemy instance did not receive reduced health")
+		return
+	var starter: WeaponData = WeaponCatalog.by_id(&"plaque_scaler")
+	opening_mob.take_damage(starter.base_damage)
+	if opening_mob.health <= 0.0:
+		_fail("opening plaque should still survive one scaler hit")
+		return
+	opening_mob.take_damage(starter.base_damage)
+	if opening_mob.health > 0.0:
+		_fail("opening plaque survives two starter scaler hits")
+		return
+	await process_frame
 	game.wave.current_wave = 12
 	game._create_enemy(plaque, game.player.global_position + Vector2(350.0, 0.0))
 	var mob: Enemy = game.get_node("Enemies").get_child(0)
@@ -62,6 +77,34 @@ func _run() -> void:
 	session.clear_run()
 	print("Denti mob curve test passed")
 	quit(0)
+
+
+func _check_opening_curve() -> bool:
+	for data in [WaveController.PLAQUE, WaveController.BACTERIA, WaveController.SUGAR, WaveController.ACID_SPITTER, WaveController.POISON_GERM, WaveController.GUM_BITER]:
+		var previous_health := 0.0
+		for wave_number in range(1, 21):
+			var late_waves := maxi(wave_number - 6, 0)
+			var original_health: float = data.max_health + (wave_number - 1) * data.health_per_wave + late_waves * late_waves * data.late_health_acceleration
+			var health: float = data.max_health * WaveController.health_multiplier(data, wave_number)
+			if health < previous_health or health > original_health + 0.001:
+				_fail("opening curve regressed or exceeded original health: %s, wave %d" % [data.display_name, wave_number])
+				return false
+			if wave_number >= 10 and not is_equal_approx(health, original_health):
+				_fail("opening adjustment changed middle/late health: %s, wave %d" % [data.display_name, wave_number])
+				return false
+			if wave_number == 1 and not is_equal_approx(health, data.max_health * 0.65):
+				_fail("opening health reduction missing: %s" % data.display_name)
+				return false
+			previous_health = health
+	for data in [WaveController.ACID_CROWN, WaveController.HUNT_GERM, WaveController.CAVITY_COUNT]:
+		for wave_number in range(1, 11):
+			var step := 0.27 if data.is_boss else 0.17
+			var late_waves := maxi(wave_number - 6, 0)
+			var original_multiplier := 1.0 + (wave_number - 1) * step + (0.0 if data.is_boss else late_waves * late_waves * 0.018)
+			if not is_equal_approx(WaveController.health_multiplier(data, wave_number), original_multiplier):
+				_fail("opening adjustment changed boss/elite health")
+				return false
+	return true
 
 
 func _fail(message: String) -> void:

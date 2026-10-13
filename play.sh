@@ -11,11 +11,9 @@ else
 fi
 printf 'Godot: %s (%s)\n' "$godot_bin" "$("$godot_bin" --version)"
 
-class_cache="$project_dir/.godot/global_script_class_cache.cfg"
-if [[ ! -f "$class_cache" ]]; then
-	printf 'Godot class cache missing; importing project once...\n'
-	"$godot_bin" --headless --path "$project_dir" --editor --quit
-fi
+# Existing caches can be stale after pulling new scripts or assets.
+printf 'Updating Godot scripts and asset imports...\n'
+"$godot_bin" --headless --path "$project_dir" --editor --import
 
 if [[ "${1:-}" == "--probe" ]]; then
 	shift

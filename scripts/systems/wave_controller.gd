@@ -24,6 +24,8 @@ const SPAWN_INTERVAL_MIN := 0.24
 const BOSS_WAVE_SPAWN_INTERVAL_MIN := 0.30
 const MOB_HEALTH_WAVE_STEP := 0.17
 const MOB_HEALTH_LATE_ACCELERATION := 0.018
+const MOB_OPENING_HEALTH_FACTOR := 0.35
+const MOB_OPENING_END_WAVE := 10
 const BOSS_HEALTH_WAVE_STEP := 0.27
 const MOB_DEFENSE_WAVE_STEP := 0.01
 const MOB_DEFENSE_LATE_STEP := 0.004
@@ -153,13 +155,22 @@ static func health_multiplier(data: EnemyData, wave_number: int) -> float:
 		return health_multiplier(data, EndlessRules.baseline_wave(wave_number)) * EndlessRules.health_factor(wave_number)
 	if not data.is_boss and data.health_per_wave > 0.0:
 		var late_waves := maxi(wave_number - MOB_LATE_START_WAVE, 0)
-		return 1.0 + (maxi(wave_number - 1, 0) * data.health_per_wave + late_waves * late_waves * data.late_health_acceleration) / maxf(data.max_health, 1.0)
+		var multiplier := 1.0 + (maxi(wave_number - 1, 0) * data.health_per_wave + late_waves * late_waves * data.late_health_acceleration) / maxf(data.max_health, 1.0)
+		return multiplier * opening_health_factor(data, wave_number)
 	var step := BOSS_HEALTH_WAVE_STEP if data.is_boss else MOB_HEALTH_WAVE_STEP
 	var multiplier := 1.0 + maxi(wave_number - 1, 0) * step
 	if not data.is_boss:
 		var late_waves := maxi(wave_number - MOB_LATE_START_WAVE, 0)
 		multiplier += late_waves * late_waves * MOB_HEALTH_LATE_ACCELERATION
-	return multiplier
+	return multiplier * opening_health_factor(data, wave_number)
+
+
+static func opening_health_factor(data: EnemyData, wave_number: int) -> float:
+	if data.is_boss or data.is_elite or wave_number >= MOB_OPENING_END_WAVE:
+		return 1.0
+	# Smoothly rejoin the existing curve without a jump at the end of the opening.
+	var progress := clampf(float(wave_number - 1) / float(MOB_OPENING_END_WAVE - 1), 0.0, 1.0)
+	return lerpf(MOB_OPENING_HEALTH_FACTOR, 1.0, smoothstep(0.0, 1.0, progress))
 
 
 static func damage_reduction(data: EnemyData, wave_number: int) -> float:

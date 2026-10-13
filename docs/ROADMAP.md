@@ -1,6 +1,6 @@
 # Denti v0.2 Roadmap — Pressure + Build Depth
 
-Version **0.2.0** bundles the implemented changes on 2026-10-01; see the [patch history](../CHANGELOG.md). This document keeps the design rationale, progress notes and remaining plans. The six secret weapon evolutions are implemented as a first playable iteration; meta progression and other unfinished stages below remain future work.
+Version **0.3.0** bundles the implemented changes through 2026-10-08, including a gentler opening health curve for ordinary enemies that rejoins the existing curve at wave 10; see the [patch history](../CHANGELOG.md). This document keeps the design rationale, progress notes and remaining plans. The six secret weapon evolutions are implemented as a first playable iteration; meta progression and other unfinished stages below remain future work.
 
 This roadmap captures the current player feedback and the intended next development loop for Denti: Divine Dentistry.
 
