@@ -2,7 +2,7 @@
 
 Ein kleiner 2D-Arena-Survivor über einen göttlichen Backenzahn, der Plaque, Zucker und Karies den Kampf ansagt. Du steuerst Denti direkt; seine Waffen greifen automatisch an. Zwischen den Wellen entscheiden Levelaufstiege und Einkäufe, wie der nächste Kampf läuft.
 
-**Aktuelle Version: 0.4.0.** Alle Änderungen seit 0.1 stehen in der [Patchnote-Historie](CHANGELOG.md).
+**Aktuelle Version: 0.4.1.** Alle Änderungen seit 0.1 stehen in der [Patchnote-Historie](CHANGELOG.md).
 
 ![Denti kämpft in Welle 4 gegen Plaque, Bakterien, Zucker und Säurespucker](docs/screenshots/kampf.png)
 

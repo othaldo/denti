@@ -270,19 +270,21 @@ func _layout() -> void:
 	title_label.add_theme_font_size_override("font_size", 21 if narrow else 26)
 	for button in buttons:
 		button.custom_minimum_size = Vector2(0, 0)
+		button.content.alignment = BoxContainer.ALIGNMENT_BEGIN
 		button.icon_rect.custom_minimum_size = Vector2(0, 24 if narrow else 32)
 		button.name_label.custom_minimum_size.y = 24
 		button.name_label.add_theme_font_size_override("font_size", 16)
 		button.rarity_label.add_theme_font_size_override("font_size", 11)
 		button.effect_label.add_theme_font_size_override("font_size", 14)
 		button.content.add_theme_constant_override("separation", 3)
-		var card_width := (panel.custom_minimum_size.x - 44 - (16 if not narrow else 0)) / cards.columns
+		var outer_width := panel.get_theme_stylebox("panel").get_minimum_size().x + 24 + scroll.get_v_scroll_bar().get_combined_minimum_size().x
+		var card_width := (panel.custom_minimum_size.x - outer_width - (cards.columns - 1) * cards.get_theme_constant("h_separation")) / cards.columns
 		var text_width := maxf(card_width - 28, 100)
 		button._wrap_chest_text(button.name_label, button.name_label.text.replace("\n", " "), text_width)
 		button._wrap_chest_text(button.keep_label, button.keep_label.text.replace("\n", " "), text_width)
 		button._wrap_chest_text(button.effect_label, button.upgrade_description, text_width)
-		# Wrapped labels retain their previous width until the container sorts.
-		# Measure the freshly wrapped text, never that cached container minimum.
+		# Measure explicit lines including theme spacing; cached Label minima
+		# can still describe the previous text until the next container sort.
 		var height := 0.0
 		var visible_children := 0
 		for child: Control in button.content.get_children():
@@ -290,10 +292,9 @@ func _layout() -> void:
 				continue
 			visible_children += 1
 			if child is Label:
-				var font := child.get_theme_font("font")
-				var font_size := child.get_theme_font_size("font_size")
-				var text_height: float = font.get_height(font_size) * child.text.split("\n").size()
-				height += maxf(child.custom_minimum_size.y, text_height)
+				var line_count: int = child.text.split("\n").size()
+				var text_height: float = child.get_theme_font("font").get_height(child.get_theme_font_size("font_size")) * line_count + child.get_theme_constant("line_spacing") * maxi(line_count - 1, 0)
+				height += maxf(child.custom_minimum_size.y, ceilf(text_height))
 			else:
 				height += child.get_combined_minimum_size().y
 		button.custom_minimum_size.y = maxf(150 if narrow else 190, height + maxi(visible_children - 1, 0) * 3 + 24)

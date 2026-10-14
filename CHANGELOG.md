@@ -2,6 +2,11 @@
 
 Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü angezeigt. 0.1.0 wurde rückblickend anhand der Git-Historie dokumentiert; 0.2.0 bündelt die seitdem entstandenen Änderungen. Die Einträge beschreiben implementierte Funktionen. Weitere Pläne stehen in der [Roadmap](docs/ROADMAP.md).
 
+## 0.4.1 — 14.10.2026
+
+- **Affix-Kartenlayout korrigiert:** Zeilenabstände und tatsächlich verfügbare Kartenbreite werden bei der Größenberechnung berücksichtigt. Lange Texte und Fortschrittsbalken bleiben innerhalb der Karten; Symbole und Überschriften sind oben einheitlich ausgerichtet.
+- **Regressionstest erweitert:** vier belegte Affix-Slots, lange Fortschrittstexte, wiederholte Waffenwechsel und Inhaltsgrenzen auf Desktop- und Mobilgrößen geprüft.
+
 ## 0.4.0 — 14.10.2026
 
 - **Individuelle Waffen und Shop-Loot:** Waffen besitzen eigene gewürfelte Attribute, Affixe und Effekt-Slots. Mk-Stufe und Attributqualität werden getrennt dargestellt; Namen behalten ihre Mk-Angabe.

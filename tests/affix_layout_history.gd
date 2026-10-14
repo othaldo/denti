@@ -14,11 +14,11 @@ func _run() -> void:
 	game.wave.set_process(false)
 	paused = true
 	game.player.loadout.restore([
-		{"id": "magic_toothbrush", "tier": 4, "affix_slots": 3, "affixes": [{"id": "fire", "rarity": 4, "rank": 3, "damage": 35}]},
+		{"id": "magic_toothbrush", "tier": 4, "affix_slots": 4, "affixes": [{"id": "poison", "rarity": 4, "rank": 1, "damage": 39.8}, {"id": "range", "rarity": 2, "rank": 3, "damage": 12.5, "progress": 0.5}, {"id": "tempo", "rarity": 4, "rank": 3, "damage": 36, "progress": 0.5}, {"id": "bleed", "rarity": 4, "rank": 3, "damage": 66.8, "progress": 0.5}]},
 		{"id": "uv_lamp", "tier": 4, "affix_slots": 1, "affixes": [{"id": "range", "rarity": 4, "rank": 2, "damage": 30}]}
 	])
 	var panel: WeaponChestPanel = game.weapon_chest_panel
-	var reward := {"options": [{"id": "range", "rarity": 2, "damage": 7}, {"id": "fire", "rarity": 3, "damage": 14}, {"id": "slot", "rarity": 2, "damage": 0}], "replace": -1}
+	var reward := {"options": [{"id": "poison", "rarity": 4, "damage": 25}, {"id": "range", "rarity": 2, "damage": 7}, {"id": "ice", "rarity": 2, "damage": 7}], "replace": -1}
 	for extent in [Vector2i(1280, 720), Vector2i(360, 640), Vector2i(568, 320)]:
 		root.content_scale_size = extent
 		root.size = extent
@@ -27,6 +27,15 @@ func _run() -> void:
 			panel._select_weapon(target)
 			for frame in 8:
 				await process_frame
+			for card in panel.buttons:
+				for control in [card.icon_rect, card.name_label, card.keep_label, card.rarity_label, card.effect_label, card.progress_bar]:
+					if control.visible and not card.get_global_rect().grow(0.5).encloses(control.get_global_rect()):
+						push_error("Affix content escapes card at %s: %s / %s" % [extent, control.get_global_rect(), card.get_global_rect()])
+						quit(1)
+						return
+			if "--capture" in OS.get_cmdline_user_args() and target == 0:
+				await RenderingServer.frame_post_draw
+				root.get_texture().get_image().save_png("res://.godot/affix_full_%dx%d.png" % [extent.x, extent.y])
 			var expected := _snapshot(panel)
 			for repeat in 3:
 				panel._select_weapon(1 - target)
