@@ -21,7 +21,7 @@ Der zusätzliche Brotato-Hordenfaktor von 0,65 wird nicht übernommen: Dort gilt
 
 Die Goldsonde erhält zusätzlich einmal für den gesamten Effekt +1 Prozentpunkt je 10 Glück, höchstens +10 Prozentpunkte. Gesamtchance mit zwei Exemplaren: maximal 50 %. Der Extraktor prüft den ursprünglichen Gegnerwert: Eine verdoppelte normale Münze bekommt seinen Bonus nicht. Der Extraktorbonus selbst wird nicht verdoppelt. Mit beiden Items am Stapellimit ist der Drop daher 1/2 für normale Gegner, 4/6 für Zucker und 6/10 für Eliten.
 
-Die Werte werden genau einmal beim Tod des Gegners festgelegt und als fertige Beute gespeichert. Aufsammeln, Wellenende und Fortsetzen würfeln sie nicht erneut. Goldfüllung verstärkt anschließend den tatsächlich eingesammelten Wert; ihre Bruchteile bleiben gespeichert. Die neuen Effekte gelten nicht für Kisten-Zerlegen, Waffenverkauf, Zinsen oder Kill-Boni. Beide Items haben Basispreis 10 und Stufe Ungewöhnlich.
+Die Werte werden genau einmal beim Tod des Gegners festgelegt und als fertige Beute gespeichert. Aufsammeln, Wellenende und Fortsetzen würfeln sie nicht erneut. Goldfüllung verstärkt anschließend den tatsächlich eingesammelten Wert; ihre Bruchteile bleiben gespeichert. Die neuen Effekte gelten nicht für Upgrade-Kapseln-Zerlegen, Waffenverkauf, Zinsen oder Kill-Boni. Beide Items haben Basispreis 10 und Stufe Ungewöhnlich.
 
 ![Neue gemalte Economy-Icons](../assets/items/item_icons_economy.png)
 
@@ -31,7 +31,7 @@ Der transparente Atlas ergänzt die bestehenden gemalten Icons um Zellen 28/29. 
 
 Nach dem Loot-Sammeln hat jede Level-up-Auswahl einen kleinen Reload-Knopf mit Münzpreis. Links daneben stehen das gerade ausgewählte Level und der Münzbestand. Ein Reroll würfelt vier geeignete Stats neu und verbraucht weder XP noch eine ausstehende Auswahl. Es gilt weiter die Seltenheit des tatsächlich verdienten Levels, einschließlich der Meilensteine.
 
-Unsere Kostenformel ist `max(2, ceil(verdientes Level / 2)) + bisherige Rerolls dieser Auswahl`. Beispiele: Level 2: 2/3/4/... Münzen, Level 5: 3/4/5/..., Level 10: 5/6/7/... und Level 20: 10/11/12/.... Die eigene Preisfolge wächst mit dem Spielverlauf und setzt beim nächsten ausstehenden Level zurück. Unbezahlbare Rerolls sind deaktiviert. Kampf, Startwaffe, Kiste, Relikt und Shop bieten keine Level-up-Rerolls.
+Unsere Kostenformel ist `max(2, ceil(verdientes Level / 2)) + bisherige Rerolls dieser Auswahl`. Beispiele: Level 2: 2/3/4/... Münzen, Level 5: 3/4/5/..., Level 10: 5/6/7/... und Level 20: 10/11/12/.... Die eigene Preisfolge wächst mit dem Spielverlauf und setzt beim nächsten ausstehenden Level zurück. Unbezahlbare Rerolls sind deaktiviert. Kampf, Startwaffe, Upgrade-Kapsel, Relikt und Shop bieten keine Level-up-Rerolls.
 
 Save/Resume bewahrt die vier konkreten Angebote, verbleibende Münzen und Rerollzahl; ältere Spielstände beginnen bei der ersten Rerollgebühr und behalten ihre gespeicherten Angebote. Die Telemetrie erfasst diese Ausgaben separat als `level_reroll`.
 
@@ -58,7 +58,7 @@ Jeder Shop hat vier Angebote. „Merken“ reserviert ein Angebot kostenlos, auc
 
 Save/Resume erhält alle vier Angebote, ihre exakten Preise, Reservierungen und Rerollkosten, auch während der folgenden Kampfwelle. Alte Shops mit drei Plätzen behalten ihre Angebote, ausverkauften Plätze und Preise; nur der vierte Platz wird ergänzt. Alte gespeicherte Level-ups mit drei Optionen bleiben erhalten, neue Level-ups bieten vier verschiedene geeignete Stats.
 
-Kisten-Zerlegewerte bleiben zunächst bei 60 % des Item-Basispreises plus vorhandenen Itemboni. Waffenverkauf bleibt bei 50 % des tatsächlich investierten Kaufwertes. Diese Werte steigen daher nicht beide pauschal mit der Shopinflation.
+Upgrade-Kapseln-Zerlegewerte bleiben zunächst bei 60 % des Item-Basispreises plus vorhandenen Itemboni. Waffenverkauf bleibt bei 50 % des tatsächlich investierten Kaufwertes. Diese Werte steigen daher nicht beide pauschal mit der Shopinflation.
 
 ## Darstellung
 
@@ -89,7 +89,7 @@ Die [Vorher-Messung](economy_combat_before_gold_update.json) wurde unmittelbar v
 
 Die Messungen verwenden unsterbliches Denti, eine vorgegebene Ellipsenbewegung, konfigurierte Waffen/Stats und keine Economy-Items oder Shopkäufe. Sie erfassen eingesammeltes und bei Zeitablauf auf dem Boden liegendes Gold. Bosswelle 10 endet für die Messung am normalen Zeitlimit, nicht erst nach einem verlängerten Bosskampf. Die Builds belegen keine vollständige, erreichbare Kaufhistorie. Rendering-/Frame-Reihenfolge kann die Kampfmessung trotz festem Seed leicht verändern. Diese Ergebnisse prüfen die laufende Kampf- und Drop-Implementierung; manuelle Runs bleiben für die endgültige Balance erforderlich.
 
-Die Telemetrie speichert pro Welle Einnahmequellen (Drops, Pickup-Items, Kill-Items, Zinsen, Kisten, Waffenverkauf) und Shopausgaben getrennt nach Waffen, Items und Rerolls. So lässt sich ein realer Run anschließend auf Kaufkraft untersuchen.
+Die Telemetrie speichert pro Welle Einnahmequellen (Drops, Pickup-Items, Kill-Items, Zinsen, Upgrade-Kapseln, Waffenverkauf) und Shopausgaben getrennt nach Waffen, Items und Rerolls. So lässt sich ein realer Run anschließend auf Kaufkraft untersuchen.
 
 Die vollständige Testsuite mit 49 Skripten besteht. Neue Integrationstests prüfen bezahlte und unbezahlbare Rerolls, Reset pro ausstehendem Level, die separate Level-9-/Level-10-Seltenheit, alte und neue Save/Resume-Daten, Stapellimits, begrenzte Glücksboni, fertige Dropwerte und die Kombination mit Goldfüllung. Layoutprüfungen umfassen auch den sichtbaren Münzstand und Reload-Knopf bei allen oben genannten Auflösungen.
 

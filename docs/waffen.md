@@ -73,7 +73,7 @@ Die Ausrüstung fasst sechs Wurzelplätze. Waffen mit einer Wurzel belegen einen
 Bohrung verursacht je nach Stufe 25–40 % mehr Schaden gegen Bosse. Schnitt verursacht 15 % mehr Schaden gegen nahezu unverletzte Gegner und baut Blutung auf. Wasserflosser-Treffer machen Gegner nass. Nass senkt das Lauftempo um 20 %, bei Eliten um 10 % und bei Bossen um 5 %; angekündigte Anstürme bleiben unverändert. Erneute Treffer frischen die Dauer auf, ohne den Slow zu stapeln. [Nassregeln und Tests](WET_STATUS.md). Die anderen Schadensarten unterscheiden sich über Reichweite, Projektiltempo, Durchschlag, Rückstoß, Strahl oder Flächentreffer. Einige Gegner haben Affix-Resistenzen, sichtbar als farbige Schilde; Grundtreffer bleiben davon unberührt. Die Waffen haben individuelle Schadensmultiplikatoren und ausgewählte Eigenschaften, die mit ihrer Stufe wachsen.
 
 Weiterentwickelte Spezialwaffen sind eigenständige Waffenformen. Ihre Mk-Stufe
-bleibt erhalten; **Mk V und höher** werden ausschließlich durch Kisten freigeschaltet. Ein grüner Aufwärtspfeil direkt auf der ausgerüsteten
+bleibt erhalten; **Mk V und höher** werden ausschließlich durch Upgrade-Kapseln freigeschaltet. Ein grüner Aufwärtspfeil direkt auf der ausgerüsteten
 Waffe im Shop zeigt eine verfügbare Fusion oder Evolution an. Er erscheint nur,
 wenn der passende Fusionspartner beziehungsweise alle Evolutionszutaten vorliegen.
 
@@ -133,7 +133,7 @@ die [Loadout-Vorschau](screenshots/weapon_loadouts.gif) zeigt diese Anordnung.
 
 ## Individuelle Affixe
 
-Zahnfee-Kisten verbessern eine gewählte Waffeninstanz nach dem Wellenende.
+Upgrade-Kapseln verbessern eine gewählte Waffeninstanz nach dem Wellenende.
 Feuer (2 s), Gift (5 s) und Affix-Blutung (3 s) verursachen zusätzlichen Schaden
 über Zeit. Eis und Elektro treffen direkt; Eis verlangsamt außerdem kurz.
 Treffer und DoTs zeigen Zahlen in Elementfarbe. Passende Gegnerresistenzen

@@ -39,7 +39,7 @@ func _ready() -> void:
 	chest_row.name = "WaveChestCounter"
 	chest_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	chest_row.add_theme_constant_override("separation", 5)
-	chest_row.tooltip_text = "In dieser Welle eingesammelte Kisten"
+	chest_row.tooltip_text = "In dieser Welle eingesammelte Upgrade-Kapseln"
 	wave_info.add_child(chest_row)
 	wave_info.move_child(chest_row, 2)
 	var chest_icon := TextureRect.new()

@@ -125,7 +125,7 @@ Statusschaden. Supportwaffen erhalten keinen irreführenden Schadensrang.
 
 1. Gemeinsame Waffendetails, aktuelle Buildwerte, Rollen und Wurzelplätze.
 2. Explizite Kauf-/Fusionsergebnisse und Vergleich mit eigener Ausrüstung.
-3. Derselbe Detailstil für Level-ups, Kisten, Relikte und Startwaffen.
+3. Derselbe Detailstil für Level-ups, Upgrade-Kapseln, Relikte und Startwaffen.
 4. Konkrete Synergiehinweise und kurze Denti-Reaktionen.
 5. Gemessene Wellenleistung nach Erweiterung der Telemetrie.
 
@@ -140,6 +140,6 @@ Der Shop verwendet jetzt Angebotskarten mit gemeinsamen Details auf Desktop und 
 
 Belegte Wurzeln öffnen denselben Detailbereich. Verkauf braucht eine Bestätigung; Fusion zeigt die nächste Stufe, frei werdende Wurzeln und markiert passende Exemplare. Kauf fusioniert nur dann automatisch, wenn für eine zusätzliche Waffe kein Platz bleibt und ein passendes Exemplar vorhanden ist. Die bestehenden Spielregeln bleiben maßgeblich.
 
-Items und Relikte stehen als horizontal scrollende Icons mit Stückzahl unten. Hover zeigt Name und Effekt, Antippen öffnet die Details. Aktionen, Weiter und Itemleiste bleiben auch im mobilen Hoch- und Querformat erreichbar. Level-up-, Kisten- und Reliktauswahl verwenden vorerst ihre vorhandene Darstellung; Kaufanimationen und neue Waffentelemetrie sind weitere Konzeptideen.
+Items und Relikte stehen als horizontal scrollende Icons mit Stückzahl unten. Hover zeigt Name und Effekt, Antippen öffnet die Details. Aktionen, Weiter und Itemleiste bleiben auch im mobilen Hoch- und Querformat erreichbar. Level-up-, Upgrade-Kapseln- und Reliktauswahl verwenden vorerst ihre vorhandene Darstellung; Kaufanimationen und neue Waffentelemetrie sind weitere Konzeptideen.
 
 Stats und Items im Pausenmenü verwenden inzwischen kompakte Tabellen beziehungsweise Icons mit Anzahl und gemeinsamen Details, ohne großes Charakterbild. Kleine Sammlungen belegen nur ihre benötigte Höhe.

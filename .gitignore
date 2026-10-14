@@ -6,3 +6,6 @@ __pycache__/
 /.codex/
 /.mcp.json
 .codex-remote-*
+
+# Upgrade capsule uses a small runtime import with mipmaps.
+!assets/loot/upgrade_capsule.png.import

@@ -86,7 +86,7 @@ func _run() -> void:
 		check(evolved_card.get_theme_stylebox("normal").border_color == WeaponPresentation.special_color(game.player.loadout.equipped()[0].data), "special weapon card is not bright red")
 		check(evolved_card.get_node_or_null("UpgradeReady") == null, "maxed special weapon still advertises an upgrade")
 		game.shop_panel._select("equipment", 0)
-		check(game.shop_panel.details.subtitle.text.contains("Mk IV") and game.shop_panel.details.merge_button.text == "Weitere Mk-Stufen aus Kisten", "special weapon details retain IV")
+		check(game.shop_panel.details.subtitle.text.contains("Mk IV") and game.shop_panel.details.merge_button.text == "Weitere Mk-Stufen aus Upgrade-Kapseln", "special weapon details retain IV")
 		check(game.shop_panel.details_panel.get_theme_stylebox("panel").border_color == WeaponPresentation.special_color(game.player.loadout.equipped()[0].data), "special weapon details lose red color")
 		var saved: Dictionary = RunSnapshot.capture(game)
 		RunSnapshot.restore(game, saved)

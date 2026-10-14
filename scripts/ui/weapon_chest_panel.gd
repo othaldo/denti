@@ -55,7 +55,8 @@ func _ready() -> void:
 	rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	rows.add_theme_constant_override("separation", 8)
 	scroll.add_child(rows)
-	title_label = _label("Zahnfee-Kiste!", 26)
+	title_label = _label("Upgrade-Kapsel!", 26)
+	title_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_label("1. Waffe wählen   2. Fund einsetzen · Jeder passende Fund bringt Fortschritt", 14)
 	weapon_grid = GridContainer.new()
 	weapon_grid.add_theme_constant_override("h_separation", 6)
@@ -102,7 +103,7 @@ func show_chest(chest: Dictionary, loadout: WeaponLoadout, player_stats: PlayerS
 	reward = chest
 	weapons = loadout.equipped()
 	stats = player_stats
-	title_label.text = "Goldene Zahnfee-Kiste!" if bool(chest.get("golden", false)) else "Zahnfee-Kiste!"
+	title_label.text = "Goldene Upgrade-Kapsel!" if bool(chest.get("golden", false)) else "Upgrade-Kapsel!"
 	for button in weapon_buttons:
 		button.free()
 	weapon_buttons.clear()
@@ -145,11 +146,11 @@ func show_chest(chest: Dictionary, loadout: WeaponLoadout, player_stats: PlayerS
 		weapon_buttons.append(button)
 		if weapon.instance_uid == str(chest.get("target_uid", "")):
 			selected = index
-	scrap_button.text = "Kiste für %d Münzen zerlegen" % scrap_coins
+	scrap_button.text = "Upgrade-Kapsel für %d Münzen zerlegen" % scrap_coins
 	if not weapons.is_empty():
 		_select_weapon(selected, false)
 	else:
-		target_summary.text = "Keine Waffe ausgerüstet. Die Kiste kann zerlegt werden."
+		target_summary.text = "Keine Waffe ausgerüstet. Die Upgrade-Kapsel kann zerlegt werden."
 		replacement.hide()
 		for button in buttons:
 			button.hide()
@@ -268,6 +269,10 @@ func _layout() -> void:
 		art.custom_minimum_size = Vector2(24, 24) if narrow else Vector2(30, 30)
 	cards.columns = 1 if narrow else 3
 	title_label.add_theme_font_size_override("font_size", 21 if narrow else 26)
+	scrap_button.text = scrap_button.text.replace("\n", " ")
+	if narrow:
+		scrap_button.text = scrap_button.text.replace(" für ", "\nfür ")
+	scrap_button.custom_minimum_size.y = 60 if narrow else 40
 	for button in buttons:
 		button.custom_minimum_size = Vector2(0, 0)
 		button.content.alignment = BoxContainer.ALIGNMENT_BEGIN

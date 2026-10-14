@@ -46,7 +46,7 @@ func configure(loot_kind: StringName, loot_amount: int, player: Player, loot_rew
 		sprite = Sprite2D.new()
 		add_child(sprite)
 	sprite.texture = CombatSpriteTextures.loot(kind)
-	sprite.scale = Vector2.ONE / CombatSpriteTextures.RESOLUTION
+	sprite.scale = Vector2(32, 32) / sprite.texture.get_size()
 	sprite.modulate = ChestRewards.TREASURE_COLOR if bool(reward_data.get("golden", false)) else Color.WHITE
 
 

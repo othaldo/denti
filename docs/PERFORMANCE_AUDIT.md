@@ -44,7 +44,7 @@ Handybildschirmen helfen; die Darstellung wird dabei etwas weicher.
   Zeit. Alte Spielstände mit einem Eintrag pro Treffer bleiben lesbar.
 - Spielerprojektile verwenden gemeinsame Texturen. Körper, pulsierender Rand
   und Schweif teilen einen Atlas; Explosionen bleiben animierte Ringe.
-  XP, Münzen und Kisten teilen ebenfalls einen Atlas, einschließlich
+  XP, Münzen und Upgrade-Kapseln teilen ebenfalls einen Atlas, einschließlich
   abwechselnd angeordneter Beutetypen.
 - Gegner-Trefferblitze verwenden einen Timer statt eines neuen Tweens bei jedem
   Treffer. Das verhindert konkurrierende Fade-Tweens unter Dauerbeschuss.

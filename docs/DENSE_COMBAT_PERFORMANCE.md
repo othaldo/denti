@@ -4,7 +4,7 @@ Auslöser war ein Bericht über teilweise 7 FPS in Welle 17 auf Chrome/Snapdrago
 
 ## Änderungen
 
-- Bodenbeute liegt in einem räumlichen Raster. Ein gemeinsamer Physics-Tick prüft nur Zellen in Dentis Magnet-/Aufhebereich. Entfernte Drops haben keine eigenen Physics-Callbacks. Beim Beutesammeln nach der Welle werden weiterhin alle Drops animiert und vollständig eingesammelt. Position, Menge, Truhen-ID und Speicherformat bleiben erhalten.
+- Bodenbeute liegt in einem räumlichen Raster. Ein gemeinsamer Physics-Tick prüft nur Zellen in Dentis Magnet-/Aufhebereich. Entfernte Drops haben keine eigenen Physics-Callbacks. Beim Beutesammeln nach der Welle werden weiterhin alle Drops animiert und vollständig eingesammelt. Position, Menge, Kapsel-ID und Speicherformat bleiben erhalten.
 - Die Zielsuche findet direkt den nächsten gültigen Gegner. Sie erzeugt und sortiert keine vollständige Trefferliste mehr. Wurzellage, Kolliderradius, Reichweite und Spawnreihenfolge bei gleich entfernten Zielen bleiben maßgeblich.
 - Kreis-/Segmentabfragen prüfen direkt die Rasterzellen, ohne zusätzliche Kandidatenlisten. Bereits getroffene Gegner werden vor der Segmentgeometrie ausgeschlossen. Geschosse sortieren ihre tatsächlichen Treffer nur einmal entlang der Flugrichtung; doppelte Geometrieprüfungen entfallen.
 - Unveränderliche Reichweiten und Darstellungsradien werden beim Abschuss ermittelt. Laufende Item-Cooldowns verhindern unnötige Zielsuche für Krit-Strahlen und Blutungsübertragung.
@@ -42,7 +42,7 @@ Die Desktopwerte sind nicht auf das Handy übertragbar. Ob der gemeldete 7-FPS-E
 
 ## Prüfen und reproduzieren
 
-Die erweiterten Kampf-Abfragetests vergleichen Kreis, Segment, nächste Ziele und Fallbacks mit vollständigen Referenzscans. Der neue Beutetest vergleicht 800 Drops über 100 Schritte mit der bisherigen Bewegung einschließlich Magnetwechsel, Teleports, Arena-Transformation, Sammelreihenfolge und Truhenbelohnung. Die bestehenden Post-wave-/Save-/Resume-Tests prüfen den kompletten Übergang zum Shop. Der Schattentest prüft Lebenszyklus und zusätzlich mit echtem Renderer Transform und Farbe; eine gerenderte Vorschau wurde visuell kontrolliert.
+Die erweiterten Kampf-Abfragetests vergleichen Kreis, Segment, nächste Ziele und Fallbacks mit vollständigen Referenzscans. Der neue Beutetest vergleicht 800 Drops über 100 Schritte mit der bisherigen Bewegung einschließlich Magnetwechsel, Teleports, Arena-Transformation, Sammelreihenfolge und Kapselbelohnung. Die bestehenden Post-wave-/Save-/Resume-Tests prüfen den kompletten Übergang zum Shop. Der Schattentest prüft Lebenszyklus und zusätzlich mit echtem Renderer Transform und Farbe; eine gerenderte Vorschau wurde visuell kontrolliert.
 
 ```powershell
 Godot_v4.7.2-stable_win64_console.exe --headless --path . --script res://tools/dense_combat_cpu_probe.gd -- --label=local

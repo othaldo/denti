@@ -1,6 +1,6 @@
 # Endlosmodus
 
-Umgesetzt am 2026-10-01. Nach dem Sieg in Welle 20 bietet der Siegbildschirm **Endlos weiterspielen** an. Erst werden alle Level-ups und Kisten dieser Welle aufgelöst. Der Sieg und eine mögliche Hell-Freischaltung zählen bereits. Waffen, Items, Relikte, Münzen und Lebenspunkte bleiben erhalten; danach öffnet der Shop vor Welle 21. Es gibt keine kostenlose Vollheilung beim Wechsel.
+Umgesetzt am 2026-10-01. Nach dem Sieg in Welle 20 bietet der Siegbildschirm **Endlos weiterspielen** an. Erst werden alle Level-ups und Upgrade-Kapseln dieser Welle aufgelöst. Der Sieg und eine mögliche Hell-Freischaltung zählen bereits. Waffen, Items, Relikte, Münzen und Lebenspunkte bleiben erhalten; danach öffnet der Shop vor Welle 21. Es gibt keine kostenlose Vollheilung beim Wechsel.
 
 ![Endlos nach dem Sieg auswählen](screenshots/endless/victory_1280x720.png)
 

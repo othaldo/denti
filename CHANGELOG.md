@@ -2,6 +2,12 @@
 
 Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü angezeigt. 0.1.0 wurde rückblickend anhand der Git-Historie dokumentiert; 0.2.0 bündelt die seitdem entstandenen Änderungen. Die Einträge beschreiben implementierte Funktionen. Weitere Pläne stehen in der [Roadmap](docs/ROADMAP.md).
 
+## 0.4.2 — 14.10.2026
+
+- **Upgrade-Kapsel:** neues transparentes Icon im gemalten Denti-Stil für HUD und Bodenbeute. Goldene Funde behalten ihre Tönung; die Drop-Größe bleibt konstant. Der Texturimport begrenzt die Laufzeitauflösung und verwendet Mipmaps.
+- **Einheitliche Bezeichnung:** Tooltips, Belohnungsmenüs, Shop, Dentipedia, Items, Run-Rückblick und Dokumentation verwenden Upgrade-Kapsel. Titel und Zerlegen-Button berücksichtigen die längeren Texte auf kleinen Bildschirmen.
+- **Tests:** gemeinsame HUD-/Drop-Textur, Drop-Größe und responsive Belohnungsansichten geprüft.
+
 ## 0.4.1 — 14.10.2026
 
 - **Affix-Kartenlayout korrigiert:** Zeilenabstände und tatsächlich verfügbare Kartenbreite werden bei der Größenberechnung berücksichtigt. Lange Texte und Fortschrittsbalken bleiben innerhalb der Karten; Symbole und Überschriften sind oben einheitlich ausgerichtet.
@@ -10,12 +16,12 @@ Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü an
 ## 0.4.0 — 14.10.2026
 
 - **Individuelle Waffen und Shop-Loot:** Waffen besitzen eigene gewürfelte Attribute, Affixe und Effekt-Slots. Mk-Stufe und Attributqualität werden getrennt dargestellt; Namen behalten ihre Mk-Angabe.
-- **Kisten mit Build-Entscheidungen:** drei Angebote, direkt sichtbare Waffen- und Ersatzauswahl, durch Glück beeinflusste Funde und seltene goldene Beuteträger. Belohnungen werden nach der Welle aufgelöst; der HUD zeigt eingesammelte Kisten als Icon mit Zähler.
-- **Fortlaufende Affix-Progression:** gleiche Effekte verstärken sich, schwächere Funde bringen anteiligen Fortschritt und höhere Seltenheiten ermöglichen Aufstiege. Nach Legendär III geht es weiter. Bis zu vier Slots, Reichweite und Angriffstempo sowie seltene Kisten-Aufstiege über Mk IV erweitern Builds; Shop und Fusion bleiben bei Mk IV.
+- **Upgrade-Kapseln mit Build-Entscheidungen:** drei Angebote, direkt sichtbare Waffen- und Ersatzauswahl, durch Glück beeinflusste Funde und seltene goldene Beuteträger. Belohnungen werden nach der Welle aufgelöst; der HUD zeigt eingesammelte Upgrade-Kapseln als Icon mit Zähler.
+- **Fortlaufende Affix-Progression:** gleiche Effekte verstärken sich, schwächere Funde bringen anteiligen Fortschritt und höhere Seltenheiten ermöglichen Aufstiege. Nach Legendär III geht es weiter. Bis zu vier Slots, Reichweite und Angriffstempo sowie seltene Upgrade-Kapseln-Aufstiege über Mk IV erweitern Builds; Shop und Fusion bleiben bei Mk IV.
 - **Lesbarer Elementarschaden:** zusätzliche farbige Schadenszahlen ohne Typtext; auch Heilung zeigt nur Zahlen. Feuer, Gift und Blutung wirken über Zeit, Gegner besitzen passende begrenzte Resistenzen.
-- **Mehr Druck:** höhere Gegner-HP und Skalierung, mehr Gegner und angepasste Kistenchancen. Normal dient als gemeinsame Basis. Hard und Hell erhalten beschleunigende Zusatzkurven für HP, Verteidigung, Tempo und Angriffsschaden. HP und Schaden wachsen im Endlosmodus weiter.
+- **Mehr Druck:** höhere Gegner-HP und Skalierung, mehr Gegner und angepasste Kapselchancen. Normal dient als gemeinsame Basis. Hard und Hell erhalten beschleunigende Zusatzkurven für HP, Verteidigung, Tempo und Angriffsschaden. HP und Schaden wachsen im Endlosmodus weiter.
 - **Stabile Affix-Karten:** feste Fundwerte, eindeutige Aktionsanzeigen und Text-/Höhenberechnung unabhängig von der zuvor ausgewählten Waffe, auch auf kleinen Bildschirmen.
-- **Speichern und Tests:** individuelle Waffenwerte, Affix-Fortschritt, Kistenentscheidungen und laufende Effekte werden beim Laden erhalten. Automatisierte Prüfungen decken Progression, Effekte, Layout und Schwierigkeitskurven ab.
+- **Speichern und Tests:** individuelle Waffenwerte, Affix-Fortschritt, Kapselentscheidungen und laufende Effekte werden beim Laden erhalten. Automatisierte Prüfungen decken Progression, Effekte, Layout und Schwierigkeitskurven ab.
 
 
 - CI-Tests auf die gewünschte Einstiegskurve (35 % Start-HP) abgestimmt. Effekt-Tests verwenden haltbare Ziele; der Save/Resume-Angriffstest verwendet reguläre Welle-10-HP und prüft separat, dass Laden und Trefferliste erhalten bleiben. Der Smoke-Test vergleicht Welle 2 mit den tatsächlichen Welle-1-HP.
@@ -90,8 +96,8 @@ Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü an
 - **18 statt 8 Waffen:** Zahnstocher-Speer, Karies-Fräse, Interdental-Bürste, Fluorid-Sprüher, Mundduschen-Turbine, UV-Lampe, Amalgam-Schleuder, Zahnseiden-Garotte, Prophylaxe-Polierer und Fluorid-Rakete erweitern das Arsenal. Neue Angriffe bieten unter anderem Stichlinien, Frontbögen, Sprühkegel und durchdringende Strahlen. [Waffenübersicht](docs/waffen.md).
 - **30 statt 18 Shop-Items:** mehr Kombinationen für Blutung, Wasser, Crit, Schild, Heilung, Projektile und Economy sowie Zucker-Builds mit Vor- und Nachteilen. [Itemübersicht](docs/items.md).
 - **Zehn statt acht Stats:** Nahschaden und Fernschaden ergänzen Bisskraft. Waffen nutzen eigene Koeffizienten für diese Schadensboni.
-- **Ununterbrochene Wellen:** Levelaufstiege werden im Kampf vorgemerkt. Nach dem Einsammeln aller verbliebenen Beute folgen die Level-up-Auswahl, Kistenentscheidungen und gegebenenfalls Bossrelikte; danach öffnet der Shop.
-- **Seltene Zahnfee-Kisten:** Item behalten oder gegen Münzen zerlegen. Glück beeinflusst die Chancen innerhalb fester Grenzen; gewöhnliche Zufallskisten sind auf einen Fund pro Welle begrenzt.
+- **Ununterbrochene Wellen:** Levelaufstiege werden im Kampf vorgemerkt. Nach dem Einsammeln aller verbliebenen Beute folgen die Level-up-Auswahl, Kapselentscheidungen und gegebenenfalls Bossrelikte; danach öffnet der Shop.
+- **Seltene Upgrade-Kapseln:** Item behalten oder gegen Münzen zerlegen. Glück beeinflusst die Chancen innerhalb fester Grenzen; gewöhnliche Zufallskapseln sind auf einen Fund pro Welle begrenzt.
 - **Fünf göttliche Relikte:** nach den Bossen in Welle 5, 10 und 15 jeweils eines von drei Angeboten wählen. Die Effekte unterstützen Blutung, Wasser, Schild, Crit und Bewegung. [Reliktübersicht](docs/relics.md).
 
 ### Kampf und Gegnerdruck

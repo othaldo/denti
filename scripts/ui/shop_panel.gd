@@ -521,13 +521,13 @@ func _render_selection() -> void:
 		details.merge_button.visible = true
 		details.merge_button.disabled = not bool(entry.mergeable)
 		details.merge_button.mouse_default_cursor_shape = Control.CURSOR_ARROW if details.merge_button.disabled else Control.CURSOR_POINTING_HAND
-		details.merge_button.text = "Weitere Mk-Stufen aus Kisten" if tier == 4 else "Fusionieren · Stufe %s" % ["I", "II", "III", "IV"][tier]
+		details.merge_button.text = "Weitere Mk-Stufen aus Upgrade-Kapseln" if tier == 4 else "Fusionieren · Stufe %s" % ["I", "II", "III", "IV"][tier]
 		if data.evolution_kind != &"":
-			details.merge_button.text = "Weitere Mk-Stufen aus Kisten"
+			details.merge_button.text = "Weitere Mk-Stufen aus Upgrade-Kapseln"
 		if bool(entry.mergeable):
 			details.action_hint.text = "%s frei\n%s" % [data.roots_text(), WeaponPresentation.comparison(data, tier + 1, data, tier, player)]
 		else:
-			details.action_hint.text = "Zu viele verschiedene Affixe für die vorhandenen Slots" if player != null and player.loadout.merge_affix_conflict(selected_index) else ("Kein Fusionspartner" if tier < 4 else "Affixe wachsen mit weiteren Kisten.")
+			details.action_hint.text = "Zu viele verschiedene Affixe für die vorhandenen Slots" if player != null and player.loadout.merge_affix_conflict(selected_index) else ("Kein Fusionspartner" if tier < 4 else "Affixe wachsen mit weiteren Upgrade-Kapseln.")
 		details.action_hint.visible = not details.action_hint.text.is_empty()
 		_highlight_equipment()
 		return

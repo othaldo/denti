@@ -1,6 +1,6 @@
 # Göttliche Relikte
 
-Nach den Bossen in Welle 5, 10 und 15 erscheint jeweils eine Auswahl aus drei noch nicht gewählten Relikten. Die Entscheidung folgt auf die Levelaufstiege und Zahnfee-Kisten, bevor der Shop öffnet. Relikte sind weder Shop-Items noch stapelbar. Du siehst sie im Pausenmenü unter **Items**.
+Nach den Bossen in Welle 5, 10 und 15 erscheint jeweils eine Auswahl aus drei noch nicht gewählten Relikten. Die Entscheidung folgt auf die Levelaufstiege und Upgrade-Kapseln, bevor der Shop öffnet. Relikte sind weder Shop-Items noch stapelbar. Du siehst sie im Pausenmenü unter **Items**.
 
 | Relikt | Effekt |
 | --- | --- |

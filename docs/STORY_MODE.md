@@ -47,7 +47,7 @@ und der kanonischen Denti-Referenz. Originale sind unverändert.
   Der kurze Wortwechsel erscheint nach dem Shop, mit dem passenden Boss-Porträt.
   Erst **Kämpfen** startet den Wellentimer und spawnt den Boss. Fortsetzen bewahrt
   den Dialogcursor; ein bereits laufender Kampf wiederholt den Dialog nicht.
-- Nach jedem Boss: vollständige Beutesammlung → Levelaufstiege → Kisten → Relikt
+- Nach jedem Boss: vollständige Beutesammlung → Levelaufstiege → Upgrade-Kapseln → Relikt
   → Abschiedsdialog → Reise/Enthüllung → Ankunftsdialog → Shop.
   Nach Welle 20 ersetzt der Abschlussdialog den Ortswechsel;
   anschließend kommt die bestehende Siegesansicht mit optionalem Endlosmodus.
@@ -102,7 +102,7 @@ die abgeschlossene Enthüllung wartet weiterhin auf **Weiter**.
 ## Prüfung
 
 `tests/story_mode.gd` prüft Intro, Startwaffe, alle vier Bossabschlüsse, lebenden Boss,
-Priorität von Level/Kiste/Relikt, Ortswechsel, verdeckte Texturen/Namen/Tooltips,
+Priorität von Level/Upgrade-Kapsel/Relikt, Ortswechsel, verdeckte Texturen/Namen/Tooltips,
 Fortsetzen, Finale, Endlos und alte Spielstände. Layouts von 320×568 bis 1920×1080,
 einschließlich 568×320, werden geprüft.
 

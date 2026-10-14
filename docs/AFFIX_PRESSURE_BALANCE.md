@@ -1,7 +1,7 @@
 # Gegnerdruck nach Einführung der Affixe
 
 Affixe liefern zusätzlichen Schaden neben den Shop-Rolls. Dieser Balanceschritt
-hebt Haltbarkeit und Dichte moderat an und reduziert die Kistenchance pro Kill.
+hebt Haltbarkeit und Dichte moderat an und reduziert die Kapselchance pro Kill.
 
 - Sechs normale Gegnertypen: Basis-HP +10 %, HP pro Welle und späte quadratische
   HP-Zuwächse jeweils +20 %. Die bisherigen unterschiedlichen Rollen bleiben erhalten.
@@ -11,10 +11,10 @@ hebt Haltbarkeit und Dichte moderat an und reduziert die Kistenchance pro Kill.
 - Normale Spawnintervalle ×0,84; auf Bosswellen ×0,92.
 - Normale Bursts und geplante Horden ×1,15, auf ganze Gegner gerundet.
   Boss-Bursts und Elitegruppen behalten ihre bisherigen Größen.
-- Normale Kistenchance: 2 % → 1,6 %. Mit 100 Glück: 5 % → 4 %.
-- Elite-Kistenchance: 18 % → 16 %. Mit 100 Glück: 45 % → 40 %.
-- Drei normale Kisten pro Welle bleiben das Limit. Goldene Träger behalten
-  ihre Spawnchance und garantierte zusätzliche Kiste.
+- Normale Kapselchance: 2 % → 1,6 %. Mit 100 Glück: 5 % → 4 %.
+- Elite-Kapselchance: 18 % → 16 %. Mit 100 Glück: 45 % → 40 %.
+- Drei normale Upgrade-Kapseln pro Welle bleiben das Limit. Goldene Träger behalten
+  ihre Spawnchance und garantierte zusätzliche Upgrade-Kapsel.
 
 ## Gemessene Spawn-Anfragen
 
@@ -32,12 +32,12 @@ Gegnerlimit und die tatsächliche Killrate können die realen Zahlen begrenzen.
 | 20 | 188 | 204 |
 
 Die Kombination aus Dichte und Dropchance ergibt auf normalen Wellen vor dem
-Kistenlimit rechnerisch etwa 92–96 % der bisherigen Kistenausbeute, in Welle 1
-etwa 96 %. Bei unverändertem Killtempo gilt diese Rechnung nicht: Kisten werden
+Kapsellimit rechnerisch etwa 92–96 % der bisherigen Kapselausbeute, in Welle 1
+etwa 96 %. Bei unverändertem Killtempo gilt diese Rechnung nicht: Upgrade-Kapseln werden
 pro tatsächlichem Kill gewürfelt. Glück und Affix-Auswahl bleiben relevant.
 
 `tests/affix_pressure_balance.gd` prüft den Anstieg gegen die bisherigen Spawn-
-und HP-Werte sowie die Kistenkompensation. `tests/mob_curve.gd` prüft zusätzlich
+und HP-Werte sowie die Kapselkompensation. `tests/mob_curve.gd` prüft zusätzlich
 Rollenunterschiede, monotone Kurven, Startgegner und Boss-/Elite-Regeln.
 
 Dieser Stand ist ein getesteter erster Balance-Schritt. Ein vollständiger

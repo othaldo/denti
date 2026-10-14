@@ -34,7 +34,7 @@ Wellen 1–5. Ziel: Hol das erste Portalfragment.
 
 **Denti:** Jeder, der seit Jahren keinen Bohrer gesehen hat.
 
-[Kämpfen. Bosswelle 5. Nach dem Sieg und Wellenende: Beute sammeln, Levelaufstiege, Kisten und Relikt auflösen.]
+[Kämpfen. Bosswelle 5. Nach dem Sieg und Wellenende: Beute sammeln, Levelaufstiege, Upgrade-Kapseln und Relikt auflösen.]
 
 ### Übergang nach Kapitel II
 

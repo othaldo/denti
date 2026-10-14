@@ -1,7 +1,7 @@
-# Zufällige Affix-Kisten
+# Zufällige Affix-Upgrade-Kapseln
 
-Erster spielbarer Stand: Kisten verbessern eine konkrete Waffeninstanz. Es gibt
-keine festen Kistenwellen, keine garantierte Run-Gesamtzahl und keine Maximalstufe
+Erster spielbarer Stand: Upgrade-Kapseln verbessern eine konkrete Waffeninstanz. Es gibt
+keine festen Kapselwellen, keine garantierte Run-Gesamtzahl und keine Maximalstufe
 für den Schaden eines Affixes. Waffen bleiben Shopkäufe; ihre Werte werden pro Angebot individuell gewürfelt.
 
 ![Drei Funde für eine gewählte Waffe](screenshots/affix_chest_1280x720.png)
@@ -17,7 +17,7 @@ für den Schaden eines Affixes. Waffen bleiben Shopkäufe; ihre Werte werden pro
 - Ein höherer Fund derselben Art springt direkt auf seine Seltenheit I. Niedrigere
   Funde geben 50 % / 25 % / 12,5 % Fortschritt bei einer / zwei / drei Seltenheiten Abstand.
   Der Schaden steigt zwischen den Ausbaustufen anteilig; kein passender Fund ist wertlos.
-- Sobald Affixe vorhanden sind, enthält jede neu gedroppte Kiste mindestens einen
+- Sobald Affixe vorhanden sind, enthält jede neu gedroppte Upgrade-Kapsel mindestens einen
   passenden Fund mit mindestens der Seltenheit eines vorhandenen Affixes.
   Die übrigen Typen bleiben zufällig und unterscheiden sich vom passenden Fund.
 - Eine Waffe startet mit einem Slot. Ab Welle 2 ersetzt ein Slotfund mit 20 %
@@ -27,15 +27,15 @@ für den Schaden eines Affixes. Waffen bleiben Shopkäufe; ihre Werte werden pro
 - Ein neuer Effekt belegt einen freien Slot. Sind alle Slots belegt, muss der
   Spieler ausdrücklich den zu ersetzenden Effekt auswählen. Wiederholungen
   verbessern den passenden Effekt unabhängig von dieser Ersatzwahl.
-- Alternativ wird die ganze Kiste für Münzen zerlegt. Ohne ausgerüstete Waffe
+- Alternativ wird die ganze Upgrade-Kapsel für Münzen zerlegt. Ohne ausgerüstete Waffe
   bleibt diese Option verfügbar.
 - Zielwaffe, Ersatzwahl und alle drei Funde überstehen Fortsetzen unverändert.
-- Alte gespeicherte Item-Kisten bleiben KEEP/SCRAP-Belohnungen.
+- Alte gespeicherte Item-Upgrade-Kapseln bleiben KEEP/SCRAP-Belohnungen.
 
 Seltenheit und Ausbau stehen getrennt neben dem elementaren Effekt. Seltenheitsnamen
 verwenden dieselben Farben wie Mk-Stufen: Gewöhnlich = Mk I, Ungewöhnlich = Mk II,
 Selten = Mk III, Legendär = Mk IV. Elementnamen und Trefferzahlen behalten ihre
-Elementfarbe. Details, Ersatzwahl und Kisten zeigen I/II/III bzw. III+.
+Elementfarbe. Details, Ersatzwahl und Upgrade-Kapseln zeigen I/II/III bzw. III+.
 
 | Seltenheit | I | II | III |
 | --- | --- | --- | --- |
@@ -107,26 +107,26 @@ Treffer und Heilungen zeigen nur Zahlen in ihrer jeweiligen Farbe, keine Typname
 
 ## Zufällige Drops und goldene Gegner
 
-- Normaler Kill: 1,6 % Kistenchance.
+- Normaler Kill: 1,6 % Kapselchance.
 - Elite-Kill: 16 %.
 - Glück multipliziert die Chancen mit `1 + 3 × max(Glück, 0) / (max(Glück, 0) + 100)`.
   Bei 100 Glück: 4 % normal / 40 % Elite; Obergrenze: vierfache Chance.
 - Höchstens drei gewöhnliche Zufallsfunde pro Welle. Neue normale Drops bleiben
-  an die aktive Timerzeit gebunden. Bosse selbst droppen weiterhin keine Kiste.
+  an die aktive Timerzeit gebunden. Bosse selbst droppen weiterhin keine Upgrade-Kapsel.
 - Ab Welle 3 kann ein regulär gespawnter normaler Gegner mit 0,17 % Chance ein
   goldener Träger werden. Glück erhöht diese Chance um höchstens 50 %.
 - Höchstens ein goldener Träger pro Welle, ohne feste Spawnzeit oder Wellenliste.
 - Träger besitzen 2,8× Leben und 85 % Laufgeschwindigkeit, goldene Färbung und
-  Glitzer. Ihr Kill während aktiver Timerzeit garantiert eine goldene Kiste,
+  Glitzer. Ihr Kill während aktiver Timerzeit garantiert eine goldene Upgrade-Kapsel,
   auch wenn alle drei gewöhnlichen Zufallsfunde bereits gefallen sind.
 - Goldene Funde sind mindestens Ungewöhnlich; ihre Seltenheit würfelt mit
   vier zusätzlichem Wellenfortschritt auf der vorhandenen, begrenzten Kurve.
-- Grundwert beim Zerlegen: `5 + floor(Welle / 2)`, goldene Kisten zusätzlich +5;
+- Grundwert beim Zerlegen: `5 + floor(Welle / 2)`, goldene Upgrade-Kapseln zusätzlich +5;
   vorhandene Zerlegeboni bleiben wirksam.
 
 Die Häufigkeit ist eine großzügigere erste Balancehypothese. Es gibt keinen
 festen Zielzähler und keinen Ausgleich für lange Durststrecken. Reale Run-Berichte
-sollen zeigen, wie viele Kisten fallen, wie viel zusätzlicher Schaden entsteht
+sollen zeigen, wie viele Upgrade-Kapseln fallen, wie viel zusätzlicher Schaden entsteht
 und wie sich Boss-TTK verändert. Affixschaden steht als `affix_fire`, `affix_ice`,
 `affix_poison`, `affix_bleed` und `affix_electric` in der bestehenden Proc-Telemetrie.
 
@@ -146,7 +146,7 @@ Alte Waffen erhalten einen leeren Slot und keine Affixe. Neue Instanzfelder sind
 additive Save-Erweiterungen; die globale Save-Version bleibt kompatibel.
 Aktive Projektile speichern ihre eigene Affixkopie und den Schadensfaktor.
 Recycelte Projektile erhalten beim Start neue Daten und übernehmen keine
-Affixe ihres vorherigen Einsatzes. Goldene Gegner, Eiszeit, Kisten auf dem Boden
+Affixe ihres vorherigen Einsatzes. Goldene Gegner, Eiszeit, Upgrade-Kapseln auf dem Boden
 und offene Belohnungen werden ebenfalls gespeichert.
 
 ![Individuelle Werte im Shop bei gleicher Mk-Stufe](screenshots/weapon_rolls_shop_1280x720.png)
@@ -158,7 +158,7 @@ Seltenheitsschutz, Slots, bewusstes Ersetzen, Fusionsschutz, Glück, Farben,
 Bossbudgets, Overkill, Projektilquellen, garantierte goldene Drops, Combat- und
 Reward-Resume sowie unterbrechungsfreie Sammlung und Layouts bis 360×640 und 568×320.
 
-`tools/preview_weapon_affixes.gd` rendert Desktop-/Mobilkisten und die arrangierte
+`tools/preview_weapon_affixes.gd` rendert Desktop-/Mobilkapseln und die arrangierte
 Kampfvorschau mit echten Schadenspfaden und getrenntem Spielstand:
 
 ```bash
@@ -200,7 +200,7 @@ individuellen Tempo-Roll, damit ein Wertewechsel die gespeicherten Beiträge nic
 `tests/weapon_rolls.gd` prüft Vielfalt, tatsächlichen Kauf, Reservieren, Shop- und
 Waffen-Resume, Fusion, bewusste Rollübernahme, Projektil-Resume und Dropfrequenz.
 Eine Simulation mit 20/30/40/55/60/70/80/90 normalen Kills je Welle und 300 Seeds
-liefert im Mittel 6,8 Kisten ohne Glück und 14,7 mit konstant 100 Glück bis Welle 8.
+liefert im Mittel 6,8 Upgrade-Kapseln ohne Glück und 14,7 mit konstant 100 Glück bis Welle 8.
 Das ist ein Vergleichsmodell, keine garantierte Run-Ausbeute.
 
 `tests/affix_progression.gd` prüft alle Ausbauübergänge, Seltenheitssprünge,
@@ -247,13 +247,13 @@ Basisreichweite und alle Stufenbereiche; Angriffstempo verkürzt die Angriffspau
 verursachen keinen zusätzlichen Elementarschaden. Entfernen oder Ersetzen nimmt
 auch ihren Bonus zurück. Der ursprüngliche Shop-Roll bleibt erhalten.
 
-Ab Welle 8 können Kisten sehr selten einen Mk-Aufstieg auf dem dritten Platz
+Ab Welle 8 können Upgrade-Kapseln sehr selten einen Mk-Aufstieg auf dem dritten Platz
 enthalten, sofern mindestens eine Waffe die Basisstufe IV erreicht hat: 2,5 %,
 mit Glück bis höchstens 4 %. Der Fund braucht keinen Affix-Slot. Je Fund erhält
 die gewählte Waffe +1 Mk, +10 % Basisschaden sowie +3 % Tempo und Reichweite.
 Diese Zuschläge summieren sich gegenüber der Waffenbasis; sie potenzieren sich
 nicht miteinander. Shop und normale Fusion enden weiter bei IV. Mk V, VI usw.
-kommen ausschließlich aus Kisten. Die Angriffsmuster/Pierce-/Geschossstaffeln
+kommen ausschließlich aus Upgrade-Kapseln. Die Angriffsmuster/Pierce-/Geschossstaffeln
 bleiben auf dem Mk-IV-Muster; höhere Mk erhöhen die genannten Waffenwerte.
 
 Evolutionen sind separate Waffenformen auf Basisstufe IV. Sie erhalten Rollen,
@@ -264,7 +264,7 @@ Rahmen entsprechen der tatsächlichen Mk-Stufe, statt pauschal Mk V zu behaupten
 Anwendbare Funde tragen eine sichtbare Aktionszeile. Schwächere gleiche Affixe
 zeigen Fortschrittsgewinn, einen Balken und vorher/nachher. Volle Slots verlangen
 sichtbar eine Ersatzwahl; Slotfunde bei vier Slots und Mk-Funde unter IV nennen
-den konkreten Grund. Im HUD steht die Anzahl bereits eingesammelter Kisten
+den konkreten Grund. Im HUD steht die Anzahl bereits eingesammelter Upgrade-Kapseln
 der laufenden Welle, einschließlich goldener und eingesammelter Restbeute.
 Der Zähler wird bei neuer Welle zurückgesetzt und beim Fortsetzen wiederhergestellt.
 

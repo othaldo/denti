@@ -19,7 +19,7 @@ Denti kann durch erfolgreiche Gegnertreffer **vergiftet** werden oder **bluten**
 
 **Zahnfleischbeißer:** kleiner roter Keim mit auffälligen Zahnspitzen und Fangzähnen. Kündigt einen kurzen Ansturm 0,65 Sekunden vorher an; die Richtung steht während der Warnung fest. Basis: 30 HP, Bewegung 118, Kontaktschaden 5, Ansturmschaden 7, Ansturm 440 px/s für 0,28 Sekunden. Blutung: 2 rohe HP je Sekunde für drei Sekunden, vor Anpassung und Härte.
 
-Die neuen Gegner haben eigene gemalte PNGs und individuelle HP-Kurven. Sie teilen das bestehende Spawnlimit und ersetzen einen Teil des normalen Spawnmixes. Sie erzeugen keine zusätzlichen garantierten Horden oder Kisten.
+Die neuen Gegner haben eigene gemalte PNGs und individuelle HP-Kurven. Sie teilen das bestehende Spawnlimit und ersetzen einen Teil des normalen Spawnmixes. Sie erzeugen keine zusätzlichen garantierten Horden oder Upgrade-Kapseln.
 
 Giftkeim, Zahnfleischbeißer, Säurespucker und Säurekrone spiegeln ihre gerichteten Grafiken entsprechend der tatsächlichen Bewegung, auch beim Rückzug und Ansturm. In der Angriffswarnung schauen sie in die festgelegte Angriffsrichtung. Senkrechte Bewegung und Stillstand behalten die vorherige Ausrichtung; Save/Resume bewahrt sie. Die Ressource beschreibt mit `sprite_facing` die ursprüngliche Bildrichtung (`FRONT`, `RIGHT` oder `LEFT`).
 

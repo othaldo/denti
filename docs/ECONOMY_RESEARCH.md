@@ -21,7 +21,7 @@ Boss-Kills selbst geben keine Münzen oder XP. Boss-Relikte sind ein separater B
 
 Waffen auf Stufe I kosten 7–18 Gold. Die Zauberbürste kostet 9/15/22/30 Gold auf I/II/III/IV. Items kosten 4–22 Gold. Es gibt keine allgemeine Welleninflation: Itempreise bleiben konstant, höhere Waffenstufen kosten mehr. Ein Shop hat drei Angebote, anfangs mindestens zwei Waffen, danach immer mindestens eine. Rerolls kosten 2, 3, 4, ... Gold und starten in jedem Shop erneut bei 2. Angebote können derzeit nicht für die nächste Welle reserviert werden.
 
-Economy-Items existieren, ersetzen aber keine gesunde Basisversorgung: Karies-Kopfgeld kostet 6 und gibt 1 Gold pro 12 Kills; Goldfüllung kostet 12 und erhöht gesammelte Münzen um 15 %; Zinszahn kostet 9 und gibt 8 % Zins auf vorhandenes Gold, höchstens 6 pro Stapel. Der Zins wird am Wellenende vor den Shopausgaben berechnet. Bei knappem Startkapital und schwacher Killrate hilft das nur begrenzt. Kisten können zerlegt werden und bringen 60 % des Itempreises, mit Pfand-Bonus mehr; gewöhnliche Kisten sind auf eine pro Welle begrenzt.
+Economy-Items existieren, ersetzen aber keine gesunde Basisversorgung: Karies-Kopfgeld kostet 6 und gibt 1 Gold pro 12 Kills; Goldfüllung kostet 12 und erhöht gesammelte Münzen um 15 %; Zinszahn kostet 9 und gibt 8 % Zins auf vorhandenes Gold, höchstens 6 pro Stapel. Der Zins wird am Wellenende vor den Shopausgaben berechnet. Bei knappem Startkapital und schwacher Killrate hilft das nur begrenzt. Upgrade-Kapseln können zerlegt werden und bringen 60 % des Itempreises, mit Pfand-Bonus mehr; gewöhnliche Upgrade-Kapseln sind auf eine pro Welle begrenzt.
 
 ## Brotato als Referenz
 
@@ -31,13 +31,13 @@ Brotato bietet vier Shopplätze und kostenlose Reservierung mit Preisbindung. Di
 
 Harvesting gibt am Wellenende Kaufwährung und XP entsprechend seinem Wert und wächst anschließend um 5 %, aufgerundet. Das schafft eine frühe Investition mit späterem Ertrag. Für Denti wäre eine identische Übernahme zugleich ein XP- und Gold-Buff; eine reine Gold-Variante passt eher zur bestehenden Trennung beider Fortschrittssysteme. [Harvesting](https://brotato.wiki.spellsandguns.com/Harvesting)
 
-Luck erhöht unter anderem Consumable-/Kistenchancen und Angebotsqualität. Es ist damit eine indirekte Economy-Investition. Eine zusätzliche direkte Gold-Skalierung über Dentis Luck würde mehrere Vorteile im selben Stat bündeln und müsste gesondert getestet werden. [Luck](https://brotato.wiki.spellsandguns.com/Luck)
+Luck erhöht unter anderem Consumable-/Kapselchancen und Angebotsqualität. Es ist damit eine indirekte Economy-Investition. Eine zusätzliche direkte Gold-Skalierung über Dentis Luck würde mehrere Vorteile im selben Stat bündeln und müsste gesondert getestet werden. [Luck](https://brotato.wiki.spellsandguns.com/Luck)
 
 ## Berechnung der Kaufkraft
 
 Reproduktion: `Godot_v4.7.2-stable_win64_console.exe --headless --path . --script res://tools/audit_economy.gd`.
 
-Das Tool wertet 30 vollständige Spawnpläne auf Normal mit festen Seeds und 60 Hz aus. Berücksichtigt werden normale Spawns, Bursts, Horden, Eliten und deren Eskorte. Die Drop-Werte sind mathematische Erwartungswerte. Keine Kampfsimulation: Spawn-Caps, Killgeschwindigkeit, Positionierung, Bossbeschwörungen, Items, Kisten, Erspartes und Shopausgaben sind ausgeschlossen. Die Annahme „60 % Clear“ multipliziert alle Gegnerrollen gleichmäßig mit 0,6; ein echter Build kann eine andere Zusammensetzung töten.
+Das Tool wertet 30 vollständige Spawnpläne auf Normal mit festen Seeds und 60 Hz aus. Berücksichtigt werden normale Spawns, Bursts, Horden, Eliten und deren Eskorte. Die Drop-Werte sind mathematische Erwartungswerte. Keine Kampfsimulation: Spawn-Caps, Killgeschwindigkeit, Positionierung, Bossbeschwörungen, Items, Upgrade-Kapseln, Erspartes und Shopausgaben sind ausgeschlossen. Die Annahme „60 % Clear“ multipliziert alle Gegnerrollen gleichmäßig mit 0,6; ein echter Build kann eine andere Zusammensetzung töten.
 
 | Welle | Angeforderte Gegner | Aktuell, alle besiegt | Aktuell, 60 % besiegt | Begrenzter Vorschlag, 60 % besiegt |
 | --- | ---: | ---: | ---: | ---: |

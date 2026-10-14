@@ -196,7 +196,7 @@ func show_starters(options: Array[WeaponData]) -> void:
 func show_chest(item: ShopOfferData, scrap_coins: int) -> void:
 	mode = &"chest"
 	chest_item = item
-	title_label.text = "Zahnfee-Kiste!"
+	title_label.text = "Upgrade-Kapsel!"
 	subtitle_label.text = item.limit_text()
 	buttons[0].call("show_item", item)
 	buttons[0].visible = true
@@ -304,7 +304,7 @@ func _end_summary(won: bool, coins: int, recap: Dictionary) -> String:
 		"%s Schaden erlitten · %s XP · %s Münzen gesammelt (%s übrig)" % [
 			_format_number(roundi(float(run.get("damage_taken", 0.0)))), _format_number(int(run.get("xp_collected", 0))),
 			_format_number(int(run.get("coins_collected", 0))), _format_number(coins)],
-		"Kisten: %d gefunden · %d behalten · %d zerlegt" % [
+		"Upgrade-Kapseln: %d gefunden · %d behalten · %d zerlegt" % [
 			int(run.get("chests_found", 0)), int(run.get("chests_kept", 0)), int(run.get("chests_scrapped", 0))],
 	]
 	if bool(recap.get("hell_unlocked_now", false)):

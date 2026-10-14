@@ -13,6 +13,12 @@ func _run() -> void:
 	game.wave.active = false
 	game.wave.set_process(false)
 	paused = true
+	var hud_icon: TextureRect = game.hud.find_child("ChestIcon", true, false)
+	assert(hud_icon != null and hud_icon.texture == CombatSpriteTextures.UPGRADE_CAPSULE, "HUD lost upgrade capsule")
+	var drop := Loot.new()
+	drop.configure(&"chest", 1, game.player)
+	assert(drop.sprite.texture == hud_icon.texture and (drop.sprite.texture.get_size() * drop.sprite.scale).is_equal_approx(Vector2(32, 32)), "drop artwork or world size differs")
+	drop.free()
 	var loadout: WeaponLoadout = game.player.loadout
 	loadout.restore([{"id": "magic_toothbrush", "tier": 4}])
 	var weapon := loadout.equipped()[0]

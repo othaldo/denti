@@ -64,7 +64,7 @@ Die dunkle Gestaltung gilt auch für Tooltips, Auswahllisten, deaktivierte Butto
 - Kompakte Shopkarten reservieren keine Leerzeilen für fehlende Kategorien,
   Werte oder Effekte. Ihre Höhe folgt dem Inhalt; Preis und Pin bleiben an den
   unteren Ecken und innerhalb einer Rasterzeile auf gleicher Höhe.
-- Kisten zeigen eine breite Itemkarte mit vollständigem Effekt neben dem Bild.
+- Upgrade-Kapseln zeigen eine breite Itemkarte mit vollständigem Effekt neben dem Bild.
   Die Karte bestimmt die Dialoghöhe; Zerlegen ist eine kleinere Aktion darunter.
   Das gilt auch für kurze Querformate.
 - Klick auf Angebot, Waffe, Item oder Relikt öffnet die vollständigen Details.
@@ -127,7 +127,7 @@ auch bei deaktiviertem Kauf vollständig lesbar. Fokusrahmen tönen Text nicht.
 die gemeinsamen Kartenlinien und das Fehlen einer separaten Rerollzeile bei
 1920×1080, 1280×720 und 1040×600.
 `tests/mobile_shop_spacing.gd` prüft das kompakte Shopraster und alle Angebote
-im Hochformat. `tests/chest_layout.gd` prüft sämtliche Kisten-Items in neun
+im Hochformat. `tests/chest_layout.gd` prüft sämtliche Upgrade-Kapseln-Items in neun
 Fenstergrößen und den anschließenden Wechsel zu anderen Belohnungen.
 `tests/shop_interaction.gd` prüft Popupgröße, unveränderte Angebotspositionen,
 Kaufhindernisse, eigenes Buttonfeedback und echte Klicks auf Karte/Kaufbutton.
