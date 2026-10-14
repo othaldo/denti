@@ -157,8 +157,12 @@ func _check_visual_sharing() -> void:
 	_check(first == CombatSpriteTextures.projectile_body(weapon.projectile_color, 11), "projectile texture was regenerated")
 	var xp := CombatSpriteTextures.loot(&"xp") as AtlasTexture
 	var coin := CombatSpriteTextures.loot(&"coin") as AtlasTexture
-	var chest := CombatSpriteTextures.loot(&"chest") as AtlasTexture
-	_check(xp.atlas == coin.atlas and coin.atlas == chest.atlas, "alternating loot kinds break texture batching")
+	var capsule := CombatSpriteTextures.loot(&"chest")
+	_check(xp != null and coin != null, "common loot lost its atlas textures")
+	if xp != null and coin != null:
+		_check(xp.atlas == coin.atlas, "alternating XP/coins break texture batching")
+	# Rare capsules intentionally use their own painted texture, shared with HUD.
+	_check(capsule == CombatSpriteTextures.UPGRADE_CAPSULE and capsule == CombatSpriteTextures.loot(&"chest"), "upgrade capsule texture was regenerated or lost")
 
 func _check_damage_budget(session: Node) -> void:
 	var prior: int = session.graphics_mode
