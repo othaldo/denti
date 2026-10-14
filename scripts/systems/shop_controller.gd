@@ -207,6 +207,8 @@ func _roll_offers(wave_number: int, luck: float, loadout: WeaponLoadout, items: 
 			offer = _pick_weapon(mini(tier, WeaponLoadout.MAX_TIER), loadout, true)
 		if offer != null:
 			offer = offer.duplicate() as ShopOfferData
+			if offer.weapon_data != null:
+				offer.weapon_data = WeaponRolls.resolve(offer.weapon_data, WeaponRolls.roll(wave_number, luck, rng))
 			offer.price = EconomyRules.shop_price(offer.price, wave_number)
 		offers[index] = offer
 

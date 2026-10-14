@@ -40,6 +40,8 @@ func _inputs(game: Node2D, tick: int) -> void:
 	if tick == 20:
 		index.get_child(0).apply_wet(0.4)
 		index.get_child(1).apply_bleed(0.2, 1.4)
+		index.get_child(0).affix_effects.apply(&"fire", 2.0)
+		index.get_child(1).affix_effects.apply(&"poison", 3.0)
 		index.get_child(2).apply_haste(0.3, 0.3)
 		index.get_child(3).apply_enamel_exposure(0.1, 0.7)
 	if tick == 65:

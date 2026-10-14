@@ -271,6 +271,8 @@ func _run() -> void:
 
 func _complete_intermission(game: Node2D) -> bool:
 	for frame in 180:
+		if game.weapon_chest_panel.visible:
+			game._on_affix_scrapped()
 		if game.choice_panel.visible and (game.choice_panel.mode == &"upgrade" or game.choice_panel.mode == &"chest" or game.choice_panel.mode == &"relic"):
 			game.choice_panel._on_choice_pressed(0)
 		if game.shop_panel.visible or game.ended:

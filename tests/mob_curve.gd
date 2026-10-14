@@ -20,7 +20,7 @@ func _run() -> void:
 	var plaque_20 := plaque.max_health * WaveController.health_multiplier(plaque, 20)
 	var sugar_20 := sugar.max_health * WaveController.health_multiplier(sugar, 20)
 	var spitter_20 := spitter.max_health * WaveController.health_multiplier(spitter, 20)
-	if plaque_20 > 230.0 or sugar_20 < 1500.0 or spitter_20 < 600.0 or sugar_20 < plaque_20 * 6.0:
+	if plaque_20 > 260.0 or sugar_20 < 1500.0 or spitter_20 < 600.0 or sugar_20 < plaque_20 * 6.0:
 		_fail("normal enemy roles do not diverge in late waves: %.0f / %.0f / %.0f" % [plaque_20, sugar_20, spitter_20])
 		return
 	if spitter.trigger_range < 500.0:
@@ -48,7 +48,7 @@ func _run() -> void:
 	game.wave.current_wave = 1
 	game._create_enemy(plaque, game.player.global_position + Vector2(300.0, 0.0))
 	var opening_mob: Enemy = game.get_node("Enemies").get_child(0)
-	if not is_equal_approx(opening_mob.max_health, 12.6):
+	if not is_equal_approx(opening_mob.max_health, 15.84):
 		_fail("opening enemy instance did not receive reduced health")
 		return
 	var starter: WeaponData = WeaponCatalog.by_id(&"plaque_scaler")
@@ -88,7 +88,7 @@ func _check_opening_curve() -> bool:
 			if wave_number >= 10 and not is_equal_approx(health, original_health):
 				_fail("opening adjustment changed middle/late health: %s, wave %d" % [data.display_name, wave_number])
 				return false
-			if wave_number == 1 and not is_equal_approx(health, data.max_health * 0.35):
+			if wave_number == 1 and not is_equal_approx(health, data.max_health * 0.40):
 				_fail("opening health reduction missing: %s" % data.display_name)
 				return false
 			previous_health = health

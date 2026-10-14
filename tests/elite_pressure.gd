@@ -45,7 +45,7 @@ func _run() -> void:
 	if game.get_node("EnemyProjectiles").get_child_count() != expected:
 		_fail("elite warning did not lead to the advertised projectile ring")
 		return
-	if ChestRewards.drop_chance(0.0, true) <= ChestRewards.drop_chance(0.0) or ChestRewards.drop_chance(1000.0, true) > 0.20:
+	if ChestRewards.drop_chance(0.0, true) <= ChestRewards.drop_chance(0.0) or ChestRewards.drop_chance(1000.0, true) > ChestRewards.ELITE_DROP_CHANCE * (1.0 + ChestRewards.LUCK_BONUS_CAP):
 		_fail("elite chest bonus is missing or unbounded")
 		return
 	elite.health = elite.max_health * 0.5

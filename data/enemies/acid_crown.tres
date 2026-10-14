@@ -30,3 +30,4 @@ radial_count = 10
 advanced_special_wave = 15
 advanced_special_attack = 6
 space_orb_radius = 34.0
+affix_resistances = {"ice": 0.3}

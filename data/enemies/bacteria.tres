@@ -6,8 +6,9 @@
 [resource]
 script = ExtResource("1")
 display_name = "Bakterium"
-health_per_wave = 4.5
-late_health_acceleration = 0.6
+max_health = 27.5
+health_per_wave = 5.4
+late_health_acceleration = 0.72
 damage_reduction = 0.05
 move_speed = 150.0
 contact_damage = 6.0
@@ -21,3 +22,4 @@ trigger_range = 175.0
 attack_speed = 430.0
 attack_duration = 0.36
 attack_damage = 9.0
+affix_resistances = {"poison": 0.3}

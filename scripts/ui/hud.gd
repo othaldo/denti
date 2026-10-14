@@ -24,10 +24,34 @@ const ICONS: Script = preload("res://scripts/ui/denti_ui_icons.gd")
 
 var fps_refresh_time: float = 0.0
 var ailments_label: Label
+var chests_label: Label
 
 
 func _ready() -> void:
 	$Root.theme = DentiUIStyle.make_theme()
+	chests_label = Label.new()
+	chests_label.name = "WaveChests"
+	chests_label.text = "0"
+	chests_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	chests_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	chests_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var chest_row := HBoxContainer.new()
+	chest_row.name = "WaveChestCounter"
+	chest_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	chest_row.add_theme_constant_override("separation", 5)
+	chest_row.tooltip_text = "In dieser Welle eingesammelte Kisten"
+	wave_info.add_child(chest_row)
+	wave_info.move_child(chest_row, 2)
+	var chest_icon := TextureRect.new()
+	chest_icon.name = "ChestIcon"
+	chest_icon.texture = CombatSpriteTextures.loot(&"chest")
+	chest_icon.custom_minimum_size = Vector2(22, 22)
+	chest_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	chest_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	chest_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	chest_row.add_child(chest_icon)
+	chest_row.add_child(chests_label)
+	DentiUIStyle.style_hud_text(chests_label, DentiUIStyle.GOLD, 14, 2, DentiUIStyle.BACKGROUND)
 	ailments_label = Label.new()
 	ailments_label.name = "Ailments"
 	ailments_label.position = Vector2(24, 130)
@@ -139,7 +163,7 @@ func update_status(stats: PlayerStats, xp: int, xp_goal: int, level: int, coins:
 	boss_bar.visible = boss_visible
 	wave_frame.offset_left = -130.0 if boss_visible else -82.0
 	wave_frame.offset_right = 130.0 if boss_visible else 82.0
-	wave_frame.offset_bottom = 116.0 if boss_visible else 86.0
+	wave_frame.offset_bottom = 138.0 if boss_visible else 108.0
 	wave_info.offset_left = -118.0 if boss_visible else -74.0
 	wave_info.offset_right = 118.0 if boss_visible else 74.0
 	if boss_visible:

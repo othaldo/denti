@@ -16,6 +16,7 @@ var confirm_button: Button
 var cancel_button: Button
 var close_button: Button
 var terms_row: HFlowContainer
+var affix_rows: VBoxContainer
 var evolution_options: VBoxContainer
 signal evolution_requested(recipe_id: StringName)
 
@@ -51,6 +52,9 @@ func _ready() -> void:
 	effect = _label(self, "", 15)
 	synergy = _label(self, "", 14)
 	synergy.add_theme_color_override("font_color", DentiUIStyle.MINT)
+	affix_rows = VBoxContainer.new()
+	affix_rows.add_theme_constant_override("separation", 3)
+	add_child(affix_rows)
 	evolution_options = VBoxContainer.new()
 	evolution_options.add_theme_constant_override("separation", 5)
 	add_child(evolution_options)
@@ -74,18 +78,18 @@ func _ready() -> void:
 
 func show_weapon(data: WeaponData, tier: int, player: Player, equipped: bool, equipment: Array[Dictionary]) -> void:
 	clear_actions()
-	heading.text = data.display_name
+	heading.text = data.display_name + " · " + WeaponPresentation.tier_text(data, tier)
 	icon.texture = data.sprite
 	subtitle.text = "%s · %s · %s · %s" % ["Ausgerüstet" if equipped else "Angebot", WeaponPresentation.tier_text(data, tier), data.roots_text(), data.damage_type_label()]
 	subtitle.add_theme_color_override("font_color", WeaponPresentation.EVOLUTION_COLOR if data.evolution_kind != &"" else DentiUIStyle.INK)
 	if data.evolution_kind != &"":
-		subtitle.text = "Spezialwaffe · Mk V · %s · %s" % [data.roots_text(), data.damage_type_label()]
+		subtitle.text = "Evolution · %s · %s · %s" % [WeaponPresentation.tier_text(data, tier), data.roots_text(), data.damage_type_label()]
 	var current := WeaponPresentation.values(data, tier, player)
 	_clear_values()
-	_value("Treffer", "%.1f" % current.damage)
-	_value("Angriffspause", "%.2f s" % current.pause)
-	_value("Reichweite", "%d" % roundi(current.range))
-	_value(DentiAttributes.name_for(DentiAttributes.Type.CRIT_CHANCE), "%d %% · ×%.1f" % [roundi(current.crit * 100.0), current.multiplier])
+	_rolled_value("Treffer", "%.1f" % current.damage, data, "damage")
+	_rolled_value("Angriffspause", "%.2f s" % current.pause, data, "interval")
+	_rolled_value("Reichweite", "%d" % roundi(current.range), data, "range")
+	_rolled_value(DentiAttributes.name_for(DentiAttributes.Type.CRIT_CHANCE), "%d %% · ×%.1f" % [roundi(current.crit * 100.0), current.multiplier], data, "crit")
 	if data.knockback_at_tier(tier) > 0:
 		_value("Rückstoß", "%d" % roundi(data.knockback_at_tier(tier)))
 	if data.splash_at_tier(tier) > 0:
@@ -103,7 +107,17 @@ func show_weapon(data: WeaponData, tier: int, player: Player, equipped: bool, eq
 	synergy.visible = not synergy.text.is_empty()
 	compare.visible = not equipped and not equipment.is_empty()
 	compare_text.visible = compare.visible
-	_terms(effect.text + " " + synergy.text + " Wurzeln " + DentiAttributes.name_for(DentiAttributes.Type.CRIT_CHANCE))
+	_terms(effect.text + " " + synergy.text + " Wurzeln Resistenzen " + DentiAttributes.name_for(DentiAttributes.Type.CRIT_CHANCE))
+
+
+func show_affixes(weapon: WeaponInstance, stats: PlayerStats) -> void:
+	_label(affix_rows, "Affix-Slots %d/%d" % [weapon.affixes.size(), weapon.affix_slots], 14)
+	for affix in weapon.affixes:
+		var data := WeaponAffixes.by_id(StringName(affix.id))
+		var label := _label(affix_rows, "%s +%.1f %s · %d×" % [data.display_name, float(affix.damage) if data.stat_key != &"" else WeaponAffixes.damage_for(affix.damage, weapon.data, stats), WeaponAffixes.damage_unit(data.id), affix.stacks], 14)
+		label.add_theme_color_override("font_color", data.color)
+		var rarity := _label(affix_rows, WeaponAffixes.progress_text(affix), 12)
+		DentiUIStyle.style_affix_rarity_label(rarity, affix.rarity)
 
 
 func show_item(entry: Dictionary, owned: bool) -> void:
@@ -122,6 +136,9 @@ func show_item(entry: Dictionary, owned: bool) -> void:
 
 
 func clear_actions() -> void:
+	if affix_rows != null:
+		for child in affix_rows.get_children():
+			child.free()
 	if evolution_options != null:
 		for child in evolution_options.get_children():
 			child.free()
@@ -151,7 +168,15 @@ func show_evolutions(recipes: Array[WeaponEvolutionRecipe]) -> void:
 		button.pressed.connect(func() -> void: evolution_requested.emit(recipe.id))
 
 
-func _value(key: String, value: String) -> void:
+func _rolled_value(key: String, value: String, data: WeaponData, attribute: String) -> void:
+	var label := _value(key, value)
+	if not data.rolls.is_empty():
+		var quality := WeaponRolls.attribute_quality(data, attribute)
+		label.add_theme_color_override("font_color", DentiRarity.color_for(quality))
+		label.tooltip_text += "\nWertequalität: " + WeaponRolls.NAMES[quality - 1]
+
+
+func _value(key: String, value: String) -> Label:
 	var type := DentiAttributes.NAMES.find(key)
 	var texture: Texture2D
 	if key == "Treffer":
@@ -179,6 +204,7 @@ func _value(key: String, value: String) -> void:
 	number.autowrap_mode = TextServer.AUTOWRAP_OFF
 	number.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	number.tooltip_text = key + " · " + value
+	return number
 
 
 func _terms(text: String) -> void:

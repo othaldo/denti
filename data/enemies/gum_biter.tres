@@ -5,9 +5,9 @@
 [resource]
 script = ExtResource("1")
 display_name = "Zahnfleischbeißer"
-max_health = 30.0
-health_per_wave = 7.0
-late_health_acceleration = 1.2
+max_health = 33.0
+health_per_wave = 8.4
+late_health_acceleration = 1.44
 damage_reduction = 0.02
 move_speed = 118.0
 contact_damage = 5.0

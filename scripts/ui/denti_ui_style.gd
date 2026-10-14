@@ -118,6 +118,11 @@ static func style_rarity_label(label: Label, tier: int) -> void:
 	label.add_theme_font_size_override("font_size", 13)
 
 
+static func style_affix_rarity_label(label: Label, tier: int) -> void:
+	style_rarity_label(label, tier)
+	label.add_theme_color_override("font_color", DentiRarity.color_for(tier))
+
+
 static func style_card(button: Button, tier: int = 1, color: Color = Color.TRANSPARENT) -> void:
 	style_button(button)
 	var accent := color if color.a > 0 else DentiRarity.color_for(tier)

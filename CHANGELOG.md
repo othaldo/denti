@@ -2,7 +2,16 @@
 
 Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü angezeigt. 0.1.0 wurde rückblickend anhand der Git-Historie dokumentiert; 0.2.0 bündelt die seitdem entstandenen Änderungen. Die Einträge beschreiben implementierte Funktionen. Weitere Pläne stehen in der [Roadmap](docs/ROADMAP.md).
 
-## In Entwicklung
+## 0.4.0 — 14.10.2026
+
+- **Individuelle Waffen und Shop-Loot:** Waffen besitzen eigene gewürfelte Attribute, Affixe und Effekt-Slots. Mk-Stufe und Attributqualität werden getrennt dargestellt; Namen behalten ihre Mk-Angabe.
+- **Kisten mit Build-Entscheidungen:** drei Angebote, direkt sichtbare Waffen- und Ersatzauswahl, durch Glück beeinflusste Funde und seltene goldene Beuteträger. Belohnungen werden nach der Welle aufgelöst; der HUD zeigt eingesammelte Kisten als Icon mit Zähler.
+- **Fortlaufende Affix-Progression:** gleiche Effekte verstärken sich, schwächere Funde bringen anteiligen Fortschritt und höhere Seltenheiten ermöglichen Aufstiege. Nach Legendär III geht es weiter. Bis zu vier Slots, Reichweite und Angriffstempo sowie seltene Kisten-Aufstiege über Mk IV erweitern Builds; Shop und Fusion bleiben bei Mk IV.
+- **Lesbarer Elementarschaden:** zusätzliche farbige Schadenszahlen ohne Typtext; auch Heilung zeigt nur Zahlen. Feuer, Gift und Blutung wirken über Zeit, Gegner besitzen passende begrenzte Resistenzen.
+- **Mehr Druck:** höhere Gegner-HP und Skalierung, mehr Gegner und angepasste Kistenchancen. Normal dient als gemeinsame Basis. Hard und Hell erhalten beschleunigende Zusatzkurven für HP, Verteidigung, Tempo und Angriffsschaden. HP und Schaden wachsen im Endlosmodus weiter.
+- **Stabile Affix-Karten:** feste Fundwerte, eindeutige Aktionsanzeigen und Text-/Höhenberechnung unabhängig von der zuvor ausgewählten Waffe, auch auf kleinen Bildschirmen.
+- **Speichern und Tests:** individuelle Waffenwerte, Affix-Fortschritt, Kistenentscheidungen und laufende Effekte werden beim Laden erhalten. Automatisierte Prüfungen decken Progression, Effekte, Layout und Schwierigkeitskurven ab.
+
 
 - CI-Tests auf die gewünschte Einstiegskurve (35 % Start-HP) abgestimmt. Effekt-Tests verwenden haltbare Ziele; der Save/Resume-Angriffstest verwendet reguläre Welle-10-HP und prüft separat, dass Laden und Trefferliste erhalten bleiben. Der Smoke-Test vergleicht Welle 2 mit den tatsächlichen Welle-1-HP.
 

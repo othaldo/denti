@@ -50,6 +50,50 @@ func _run() -> void:
 	if WaveController.elite_groups_for_wave(8) != [1] or WaveController.elite_groups_for_wave(8, &"easy") != [] or WaveController.elite_groups_for_wave(6, &"hell") != [3]:
 		_fail("difficulty elite progression is wrong")
 		return
+	# Check the actual spawn path for trash, elites and bosses, including Endless.
+	for data: EnemyData in [WaveController.ACID_SPITTER, load("res://data/enemies/plaque.tres"), load("res://data/enemies/acid_crown.tres"), load("res://data/enemies/cavity_king.tres")]:
+		for wave_number in [1, 10, 20, 21, 50]:
+			var previous_hp := 0.0
+			var previous_defense := -1.0
+			var previous_speed := 0.0
+			var previous_contact := -1.0
+			var previous_attack := -1.0
+			for difficulty: DifficultyData in [DifficultyCatalog.NORMAL, DifficultyCatalog.HARD, DifficultyCatalog.HELL]:
+				var probe := Enemy.new()
+				probe.configure(data, game.player, wave_number, difficulty.id)
+				if probe.max_health <= previous_hp or probe.damage_reduction <= previous_defense or probe.move_speed <= previous_speed or probe.damage_reduction > 0.56001 or (data.contact_damage > 0 and probe.contact_damage <= previous_contact) or (data.attack_damage > 0 and probe.attack_damage <= previous_attack):
+					probe.free()
+					_fail("difficulty stat curves do not increase safely")
+					return
+				if difficulty.id == &"normal" and (not is_equal_approx(probe.max_health, data.max_health * WaveController.health_multiplier(data, wave_number)) or not is_equal_approx(probe.move_speed, data.move_speed * WaveController.enemy_speed_multiplier(data, wave_number)) or not is_equal_approx(probe.damage_reduction, WaveController.damage_reduction(data, wave_number))):
+					probe.free()
+					_fail("Normal balance changed")
+					return
+				previous_hp = probe.max_health
+				previous_defense = probe.damage_reduction
+				previous_speed = probe.move_speed
+				previous_contact = probe.contact_damage
+				previous_attack = probe.attack_damage
+				probe.free()
+	for difficulty: DifficultyData in DifficultyCatalog.ALL:
+		if not is_equal_approx(difficulty.damage_factor(1), difficulty.enemy_damage_multiplier) or not is_equal_approx(difficulty.damage_factor(20), difficulty.enemy_damage_multiplier + difficulty.enemy_damage_late_bonus) or difficulty.damage_factor(50) != difficulty.damage_factor(20):
+			_fail("damage curve endpoints or Endless continuity changed")
+			return
+		for data: EnemyData in [WaveController.PLAQUE, WaveController.CAVITY_EMPEROR]:
+			var previous_damage := 0.0
+			for wave_number in [20, 21, 30, 40, 50, 100]:
+				var probe := Enemy.new()
+				probe.configure(data, game.player, wave_number, difficulty.id)
+				if probe.contact_damage <= previous_damage or not is_equal_approx(probe.contact_damage, data.contact_damage * WaveController.enemy_damage_multiplier(data, wave_number) * difficulty.damage_factor(wave_number)):
+					probe.free()
+					_fail("actual contact damage stopped growing in Endless")
+					return
+				previous_damage = probe.contact_damage
+				probe.free()
+	for difficulty: DifficultyData in [DifficultyCatalog.HARD, DifficultyCatalog.HELL]:
+		if difficulty.health_factor(15) - difficulty.health_factor(10) <= difficulty.health_factor(6) - difficulty.health_factor(1) or not is_equal_approx(difficulty.health_factor(20), 1.0 + difficulty.enemy_health_bonus.y) or difficulty.speed_factor(50) != difficulty.speed_factor(20) or difficulty.defense_bonus(50) != difficulty.defense_bonus(20):
+			_fail("difficulty acceleration or Endless caps are wrong")
+			return
 	game._create_enemy(WaveController.ACID_SPITTER, game.player.global_position + Vector2(200.0, 0.0))
 	var enemy: Enemy = game.get_node("Enemies").get_child(-1)
 	var normal_damage := WaveController.ACID_SPITTER.attack_damage * WaveController.enemy_damage_multiplier(WaveController.ACID_SPITTER, 8)

@@ -133,7 +133,7 @@ func _run() -> void:
 	game.player.loadout.restore([{"id": "magic_toothbrush", "tier": 4}])
 	game._update_shop_panel()
 	ui._select("equipment", 0)
-	if not ui.details.merge_button.disabled or not ui.details.merge_button.text.contains("IV"):
+	if not ui.details.merge_button.disabled or not ui.details.merge_button.text.contains("Kisten"):
 		_fail("maximum-tier weapon still offers fusion")
 		return
 	for frame in 3:

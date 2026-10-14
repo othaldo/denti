@@ -70,10 +70,10 @@ voller Fokus und situative Itemeffekte sind zusätzliche Leistung.
 
 Die Ausrüstung fasst sechs Wurzelplätze. Waffen mit einer Wurzel belegen einen, Waffen mit zwei Wurzeln zwei. Solange genug Plätze frei sind, fügt ein Kauf die Waffe einzeln hinzu. Ist die Ausrüstung voll, verschmilzt eine gekaufte Waffe mit einem gleichen Exemplar derselben Stufe (bis IV). Zwei bereits ausgerüstete gleiche Waffen derselben Stufe lassen sich per Rechtsklick auf eine der Waffen verschmelzen. Verkauf benötigt zwei Linksklicks und erstattet die Hälfte des Kaufwerts aller in dieser Waffe aufgegangenen Exemplare. Jede Stufe erhöht Schaden und Angriffstempo. Der Spielstand speichert Waffentypen, Stufen und investierte Münzen.
 
-Bohrung verursacht je nach Stufe 25–40 % mehr Schaden gegen Bosse. Schnitt verursacht 15 % mehr Schaden gegen nahezu unverletzte Gegner und baut Blutung auf. Wasserflosser-Treffer machen Gegner nass. Nass senkt das Lauftempo um 20 %, bei Eliten um 10 % und bei Bossen um 5 %; angekündigte Anstürme bleiben unverändert. Erneute Treffer frischen die Dauer auf, ohne den Slow zu stapeln. [Nassregeln und Tests](WET_STATUS.md). Die anderen Schadensarten unterscheiden sich über Reichweite, Projektiltempo, Durchschlag, Rückstoß, Strahl oder Flächentreffer. Gegner haben derzeit keine elementaren Resistenzen. Die Waffen haben individuelle Schadensmultiplikatoren und ausgewählte Eigenschaften, die mit ihrer Stufe wachsen.
+Bohrung verursacht je nach Stufe 25–40 % mehr Schaden gegen Bosse. Schnitt verursacht 15 % mehr Schaden gegen nahezu unverletzte Gegner und baut Blutung auf. Wasserflosser-Treffer machen Gegner nass. Nass senkt das Lauftempo um 20 %, bei Eliten um 10 % und bei Bossen um 5 %; angekündigte Anstürme bleiben unverändert. Erneute Treffer frischen die Dauer auf, ohne den Slow zu stapeln. [Nassregeln und Tests](WET_STATUS.md). Die anderen Schadensarten unterscheiden sich über Reichweite, Projektiltempo, Durchschlag, Rückstoß, Strahl oder Flächentreffer. Einige Gegner haben Affix-Resistenzen, sichtbar als farbige Schilde; Grundtreffer bleiben davon unberührt. Die Waffen haben individuelle Schadensmultiplikatoren und ausgewählte Eigenschaften, die mit ihrer Stufe wachsen.
 
-Weiterentwickelte Spezialwaffen werden als **Mk V** mit kräftig rotem Rahmen und
-Stufenabzeichen angezeigt. Ein grüner Aufwärtspfeil direkt auf der ausgerüsteten
+Weiterentwickelte Spezialwaffen sind eigenständige Waffenformen. Ihre Mk-Stufe
+bleibt erhalten; **Mk V und höher** werden ausschließlich durch Kisten freigeschaltet. Ein grüner Aufwärtspfeil direkt auf der ausgerüsteten
 Waffe im Shop zeigt eine verfügbare Fusion oder Evolution an. Er erscheint nur,
 wenn der passende Fusionspartner beziehungsweise alle Evolutionszutaten vorliegen.
 
@@ -130,3 +130,34 @@ Mit `-- --loadouts` zeigt das Werkzeug sechs Speere gegen ein Ziel,
 sechs Kratzer und Wasserflosser gegen mehrere Ziele sowie einen gemischten Build
 unter `.godot/weapon_loadout_frames/`;
 die [Loadout-Vorschau](screenshots/weapon_loadouts.gif) zeigt diese Anordnung.
+
+## Individuelle Affixe
+
+Zahnfee-Kisten verbessern eine gewählte Waffeninstanz nach dem Wellenende.
+Feuer (2 s), Gift (5 s) und Affix-Blutung (3 s) verursachen zusätzlichen Schaden
+über Zeit. Eis und Elektro treffen direkt; Eis verlangsamt außerdem kurz.
+Treffer und DoTs zeigen Zahlen in Elementfarbe. Passende Gegnerresistenzen
+sind durch kleine farbige Schilde erkennbar. Weitere Funde desselben Affixes
+erhöhen bei gleicher Seltenheit die Ausbaustufe I–III und danach die Seltenheit.
+Höhere Funde überspringen Stufen, niedrigere geben 50/25/12,5 % Fortschritt.
+Nach Legendär III wachsen passende legendäre Beiträge mit jeweils +2 weiter.
+Waffen beginnen mit einem Affix-Slot; Slotfunde öffnen bis zu vier Slots.
+Auch Reichweite und Angriffstempo können als Waffen-Affixe gefunden werden.
+Ein neuer Effekt bei vollen Slots benötigt eine ausdrückliche Ersatzwahl.
+
+Fusion verbindet gleiche Effekte nach den Ausbau-Regeln; unterschiedliche werden
+übernommen, sofern sie in die höhere Slotkapazität beider Waffen passen. Bei zu vielen
+verschiedenen Effekten bleibt die Fusion gesperrt und verbraucht keine Waffe.
+Evolutionen erhalten die Affixe ebenfalls. Ein Kauf mit automatischer Fusion erhält
+alle Affixe der vorhandenen Waffe. Details und Pause-Menü zeigen Affixe separat.
+
+[Zufall, Wertebereiche, Speicherung und Tests](WEAPON_AFFIXES.md).
+
+Shopwaffen haben zusätzlich individuelle Rolls für Grundschaden (60–170 %),
+Angriffspause (72–135 %), Reichweite (80–125 %) und Crit (+0–10 Prozentpunkte).
+Schrott/Solide/Meisterwerk/Göttlich ist unabhängig von Mk. Fusion behält den
+Roll der ausgewählten Waffe; beim Kauf mit voller Ausrüstung kann in den Details
+stattdessen der gesamte neue Roll übernommen werden. Affixe bleiben erhalten.
+
+Waffenname und Rahmen zeigen immer Mk. Die Rollqualität färbt nur die einzelnen
+Attribute; auch eine Mk-I-Waffe mit hervorragendem Schaden behält ihren Mk-I-Rahmen.

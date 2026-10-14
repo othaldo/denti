@@ -11,6 +11,7 @@ enum SpriteFacing { FRONT, RIGHT, LEFT }
 @export var late_health_acceleration: float = 0.0
 @export_range(0.0, 0.6, 0.01) var damage_reduction: float = 0.0
 @export_range(0.0, 1.0, 0.01) var knockback_resistance: float = 0.0
+@export var affix_resistances: Dictionary = {}
 @export var move_speed: float = 90.0
 @export var contact_damage: float = 9.0
 @export var radius: float = 18.0
@@ -79,3 +80,7 @@ enum SpriteFacing { FRONT, RIGHT, LEFT }
 @export_range(0.0, 1.0, 0.01) var overtime_speed_per_second: float = 0.03
 @export_range(0.0, 1.0, 0.01) var overtime_attack_rate_per_second: float = 0.04
 @export_range(0.0, 1.0, 0.01) var overtime_health_per_second: float = 0.02
+
+
+func affix_resistance(kind: StringName) -> float:
+	return clampf(float(affix_resistances.get(str(kind), 0.0)), 0.0, 0.60)

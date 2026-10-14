@@ -10,7 +10,7 @@ static func capture(game) -> Dictionary:
 	for enemy: Enemy in game.get_node("Enemies").get_children():
 		enemy_indices[enemy.get_instance_id()] = enemies_data.size()
 		enemies_data.append({
-			"type": enemy.data.resource_path, "position": _vector_data(enemy.position),
+			"type": enemy.data.resource_path, "treasure_carrier": enemy.treasure_carrier, "chill_time": enemy.chill_time, "position": _vector_data(enemy.position),
 			"sprite_flip_h": enemy.sprite.flip_h,
 			"inflicted_statuses": enemy.inflicted_statuses.duplicate(true),
 			"health": enemy.health, "phase": enemy.special_phase,
@@ -19,7 +19,7 @@ static func capture(game) -> Dictionary:
 			"boss_dash_end": _vector_data(enemy.boss_dash_end), "boss_dash_origin": _vector_data(enemy.boss_dash_origin),
 			"dying": enemy.dying, "death_elapsed": enemy.death_elapsed, "enraged": enemy.is_enraged,
 			"overtime_active": enemy.overtime_active, "overtime_seconds": enemy.overtime_seconds, "overtime_tick": enemy.overtime_tick,
-			"bleed_stacks": enemy.bleed_stacks, "bleed_dps": enemy.bleed_dps,
+			"affix_effects": enemy.affix_effects.save_data(), "bleed_stacks": enemy.bleed_stacks, "bleed_dps": enemy.bleed_dps,
 			"bleed_time": enemy.bleed_time, "bleed_tick": enemy.bleed_tick,
 			"wet_time": enemy.wet_time,
 			"exposure_time": enemy.exposure_time, "enamel_exposure": enemy.enamel_exposure,
@@ -47,7 +47,7 @@ static func capture(game) -> Dictionary:
 	for drop: Loot in game.get_node("Loot").get_children():
 		if drop.is_queued_for_deletion():
 			continue
-		loot_data.append({"position": _vector_data(drop.position), "kind": str(drop.kind), "amount": drop.amount, "reward_id": str(drop.reward_id)})
+		loot_data.append({"position": _vector_data(drop.position), "kind": str(drop.kind), "amount": drop.amount, "reward_id": str(drop.reward_id), "reward_data": drop.reward_data.duplicate(true)})
 	var acid_data: Array[Dictionary] = []
 	for projectile: AcidProjectile in game.get_node("EnemyProjectiles").get_children():
 		if projectile.is_queued_for_deletion():
@@ -56,7 +56,7 @@ static func capture(game) -> Dictionary:
 	var offer_data: Array[Dictionary] = []
 	for index in game.shop.offers.size():
 		var offer: ShopOfferData = game.shop.offers[index]
-		offer_data.append({"id": str(offer.id), "tier": offer.weapon_tier, "price": offer.price, "reserved": game.shop.reserved[index]} if offer != null else {})
+		offer_data.append({"id": str(offer.id), "tier": offer.weapon_tier, "rolls": offer.weapon_data.rolls.duplicate(true) if offer.weapon_data != null else {}, "price": offer.price, "reserved": game.shop.reserved[index]} if offer != null else {})
 	var upgrades: Array[Dictionary] = []
 	if game.choice_panel.visible and game.choice_panel.mode == &"upgrade":
 		for upgrade in game.choice_panel.current_upgrades:
@@ -173,7 +173,7 @@ static func restore(game, saved: Dictionary) -> void:
 		var enemy_data := _enemy_from_path(str(entry.get("type", "")))
 		if enemy_data == null:
 			continue
-		game._create_enemy(enemy_data, _read_vector(entry.get("position", [0.0, 0.0])))
+		game._create_enemy(enemy_data, _read_vector(entry.get("position", [0.0, 0.0])), bool(entry.get("treasure_carrier", false)))
 		var enemy: Enemy = game.get_node("Enemies").get_child(-1)
 		enemy.sprite.flip_h = bool(entry.get("sprite_flip_h", enemy.sprite.flip_h)) if enemy.data.sprite_facing != EnemyData.SpriteFacing.FRONT else false
 		# Legacy mobs had no random traits; never reroll traits while resuming.
@@ -197,10 +197,12 @@ static func restore(game, saved: Dictionary) -> void:
 		enemy.sync_inflammation_aura(0.0, enemy.death_elapsed / Enemy.BOSS_DEATH_DURATION if enemy.dying else 0.0)
 		if enemy.dying:
 			enemy.remove_from_group("enemies")
+		enemy.affix_effects.restore(entry.get("affix_effects", {}))
 		enemy.bleed_stacks = clampi(int(entry.get("bleed_stacks", 0)), 0, 5)
 		enemy.bleed_dps = maxf(float(entry.get("bleed_dps", 0.0)), 0.0)
 		enemy.bleed_time = maxf(float(entry.get("bleed_time", 0.0)), 0.0)
 		enemy.bleed_tick = clampf(float(entry.get("bleed_tick", 1.0)), 0.0, 1.0)
+		enemy.chill_time = maxf(float(entry.get("chill_time", 0.0)), 0.0)
 		enemy.wet_time = maxf(float(entry.get("wet_time", 0.0)), 0.0)
 		enemy.exposure_time = maxf(float(entry.get("exposure_time", 0.0)), 0.0)
 		enemy.enamel_exposure = clampf(float(entry.get("enamel_exposure", 0.0)), 0.0, 0.30)
@@ -228,8 +230,9 @@ static func restore(game, saved: Dictionary) -> void:
 			continue
 		var data := WeaponCatalog.by_id(StringName(entry.get("id", "")))
 		if data != null:
+			data = WeaponRolls.resolve(data, entry.get("rolls", {}), entry.get("upgrades", {}))
 			var projectile := projectiles.acquire(data, clampi(entry.get("tier", 1), 1, 4))
-			projectile.restore_state(entry, game.items, restored_enemies)
+			projectile.restore_state(entry, game.items, restored_enemies, data)
 	for index in mini(runtime.size(), weapons.size()):
 		if not runtime[index] is Dictionary:
 			continue
@@ -244,8 +247,8 @@ static func restore(game, saved: Dictionary) -> void:
 			weapon.focus_time = clampf(float(entry.get("focus_time", 0.0)), 0.0, 30.0)
 	for entry in saved.get("loot", []):
 		var kind := StringName(str(entry.get("kind", "xp")))
-		if kind == &"xp" or kind == &"coin" or kind == &"chest" and ShopController.by_id(StringName(str(entry.get("reward_id", "")))) != null:
-			game._spawn_loot(_read_vector(entry.get("position", [0.0, 0.0])), kind, maxi(int(entry.get("amount", 1)), 1), StringName(str(entry.get("reward_id", ""))))
+		if kind == &"xp" or kind == &"coin" or kind == &"chest" and (ShopController.by_id(StringName(str(entry.get("reward_id", "")))) != null or not WeaponAffixes.sanitize_chest(entry.get("reward_data", {})).is_empty()):
+			game._spawn_loot(_read_vector(entry.get("position", [0.0, 0.0])), kind, maxi(int(entry.get("amount", 1)), 1), StringName(str(entry.get("reward_id", ""))), entry.get("reward_data", {}))
 	for entry in saved.get("acid", []):
 		var projectile := EnemyProjectilePatterns.acquire(game.get_node("EnemyProjectiles"))
 		projectile.launch(_read_vector(entry.get("position", [0.0, 0.0])), _read_vector(entry.get("direction", [1.0, 0.0])), float(entry.get("speed", 290.0)), float(entry.get("damage", 8.0)), player, Color(str(entry.get("color", "87e021"))), float(entry.get("hit_radius", 21.0)), float(entry.get("visual_radius", 9.0)), DentiStatus.sanitize_attacks(entry.get("inflicted_statuses", [])))
@@ -265,6 +268,7 @@ static func restore(game, saved: Dictionary) -> void:
 		if template != null:
 			if template.weapon_data != null and value is Dictionary:
 				found = ShopController.weapon_offer(template, int(value.get("tier", 1)))
+				found.weapon_data = WeaponRolls.resolve(template.weapon_data, value.get("rolls", {}))
 			else:
 				found = template.duplicate() as ShopOfferData
 			if value is Dictionary:

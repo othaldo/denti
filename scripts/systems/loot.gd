@@ -10,6 +10,7 @@ const WAVE_COLLECTION_SPEED := 620.0
 var kind: StringName
 var amount: int
 var reward_id: StringName = &""
+var reward_data: Dictionary = {}
 var target: Player
 var wave_collecting: bool = false
 var sprite: Sprite2D
@@ -35,16 +36,18 @@ func _exit_tree() -> void:
 		spatial_index.unregister(self)
 
 
-func configure(loot_kind: StringName, loot_amount: int, player: Player, loot_reward_id: StringName = &"") -> void:
+func configure(loot_kind: StringName, loot_amount: int, player: Player, loot_reward_id: StringName = &"", payload: Dictionary = {}) -> void:
 	kind = loot_kind
 	amount = loot_amount
 	reward_id = loot_reward_id
+	reward_data = payload.duplicate(true)
 	target = player
 	if sprite == null:
 		sprite = Sprite2D.new()
 		add_child(sprite)
 	sprite.texture = CombatSpriteTextures.loot(kind)
 	sprite.scale = Vector2.ONE / CombatSpriteTextures.RESOLUTION
+	sprite.modulate = ChestRewards.TREASURE_COLOR if bool(reward_data.get("golden", false)) else Color.WHITE
 
 
 func begin_wave_collection() -> void:

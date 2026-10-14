@@ -13,6 +13,7 @@ var upgrade_tier: int = 1
 var upgrade_description: String = ""
 var content_margin: MarginContainer
 var chest_row: HBoxContainer
+var progress_bar: ProgressBar
 var keep_label: Label
 var chest_name: String = ""
 var chest_effect: String = ""
@@ -80,6 +81,23 @@ func show_item(item: ShopOfferData) -> void:
 	tooltip_text = "%s\n%s\nBehalten" % [item.display_name, chest_effect]
 	disabled = false
 	DentiUIStyle.style_card(self, item.rarity_tier)
+
+
+func show_affix(option: Dictionary, comparison: String) -> void:
+	_restore_standard_content()
+	text = ""
+	content.visible = true
+	var data := WeaponAffixes.by_id(StringName(str(option.id)))
+	icon_rect.texture = ICONS.item(data.icon_index) if data != null else ICONS.hud(4)
+	name_label.text = data.display_name.to_upper() if data != null else "ZWEITER EFFEKT-SLOT"
+	name_label.add_theme_color_override("font_color", data.color if data != null else DentiUIStyle.INK)
+	rarity_label.text = DentiRarity.name_for(int(option.rarity)).to_upper()
+	DentiUIStyle.style_affix_rarity_label(rarity_label, int(option.rarity))
+	upgrade_description = comparison
+	effect_label.text = comparison
+	tooltip_text = comparison + "\nJeder passende Fund bringt Fortschritt. Höhere Seltenheit: direktes Upgrade.\nWeitere Treffer addieren ihr Schadensbudget. Gegnerresistenzen reduzieren den jeweiligen Zusatzschaden."
+	disabled = false
+	DentiUIStyle.style_card(self, int(option.rarity))
 
 
 func show_relic(relic: RelicData) -> void:
@@ -191,6 +209,8 @@ func _wrap_chest_text(label: Label, source: String, width: float) -> void:
 
 
 func _restore_standard_content() -> void:
+	progress_bar.hide()
+	content.move_child(keep_label, -1)
 	icon = null
 	focus_neighbor_top = NodePath()
 	focus_neighbor_bottom = NodePath()
@@ -258,6 +278,13 @@ func _build_content() -> void:
 	effect_label.add_theme_font_size_override("font_size", 14)
 	effect_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	content.add_child(effect_label)
+	progress_bar = ProgressBar.new()
+	progress_bar.custom_minimum_size = Vector2(0, 8)
+	progress_bar.show_percentage = false
+	progress_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	progress_bar.hide()
+	DentiUIStyle.style_progress(progress_bar, DentiUIStyle.MINT)
+	content.add_child(progress_bar)
 	keep_label = Label.new()
 	keep_label.text = "Behalten"
 	keep_label.visible = false

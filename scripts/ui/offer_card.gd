@@ -65,7 +65,7 @@ func set_catalog_layout(vertical: bool, dense: bool = false, compact_grid: bool 
 				if child is Label:
 					child.add_theme_font_size_override("font_size", stat_font_size if bool(cell.get_meta("primary", true)) else secondary_font_size)
 	# Desktop cards reserve common text slots; compact rows remove empty fields.
-	name_label.custom_minimum_size.y = 2.0 * ceilf(name_label.get_theme_font("font").get_height(name_label.get_theme_font_size("font_size")))
+	name_label.custom_minimum_size.y = 2.0 * ceilf(name_label.get_theme_font("font").get_height(name_label.get_theme_font_size("font_size"))) + name_label.get_theme_constant("line_spacing")
 	effect_label.custom_minimum_size.y = (2.0 if dense else 3.0) * ceilf(effect_label.get_theme_font("font").get_height(effect_label.get_theme_font_size("font_size")))
 	name_label.vertical_alignment = VERTICAL_ALIGNMENT_TOP
 	catalog_header.custom_minimum_size.y = name_label.custom_minimum_size.y if dense else 0.0
@@ -110,7 +110,8 @@ func show_offer(offer: ShopOfferData, coins: int, available: bool = true, _owned
 	info_badge.visible = selection_only
 	text = ""
 	icon_rect.texture = offer.weapon_data.sprite if offer.weapon_data != null else (offer.icon_texture if offer.icon_texture != null else ICONS.item(offer.icon_index))
-	name_label.text = offer.display_name
+	name_label.text = offer.display_name + ("\n" + WeaponPresentation.tier_text(offer.weapon_data, offer.weapon_tier) if offer.weapon_data != null else "")
+	name_label.autowrap_mode = TextServer.AUTOWRAP_OFF if offer.weapon_data != null else TextServer.AUTOWRAP_WORD_SMART
 	rarity_label.text = "%s" % DentiRarity.name_for(offer.rarity_tier)
 	if offer.weapon_data != null:
 		rarity_label.text += " · %s\n%s" % [["I", "II", "III", "IV"][offer.weapon_tier - 1], offer.weapon_data.damage_type_label().to_upper()]
@@ -145,8 +146,10 @@ func show_offer(offer: ShopOfferData, coins: int, available: bool = true, _owned
 		tooltip_text = "%s\n%s\n%s" % [offer.display_name, offer.effect_text(), offer.limit_text()]
 		if not available:
 			tooltip_text += "\nLimit erreicht"
+	if offer.weapon_data != null and not offer.weapon_data.rolls.is_empty():
+		tooltip_text += "\n" + WeaponRolls.description(offer.weapon_data)
 	tooltip_text += "\nSeltenheit: " + DentiRarity.name_for(offer.rarity_tier)
-	DentiUIStyle.style_card(self, offer.rarity_tier)
+	DentiUIStyle.style_card(self, offer.weapon_tier if offer.weapon_data != null else offer.rarity_tier)
 	_queue_fit()
 
 
@@ -384,10 +387,14 @@ func show_weapon_values(data: WeaponData, tier: int, player: Player) -> void:
 		summary_row.remove_child(child)
 		child.queue_free()
 	var values := WeaponPresentation.values(data, tier, player)
-	for entry in [[ICONS.stat(0), "%.1f" % values.damage, "Trefferschaden"], [ICONS.hud(5), "%.2f s" % values.pause, "Angriffspause"]]:
-		_stat_cell(entry[0], entry[1], entry[2], true)
-	_stat_cell(ICONS.stat(4), "%d %%" % roundi(values.crit * 100), "Krit-Chance", false)
-	_stat_cell(ICONS.RANGE, "%d" % roundi(values.range), "Reichweite", false)
+	for entry in [[ICONS.stat(0), "%.1f" % values.damage, "Trefferschaden", "damage", true], [ICONS.hud(5), "%.2f s" % values.pause, "Angriffspause", "interval", true], [ICONS.stat(4), "%d %%" % roundi(values.crit * 100), "Krit-Chance", "crit", false], [ICONS.RANGE, "%d" % roundi(values.range), "Reichweite", "range", false]]:
+		var row := _stat_cell(entry[0], entry[1], entry[2], entry[4])
+		if not data.rolls.is_empty():
+			var quality := WeaponRolls.attribute_quality(data, entry[3])
+			var number := row.get_child(1) as Label
+			number.add_theme_color_override("font_color", DentiRarity.color_for(quality))
+			row.tooltip_text += "\nWertequalität: " + WeaponRolls.NAMES[quality - 1]
+
 	_sync_catalog_slots()
 
 

@@ -54,4 +54,4 @@ func tick(weapon: WeaponInstance, from_progress: float, to_progress: float) -> v
 			var radius := enemy.data.radius + weapon.data.attack_width * 0.5
 			if closest.distance_squared_to(enemy.global_position) <= radius * radius:
 				hit_ids[id] = true
-				WeaponAttackShapes.hit(enemy, weapon.data, weapon.tier, damage, critical, weapon.player.items, weapon.aim)
+				WeaponAttackShapes.hit(enemy, weapon.data, weapon.tier, damage, critical, weapon.player.items, weapon.aim, weapon.affixes)

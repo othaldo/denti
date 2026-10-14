@@ -4,6 +4,8 @@ extends Resource
 const MIN_ATTACK_COOLDOWN := 0.05
 const WET_STATUS = preload("res://data/statuses/wet.tres")
 
+@export var chest_upgrades: Dictionary = {}
+@export var rolls: Dictionary = {}
 @export var id: StringName
 @export var display_name: String
 @export var role: String

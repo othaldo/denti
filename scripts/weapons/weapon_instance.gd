@@ -6,6 +6,9 @@ const PROJECTILE_SCENE: PackedScene = preload("res://scenes/game/weapon_projecti
 var data: WeaponData
 var tier: int = 1
 var invested_coins: int = 0
+var instance_uid: String = ""
+var affix_slots: int = 1
+var affixes: Array[Dictionary] = []
 var cooldown: float = 0.0
 var attack_time: float = 0.0
 var attack_duration: float = 0.32
@@ -36,6 +39,7 @@ func configure(weapon: WeaponData, weapon_tier: int = 1) -> void:
 	data = weapon
 	tier = clampi(weapon_tier, 1, 4)
 	name = "%s_%d" % [str(data.id), get_instance_id()]
+	instance_uid = "%d:%d" % [Time.get_ticks_usec(), get_instance_id()]
 
 
 func _ready() -> void:
@@ -194,16 +198,16 @@ func _fire(targets: Array[Enemy], damage: float, critical: bool) -> void:
 			for index in count:
 				var angle := 0.0 if index == 0 else (-0.12 if index == 1 else 0.12)
 				var projectile := pool.acquire(data, tier)
-				projectile.launch(muzzle, aim.rotated(angle), damage if is_zero_approx(angle) else damage * 0.55, data, player.items, critical, tier)
+				projectile.launch(muzzle, aim.rotated(angle), damage if is_zero_approx(angle) else damage * 0.55, data, player.items, critical, tier, affixes, 1.0 if index == 0 else 0.55)
 		&"beam":
-			WeaponAttackShapes.hit(targets[0], data, tier, damage, critical, player.items, aim)
+			WeaponAttackShapes.hit(targets[0], data, tier, damage, critical, player.items, aim, affixes)
 		&"beam_line", &"cone":
 			# Acquisition uses Denti's range; the emitted shape uses the barrel's range.
 			for enemy in player.nearby_enemies(muzzle, data.range_at_tier(tier)):
 				if enemy == null or enemy.health <= 0:
 					continue
 				if WeaponAttackShapes.contains(data, tier, muzzle, aim, enemy.global_position, enemy.data.radius):
-					WeaponAttackShapes.hit(enemy, data, tier, damage, critical, player.items, aim)
+					WeaponAttackShapes.hit(enemy, data, tier, damage, critical, player.items, aim, affixes)
 
 
 func save_motion(enemy_indices: Dictionary) -> Dictionary:
@@ -302,3 +306,17 @@ func _draw() -> void:
 			for index in 3:
 				var direction := aim.rotated(lerpf(-half_angle, half_angle, float(index) / 2.0))
 				draw_line(muzzle, muzzle + direction * reach * (0.4 + fraction * 0.6), Color(color, fade * 0.6), 2.0)
+
+
+func refresh_affix_stats() -> void:
+	var upgrades := data.chest_upgrades.duplicate(true)
+	upgrades["range"] = 0.0
+	upgrades["tempo"] = 0.0
+	for affix in affixes:
+		var definition := WeaponAffixes.by_id(StringName(affix.id))
+		if definition.stat_key != &"":
+			upgrades[str(definition.stat_key)] += float(affix.damage)
+	# Preserve neutral resource identity when no weapon stat has changed.
+	if float(upgrades.range) == 0 and float(upgrades.tempo) == 0 and int(upgrades.get("mk", 0)) == 0:
+		upgrades = {}
+	data = WeaponRolls.resolve(data, data.rolls, upgrades)

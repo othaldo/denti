@@ -6,9 +6,9 @@
 [resource]
 script = ExtResource("1")
 display_name = "Zuckerstück"
-max_health = 100.0
-health_per_wave = 20.0
-late_health_acceleration = 6.0
+max_health = 110.0
+health_per_wave = 24.0
+late_health_acceleration = 7.2
 damage_reduction = 0.12
 move_speed = 100.0
 contact_damage = 15.0
@@ -29,3 +29,4 @@ attack_speed = 600.0
 attack_duration = 0.85
 attack_damage = 13.0
 dash_impact_radius = 76.0
+affix_resistances = {"bleed": 0.35}

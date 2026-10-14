@@ -55,7 +55,7 @@ func _run() -> void:
 	check(session.discovered_fusions.has(str(recipe.id)), "sale or new run erased discovery")
 	var revealed := DentipediaData.entries(0, session.discovered_fusions)
 	check(revealed[WeaponCatalog.ALL.size()].title == recipe.result.display_name and revealed[WeaponCatalog.ALL.size()].has("recipe"), "discovered entry lacks recipe")
-	check(revealed[WeaponCatalog.ALL.size()].body.contains("Mk V:") and not revealed[WeaponCatalog.ALL.size()].body.contains("Mk IV:"), "Dentipedia special weapon has wrong tier")
+	check(revealed[WeaponCatalog.ALL.size()].body.contains("Mk IV:") and not revealed[WeaponCatalog.ALL.size()].body.contains("Mk V:"), "Dentipedia special weapon has wrong tier")
 	check(DentipediaData.ingredients(recipe).size() == 1 + recipe.families.size() + recipe.items.size(), "recipe ingredients incomplete")
 	game.game_menu.open_pause()
 	var found := false

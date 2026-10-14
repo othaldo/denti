@@ -5,9 +5,9 @@
 [resource]
 script = ExtResource("1")
 display_name = "Giftkeim"
-max_health = 45.0
-health_per_wave = 8.2
-late_health_acceleration = 1.7
+max_health = 49.5
+health_per_wave = 9.84
+late_health_acceleration = 2.04
 damage_reduction = 0.04
 move_speed = 85.0
 contact_damage = 4.0
@@ -25,3 +25,4 @@ trigger_range = 500.0
 preferred_range = 245.0
 attack_speed = 220.0
 attack_damage = 5.0
+affix_resistances = {"poison": 0.5}

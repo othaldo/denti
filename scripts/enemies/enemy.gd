@@ -3,6 +3,7 @@ extends Node2D
 
 signal defeated(position: Vector2, data: EnemyData)
 signal damaged(position: Vector2, amount: float)
+signal affix_damaged(position: Vector2, amount: float, kind: StringName)
 signal damage_recorded(amount: float, weapon_id: StringName, proc_id: StringName)
 signal weapon_hit(enemy: Enemy, amount: float, weapon: WeaponData, critical: bool)
 signal attack_performed(kind: StringName)
@@ -50,11 +51,14 @@ var overtime_active: bool = false
 var overtime_seconds: int = 0
 var overtime_tick: float = 0.0
 var sprite_base_scale: Vector2 = Vector2.ONE
+var affix_effects := EnemyAffixEffects.new()
 var bleed_stacks: int = 0
 var bleed_dps: float = 0.0
 var bleed_time: float = 0.0
 var bleed_tick: float = 1.0
 var wet_time: float = 0.0
+var chill_time: float = 0.0
+var treasure_carrier: bool = false
 var exposure_time: float = 0.0
 var enamel_exposure: float = 0.0
 var haste_time: float = 0.0
@@ -95,12 +99,12 @@ func configure(enemy_data: EnemyData, player: Player, wave_number: int = 1, diff
 	var advanced := data.advanced_special_wave > 0 and wave_number >= data.advanced_special_wave
 	active_special_attack = data.advanced_special_attack if advanced else data.special_attack
 	active_trigger_range = data.advanced_trigger_range if advanced and data.advanced_trigger_range > 0.0 else data.trigger_range
-	max_health = data.max_health * WaveController.health_multiplier(data, wave_number)
+	max_health = data.max_health * WaveController.health_multiplier(data, wave_number) * difficulty.health_factor(wave_number)
 	health = max_health
-	damage_reduction = WaveController.damage_reduction(data, wave_number)
-	contact_damage = data.contact_damage * WaveController.enemy_damage_multiplier(data, wave_number) * difficulty.enemy_damage_multiplier
-	attack_damage = data.attack_damage * WaveController.enemy_damage_multiplier(data, wave_number) * difficulty.enemy_damage_multiplier
-	move_speed = data.move_speed * WaveController.enemy_speed_multiplier(data, wave_number)
+	damage_reduction = WaveController.damage_reduction(data, wave_number) + difficulty.defense_bonus(wave_number)
+	contact_damage = data.contact_damage * WaveController.enemy_damage_multiplier(data, wave_number) * difficulty.damage_factor(wave_number)
+	attack_damage = data.attack_damage * WaveController.enemy_damage_multiplier(data, wave_number) * difficulty.damage_factor(wave_number)
+	move_speed = data.move_speed * WaveController.enemy_speed_multiplier(data, wave_number) * difficulty.speed_factor(wave_number)
 	special_phase = SpecialPhase.COOLDOWN
 	var interval := data.special_interval * (WaveController.ranged_interval_multiplier(wave_number) * difficulty.ranged_interval_multiplier if active_special_attack == EnemyData.SpecialAttack.SHOOT else 1.0)
 	if data.is_elite:
@@ -114,6 +118,13 @@ func configure(enemy_data: EnemyData, player: Player, wave_number: int = 1, diff
 	queue_redraw()
 
 
+func make_treasure_carrier() -> void:
+	treasure_carrier = true
+	max_health *= ChestRewards.TREASURE_HEALTH_FACTOR
+	health = max_health
+	move_speed *= ChestRewards.TREASURE_SPEED_FACTOR
+
+
 func _ready() -> void:
 	add_to_group("enemies")
 	spatial_index = get_parent() as EnemySpatialIndex
@@ -122,7 +133,7 @@ func _ready() -> void:
 		set_notify_local_transform(true)
 		set_physics_process(false)
 	sprite.texture = data.sprite
-	sprite.modulate = data.sprite_tint
+	sprite.modulate = ChestRewards.TREASURE_COLOR if treasure_carrier else data.sprite_tint
 	var side := maxf(float(data.sprite.get_width()), float(data.sprite.get_height()))
 	sprite.scale = Vector2.ONE * (data.radius * 2.35 / side)
 	sprite_base_scale = sprite.scale
@@ -170,6 +181,8 @@ func _process(delta: float) -> void:
 			queue_free()
 		return
 	animation_time += delta * (2.5 if data.is_boss else 5.0)
+	if treasure_carrier:
+		queue_redraw()
 	sprite.position.y = sin(animation_time) * (2.2 if data.is_boss else 1.2)
 	sprite.rotation = sin(animation_time * 0.7) * (0.025 if data.is_boss else 0.045)
 	sync_inflammation_aura(delta)
@@ -180,6 +193,7 @@ func _process(delta: float) -> void:
 
 func _physics_process(delta: float) -> void:
 	_tick_overtime(delta)
+	chill_time = maxf(chill_time - delta, 0.0)
 	if exposure_time > 0.0:
 		exposure_time = maxf(exposure_time - delta, 0.0)
 		if exposure_time <= 0.0:
@@ -225,6 +239,7 @@ func _physics_process(delta: float) -> void:
 			bleed_stacks = 0
 			bleed_dps = 0.0
 			queue_redraw()
+	affix_effects.advance(self, delta)
 	if health <= 0.0:
 		return
 	if target == null or target.stats.health <= 0.0:
@@ -380,8 +395,15 @@ func overtime_defense_factor() -> float:
 
 
 func _movement_speed() -> float:
-	var wet_factor: float = WET_STATUS.speed_factor(data) if wet_time > 0.0 else 1.0
+	var wet_factor := status_speed_factor()
 	return move_speed * overtime_speed_factor() * (1.0 + haste_bonus if haste_time > 0.0 else 1.0) * wet_factor
+
+
+func status_speed_factor() -> float:
+	var wet_factor: float = WET_STATUS.speed_factor(data) if wet_time > 0.0 else 1.0
+	var ice := WeaponAffixes.by_id(&"ice")
+	var resistance := 0.25 if data.is_boss else (0.5 if data.is_elite else 1.0)
+	return minf(wet_factor, 1.0 - ice.slow_fraction * resistance if chill_time > 0.0 else 1.0)
 
 
 func apply_haste(bonus: float, duration: float) -> void:
@@ -542,10 +564,33 @@ func apply_enamel_exposure(bonus: float, duration: float) -> void:
 		queue_redraw()
 
 
-func take_damage(amount: float, weapon: WeaponData = null, critical: bool = false, proc_id: StringName = &"") -> void:
+func take_damage(amount: float, weapon: WeaponData = null, critical: bool = false, proc_id: StringName = &"", additions: Array[Dictionary] = []) -> void:
 	if health <= 0.0:
 		return
-	var applied := maxf(amount * (1.0 - damage_reduction) / overtime_defense_factor(), 1.0)
+	var direct: Array[Dictionary] = []
+	var delayed: Array[Dictionary] = []
+	var total := amount * (1.0 - data.affix_resistance(&"bleed")) if proc_id == &"bleed" else amount
+	amount = total
+	for addition in additions:
+		var kind := StringName(addition.id)
+		var definition := WeaponAffixes.by_id(kind)
+		var tick := bool(addition.get("dot_tick", false))
+		var value := float(addition.damage) * (1.0 if tick else 1.0 - data.affix_resistance(kind))
+		if definition != null and definition.dot_duration > 0 and not tick:
+			delayed.append({"id": kind, "damage": value})
+		else:
+			direct.append({"id": kind, "damage": value, "dot_tick": tick})
+			total += value
+	# Pure DoT applications do not manufacture a minimum-damage direct hit.
+	if total <= 0:
+		if not (data.is_boss and boss_phase_timer > 0):
+			for addition in delayed:
+				affix_effects.apply(StringName(addition.id), addition.damage)
+			if not delayed.is_empty():
+				queue_redraw()
+		return
+	additions = direct
+	var applied := maxf(total * (1.0 - damage_reduction) / overtime_defense_factor(), 1.0 if amount > 0 else 0.0)
 	if data.is_boss and data.boss_guard_recharge_seconds > 0.0:
 		if boss_phase_timer > 0.0:
 			_guard_boss_hit()
@@ -565,10 +610,30 @@ func take_damage(amount: float, weapon: WeaponData = null, critical: bool = fals
 		elite_damage_budget = maxf(elite_damage_budget - applied, 0.0)
 	var counted := minf(applied, health)
 	health -= applied
-	damaged.emit(global_position + Vector2(0.0, -data.radius), applied)
-	damage_recorded.emit(counted, weapon.id if weapon != null else &"", proc_id)
+	if health > 0:
+		for addition in delayed:
+			affix_effects.apply(StringName(addition.id), addition.damage)
+		if not delayed.is_empty():
+			queue_redraw()
+	var normal_share := amount / total if not additions.is_empty() else 1.0
+	var hit_at := global_position + Vector2(0.0, -data.radius)
+	if proc_id == &"bleed":
+		affix_damaged.emit(hit_at, applied, &"bleed")
+	elif amount > 0:
+		damaged.emit(hit_at, applied * normal_share)
+	if amount > 0:
+		damage_recorded.emit(counted * normal_share, weapon.id if weapon != null else &"", proc_id)
+	for index in additions.size():
+		var addition := additions[index]
+		var share := float(addition.damage) / total
+		var kind := StringName(addition.id)
+		var side := -32.0 if bool(addition.get("dot_tick", false)) else 32.0
+		affix_damaged.emit(hit_at + Vector2(side, -24.0 * (index + 1)), applied * share, kind)
+		damage_recorded.emit(counted * share, &"", StringName("affix_" + str(kind)))
+		if kind == &"ice" and health > 0.0:
+			chill_time = maxf(chill_time, WeaponAffixes.by_id(kind).slow_duration)
 	if weapon != null:
-		weapon_hit.emit(self, applied, weapon, critical)
+		weapon_hit.emit(self, applied * normal_share, weapon, critical)
 	if data.is_boss and not is_enraged and health > 0.0 and health <= max_health * 0.5:
 		is_enraged = true
 		enraged.emit(global_position)
@@ -640,6 +705,13 @@ func _draw() -> void:
 				draw_circle(at, 2.0, Color(0.13, 0.35, 0.13))
 	if data == null:
 		return
+	if treasure_carrier and health > 0.0:
+		draw_arc(Vector2.ZERO, data.radius + 6.0, 0, TAU, 24, Color(1, 0.8, 0.25, 0.75), 2.0)
+		for index in 4:
+			var point := Vector2.RIGHT.rotated(animation_time * 0.4 + index * TAU / 4.0) * (data.radius + 11.0)
+			var shine := 3.0 + sin(animation_time + index) * 1.5
+			draw_line(point - Vector2(shine, 0), point + Vector2(shine, 0), Color(1, 0.95, 0.6), 2.0)
+			draw_line(point - Vector2(0, shine), point + Vector2(0, shine), Color(1, 0.95, 0.6), 2.0)
 	if dying:
 		var progress := clampf(death_elapsed / BOSS_DEATH_DURATION, 0.0, 1.0)
 		var fade := 1.0 - progress
@@ -694,6 +766,7 @@ func _draw() -> void:
 	if pulse_flash_time > 0.0:
 		var flash_radius := data.dash_impact_radius if active_special_attack == EnemyData.SpecialAttack.DASH and data.dash_impact_radius > 0.0 else data.attack_radius
 		CombatDrawCache.arc(self, Vector2.ZERO, flash_radius, 0.0, TAU, 64, Color(1.0, 0.72, 0.27, pulse_flash_time / PULSE_FLASH_DURATION), 8.0)
+	affix_effects.draw_markers(self)
 	if bleed_stacks > 0:
 		CombatDrawCache.arc(self, Vector2.ZERO, data.radius + 4.0, 0.0, TAU, 24, Color(0.78, 0.25, 0.48, 0.85), 2.5 + bleed_stacks)
 	if wet_time > 0.0:

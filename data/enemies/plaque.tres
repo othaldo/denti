@@ -6,9 +6,10 @@
 [resource]
 script = ExtResource("1")
 display_name = "Plaque"
-max_health = 36.0
-health_per_wave = 6.0
-late_health_acceleration = 0.3
+max_health = 39.6
+health_per_wave = 7.2
+late_health_acceleration = 0.36
 move_speed = 82.0
 coin_drop_chance = 1.0
 sprite = ExtResource("2")
+affix_resistances = {"fire": 0.25}

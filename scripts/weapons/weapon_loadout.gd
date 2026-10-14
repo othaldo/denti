@@ -22,6 +22,8 @@ func evolution_ready(index: int, recipe: WeaponEvolutionRecipe, items: ItemInven
 	for id in recipe.items:
 		if items.count(id) < 1:
 			return false
+	if partner != null and not _affixes_fit(selected, partner):
+		return false
 	return used_slots() - selected.data.hands - (partner.data.hands if partner != null else 0) + recipe.result.hands <= CAPACITY
 
 
@@ -40,10 +42,21 @@ func evolve(index: int, recipe: WeaponEvolutionRecipe, items: ItemInventory) -> 
 	var other_id := recipe.partner_weapon if selected.data.id == recipe.base_weapon else recipe.base_weapon
 	var partner := _find_tier(other_id, MAX_TIER, selected) if other_id != &"" else null
 	var invested := selected.invested_coins + (partner.invested_coins if partner != null else 0)
+	var inherited := _combined_affixes(selected, partner) if partner != null else selected.affixes.duplicate(true)
+	var slots := maxi(selected.affix_slots, partner.affix_slots if partner != null else 1)
+	var uid := selected.instance_uid
+	var rolls := selected.data.rolls.duplicate(true)
+	var upgrades := selected.data.chest_upgrades.duplicate(true)
+	if partner != null:
+		upgrades["mk"] = int(upgrades.get("mk", 0)) + int(partner.data.chest_upgrades.get("mk", 0))
 	if partner != null:
 		partner.free()
 	selected.free()
-	_add(recipe.result, MAX_TIER, invested)
+	var evolved := _add(WeaponRolls.resolve(recipe.result, rolls, upgrades), MAX_TIER, invested)
+	evolved.affixes.assign(inherited)
+	evolved.affix_slots = slots
+	evolved.instance_uid = uid
+	evolved.refresh_affix_stats()
 	_refresh_positions()
 	return true
 
@@ -80,7 +93,7 @@ func can_acquire(data: WeaponData, tier: int = 1) -> bool:
 	return used_slots() + data.hands <= CAPACITY or (tier < MAX_TIER and _find_tier(data.id, tier) != null)
 
 
-func acquire(data: WeaponData, tier: int = 1, paid_coins: int = -1) -> bool:
+func acquire(data: WeaponData, tier: int = 1, paid_coins: int = -1, use_offer_rolls: bool = false) -> bool:
 	if not can_acquire(data, tier):
 		return false
 	var value := paid_coins if paid_coins >= 0 else _legacy_value(data, tier)
@@ -89,6 +102,8 @@ func acquire(data: WeaponData, tier: int = 1, paid_coins: int = -1) -> bool:
 	else:
 		var matching := _find_tier(data.id, tier)
 		matching.tier += 1
+		if use_offer_rolls:
+			matching.data = WeaponRolls.resolve(data, data.rolls, matching.data.chest_upgrades)
 		matching.invested_coins += value
 	_refresh_positions()
 	return true
@@ -99,14 +114,25 @@ func can_merge(index: int) -> bool:
 	if index < 0 or index >= weapons.size():
 		return false
 	var weapon := weapons[index]
-	return weapon.tier < MAX_TIER and _find_tier(weapon.data.id, weapon.tier, weapon) != null
+	return weapon.tier < MAX_TIER and _merge_partner(weapon) != null
+
+
+func merge_affix_conflict(index: int) -> bool:
+	var weapons := equipped()
+	if index < 0 or index >= weapons.size():
+		return false
+	var weapon := weapons[index]
+	return weapon.tier < MAX_TIER and _find_tier(weapon.data.id, weapon.tier, weapon) != null and _merge_partner(weapon) == null
 
 
 func merge(index: int) -> bool:
 	if not can_merge(index):
 		return false
 	var weapon := equipped()[index]
-	var partner := _find_tier(weapon.data.id, weapon.tier, weapon)
+	var partner := _merge_partner(weapon)
+	weapon.affixes = _combined_affixes(weapon, partner)
+	weapon.affix_slots = maxi(weapon.affix_slots, partner.affix_slots)
+	weapon.refresh_affix_stats()
 	weapon.tier += 1
 	weapon.invested_coins += partner.invested_coins
 	partner.free()
@@ -123,14 +149,18 @@ func restore(saved: Array) -> void:
 		var data := WeaponCatalog.by_id(StringName(str(entry.get("id", ""))))
 		if data != null and used_slots() + data.hands <= CAPACITY:
 			var tier := clampi(int(entry.get("tier", 1)), 1, MAX_TIER)
-			_add(data, tier, maxi(int(entry.get("invested_coins", _legacy_value(data, tier))), 0))
+			var weapon := _add(WeaponRolls.resolve(data, entry.get("rolls", {}), entry.get("upgrades", {})), tier, maxi(int(entry.get("invested_coins", _legacy_value(data, tier))), 0))
+			weapon.affixes = WeaponAffixes.sanitize(entry.get("affixes", []))
+			weapon.affix_slots = clampi(maxi(int(entry.get("affix_slots", 1)), weapon.affixes.size()), 1, WeaponAffixes.MAX_SLOTS)
+			weapon.instance_uid = str(entry.get("uid", weapon.instance_uid))
+			weapon.refresh_affix_stats()
 	_refresh_positions()
 
 
 func save_data() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for weapon in equipped():
-		result.append({"id": str(weapon.data.id), "tier": weapon.tier, "invested_coins": weapon.invested_coins})
+		result.append({"id": str(weapon.data.id), "tier": weapon.tier, "invested_coins": weapon.invested_coins, "uid": weapon.instance_uid, "rolls": weapon.data.rolls.duplicate(true), "upgrades": weapon.data.chest_upgrades.duplicate(true), "affix_slots": weapon.affix_slots, "affixes": weapon.affixes.duplicate(true)})
 	return result
 
 
@@ -153,12 +183,32 @@ func refund_for(index: int) -> int:
 	return roundi(float(weapon.invested_coins) * 0.5)
 
 
-func _add(data: WeaponData, tier: int, value: int) -> void:
+func _add(data: WeaponData, tier: int, value: int) -> WeaponInstance:
 	var weapon := WeaponInstance.new()
 	CombatDiagnostics.instrument(weapon, "weapon", self)
 	weapon.configure(data, tier)
 	weapon.invested_coins = value
 	add_child(weapon)
+	return weapon
+
+
+func _affixes_fit(primary: WeaponInstance, partner: WeaponInstance) -> bool:
+	var kinds: Array[String] = []
+	for affix in primary.affixes + partner.affixes:
+		if not kinds.has(str(affix.id)):
+			kinds.append(str(affix.id))
+	return kinds.size() <= maxi(primary.affix_slots, partner.affix_slots)
+
+
+func _combined_affixes(primary: WeaponInstance, partner: WeaponInstance) -> Array[Dictionary]:
+	return WeaponAffixes.sanitize(primary.affixes + partner.affixes)
+
+
+func _merge_partner(weapon: WeaponInstance) -> WeaponInstance:
+	for partner in equipped():
+		if partner != weapon and partner.data.id == weapon.data.id and partner.tier == weapon.tier and _affixes_fit(weapon, partner):
+			return partner
+	return null
 
 
 func _find_tier(id: StringName, tier: int, except: WeaponInstance = null) -> WeaponInstance:

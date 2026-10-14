@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="WeaponAffixData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/weapons/weapon_affix_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"ice"
+display_name = "Eis"
+color = Color(0.35, 0.8, 1, 1)
+icon_index = 8
+slow_fraction = 0.15
+slow_duration = 1.5

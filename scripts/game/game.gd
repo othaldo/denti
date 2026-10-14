@@ -54,6 +54,7 @@ var camera_shake_time: float = 0.0
 var hud_refresh_time: float = 0.0
 var telemetry := RunTelemetry.new()
 var rewards := PostWaveRewards.new()
+var weapon_chest_panel: WeaponChestPanel
 var story := StoryProgress.new()
 var story_dialogue: StoryDialogue
 var story_travel: StoryTravel
@@ -101,12 +102,19 @@ func _ready() -> void:
 	choice_panel.upgrade_chosen.connect(_on_upgrade_chosen)
 	choice_panel.level_reroll_requested.connect(_on_level_reroll)
 	choice_panel.chest_resolved.connect(_on_chest_resolved)
+	weapon_chest_panel = WeaponChestPanel.new()
+	weapon_chest_panel.name = "WeaponChestPanel"
+	add_child(weapon_chest_panel)
+	weapon_chest_panel.chosen.connect(_on_affix_chosen)
+	weapon_chest_panel.scrapped.connect(_on_affix_scrapped)
+	weapon_chest_panel.selection_changed.connect(_save_run)
 	choice_panel.relic_chosen.connect(_on_relic_chosen)
 	choice_panel.starter_chosen.connect(_on_starter_chosen)
 	choice_panel.restart_requested.connect(_restart)
 	choice_panel.main_menu_requested.connect(_on_end_main_menu)
 	choice_panel.endless_requested.connect(_on_endless_requested)
 	shop_panel.buy_requested.connect(_on_shop_buy)
+	shop_panel.buy_with_rolls_requested.connect(_on_shop_buy.bind(true))
 	shop_panel.sell_requested.connect(_on_shop_sell)
 	shop_panel.merge_requested.connect(_on_shop_merge)
 	shop_panel.evolution_requested.connect(_on_shop_evolve)
@@ -242,7 +250,7 @@ func _start_combat_wave() -> void:
 
 
 func _process(delta: float) -> void:
-	var combat_active := not ended and not in_shop and not starter_pending and not collecting_wave_loot and not choice_panel.visible and not shop_panel.visible and not story_dialogue.visible and not story_travel.visible and not game_menu.visible and (wave.active or boss_pending)
+	var combat_active := not ended and not in_shop and not starter_pending and not collecting_wave_loot and not choice_panel.visible and not weapon_chest_panel.visible and not shop_panel.visible and not story_dialogue.visible and not story_travel.visible and not game_menu.visible and (wave.active or boss_pending)
 	mobile_controls.set_combat_active(combat_active)
 	session.update_graphics_performance(combat_active)
 	if not ended and (wave.active or boss_pending):
@@ -270,7 +278,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		hud.toggle_telemetry()
 		get_viewport().set_input_as_handled()
 		return
-	if event.is_action_pressed("ui_cancel") and not ended and not collecting_wave_loot and not choice_panel.visible and not shop_panel.visible and not story_dialogue.visible and not story_travel.visible and not game_menu.visible:
+	if event.is_action_pressed("ui_cancel") and not ended and not collecting_wave_loot and not choice_panel.visible and not weapon_chest_panel.visible and not shop_panel.visible and not story_dialogue.visible and not story_travel.visible and not game_menu.visible:
 		get_viewport().set_input_as_handled()
 		game_menu.open_pause()
 
@@ -284,6 +292,8 @@ func _refresh_hud() -> void:
 	boss = BossEncounter.primary($Enemies)
 	var visible_boss: Enemy = boss if is_instance_valid(boss) else null
 	hud.update_status(player.stats, xp, xp_goal, level, coins, wave.current_wave, wave.remaining, in_shop, visible_boss, boss_pending, collecting_wave_loot, rewards.pending_levels)
+	hud.chests_label.text = str(telemetry.wave_chests_found)
+	hud.chests_label.tooltip_text = "In dieser Welle eingesammelt"
 	hud.update_ailments(player.status_effects)
 	if wave.endless_enabled:
 		hud.wave_label.text = "ENDLOS · %d" % wave.current_wave
@@ -309,7 +319,10 @@ func _spawn_enemy(data: EnemyData) -> void:
 	if $Enemies.get_child_count() >= limit:
 		telemetry.record_spawn_blocked()
 		return
-	_create_enemy(data, _spawn_position(_spawn_edge()))
+	var treasure := wave.active and wave.current_wave >= ChestRewards.TREASURE_FIRST_WAVE and not data.is_boss and not data.is_elite and not rewards.treasure_spawned and randf() < ChestRewards.TREASURE_SPAWN_CHANCE * (1.0 + minf(maxf(player.stats.luck, 0.0) / 100.0, 0.5))
+	if treasure:
+		rewards.treasure_spawned = true
+	_create_enemy(data, _spawn_position(_spawn_edge()), treasure)
 
 
 func _spawn_elite(data: EnemyData) -> void:
@@ -376,12 +389,15 @@ func _spawn_position(edge: int) -> Vector2:
 			return Vector2(center.x - half_view.x - SPAWN_PADDING, randf_range(maxf(lower.y, center.y - half_view.y), minf(upper.y, center.y + half_view.y)))
 
 
-func _create_enemy(data: EnemyData, at: Vector2) -> void:
+func _create_enemy(data: EnemyData, at: Vector2, treasure: bool = false) -> void:
 	var enemy: Enemy = ENEMY_SCENE.instantiate()
 	CombatDiagnostics.instrument(enemy, "enemy", self)
 	enemy.position = at
 	enemy.configure(data, player, wave.current_wave, wave.difficulty_id)
-	enemy.defeated.connect(_on_enemy_defeated)
+	if treasure:
+		enemy.make_treasure_carrier()
+	enemy.defeated.connect(_on_enemy_defeated.bind(treasure))
+	enemy.affix_damaged.connect(_on_enemy_affix_damaged)
 	enemy.damaged.connect(_on_enemy_damaged)
 	enemy.damage_recorded.connect(telemetry.record_damage)
 	enemy.weapon_hit.connect(items.on_weapon_hit)
@@ -401,7 +417,7 @@ func _create_enemy(data: EnemyData, at: Vector2) -> void:
 		boss = enemy
 
 
-func _on_enemy_defeated(at: Vector2, data: EnemyData) -> void:
+func _on_enemy_defeated(at: Vector2, data: EnemyData, treasure: bool = false) -> void:
 	telemetry.record_kill(data.is_boss, data.is_elite)
 	if not data.is_boss:
 		sound.play_cue(&"down")
@@ -414,11 +430,11 @@ func _on_enemy_defeated(at: Vector2, data: EnemyData) -> void:
 		if boss_pending:
 			call_deferred("_resolve_boss_wave")
 		return
-	if wave.active and not rewards.chest_spawned and randf() < ChestRewards.drop_chance(player.stats.luck, data.is_elite):
-		var chest := ChestRewards.roll_item(wave.current_wave, player.stats.luck, items)
-		if not chest.is_empty():
+	if wave.active and (treasure or rewards.can_drop_chest() and randf() < ChestRewards.drop_chance(player.stats.luck, data.is_elite)):
+		var chest := WeaponAffixes.roll_chest(wave.current_wave, player.stats.luck, player.loadout, treasure)
+		if not treasure:
 			rewards.mark_chest_spawned()
-			_spawn_loot(at, &"chest", int(chest["scrap_coins"]), StringName(str(chest["item_id"])))
+		_spawn_loot(at, &"chest", int(chest["scrap_coins"]), WeaponAffixes.CHEST_ID, chest)
 	if reward_drop:
 		_spawn_loot(at + Vector2(-11.0, 0.0), &"xp", data.xp_drop)
 	if wave.active and data.coin_drop > 0 and randf() < EconomyRules.coin_chance(data, wave.current_wave, DifficultyCatalog.by_id(wave.difficulty_id).reward_chance_multiplier):
@@ -458,19 +474,23 @@ func _on_boss_reinforcements(count: int) -> void:
 	_spawn_horde(WaveController.ACID_SPITTER if wave.current_wave >= WaveController.MAX_WAVES else WaveController.BACTERIA, count)
 
 
-func _spawn_loot(at: Vector2, kind: StringName, amount: int, reward_id: StringName = &"") -> void:
+func _spawn_loot(at: Vector2, kind: StringName, amount: int, reward_id: StringName = &"", reward_data: Dictionary = {}) -> void:
 	var loot: Loot = LOOT_SCENE.instantiate()
 	loot.position = at
-	loot.configure(kind, amount, player, reward_id)
-	loot.collected.connect(_on_loot_collected)
+	loot.configure(kind, amount, player, reward_id, reward_data)
+	loot.collected.connect(_on_loot_collected.bind(loot))
 	$Loot.add_child(loot)
 
 
-func _on_loot_collected(kind: StringName, amount: int, reward_id: StringName = &"") -> void:
+func _on_loot_collected(kind: StringName, amount: int, reward_id: StringName = &"", drop: Loot = null) -> void:
 	sound.play_cue(&"pickup")
 	if kind == &"chest":
-		rewards.queue_chest(reward_id, amount)
+		if reward_id == WeaponAffixes.CHEST_ID and drop != null:
+			rewards.queue_affix_chest(drop.reward_data)
+		else:
+			rewards.queue_chest(reward_id, amount)
 		telemetry.record_chest_found()
+		hud.chests_label.text = str(telemetry.wave_chests_found)
 	else:
 		var bonus := items.on_pickup(kind, amount)
 		telemetry.record_loot(kind, amount)
@@ -488,6 +508,14 @@ func _on_loot_collected(kind: StringName, amount: int, reward_id: StringName = &
 func _on_enemy_damaged(at: Vector2, amount: float) -> void:
 	_show_damage_number(at, amount)
 	sound.play_cue(&"hit")
+
+
+func _on_enemy_affix_damaged(at: Vector2, amount: float, kind: StringName) -> void:
+	var limit := MAX_ECONOMY_DAMAGE_NUMBERS if session.economy_graphics() else MAX_DAMAGE_NUMBERS
+	if $DamageNumbers.get_child_count() >= limit:
+		return
+	var number: DamageNumber = $DamageNumbers.acquire(DAMAGE_NUMBER_SCENE)
+	number.show_affix(at, amount, kind)
 
 
 func _on_player_damaged(at: Vector2, amount: float) -> void:
@@ -589,6 +617,32 @@ func _on_chest_resolved(keep: bool) -> void:
 	_advance_post_wave_rewards()
 
 
+func _on_affix_chosen(uid: String, option_index: int, replace: int) -> void:
+	var chest := rewards.current_chest()
+	if rewards.step != PostWaveRewards.Step.CHESTS or chest.get("kind", "") != "affix" or option_index < 0 or option_index >= 3:
+		return
+	for weapon in player.loadout.equipped():
+		if weapon.instance_uid == uid and WeaponAffixes.apply(weapon, chest.options[option_index], replace):
+			telemetry.record_chest_kept()
+			weapon_chest_panel.hide()
+			rewards.resolve_chest()
+			_advance_post_wave_rewards()
+			return
+
+
+func _on_affix_scrapped() -> void:
+	var chest := rewards.current_chest()
+	if rewards.step != PostWaveRewards.Step.CHESTS or chest.get("kind", "") != "affix":
+		return
+	var amount := items.scrap_value(int(chest.scrap_coins))
+	coins += amount
+	telemetry.record_loot(&"coin", amount, &"chest_scrap")
+	telemetry.record_chest_scrapped()
+	weapon_chest_panel.hide()
+	rewards.resolve_chest()
+	_advance_post_wave_rewards()
+
+
 func _on_relic_chosen(id: StringName) -> void:
 	if rewards.step != PostWaveRewards.Step.RELICS or not rewards.pending_relics.has(str(id)):
 		return
@@ -671,6 +725,12 @@ func _advance_post_wave_rewards() -> void:
 			_show_level_choice()
 		PostWaveRewards.Step.CHESTS:
 			var chest := rewards.current_chest()
+			if chest.get("kind", "") == "affix":
+				choice_panel.hide()
+				weapon_chest_panel.show_chest(chest, player.loadout, player.stats, items.scrap_value(int(chest.scrap_coins)))
+				get_tree().paused = true
+				_save_run()
+				return
 			var item := ShopController.by_id(StringName(str(chest.get("item_id", ""))))
 			if item == null:
 				rewards.resolve_chest()
@@ -708,8 +768,12 @@ func _clear_arena(collect_drops: bool, keep_boss: bool = false) -> void:
 			continue
 		if collect_drops:
 			if drop.kind == &"chest":
-				rewards.queue_chest(drop.reward_id, drop.amount)
+				if drop.reward_id == WeaponAffixes.CHEST_ID:
+					rewards.queue_affix_chest(drop.reward_data)
+				else:
+					rewards.queue_chest(drop.reward_id, drop.amount)
 				telemetry.record_chest_found()
+				hud.chests_label.text = str(telemetry.wave_chests_found)
 			else:
 				var bonus := items.on_pickup(drop.kind, drop.amount)
 				telemetry.record_loot(drop.kind, drop.amount)
@@ -784,7 +848,7 @@ func _update_shop_panel() -> void:
 	var weapons := player.loadout.equipped()
 	for index in weapons.size():
 		var weapon := weapons[index]
-		equipment.append({"data": weapon.data, "hands": weapon.data.hands, "icon": weapon.data.sprite, "uid": weapon.get_instance_id(), "name": weapon.data.display_name, "tier": weapon.tier, "refund": player.loadout.refund_for(index), "stats": weapon.data.stats_text(weapon.tier), "combat": weapon.data.combat_text(), "description": weapon.data.description, "dps": _weapon_dps(weapon.data, weapon.tier), "mergeable": player.loadout.can_merge(index)})
+		equipment.append({"data": weapon.data, "hands": weapon.data.hands, "icon": weapon.data.sprite, "uid": weapon.get_instance_id(), "name": weapon.data.display_name, "tier": weapon.tier, "refund": player.loadout.refund_for(index), "stats": weapon.data.stats_text(weapon.tier), "combat": weapon.data.combat_text() + "\n" + WeaponAffixes.summary(weapon, player.stats), "description": weapon.data.description, "dps": _weapon_dps(weapon.data, weapon.tier), "mergeable": player.loadout.can_merge(index)})
 	var buyable: Array[bool] = []
 	var offer_dps: Array[float] = []
 	for offer in shop.offers:
@@ -804,7 +868,7 @@ func _weapon_dps(data: WeaponData, tier: int) -> float:
 	return data.estimated_dps(tier, player.stats, items.attack_interval_factor(), items.base_weapon_damage_bonus())
 
 
-func _on_shop_buy(index: int) -> void:
+func _on_shop_buy(index: int, use_offer_rolls: bool = false) -> void:
 	if not in_shop:
 		return
 	var offer := shop.offers[index]
@@ -814,7 +878,7 @@ func _on_shop_buy(index: int) -> void:
 		return
 	if offer.weapon_data == null and not items.can_acquire(offer):
 		return
-	var acquired := player.loadout.acquire(offer.weapon_data, offer.weapon_tier, offer.price) if offer.weapon_data != null else items.acquire(offer)
+	var acquired := player.loadout.acquire(offer.weapon_data, offer.weapon_tier, offer.price, use_offer_rolls) if offer.weapon_data != null else items.acquire(offer)
 	if not acquired:
 		return
 	coins -= offer.price
@@ -896,6 +960,8 @@ func _on_player_died() -> void:
 		return
 	ended = true
 	player.status_effects.clear()
+	hud.chests_label.text = str(telemetry.wave_chests_found)
+	hud.chests_label.tooltip_text = "In dieser Welle eingesammelt"
 	hud.update_ailments(player.status_effects)
 	_sync_music()
 	_clear_arena(false)
@@ -946,6 +1012,7 @@ func debug_start_wave(number: int) -> void:
 	in_shop = false
 	starter_pending = false
 	choice_panel.visible = false
+	weapon_chest_panel.hide()
 	shop_panel.visible = false
 	game_menu.visible = false
 	player.set_physics_process(true)

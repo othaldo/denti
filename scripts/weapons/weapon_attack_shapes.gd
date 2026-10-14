@@ -22,11 +22,14 @@ static func contains(weapon: WeaponData, tier: int, origin: Vector2, direction: 
 	return true
 
 
-static func hit(enemy: Enemy, weapon: WeaponData, tier: int, damage: float, critical: bool, items: ItemInventory, direction: Vector2) -> void:
+static func hit(enemy: Enemy, weapon: WeaponData, tier: int, damage: float, critical: bool, items: ItemInventory, direction: Vector2, affixes: Array[Dictionary] = [], affix_factor: float = 1.0) -> void:
 	if enemy.health <= 0.0:
 		return
 	var value := items.modify_damage(enemy, weapon, damage) if items != null else damage
-	enemy.take_damage(weapon.damage_against(enemy, value, tier), weapon, critical)
+	var additions: Array[Dictionary] = []
+	if items != null and not affixes.is_empty():
+		additions = WeaponAffixes.packets(affixes, weapon, items.player.stats, affix_factor)
+	enemy.take_damage(weapon.damage_against(enemy, value, tier), weapon, critical, &"", additions)
 	if enemy.health > 0.0:
 		var push := weapon.knockback_at_tier(tier) * (1.0 - enemy.data.knockback_resistance)
 		enemy.global_position += direction * push

@@ -5,6 +5,8 @@ const HIT_RADIUS := 10.0
 const IMPACT_DURATION := 0.18
 
 var data: WeaponData
+var affixes: Array[Dictionary] = []
+var affix_factor: float = 1.0
 var direction: Vector2
 var damage: float
 var traveled: float = 0.0
@@ -34,7 +36,7 @@ var pool: PlayerProjectilePool
 var retired: bool = false
 
 
-func launch(start: Vector2, aim: Vector2, attack_damage: float, weapon: WeaponData, inventory: ItemInventory = null, is_critical: bool = false, weapon_tier: int = 1) -> void:
+func launch(start: Vector2, aim: Vector2, attack_damage: float, weapon: WeaponData, inventory: ItemInventory = null, is_critical: bool = false, weapon_tier: int = 1, weapon_affixes: Array[Dictionary] = [], additions_factor: float = 1.0) -> void:
 	retired = false
 	traveled = 0.0
 	animation_time = 0.0
@@ -55,6 +57,8 @@ func launch(start: Vector2, aim: Vector2, attack_damage: float, weapon: WeaponDa
 	direction = aim.normalized()
 	damage = attack_damage
 	data = weapon
+	affixes = weapon_affixes.duplicate(true)
+	affix_factor = additions_factor
 	tier = weapon_tier
 	critical = is_critical
 	splash_radius = weapon.splash_at_tier(tier)
@@ -164,7 +168,7 @@ func _physics_process(delta: float) -> void:
 			return
 		hit_ids.append(enemy.get_instance_id())
 		var collision_point := Geometry2D.get_closest_point_to_segment(enemy.global_position, previous_position, global_position)
-		WeaponAttackShapes.hit(enemy, data, tier, damage, critical, items, direction)
+		WeaponAttackShapes.hit(enemy, data, tier, damage, critical, items, direction, affixes, affix_factor)
 		if returning:
 			return_hits_left -= 1
 			if return_hits_left <= 0:
@@ -202,6 +206,7 @@ func _start_return() -> void:
 	returning = true
 	traveled = 0.0
 	damage *= return_factor
+	affix_factor *= return_factor
 	critical = false
 	return_hits_left = maxi(roundi(return_factor / 0.35), 1)
 	queue_redraw()
@@ -211,7 +216,7 @@ func _explode() -> void:
 	for enemy in EnemySpatialIndex.circle(get_tree(), enemy_index, global_position, splash_radius):
 		if enemy.health > 0:
 			var push_direction := global_position.direction_to(enemy.global_position)
-			WeaponAttackShapes.hit(enemy, data, tier, damage, critical, items, direction if push_direction.is_zero_approx() else push_direction)
+			WeaponAttackShapes.hit(enemy, data, tier, damage, critical, items, direction if push_direction.is_zero_approx() else push_direction, affixes, affix_factor)
 	impact_time = IMPACT_DURATION
 	_sync_visuals()
 	queue_redraw()
@@ -226,7 +231,7 @@ func save_state(indices: Dictionary) -> Dictionary:
 	for id in orbit_hits:
 		if indices.has(id):
 			orbit.append(indices[id])
-	return {"id": str(data.id), "tier": tier, "x": global_position.x, "y": global_position.y,
+	return {"id": str(data.id), "rolls": data.rolls.duplicate(true), "upgrades": data.chest_upgrades.duplicate(true), "tier": tier, "affixes": affixes.duplicate(true), "affix_factor": affix_factor, "x": global_position.x, "y": global_position.y,
 		"dx": direction.x, "dy": direction.y, "damage": damage, "critical": critical,
 		"traveled": traveled, "animation": animation_time, "impact": impact_time, "pierce": pierces_left,
 		"hits": hits, "factor": return_factor, "returning": returning, "rearmed": return_rearmed,
@@ -234,9 +239,11 @@ func save_state(indices: Dictionary) -> Dictionary:
 		"orbit_finished": orbit_finished, "orbit_hits": orbit}
 
 
-func restore_state(saved: Dictionary, inventory: ItemInventory, enemies: Array[Node]) -> void:
+func restore_state(saved: Dictionary, inventory: ItemInventory, enemies: Array[Node], restored_data: WeaponData = null) -> void:
+	if restored_data == null:
+		restored_data = WeaponRolls.resolve(WeaponCatalog.by_id(StringName(saved.id)), saved.get("rolls", {}), saved.get("upgrades", {}))
 	launch(Vector2(saved.x, saved.y), Vector2(saved.dx, saved.dy), maxf(saved.damage, 0),
-		WeaponCatalog.by_id(StringName(saved.id)), inventory, bool(saved.get("critical", false)), clampi(saved.get("tier", 1), 1, 4))
+		restored_data, inventory, bool(saved.get("critical", false)), clampi(saved.get("tier", 1), 1, 4), WeaponAffixes.sanitize(saved.get("affixes", [])), maxf(float(saved.get("affix_factor", 1.0)), 0.0))
 	traveled = maxf(saved.get("traveled", 0), 0)
 	animation_time = maxf(saved.get("animation", 0), 0)
 	impact_time = clampf(saved.get("impact", 0), 0, IMPACT_DURATION)

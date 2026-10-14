@@ -70,7 +70,7 @@ func _run() -> void:
 	if not paused or not game.shop_panel.visible or game.coins != 7 or game.items.count(&"fluoride_gel") != 0 or game.telemetry.chests_found != 2 or game.telemetry.chests_kept != 1 or game.telemetry.chests_scrapped != 1:
 		_fail("SCRAP did not grant coins and finish the reward queue before shop")
 		return
-	if ChestRewards.drop_chance(1000.0) > ChestRewards.BASE_DROP_CHANCE * 2.0 or ChestRewards.drop_chance(100.0) <= ChestRewards.drop_chance(0.0):
+	if ChestRewards.drop_chance(1000.0) > ChestRewards.BASE_DROP_CHANCE * (1.0 + ChestRewards.LUCK_BONUS_CAP) or ChestRewards.drop_chance(100.0) <= ChestRewards.drop_chance(0.0):
 		_fail("luck did not affect chest chance within its cap")
 		return
 	session.clear_run()

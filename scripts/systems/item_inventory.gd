@@ -225,8 +225,9 @@ func on_pickup(kind: StringName, amount: int) -> int:
 	var extra_xp := floori(xp_fraction + 0.0001)
 	xp_fraction -= float(extra_xp)
 	var heal_amount := float(amount) * _power(&"xp_heal")
-	if heal_amount > 0.0 and player.stats.heal(heal_amount) > 0.0 and _ready_proc(&"xp_heal_feedback", 0.75):
-		_announce("+Leben", player.global_position, Color(0.50, 1.0, 0.70))
+	var healed := player.stats.heal(heal_amount) if heal_amount > 0.0 else 0.0
+	if healed > 0.0 and _ready_proc(&"xp_heal_feedback", 0.75):
+		_announce("+%s" % DentiAttributes.number(healed), player.global_position, Color(0.50, 1.0, 0.70))
 	return extra_xp
 
 
@@ -250,7 +251,7 @@ func on_kill(at: Vector2, is_boss: bool) -> int:
 			kill_heal_progress -= 8
 			var healed := player.stats.heal(_power(&"kill_heal"))
 			if healed > 0.0:
-				_announce("+%d Leben" % ceili(healed), player.global_position, Color(0.50, 1.0, 0.70))
+				_announce("+%s" % DentiAttributes.number(healed), player.global_position, Color(0.50, 1.0, 0.70))
 	if _power(&"kill_burst") > 0.0 and not is_boss:
 		kill_burst_progress += 1
 		if kill_burst_progress >= 10 and not burst_busy:

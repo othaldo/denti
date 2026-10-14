@@ -6,15 +6,21 @@ const EVOLUTION_COLOR := Color("ff3038")
 
 # Evolutions keep tier IV internally for combat values and legacy saves.
 static func tier_text(data: WeaponData, tier: int) -> String:
-	return "Mk V" if data != null and data.evolution_kind != &"" else "Mk " + ["I", "II", "III", "IV"][clampi(tier, 1, 4) - 1]
+	var level := tier + int(data.chest_upgrades.get("mk", 0)) if data != null else tier
+	var roman := ""
+	for entry in [[1000, "M"], [900, "CM"], [500, "D"], [400, "CD"], [100, "C"], [90, "XC"], [50, "L"], [40, "XL"], [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"]]:
+		while level >= int(entry[0]):
+			roman += str(entry[1])
+			level -= int(entry[0])
+	return "Mk " + roman
 
 
 static func tier_color(data: WeaponData, tier: int) -> Color:
-	return EVOLUTION_COLOR if data != null and data.evolution_kind != &"" else DentiRarity.color_for(tier)
+	return DentiRarity.color_for(mini(tier + int(data.chest_upgrades.get("mk", 0)), 5)) if data != null else DentiRarity.color_for(tier)
 
 
 static func special_color(data: WeaponData) -> Color:
-	return EVOLUTION_COLOR if data != null and data.evolution_kind != &"" else Color.TRANSPARENT
+	return tier_color(data, 4) if data != null and (data.evolution_kind != &"" or int(data.chest_upgrades.get("mk", 0)) > 0) else Color.TRANSPARENT
 
 
 static func role(data: WeaponData) -> String:

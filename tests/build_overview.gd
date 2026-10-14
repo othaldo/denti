@@ -36,7 +36,7 @@ func _run() -> void:
 		weapons.get_child(0).pressed.emit()
 		for frame in 3:
 			await process_frame
-		if menu.item_details.heading.text != game.player.loadout.equipped()[0].data.display_name or not bounds.encloses(menu.build_panel.get_global_rect()):
+		if not menu.item_details.heading.text.begins_with(game.player.loadout.equipped()[0].data.display_name + " · Mk ") or not bounds.encloses(menu.build_panel.get_global_rect()):
 			_fail("weapon inspection from stats is missing or exceeds viewport")
 			return
 		menu._show_items()

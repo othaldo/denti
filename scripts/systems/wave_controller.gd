@@ -17,6 +17,9 @@ const ELITE_SECOND_START_FRACTION := 0.62
 const ELITE_SECOND_END_FRACTION := 0.69
 const ELITE_THIRD_START_FRACTION := 0.78
 const ELITE_THIRD_END_FRACTION := 0.84
+const MOB_SPAWN_INTERVAL_FACTOR := 0.84
+const BOSS_SPAWN_INTERVAL_FACTOR := 0.92
+const MOB_BURST_SIZE_FACTOR := 1.15
 const SPAWN_INTERVAL_START := 1.25
 const SPAWN_INTERVAL_WAVE_STEP := 0.06
 const SPAWN_INTERVAL_ACCELERATION := 0.012
@@ -24,7 +27,7 @@ const SPAWN_INTERVAL_MIN := 0.24
 const BOSS_WAVE_SPAWN_INTERVAL_MIN := 0.30
 const MOB_HEALTH_WAVE_STEP := 0.17
 const MOB_HEALTH_LATE_ACCELERATION := 0.018
-const MOB_OPENING_HEALTH_FACTOR := 0.35
+const MOB_OPENING_HEALTH_FACTOR := 0.40
 const MOB_OPENING_END_WAVE := 10
 const BOSS_HEALTH_WAVE_STEP := 0.27
 const MOB_DEFENSE_WAVE_STEP := 0.01
@@ -284,7 +287,7 @@ func _process(delta: float) -> void:
 		return
 	if not horde_spawned and horde_waves.has(current_wave) and remaining <= duration * (1.0 - HORDE_TIME_FRACTION):
 		horde_spawned = true
-		horde_requested.emit(_horde_data(current_wave), maxi(roundi(float(5 + current_wave) * DifficultyCatalog.by_id(difficulty_id).horde_size_multiplier), 1))
+		horde_requested.emit(_horde_data(current_wave), maxi(roundi(float(5 + current_wave) * MOB_BURST_SIZE_FACTOR * DifficultyCatalog.by_id(difficulty_id).horde_size_multiplier), 1))
 	var elapsed := duration - remaining
 	while elite_index < elite_times.size() and elapsed >= elite_times[elite_index]:
 		for member in elite_counts[elite_index]:
@@ -298,7 +301,8 @@ func _process(delta: float) -> void:
 	if spawn_cooldown <= 0.0:
 		enemy_requested.emit(_choose_enemy())
 		var spawn_floor := BOSS_WAVE_SPAWN_INTERVAL_MIN if is_boss_wave(current_wave) else SPAWN_INTERVAL_MIN
-		spawn_cooldown = maxf(SPAWN_INTERVAL_START - elapsed * SPAWN_INTERVAL_ACCELERATION - (current_wave - 1) * SPAWN_INTERVAL_WAVE_STEP, spawn_floor) * DifficultyCatalog.by_id(difficulty_id).spawn_interval_multiplier / EndlessRules.density_factor(current_wave)
+		var density_factor := BOSS_SPAWN_INTERVAL_FACTOR if is_boss_wave(current_wave) else MOB_SPAWN_INTERVAL_FACTOR
+		spawn_cooldown = density_factor * maxf(SPAWN_INTERVAL_START - elapsed * SPAWN_INTERVAL_ACCELERATION - (current_wave - 1) * SPAWN_INTERVAL_WAVE_STEP, spawn_floor) * DifficultyCatalog.by_id(difficulty_id).spawn_interval_multiplier / EndlessRules.density_factor(current_wave)
 
 
 func plan_bursts() -> void:
@@ -347,7 +351,8 @@ func _burst_count(index: int) -> int:
 			base_count = 5 + current_wave
 		_:
 			base_count = 2 + current_wave / 5 if is_boss_wave(current_wave) else 3 + current_wave / 3
-	return clampi(roundi(float(base_count) * DifficultyCatalog.by_id(difficulty_id).horde_size_multiplier), 1, 60)
+	var size_factor := 1.0 if is_boss_wave(current_wave) else MOB_BURST_SIZE_FACTOR
+	return clampi(roundi(float(base_count) * size_factor * DifficultyCatalog.by_id(difficulty_id).horde_size_multiplier), 1, 60)
 
 
 func _choose_enemy() -> EnemyData:

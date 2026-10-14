@@ -3,9 +3,11 @@ extends RefCounted
 
 # Stat names/meanings come from the same source as upgrades and inventory.
 const MECHANICS := {
+	"Feuer": "Feuer an Gegnern verteilt den Affixschaden über 2 Sekunden. Weitere Treffer addieren ihr eigenes Budget. Die angezeigte Zahl ist der Gesamtschaden, kein Schaden pro Sekunde.",
+	"Resistenzen": "Farbige Schilde zeigen Resistenz gegen Affixe: Plaque Feuer 25 %, Bakterium Gift 30 %, Giftkeim Gift 50 %, Säurespucker Gift 35 %, Zuckerstück Blutung 35 %, Säurekrone Eis 30 %, Jagdkeim Elektro 25 %. Grundtreffer bleiben unverändert.",
 	"Nass": "Wasserangriffe können Gegner durchnässen. Passende Items verändern Dauer und Wechselwirkungen; die konkreten Werte stehen beim Item.",
-	"Blutung": "Schaden über Zeit. Stärke und Dauer hängen von der Quelle ab. Bei Denti reduziert Härte den Blutungsschaden.",
-	"Gift": "Schaden über Zeit. Gift an Denti ignoriert Härte. Laufende Effekte enden nach dem Kampf.",
+	"Blutung": "Blutungsaffixe verteilen ihren Schaden über 3 Sekunden. Weitere Treffer addieren ihr Budget. Waffen und Items haben eigene Blutungsregeln. Bei Denti reduziert Härte den Schaden.",
+	"Gift": "Gift an Gegnern verteilt den Affixschaden über 5 Sekunden. Weitere Treffer addieren ihr Budget. Gift an Denti ignoriert Härte. Laufende Effekte enden nach dem Kampf.",
 	"Wurzeln": "Denti hat sechs Wurzeln. Waffen belegen eine oder zwei. Gleiche Waffen derselben Stufe können bis Stufe IV fusionieren; dabei werden Wurzeln frei.",
 	"Münzen": "Währung für Waffen, Items und Neuwürfeln. Der Pin merkt ein Angebot kostenlos und hält seinen Preis fest.",
 }

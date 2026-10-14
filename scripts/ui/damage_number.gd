@@ -20,7 +20,14 @@ var render_extent: Vector2
 
 func show_amount(at: Vector2, amount: float, player_hit: bool = false) -> void:
 	text = "-%d" % maxi(roundi(amount), 1) if player_hit else "%d" % maxi(roundi(amount), 1)
-	add_theme_color_override("font_color", Color(1.0, 0.40, 0.35) if player_hit else Color(1.0, 0.88, 0.37))
+	add_theme_color_override("font_color", Color(1.0, 0.40, 0.35) if player_hit else Color(1.0, 0.95, 0.84))
+	_animate(at)
+
+
+func show_affix(at: Vector2, amount: float, kind: StringName) -> void:
+	var data := WeaponAffixes.by_id(kind)
+	text = "%.1f" % amount
+	add_theme_color_override("font_color", data.color)
 	_animate(at)
 
 

@@ -19,7 +19,7 @@ func _run() -> void:
 	number.show_amount(Vector2(200, 150), 123)
 	var id := number.get_instance_id()
 	check(number.text == "123" and not number.visible and number.render_line.get_line_width() > 0, "damage text was not prepared for shared drawing")
-	check(number.render_color == Color(1.0, 0.88, 0.37) and number.render_outline_size == 5, "enemy damage text lost its color or outline")
+	check(number.render_color == Color(1.0, 0.95, 0.84) and number.render_outline_size == 5, "enemy damage text lost its color or outline")
 	var same := batch.acquire(SCENE)
 	same.show_amount(Vector2(220, 180), 123)
 	check(number.render_line == same.render_line, "repeated damage still reshapes the same font/size/text")

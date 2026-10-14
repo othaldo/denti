@@ -10,6 +10,8 @@ var level_rerolls: int = 0
 var pending_chests: Array[Dictionary] = []
 var pending_relics: Array[String] = []
 var chest_spawned: bool = false
+var random_chests_spawned: int = 0
+var treasure_spawned: bool = false
 var final_wave: bool = false
 var pending_story: StringName = &""
 
@@ -21,6 +23,8 @@ func begin_wave() -> void:
 	pending_chests.clear()
 	pending_relics.clear()
 	chest_spawned = false
+	random_chests_spawned = 0
+	treasure_spawned = false
 	final_wave = false
 	pending_story = &""
 
@@ -29,8 +33,14 @@ func earn_level() -> void:
 	pending_levels += 1
 
 
+func can_drop_chest() -> bool:
+	# Old debug tools/tests use the legacy flag to suppress random loot.
+	return random_chests_spawned < ChestRewards.MAX_RANDOM_CHESTS_PER_WAVE and not (chest_spawned and random_chests_spawned == 0)
+
+
 func mark_chest_spawned() -> void:
 	chest_spawned = true
+	random_chests_spawned += 1
 
 
 func queue_chest(item_id: StringName, scrap_coins: int) -> void:
@@ -38,6 +48,12 @@ func queue_chest(item_id: StringName, scrap_coins: int) -> void:
 	if item == null or item.weapon_data != null:
 		return
 	pending_chests.append({"item_id": str(item_id), "scrap_coins": maxi(scrap_coins, 1)})
+
+
+func queue_affix_chest(value: Dictionary) -> void:
+	var chest := WeaponAffixes.sanitize_chest(value)
+	if not chest.is_empty():
+		pending_chests.append(chest)
 
 
 func queue_relics(options: Array[String]) -> void:
@@ -96,7 +112,7 @@ func resolve_story() -> void:
 
 func save_data() -> Dictionary:
 	return {"step": step, "pending_levels": pending_levels, "level_rerolls": level_rerolls, "pending_chests": pending_chests.duplicate(true),
-		"pending_relics": pending_relics.duplicate(), "chest_spawned": chest_spawned, "final_wave": final_wave, "pending_story": str(pending_story)}
+		"pending_relics": pending_relics.duplicate(), "chest_spawned": chest_spawned, "random_chests_spawned": random_chests_spawned, "treasure_spawned": treasure_spawned, "final_wave": final_wave, "pending_story": str(pending_story)}
 
 
 func restore(saved: Dictionary) -> void:
@@ -110,6 +126,9 @@ func restore(saved: Dictionary) -> void:
 	for entry in saved.get("pending_chests", []):
 		if not entry is Dictionary:
 			continue
+		if entry.get("kind", "") == "affix":
+			queue_affix_chest(entry)
+			continue
 		var item := ShopController.by_id(StringName(str(entry.get("item_id", ""))))
 		if item != null and item.weapon_data == null:
 			pending_chests.append({"item_id": str(item.id), "scrap_coins": maxi(int(entry.get("scrap_coins", 1)), 1)})
@@ -119,6 +138,8 @@ func restore(saved: Dictionary) -> void:
 		if RelicCatalog.by_id(StringName(id)) != null and not pending_relics.has(id):
 			pending_relics.append(id)
 	chest_spawned = bool(saved.get("chest_spawned", false))
+	random_chests_spawned = clampi(int(saved.get("random_chests_spawned", ChestRewards.MAX_RANDOM_CHESTS_PER_WAVE if chest_spawned else 0)), 0, ChestRewards.MAX_RANDOM_CHESTS_PER_WAVE)
+	treasure_spawned = bool(saved.get("treasure_spawned", false))
 	final_wave = bool(saved.get("final_wave", false))
 	if step == Step.LEVELS and pending_levels == 0 or step == Step.CHESTS and pending_chests.is_empty() or step == Step.RELICS and pending_relics.is_empty() or step == Step.STORY and pending_story == &"":
 		_advance()

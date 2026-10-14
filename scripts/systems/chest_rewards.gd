@@ -1,15 +1,22 @@
 class_name ChestRewards
 extends RefCounted
 
-const BASE_DROP_CHANCE := 0.0018
-const ELITE_DROP_CHANCE := 0.10
-const LUCK_BONUS_CAP := 1.0
+const BASE_DROP_CHANCE := 0.016
+const MAX_RANDOM_CHESTS_PER_WAVE := 3
+const TREASURE_SPAWN_CHANCE := 0.0017
+const TREASURE_FIRST_WAVE := 3
+const TREASURE_HEALTH_FACTOR := 2.8
+const TREASURE_SPEED_FACTOR := 0.85
+const TREASURE_COLOR := Color(1.0, 0.8, 0.25)
+const ELITE_DROP_CHANCE := 0.16
+const LUCK_BONUS_CAP := 3.0
 const SCRAP_FRACTION := 0.6
 
 
 static func drop_chance(luck: float, is_elite: bool = false) -> float:
 	var base := ELITE_DROP_CHANCE if is_elite else BASE_DROP_CHANCE
-	return base * (1.0 + minf(maxf(luck, 0.0) / 100.0, LUCK_BONUS_CAP))
+	var positive_luck := maxf(luck, 0.0)
+	return base * (1.0 + LUCK_BONUS_CAP * positive_luck / (positive_luck + 100.0))
 
 
 static func roll_item(wave_number: int, luck: float, inventory: ItemInventory, rng: RandomNumberGenerator = null) -> Dictionary:

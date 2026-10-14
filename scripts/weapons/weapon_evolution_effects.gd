@@ -134,7 +134,7 @@ func _release_beam() -> void:
 		for enemy in weapon.player.enemies_on_segment(charge_origin, end, weapon.data.attack_width * 0.5):
 			var closest := Geometry2D.get_closest_point_to_segment(enemy.global_position, charge_origin, end)
 			if closest.distance_to(enemy.global_position) <= weapon.data.attack_width * 0.5 + enemy.data.radius:
-				WeaponAttackShapes.hit(enemy, weapon.data, weapon.tier, damage, charge_critical, weapon.player.items, directions[index])
+				WeaponAttackShapes.hit(enemy, weapon.data, weapon.tier, damage, charge_critical, weapon.player.items, directions[index], weapon.affixes, 1.0 if index == 0 else weapon.data.evolution_damage_factor)
 		_flash(charge_origin, end, true, directions[index], weapon.data.range_at_tier(weapon.tier), directions[index].angle() - charge_direction.angle())
 
 func _line_damage(start: Vector2, end: Vector2, amount: float, width: float, bleed: bool) -> void:

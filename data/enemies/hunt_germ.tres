@@ -31,3 +31,4 @@ trigger_range = 260.0
 attack_speed = 530.0
 attack_duration = 0.42
 attack_damage = 12.0
+affix_resistances = {"electric": 0.25}

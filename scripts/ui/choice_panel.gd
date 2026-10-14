@@ -336,6 +336,7 @@ func _end_summary(won: bool, coins: int, recap: Dictionary) -> String:
 
 func _proc_name(id: StringName) -> String:
 	var labels := {
+		"affix_fire": "Feuer", "affix_ice": "Eis", "affix_poison": "Gift", "affix_bleed": "Affix-Blutung", "affix_electric": "Elektro",
 		"bleed": "Blutung", "chain": "Kettenblitz", "water_puddle": "Spülpfützen",
 		"splash": "Spritzer", "crit_burst": "Krit-Blitz", "crit_beam": "Glanzstrahl",
 		"thorns": "Keramiksplitter", "shield_shards": "Schildsplitter", "kill_burst": "Zahnblitz",
