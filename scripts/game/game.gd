@@ -98,6 +98,7 @@ func _ready() -> void:
 	player.damaged.connect(_on_player_damaged)
 	player.damaged.connect(items.on_player_hurt)
 	items.feedback.connect(_show_item_feedback)
+	items.enchantment_support.connect(telemetry.record_enchantment_support)
 	relics.feedback.connect(_show_item_feedback)
 	choice_panel.upgrade_chosen.connect(_on_upgrade_chosen)
 	choice_panel.level_reroll_requested.connect(_on_level_reroll)
@@ -114,7 +115,6 @@ func _ready() -> void:
 	choice_panel.main_menu_requested.connect(_on_end_main_menu)
 	choice_panel.endless_requested.connect(_on_endless_requested)
 	shop_panel.buy_requested.connect(_on_shop_buy)
-	shop_panel.buy_with_rolls_requested.connect(_on_shop_buy.bind(true))
 	shop_panel.sell_requested.connect(_on_shop_sell)
 	shop_panel.merge_requested.connect(_on_shop_merge)
 	shop_panel.evolution_requested.connect(_on_shop_evolve)
@@ -402,6 +402,8 @@ func _create_enemy(data: EnemyData, at: Vector2, treasure: bool = false) -> void
 	enemy.damage_recorded.connect(telemetry.record_damage)
 	enemy.weapon_hit.connect(items.on_weapon_hit)
 	enemy.weapon_hit.connect(relics.on_weapon_hit)
+	enemy.died.connect(items.on_enemy_died)
+	enemy.died.connect(relics.on_enemy_died)
 	enemy.attack_performed.connect(sound.play_cue)
 	if data.is_boss:
 		enemy.death_started.connect(_on_boss_death_started)
@@ -727,7 +729,7 @@ func _advance_post_wave_rewards() -> void:
 			var chest := rewards.current_chest()
 			if chest.get("kind", "") == "affix":
 				choice_panel.hide()
-				weapon_chest_panel.show_chest(chest, player.loadout, player.stats, items.scrap_value(int(chest.scrap_coins)))
+				weapon_chest_panel.show_chest(chest, player.loadout, player.stats, items.scrap_value(int(chest.scrap_coins)), items)
 				get_tree().paused = true
 				_save_run()
 				return
@@ -848,7 +850,7 @@ func _update_shop_panel() -> void:
 	var weapons := player.loadout.equipped()
 	for index in weapons.size():
 		var weapon := weapons[index]
-		equipment.append({"data": weapon.data, "hands": weapon.data.hands, "icon": weapon.data.sprite, "uid": weapon.get_instance_id(), "name": weapon.data.display_name, "tier": weapon.tier, "refund": player.loadout.refund_for(index), "stats": weapon.data.stats_text(weapon.tier), "combat": weapon.data.combat_text() + "\n" + WeaponAffixes.summary(weapon, player.stats), "description": weapon.data.description, "dps": _weapon_dps(weapon.data, weapon.tier), "mergeable": player.loadout.can_merge(index)})
+		equipment.append({"data": weapon.data, "hands": weapon.data.hands, "icon": weapon.data.sprite, "uid": weapon.get_instance_id(), "name": WeaponPresentation.weapon_name(weapon), "tier": weapon.tier, "refund": player.loadout.refund_for(index), "stats": weapon.data.stats_text(weapon.tier), "combat": weapon.data.combat_text() + "\n" + WeaponAffixes.summary(weapon, player.stats, items), "description": weapon.data.description, "dps": _weapon_dps(weapon.data, weapon.tier), "mergeable": player.loadout.can_merge(index)})
 	var buyable: Array[bool] = []
 	var offer_dps: Array[float] = []
 	for offer in shop.offers:
@@ -868,7 +870,7 @@ func _weapon_dps(data: WeaponData, tier: int) -> float:
 	return data.estimated_dps(tier, player.stats, items.attack_interval_factor(), items.base_weapon_damage_bonus())
 
 
-func _on_shop_buy(index: int, use_offer_rolls: bool = false) -> void:
+func _on_shop_buy(index: int) -> void:
 	if not in_shop:
 		return
 	var offer := shop.offers[index]
@@ -878,7 +880,7 @@ func _on_shop_buy(index: int, use_offer_rolls: bool = false) -> void:
 		return
 	if offer.weapon_data == null and not items.can_acquire(offer):
 		return
-	var acquired := player.loadout.acquire(offer.weapon_data, offer.weapon_tier, offer.price, use_offer_rolls) if offer.weapon_data != null else items.acquire(offer)
+	var acquired := player.loadout.acquire(offer.weapon_data, offer.weapon_tier, offer.price) if offer.weapon_data != null else items.acquire(offer)
 	if not acquired:
 		return
 	coins -= offer.price

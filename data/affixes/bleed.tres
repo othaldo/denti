@@ -4,6 +4,10 @@
 script = ExtResource("1")
 id = &"bleed"
 display_name = "Blutung"
+name_suffix = "des Aderlasses"
+description = "Blutung über Zeit. Profitiert von Blutungsitems und Blutmond."
+build_tags = Array[StringName]([&"bleed", &"melee"])
+damage_factor = 0.8
 color = Color(1, 0.26, 0.36, 1)
 icon_index = 10
 dot_duration = 3.0

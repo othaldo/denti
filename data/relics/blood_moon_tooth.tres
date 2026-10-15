@@ -6,5 +6,5 @@
 script = ExtResource("1")
 id = &"blood_moon_tooth"
 display_name = "Blutmond-Zahn"
-description = "Stirbt ein blutender Gegner durch eine Waffe, explodiert er und verteilt Blutung auf Gegner in der Nähe."
+description = "Blutende Gegner explodieren beim Tod und verteilen Blutung. Auch Verzauberungen zählen. Keine Ketten."
 icon_index = 0

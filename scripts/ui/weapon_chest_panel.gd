@@ -8,6 +8,7 @@ signal selection_changed
 var reward: Dictionary = {}
 var weapons: Array[WeaponInstance] = []
 var stats: PlayerStats
+var item_context: ItemInventory
 var root_control: Control
 var panel: PanelContainer
 var scroll: ScrollContainer
@@ -57,7 +58,7 @@ func _ready() -> void:
 	scroll.add_child(rows)
 	title_label = _label("Upgrade-Kapsel!", 26)
 	title_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_label("1. Waffe wählen   2. Fund einsetzen · Jeder passende Fund bringt Fortschritt", 14)
+	_label("Waffe wählen, dann verzaubern. Gleiche Effekte werden stärker.", 14)
 	weapon_grid = GridContainer.new()
 	weapon_grid.add_theme_constant_override("h_separation", 6)
 	weapon_grid.add_theme_constant_override("v_separation", 6)
@@ -70,7 +71,7 @@ func _ready() -> void:
 	rows.add_child(target_summary)
 	replacement = VBoxContainer.new()
 	rows.add_child(replacement)
-	ShopDetails._label(replacement, "Neuer Effekt bei vollen Slots? Wähle, was ersetzt wird:", 13)
+	ShopDetails._label(replacement, "Alle Plätze belegt. Für einen neuen Effekt Ersatz wählen:", 13)
 	replacement_grid = GridContainer.new()
 	replacement_grid.columns = 2
 	replacement_grid.add_theme_constant_override("h_separation", 6)
@@ -99,8 +100,9 @@ func _label(value: String, font_size: int) -> Label:
 	return ShopDetails._label(rows, value, font_size)
 
 
-func show_chest(chest: Dictionary, loadout: WeaponLoadout, player_stats: PlayerStats, scrap_coins: int) -> void:
+func show_chest(chest: Dictionary, loadout: WeaponLoadout, player_stats: PlayerStats, scrap_coins: int, items: ItemInventory = null) -> void:
 	reward = chest
+	item_context = items
 	weapons = loadout.equipped()
 	stats = player_stats
 	title_label.text = "Goldene Upgrade-Kapsel!" if bool(chest.get("golden", false)) else "Upgrade-Kapsel!"
@@ -113,7 +115,7 @@ func show_chest(chest: Dictionary, loadout: WeaponLoadout, player_stats: PlayerS
 		var button := Button.new()
 		button.custom_minimum_size = Vector2(0, 66)
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		button.tooltip_text = weapon.data.display_name + "\n" + WeaponAffixes.summary(weapon, stats) + "\n" + weapon.data.stats_text(weapon.tier)
+		button.tooltip_text = WeaponPresentation.weapon_name(weapon) + "\n" + WeaponAffixes.summary(weapon, stats, item_context) + "\n" + weapon.data.stats_text(weapon.tier)
 		weapon_grid.add_child(button)
 		var margin := MarginContainer.new()
 		margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -135,8 +137,7 @@ func show_chest(chest: Dictionary, loadout: WeaponLoadout, player_stats: PlayerS
 		text_rows.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		text_rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		line.add_child(text_rows)
-		var name_label := ShopDetails._label(text_rows, "%d. %s" % [index + 1, weapon.data.display_name], 14)
-		name_label.max_lines_visible = 2
+		var name_label := ShopDetails._label(text_rows, WeaponPresentation.weapon_name(weapon), 14)
 		name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		var info := ShopDetails._label(text_rows, "%s · %d/%d Effekte" % [WeaponPresentation.tier_text(weapon.data, weapon.tier), weapon.affixes.size(), weapon.affix_slots], 12)
 		info.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -164,11 +165,14 @@ func _select_weapon(index: int, reset_replace: bool = true) -> void:
 	reward["target_uid"] = weapon.instance_uid
 	if reset_replace:
 		reward["replace"] = -1
-	var summary := WeaponAffixes.summary(weapon, stats).replace("\n", " · ")
-	for tier in range(1, 5):
-		var name := DentiRarity.name_for(tier)
-		summary = summary.replace(name, "[color=#%s]%s[/color]" % [DentiRarity.color_for(tier).to_html(false), name])
-	target_summary.text = weapon.data.display_name + " · " + summary
+	var needs_replacement := false
+	if weapon.affixes.size() >= weapon.affix_slots:
+		for option: Dictionary in reward.options:
+			if option.id not in ["slot", "mk"] and WeaponAffixes.find(weapon.affixes, StringName(option.id)) < 0:
+				needs_replacement = true
+	target_summary.text = "Verzauberungen · %d/%d Plätze belegt" % [weapon.affixes.size(), weapon.affix_slots]
+	if not needs_replacement:
+		target_summary.text += "\n" + WeaponPresentation.enchantment_list(weapon)
 	for button in replacement_buttons:
 		button.free()
 	replacement_buttons.clear()
@@ -181,7 +185,7 @@ func _select_weapon(index: int, reset_replace: bool = true) -> void:
 		text_rows.alignment = BoxContainer.ALIGNMENT_CENTER
 		text_rows.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		button.add_child(text_rows)
-		var effect := ShopDetails._label(text_rows, "%s +%.1f%s" % [data.display_name, float(affix.damage) if data.stat_key != &"" else WeaponAffixes.damage_for(affix.damage, weapon.data, stats), " %" if data.stat_key != &"" else ""], 13)
+		var effect := ShopDetails._label(text_rows, "%s +%s%s" % [data.display_name, WeaponAffixes.value_text(float(affix.damage), data.id, weapon.data, stats, item_context), " %" if data.stat_key != &"" else (" s" if data.effect_kind == "wet" else (" HP" if data.effect_kind == "leech" else ""))], 13)
 		effect.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		effect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		var rarity := ShopDetails._label(text_rows, WeaponAffixes.progress_text(affix), 12)
@@ -199,7 +203,7 @@ func _select_weapon(index: int, reset_replace: bool = true) -> void:
 			_refresh_cards()
 			selection_changed.emit())
 		replacement_buttons.append(button)
-	replacement.visible = weapon.affixes.size() >= weapon.affix_slots
+	replacement.visible = needs_replacement
 	var replace := int(reward.get("replace", -1))
 	if replace < -1 or replace >= weapon.affixes.size():
 		reward["replace"] = -1
@@ -220,28 +224,34 @@ func _refresh_cards() -> void:
 	var weapon := weapons[selected_weapon]
 	for index in buttons.size():
 		var option: Dictionary = reward.options[index]
-		buttons[index].show_affix(option, WeaponAffixes.comparison(weapon, option, stats, int(reward.get("replace", -1))))
+		var replace := int(reward.get("replace", -1))
+		var preview := WeaponAffixes.comparison(weapon, option, stats, replace, true, item_context)
+		var hint := WeaponPresentation.enchantment_hint(StringName(option.id), weapon, item_context, replace)
+		buttons[index].show_affix(option, preview + ("\n" + hint if not hint.is_empty() else ""), WeaponAffixes.comparison(weapon, option, stats, replace, false, item_context))
 		buttons[index].disabled = not WeaponAffixes.can_apply(weapon, option, int(reward.get("replace", -1)))
-		var badge := "Neues Affix einsetzen"
+		var badge := "Verzaubern"
 		if option.id == "slot":
-			buttons[index].name_label.text = (["", "ZWEITER", "DRITTER", "VIERTER"][mini(weapon.affix_slots, 3)] + " AFFIX-SLOT") if weapon.affix_slots < WeaponAffixes.MAX_SLOTS else "AFFIX-SLOTS"
-			badge = "Nächsten Slot öffnen" if not buttons[index].disabled else "Alle 4 Slots geöffnet"
+			buttons[index].name_label.text = "Mehr Platz"
+			badge = "Platz freischalten" if not buttons[index].disabled else "Alle 4 Plätze offen"
 		elif option.id == "mk":
-			buttons[index].name_label.text = "MK-AUFSTIEG"
+			buttons[index].name_label.text = "Mk-Aufstieg"
 			badge = "Nächste Mk-Stufe" if not buttons[index].disabled else "Benötigt Mk IV"
 		else:
 			var existing := WeaponAffixes.find(weapon.affixes, StringName(option.id))
 			if existing >= 0:
-				badge = "Verstärken · +%.1f %% Fortschritt" % (WeaponAffixes.progress_weight(weapon.affixes[existing], option) * 100) if int(option.rarity) <= int(weapon.affixes[existing].rarity) else "Seltenheits-Aufstieg"
+				badge = "Verstärken" if int(option.rarity) <= int(weapon.affixes[existing].rarity) else "Seltenheit erhöhen"
 			elif buttons[index].disabled:
-				badge = "Erst Ersatz auswählen"
-		buttons[index].content.move_child(buttons[index].keep_label, 2)
+				badge = "Erst Ersatz wählen"
+			elif weapon.affixes.size() >= weapon.affix_slots:
+				badge = "Ersetzen"
+		buttons[index].content.move_child(buttons[index].keep_label, -1)
 		if option.id not in ["slot", "mk"]:
 			var existing := WeaponAffixes.find(weapon.affixes, StringName(option.id))
 			if existing >= 0 and int(option.rarity) <= int(weapon.affixes[existing].rarity):
 				buttons[index].progress_bar.show()
 				buttons[index].progress_bar.value = minf(float(weapon.affixes[existing].get("progress", 0)) + WeaponAffixes.progress_weight(weapon.affixes[existing], option), 1.0) * 100
-		buttons[index].keep_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		buttons[index].keep_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		buttons[index].keep_label.add_theme_font_size_override("font_size", 14)
 		buttons[index].keep_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		buttons[index].keep_label.text = badge
 		buttons[index].keep_label.visible = true
@@ -254,17 +264,20 @@ func _layout() -> void:
 	if panel == null:
 		return
 	var viewport := get_viewport().get_visible_rect().size
-	var narrow := viewport.x < 780 or viewport.y < 480
-	panel.custom_minimum_size = Vector2(minf(viewport.x - 24, 1060), 0)
+	var narrow := viewport.x < 1000 or viewport.y < 480
+	panel.custom_minimum_size = Vector2(minf(viewport.x - 16, 1160), 0)
 	scroll.custom_minimum_size.y = minf(viewport.y - 60, 800)
-	weapon_grid.columns = 2 if narrow else 3
+	weapon_grid.columns = (1 if viewport.x < 360 else 2) if narrow else 3
+	var outer_width := panel.get_theme_stylebox("panel").get_minimum_size().x + 24 + scroll.get_v_scroll_bar().get_combined_minimum_size().x
+	var weapon_width := (panel.custom_minimum_size.x - outer_width - (weapon_grid.columns - 1) * weapon_grid.get_theme_constant("h_separation")) / weapon_grid.columns
 	for index in weapon_buttons.size():
 		var button := weapon_buttons[index]
-		button.custom_minimum_size.y = 78 if narrow else 66
 		var labels: Array = button.get_meta("labels")
-		labels[0].add_theme_font_size_override("font_size", 12 if narrow else 14)
+		labels[0].add_theme_font_size_override("font_size", 13 if narrow else 14)
+		buttons[0]._wrap_chest_text(labels[0], WeaponPresentation.weapon_name(weapons[index]), maxf(weapon_width - (42 if narrow else 48), 32))
 		labels[1].text = "%s · %d/%d%s" % [WeaponPresentation.tier_text(weapons[index].data, weapons[index].tier), weapons[index].affixes.size(), weapons[index].affix_slots, "" if narrow else " Effekte"]
 		labels[1].add_theme_font_size_override("font_size", 11 if narrow else 12)
+		button.custom_minimum_size.y = maxf(66, _label_height(labels[0]) + _label_height(labels[1]) + 16)
 		var art: TextureRect = button.get_meta("art")
 		art.custom_minimum_size = Vector2(24, 24) if narrow else Vector2(30, 30)
 	cards.columns = 1 if narrow else 3
@@ -276,16 +289,22 @@ func _layout() -> void:
 	for button in buttons:
 		button.custom_minimum_size = Vector2(0, 0)
 		button.content.alignment = BoxContainer.ALIGNMENT_BEGIN
-		button.icon_rect.custom_minimum_size = Vector2(0, 24 if narrow else 32)
-		button.name_label.custom_minimum_size.y = 24
-		button.name_label.add_theme_font_size_override("font_size", 16)
+		button.set_affix_header()
+		button.name_label.custom_minimum_size.y = 0
+		button.name_label.max_lines_visible = -1
+		button.name_label.add_theme_font_size_override("font_size", 18)
 		button.rarity_label.add_theme_font_size_override("font_size", 11)
 		button.effect_label.add_theme_font_size_override("font_size", 14)
-		button.content.add_theme_constant_override("separation", 3)
-		var outer_width := panel.get_theme_stylebox("panel").get_minimum_size().x + 24 + scroll.get_v_scroll_bar().get_combined_minimum_size().x
+		button.content.add_theme_constant_override("separation", 2)
+		for label in [button.name_label, button.rarity_label, button.effect_label]:
+			label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+			label.add_theme_constant_override("line_spacing", 1)
+		button.rarity_label.size_flags_horizontal = Control.SIZE_FILL
+		for edge in ["left", "right"]:
+			button.content_margin.add_theme_constant_override("margin_" + edge, 10)
 		var card_width := (panel.custom_minimum_size.x - outer_width - (cards.columns - 1) * cards.get_theme_constant("h_separation")) / cards.columns
-		var text_width := maxf(card_width - 28, 100)
-		button._wrap_chest_text(button.name_label, button.name_label.text.replace("\n", " "), text_width)
+		var text_width := maxf(card_width - 20, 100)
+		button._wrap_chest_text(button.name_label, button.name_label.text.replace("\n", " "), text_width - 34)
 		button._wrap_chest_text(button.keep_label, button.keep_label.text.replace("\n", " "), text_width)
 		button._wrap_chest_text(button.effect_label, button.upgrade_description, text_width)
 		# Measure explicit lines including theme spacing; cached Label minima
@@ -296,10 +315,20 @@ func _layout() -> void:
 			if not child.visible:
 				continue
 			visible_children += 1
-			if child is Label:
-				var line_count: int = child.text.split("\n").size()
-				var text_height: float = child.get_theme_font("font").get_height(child.get_theme_font_size("font_size")) * line_count + child.get_theme_constant("line_spacing") * maxi(line_count - 1, 0)
-				height += maxf(child.custom_minimum_size.y, ceilf(text_height))
+			if child == button.affix_header:
+				height += maxf(26, _label_height(button.name_label))
+			elif child is Label:
+				height += _label_height(child)
 			else:
 				height += child.get_combined_minimum_size().y
-		button.custom_minimum_size.y = maxf(150 if narrow else 190, height + maxi(visible_children - 1, 0) * 3 + 24)
+		button.custom_minimum_size.y = maxf(140, height + maxi(visible_children - 1, 0) * 2 + 24)
+	for index in replacement_buttons.size():
+		var label: Label = replacement_buttons[index].get_meta("rarity_label")
+		label.text = WeaponAffixes.progress_text(weapons[selected_weapon].affixes[index])
+		if narrow:
+			label.text = label.text.replace("Ungewöhnlich", "Ungew.").replace(".0 %", " %")
+
+
+func _label_height(label: Label) -> float:
+	var lines := label.text.split("\n").size()
+	return maxf(label.custom_minimum_size.y, ceilf(label.get_theme_font("font").get_height(label.get_theme_font_size("font_size")) * lines + label.get_theme_constant("line_spacing") * maxi(lines - 1, 0)))

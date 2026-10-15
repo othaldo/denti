@@ -2,6 +2,7 @@ class_name ItemInventory
 extends Node2D
 
 signal feedback(message: String, at: Vector2, color: Color)
+signal enchantment_support(kind: StringName, amount: float)
 
 const CHAIN_RANGE := 190.0
 const SPLASH_RADIUS := 82.0
@@ -142,6 +143,10 @@ func preferred_tags(loadout: WeaponLoadout) -> Array[StringName]:
 			result.append(tag)
 		if weapon.data.damage_type == "Schnitt" and not result.has(&"bleed"):
 			result.append(&"bleed")
+		for affix in weapon.affixes:
+			for build_tag in WeaponAffixes.by_id(StringName(affix.id)).build_tags:
+				if not result.has(build_tag):
+					result.append(build_tag)
 	return result
 
 
@@ -268,7 +273,7 @@ func modify_damage(enemy: Enemy, weapon: WeaponData, base: float) -> float:
 	var bonus := base_weapon_damage_bonus()
 	if enemy.data.is_boss:
 		bonus += _power(&"boss_bonus") * 100.0
-	if enemy.bleed_stacks > 0:
+	if enemy.has_bleeding():
 		bonus += _power(&"bleed_bonus") * 100.0
 	if enemy.wet_time > 0.0 and (weapon.damage_type == "Wasser" or weapon.damage_type == "Licht"):
 		bonus += _power(&"conductive_wet") * 100.0
@@ -302,16 +307,8 @@ func on_weapon_hit(enemy: Enemy, amount: float, weapon: WeaponData, critical: bo
 		enemy.apply_bleed((weapon.bleed_dps + _power(&"bleed")) * player.stats.damage_factor(), weapon.bleed_duration + _power(&"bleed_clock"), 3 + extra_stacks)
 	if enemy.health > 0.0 and weapon.wet_duration > 0.0:
 		enemy.apply_wet(weapon.wet_duration + (0.5 if _power(&"conductive_wet") > 0.0 else 0.0))
-	if weapon.damage_type == "Wasser" and _power(&"water_puddle") > 0.0 and _ready_proc(&"water_puddle", 1.5):
-		puddles.append({"at": enemy.global_position, "life": PUDDLE_DURATION, "tick": 0.0})
-		if puddles.size() > 4:
-			puddles.pop_front()
-		queue_redraw()
-	if enemy.health <= 0.0 and enemy.bleed_stacks > 0 and _power(&"bleed_spread") > 0.0 and float(cooldowns.get("bleed_spread", 0.0)) <= 0.0:
-		var nearby := _nearest_other(enemy.global_position, enemy, 110.0 + _power(&"bleed_spread"))
-		if nearby != null and _ready_proc(&"bleed_spread", 0.4):
-			nearby.apply_bleed(enemy.bleed_dps, 2.5 + _power(&"bleed_clock"), 3 + roundi(_power(&"bleed_clock")))
-			_line(enemy.global_position, nearby.global_position, Color(0.86, 0.31, 0.51))
+	if weapon.damage_type == "Wasser" and _power(&"water_puddle") > 0.0:
+		create_puddle(enemy.global_position)
 	if _power(&"chain") > 0.0 and (weapon.damage_type == "Wasser" or weapon.damage_type == "Licht") and float(cooldowns.get("chain", 0.0)) <= 0.0:
 		var chain_range := CHAIN_RANGE + (85.0 if enemy.wet_time > 0.0 else 0.0)
 		var next := _nearest_other(enemy.global_position, enemy, chain_range)
@@ -330,6 +327,31 @@ func on_weapon_hit(enemy: Enemy, amount: float, weapon: WeaponData, critical: bo
 			var beam_factor := _power(&"crit_beam") * (1.5 if weapon.damage_type == "Licht" else 1.0)
 			beam_target.take_damage(amount * beam_factor, null, false, &"crit_beam")
 			_line(enemy.global_position, beam_target.global_position, Color(1.0, 0.88, 0.42))
+
+
+func create_puddle(at: Vector2) -> void:
+	if not _ready_proc(&"water_puddle", 1.5):
+		return
+	puddles.append({"at": at, "life": PUDDLE_DURATION, "tick": 0.0})
+	if puddles.size() > 4:
+		puddles.pop_front()
+	queue_redraw()
+
+
+func on_enemy_died(enemy: Enemy, _amount: float) -> void:
+	WeaponEnchantmentEffects.on_enemy_died(self, enemy)
+	if not enemy.has_bleeding() or _power(&"bleed_spread") <= 0.0:
+		return
+	var nearby := _nearest_other(enemy.global_position, enemy, 110.0 + _power(&"bleed_spread"))
+	if nearby == null or not _ready_proc(&"bleed_spread", 0.4):
+		return
+	if enemy.bleed_stacks > 0:
+		nearby.apply_bleed(enemy.bleed_dps, 2.5 + _power(&"bleed_clock"), 3 + roundi(_power(&"bleed_clock")))
+	var budget := enemy.affix_effects.budget(&"bleed")
+	if budget > 0:
+		var additions: Array[Dictionary] = [{"id": "bleed", "damage": budget * 0.3, "duration": 3.0 + _power(&"bleed_clock")}]
+		nearby.take_damage(0, null, false, &"", additions)
+	_line(enemy.global_position, nearby.global_position, Color(0.86, 0.31, 0.51))
 
 
 func on_player_hurt(_at: Vector2, amount: float) -> void:

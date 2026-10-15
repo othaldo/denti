@@ -198,7 +198,7 @@ static func restore(game, saved: Dictionary) -> void:
 		if enemy.dying:
 			enemy.remove_from_group("enemies")
 		enemy.affix_effects.restore(entry.get("affix_effects", {}))
-		enemy.bleed_stacks = clampi(int(entry.get("bleed_stacks", 0)), 0, 5)
+		enemy.bleed_stacks = clampi(int(entry.get("bleed_stacks", 0)), 0, Enemy.MAX_BLEED_STACKS)
 		enemy.bleed_dps = maxf(float(entry.get("bleed_dps", 0.0)), 0.0)
 		enemy.bleed_time = maxf(float(entry.get("bleed_time", 0.0)), 0.0)
 		enemy.bleed_tick = clampf(float(entry.get("bleed_tick", 1.0)), 0.0, 1.0)

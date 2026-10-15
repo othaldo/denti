@@ -4,6 +4,7 @@
 script = ExtResource("1")
 id = &"range"
 display_name = "Reichweite"
+name_suffix = "der Weitsicht"
 color = Color(0.35, 0.8, 1, 1)
 icon_index = 10
 stat_key = &"range"

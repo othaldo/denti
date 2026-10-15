@@ -59,27 +59,33 @@ func _run() -> void:
 		saved.append({"id": str(template.id), "tier": 4})
 	loadout.restore(saved)
 	assert(loadout.used_slots() == 6)
-	assert(loadout.acquire(weak, 1, 10, false))
+	assert(loadout.acquire(weak, 1, 10))
 	assert(loadout.equipped()[0].data.rolls == rolled.rolls, "default shop fusion destroyed existing roll")
-	loadout.restore(saved)
-	assert(loadout.acquire(weak, 1, 10, true))
-	assert(loadout.equipped()[0].data.rolls == weak.rolls and loadout.equipped()[0].affixes[0].damage == 5, "new roll adoption lost affix")
+	_fusion_regressions(loadout, template, rolled, weak)
+	for entry: Dictionary in saved:
+		entry["rolls"] = weak.rolls
 	loadout.restore(saved)
 	var upgrade_offer := ShopController.weapon_offer(ShopController.by_id(template.id), 1)
-	upgrade_offer.weapon_data = weak
+	upgrade_offer.weapon_data = rolled
 	game.shop.offers[0] = upgrade_offer
 	game._update_shop_panel()
 	game.shop_panel._select("offer", 0)
-	assert(game.shop_panel.roll_buy_button.visible, "full-loadout fusion has no roll choice")
+	assert(game.shop_panel.detail_buy_button.text.begins_with("Fusion"), "full-loadout purchase hides fusion")
+	assert(game.shop_panel.details.action_hint.text.contains("beste Werte"), "fusion lacks result preview")
+	assert(game.shop_panel.details.action_hint.text.contains("Crit") and not game.shop_panel.details.compare.visible, "fusion lacks crit preview or shows a misleading unmerged comparison")
 	for extent in [Vector2i(1280, 720), Vector2i(360, 640)]:
 		root.content_scale_size = extent
 		root.size = extent
 		for frame in 5:
 			await process_frame
 		assert(Rect2(Vector2.ZERO, Vector2(extent)).encloses(game.shop_panel.detail_popup.get_global_rect()), "roll purchase popup exceeds viewport")
-		assert(game.shop_panel.detail_popup.get_global_rect().encloses(game.shop_panel.roll_buy_button.get_global_rect()), "roll purchase action inaccessible")
-	game.shop_panel.roll_buy_button.pressed.emit()
-	assert(loadout.equipped()[0].data.rolls == weak.rolls and loadout.equipped()[0].affixes[0].damage == 5, "shop roll choice failed to adopt purchased stats")
+		assert(game.shop_panel.detail_popup.get_global_rect().encloses(game.shop_panel.detail_buy_button.get_global_rect()), "fusion purchase action inaccessible")
+		if "--capture" in OS.get_cmdline_user_args():
+			root.get_texture().get_image().save_png("res://.godot/fusion-%dx%d.png" % [extent.x, extent.y])
+	var coins_before: int = game.coins
+	game.shop_panel.offer_buttons[0].buy_button.pressed.emit()
+	assert(game.coins == coins_before - upgrade_offer.price and game.shop.offers[0] == null, "fusion purchase charged incorrectly")
+	assert(loadout.equipped()[0].tier == 2 and loadout.equipped()[0].data.rolls == rolled.rolls and loadout.equipped()[0].affixes[0].damage == 5, "direct shop fusion lost legendary values or enchantments")
 	var mixed := WeaponRolls.resolve(template, {"quality": 3, "damage": 1.65, "interval": 1.35, "range": 1.0, "crit": 0})
 	var mixed_offer := ShopController.weapon_offer(ShopController.by_id(template.id), 1)
 	mixed_offer.weapon_data = mixed
@@ -166,6 +172,46 @@ func _run() -> void:
 	session.clear_run()
 	print("PASS weapon rolls, shop/fusion/save and chest frequency")
 	quit(0)
+
+func _fusion_regressions(loadout: WeaponLoadout, template: WeaponData, rolled: WeaponData, weak: WeaponData) -> void:
+	var specialist := WeaponRolls.resolve(template, {"quality": 3, "damage": 1.7, "interval": 1.35, "range": 1.25, "crit": 0})
+	var expected := {"quality": 4, "damage": 1.7, "interval": 0.75, "range": 1.25, "crit": 0.09}
+	assert(WeaponRolls.fuse(specialist, rolled).rolls == expected, "fusion discarded a better individual attribute")
+	assert(WeaponRolls.fuse(rolled, specialist).rolls == expected, "fusion depends on operand order")
+	assert(WeaponRolls.fuse(template, weak).base_damage == template.base_damage, "legacy neutral damage was downgraded")
+	assert(WeaponRolls.fuse(template, weak).interval == template.interval, "legacy neutral tempo was downgraded")
+	assert(WeaponRolls.fuse(template, template) == template, "neutral fusion mutated catalog identity")
+	var mk_left := WeaponRolls.resolve(template, rolled.rolls, {"mk": 2})
+	var mk_right := WeaponRolls.resolve(template, weak.rolls, {"mk": 3})
+	var mk_result := WeaponRolls.fuse(mk_left, mk_right)
+	assert(int(mk_result.chest_upgrades.mk) == 3 and is_equal_approx(mk_result.base_damage, template.base_damage * 1.65 * 1.3), "fusion discarded or added capsule Mk upgrades")
+	var state: Array = [
+		{"id": str(template.id), "tier": 1, "uid": "weak", "rolls": weak.rolls, "invested_coins": 5},
+		{"id": str(template.id), "tier": 1, "uid": "best", "rolls": specialist.rolls, "invested_coins": 20, "affix_slots": 2, "affixes": [{"id": "fire", "damage": 5, "rarity": 2}, {"id": "tempo", "damage": 15, "rarity": 2}]},
+	]
+	for index in 4:
+		state.append({"id": str(template.id), "tier": 4})
+	loadout.restore(state)
+	var target := loadout.purchase_fusion_target(rolled, 1)
+	assert(target.instance_uid == "best", "purchase selected first match instead of best fusion result")
+	var preview := loadout.fusion_data(target, rolled)
+	assert(loadout.acquire(rolled, 1, 11))
+	assert(target.tier == 2 and target.data.rolls == expected and target.instance_uid == "best", "automatic fusion lost mixed legendary values or identity")
+	assert(target.affixes.size() == 2 and target.affix_slots == 2 and target.invested_coins == 31, "fusion lost investments or enchantments")
+	assert(target.data.interval == preview.interval and target.data.attack_range == preview.attack_range, "preview disagrees with result")
+	assert(loadout.equipped()[0].data.rolls == weak.rolls and loadout.equipped()[0].tier == 1, "fusion consumed an unrelated copy")
+	loadout.restore(loadout.save_data())
+	assert(loadout.equipped()[1].data.interval == preview.interval and loadout.equipped()[1].data.rolls == expected, "fused stats compounded or changed on resume")
+	# Selecting a weak weapon must still find the strongest compatible partner.
+	loadout.restore([state[0], state[0], {"id": str(template.id), "tier": 1, "rolls": rolled.rolls}])
+	assert(loadout.merge_partner(0) == loadout.equipped()[2], "manual fusion chose a weak first partner")
+	assert(loadout.merge(0) and loadout.equipped()[0].data.rolls == rolled.rolls, "manual fusion discarded better partner rolls")
+	assert(loadout.equipped().size() == 2 and loadout.equipped()[1].data.rolls == weak.rolls, "manual fusion consumed wrong copy")
+	loadout.restore([])
+	assert(loadout.purchase_fusion_target(rolled, 1) == null and loadout.acquire(rolled, 1), "fusion prevented a free-slot purchase")
+	assert(loadout.equipped()[0].tier == 1 and loadout.equipped()[0].data.rolls == rolled.rolls, "free-slot purchase changed offer")
+	assert(template.rolls.is_empty() and specialist.rolls.damage == 1.7 and rolled.rolls.damage == 1.65, "fusion changed shared/source resources")
+
 
 func _chests(rng: RandomNumberGenerator, luck: float) -> int:
 	var total := 0

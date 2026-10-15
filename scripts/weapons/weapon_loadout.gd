@@ -93,20 +93,38 @@ func can_acquire(data: WeaponData, tier: int = 1) -> bool:
 	return used_slots() + data.hands <= CAPACITY or (tier < MAX_TIER and _find_tier(data.id, tier) != null)
 
 
-func acquire(data: WeaponData, tier: int = 1, paid_coins: int = -1, use_offer_rolls: bool = false) -> bool:
+func acquire(data: WeaponData, tier: int = 1, paid_coins: int = -1) -> bool:
 	if not can_acquire(data, tier):
 		return false
 	var value := paid_coins if paid_coins >= 0 else _legacy_value(data, tier)
 	if used_slots() + data.hands <= CAPACITY:
 		_add(data, tier, value)
 	else:
-		var matching := _find_tier(data.id, tier)
+		var matching := purchase_fusion_target(data, tier)
+		matching.data = WeaponRolls.fuse(matching.data, data)
 		matching.tier += 1
-		if use_offer_rolls:
-			matching.data = WeaponRolls.resolve(data, data.rolls, matching.data.chest_upgrades)
+		matching.refresh_affix_stats()
 		matching.invested_coins += value
 	_refresh_positions()
 	return true
+
+
+func purchase_fusion_target(data: WeaponData, tier: int = 1) -> WeaponInstance:
+	if tier >= MAX_TIER or used_slots() + data.hands <= CAPACITY:
+		return null
+	return _best_fusion_partner(data, tier)
+
+
+func merge_partner(index: int) -> WeaponInstance:
+	var weapons := equipped()
+	if index < 0 or index >= weapons.size() or weapons[index].tier >= MAX_TIER:
+		return null
+	return _merge_partner(weapons[index])
+
+
+func fusion_data(primary: WeaponInstance, data: WeaponData, partner: WeaponInstance = null) -> WeaponData:
+	var affixes := _combined_affixes(primary, partner) if partner != null else primary.affixes
+	return WeaponRolls.with_affixes(WeaponRolls.fuse(primary.data, data), affixes)
 
 
 func can_merge(index: int) -> bool:
@@ -130,6 +148,7 @@ func merge(index: int) -> bool:
 		return false
 	var weapon := equipped()[index]
 	var partner := _merge_partner(weapon)
+	weapon.data = WeaponRolls.fuse(weapon.data, partner.data)
 	weapon.affixes = _combined_affixes(weapon, partner)
 	weapon.affix_slots = maxi(weapon.affix_slots, partner.affix_slots)
 	weapon.refresh_affix_stats()
@@ -205,10 +224,37 @@ func _combined_affixes(primary: WeaponInstance, partner: WeaponInstance) -> Arra
 
 
 func _merge_partner(weapon: WeaponInstance) -> WeaponInstance:
+	return _best_fusion_partner(weapon.data, weapon.tier, weapon)
+
+
+func _best_fusion_partner(data: WeaponData, tier: int, primary: WeaponInstance = null) -> WeaponInstance:
+	var best: WeaponInstance
+	var best_data: WeaponData
 	for partner in equipped():
-		if partner != weapon and partner.data.id == weapon.data.id and partner.tier == weapon.tier and _affixes_fit(weapon, partner):
-			return partner
-	return null
+		if partner == primary or partner.data.id != data.id or partner.tier != tier:
+			continue
+		if primary != null and not _affixes_fit(primary, partner):
+			continue
+		var result := fusion_data(primary, partner.data, partner) if primary != null else fusion_data(partner, data)
+		if best == null or _better_fusion(result, best_data, tier + 1):
+			best = partner
+			best_data = result
+	return best
+
+
+func _better_fusion(candidate: WeaponData, current: WeaponData, tier: int) -> bool:
+	var candidate_dps := _fusion_dps(candidate, tier)
+	var current_dps := _fusion_dps(current, tier)
+	if not is_equal_approx(candidate_dps, current_dps):
+		return candidate_dps > current_dps
+	return candidate.range_at_tier(tier) > current.range_at_tier(tier)
+
+
+func _fusion_dps(data: WeaponData, tier: int) -> float:
+	var player := get_parent() as Player
+	if player != null:
+		return data.estimated_dps(tier, player.stats, player.items.attack_interval_factor(), player.items.base_weapon_damage_bonus())
+	return data.damage_at_tier(tier) * (1.0 + data.crit_bonus * (data.crit_multiplier - 1.0)) / maxf(data.interval_at_tier(tier), WeaponData.MIN_ATTACK_COOLDOWN)
 
 
 func _find_tier(id: StringName, tier: int, except: WeaponInstance = null) -> WeaponInstance:

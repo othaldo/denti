@@ -1,4 +1,11 @@
-# Zufällige Affix-Upgrade-Kapseln
+# Verzauberungen aus Upgrade-Kapseln
+
+Im Spiel heißen Affixe **Verzauberungen**. Die am weitesten entwickelte
+Verzauberung bestimmt einen Namenszusatz, etwa „Zauberbürste der Glut“ oder
+„Turbo-Bohrer der Eile“. Bei Gleichstand bleibt die Reihenfolge der belegten
+Plätze maßgeblich. Der Zusatz wird aus der jeweiligen Waffeninstanz abgeleitet;
+Ersetzen, Verstärken, Fusion und Fortsetzen aktualisieren ihn automatisch.
+Mk-Stufe und alle weiteren Verzauberungen bleiben separat sichtbar.
 
 Erster spielbarer Stand: Upgrade-Kapseln verbessern eine konkrete Waffeninstanz. Es gibt
 keine festen Kapselwellen, keine garantierte Run-Gesamtzahl und keine Maximalstufe
@@ -51,33 +58,69 @@ werden unverändert wiederhergestellt.
 
 ## Zusätzlicher Schaden
 
-| Affix | Schadenszahl | Zusätzliche Mechanik |
+| Verzauberung | Schadenszahl | Eigene Rolle |
 | --- | --- | --- |
-| Feuer | Orange | Gesamtschaden über 2 s |
-| Eis | Blau | Direkter Zusatzschaden; 15 % Slow für 1,5 s |
-| Gift | Grün | Gesamtschaden über 5 s; weitere Treffer bauen das Budget auf |
-| Blutung | Rot | Gesamtschaden über 3 s |
-| Elektro | Gelb | Direkter Zusatzschaden |
+| Feuer | Orange | Schaden über 2 s; beim Tod Glut an bis zu drei Ziele |
+| Eis | Blau | 15 % Slow für 1,5 s; Krits gegen gekühlte Gegner lösen Eissplitter aus |
+| Gift | Grün | Schaden über 5 s; wiederholtes Vergiften baut bis zu fünf Stufen auf |
+| Blutung | Rot | Schaden über 3 s; gemeinsame Synergien mit Blutungsitems und Blutmond |
+| Elektro | Gelb | Ein Kettensprung, +1 durch Nässe und +1 durch Kettenitems, höchstens drei |
+| Nässe | Cyan | Kein Zusatzschaden; Nassstatus für Elektro, Leitlack und Spülpfützen |
+| Weihe | Gold | Drei kritische Treffer auf ein markiertes Ziel erzeugen einen Lichtstoß |
+| Lebensraub | Rosa | Kein Zusatzschaden; begrenzte Heilung durch wirksame Waffentreffer |
 
-Feuer, Gift und Affix-Blutung verbrauchen das bisherige Zusatzschadensbudget
-über Zeit statt beim Einschlag. Alle 0,5 s wird eine anteilige Rate abgerechnet.
-Jeder Treffer bringt sein eigenes vollständiges Budget mit; Wiederholungen
-addieren Raten, ohne alte Laufzeiten neu zu starten oder alte DPS zu multiplizieren.
-Das ist für Gift ein Aufbau über mehrere Treffer, für Feuer ein kürzerer Brand.
-Waffen-/Item-Blutung bleibt ein separates System, teilt aber die Blutungsresistenz.
-Elektro bleibt direkt; Kettenblitze sind noch kein Bestandteil dieses Affixes.
+Zusammen mit Reichweite und Angriffstempo gibt es zehn Verzauberungen. Alle
+Mechanikwerte liegen in `WeaponAffixData`-Ressourcen. Die Rollen ersetzen einen
+Teil des alten pauschalen Schadens: Feuer/Eis/Gift erhalten 65 %, Blutung 80 %,
+Elektro 55 % des bisherigen Werts. Alte Investitionen und Rangfortschritt bleiben
+gespeichert; die neuen Faktoren gelten auch für vorhandene Waffen.
+
+Feuer, Gift und Blutung rechnen weiter in Halbsekunden-Raten ab. Jede Anwendung
+hat ein eigenes Budget, das beim erneuten Treffen weder aufgefrischt noch erneut
+multipliziert wird. Gift erhöht ausschließlich neue Budgets: höchstens eine neue
+Stufe je 0,6 s, +15 % pro weiterer Stufe bis +60 %. Nach 5 s ohne Gift verfällt der
+Aufbau. Blutungsuhr verlängert die Verzauberung bis zur gemeinsamen Obergrenze
+von 8 s. Zahnseide ergänzt auf Waffen ohne eigene Schnitt-Blutung die normalen,
+begrenzten Blutungsstapel. Skalpellwachs, Verbreitung und Blutmond erkennen beide
+Blutungsquellen; DoT-Kills lösen die Todesmechaniken ebenfalls aus.
+
+Glut überträgt 45 % eines einzelnen akzeptierten Feuerbudgets an höchstens drei
+Gegner in 115 Reichweite, höchstens alle 0,35 s. Übertragene Glut kann sich nicht
+erneut verbreiten. Eissplitter treffen bei Krits höchstens sechs andere Gegner
+in 95 Reichweite mit 75 % des gespeicherten Eistreffers, Intervall 0,8 s.
+
+Elektro springt alle 0,45 s. Ein nasses Startziel vergrößert die Sprungreichweite
+um 85. Kettenitems verstärken den Sprungschaden von 45 % um höchstens weitere
+60 Prozentpunkte des Elektrotreffers. Leitlack verstärkt Elektro gegen bereits
+nasse Ziele um höchstens 100 %. Jedes Ziel wird innerhalb einer Kette nur einmal
+getroffen. Zusätze durch Wasser-/Lichtitems bleiben eigene, getrennt gemessene
+Folgeeffekte.
+
+Nässe hält `min(1,2 + Stärke × 0,06; 4)` Sekunden, mit Leitlack +0,5 s.
+Weihe speichert höchstens drei Krit-Markierungen für 4 s; Krits anderer Waffen
+können ein markiertes Ziel auslösen. Der Lichtstoß trifft höchstens acht Ziele
+in 105 Reichweite, Intervall 0,8 s. Sein Schaden beträgt Stärke × Waffen-/Bisskraft-
+Skalierung × 0,9 × 1,3. Lebensraub heilt höchstens 5 % des tatsächlich gezählten
+Trefferschadens und `min(0,25 + Stärke × 0,04; 2)` HP je Impuls, alle 0,75 s.
+Alle Waffen teilen diese Intervalle. DoTs und Folgeeffekte lösen keine neuen
+Waffentreffer oder Lebensraub aus. Gegnerverteidigung und Boss-/Elitebudgets
+gelten auch für alle Folgeeffekte.
 
 Neue Funde starten auf Stufe I ihrer Seltenheit. Die Ressourcen unter `data/affixes/`
 enthalten die zwölf Ausbauwerte. Bei der Verwendung skaliert der Zusatz mit
 `(Basisintervall / 0,65)^0,65` und Bisskraft. Schwere, langsamere Waffen erhalten
-größere Ergänzungen pro Treffer; schnelle Waffen kleinere. Karten und Details
-zeigen zuerst den festen Fundwert (Basisschaden auf Stufe I), danach ausdrücklich
-„Auf dieser Waffe“ mit dem angepassten Gesamtschaden samt Dauer bzw. direktem
-Schaden pro Treffer. Diese Werte gelten vor Gegnerresistenzen. Upgrades zeigen dort
-den bisherigen und den neuen Gesamtschaden des Affixes. Beim Waffenwechsel bleibt
-der Fundwert gleich; nur die Vorschau der Waffenwirkung verändert sich.
+größere Ergänzungen pro Treffer; schnelle Waffen kleinere. Karten erklären zuerst
+die Wirkung und zeigen danach den angepassten Schaden dieser Waffe samt Dauer
+bzw. direktem Schaden pro Treffer. Upgrades zeigen den bisherigen und neuen Wert
+sowie den Ausbaufortschritt. Der Tooltip enthält zusätzlich den festen Fundwert
+(Basisschaden auf Stufe I). Diese Werte gelten vor Gegnerresistenzen.
+Beim Waffenwechsel bleibt der Fundwert gleich; nur die Vorschau der Waffenwirkung
+verändert sich. Symbole und Titel teilen sich eine Zeile; linksbündiger Text,
+schmalere Innenränder und dynamische Höhen nutzen die Kartenbreite. Schmale
+Bildschirme zeigen die Angebote untereinander im scrollbaren Menü.
 
-Mk, Crit und situative Item-Schadensboni multiplizieren diesen Zusatz nicht.
+Mk und der normale Krit-Multiplikator multiplizieren diesen Zusatz nicht.
+Gezielte Synergien wie Leitlack greifen ausschließlich an den beschriebenen Stellen.
 Seitliche Bürstengeschosse und zusätzliche Offenbarungsstrahlen skalieren auch
 ihren Affixschaden mit ihrem jeweiligen Schadensanteil. Rückflug verwendet den
 gleichen Rückflugfaktor wie der Grundschaden. Evolutions-Sekundärschaden startet
@@ -94,8 +137,16 @@ laufen nur am Grundtreffer; DoTs starten keine rekursiven Treffer-Procs.
 
 Die neue Komponente `EnemyAffixEffects` speichert höchstens die feste Anzahl
 zukünftiger Halbsekunden-Raten je Effekt, unabhängig von der Trefferzahl.
-Restzeit und Raten werden beim Fortsetzen erhalten, ohne die Resistenz erneut
+Restzeit, Raten, Giftaufbau, Glut-Herkunft, Eisschaden, Weihemarken und gemeinsame
+Abklingzeiten werden beim Fortsetzen erhalten, ohne Resistenz oder Aufbau erneut
 anzurechnen. Treffer gegen bereits tote Gegner erzeugen keine weiteren DoTs.
+
+Die Karten nennen passende vorhandene Build-Teile. Shopgewichtung berücksichtigt
+Verzauberungstags. Die Debug-Telemetrie trennt Elektroketten, Eissplitter und
+Lichtstöße und zählt tatsächliche Lebensraub-Heilung, Nasstreffer und Glutereignisse.
+`tests/enchantment_synergies.gd` prüft Rollen, Itemverbindungen, Grenzen,
+Schutzphasen, Fundpool, Textglyphen, Fortsetzen und 300 feste Schritte mit echten automatischen Nahkampf- und Projektilangriffen. Die Werte sind ein Ausgangspunkt
+für weitere Spieltests, keine abschließend gemessene Balance.
 
 Eis und Nass verwenden die stärkere Verlangsamung, ohne sie zu multiplizieren.
 Eliten erhalten die halbe Eiswirkung, Bosse ein Viertel. Angekündigte Anstürme
@@ -189,16 +240,25 @@ Wertequalität; Karten, DPS und Vergleich zeigen die tatsächlichen Werte.
 Preise verwenden weiterhin die bestehende Mk-/Wellenkurve.
 
 Reservierte Angebote behalten ihre Werte. Kauf und Fortsetzen würfeln nichts neu.
-Manuelle Fusion behält den gesamten Roll der ausgewählten Primärwaffe und verbindet
-Affixe beider Exemplare nach den Ausbau-Regeln. Beim Kauf mit vollen Wurzeln kann man in den Details
-zwischen bisherigen und neuen Grundwerten wählen; Affixe bleiben in beiden Fällen
-erhalten. Der direkte Kartenkauf behält bisherige Werte. Evolution übernimmt die
-Rollfaktoren der Primärwaffe auf die neue Waffenbasis. Alte Saves bleiben neutral.
+Manuelle und automatische Fusion übernehmen je Attribut den besseren Wert beider
+Exemplare: Maximum für Schaden, Reichweite und Crit, Minimum für Angriffspause.
+Legendäre Einzelwerte können dadurch beim direkten Kartenkauf nicht verloren gehen.
+Bei mehreren passenden Partnern gewinnt das Ergebnis mit der höchsten erwarteten
+Grund-DPS unter den aktuellen Spieler- und Itemwerten; bei Gleichstand entscheidet
+die Reichweite, danach die Ausrüstungsreihenfolge. Verzauberungs-Konflikte bleiben
+bei manueller Fusion gesperrt. Affixe verbinden sich nach den Ausbau-Regeln; beim
+Kauf bleiben alle Affixe des ausgerüsteten Exemplars erhalten. Zusätzliche Mk-Aufstiege
+aus Kapseln übernehmen den höheren Stand beider Waffen, ohne ihn zu addieren. Tempo-
+und Reichweiten-Verzauberungen werden aus den übernommenen Affixen neu berechnet.
+Die Details zeigen Fusionspartner und Ergebnis vorab; es gibt eine einzige Kaufaktion.
+Evolution übernimmt weiterhin die Rollfaktoren der Primärwaffe auf die neue Waffenbasis.
+Alte Saves bleiben neutral; bei Fusion gelten ihre neutralen Faktoren als Vergleichswerte.
 Affix-Beiträge skalieren mit dem Standardintervall des Waffentyps, unabhängig vom
 individuellen Tempo-Roll, damit ein Wertewechsel die gespeicherten Beiträge nicht ändert.
 
 `tests/weapon_rolls.gd` prüft Vielfalt, tatsächlichen Kauf, Reservieren, Shop- und
-Waffen-Resume, Fusion, bewusste Rollübernahme, Projektil-Resume und Dropfrequenz.
+Waffen-Resume, bessere Einzelattribute, optimale Partnerwahl, direkten Fusionskauf,
+Vorschau, unveränderte Ausgangsressourcen, Projektil-Resume und Dropfrequenz.
 Eine Simulation mit 20/30/40/55/60/70/80/90 normalen Kills je Welle und 300 Seeds
 liefert im Mittel 6,8 Upgrade-Kapseln ohne Glück und 14,7 mit konstant 100 Glück bis Welle 8.
 Das ist ein Vergleichsmodell, keine garantierte Run-Ausbeute.

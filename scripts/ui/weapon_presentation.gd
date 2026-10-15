@@ -4,6 +4,74 @@ extends RefCounted
 const EVOLUTION_COLOR := Color("ff3038")
 
 
+static func weapon_name(weapon: WeaponInstance) -> String:
+	if weapon.affixes.is_empty():
+		return weapon.data.display_name
+	# Compare development, not incomparable damage and percentage values.
+	# Equal effects keep their slot order, so names are stable across save/resume.
+	var strongest: Dictionary = weapon.affixes[0]
+	for affix in weapon.affixes:
+		if WeaponAffixes.nominal(affix) > WeaponAffixes.nominal(strongest):
+			strongest = affix
+	var suffix := WeaponAffixes.by_id(StringName(strongest.id)).name_suffix
+	return weapon.data.display_name + (" " + suffix if not suffix.is_empty() else "")
+
+
+static func enchantment_list(weapon: WeaponInstance) -> String:
+	var parts: PackedStringArray = []
+	for affix in weapon.affixes:
+		parts.append("%s %s" % [WeaponAffixes.by_id(StringName(affix.id)).display_name,
+			["I", "II", "III"][clampi(int(affix.get("rank", 1)), 1, WeaponAffixes.MAX_RANK) - 1] + ("+" if float(affix.get("bonus", 0)) > 0 else "")])
+	return " · ".join(parts) if not parts.is_empty() else "Noch keine Verzauberung"
+
+
+static func enchantment_hint(kind: StringName, weapon: WeaponInstance, items: ItemInventory = null, replace: int = -1) -> String:
+	var parts: PackedStringArray = []
+	var selected_affixes := weapon.affixes
+	if replace >= 0 and replace < selected_affixes.size() and WeaponAffixes.find(selected_affixes, kind) < 0:
+		selected_affixes = selected_affixes.duplicate()
+		selected_affixes.remove_at(replace)
+	var wet_build := weapon.data.wet_duration > 0 or WeaponAffixes.find(selected_affixes, &"wet") >= 0
+	var electric_build := WeaponAffixes.find(selected_affixes, &"electric") >= 0
+	if items != null:
+		for other in items.player.loadout.equipped():
+			if other == weapon:
+				continue
+			wet_build = wet_build or other.data.wet_duration > 0 or WeaponAffixes.find(other.affixes, &"wet") >= 0
+			electric_build = electric_build or WeaponAffixes.find(other.affixes, &"electric") >= 0
+	match kind:
+		&"fire":
+			if weapon.data.attack_mode in [&"area", &"sweep", &"cone"] or weapon.data.splash_radius > 0:
+				parts.append("Flächenwaffe")
+		&"ice", &"holy":
+			if items != null and (items.player.stats.crit_chance + weapon.data.crit_bonus >= 0.10 or items._power(&"crit_burst") > 0 or items._power(&"crit_beam") > 0):
+				parts.append("Krit-Build")
+			if kind == &"holy" and WeaponAffixes.find(selected_affixes, &"ice") >= 0:
+				parts.append("Eis")
+		&"poison":
+			if weapon.data.interval <= 0.5 or WeaponAffixes.find(selected_affixes, &"tempo") >= 0:
+				parts.append("schnelle Treffer")
+		&"bleed":
+			if weapon.data.bleed_dps > 0:
+				parts.append("Schnitt-Blutung")
+			if items != null and (items._power(&"bleed") > 0 or items._power(&"bleed_clock") > 0 or items._power(&"bleed_bonus") > 0 or items._power(&"bleed_spread") > 0):
+				parts.append("Blutungsitems")
+		&"electric":
+			if wet_build:
+				parts.append("Nässe im Build")
+			if items != null and items._power(&"chain") > 0:
+				parts.append("Kettenitems")
+		&"wet":
+			if electric_build:
+				parts.append("Elektro im Build")
+			if items != null and (items._power(&"conductive_wet") > 0 or items._power(&"water_puddle") > 0):
+				parts.append("Wasseritems")
+		&"leech":
+			if items != null and items._power(&"overheal_shield") > 0:
+				parts.append("Speichelkelch")
+	return "Passt zu: " + ", ".join(parts) if not parts.is_empty() else ""
+
+
 # Evolutions keep tier IV internally for combat values and legacy saves.
 static func tier_text(data: WeaponData, tier: int) -> String:
 	var level := tier + int(data.chest_upgrades.get("mk", 0)) if data != null else tier

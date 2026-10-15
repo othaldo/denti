@@ -12,6 +12,8 @@ Bisskraft und Item-Prozentboni werden addiert; Folgeeffekte skalieren einen bere
 
 Die [ursprünglichen Designnotizen](ITEM_RARITY_EXPANSION.md) erklären die Auswahl; ihre niedrigeren Limits sind durch diese Stapelregeln ersetzt. Die [Attributübersicht](ATTRIBUTES.md) definiert die einheitlichen Namen: Härte ist Rüstung, Schmelz sind maximale HP. Die Tabellen geben die Ressourcentexte wieder; im Spiel werden deren ältere Bezeichnungen zentral aufgelöst. [Alle 56 neuen Icons in Kartengröße](screenshots/item_families_icons_48px.png).
 
+Verzauberungen verbinden diese Familien zusätzlich: Blutungsitems unterstützen auch verzauberte Waffen; Kettenitems erweitern Elektro auf bis zu drei Sprünge. Leitlack verstärkt Elektro gegen nasse Ziele, Nässeverzauberungen aktivieren Spülpfützen und Lebensraub kann Heilungsbuilds ergänzen. [Mechaniken, Grenzen und Zahlen](WEAPON_AFFIXES.md).
+
 ## Schmelz / HP
 
 Gemeinsames Familienlimit: **12**.
@@ -106,10 +108,10 @@ Gemeinsames Familienlimit: **12**.
 
 | Seltenheit | Item | Vollständiger Effekt | Basispreis |
 | --- | --- | --- | ---: |
-| Common | Zahnseide-Spule | +2 Nahschaden. Schnitt-Blutung verursacht +3 Schaden/s. | 5 |
-| Uncommon | Rasierseide | +3 Nahschaden, -1 Härte. Schnitt-Blutung: +4 Schaden/s. | 9 |
-| Rare | Rubinseide | +4 Nahschaden, -5 % Angriffstempo. Schnitt-Blutung: +5 Schaden/s. | 14 |
-| Legendary | Henkerseide | +6 Nahschaden, -15 Leben. Schnitt-Blutung: +7 Schaden/s. | 22 |
+| Common | Zahnseide-Spule | +2 Nahschaden. Schnitt- und Verzauberungsblutung verursacht +3 Schaden/s. | 5 |
+| Uncommon | Rasierseide | +3 Nahschaden, -1 Härte. Schnitt- und Verzauberungsblutung: +4 Schaden/s. | 9 |
+| Rare | Rubinseide | +4 Nahschaden, -5 % Angriffstempo. Schnitt- und Verzauberungsblutung: +5 Schaden/s. | 14 |
+| Legendary | Henkerseide | +6 Nahschaden, -15 Leben. Schnitt- und Verzauberungsblutung: +7 Schaden/s. | 22 |
 
 ## Wasser / Licht / Ketten
 
@@ -210,10 +212,10 @@ Diese 16 bisherigen Items ergänzen die Familien mit eigenen Regeln. Ihre Stapel
 | Blutungsuhr | Uncommon | Blutung hält +1 s und stapelt einmal mehr. -6 % Schaden. | 6 | 9 |
 | Goldextraktor | Uncommon | +1 Münze bei Drops mit mindestens 2 Basis-Münzen (Zucker und Eliten). -3 % Bewegung. | 6 | 10 |
 | Goldsonde | Uncommon | 20 % Chance auf doppelten Münz-Drop. +1 Prozentpunkt je 10 Glück (max. +10). -5 % Schaden. | 2 | 10 |
-| Leitlack | Uncommon | Nasse Gegner: +18 % Wasser- und Lichtschaden, längere Nassdauer und größere Kettenreichweite. -3 % Bewegung. | 6 | 9 |
+| Leitlack | Uncommon | Nasse Gegner: +18 % Wasser-, Licht- und Elektro-Verzauberungsschaden, längere Nassdauer und größere Kettenreichweite. -3 % Bewegung. | 6 | 9 |
 | Speichelkelch | Uncommon | 50 % Überheilung ansparen (gesamt max. 100 %): je 20 Punkte +1 Schild (max. 5). -12 Leben. | 2 | 10 |
 | Splitterkrone | Uncommon | Schildblock: 18 Splitterschaden im Umkreis. -3 % Bewegung. | 6 | 10 |
-| Spülventil | Uncommon | Wassertreffer erzeugen für 2 s eine Pfütze: macht Gegner nass und verursacht 4 Schaden alle 0,5 s. -3 % Bewegung. | 6 | 9 |
+| Spülventil | Uncommon | Wasser- und Nässeverzauberungstreffer erzeugen für 2 s eine Pfütze: macht Gegner nass und verursacht 4 Schaden alle 0,5 s. -3 % Bewegung. | 6 | 9 |
 | Zahnfee-Pfand | Uncommon | +10 Glück, +50 % Upgrade-Kapseln-Zerlegewert. -10 Leben. | 2 | 9 |
 | Zinszahn | Uncommon | Wellenende: 8 % Zins auf Erspartes, höchstens 6 Münzen pro Exemplar. -8 Leben. | 6 | 9 |
 | Amalgamkern | Rare | Je Härte +2,5 % Waffenschaden (gesamt max. 60 %). -5 % Bewegung. | 2 | 13 |

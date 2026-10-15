@@ -5,7 +5,6 @@ const ICONS: Script = preload("res://scripts/ui/denti_ui_icons.gd")
 const RELOAD_ICON: Texture2D = preload("res://assets/ui/reload_light.svg")
 const UPGRADE_ICON: Texture2D = preload("res://assets/ui/upgrade_ready.svg")
 signal buy_requested(index: int)
-signal buy_with_rolls_requested(index: int)
 signal sell_requested(index: int)
 signal merge_requested(index: int)
 signal evolution_requested(index: int, recipe_id: StringName)
@@ -59,7 +58,6 @@ var stat_chips: Array[Button] = []
 var amalgam_chip: Button
 var expanded := false
 var detail_buy_button: Button
-var roll_buy_button: Button
 var detail_pin_button: Button
 var build_portrait: TextureRect
 var detail_overlay: Control
@@ -194,10 +192,6 @@ func _ready() -> void:
 	detail_buy_button.add_theme_constant_override("icon_max_width", 23)
 	detail_buy_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	detail_buy_button.pressed.connect(func() -> void: buy_requested.emit(selected_index))
-	roll_buy_button = _button(detail_actions, "Kaufen & neue Werte", true)
-	roll_buy_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	roll_buy_button.pressed.connect(func() -> void: buy_with_rolls_requested.emit(selected_index))
-	roll_buy_button.hide()
 	detail_pin_button = _button(detail_actions, "")
 	detail_pin_button.add_theme_constant_override("icon_max_width", 23)
 	detail_pin_button.pressed.connect(func() -> void: reservation_requested.emit(selected_index))
@@ -298,7 +292,7 @@ func _update_layout() -> void:
 	reroll_button.add_theme_font_size_override("font_size", 14)
 	continue_button.custom_minimum_size = Vector2(148, 44)
 	continue_button.add_theme_font_size_override("font_size", 14)
-	for button in [details.merge_button, details.sell_button, details.confirm_button, details.cancel_button, detail_buy_button, roll_buy_button, detail_pin_button]:
+	for button in [details.merge_button, details.sell_button, details.confirm_button, details.cancel_button, detail_buy_button, detail_pin_button]:
 		button.custom_minimum_size.y = 44
 		button.add_theme_font_size_override("font_size", 15)
 		DentiUIMotion.bind_action(button)
@@ -391,6 +385,8 @@ func show_shop(wave_number: int, coins: int, reroll_cost: int, new_offers: Array
 		offer_buttons[index].show_reservation(index < reserved.size() and reserved[index])
 		if offer != null and offer.weapon_data != null:
 			offer_buttons[index].show_weapon_values(offer.weapon_data, offer.weapon_tier, player)
+			if player != null and player.loadout.purchase_fusion_target(offer.weapon_data, offer.weapon_tier) != null:
+				offer_buttons[index].buy_button.tooltip_text += "\nKaufen & fusionieren: je Attribut der bessere Wert. Verzauberungen bleiben erhalten."
 	_show_inventory(equipment, used_slots, capacity)
 	_show_items(owned_items)
 	_refresh_stats()
@@ -474,7 +470,6 @@ func _size_detail_popup() -> void:
 	detail_popup.position = (extent - detail_popup.size) * 0.5
 
 func _render_selection() -> void:
-	roll_buy_button.hide()
 	details.clear_actions()
 	_highlight_equipment()
 	var tier := 0
@@ -513,7 +508,7 @@ func _render_selection() -> void:
 		tier = int(entry.tier)
 		details.show_weapon(data, tier, player, true, equipment)
 		if player != null and selected_index < player.loadout.equipped().size():
-			details.show_affixes(player.loadout.equipped()[selected_index], player.stats)
+			details.show_affixes(player.loadout.equipped()[selected_index], player.stats, player.items)
 		if player != null:
 			details.show_evolutions(player.loadout.ready_evolutions(selected_index, player.items))
 		details.sell_button.visible = true
@@ -525,9 +520,12 @@ func _render_selection() -> void:
 		if data.evolution_kind != &"":
 			details.merge_button.text = "Weitere Mk-Stufen aus Upgrade-Kapseln"
 		if bool(entry.mergeable):
-			details.action_hint.text = "%s frei\n%s" % [data.roots_text(), WeaponPresentation.comparison(data, tier + 1, data, tier, player)]
+			var primary := player.loadout.equipped()[selected_index]
+			var partner := player.loadout.merge_partner(selected_index)
+			var result := player.loadout.fusion_data(primary, partner.data, partner)
+			details.action_hint.text = "%s frei · beste Werte\n%s" % [data.roots_text(), _fusion_comparison(result, tier + 1, data, tier)]
 		else:
-			details.action_hint.text = "Zu viele verschiedene Affixe für die vorhandenen Slots" if player != null and player.loadout.merge_affix_conflict(selected_index) else ("Kein Fusionspartner" if tier < 4 else "Affixe wachsen mit weiteren Upgrade-Kapseln.")
+			details.action_hint.text = "Zu viele Verzauberungen für die vorhandenen Plätze" if player != null and player.loadout.merge_affix_conflict(selected_index) else ("Kein Fusionspartner" if tier < 4 else "Verzauberungen wachsen mit weiteren Upgrade-Kapseln.")
 		details.action_hint.visible = not details.action_hint.text.is_empty()
 		_highlight_equipment()
 		return
@@ -552,24 +550,28 @@ func _render_selection() -> void:
 	detail_pin_button.icon = pin.icon
 	detail_pin_button.tooltip_text = pin.tooltip_text
 	DentiUIStyle.style_button(detail_pin_button, pin.icon == OfferCard.PIN_ICON)
-	var fusion := false
-	for entry in equipment:
-		var data: WeaponData = entry.get("data")
-		if data != null and offer.weapon_data != null and data.id == offer.weapon_data.id and int(entry.tier) == offer.weapon_tier and offer.weapon_tier < 4:
-			fusion = player != null and player.loadout.used_slots() + offer.weapon_data.hands > WeaponLoadout.CAPACITY
-	roll_buy_button.visible = fusion and offer.weapon_data != null and not offer.weapon_data.rolls.is_empty()
-	roll_buy_button.text = "Neue Werte · %d" % offer.price
-	roll_buy_button.disabled = detail_buy_button.disabled
-	roll_buy_button.tooltip_text = "Fusioniert mit dem ersten passenden Exemplar. Übernimmt den kompletten neuen Roll; alle vorhandenen Affixe bleiben erhalten."
-	if roll_buy_button.visible:
-		detail_buy_button.text = "Behalten · %d" % offer.price
-		detail_buy_button.tooltip_text = "Fusioniert mit dem ersten passenden Exemplar. Behält dessen Grundwerte und Affixe."
-	offer_buttons[selected_index].buy_button.tooltip_text = "Kaufen & fusionieren" if fusion and can_buy and wallet >= offer.price else offer_buttons[selected_index].buy_button.tooltip_text
-	details.action_hint.text = "Es fehlen %d Münzen" % (offer.price - wallet) if wallet < offer.price else (("Alle Wurzeln belegt" if offer.weapon_data != null else "Stapellimit erreicht") if not can_buy else ("Kauf fusioniert zu Stufe %s" % ["I", "II", "III", "IV"][offer.weapon_tier] if fusion else ""))
+	var target: WeaponInstance
+	if player != null and offer.weapon_data != null:
+		target = player.loadout.purchase_fusion_target(offer.weapon_data, offer.weapon_tier)
+	var fusion_hint := ""
+	if target != null:
+		details.compare.hide()
+		details.compare_text.hide()
+		var result := player.loadout.fusion_data(target, offer.weapon_data)
+		fusion_hint = "Fusion zu %s · beste Werte\n%s" % [WeaponPresentation.tier_text(result, offer.weapon_tier + 1), _fusion_comparison(result, offer.weapon_tier + 1, target.data, target.tier)]
+		detail_buy_button.tooltip_text += "\nFusionspartner: " + WeaponPresentation.weapon_name(target)
+		detail_buy_button.text = "Fusion · %d" % offer.price
+	details.action_hint.text = "Es fehlen %d Münzen" % (offer.price - wallet) if wallet < offer.price else (("Alle Wurzeln belegt" if offer.weapon_data != null else "Stapellimit erreicht") if not can_buy else fusion_hint)
 	details.action_hint.visible = not details.action_hint.text.is_empty()
 	details.action_hint.add_theme_color_override("font_color", DentiUIStyle.CORAL if detail_buy_button.disabled else DentiUIStyle.MINT)
 	_highlight_equipment()
 	_queue_popup_layout()
+
+func _fusion_comparison(result: WeaponData, tier: int, previous: WeaponData, previous_tier: int) -> String:
+	var before := WeaponPresentation.values(previous, previous_tier, player)
+	var after := WeaponPresentation.values(result, tier, player)
+	return WeaponPresentation.comparison(result, tier, previous, previous_tier, player) + "\nCrit %.1f -> %.1f %%" % [before.crit * 100.0, after.crit * 100.0]
+
 
 func _compare(index: int) -> void:
 	if selected_kind != "offer" or equipment.is_empty() or offers[selected_index] == null or offers[selected_index].weapon_data == null:

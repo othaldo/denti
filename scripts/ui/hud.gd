@@ -117,6 +117,9 @@ func update_telemetry(stats: RunTelemetry, enemies_alive: int, projectiles_alive
 	]
 	telemetry_label.text += "\nZahnflutsch: %d Welle · %d Run" % [stats.wave_dodges, stats.dodges]
 	telemetry_label.text += "\nGift/Blutung HP: %.1f / %.1f" % [stats.status_damage.get("poison", 0.0), stats.status_damage.get("bleed", 0.0)]
+	telemetry_label.text += "\nKette %.0f · Eis %.0f · Weihe %.0f" % [stats.proc_damage.get("affix_electric_chain", 0.0), stats.proc_damage.get("affix_ice_shatter", 0.0), stats.proc_damage.get("affix_holy", 0.0)]
+	telemetry_label.text += "\nLebensraub %.1f HP · Nässe %.0f" % [stats.enchantment_support.get("leech_healing", 0.0), stats.enchantment_support.get("wet_hits", 0.0)]
+	telemetry_panel.offset_bottom = telemetry_panel.offset_top + ceilf(telemetry_label.get_theme_font("font").get_height(telemetry_label.get_theme_font_size("font_size")) * telemetry_label.text.split("\n").size()) + 16
 
 
 func update_ailments(effects: PlayerStatusEffects) -> void:

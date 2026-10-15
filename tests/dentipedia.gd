@@ -27,6 +27,24 @@ func _run() -> void:
 		check(not str(entry).contains(WeaponEvolutions.ALL[index].result.display_name), "secret weapon name exposed")
 	for category in DentipediaData.CATEGORIES.size():
 		check(not DentipediaData.entries(category, []).is_empty(), "empty category")
+	var enchantment_category := DentipediaData.CATEGORIES.find("Verzauberungen")
+	check(enchantment_category >= 0, "dedicated enchantment category missing")
+	var enchantments := DentipediaData.entries(enchantment_category, [])
+	check(enchantments.size() == WeaponAffixes.ALL.size() + 1, "enchantment overview or individual entries missing")
+	var enchantment_entries: Dictionary = {}
+	for entry in enchantments:
+		if entry.has("enchantment_id"):
+			enchantment_entries[entry.enchantment_id] = entry
+		for index in str(entry.body).length():
+			var code := str(entry.body).unicode_at(index)
+			check(code <= 32 or DentiUIStyle.FONT.has_char(code), "enchantment entry has an unsupported glyph: U+%04X" % code)
+	for data in WeaponAffixes.ALL:
+		check(enchantment_entries.has(str(data.id)), "missing enchantment entry: " + str(data.id))
+		var entry: Dictionary = enchantment_entries.get(str(data.id), {})
+		check(entry.get("title") == data.display_name and entry.get("icon") != null and str(entry.get("body", "")).contains("Passt zu deinem Build:"), "enchantment entry lacks name, icon or synergies")
+	check(str(enchantment_entries["wet"].body).contains("Leitlack") and str(enchantment_entries["electric"].body).contains("Ein Sprung") and str(enchantment_entries["electric"].body).contains("Kettenitems"), "wet/electric synergy documentation missing")
+	check(str(enchantment_entries["leech"].body).contains("DoTs und Folgeeffekte heilen nicht"), "leech limitations missing")
+	check(str(DentipediaData.TOPICS["Strom & Nass"]).contains("auch ohne dieses Item"), "legacy electricity topic contradicts intrinsic chains")
 	var game: Node2D = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(game)
 	current_scene = game
@@ -89,6 +107,33 @@ func _run() -> void:
 			root.get_texture().get_image().save_png("res://.godot/dentipedia-%d.png" % extent.x)
 		pedia.category.selected = 4
 		pedia._refresh()
+		check(pedia.listing.get_child(0).get_meta("entry").title == "Verzauberungen", "mechanics overview is not reachable")
+		pedia.category.selected = enchantment_category
+		pedia.search.text = "Lebensraub"
+		pedia._refresh()
+		var found_leech := false
+		for button in pedia.listing.get_children():
+			if button.get_meta("entry").get("enchantment_id", "") == "leech":
+				button.pressed.emit()
+				found_leech = true
+				break
+		check(found_leech and pedia.selected.get("enchantment_id", "") == "leech", "search cannot open new enchantment entry")
+		pedia.search.text = ""
+		pedia._refresh()
+		pedia._show(enchantments[0])
+		for frame in 5:
+			await process_frame
+		check(Rect2(Vector2.ZERO, Vector2(extent)).encloses(game.game_menu.build_panel.get_global_rect()), "enchantment overview escaped viewport %s" % extent)
+		if "--capture" in OS.get_cmdline_user_args():
+			await RenderingServer.frame_post_draw
+			root.get_texture().get_image().save_png("res://.godot/dentipedia-enchantments-%dx%d.png" % [extent.x, extent.y])
+		pedia._show(enchantment_entries["holy"])
+		for frame in 5:
+			await process_frame
+		check(Rect2(Vector2.ZERO, Vector2(extent)).encloses(game.game_menu.build_panel.get_global_rect()), "individual enchantment escaped viewport %s" % extent)
+		if "--capture" in OS.get_cmdline_user_args():
+			await RenderingServer.frame_post_draw
+			root.get_texture().get_image().save_png("res://.godot/dentipedia-holy-%dx%d.png" % [extent.x, extent.y])
 		pedia.category.selected = 1
 		pedia._refresh()
 		for frame in 5:

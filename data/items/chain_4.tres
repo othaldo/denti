@@ -4,7 +4,7 @@
 script = ExtResource("1")
 id = &"chain_4"
 display_name = "Blitzableiter"
-description = "+3 Fernschaden, -6 % Angriffstempo. Wasser/Licht springt mit 60 % Schaden über."
+description = "+3 Fernschaden, -6 % Angriffstempo. Wasser/Licht springt mit 60 % Schaden über. Elektro-Verzauberungen: ein weiterer, stärkerer Kettensprung."
 rarity_tier = 4
 price = 22
 icon_index = 59

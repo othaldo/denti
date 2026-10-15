@@ -4,7 +4,7 @@
 script = ExtResource("1")
 id = &"bleed_4"
 display_name = "Henkerseide"
-description = "+6 Nahschaden, -15 Leben. Schnitt-Blutung: +7 Schaden/s."
+description = "+6 Nahschaden, -15 Leben. Schnitt- und Verzauberungsblutung: +7 Schaden/s."
 rarity_tier = 4
 price = 22
 icon_index = 56

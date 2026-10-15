@@ -4,6 +4,14 @@
 script = ExtResource("1")
 id = &"fire"
 display_name = "Feuer"
+name_suffix = "der Glut"
+description = "Brennende Gegner geben beim Tod Glut weiter."
+build_tags = Array[StringName]([&"area"])
+damage_factor = 0.65
+proc_factor = 0.45
+proc_radius = 115.0
+proc_cooldown = 0.35
+proc_targets = 3
 color = Color(1, 0.48, 0.19, 1)
 icon_index = 14
 dot_duration = 2.0

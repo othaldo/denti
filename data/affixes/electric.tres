@@ -4,5 +4,14 @@
 script = ExtResource("1")
 id = &"electric"
 display_name = "Elektro"
+name_suffix = "des Gewitters"
+description = "Kettenblitze. Nässe und Kettenitems erlauben weitere Sprünge."
+build_tags = Array[StringName]([&"ranged", &"area"])
+damage_factor = 0.55
+proc_factor = 0.45
+proc_radius = 190.0
+proc_cooldown = 0.45
+proc_targets = 1
+proc_target_cap = 3
 color = Color(1, 0.92, 0.23, 1)
 icon_index = 5

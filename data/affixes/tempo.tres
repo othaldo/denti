@@ -4,6 +4,7 @@
 script = ExtResource("1")
 id = &"tempo"
 display_name = "Angriffstempo"
+name_suffix = "der Eile"
 color = Color(1, 0.5, 0.75, 1)
 icon_index = 39
 stat_key = &"tempo"

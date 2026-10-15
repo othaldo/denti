@@ -81,10 +81,10 @@ func _run() -> void:
 	enemy.data = enemy.data.duplicate() as EnemyData
 	enemy.data.affix_resistances = {}
 	WeaponAttackShapes.hit(enemy, first.data, 1, 20, false, game.items, Vector2.RIGHT, first.affixes)
-	if not _expect(is_equal_approx(enemy.health, 974) and enemy.affix_effects.is_active(), "fire was dealt instantly instead of queued"):
+	if not _expect(is_equal_approx(enemy.health, 976.1) and enemy.affix_effects.is_active(), "fire was dealt instantly instead of queued"):
 		return
 	enemy.affix_effects.advance(enemy, 2.0)
-	if not _expect(is_equal_approx(enemy.health, 966) and enemy.chill_time > 0 and is_equal_approx(enemy.status_speed_factor(), 0.85), "affixes did not deal additional damage or apply ice slow"):
+	if not _expect(is_equal_approx(enemy.health, 970.9) and enemy.chill_time > 0 and is_equal_approx(enemy.status_speed_factor(), 0.85), "affixes did not deal additional damage or apply ice slow"):
 		return
 	var colors: Dictionary = {}
 	for number: DamageNumber in game.get_node("DamageNumbers").get_children():

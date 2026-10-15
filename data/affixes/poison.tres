@@ -4,6 +4,13 @@
 script = ExtResource("1")
 id = &"poison"
 display_name = "Gift"
+name_suffix = "des Gifts"
+description = "Wiederholtes Vergiften steigert den Giftschaden bis +60 %."
+build_tags = Array[StringName]([&"ranged"])
+damage_factor = 0.65
+buildup_limit = 5
+buildup_interval = 0.6
+buildup_bonus = 0.15
 color = Color(0.43, 1, 0.3, 1)
 icon_index = 3
 dot_duration = 5.0

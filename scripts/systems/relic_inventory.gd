@@ -17,6 +17,7 @@ var critical_hits: int = 0
 var moving_hits: int = 0
 var halo_time: float = 0.0
 var flashes: Array[Dictionary] = []
+var blood_burst_busy: bool = false
 
 
 func _process(delta: float) -> void:
@@ -69,8 +70,6 @@ func on_shield_blocked() -> void:
 func on_weapon_hit(enemy: Enemy, amount: float, weapon: WeaponData, critical: bool) -> void:
 	if owned.is_empty():
 		return
-	if has_relic(&"blood_moon_tooth") and enemy.health <= 0.0 and enemy.bleed_stacks > 0:
-		_blood_burst(enemy, amount)
 	if has_relic(&"tidal_seal") and weapon.damage_type == "Wasser":
 		water_hits += 1
 		if water_hits >= 5:
@@ -92,12 +91,24 @@ func on_weapon_hit(enemy: Enemy, amount: float, weapon: WeaponData, critical: bo
 				_line(enemy.global_position, next.global_position, Color(0.27, 0.95, 0.98))
 
 
+func on_enemy_died(enemy: Enemy, amount: float) -> void:
+	if not blood_burst_busy and has_relic(&"blood_moon_tooth") and enemy.has_bleeding():
+		blood_burst_busy = true
+		_blood_burst(enemy, amount)
+		blood_burst_busy = false
+
+
 func _blood_burst(enemy: Enemy, amount: float) -> void:
 	var at := enemy.global_position
 	for other in player.nearby_enemies(at, BLOOD_RADIUS):
 		if other == null or other == enemy or other.health <= 0.0 or at.distance_squared_to(other.global_position) > (BLOOD_RADIUS + other.data.radius) * (BLOOD_RADIUS + other.data.radius):
 			continue
-		other.apply_bleed(enemy.bleed_dps, 2.5, 3)
+		if enemy.bleed_stacks > 0:
+			other.apply_bleed(enemy.bleed_dps, 2.5, 3)
+		var budget := enemy.affix_effects.budget(&"bleed")
+		if budget > 0:
+			var additions: Array[Dictionary] = [{"id": "bleed", "damage": budget * 0.3}]
+			other.take_damage(0, null, false, &"", additions)
 		other.take_damage(minf(amount * 0.5, 75.0), null, false, &"blood_moon_tooth")
 	_ring(at, BLOOD_RADIUS, Color(0.95, 0.25, 0.39))
 

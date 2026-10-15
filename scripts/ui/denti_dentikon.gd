@@ -3,11 +3,11 @@ extends RefCounted
 
 # Stat names/meanings come from the same source as upgrades and inventory.
 const MECHANICS := {
-	"Feuer": "Feuer an Gegnern verteilt den Affixschaden über 2 Sekunden. Weitere Treffer addieren ihr eigenes Budget. Die angezeigte Zahl ist der Gesamtschaden, kein Schaden pro Sekunde.",
-	"Resistenzen": "Farbige Schilde zeigen Resistenz gegen Affixe: Plaque Feuer 25 %, Bakterium Gift 30 %, Giftkeim Gift 50 %, Säurespucker Gift 35 %, Zuckerstück Blutung 35 %, Säurekrone Eis 30 %, Jagdkeim Elektro 25 %. Grundtreffer bleiben unverändert.",
+	"Feuer": "Feuer an Gegnern verteilt den Zusatzschaden über 2 Sekunden. Weitere Treffer addieren ihren Schaden. Die angezeigte Zahl ist der Gesamtschaden, kein Schaden pro Sekunde. Beim Tod geht ein Teil der Glut auf bis zu drei Nachbarn über, ohne weitere Glutkette.",
+	"Resistenzen": "Farbige Schilde zeigen Resistenz gegen Verzauberungen: Plaque Feuer 25 %, Bakterium Gift 30 %, Giftkeim Gift 50 %, Säurespucker Gift 35 %, Zuckerstück Blutung 35 %, Säurekrone Eis 30 %, Jagdkeim Elektro 25 %. Grundtreffer bleiben unverändert.",
 	"Nass": "Wasserangriffe können Gegner durchnässen. Passende Items verändern Dauer und Wechselwirkungen; die konkreten Werte stehen beim Item.",
-	"Blutung": "Blutungsaffixe verteilen ihren Schaden über 3 Sekunden. Weitere Treffer addieren ihr Budget. Waffen und Items haben eigene Blutungsregeln. Bei Denti reduziert Härte den Schaden.",
-	"Gift": "Gift an Gegnern verteilt den Affixschaden über 5 Sekunden. Weitere Treffer addieren ihr Budget. Gift an Denti ignoriert Härte. Laufende Effekte enden nach dem Kampf.",
+	"Blutung": "Blutungsverzauberungen verteilen ihren Schaden über 3 Sekunden. Weitere Treffer addieren ihren Schaden. Zahnseide, Blutungsuhr, Skalpellwachs, Verbreitung und Blutmond unterstützen auch diese Verzauberung. Bei Denti reduziert Härte den Schaden.",
+	"Gift": "Gift an Gegnern verteilt den Zusatzschaden über 5 Sekunden. Wiederholtes Vergiften baut bis zu fünf Stufen auf; neue Anwendungen verursachen bis zu 60 % mehr Schaden. Gift an Denti ignoriert Härte. Laufende Effekte enden nach dem Kampf.",
 	"Wurzeln": "Denti hat sechs Wurzeln. Waffen belegen eine oder zwei. Gleiche Waffen derselben Stufe können bis Stufe IV fusionieren; dabei werden Wurzeln frei.",
 	"Münzen": "Währung für Waffen, Items und Neuwürfeln. Der Pin merkt ein Angebot kostenlos und hält seinen Preis fest.",
 }

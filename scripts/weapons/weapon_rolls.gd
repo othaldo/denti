@@ -1,8 +1,7 @@
 class_name WeaponRolls
 extends RefCounted
 
-# Instance quality is independent of Mk. A whole roll survives fusion; individual
-# best values are never harvested from several weapons.
+# Instance quality is independent of Mk. Fusion preserves each better attribute.
 const NAMES: Array[String] = ["Schrott", "Solide", "Meisterwerk", "Göttlich"]
 const BANDS: Array[Vector2] = [Vector2(0, 0.38), Vector2(0.25, 0.68), Vector2(0.55, 0.9), Vector2(0.8, 1)]
 const DAMAGE := Vector2(0.60, 1.70)
@@ -57,6 +56,35 @@ static func resolve(data: WeaponData, value: Dictionary, upgrades: Dictionary = 
 		result.range_tiers[index] *= reach
 	result.crit_bonus += float(values.get("crit", 0))
 	return result
+
+
+static func fuse(primary: WeaponData, partner: WeaponData) -> WeaponData:
+	var left := sanitize(primary.rolls)
+	var right := sanitize(partner.rolls)
+	var values: Dictionary = {}
+	if not left.is_empty() or not right.is_empty():
+		values["quality"] = maxi(int(left.get("quality", 2)), int(right.get("quality", 2)))
+		for key in ["damage", "interval", "range", "crit"]:
+			var neutral := 0.0 if key == "crit" else 1.0
+			var a := float(left.get(key, neutral))
+			var b := float(right.get(key, neutral))
+			values[key] = minf(a, b) if key == "interval" else maxf(a, b)
+	var upgrades: Dictionary = {}
+	if not primary.chest_upgrades.is_empty() or not partner.chest_upgrades.is_empty():
+		upgrades["mk"] = maxi(int(primary.chest_upgrades.get("mk", 0)), int(partner.chest_upgrades.get("mk", 0)))
+	# Resolve from the catalog, so previews and repeated fusions never compound factors.
+	return resolve(primary, values, upgrades)
+
+
+static func with_affixes(data: WeaponData, affixes: Array[Dictionary]) -> WeaponData:
+	var upgrades := {"mk": int(data.chest_upgrades.get("mk", 0)), "range": 0.0, "tempo": 0.0}
+	for affix in affixes:
+		var definition := WeaponAffixes.by_id(StringName(affix.id))
+		if definition.stat_key != &"":
+			upgrades[str(definition.stat_key)] += float(affix.damage)
+	if float(upgrades.range) == 0 and float(upgrades.tempo) == 0 and int(upgrades.mk) == 0:
+		upgrades = {}
+	return resolve(data, data.rolls, upgrades)
 
 
 static func title(data: WeaponData) -> String:

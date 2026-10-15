@@ -4,7 +4,7 @@
 script = ExtResource("1")
 id = &"bleed_2"
 display_name = "Rasierseide"
-description = "+3 Nahschaden, -1 Härte. Schnitt-Blutung: +4 Schaden/s."
+description = "+3 Nahschaden, -1 Härte. Schnitt- und Verzauberungsblutung: +4 Schaden/s."
 rarity_tier = 2
 price = 9
 icon_index = 54

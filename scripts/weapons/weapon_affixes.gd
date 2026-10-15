@@ -12,6 +12,7 @@ const ALL: Array[WeaponAffixData] = [
 	preload("res://data/affixes/poison.tres"), preload("res://data/affixes/bleed.tres"),
 	preload("res://data/affixes/electric.tres"),
 	preload("res://data/affixes/range.tres"), preload("res://data/affixes/tempo.tres"),
+	preload("res://data/affixes/wet.tres"), preload("res://data/affixes/holy.tres"), preload("res://data/affixes/leech.tres"),
 ]
 
 
@@ -209,55 +210,136 @@ static func damage_for(value: float, data: WeaponData, stats: PlayerStats = null
 static func packets(values: Array[Dictionary], data: WeaponData, stats: PlayerStats, factor: float = 1.0) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for affix in values:
-		if by_id(StringName(affix.id)).stat_key != &"":
+		if by_id(StringName(affix.id)).stat_key != &"" or by_id(StringName(affix.id)).effect_kind != "damage":
 			continue
-		result.append({"id": str(affix.id), "damage": damage_for(float(affix.damage), data, stats) * factor})
+		result.append({"id": str(affix.id), "damage": effect_damage(float(affix.damage), StringName(affix.id), data, stats) * factor})
 	return result
 
 
-static func summary(weapon: WeaponInstance, stats: PlayerStats = null) -> String:
+static func effect_damage(value: float, kind: StringName, data: WeaponData, stats: PlayerStats = null) -> float:
+	return damage_for(value, data, stats) * by_id(kind).damage_factor
+
+
+static func utility_value(affix: Dictionary) -> float:
+	var data := by_id(StringName(affix.id))
+	return minf(data.utility_base + float(affix.damage) * data.utility_scale, data.utility_cap)
+
+
+static func display_value(value: float, kind: StringName, weapon: WeaponData, stats: PlayerStats = null, items: ItemInventory = null) -> float:
+	var data := by_id(kind)
+	if data.effect_kind in ["wet", "leech"]:
+		return utility_value({"id": str(kind), "damage": value}) + (0.5 if kind == &"wet" and items != null and items._power(&"conductive_wet") > 0 else 0.0)
+	if data.stat_key != &"":
+		return value
+	return effect_damage(value, kind, weapon, stats) * (data.proc_factor if data.effect_kind == "holy" else 1.0)
+
+
+static func value_text(value: float, kind: StringName, weapon: WeaponData, stats: PlayerStats = null, items: ItemInventory = null) -> String:
+	return ("%.2f" if by_id(kind).effect_kind in ["wet", "leech"] else "%.1f") % display_value(value, kind, weapon, stats, items)
+
+
+static func summary(weapon: WeaponInstance, stats: PlayerStats = null, items: ItemInventory = null) -> String:
 	var lines: PackedStringArray = []
 	for affix in weapon.affixes:
 		var data := by_id(StringName(affix.id))
-		lines.append("%s +%.1f%s · %s · %d×" % [data.display_name, float(affix.damage) if data.stat_key != &"" else damage_for(affix.damage, weapon.data, stats), " %" if data.stat_key != &"" else "", progress_text(affix), affix.stacks])
-	return "Affix-Slots %d/%d" % [weapon.affixes.size(), weapon.affix_slots] + ("\n" + "\n".join(lines) if not lines.is_empty() else "")
+		lines.append("%s +%s %s · %s" % [data.display_name, value_text(float(affix.damage), data.id, weapon.data, stats, items), damage_unit(data.id, items), progress_text(affix)])
+	return "Verzauberungen · %d/%d Plätze" % [weapon.affixes.size(), weapon.affix_slots] + ("\n" + "\n".join(lines) if not lines.is_empty() else "")
 
 
-static func damage_unit(kind: StringName) -> String:
+static func dot_duration(kind: StringName, items: ItemInventory = null) -> float:
+	return minf(by_id(kind).dot_duration + (items._power(&"bleed_clock") if items != null and kind == &"bleed" else 0.0), EnemyAffixEffects.MAX_DOT_DURATION)
+
+
+static func damage_unit(kind: StringName, items: ItemInventory = null) -> String:
 	var data := by_id(kind)
+	if data.effect_kind == "wet":
+		return "s Nässe"
+	if data.effect_kind == "leech":
+		return "HP / Heilimpuls"
+	if data.effect_kind == "holy":
+		return "Schaden / Lichtstoß"
 	if data.stat_key != &"":
 		return "% " + data.display_name
-	return "Gesamtschaden über %.0f s" % data.dot_duration if data.dot_duration > 0 else "Schaden/Treffer"
+	return "Gesamtschaden über %.0f s" % dot_duration(kind, items) if data.dot_duration > 0 else "Schaden/Treffer"
 
 
-static func comparison(weapon: WeaponInstance, option: Dictionary, stats: PlayerStats, replace: int) -> String:
+static func effect_description(kind: StringName) -> String:
+	var data := by_id(kind)
+	if not data.description.is_empty():
+		return data.description
+	if data.stat_key == &"range":
+		return "Diese Waffe trifft weiter entfernte Gegner."
+	if data.stat_key == &"tempo":
+		return "Diese Waffe greift schneller an."
+	if data.dot_duration > 0:
+		return "Jeder Treffer: %s über %.0f s." % [data.display_name, data.dot_duration]
+	if data.slow_fraction > 0:
+		return "Treffer verursachen Eisschaden und verlangsamen."
+	return "Jeder Treffer verursacht zusätzlichen Elektroschaden."
+
+
+static func comparison(weapon: WeaponInstance, option: Dictionary, stats: PlayerStats, replace: int, compact: bool = false, items: ItemInventory = null) -> String:
 	if option.id == "slot":
 		if weapon.affix_slots >= MAX_SLOTS:
-			return "Alle vier Affix-Slots sind bereits geöffnet.\nWähle eine andere Waffe."
-		return "Effekt-Slots %d → %d\nÖffnet den nächsten Affix-Slot." % [weapon.affix_slots, mini(weapon.affix_slots + 1, MAX_SLOTS)]
+			return "Alle 4 Plätze sind bereits offen.\nWähle eine andere Waffe."
+		return "Plätze %d -> %d\nFür eine weitere Verzauberung." % [weapon.affix_slots, mini(weapon.affix_slots + 1, MAX_SLOTS)]
 	if option.id == "mk":
 		if weapon.tier < 4:
 			return "Benötigt Mk IV.\nVerbessere diese Waffe zuerst im Shop."
 		var upgrades := weapon.data.chest_upgrades.duplicate(true)
 		upgrades["mk"] = int(upgrades.get("mk", 0)) + 1
 		var next := WeaponRolls.resolve(weapon.data, weapon.data.rolls, upgrades)
-		return "%s → %s\n+10 %% Basisschaden\n+3 %% Tempo und Reichweite\nBenötigt mindestens Mk IV" % [WeaponPresentation.tier_text(weapon.data, weapon.tier), WeaponPresentation.tier_text(next, weapon.tier)]
+		return "%s -> %s\n+10 %% Basisschaden\n+3 %% Tempo und Reichweite\nBenötigt mindestens Mk IV" % [WeaponPresentation.tier_text(weapon.data, weapon.tier), WeaponPresentation.tier_text(next, weapon.tier)]
 	var data := by_id(StringName(option.id))
 	var index := find(weapon.affixes, data.id)
 	var before := float(weapon.affixes[index].damage) if index >= 0 else 0.0
 	var after := float(upgraded(weapon.affixes[index], option).damage) if index >= 0 else rank_damage(data.id, int(option.rarity))
-	var result := "Fundwert: +%.1f %s" % [rank_damage(data.id, int(option.rarity)), "% " + data.display_name if data.stat_key != &"" else "Basisschaden"]
+	var result := ("Fundstärke: %.1f" if data.effect_kind != "damage" else "Fundwert: +%.1f " + ("%% " + data.display_name if data.stat_key != &"" else "Basisschaden")) % rank_damage(data.id, int(option.rarity))
+	var value_before := value_text(before, data.id, weapon.data, stats, items)
+	var value_after := value_text(after, data.id, weapon.data, stats, items)
+	if compact:
+		var unit := "Schaden / %.0f s" % dot_duration(data.id, items) if data.dot_duration > 0 else damage_unit(data.id, items)
+		result = effect_description(data.id) + "\n" + ("+%s -> +%s" % [value_before, value_after] if index >= 0 else "+%s" % value_after) + " " + unit
+		if index >= 0:
+			result += "\n%s -> %s" % [progress_text(weapon.affixes[index]), progress_text(upgraded(weapon.affixes[index], option))]
+		elif weapon.affixes.size() >= weapon.affix_slots:
+			result += "\nErsetzt: " + (by_id(StringName(weapon.affixes[replace].id)).display_name if replace >= 0 and replace < weapon.affixes.size() else "Bitte Ersatz wählen")
+		if data.slow_fraction > 0:
+			result += "\nBis zu %.0f %% langsamer für %.1f s" % [data.slow_fraction * 100, data.slow_duration]
+		return result
 	if index >= 0:
-		result += "\nAuf dieser Waffe: +%.1f → +%.1f %s" % [before if data.stat_key != &"" else damage_for(before, weapon.data, stats), after if data.stat_key != &"" else damage_for(after, weapon.data, stats), damage_unit(data.id)]
+		result += "\nAuf dieser Waffe: +%s -> +%s %s" % [value_before, value_after, damage_unit(data.id, items)]
 	else:
-		result += "\nAuf dieser Waffe: +%.1f %s" % [after if data.stat_key != &"" else damage_for(after, weapon.data, stats), damage_unit(data.id)]
+		result += "\nAuf dieser Waffe: +%s %s" % [value_after, damage_unit(data.id, items)]
 	if index >= 0:
-		result += "\n%s → %s" % [progress_text(weapon.affixes[index]), progress_text(upgraded(weapon.affixes[index], option))]
+		result += "\n%s -> %s" % [progress_text(weapon.affixes[index]), progress_text(upgraded(weapon.affixes[index], option))]
 		result += "\nFortschritt: +%.1f %% · danach %.1f %%" % [progress_weight(weapon.affixes[index], option) * 100, float(upgraded(weapon.affixes[index], option).get("progress", 0)) * 100]
 	elif weapon.affixes.size() >= weapon.affix_slots:
 		result += "\nErsetzt: " + (by_id(StringName(weapon.affixes[replace].id)).display_name if replace >= 0 and replace < weapon.affixes.size() else "Bitte Effekt wählen")
 	else:
-		result += "\nBelegt einen freien Effekt-Slot"
+		result += "\nBelegt einen freien Platz für Verzauberungen"
 	if data.slow_fraction > 0:
 		result += "\nVerlangsamt für %.1f s" % data.slow_duration
-	return result
+	return result + "\n" + effect_description(data.id) + "\n" + mechanics_text(data.id)
+
+
+static func mechanics_text(kind: StringName) -> String:
+	var data := by_id(kind)
+	match kind:
+		&"fire":
+			return "Glut: %.0f %% eines Trefferbudgets an bis zu %d Ziele im Radius %.0f. Intervall %.2f s; übertragene Glut verbreitet sich nicht erneut." % [data.proc_factor * 100, data.proc_targets, data.proc_radius, data.proc_cooldown]
+		&"ice":
+			return "Krits auf gekühlte Ziele: Eissplitter mit %.0f %% Eisschaden an bis zu %d andere Ziele. Gemeinsames Intervall %.1f s." % [data.proc_factor * 100, data.proc_targets, data.proc_cooldown]
+		&"poison":
+			return "Bis zu %d Giftstufen, höchstens eine je %.1f s. Jede weitere Stufe: +%.0f %% Schaden neuer Giftanwendungen. Verfällt ohne Gift nach %.0f s." % [data.buildup_limit, data.buildup_interval, data.buildup_bonus * 100, data.dot_duration]
+		&"bleed":
+			return "Zahnseide ergänzt begrenzte Blutungsstapel. Sanduhr verlängert den Effekt; Skalpellwachs, Ansteckende Zahnseide und Blutmond erkennen diese Blutung."
+		&"electric":
+			return "Ein Sprung, +1 bei nassem Startziel, +1 mit Kettenitem; maximal %d. Sprungschaden %.0f %% des Elektrotreffers, Kettenitems verstärken ihn. Intervall %.2f s. Leitlack verstärkt Elektro auf nassen Zielen." % [data.proc_target_cap, data.proc_factor * 100, data.proc_cooldown]
+		&"wet":
+			return "Kein Zusatzschaden. Nassdauer maximal %.1f s; aktiviert Elektro, Leitlack und Spülpfützen. Nass verlangsamt nach den normalen Gegnerregeln." % data.utility_cap
+		&"holy":
+			return "%d Krits; Markierungen halten jeweils %.0f s. Weitere Waffen können markierte Ziele auslösen. Lichtstoß trifft bis zu %d Ziele, Intervall %.1f s." % [data.mark_threshold, data.mark_duration, data.proc_targets, data.proc_cooldown]
+		&"leech":
+			return "Kein Zusatzschaden. Heilt bis zu %.0f %% des tatsächlich verursachten Trefferschadens, höchstens %.1f HP je Impuls. Gemeinsames Intervall %.2f s für alle Waffen; DoTs und Folgeeffekte heilen nicht." % [data.proc_factor * 100, data.utility_cap, data.proc_cooldown]
+	return ""

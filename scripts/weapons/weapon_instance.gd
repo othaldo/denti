@@ -309,14 +309,4 @@ func _draw() -> void:
 
 
 func refresh_affix_stats() -> void:
-	var upgrades := data.chest_upgrades.duplicate(true)
-	upgrades["range"] = 0.0
-	upgrades["tempo"] = 0.0
-	for affix in affixes:
-		var definition := WeaponAffixes.by_id(StringName(affix.id))
-		if definition.stat_key != &"":
-			upgrades[str(definition.stat_key)] += float(affix.damage)
-	# Preserve neutral resource identity when no weapon stat has changed.
-	if float(upgrades.range) == 0 and float(upgrades.tempo) == 0 and int(upgrades.get("mk", 0)) == 0:
-		upgrades = {}
-	data = WeaponRolls.resolve(data, data.rolls, upgrades)
+	data = WeaponRolls.with_affixes(data, affixes)

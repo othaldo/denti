@@ -251,7 +251,7 @@ func refresh() -> void:
 	for index in equipped.size():
 		var row := HBoxContainer.new()
 		equipped_rows.add_child(row)
-		var name_label := _label(equipped[index].data.display_name)
+		var name_label := _label(WeaponPresentation.weapon_name(equipped[index]))
 		name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(name_label)
 		var spin := _spin(row, 1, 4, 1, equipped[index].tier)

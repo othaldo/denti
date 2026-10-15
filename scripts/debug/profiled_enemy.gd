@@ -29,11 +29,12 @@ func _draw() -> void:
 	if measured:
 		diagnostics.record(&"drawing", started)
 
-func take_damage(amount: float, weapon: WeaponData = null, critical: bool = false, proc_id: StringName = &"", additions: Array[Dictionary] = []) -> void:
+func take_damage(amount: float, weapon: WeaponData = null, critical: bool = false, proc_id: StringName = &"", additions: Array[Dictionary] = []) -> float:
 	if diagnostics.no_hits():
-		return
+		return 0.0
 	var measured := diagnostics.should_sample(Engine.is_in_physics_frame())
 	var started := Time.get_ticks_usec() if measured else 0
-	super.take_damage(amount, weapon, critical, proc_id, additions)
+	var dealt := super.take_damage(amount, weapon, critical, proc_id, additions)
 	if measured:
 		diagnostics.record(&"hits", started)
+	return dealt

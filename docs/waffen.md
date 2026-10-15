@@ -131,7 +131,7 @@ sechs Kratzer und Wasserflosser gegen mehrere Ziele sowie einen gemischten Build
 unter `.godot/weapon_loadout_frames/`;
 die [Loadout-Vorschau](screenshots/weapon_loadouts.gif) zeigt diese Anordnung.
 
-## Individuelle Affixe
+## Individuelle Verzauberungen
 
 Upgrade-Kapseln verbessern eine gewählte Waffeninstanz nach dem Wellenende.
 Feuer (2 s), Gift (5 s) und Affix-Blutung (3 s) verursachen zusätzlichen Schaden
@@ -141,7 +141,7 @@ sind durch kleine farbige Schilde erkennbar. Weitere Funde desselben Affixes
 erhöhen bei gleicher Seltenheit die Ausbaustufe I–III und danach die Seltenheit.
 Höhere Funde überspringen Stufen, niedrigere geben 50/25/12,5 % Fortschritt.
 Nach Legendär III wachsen passende legendäre Beiträge mit jeweils +2 weiter.
-Waffen beginnen mit einem Affix-Slot; Slotfunde öffnen bis zu vier Slots.
+Waffen beginnen mit einem Platz für Verzauberungen; Slotfunde öffnen bis zu vier Slots.
 Auch Reichweite und Angriffstempo können als Waffen-Affixe gefunden werden.
 Ein neuer Effekt bei vollen Slots benötigt eine ausdrückliche Ersatzwahl.
 
@@ -151,13 +151,15 @@ verschiedenen Effekten bleibt die Fusion gesperrt und verbraucht keine Waffe.
 Evolutionen erhalten die Affixe ebenfalls. Ein Kauf mit automatischer Fusion erhält
 alle Affixe der vorhandenen Waffe. Details und Pause-Menü zeigen Affixe separat.
 
-[Zufall, Wertebereiche, Speicherung und Tests](WEAPON_AFFIXES.md).
+Feuer, Eis, Gift, Blutung und Elektro haben eigene Build-Rollen. Nässe bereitet Elektro und Wasseritems vor, Weihe belohnt kritische Treffer und Lebensraub heilt begrenzt. [Alle zehn Verzauberungen, Synergien, Grenzen und Tests](WEAPON_AFFIXES.md).
 
 Shopwaffen haben zusätzlich individuelle Rolls für Grundschaden (60–170 %),
 Angriffspause (72–135 %), Reichweite (80–125 %) und Crit (+0–10 Prozentpunkte).
-Schrott/Solide/Meisterwerk/Göttlich ist unabhängig von Mk. Fusion behält den
-Roll der ausgewählten Waffe; beim Kauf mit voller Ausrüstung kann in den Details
-stattdessen der gesamte neue Roll übernommen werden. Affixe bleiben erhalten.
+Schrott/Solide/Meisterwerk/Göttlich ist unabhängig von Mk. Jede Fusion übernimmt
+je Attribut den besseren Wert beider Waffen: mehr Schaden, Reichweite und Crit,
+aber die kürzere Angriffspause. Bei mehreren passenden Partnern zählt die höhere
+erwartete Grund-DPS mit den aktuellen Buildwerten, bei Gleichstand die Reichweite.
+Die Shopdetails zeigen das Ergebnis vor dem Kauf. Verzauberungen bleiben erhalten.
 
 Waffenname und Rahmen zeigen immer Mk. Die Rollqualität färbt nur die einzelnen
 Attribute; auch eine Mk-I-Waffe mit hervorragendem Schaden behält ihren Mk-I-Rahmen.

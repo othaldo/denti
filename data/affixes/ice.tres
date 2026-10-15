@@ -4,6 +4,14 @@
 script = ExtResource("1")
 id = &"ice"
 display_name = "Eis"
+name_suffix = "des Frosts"
+description = "Verlangsamt. Krits gegen gekühlte Ziele lösen Eissplitter aus."
+build_tags = Array[StringName]([&"crit", &"defense", &"area"])
+damage_factor = 0.65
+proc_factor = 0.75
+proc_radius = 95.0
+proc_cooldown = 0.8
+proc_targets = 6
 color = Color(0.35, 0.8, 1, 1)
 icon_index = 8
 slow_fraction = 0.15

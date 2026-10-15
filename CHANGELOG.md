@@ -2,6 +2,18 @@
 
 Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü angezeigt. 0.1.0 wurde rückblickend anhand der Git-Historie dokumentiert; 0.2.0 bündelt die seitdem entstandenen Änderungen. Die Einträge beschreiben implementierte Funktionen. Weitere Pläne stehen in der [Roadmap](docs/ROADMAP.md).
 
+## 0.4.4 — 15.10.2026
+
+- **Fusion behält die besten Werte:** Kauf und manuelle Fusion übernehmen je Attribut den besseren Wert beider Waffen. Mehrere passende Partner werden nach dem erwarteten Ergebnis ausgewählt; die Shopdetails zeigen die Vorschau. Eine einzige Kaufaktion ersetzt die Wahl zwischen alten und neuen Werten. Verzauberungen, Waffen-ID und investierte Münzen bleiben erhalten.
+
+- **Verzauberungen in der Dentipedia:** eigene Kategorie mit Übersicht und allen zehn Effekten, ihren Regeln, Grenzen und passenden Builds. Die Mechanikartikel zu Strom, Blutung, Krits und Heilung erklären die neuen Verbindungen.
+- **Zehn Verzauberungen mit Build-Rollen:** Glut-Verbreitung, Eissplitter bei Krits, begrenzter Giftaufbau und Elektroketten. Blutungsitems und Blutmond unterstützen verzauberte Waffen; geringere Grundschadensbudgets schaffen Platz für die Mechaniken.
+- **Nässe, Weihe und Lebensraub:** Nassstatus für Wasser-/Elektrobuilds, Krit-Markierungen mit Lichtstoß und begrenzte Trefferheilung. Gemeinsame Abklingzeiten, Zielgrenzen und Schutz vor rekursiven Ketten.
+- **Sichtbare Synergien und Messwerte:** passende Build-Hinweise in Kapselkarten, Verzauberungstags in der Shopgewichtung und eigene Schadens-/Unterstützungszahlen in der Debug-Telemetrie. Laufende Effekte und Abklingzeiten bleiben beim Fortsetzen erhalten.
+- **Verzauberungen verständlicher:** ersetzt „Affixe“ im Spiel. Waffen erhalten einen Namenszusatz aus ihrer stärksten Verzauberung, der auch in Shop und Pause-Menü erscheint.
+- **Kompaktere Kapselkarten:** Wirkung und konkrete Werte im Vordergrund, ausführliche Fundwerte im Tooltip. Symbole neben dem Titel, geringere Abstände und dynamische Umbrüche für Desktop und Mobilgeräte; die bestehende Schrift bleibt erhalten.
+- **Prüfungen:** Namenswechsel nach Verstärkung, Austausch, Fusion und Fortsetzen sowie Textgrenzen in sechs Bildschirmgrößen.
+
 ## 0.4.2 — 14.10.2026
 
 - **Upgrade-Kapsel:** neues transparentes Icon im gemalten Denti-Stil für HUD und Bodenbeute. Goldene Funde behalten ihre Tönung; die Drop-Größe bleibt konstant. Der Texturimport begrenzt die Laufzeitauflösung und verwendet Mipmaps.

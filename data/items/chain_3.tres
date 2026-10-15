@@ -4,7 +4,7 @@
 script = ExtResource("1")
 id = &"chain_3"
 display_name = "Gewittersonde"
-description = "+2 Fernschaden, -2 Härte. Wasser/Licht springt mit 50 % Schaden über."
+description = "+2 Fernschaden, -2 Härte. Wasser/Licht springt mit 50 % Schaden über. Elektro-Verzauberungen: ein weiterer, stärkerer Kettensprung."
 rarity_tier = 3
 price = 14
 icon_index = 58

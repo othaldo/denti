@@ -26,10 +26,13 @@ static func hit(enemy: Enemy, weapon: WeaponData, tier: int, damage: float, crit
 	if enemy.health <= 0.0:
 		return
 	var value := items.modify_damage(enemy, weapon, damage) if items != null else damage
+	var was_chilled := enemy.chill_time > 0
 	var additions: Array[Dictionary] = []
 	if items != null and not affixes.is_empty():
-		additions = WeaponAffixes.packets(affixes, weapon, items.player.stats, affix_factor)
-	enemy.take_damage(weapon.damage_against(enemy, value, tier), weapon, critical, &"", additions)
+		additions = WeaponEnchantmentEffects.packets(items, enemy, weapon, affixes, affix_factor)
+	var dealt := enemy.take_damage(weapon.damage_against(enemy, value, tier), weapon, critical, &"", additions)
+	if items != null:
+		WeaponEnchantmentEffects.after_hit(items, enemy, weapon, affixes, critical, dealt, affix_factor, was_chilled)
 	if enemy.health > 0.0:
 		var push := weapon.knockback_at_tier(tier) * (1.0 - enemy.data.knockback_resistance)
 		enemy.global_position += direction * push

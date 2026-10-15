@@ -4,7 +4,7 @@
 script = ExtResource("1")
 id = &"chain_1"
 display_name = "Funkenclip"
-description = "Wasser/Licht springt mit 20 % Trefferschaden auf ein nahes Ziel. -2 % Schaden."
+description = "Wasser/Licht springt mit 20 % Trefferschaden auf ein nahes Ziel. -2 % Schaden. Elektro-Verzauberungen: ein weiterer, stärkerer Kettensprung."
 rarity_tier = 1
 price = 5
 icon_index = 57

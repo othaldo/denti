@@ -21,6 +21,8 @@ var chests_kept: int = 0
 var chests_scrapped: int = 0
 var weapon_damage: Dictionary = {}
 var proc_damage: Dictionary = {}
+var enchantment_support: Dictionary = {}
+var wave_enchantment_support: Dictionary = {}
 var other_damage: float = 0.0
 var peak_dps: float = 0.0
 var current_wave: int = 0
@@ -81,6 +83,7 @@ func begin_wave(number: int, profile_id: StringName = &"") -> void:
 	wave_dodges = 0
 	wave_status_damage.clear()
 	wave_status_applications.clear()
+	wave_enchantment_support.clear()
 	wave_peak_dps = 0.0
 	wave_boss_ttk = 0.0
 	wave_peak_enemies = 0
@@ -242,6 +245,7 @@ func current_wave_summary() -> Dictionary:
 		"peak_dps": wave_peak_dps, "damage_taken": wave_taken,
 		"dodges": wave_dodges,
 		"status_damage": wave_status_damage.duplicate(), "status_applications": wave_status_applications.duplicate(),
+		"enchantment_support": wave_enchantment_support.duplicate(),
 		"coins_collected": wave_coins, "xp_collected": wave_xp,
 		"gold_sources": wave_gold_sources.duplicate(), "shop_spending": wave_shop_spending.duplicate(),
 		"chests_found": wave_chests_found, "chests_kept": wave_chests_kept, "chests_scrapped": wave_chests_scrapped,
@@ -266,6 +270,7 @@ func save_data() -> Dictionary:
 		"coins_collected": coins_collected, "xp_collected": xp_collected,
 		"chests_found": chests_found, "chests_kept": chests_kept, "chests_scrapped": chests_scrapped,
 		"weapon_damage": weapon_damage.duplicate(), "proc_damage": proc_damage.duplicate(),
+		"enchantment_support": enchantment_support.duplicate(), "wave_enchantment_support": wave_enchantment_support.duplicate(),
 		"other_damage": other_damage, "peak_dps": peak_dps,
 		"current_wave": current_wave, "current_profile_id": str(current_profile_id), "wave_started_at": wave_started_at,
 		"wave_history": wave_history.duplicate(true),
@@ -305,6 +310,8 @@ func restore(saved: Dictionary, wave_number: int) -> void:
 	chests_scrapped = maxi(int(saved.get("chests_scrapped", 0)), 0)
 	weapon_damage = saved.get("weapon_damage", {}).duplicate()
 	proc_damage = saved.get("proc_damage", {}).duplicate()
+	enchantment_support = saved.get("enchantment_support", {}).duplicate()
+	wave_enchantment_support = saved.get("wave_enchantment_support", {}).duplicate()
 	other_damage = maxf(float(saved.get("other_damage", 0.0)), 0.0)
 	peak_dps = maxf(float(saved.get("peak_dps", 0.0)), 0.0)
 	current_wave = maxi(int(saved.get("current_wave", wave_number)), 0)
@@ -345,6 +352,14 @@ func restore(saved: Dictionary, wave_number: int) -> void:
 	for event in taken_events:
 		recent_taken += float(event["amount"])
 	_prune_events()
+
+
+func record_enchantment_support(kind: StringName, amount: float) -> void:
+	if not is_finite(amount) or amount <= 0:
+		return
+	var key := str(kind)
+	enchantment_support[key] = float(enchantment_support.get(key, 0)) + amount
+	wave_enchantment_support[key] = float(wave_enchantment_support.get(key, 0)) + amount
 
 
 # Hits in one frame share a timestamp and expiration; keep one bucket per frame.

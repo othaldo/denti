@@ -6,6 +6,7 @@ signal damaged(position: Vector2, amount: float)
 signal affix_damaged(position: Vector2, amount: float, kind: StringName)
 signal damage_recorded(amount: float, weapon_id: StringName, proc_id: StringName)
 signal weapon_hit(enemy: Enemy, amount: float, weapon: WeaponData, critical: bool)
+signal died(enemy: Enemy, amount: float)
 signal attack_performed(kind: StringName)
 signal death_started(position: Vector2)
 signal enraged(position: Vector2)
@@ -21,6 +22,7 @@ const PULSE_FLASH_DURATION := 0.18
 const BOSS_DEATH_DURATION := 0.9
 const AURA_PULSE_INTERVAL := 0.4
 const AURA_HASTE_DURATION := 0.65
+const MAX_BLEED_STACKS := 9
 const WET_STATUS = preload("res://data/statuses/wet.tres")
 
 @onready var sprite: Sprite2D = $Sprite2D
@@ -542,7 +544,7 @@ func _projectile_root() -> Node2D:
 
 func apply_bleed(dps: float, duration: float, stack_cap: int = 3) -> void:
 	var previous_stacks := bleed_stacks
-	bleed_stacks = mini(bleed_stacks + 1, stack_cap)
+	bleed_stacks = mini(bleed_stacks + 1, clampi(stack_cap, 1, MAX_BLEED_STACKS))
 	bleed_dps = maxf(bleed_dps, dps)
 	bleed_time = maxf(bleed_time, duration)
 	if bleed_stacks != previous_stacks:
@@ -564,9 +566,13 @@ func apply_enamel_exposure(bonus: float, duration: float) -> void:
 		queue_redraw()
 
 
-func take_damage(amount: float, weapon: WeaponData = null, critical: bool = false, proc_id: StringName = &"", additions: Array[Dictionary] = []) -> void:
+func has_bleeding() -> bool:
+	return bleed_stacks > 0 or affix_effects.pending.has("bleed")
+
+
+func take_damage(amount: float, weapon: WeaponData = null, critical: bool = false, proc_id: StringName = &"", additions: Array[Dictionary] = []) -> float:
 	if health <= 0.0:
-		return
+		return 0.0
 	var direct: Array[Dictionary] = []
 	var delayed: Array[Dictionary] = []
 	var total := amount * (1.0 - data.affix_resistance(&"bleed")) if proc_id == &"bleed" else amount
@@ -577,42 +583,42 @@ func take_damage(amount: float, weapon: WeaponData = null, critical: bool = fals
 		var tick := bool(addition.get("dot_tick", false))
 		var value := float(addition.damage) * (1.0 if tick else 1.0 - data.affix_resistance(kind))
 		if definition != null and definition.dot_duration > 0 and not tick:
-			delayed.append({"id": kind, "damage": value})
+			delayed.append({"id": kind, "damage": value, "can_spread": bool(addition.get("can_spread", true)), "duration": float(addition.get("duration", 0))})
 		else:
-			direct.append({"id": kind, "damage": value, "dot_tick": tick})
+			direct.append({"id": kind, "damage": value, "dot_tick": tick, "proc_id": str(addition.get("proc_id", "affix_" + str(kind)))})
 			total += value
 	# Pure DoT applications do not manufacture a minimum-damage direct hit.
 	if total <= 0:
 		if not (data.is_boss and boss_phase_timer > 0):
 			for addition in delayed:
-				affix_effects.apply(StringName(addition.id), addition.damage)
+				affix_effects.apply(StringName(addition.id), addition.damage, addition.can_spread, addition.duration)
 			if not delayed.is_empty():
 				queue_redraw()
-		return
+		return 0.0
 	additions = direct
 	var applied := maxf(total * (1.0 - damage_reduction) / overtime_defense_factor(), 1.0 if amount > 0 else 0.0)
 	if data.is_boss and data.boss_guard_recharge_seconds > 0.0:
 		if boss_phase_timer > 0.0:
 			_guard_boss_hit()
-			return
+			return 0.0
 		applied = minf(applied, boss_damage_budget)
 		if boss_phase < 2:
 			applied = minf(applied, maxf(health - _boss_phase_floor(), 0.0))
 		if applied <= 0.0:
 			_guard_boss_hit()
-			return
+			return 0.0
 		boss_damage_budget = maxf(boss_damage_budget - applied, 0.0)
 	elif data.is_elite and data.elite_guard_recharge_seconds > 0.0:
 		applied = minf(applied, elite_damage_budget)
 		if applied <= 0.0:
 			_guard_elite_hit()
-			return
+			return 0.0
 		elite_damage_budget = maxf(elite_damage_budget - applied, 0.0)
 	var counted := minf(applied, health)
 	health -= applied
 	if health > 0:
 		for addition in delayed:
-			affix_effects.apply(StringName(addition.id), addition.damage)
+			affix_effects.apply(StringName(addition.id), addition.damage, addition.can_spread, addition.duration)
 		if not delayed.is_empty():
 			queue_redraw()
 	var normal_share := amount / total if not additions.is_empty() else 1.0
@@ -629,9 +635,10 @@ func take_damage(amount: float, weapon: WeaponData = null, critical: bool = fals
 		var kind := StringName(addition.id)
 		var side := -32.0 if bool(addition.get("dot_tick", false)) else 32.0
 		affix_damaged.emit(hit_at + Vector2(side, -24.0 * (index + 1)), applied * share, kind)
-		damage_recorded.emit(counted * share, &"", StringName("affix_" + str(kind)))
+		damage_recorded.emit(counted * share, &"", StringName(addition.proc_id))
 		if kind == &"ice" and health > 0.0:
 			chill_time = maxf(chill_time, WeaponAffixes.by_id(kind).slow_duration)
+			affix_effects.ice_power = maxf(affix_effects.ice_power, float(addition.damage))
 	if weapon != null:
 		weapon_hit.emit(self, applied * normal_share, weapon, critical)
 	if data.is_boss and not is_enraged and health > 0.0 and health <= max_health * 0.5:
@@ -641,6 +648,10 @@ func take_damage(amount: float, weapon: WeaponData = null, critical: bool = fals
 		_start_boss_phase()
 	if health <= 0.0:
 		health = 0.0
+		for addition in delayed:
+			if addition.id == &"fire":
+				affix_effects.remember_fire(addition.damage, addition.can_spread)
+		died.emit(self, counted)
 		remove_from_group("enemies")
 		if data.is_boss:
 			dying = true
@@ -657,6 +668,7 @@ func take_damage(amount: float, weapon: WeaponData = null, critical: bool = fals
 		if hit_flash_time < 0.12:
 			modulate = Color(1.6, 1.6, 1.6)
 		hit_flash_time = 0.12
+	return counted
 
 
 func _boss_phase_floor() -> float:

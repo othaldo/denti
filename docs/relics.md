@@ -4,7 +4,7 @@ Nach den Bossen in Welle 5, 10 und 15 erscheint jeweils eine Auswahl aus drei no
 
 | Relikt | Effekt |
 | --- | --- |
-| Blutmond-Zahn | Durch Waffen getötete, blutende Gegner explodieren und verteilen Blutung auf nahe Gegner. Der Flächenschaden ist begrenzt. |
+| Blutmond-Zahn | Blutende Gegner explodieren beim Tod und verteilen Blutung, auch bei Verzauberungen und DoT-Kills. Der Flächenschaden ist begrenzt; Explosionen lösen keine weitere Blutmond-Kette aus. |
 | Gezeiten-Siegel | Jeder fünfte Wassertreffer verursacht eine Welle, die nahe Gegner trifft und durchnässt. |
 | Splitter-Heiligenschein | Nach einem geblockten Treffer verursachen Waffen vier Sekunden lang 30 % mehr Schaden. |
 | Sonnenmal | Jeder dritte kritische Treffer erzeugt eine heilige Explosion um das Ziel. |

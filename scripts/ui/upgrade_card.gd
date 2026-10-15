@@ -18,6 +18,7 @@ var keep_label: Label
 var chest_name: String = ""
 var chest_effect: String = ""
 var chest_layout: bool = false
+var affix_header: HBoxContainer
 
 
 func _ready() -> void:
@@ -83,19 +84,19 @@ func show_item(item: ShopOfferData) -> void:
 	DentiUIStyle.style_card(self, item.rarity_tier)
 
 
-func show_affix(option: Dictionary, comparison: String) -> void:
+func show_affix(option: Dictionary, comparison: String, detail_text: String = "") -> void:
 	_restore_standard_content()
 	text = ""
 	content.visible = true
 	var data := WeaponAffixes.by_id(StringName(str(option.id)))
 	icon_rect.texture = ICONS.item(data.icon_index) if data != null else ICONS.hud(4)
-	name_label.text = data.display_name.to_upper() if data != null else "ZWEITER EFFEKT-SLOT"
+	name_label.text = data.display_name if data != null else "Mehr Platz"
 	name_label.add_theme_color_override("font_color", data.color if data != null else DentiUIStyle.INK)
 	rarity_label.text = DentiRarity.name_for(int(option.rarity)).to_upper()
 	DentiUIStyle.style_affix_rarity_label(rarity_label, int(option.rarity))
 	upgrade_description = comparison
 	effect_label.text = comparison
-	tooltip_text = comparison + "\nJeder passende Fund bringt Fortschritt. Höhere Seltenheit: direktes Upgrade.\nWeitere Treffer addieren ihr Schadensbudget. Gegnerresistenzen reduzieren den jeweiligen Zusatzschaden."
+	tooltip_text = (detail_text if not detail_text.is_empty() else comparison) + "\nJede passende Verzauberung bringt Fortschritt. Höhere Seltenheit: direktes Upgrade.\nZusatzschaden gilt pro Treffer und vor Gegnerresistenzen."
 	disabled = false
 	DentiUIStyle.style_card(self, int(option.rarity))
 
@@ -200,6 +201,7 @@ func _wrap_chest_text(label: Label, source: String, width: float) -> void:
 	label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	var paragraph := TextParagraph.new()
 	paragraph.width = width
+	paragraph.break_flags = TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND | TextServer.BREAK_ADAPTIVE
 	paragraph.add_string(source, label.get_theme_font("font"), label.get_theme_font_size("font_size"))
 	var lines: PackedStringArray = []
 	for index in paragraph.get_line_count():
@@ -210,6 +212,27 @@ func _wrap_chest_text(label: Label, source: String, width: float) -> void:
 
 func _restore_standard_content() -> void:
 	progress_bar.hide()
+	if affix_header != null and affix_header.visible:
+		icon_rect.reparent(content)
+		name_label.reparent(content)
+		content.move_child(icon_rect, 0)
+		content.move_child(name_label, 1)
+		affix_header.hide()
+		for edge in ["left", "right"]:
+			content_margin.add_theme_constant_override("margin_" + edge, 14)
+		for label in [name_label, rarity_label, effect_label]:
+			label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			label.remove_theme_constant_override("line_spacing")
+		name_label.max_lines_visible = 2
+		name_label.custom_minimum_size.y = 48
+		name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		effect_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		name_label.size_flags_vertical = Control.SIZE_FILL
+		icon_rect.custom_minimum_size = Vector2(0, 56)
+		icon_rect.size_flags_vertical = Control.SIZE_FILL
+		content.alignment = BoxContainer.ALIGNMENT_CENTER
+		content.add_theme_constant_override("separation", 5)
+		rarity_label.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	content.move_child(keep_label, -1)
 	icon = null
 	focus_neighbor_top = NodePath()
@@ -233,6 +256,23 @@ func _restore_standard_content() -> void:
 	name_label.custom_minimum_size.y = 48
 	rarity_label.remove_theme_font_size_override("font_size")
 	effect_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+
+
+func set_affix_header() -> void:
+	if affix_header == null:
+		affix_header = HBoxContainer.new()
+		affix_header.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		affix_header.add_theme_constant_override("separation", 8)
+		content.add_child(affix_header)
+		content.move_child(affix_header, 0)
+	if not affix_header.visible or icon_rect.get_parent() != affix_header:
+		icon_rect.reparent(affix_header)
+		name_label.reparent(affix_header)
+		affix_header.show()
+	icon_rect.custom_minimum_size = Vector2(26, 26)
+	icon_rect.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	name_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
 
 func _build_content() -> void:

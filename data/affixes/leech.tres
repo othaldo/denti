@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="WeaponAffixData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/weapons/weapon_affix_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"leech"
+display_name = "Lebensraub"
+name_suffix = "des Lebensdursts"
+description = "Wirksame Treffer heilen begrenzt. Ein gemeinsames Heilintervall."
+effect_kind = "leech"
+color = Color(1, 0.4, 0.55, 1)
+icon_index = 26
+build_tags = Array[StringName]([&"heal", &"defense"])
+utility_base = 0.25
+utility_scale = 0.04
+utility_cap = 2.0
+proc_factor = 0.05
+proc_cooldown = 0.75

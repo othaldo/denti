@@ -380,7 +380,7 @@ func _show_stats() -> void:
 		chip.custom_minimum_size = Vector2(0, 52)
 		chip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		chip.size_flags_stretch_ratio = float(weapon.data.hands)
-		chip.tooltip_text = "%s\n%s\n%s" % [weapon.data.display_name, weapon.data.stats_text(weapon.tier), weapon.data.combat_text() + "\n" + WeaponAffixes.summary(weapon, game.player.stats)]
+		chip.tooltip_text = "%s\n%s\n%s" % [WeaponPresentation.weapon_name(weapon), weapon.data.stats_text(weapon.tier), weapon.data.combat_text() + "\n" + WeaponAffixes.summary(weapon, game.player.stats, game.items)]
 		DentiUIStyle.style_card(chip, weapon.tier, WeaponPresentation.special_color(weapon.data))
 		weapons.add_child(chip)
 		chip.pressed.connect(_show_weapon_details.bind(weapon.data, weapon.tier, weapon))
@@ -395,7 +395,7 @@ func _show_weapon_details(data: WeaponData, tier: int, weapon: WeaponInstance = 
 	rows.add_child(item_details)
 	item_details.show_weapon(data, tier, game.player, true, [])
 	if weapon != null:
-		item_details.show_affixes(weapon, game.player.stats)
+		item_details.show_affixes(weapon, game.player.stats, game.items)
 	_button("Zurück", _show_stats, true)
 	_update_build_layout()
 

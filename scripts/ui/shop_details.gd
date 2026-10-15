@@ -110,11 +110,13 @@ func show_weapon(data: WeaponData, tier: int, player: Player, equipped: bool, eq
 	_terms(effect.text + " " + synergy.text + " Wurzeln Resistenzen " + DentiAttributes.name_for(DentiAttributes.Type.CRIT_CHANCE))
 
 
-func show_affixes(weapon: WeaponInstance, stats: PlayerStats) -> void:
-	_label(affix_rows, "Affix-Slots %d/%d" % [weapon.affixes.size(), weapon.affix_slots], 14)
+func show_affixes(weapon: WeaponInstance, stats: PlayerStats, items: ItemInventory = null) -> void:
+	heading.text = WeaponPresentation.weapon_name(weapon) + " · " + WeaponPresentation.tier_text(weapon.data, weapon.tier)
+	_label(affix_rows, "Verzauberungen · %d/%d Plätze" % [weapon.affixes.size(), weapon.affix_slots], 14)
 	for affix in weapon.affixes:
 		var data := WeaponAffixes.by_id(StringName(affix.id))
-		var label := _label(affix_rows, "%s +%.1f %s · %d×" % [data.display_name, float(affix.damage) if data.stat_key != &"" else WeaponAffixes.damage_for(affix.damage, weapon.data, stats), WeaponAffixes.damage_unit(data.id), affix.stacks], 14)
+		var label := _label(affix_rows, "%s +%s %s" % [data.display_name, WeaponAffixes.value_text(float(affix.damage), data.id, weapon.data, stats, items), WeaponAffixes.damage_unit(data.id, items)], 14)
+		label.tooltip_text = WeaponAffixes.effect_description(data.id) + "\n" + WeaponAffixes.mechanics_text(data.id)
 		label.add_theme_color_override("font_color", data.color)
 		var rarity := _label(affix_rows, WeaponAffixes.progress_text(affix), 12)
 		DentiUIStyle.style_affix_rarity_label(rarity, affix.rarity)

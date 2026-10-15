@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="WeaponAffixData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/weapons/weapon_affix_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"wet"
+display_name = "Nässe"
+name_suffix = "der Flut"
+description = "Durchnässt Gegner. Bereitet Elektro, Leitlack und Spülpfützen vor."
+effect_kind = "wet"
+color = Color(0.25, 0.85, 1, 1)
+icon_index = 21
+build_tags = Array[StringName]([&"ranged", &"area"])
+utility_base = 1.2
+utility_scale = 0.06
+utility_cap = 4.0

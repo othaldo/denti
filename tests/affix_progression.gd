@@ -74,7 +74,49 @@ func _run() -> void:
 	assert(brush_text.get_slice("\n", 1) != lamp_text.get_slice("\n", 1) and lamp_text.contains("Auf dieser Waffe:"), "weapon-specific damage is not identified separately")
 	assert(offer == original_offer, "preview changed the drop")
 	var upgrade_text := WeaponAffixes.comparison(weapon, chest.options[0], game.player.stats, -1)
-	assert(upgrade_text.begins_with("Fundwert: +25.0 Basisschaden") and upgrade_text.get_slice("\n", 1).contains("→"), "upgrade preview lost fixed fund or before/after damage")
+	assert(upgrade_text.begins_with("Fundwert: +25.0 Basisschaden") and upgrade_text.get_slice("\n", 1).contains("->"), "upgrade preview lost fixed fund or before/after damage")
+	# Check the bundled font itself: system fallback can hide missing glyphs on desktop.
+	var glyph_chest := {"kind": "affix", "options": [chest.options[0], {"id": "slot", "rarity": 3}, {"id": "mk", "rarity": 4}], "scrap_coins": 5}
+	panel.show_chest(glyph_chest, loadout, game.player.stats, 5)
+	assert(not panel.replacement.visible, "upgrades with no new effects waste space on a replacement selector")
+	for card in panel.buttons:
+		for text in [card.effect_label.text, card.tooltip_text]:
+			for index in text.length():
+				var code: int = text.unicode_at(index)
+				if code > 32 and not DentiUIStyle.FONT.has_char(code):
+					push_error("Affix card uses an unsupported glyph: U+%04X" % code)
+					quit(1)
+					return
+	# Names belong to individual weapons, and use development rather than raw
+	# values (a legacy damage roll must not beat a higher-tier tempo effect).
+	var base_name := WeaponCatalog.by_id(&"magic_toothbrush").display_name
+	loadout.restore([
+		{"id": "magic_toothbrush", "tier": 2, "affix_slots": 4, "affixes": [
+			{"id": "fire", "rarity": 1, "damage": 999}, {"id": "ice", "rarity": 2, "damage": 7},
+			{"id": "tempo", "rarity": 3, "damage": 14}, {"id": "poison", "rarity": 1, "damage": 3}]},
+		{"id": "magic_toothbrush", "tier": 2}])
+	weapon = loadout.equipped()[0]
+	assert(WeaponPresentation.weapon_name(weapon) == base_name + " der Eile")
+	assert(WeaponPresentation.weapon_name(loadout.equipped()[1]) == base_name and weapon.data.display_name == base_name, "instance name contaminated shared weapon data")
+	assert(WeaponPresentation.enchantment_list(weapon).contains("Feuer I") and WeaponPresentation.enchantment_list(weapon).contains("Angriffstempo I"))
+	assert(WeaponAffixes.apply(weapon, {"id": "ice", "rarity": 4, "damage": 25}))
+	assert(WeaponPresentation.weapon_name(weapon) == base_name + " des Frosts", "stronger enchantment did not update the name")
+	loadout.restore(loadout.save_data())
+	weapon = loadout.equipped()[0]
+	assert(WeaponPresentation.weapon_name(weapon) == base_name + " des Frosts", "resume changed the enchanted name")
+	assert(WeaponAffixes.apply(weapon, {"id": "bleed", "rarity": 1, "damage": 3}, 1))
+	assert(WeaponPresentation.weapon_name(weapon) == base_name + " der Eile", "replacing the dominant enchantment left a stale name")
+	assert(loadout.merge(0) and WeaponPresentation.weapon_name(loadout.equipped()[0]) == base_name + " der Eile", "fusion lost the enchanted name")
+	for data in WeaponAffixes.ALL:
+		assert(not data.name_suffix.is_empty())
+		var option := {"id": str(data.id), "rarity": 2, "damage": 7}
+		var compact := WeaponAffixes.comparison(weapon, option, game.player.stats, -1, true)
+		assert(compact.begins_with(WeaponAffixes.effect_description(data.id)) and not compact.contains("Fundwert:"))
+		assert(WeaponAffixes.comparison(weapon, option, game.player.stats, -1).contains("Fundwert: +7.0" if data.effect_kind == "damage" else "Fundstärke: 7.0"))
+	assert(WeaponAffixes.effect_description(&"tempo").contains("schneller"))
+	game.shop_panel.details.show_weapon(weapon.data, weapon.tier, game.player, true, equipment)
+	game.shop_panel.details.show_affixes(weapon, game.player.stats)
+	assert(game.shop_panel.details.heading.text.begins_with(WeaponPresentation.weapon_name(weapon)))
 	session.clear_run()
 	paused = false
 	print("PASS ranked affixes, upgrades, matching rewards, migration and Mk colors")

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="WeaponAffixData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/weapons/weapon_affix_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"holy"
+display_name = "Weihe"
+name_suffix = "des Segens"
+description = "Drei Krits auf ein markiertes Ziel lösen einen Lichtstoß aus."
+effect_kind = "holy"
+color = Color(1, 0.88, 0.48, 1)
+icon_index = 18
+build_tags = Array[StringName]([&"crit", &"area"])
+damage_factor = 0.9
+proc_factor = 1.3
+proc_radius = 105.0
+proc_cooldown = 0.8
+proc_targets = 8
+mark_threshold = 3
+mark_duration = 4.0
