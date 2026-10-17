@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 id = &"range"
+projectile_effect_index = 5
 display_name = "Reichweite"
 name_suffix = "der Weitsicht"
 color = Color(0.35, 0.8, 1, 1)

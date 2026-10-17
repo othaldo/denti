@@ -5,6 +5,8 @@ extends RefCounted
 var multimesh := MultiMesh.new()
 var texture: Texture2D
 var enemies: Array[Enemy] = []
+var attack_enemies: Array[Enemy] = []
+var warning_count := 0
 
 func _init() -> void:
 	texture = CombatSpriteTextures.enemy_shadow()
@@ -29,18 +31,22 @@ func _init() -> void:
 	multimesh.visible_instance_count = 0
 
 func update() -> bool:
+	warning_count = 0
+	attack_enemies.clear()
 	if multimesh.instance_count < enemies.size():
 		multimesh.instance_count = maxi(16, nearest_po2(enemies.size()))
 	var count := 0
-	var has_attack_visuals := false
 	for enemy in enemies:
 		if enemy.is_queued_for_deletion() or not enemy.visible:
 			continue
-		has_attack_visuals = has_attack_visuals or enemy.health > 0.0 and enemy.special_phase != Enemy.SpecialPhase.COOLDOWN
+		if enemy.health > 0.0 and enemy.special_phase != Enemy.SpecialPhase.COOLDOWN:
+			attack_enemies.append(enemy)
+			if enemy.special_phase == Enemy.SpecialPhase.WARNING:
+				warning_count += 1
 		var radius := enemy.data.radius * 0.7
 		var shadow := Transform2D(0, Vector2.ONE * radius / 15.0, 0, Vector2(0, radius))
 		multimesh.set_instance_transform_2d(count, enemy.transform * shadow)
 		multimesh.set_instance_color(count, enemy.modulate * enemy.self_modulate)
 		count += 1
 	multimesh.visible_instance_count = count
-	return has_attack_visuals
+	return not attack_enemies.is_empty()

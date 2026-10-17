@@ -44,6 +44,8 @@ func configure(weapon: WeaponData, weapon_tier: int = 1) -> void:
 
 func _ready() -> void:
 	player = get_parent().get_parent() as Player
+	if data.attack_mode == &"cone":
+		AttackEffects.prepare_spray(data.arc_degrees)
 	sprite = Sprite2D.new()
 	sprite.texture = data.held_texture()
 	sprite.offset = (Vector2(0.5, 0.5) - data.grip_anchor) * data.held_texture().get_size()
@@ -277,35 +279,27 @@ func _draw() -> void:
 		if fraction < WeaponMotion.ACTIVE_START:
 			return
 		var blade := WeaponMotion.segment(data, WeaponMotion.pose(data, tier, home_position, aim, fraction, idle_time, aim_distance, visual_density))
-		draw_line(blade[0], blade[1], Color(color, fade * 0.35), 3.0)
+		AttackEffects.strip(self, AttackEffects.Shape.THREAD, blade[0], blade[1], 9.0, Color(color, fade * 0.35), idle_time)
 		if data.attack_animation in ["drill", "polish"]:
-			draw_arc(muzzle, 7.0, idle_time * 25.0, idle_time * 25.0 + PI, 12, color, 2.0)
+			AttackEffects.flash(self, muzzle, 10.0, Color(color, fade * 0.65), idle_time)
 		else:
 			var previous := WeaponMotion.segment(data, WeaponMotion.pose(data, tier, home_position, aim, maxf(fraction - 0.06, WeaponMotion.ACTIVE_START), idle_time, aim_distance, visual_density))
-			draw_line(previous[1], blade[1], Color(color, fade * 0.65), 4.0)
+			AttackEffects.strip(self, AttackEffects.Shape.SLASH, previous[1], blade[1], 16.0, Color(color, fade * 0.65), idle_time)
 		return
 	match data.attack_mode:
 		&"projectile":
 			if fraction < 0.25:
-				draw_circle(muzzle, (1.0 - fraction / 0.25) * 7.0, color)
+				AttackEffects.flash(self, muzzle, (1.0 - fraction / 0.25) * 15.0, color, idle_time)
 		&"beam":
 			var end := to_local(beam_segment()[1])
-			draw_line(muzzle, end, color, 4.0)
-			draw_circle(end, 6.0, Color(1, 1, 1, fade))
+			AttackEffects.strip(self, AttackEffects.Shape.BEAM, muzzle, end, 40.0, Color(1, 1, 1, fade), idle_time)
+			AttackEffects.flash(self, end, 15.0, Color(1, 0.98, 0.83, fade), idle_time)
 		&"beam_line":
 			var end := to_local(beam_segment()[1])
-			draw_line(muzzle, end, Color(color, fade * 0.2), data.attack_width)
-			draw_line(muzzle, end, color, 4.0)
+			AttackEffects.strip(self, AttackEffects.Shape.UV, muzzle, end, data.attack_width * 1.5, Color(1, 1, 1, fade), idle_time)
+			AttackEffects.flash(self, muzzle, data.attack_width * 0.7, color, idle_time)
 		&"cone":
-			var half_angle := deg_to_rad(data.arc_degrees * 0.5)
-			var reach := data.range_at_tier(tier)
-			var points := PackedVector2Array([muzzle])
-			for index in 13:
-				points.append(muzzle + aim.rotated(-half_angle + float(index) / 12.0 * half_angle * 2.0) * reach)
-			draw_colored_polygon(points, Color(color, fade * 0.12))
-			for index in 3:
-				var direction := aim.rotated(lerpf(-half_angle, half_angle, float(index) / 2.0))
-				draw_line(muzzle, muzzle + direction * reach * (0.4 + fraction * 0.6), Color(color, fade * 0.6), 2.0)
+			AttackEffects.spray(self, muzzle, aim, data.range_at_tier(tier), data.arc_degrees, Color(1, 1, 1, fade * 0.85), idle_time)
 
 
 func refresh_affix_stats() -> void:

@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 id = &"poison"
+projectile_effect_index = 2
 display_name = "Gift"
 name_suffix = "des Gifts"
 description = "Wiederholtes Vergiften steigert den Giftschaden bis +60 %."

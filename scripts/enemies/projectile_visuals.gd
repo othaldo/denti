@@ -4,6 +4,7 @@ extends RefCounted
 # Standard colors/sizes share one atlas, including alternating status bullets.
 static var textures: Dictionary[String, Texture2D] = {}
 const RESOLUTION := 2.0
+const BODY_RADIUS := 9.0
 const PREPARED = preload("res://scripts/enemies/prepared_projectile_textures.gd")
 const ORB_CROWN: EnemyData = preload("res://data/enemies/acid_crown.tres")
 const ORB_EMPEROR: EnemyData = preload("res://data/enemies/cavity_emperor.tres")
@@ -21,16 +22,10 @@ static func body(tint: Color, radius: float) -> Texture2D:
 	return textures[key]
 
 
-static func body_image(tint: Color, radius: float) -> Image:
-	var extent := ceilf(maxf(18.0, radius) + 2.0)
-	var image := Image.create(int(extent * 2.0 * RESOLUTION), int(extent * 2.0 * RESOLUTION), false, Image.FORMAT_RGBA8)
-	var center := Vector2.ONE * extent
-	_circle(image, center + Vector2(-14, 0), 4.0, Color(tint, 0.35))
-	_circle(image, center + Vector2(-7, 0), 5.0, Color(tint, 0.55))
-	_circle(image, center, radius, Color(0.20, 0.12, 0.17))
-	_circle(image, center, radius * 0.72, tint)
-	_circle(image, center + Vector2(-radius * 0.22, -radius * 0.3), maxf(2.0, radius * 0.22), Color(0.92, 1.0, 0.68))
-	return image
+static func body_image(tint: Color, _radius: float) -> Image:
+	# Large space-denial shots scale the same compact painted body. Their halo
+	# stays at the precise collision radius and does not pulse with the body.
+	return ProjectilePaint.image(ProjectilePaint.enemy_kind(tint), BODY_RADIUS)
 
 
 static func halo(tint: Color, radius: float) -> Texture2D:

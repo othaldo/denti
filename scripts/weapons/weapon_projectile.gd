@@ -27,8 +27,9 @@ var orbit_finished: bool = false
 var orbit_hits: Array[int] = []
 var enemy_index: EnemySpatialIndex
 var body_sprite: Sprite2D
-var tail_sprite: Sprite2D
-var outline_sprite: Sprite2D
+var visual_frames: Array[Texture2D] = []
+var visual_frame_index: int = -1
+var visual_generation: int = -1
 var visual_radius: float = 7.0
 var flight_range: float = 0.0
 var splash_radius: float = 0.0
@@ -85,15 +86,17 @@ func retire() -> void:
 
 
 func _create_visuals() -> void:
-	if body_sprite != null:
-		return
-	var radius := visual_radius
-	if data.projectile_shape != &"rocket":
-		tail_sprite = _visual_sprite(CombatSpriteTextures.projectile_tail(data.projectile_color, radius))
-		outline_sprite = _visual_sprite(CombatSpriteTextures.projectile_outline(data.projectile_color, radius))
-		body_sprite = _visual_sprite(CombatSpriteTextures.projectile_body(data.projectile_color, radius))
+	var base := ProjectileEnchantmentSkins.base_texture(data, tier)
+	var radius := ProjectileEnchantmentSkins.visual_radius(data, tier)
+	if is_instance_valid(pool):
+		visual_frames = pool.skins.frames(base, ProjectileEnchantmentSkins.mask(affixes), radius)
+		visual_generation = pool.skins.generation
 	else:
-		body_sprite = _visual_sprite(CombatSpriteTextures.rocket(data.projectile_color))
+		visual_frames = ProjectileEnchantmentSkins.unmanaged_frames(base, affixes, radius)
+		visual_generation = -1
+	visual_frame_index = -1
+	if body_sprite == null:
+		body_sprite = _visual_sprite(visual_frames[0])
 
 
 func _visual_sprite(texture: Texture2D) -> Sprite2D:
@@ -104,18 +107,19 @@ func _visual_sprite(texture: Texture2D) -> Sprite2D:
 	return visual
 
 
-func _sync_visuals() -> void:
+func _sync_visuals(heading: Vector2 = Vector2.ZERO) -> void:
 	if body_sprite == null:
 		return
 	body_sprite.visible = impact_time <= 0.0
-	if tail_sprite != null:
-		tail_sprite.visible = body_sprite.visible
-		tail_sprite.rotation = direction.angle()
-		outline_sprite.visible = body_sprite.visible
-		var radius := visual_radius
-		outline_sprite.scale = Vector2.ONE * (radius + sin(animation_time * 20.0)) / (radius + 1.0) / CombatSpriteTextures.RESOLUTION
-	else:
-		body_sprite.rotation = direction.angle()
+	if not visual_frames.is_empty():
+		var frame := (floori(animation_time * ProjectileParticleFrames.FPS) + get_instance_id() % ProjectileParticleFrames.COUNT) % visual_frames.size()
+		if frame != visual_frame_index or body_sprite.texture != visual_frames[frame]:
+			body_sprite.texture = visual_frames[frame]
+			visual_frame_index = frame
+	if heading.is_zero_approx():
+		heading = Vector2.from_angle(animation_time * 9.0).orthogonal() if orbit_time > 0.0 else direction
+	# Heading is world-space, including beneath rotated/scaled arena parents.
+	body_sprite.rotation = global_transform.affine_inverse().basis_xform(heading).angle()
 
 
 func _physics_process(delta: float) -> void:
@@ -129,7 +133,7 @@ func _physics_process(delta: float) -> void:
 			if enemy.health > 0 and not orbit_hits.has(enemy.get_instance_id()):
 				orbit_hits.append(enemy.get_instance_id())
 				enemy.take_damage(damage * data.evolution_damage_factor, null, false, &"evolution")
-		_sync_visuals()
+		_sync_visuals(Vector2.from_angle(animation_time * 9.0).orthogonal())
 		if orbit_time <= 0:
 			_start_return()
 		return
@@ -273,5 +277,5 @@ func _draw() -> void:
 	if impact_time > 0.0:
 		var progress := 1.0 - impact_time / IMPACT_DURATION
 		var radius := data.splash_at_tier(tier) if data.splash_at_tier(tier) > 0.0 else 20.0
-		CombatDrawCache.arc(self, Vector2.ZERO, radius * progress, 0.0, TAU, 40, Color(data.projectile_color, 1.0 - progress), 4.0)
+		GroundEffects.draw(self, GroundEffects.Shape.RIPPLE, Vector2.ZERO, radius * progress, Color(data.projectile_color, 1.0 - progress))
 		return

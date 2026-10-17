@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 id = &"leech"
+projectile_effect_index = 9
 display_name = "Lebensraub"
 name_suffix = "des Lebensdursts"
 description = "Wirksame Treffer heilen begrenzt. Ein gemeinsames Heilintervall."

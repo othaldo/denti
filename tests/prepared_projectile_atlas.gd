@@ -32,7 +32,7 @@ func _run() -> void:
 	_check(EnemyProjectileVisuals.textures.size() == EnemyProjectileVisuals.standard_specs().size(), "prepared variants overlap or were omitted")
 	# Custom/future data still works before the atlas is regenerated.
 	var custom := EnemyProjectileVisuals.body(Color(0.3, 0.5, 0.7), 12.3)
-	_check(custom is ImageTexture and custom.get_width() == 80, "nonstandard projectile lost its procedural fallback")
+	_check(custom is ImageTexture and custom.get_size() == Vector2(EnemyProjectileVisuals.body_image(Color(0.3, 0.5, 0.7), 12.3).get_size()), "nonstandard projectile lost its painted fallback")
 	_check(custom == EnemyProjectileVisuals.body(Color(0.3, 0.5, 0.7), 12.3), "fallback texture is not cached")
 	if failures == 0:
 		print("Denti prepared projectile atlas test passed")

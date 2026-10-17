@@ -28,12 +28,12 @@ func launch(at: Vector2, aim: Vector2, projectile_speed: float, amount: float, p
 	projectile_color = DentiStatus.COLORS[int(inflicted_statuses[0]["kind"])] if not inflicted_statuses.is_empty() else tint
 	hit_radius = collision_radius
 	visual_radius = draw_radius
-	rotation = direction.angle()
+	rotation = get_parent().global_transform.affine_inverse().basis_xform(direction).angle() if get_parent() is Node2D else direction.angle()
 	if body_sprite == null:
 		body_sprite = Sprite2D.new()
 		add_child(body_sprite)
 	body_sprite.texture = EnemyProjectileVisuals.body(projectile_color, draw_radius)
-	body_sprite.scale = Vector2.ONE / EnemyProjectileVisuals.RESOLUTION
+	body_sprite.scale = Vector2.ONE * draw_radius / EnemyProjectileVisuals.BODY_RADIUS / EnemyProjectileVisuals.RESOLUTION
 	if draw_radius > 13.0:
 		if halo_sprite == null:
 			halo_sprite = Sprite2D.new()
@@ -50,7 +50,7 @@ func _physics_process(delta: float) -> void:
 	lifetime -= delta
 	animation_time += delta * 15.0
 	if body_sprite != null:
-		body_sprite.scale = Vector2.ONE * (1.0 + sin(animation_time) * 1.5 / maxf(visual_radius, 1.0)) / EnemyProjectileVisuals.RESOLUTION
+		body_sprite.scale = Vector2.ONE * (visual_radius + sin(animation_time) * 1.5) / EnemyProjectileVisuals.BODY_RADIUS / EnemyProjectileVisuals.RESOLUTION
 	if target != null and global_position.distance_squared_to(target.global_position) < hit_radius * hit_radius:
 		var hit_target := target
 		var hit_statuses := inflicted_statuses

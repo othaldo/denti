@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 id = &"tempo"
+projectile_effect_index = 6
 display_name = "Angriffstempo"
 name_suffix = "der Eile"
 color = Color(1, 0.5, 0.75, 1)

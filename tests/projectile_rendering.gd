@@ -54,6 +54,9 @@ func _run() -> void:
 	EnemyProjectilePatterns.fire_space_orb(projectiles, at, Vector2.UP, 120, 9, 42, game.player)
 	var orb: AcidProjectile = projectiles.get_child(-1)
 	var halo_scale := orb.halo_sprite.scale
+	if not orb.body_sprite.scale.is_equal_approx(Vector2.ONE * 29.4 / EnemyProjectileVisuals.BODY_RADIUS / EnemyProjectileVisuals.RESOLUTION):
+		_fail("large painted orb lost its visual radius when sharing the compact body")
+		return
 	orb._physics_process(0.1)
 	if orb.halo_sprite == null or orb.halo_sprite.scale != halo_scale or orb.hit_radius != 42 or not is_equal_approx(orb.visual_radius, 29.4):
 		_fail("orb warning radius changed with its pulse")

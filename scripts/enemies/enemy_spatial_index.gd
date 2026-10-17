@@ -11,6 +11,7 @@ var next_order: int = 0
 var shadow_batch := EnemyShadowBatch.new()
 var had_attack_visuals := false
 var motion := EnemyMotion.new()
+var warning_density := WarningVisualDensity.new()
 
 func _ready() -> void:
 	process_priority = 1
@@ -20,8 +21,9 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	motion.step(self, delta)
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	var has_attack_visuals := shadow_batch.update()
+	warning_density.update(delta, shadow_batch.attack_enemies, shadow_batch.warning_count)
 	if has_attack_visuals or had_attack_visuals:
 		queue_redraw()
 	had_attack_visuals = has_attack_visuals
@@ -30,12 +32,21 @@ func _draw() -> void:
 	draw_multimesh(shadow_batch.multimesh, shadow_batch.texture)
 	# Draw telegraphs together below all sprites instead of alternating between
 	# each enemy's primitive geometry and texture. No extra gameplay children.
-	for enemy in shadow_batch.enemies:
+	# Keep all faded fills together, then draw precise boundaries/timers above
+	# them. This also avoids a primitive/rectangle batch switch per enemy.
+	var fallback := WarningVisualDensity.FULL_SCALES if not warning_density.scales.is_empty() else WarningVisualDensity.NO_SCALES
+	for priority in 2:
+		for enemy in shadow_batch.attack_enemies:
+			if enemy.health <= 0.0 or not enemy.visible or enemy.is_queued_for_deletion() or enemy.special_phase != Enemy.SpecialPhase.WARNING or enemy.data.is_boss != (priority == 1):
+				continue
+			draw_set_transform_matrix(enemy.transform)
+			enemy.draw_warning_fill(self, enemy.transform, warning_density.scales.get(enemy.get_instance_id(), fallback))
+	for enemy in shadow_batch.attack_enemies:
 		if enemy.health <= 0.0 or not enemy.visible or enemy.is_queued_for_deletion():
 			continue
 		if enemy.special_phase != Enemy.SpecialPhase.COOLDOWN:
 			draw_set_transform_matrix(enemy.transform)
-			enemy.draw_attack_visuals(self, enemy.transform)
+			enemy.draw_attack_visuals(self, enemy.transform, WarningVisualDensity.NO_SCALES, false)
 	draw_set_transform_matrix(Transform2D.IDENTITY)
 
 func register(enemy: Enemy) -> void:
@@ -52,6 +63,7 @@ func register(enemy: Enemy) -> void:
 		cells[cell] = []
 	cells[cell].append(enemy)
 	shadow_batch.enemies.append(enemy)
+	warning_density.invalidate()
 	set_process(true)
 	set_physics_process(true)
 	queue_redraw()
@@ -81,8 +93,11 @@ func unregister(enemy: Enemy) -> void:
 		membership.erase(id)
 	bosses.erase(enemy)
 	shadow_batch.enemies.erase(enemy)
+	shadow_batch.attack_enemies.erase(enemy)
+	warning_density.invalidate()
 	queue_redraw()
 	if membership.is_empty():
+		warning_density.update(0.0, shadow_batch.enemies, 0)
 		maximum_radius = 0.0
 		next_order = 0
 		shadow_batch.multimesh.visible_instance_count = 0

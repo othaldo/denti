@@ -233,6 +233,9 @@ static func restore(game, saved: Dictionary) -> void:
 			data = WeaponRolls.resolve(data, entry.get("rolls", {}), entry.get("upgrades", {}))
 			var projectile := projectiles.acquire(data, clampi(entry.get("tier", 1), 1, 4))
 			projectile.restore_state(entry, game.items, restored_enemies, data)
+	# Historic in-flight combinations can differ from the current equipment.
+	# Restore those first, then keep the equipped styles ready before unpausing.
+	projectiles.prepare_skins(weapons)
 	for index in mini(runtime.size(), weapons.size()):
 		if not runtime[index] is Dictionary:
 			continue

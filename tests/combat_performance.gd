@@ -151,10 +151,10 @@ func _check_telemetry() -> void:
 
 func _check_visual_sharing() -> void:
 	var weapon := WeaponCatalog.by_id(&"water_jet")
-	var first := CombatSpriteTextures.projectile_body(weapon.projectile_color, 11) as AtlasTexture
-	var second := CombatSpriteTextures.projectile_tail(weapon.projectile_color, 11) as AtlasTexture
-	_check(first.atlas == second.atlas, "projectile layers cannot batch together")
-	_check(first == CombatSpriteTextures.projectile_body(weapon.projectile_color, 11), "projectile texture was regenerated")
+	var first := CombatSpriteTextures.projectile(weapon.projectile_color, 7) as AtlasTexture
+	var second := CombatSpriteTextures.projectile(WeaponCatalog.by_id(&"magic_toothbrush").projectile_color, 7) as AtlasTexture
+	_check(first.atlas == second.atlas, "different painted projectile families cannot batch together")
+	_check(first == CombatSpriteTextures.projectile(weapon.projectile_color, 7), "projectile texture was regenerated")
 	var xp := CombatSpriteTextures.loot(&"xp") as AtlasTexture
 	var coin := CombatSpriteTextures.loot(&"coin") as AtlasTexture
 	var capsule := CombatSpriteTextures.loot(&"chest")

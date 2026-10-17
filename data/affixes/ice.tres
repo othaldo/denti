@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 id = &"ice"
+projectile_effect_index = 1
 display_name = "Eis"
 name_suffix = "des Frosts"
 description = "Verlangsamt. Krits gegen gekühlte Ziele lösen Eissplitter aus."

@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 id = &"holy"
+projectile_effect_index = 8
 display_name = "Weihe"
 name_suffix = "des Segens"
 description = "Drei Krits auf ein markiertes Ziel lösen einen Lichtstoß aus."

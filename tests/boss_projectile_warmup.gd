@@ -18,7 +18,16 @@ func _run() -> void:
 	var warmup: SubViewport = load("res://scripts/enemies/boss_projectile_warmup.gd").new()
 	root.add_child(warmup)
 	_check(warmup.size == Vector2i(8, 8) and warmup.world_2d != null and warmup.world_2d != root.world_2d and warmup.gui_disable_input, "warmup is not isolated from the game viewport/input")
-	_check(warmup.render_target_update_mode == SubViewport.UPDATE_ONCE and warmup.get_child_count() == EnemyProjectileVisuals.standard_specs().size() + CombatSpriteTextures.PREPARED.REGIONS.size() + BossProjectileWarmup.art_textures().size() + 4, "warmup did not schedule enemy/player/loot textures, art, warning atlas and charge primitives for rendering")
+	_check(warmup.render_target_update_mode == SubViewport.UPDATE_ONCE and warmup.get_child_count() == EnemyProjectileVisuals.standard_specs().size() + CombatSpriteTextures.PREPARED.REGIONS.size() + BossProjectileWarmup.art_textures().size() + 6, "warmup did not schedule enemy/player/loot textures, art, ground/warning/attack atlases and charge primitives for rendering")
+	var has_ground_atlas := false
+	var has_attack_atlas := false
+	for child in warmup.get_children():
+		if child is Sprite2D and child.texture == GroundEffects.ATLAS:
+			has_ground_atlas = true
+		if child is Sprite2D and child.texture == AttackEffects.ATLAS:
+			has_attack_atlas = true
+	_check(has_ground_atlas, "ground effect atlas was not drawn before combat")
+	_check(has_attack_atlas, "attack effect atlas was not drawn before combat")
 	_check(warmup.has_node("CombatFontWarmup") and warmup.get_node("CombatFontWarmup").text == "0123456789-+!", "combat number font was omitted from warmup")
 	var cache_size := EnemyProjectileVisuals.textures.size()
 	_check(cache_size == EnemyProjectileVisuals.standard_specs().size(), "warmup did not prepare acid, status and orb textures")

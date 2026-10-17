@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 id = &"electric"
+projectile_effect_index = 4
 display_name = "Elektro"
 name_suffix = "des Gewitters"
 description = "Kettenblitze. Nässe und Kettenitems erlauben weitere Sprünge."

@@ -14,6 +14,8 @@
 - Die Item- und HUD-Icon-Atlanten unter `assets/items/` und `assets/ui/`, einschließlich der acht neuen Item-Symbole, wurden mit OpenAI ImageGen erstellt.
 - Die zehn eigenen Stat-Icons in `assets/ui/stat_icons_atlas.png` wurden mit dem eingebauten OpenAI ImageGen-Werkzeug erstellt. Prompt, Zuordnung und Schutz vor abgeschnittenen Motiven stehen in `docs/STAT_ICONS.md`.
 - Die acht Animationsframes der Boss-Entzündungs-Aura in `assets/vfx/boss_inflammation_aura.png` wurden mit dem eingebauten OpenAI ImageGen-Werkzeug erstellt; Prompt und Farbstufen stehen in `docs/BOSS_INFLAMMATION.md`.
+- Die gemalten Projektil-, Strahl- und Bodenwarnungs-Quellen unter `assets/vfx/` wurden mit dem eingebauten OpenAI ImageGen-Werkzeug erstellt. Prompts, Zuschnitt und Laufzeitatlanten sind in `docs/PROJECTILE_ART.md` und `docs/ATTACK_EFFECTS.md` dokumentiert; Partikelframes für Verzauberungen und präzise Bodenmasken werden offline erzeugt.
+- Die XP-Schmelzkristalle und Goldmünzen unter `assets/loot/` wurden mit dem eingebauten OpenAI ImageGen-Werkzeug erstellt und für den gemeinsamen Beute-Atlas aufbereitet. Quelle, Prompt und Vorschau stehen in `docs/LOOT_ART.md`.
 - HUD, Karten, Buttons und Fortschrittsbalken sind eigene Godot-UI-Elemente. Es werden keine externen UI-Packs verwendet.
 
 ## Musik

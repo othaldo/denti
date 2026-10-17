@@ -35,9 +35,9 @@ func _draw() -> void:
 	for flash in flashes:
 		var alpha := clampf(float(flash["life"]) / 0.3, 0.0, 1.0)
 		if flash["kind"] == &"line":
-			draw_line(flash["from"], flash["at"], Color(flash["color"] as Color, alpha), 4.0)
+			AttackEffects.strip(self, AttackEffects.Shape.THREAD, flash["from"], flash["at"], 16.0, Color(flash["color"] as Color, alpha), 0.3 - float(flash["life"]))
 		else:
-			CombatDrawCache.arc(self, flash["at"], float(flash["radius"]) * (1.0 - alpha * 0.2), 0.0, TAU, 36, Color(flash["color"] as Color, alpha), 4.0)
+			GroundEffects.draw(self, GroundEffects.Shape.RIPPLE, flash["at"], float(flash["radius"]) * (1.0 - alpha * 0.2), Color(flash["color"] as Color, alpha))
 
 
 func has_relic(id: StringName) -> bool:

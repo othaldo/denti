@@ -159,13 +159,12 @@ func _draw() -> void:
 		return
 	var color := weapon.data.projectile_color
 	for pool in pools:
-		draw_circle(to_local(pool.at), weapon.data.evolution_radius, Color(color, 0.08))
-		CombatDrawCache.arc(self, to_local(pool.at), weapon.data.evolution_radius, 0, TAU, 32, Color(color, 0.4), 2)
+		GroundEffects.draw(self, GroundEffects.Shape.POOL, to_local(pool.at), weapon.data.evolution_radius, Color(color, 0.8))
 	for thread in threads:
 		var a := instance_from_id(thread.a) as Enemy
 		var b := instance_from_id(thread.b) as Enemy
 		if is_instance_valid(a) and is_instance_valid(b):
-			draw_line(to_local(a.global_position), to_local(b.global_position), Color(color, 0.6), 2)
+			AttackEffects.strip(self, AttackEffects.Shape.THREAD, to_local(a.global_position), to_local(b.global_position), 12.0, Color(color, 0.6), weapon.idle_time)
 	for id in marks:
 		var enemy := instance_from_id(id) as Enemy
 		if is_instance_valid(enemy):
@@ -173,13 +172,12 @@ func _draw() -> void:
 	for flash in flashes:
 		var line := flash_segment(flash)
 		var width := weapon.data.attack_width if weapon.data.evolution_kind == &"revelation" and flash.get("mounted", false) else 3.0
-		draw_line(to_local(line[0]), to_local(line[1]), Color(color, float(flash.life) / 0.22 * 0.18), width)
-		draw_line(to_local(line[0]), to_local(line[1]), Color(color, float(flash.life) / 0.22), 3)
+		AttackEffects.strip(self, AttackEffects.Shape.BEAM, to_local(line[0]), to_local(line[1]), maxf(width, 18.0), Color(color, float(flash.life) / 0.22), weapon.idle_time)
 	if charge_time > 0:
 		var start := weapon.muzzle_position()
-		draw_line(to_local(start), to_local(start + weapon.aim * weapon.data.range_at_tier(weapon.tier)), Color(color, 0.4), 2)
+		AttackEffects.aim(self, to_local(start), to_local(start + weapon.aim * weapon.data.range_at_tier(weapon.tier)), Color(color, 0.6), 1.0 - charge_time / weapon.data.evolution_duration)
 		var pulse := 6.0 + (1.0 - charge_time / weapon.data.evolution_duration) * 7.0
-		CombatDrawCache.arc(self, to_local(weapon.muzzle_position()), pulse, 0, TAU, 24, Color(color, 0.8), 2)
+		AttackEffects.flash(self, to_local(weapon.muzzle_position()), pulse, Color(color, 0.8), weapon.idle_time)
 
 func flash_segment(flash: Dictionary) -> PackedVector2Array:
 	if not flash.get("mounted", false):

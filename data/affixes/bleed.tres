@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 id = &"bleed"
+projectile_effect_index = 3
 display_name = "Blutung"
 name_suffix = "des Aderlasses"
 description = "Blutung über Zeit. Profitiert von Blutungsitems und Blutmond."

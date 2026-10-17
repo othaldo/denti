@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 id = &"wet"
+projectile_effect_index = 7
 display_name = "Nässe"
 name_suffix = "der Flut"
 description = "Durchnässt Gegner. Bereitet Elektro, Leitlack und Spülpfützen vor."

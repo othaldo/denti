@@ -12,11 +12,12 @@ class ChargePreview extends Node2D:
 		shadow.multimesh.set_instance_color(0, Color.WHITE)
 
 	func _draw() -> void:
-		# Exercise the same built-in canvas draw paths as the lane warning/trail.
-		draw_colored_polygon(PackedVector2Array([Vector2(1, 1), Vector2(7, 1), Vector2(7, 7), Vector2(1, 7)]), Color(0.95, 0.20, 0.29, 0.3))
-		draw_line(Vector2(1, 4), Vector2(7, 4), Color(1.0, 0.72, 0.27, 0.7), 3.0)
-		draw_circle(Vector2(6, 4), 1.0, Color(0.95, 0.20, 0.29, 0.3))
-		draw_arc(Vector2(4, 4), 2.0, 0.0, TAU, 8, Color(1.0, 0.72, 0.27), 1.0)
+		# Exercise the actual textured strip, sector, timer and shadow paths.
+		AttackEffects.lane(self, Vector2(1, 4), Vector2(7, 4), 2.0, Color.WHITE, 0.5)
+		AttackEffects.lane(self, Vector2(1, 4), Vector2(7, 4), 2.0, Color.WHITE, 0.5, Transform2D.IDENTITY, PackedFloat32Array([1, 1, 0.5, 0.3, 0.2, 0.3, 0.5, 1, 1]))
+		AttackEffects.spray(self, Vector2(1, 4), Vector2.RIGHT, 6.0, 65.0, Color.WHITE, 0.0)
+		AttackEffects.warning_ring(self, Vector2(4, 4), 2.0, 0.5, Color.WHITE)
+		AttackEffects.danger(self, Vector2(4, 4), 2.0, Color.WHITE)
 		draw_multimesh(shadow.multimesh, shadow.texture)
 
 
@@ -35,6 +36,8 @@ func _ready() -> void:
 	textures.append_array(CombatSpriteTextures.standard_textures())
 	CombatDrawCache.prepare()
 	textures.append(CombatGlyphs.ATLAS)
+	textures.append(GroundEffects.ATLAS)
+	textures.append(AttackEffects.ATLAS)
 	textures.append_array(art_textures())
 	texture_count = textures.size()
 	for texture in textures:

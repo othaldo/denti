@@ -9,6 +9,7 @@ const MAX_IDLE := 512
 var idle: Dictionary[WeaponData, Dictionary] = {}
 var idle_count: int = 0
 var created: int = 0
+var skins := ProjectileEnchantmentSkins.new()
 
 func _bucket(weapon: WeaponData, tier: int) -> Array:
 	if not idle.has(weapon):
@@ -45,9 +46,24 @@ func prepare_loadout(weapons: Array[WeaponInstance]) -> void:
 			idle[data].erase(tier)
 		if idle[data].is_empty():
 			idle.erase(data)
+	prepare_skins(weapons)
 	for data: WeaponData in wanted:
 		for tier: int in wanted[data]:
 			prepare(data, tier)
+
+func prepare_skins(weapons: Array[WeaponInstance]) -> void:
+	var generation := skins.generation
+	skins.prepare(weapons)
+	if generation == skins.generation:
+		return
+	# Idle bodies must not pin an obsolete enchantment atlas generation.
+	# Active shots retain their original look until they finish their flight.
+	for styles: Dictionary in idle.values():
+		for bucket: Array in styles.values():
+			for shot: WeaponProjectile in bucket:
+				shot.body_sprite.texture = ProjectileEnchantmentSkins.base_texture(shot.data, shot.tier)
+				shot.visual_frames = []
+				shot.visual_frame_index = -1
 
 func _create(weapon: WeaponData, tier: int) -> WeaponProjectile:
 	var shot: WeaponProjectile = PROJECTILE.instantiate()
@@ -82,6 +98,10 @@ func recycle(shot: WeaponProjectile) -> void:
 	shot.items = null
 	shot.enemy_index = null
 	remove_child(shot)
+	if shot.visual_generation != skins.generation:
+		shot.body_sprite.texture = ProjectileEnchantmentSkins.base_texture(shot.data, shot.tier)
+		shot.visual_frames = []
+		shot.visual_frame_index = -1
 	if idle_count < MAX_IDLE:
 		_bucket(shot.data, shot.tier).append(shot)
 		idle_count += 1
@@ -95,3 +115,4 @@ func _exit_tree() -> void:
 				shot.free()
 	idle.clear()
 	idle_count = 0
+	skins.clear()

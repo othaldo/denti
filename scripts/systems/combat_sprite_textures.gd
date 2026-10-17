@@ -28,6 +28,13 @@ static func projectile_tail(tint: Color, radius: float) -> Texture2D:
 	_ensure_orb(tint, radius)
 	return textures["tail:%s:%s" % [tint.to_html(), radius]]
 
+static func projectile(tint: Color, radius: float) -> Texture2D:
+	var key := "shot:%s:%s" % [tint.to_html(), radius]
+	if not textures.has(key):
+		var prepared: Texture2D = PREPARED.find(key)
+		textures[key] = prepared if prepared != null else ImageTexture.create_from_image(ProjectilePaint.image(ProjectilePaint.player_kind(tint), radius))
+	return textures[key]
+
 static func _ensure_orb(tint: Color, radius: float) -> void:
 	var key := "%s:%s" % [tint.to_html(), radius]
 	if textures.has("body:" + key):
@@ -60,15 +67,7 @@ static func rocket(tint: Color) -> Texture2D:
 	return _store(key, rocket_image(tint))
 
 static func rocket_image(tint: Color) -> Image:
-	var image := _image(40)
-	_line(image, Vector2(24, 40), Vector2(46, 40), 10, Color(0.98, 0.94, 0.82))
-	var triangle := PackedVector2Array([Vector2(57, 40), Vector2(45, 47), Vector2(45, 33)])
-	for y in range(65, 96):
-		for x in range(88, 117):
-			if Geometry2D.is_point_in_polygon(Vector2(x + 0.5, y + 0.5) / RESOLUTION, triangle):
-				image.set_pixel(x, y, tint)
-	_line(image, Vector2(20, 40), Vector2(6, 40), 5, Color(1.0, 0.78, 0.28, 0.65))
-	return image
+	return ProjectilePaint.image(ProjectilePaint.Kind.ROCKET, 13.0)
 
 static func loot(kind: StringName) -> Texture2D:
 	if kind == &"chest":
@@ -137,21 +136,14 @@ static func orb_images(tint: Color, radius: float) -> Array[Image]:
 	return layers
 
 static func loot_images() -> Array[Image]:
-	var kinds: Array[StringName] = [&"xp", &"coin", &"chest"]
-	var result: Array[Image] = []
-	for index in 3:
-		var image := _image(16)
-		if kinds[index] == &"chest":
-			_rect(image, Rect2(3, 7, 26, 20), Color(0.33, 0.16, 0.30))
-			_rect(image, Rect2(5, 9, 22, 16), Color(0.96, 0.69, 0.28))
-			_rect(image, Rect2(5, 15, 22, 3), Color(0.52, 0.20, 0.34))
-			_circle(image, Vector2(16, 16), 3, Color(1.0, 0.95, 0.65))
-		else:
-			_circle(image, Vector2(16, 16), 8, Color(0.2, 0.16, 0.2))
-			_circle(image, Vector2(16, 16), 6, Color(0.35, 0.84, 0.96) if kinds[index] == &"xp" else Color(1.0, 0.79, 0.29))
-			_circle(image, Vector2(14, 14), 2, Color.WHITE)
-		result.append(image)
-	return result
+	# Used by the offline atlas baker and fallback only. Ordinary combat reads
+	# the prepared atlas and never loads the high-resolution source sheet.
+	var chest := _image(16)
+	_rect(chest, Rect2(3, 7, 26, 20), Color(0.33, 0.16, 0.30))
+	_rect(chest, Rect2(5, 9, 22, 16), Color(0.96, 0.69, 0.28))
+	_rect(chest, Rect2(5, 15, 22, 3), Color(0.52, 0.20, 0.34))
+	_circle(chest, Vector2(16, 16), 3, Color(1.0, 0.95, 0.65))
+	return [Image.load_from_file("res://assets/loot/xp_crystal.png"), Image.load_from_file("res://assets/loot/gold_tooth_coin.png"), chest]
 
 static func standard_images() -> Dictionary[String, Image]:
 	var images: Dictionary[String, Image] = {"enemy_shadow": shadow_image()}
@@ -169,9 +161,7 @@ static func standard_images() -> Dictionary[String, Image]:
 		else:
 			for tier in range(1, 5):
 				var radius := 11.0 if weapon.splash_at_tier(tier) > 0 or weapon.pierce_at_tier(tier) > 0 else 7.0
-				var layers := orb_images(weapon.projectile_color, radius)
-				for index in 3:
-					images["%s:%s:%s" % [["tail", "outline", "body"][index], weapon.projectile_color.to_html(), radius]] = layers[index]
+				images["shot:%s:%s" % [weapon.projectile_color.to_html(), radius]] = ProjectilePaint.image(ProjectilePaint.player_kind(weapon.projectile_color), radius)
 	return images
 
 static func standard_textures() -> Array[Texture2D]:

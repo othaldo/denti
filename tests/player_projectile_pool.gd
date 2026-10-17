@@ -38,8 +38,6 @@ func _run() -> void:
 	var count := pool.created
 	var shot := _shot(MAGIC)
 	var body := shot.body_sprite
-	var tail := shot.tail_sprite
-	var outline := shot.outline_sprite
 	# Exercise actual expiry before stressing all state that can survive reuse.
 	shot._physics_process(10)
 	_check(shot.retired and not shot.is_inside_tree() and not shot.is_physics_processing() and RunSnapshot.capture(game).player_projectiles.is_empty(), "retired player shot still ticks, draws or enters the save")
@@ -67,7 +65,7 @@ func _run() -> void:
 	pool.add_child(reference)
 	reference.launch(shot.global_position, Vector2.RIGHT, 100, MAGIC, null, false, 4)
 	_check(shot.save_state({}) == reference.save_state({}), "reused player shot retained old hit, impact, return or orbit state")
-	_check(shot.body_sprite == body and shot.tail_sprite == tail and shot.outline_sprite == outline and body.visible and tail.visible and outline.visible, "reuse created sprites or retained hidden impact visuals")
+	_check(shot.body_sprite == body and body.visible and shot.get_child_count() == 1, "reuse created sprites or retained hidden impact visuals")
 	reference.free()
 	shot.retire()
 	for cycle in 50:
@@ -82,7 +80,7 @@ func _run() -> void:
 	var red := _shot(colored)
 	var low_tier := _shot(MAGIC, 1)
 	var rocket := _shot(ROCKET)
-	_check(red.body_sprite.texture != body.texture and low_tier != shot and rocket.tail_sprite == null and rocket.outline_sprite == null, "pool mixed resource identities, tiers or rocket/orb sprites")
+	_check(red.body_sprite.texture != body.texture and low_tier != shot and rocket.get_child_count() == 1, "pool mixed resource identities, tiers or rocket/orb sprites")
 	rocket._physics_process(10)
 	_check(rocket.impact_time > 0 and not rocket.body_sprite.visible and not rocket.retired, "rocket expiry lost the visible explosion lifetime")
 	rocket._physics_process(WeaponProjectile.IMPACT_DURATION)

@@ -2,7 +2,7 @@
 
 Ein kleiner 2D-Arena-Survivor über einen göttlichen Backenzahn, der Plaque, Zucker und Karies den Kampf ansagt. Du steuerst Denti direkt; seine Waffen greifen automatisch an. Zwischen den Wellen entscheiden Levelaufstiege und Einkäufe, wie der nächste Kampf läuft.
 
-**Aktuelle Version: 0.4.4.** Alle Änderungen seit 0.1 stehen in der [Patchnote-Historie](CHANGELOG.md).
+**Aktuelle Version: 0.5.0.** Alle Änderungen seit 0.1 stehen in der [Patchnote-Historie](CHANGELOG.md).
 
 ![Denti kämpft in Welle 4 gegen Plaque, Bakterien, Zucker und Säurespucker](docs/screenshots/kampf.png)
 
@@ -72,6 +72,8 @@ Auf Normal fällt Gold in Welle 1–4 garantiert und sinkt bis Welle 20 auf 70 %
 - **Nachtklinik:** dunkle Spielansichten, große Objektbilder und kompakte Iconwerte. Hover erklärt Werte, Klick öffnet Details oder das Dentikon. Kurze Hover-, Klick-, Kauf- und Fusionsreaktionen laufen auch in der Shop-Pause. UI-Klänge und reduzierte Bewegung werden unter **Escape → Einstellungen** gespeichert; Kauf, Pins, Preisbindung, Vergleich, Verkauf und Fusion bleiben erhalten. [Gestaltung und Aufnahmen](docs/UI_ART_DIRECTION.md).
 
 Das Spiel ist ein **spielbarer Prototyp**. Balancing, Effekte und weitere Inhalte sind noch in Arbeit.
+
+**0.5.0** bringt gemalte Projektile, Lichtstrahlen, Sprühnebel, Bodenwarnungen sowie eigene XP- und Gold-Sprites. Bis zu vier Verzauberungen werden gemeinsam als animierter Partikellook in einem Projektil-Sprite dargestellt. Überlagerte Warnflächen bleiben transparenter; Boss-Charges werden hervorgehoben. Gemeinsame Texturatlanten und vorbereitete Effekte begrenzen zusätzliche Zeichenaufrufe. [Darstellung, Belastungsszenen und Messwerte](docs/ATTACK_EFFECTS.md), [Verzauberungs-Projektile](docs/ENCHANTMENT_PROJECTILES.md) und [Beutegrafiken](docs/LOOT_ART.md).
 
 **0.4.0** erweitert Upgrade-Kapseln um individuelle Waffen-Verzauberungen mit fortlaufender Verstärkung, bis zu vier Effekt-Slots, Reichweite, Angriffstempo und seltene Mk-Aufstiege über IV. Shopwaffen besitzen gewürfelte Attribute; Feuer, Gift und Blutung verursachen Schaden über Zeit. Mehr Gegnerdruck und steilere Hard-/Hell-Kurven ergänzen die neue Progression. Details stehen in den [Patchnotes](CHANGELOG.md).
 

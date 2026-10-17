@@ -33,7 +33,7 @@ func _run() -> void:
 			if weapon.projectile_shape == &"rocket":
 				_check(CombatSpriteTextures.rocket(weapon.projectile_color) is AtlasTexture, "rocket generated pixels during combat")
 			else:
-				_check(CombatSpriteTextures.projectile_body(weapon.projectile_color, radius) is AtlasTexture, "player shot generated pixels during combat")
+				_check(CombatSpriteTextures.projectile(weapon.projectile_color, radius) is AtlasTexture, "painted shot generated pixels during combat")
 	_check(CombatSpriteTextures.enemy_shadow() is AtlasTexture and CombatSpriteTextures.loot(&"chest") == CombatSpriteTextures.UPGRADE_CAPSULE and CombatSpriteTextures.textures.size() == count, "standard calls generated new textures after warmup")
 	CombatDrawCache.prepare()
 	var arc_count := CombatDrawCache.arcs.size()

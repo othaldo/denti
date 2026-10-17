@@ -742,7 +742,7 @@ func _draw() -> void:
 				var preview_count := boss_radial_volleys_remaining if boss_phase_burst_fired else data.boss_radial_volley_count
 				var current_gap_angle := boss_phase_gap_angle + deg_to_rad(data.boss_radial_angle_step_degrees * float(first_preview_index))
 				for ray in EnemyProjectilePatterns.radial_directions(data.boss_radial_count + boss_phase * 2, current_gap_angle):
-					draw_line(ray * data.radius, ray * 290.0, Color(0.95, 0.25, 0.42, 0.3), 3.0)
+					AttackEffects.aim(self, ray * data.radius, ray * 290.0, Color(0.95, 0.25, 0.42, 0.6), 0.5)
 				for volley_offset in preview_count:
 					var preview_angle := boss_phase_gap_angle + deg_to_rad(data.boss_radial_angle_step_degrees * float(first_preview_index + volley_offset))
 					var gap_marker := Vector2.RIGHT.rotated(preview_angle) * 290.0
@@ -752,20 +752,18 @@ func _draw() -> void:
 					match data.boss_signature:
 						EnemyData.BossSignature.AIMED_FAN:
 							for ray in EnemyProjectilePatterns.fan_directions(phase_aim, data.boss_fan_count):
-								draw_line(ray * data.radius, ray * 320.0, Color(1.0, 0.78, 0.3, 0.42), 4.0)
+								AttackEffects.aim(self, ray * data.radius, ray * 320.0, Color(1.0, 0.65, 0.3, 0.7), 0.5)
 						EnemyData.BossSignature.TRAIL_FAN:
 							for ray in EnemyProjectilePatterns.fan_directions(-phase_aim, data.boss_fan_count):
-								draw_line(ray * data.radius, ray * 320.0, Color(1.0, 0.78, 0.3, 0.42), 4.0)
+								AttackEffects.aim(self, ray * data.radius, ray * 320.0, Color(1.0, 0.65, 0.3, 0.7), 0.5)
 						EnemyData.BossSignature.LANE:
-							var lane_side := phase_aim.orthogonal() * (data.boss_signature_projectile_spacing * float(data.boss_signature_projectile_count - 1) * 0.5 + 21.0)
+							var lane_half_width := data.boss_signature_projectile_spacing * float(data.boss_signature_projectile_count - 1) * 0.5 + 21.0
 							var lane_end := phase_aim * 520.0
-							draw_colored_polygon(PackedVector2Array([-lane_side, lane_end - lane_side, lane_end + lane_side, lane_side]), Color(0.95, 0.32, 0.63, 0.13))
-							draw_line(-lane_side, lane_end - lane_side, Color(1.0, 0.78, 0.3, 0.6), 3.0)
-							draw_line(lane_side, lane_end + lane_side, Color(1.0, 0.78, 0.3, 0.6), 3.0)
+							AttackEffects.lane(self, Vector2.ZERO, lane_end, lane_half_width, Color(1.0, 0.35, 0.48, 0.8), 0.5)
 						EnemyData.BossSignature.SPACE_ORB:
 							var orb_end := phase_aim * 520.0
-							draw_line(Vector2.ZERO, orb_end, Color(0.95, 0.32, 0.63, 0.24), data.boss_signature_orb_radius * 1.4)
-							CombatDrawCache.arc(self, orb_end, data.boss_signature_orb_radius, 0.0, TAU, 40, Color(1.0, 0.78, 0.3, 0.75), 4.0)
+							AttackEffects.lane(self, Vector2.ZERO, orb_end, data.boss_signature_orb_radius * 0.7, Color(1.0, 0.43, 0.25, 0.65), 0.5)
+							GroundEffects.draw(self, GroundEffects.Shape.DANGER, orb_end, data.boss_signature_orb_radius, Color(1.0, 0.48, 0.3, 0.85))
 		elif boss_damage_budget <= max_health * 0.01:
 			CombatDrawCache.arc(self, Vector2.ZERO, data.radius + 19.0, 0.0, TAU, 48, Color(0.43, 0.84, 0.94, 0.8), 5.0)
 	if data.is_elite and data.elite_guard_fraction > 0.0:
@@ -810,58 +808,84 @@ func _warning_rays(mode: int, count: int) -> Array[Vector2]:
 	return warning_rays
 
 
-func draw_attack_visuals(canvas: CanvasItem, base: Transform2D = Transform2D.IDENTITY) -> void:
+func warning_lane_start() -> Vector2:
+	return special_direction * data.radius * 0.5 if active_special_attack == EnemyData.SpecialAttack.BOSS and boss_move == BossMove.CHARGE else Vector2.ZERO
+
+func warning_lane_end() -> Vector2:
+	match active_special_attack:
+		EnemyData.SpecialAttack.DASH:
+			if target == null:
+				return Vector2.ZERO
+			var margin := DentiArena.WALL_WIDTH + data.radius + 6.0
+			return (global_position + special_direction * data.attack_speed * data.attack_duration).clamp(Vector2.ONE * margin, target.arena.arena_size - Vector2.ONE * margin) - global_position
+		EnemyData.SpecialAttack.BOSS:
+			return boss_dash_end - global_position
+		EnemyData.SpecialAttack.LANE, EnemyData.SpecialAttack.SPACE_ORB:
+			return special_direction.normalized() * 550.0
+	return Vector2.ZERO
+
+func warning_lane_half_width() -> float:
+	match active_special_attack:
+		EnemyData.SpecialAttack.DASH:
+			return data.radius
+		EnemyData.SpecialAttack.BOSS:
+			return data.radius + 19.0 if boss_move == BossMove.CHARGE else 0.0
+		EnemyData.SpecialAttack.LANE:
+			return data.lane_projectile_spacing * float(data.lane_projectile_count - 1) * 0.5 + 21.0
+		EnemyData.SpecialAttack.SPACE_ORB:
+			return data.space_orb_radius * 0.7
+	return 0.0
+
+func draw_warning_fill(canvas: CanvasItem, base: Transform2D = Transform2D.IDENTITY, fill_scales: PackedFloat32Array = PackedFloat32Array()) -> void:
+	if special_phase != SpecialPhase.WARNING or warning_lane_half_width() <= 0.0:
+		return
+	var tint := Color(0.73, 0.20, 0.19, 0.85)
+	match active_special_attack:
+		EnemyData.SpecialAttack.BOSS:
+			tint = Color(1.0, 0.3, 0.32, 0.95)
+		EnemyData.SpecialAttack.LANE:
+			tint = Color(0.50, 0.88, 0.14, 0.9)
+		EnemyData.SpecialAttack.SPACE_ORB:
+			tint = Color(1.0, 0.43, 0.25, 0.65)
+	if canvas != self:
+		tint *= modulate * self_modulate
+	var progress := 1.0 - clampf(special_timer / maxf(data.warning_time, 0.01), 0.0, 1.0)
+	AttackEffects.lane(canvas, warning_lane_start(), warning_lane_end(), warning_lane_half_width(), tint, progress, base, fill_scales)
+
+func draw_attack_visuals(canvas: CanvasItem, base: Transform2D = Transform2D.IDENTITY, fill_scales: PackedFloat32Array = PackedFloat32Array(), draw_fill: bool = true) -> void:
 	var visual_tint := modulate * self_modulate if canvas != self else Color.WHITE
+	if draw_fill:
+		draw_warning_fill(canvas, base, fill_scales)
 	if special_phase == SpecialPhase.WARNING:
 		var warning_color := Color(0.73, 0.20, 0.19, 0.85)
 		var warning_progress := 1.0 - clampf(special_timer / maxf(data.warning_time, 0.01), 0.0, 1.0)
 		if active_special_attack == EnemyData.SpecialAttack.DASH or active_special_attack == EnemyData.SpecialAttack.BOSS and boss_move == BossMove.CHARGE:
-			var dash_path := boss_dash_end - global_position
-			if active_special_attack == EnemyData.SpecialAttack.DASH:
-				var margin := DentiArena.WALL_WIDTH + data.radius + 6.0
-				dash_path = (global_position + special_direction * data.attack_speed * data.attack_duration).clamp(Vector2.ONE * margin, target.arena.arena_size - Vector2.ONE * margin) - global_position
-			if active_special_attack == EnemyData.SpecialAttack.BOSS:
-				var side := special_direction.orthogonal() * (data.radius + 19.0)
-				var start := special_direction * data.radius * 0.5
-				canvas.draw_colored_polygon(PackedVector2Array([start - side, dash_path - side, dash_path + side, start + side]), Color(0.95, 0.20, 0.29, 0.18 + warning_progress * 0.22) * visual_tint)
-				CombatDrawCache.line(canvas, start - side, dash_path - side, warning_color, 3.0 + warning_progress * 3.0, base, visual_tint)
-				CombatDrawCache.line(canvas, start + side, dash_path + side, warning_color, 3.0 + warning_progress * 3.0, base, visual_tint)
-			CombatDrawCache.line(canvas, Vector2.ZERO, dash_path, warning_color, 5.0, base, visual_tint)
-			CombatDrawCache.circle(canvas, dash_path, data.dash_impact_radius if active_special_attack == EnemyData.SpecialAttack.DASH and data.dash_impact_radius > 0.0 else (data.radius * 0.55 if data.is_boss else 6.0), Color(0.95, 0.20, 0.29, 0.20 + warning_progress * 0.25), visual_tint)
+			var dash_path := warning_lane_end()
 			if active_special_attack == EnemyData.SpecialAttack.DASH and data.dash_impact_radius > 0.0:
-				CombatDrawCache.arc(canvas, dash_path, data.dash_impact_radius, 0.0, TAU, 32, warning_color, 3.0, base, visual_tint)
-			CombatDrawCache.arc(canvas, Vector2.ZERO, data.radius + 7.0, -PI / 2.0, -PI / 2.0 + TAU * warning_progress, 32, Color(1.0, 0.72, 0.27), 4.0, base, visual_tint)
+				AttackEffects.danger(canvas, dash_path, data.dash_impact_radius, warning_color * visual_tint)
+			else:
+				AttackEffects.flash(canvas, dash_path, data.radius * 0.55 if data.is_boss else 9.0, Color(1.0, 0.4, 0.32, 0.6) * visual_tint)
+			AttackEffects.warning_ring(canvas, Vector2.ZERO, data.radius + 7.0, warning_progress, Color(1.0, 0.72, 0.27) * visual_tint)
 		elif active_special_attack == EnemyData.SpecialAttack.SHOOT:
 			var shot_color := Color(DentiStatus.COLORS[int(inflicted_statuses[0]["kind"])], 0.9) if not inflicted_statuses.is_empty() else Color(data.projectile_color, 0.9)
 			for ray in _warning_rays(EnemyData.SpecialAttack.SHOOT, _aimed_projectile_count()):
-				CombatDrawCache.line(canvas, Vector2.ZERO, ray * 150.0, shot_color, 3.0, base, visual_tint)
-			CombatDrawCache.arc(canvas, Vector2.ZERO, data.radius + 8.0, -PI / 2.0, -PI / 2.0 + TAU * warning_progress, 32, shot_color, 4.0, base, visual_tint)
+				AttackEffects.aim(canvas, ray * data.radius, ray * 150.0, shot_color * visual_tint, warning_progress, base)
+			AttackEffects.warning_ring(canvas, Vector2.ZERO, data.radius + 8.0, warning_progress, shot_color * visual_tint)
 		elif active_special_attack == EnemyData.SpecialAttack.RADIAL:
 			var shot_color := Color(1.0, 0.48, 0.19, 0.9)
 			for ray in _warning_rays(EnemyData.SpecialAttack.RADIAL, data.radial_count):
-				CombatDrawCache.line(canvas, ray * data.radius, ray * 235.0, Color(shot_color, 0.3 + warning_progress * 0.35), 3.0, base, visual_tint)
-			CombatDrawCache.arc(canvas, Vector2.ZERO, data.radius + 9.0, -PI / 2.0, -PI / 2.0 + TAU * warning_progress, 32, shot_color, 5.0, base, visual_tint)
+				AttackEffects.aim(canvas, ray * data.radius, ray * 235.0, Color(shot_color, 0.3 + warning_progress * 0.35) * visual_tint, warning_progress, base)
+			AttackEffects.warning_ring(canvas, Vector2.ZERO, data.radius + 9.0, warning_progress, shot_color * visual_tint)
 		elif active_special_attack == EnemyData.SpecialAttack.LANE:
 			var lane_color := Color(0.50, 0.88, 0.14, 0.9)
-			var lane_direction := special_direction.normalized()
-			var lane_side := lane_direction.orthogonal() * (data.lane_projectile_spacing * float(data.lane_projectile_count - 1) * 0.5 + 21.0)
-			var lane_end := lane_direction * 550.0
-			# This lane is a rectangle. Use the shared white atlas glyph rather
-			# than switching to untextured polygons between every enemy's rings.
-			CombatDrawCache.line(canvas, Vector2.ZERO, lane_end, Color(lane_color, 0.10 + warning_progress * 0.12), lane_side.length() * 2.0, base, visual_tint, true)
-			CombatDrawCache.line(canvas, -lane_side, lane_end - lane_side, lane_color, 3.0, base, visual_tint)
-			CombatDrawCache.line(canvas, lane_side, lane_end + lane_side, lane_color, 3.0, base, visual_tint)
-			CombatDrawCache.arc(canvas, Vector2.ZERO, data.radius + 8.0, -PI / 2.0, -PI / 2.0 + TAU * warning_progress, 32, lane_color, 4.0, base, visual_tint)
+			AttackEffects.warning_ring(canvas, Vector2.ZERO, data.radius + 8.0, warning_progress, lane_color * visual_tint)
 		elif active_special_attack == EnemyData.SpecialAttack.SPACE_ORB:
 			var orb_color := Color(1.0, 0.43, 0.25, 0.88)
-			var orb_direction := special_direction.normalized()
-			var orb_end := orb_direction * 550.0
-			CombatDrawCache.line(canvas, Vector2.ZERO, orb_end, Color(orb_color, 0.42), data.space_orb_radius * 1.4, base, visual_tint)
-			CombatDrawCache.arc(canvas, orb_end, data.space_orb_radius, 0.0, TAU, 40, orb_color, 4.0, base, visual_tint)
-			CombatDrawCache.arc(canvas, Vector2.ZERO, data.radius + 8.0, -PI / 2.0, -PI / 2.0 + TAU * warning_progress, 32, orb_color, 4.0, base, visual_tint)
+			var orb_end := warning_lane_end()
+			AttackEffects.danger(canvas, orb_end, data.space_orb_radius, orb_color * visual_tint)
+			AttackEffects.warning_ring(canvas, Vector2.ZERO, data.radius + 8.0, warning_progress, orb_color * visual_tint)
 		else:
-			CombatDrawCache.circle(canvas, Vector2.ZERO, data.attack_radius, Color(0.95, 0.36, 0.28, 0.13), visual_tint)
-			CombatDrawCache.arc(canvas, Vector2.ZERO, data.attack_radius, 0.0, TAU, 64, warning_color, 4.0, base, visual_tint)
-			CombatDrawCache.arc(canvas, Vector2.ZERO, data.attack_radius - 8.0, -PI / 2.0, -PI / 2.0 + TAU * warning_progress, 64, Color(1.0, 0.72, 0.27), 4.0, base, visual_tint)
+			AttackEffects.danger(canvas, Vector2.ZERO, data.attack_radius, Color(1.0, 0.34, 0.29, 0.8 + warning_progress * 0.2) * visual_tint)
+			AttackEffects.warning_ring(canvas, Vector2.ZERO, data.attack_radius - 8.0, warning_progress, Color(1.0, 0.72, 0.27) * visual_tint)
 	elif special_phase == SpecialPhase.ACTIVE and (active_special_attack == EnemyData.SpecialAttack.DASH or active_special_attack == EnemyData.SpecialAttack.BOSS and boss_move == BossMove.CHARGE):
-		CombatDrawCache.line(canvas, boss_dash_origin - global_position if data.is_boss else -special_direction * data.radius, Vector2.ZERO, Color(1.0, 0.72, 0.27, 0.7), 15.0 if data.is_boss else 7.0, base, visual_tint)
+		AttackEffects.strip(canvas, AttackEffects.Shape.TRAIL, boss_dash_origin - global_position if data.is_boss else -special_direction * data.radius, Vector2.ZERO, 32.0 if data.is_boss else 16.0, Color(1.0, 0.72, 0.27, 0.7) * visual_tint, animation_time, base)

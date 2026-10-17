@@ -2,6 +2,15 @@
 
 Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü angezeigt. 0.1.0 wurde rückblickend anhand der Git-Historie dokumentiert; 0.2.0 bündelt die seitdem entstandenen Änderungen. Die Einträge beschreiben implementierte Funktionen. Weitere Pläne stehen in der [Roadmap](docs/ROADMAP.md).
 
+## 0.5.0 — 17.10.2026
+
+- **Gemalte Projektile:** eigene Formen für Wasser, Paste, Mundspülung, Metall, Licht, Raketen sowie gegnerische Säure- und Splittergeschosse. Spielerprojektile verwenden einen gemeinsamen Sprite statt mehrerer Ebenen. Flugrichtung, Rückflug und kreisende Geschosse richten sich korrekt aus, auch unter transformierten Eltern.
+- **Verzauberungen am Geschoss:** bis zu vier gleichzeitig sichtbare Effekte als animierte Funken, Tröpfchen, Nebel und Lichtfäden. Die Darstellung wird beim Ausrüsten vorbereitet und bleibt ein Sprite pro Projektil. Aktive Geschosse behalten beim Waffenwechsel und Fortsetzen ihre ursprünglichen Effekte.
+- **Waffen- und Bodeneffekte:** gemalte Licht- und UV-Ströme, Sprühnebel, Ketteneffekte, Nahkampf-Nachbilder, Pfützen und Impulse ersetzen einfache Linien und Flächen. Charge- und Geschosswarnungen zeigen pulsierenden Bodendruck mit Rissen.
+- **Lesbarkeit bei vielen Warnungen:** überlagerte Füllungen werden lokal transparenter, während Zeitringe und Einschlagsgrenzen sichtbar bleiben. Boss-Charges werden nach gewöhnlichen Warnflächen gezeichnet und behalten eine stärkere Mindest-Sichtbarkeit. Belastungsszenen zeigen 10 und 20 gleichzeitige Warnungen mit zusätzlichen Projektilen.
+- **Eigene Beute-Sprites:** XP fällt als türkisblauer Schmelzkristall in Zahnform, Gold als plastische Münze mit Zahnprägung. Beide nutzen den bestehenden Texturatlas und weiterhin nur einen Sprite pro Drop.
+- **Vorbereitung und Messwerkzeuge:** gemeinsame Atlanten, vorbereitete Animationsframes und Menü-Warmup begrenzen Arbeit während des Kampfes. Neue reproduzierbare Vorschauen und Prüfungen decken Projektilausrichtung, kombinierte Verzauberungen, Warnungsüberlagerungen und Sammelflüsse ab. Nahkampf-Benchmarks samt Berichten ergänzen die Performance-Dokumentation; Desktop-Messwerte sind keine Browser-FPS-Zusage.
+
 ## 0.4.4 — 15.10.2026
 
 - **Fusion behält die besten Werte:** Kauf und manuelle Fusion übernehmen je Attribut den besseren Wert beider Waffen. Mehrere passende Partner werden nach dem erwarteten Ergebnis ausgewählt; die Shopdetails zeigen die Vorschau. Eine einzige Kaufaktion ersetzt die Wahl zwischen alten und neuen Werten. Verzauberungen, Waffen-ID und investierte Münzen bleiben erhalten.

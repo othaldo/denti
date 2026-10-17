@@ -196,6 +196,8 @@ static func apply(weapon: WeaponInstance, option: Dictionary, replace: int = -1)
 		else:
 			weapon.affixes[replace] = entry
 	weapon.refresh_affix_stats()
+	if weapon.get_parent() is WeaponLoadout:
+		weapon.get_parent().prepare_projectile_visuals()
 	return true
 
 

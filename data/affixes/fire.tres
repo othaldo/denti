@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 id = &"fire"
+projectile_effect_index = 0
 display_name = "Feuer"
 name_suffix = "der Glut"
 description = "Brennende Gegner geben beim Tod Glut weiter."
