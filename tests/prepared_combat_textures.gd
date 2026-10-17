@@ -1,6 +1,8 @@
 extends SceneTree
 
 var failures := 0
+const MAX_PAINTED_CHANNEL_ERROR := 1
+const MAX_PAINTED_CHANGED_FRACTION := 0.005
 
 func _initialize() -> void:
 	call_deferred("_run")
@@ -10,7 +12,41 @@ func _check(condition: bool, message: String) -> void:
 		failures += 1
 		push_error(message)
 
+func _compare_raster(prepared: Image, reference: Image, allow_resize_rounding: bool) -> Dictionary:
+	if prepared.get_size() != reference.get_size() or prepared.get_format() != reference.get_format():
+		return {"matches": false, "changed": -1, "maximum": -1}
+	var left := prepared.get_data()
+	var right := reference.get_data()
+	if left == right:
+		return {"matches": true, "changed": 0, "maximum": 0}
+	var changed := 0
+	var maximum := 0
+	for index in left.size():
+		var difference := absi(int(left[index]) - int(right[index]))
+		if difference > 0:
+			changed += 1
+			maximum = maxi(maximum, difference)
+	# CPU image resizing can round a channel one byte differently between
+	# Windows and Linux builds. Keep dimensions/format exact, all other rasters
+	# byte-exact, and reject larger or widespread differences in painted art.
+	var allowed_channels := maxi(1, floori(left.size() * MAX_PAINTED_CHANGED_FRACTION))
+	return {"matches": allow_resize_rounding and maximum <= MAX_PAINTED_CHANNEL_ERROR and changed <= allowed_channels, "changed": changed, "maximum": maximum}
+
+func _check_comparison_bounds() -> void:
+	var reference := Image.create(16, 16, false, Image.FORMAT_RGBA8)
+	var changed: Image = reference.duplicate()
+	changed.set_pixel(0, 0, Color(1.0 / 255.0, 0, 0, 0))
+	_check(_compare_raster(changed, reference, true).matches, "single-byte painted resize rounding was rejected")
+	_check(not _compare_raster(changed, reference, false).matches, "non-resized loot/procedural rasters lost exact comparison")
+	changed.set_pixel(0, 0, Color(2.0 / 255.0, 0, 0, 0))
+	_check(not _compare_raster(changed, reference, true).matches, "painted raster comparison allows larger color errors")
+	for index in 6:
+		changed.set_pixel(index, 0, Color(1.0 / 255.0, 0, 0, 0))
+	_check(not _compare_raster(changed, reference, true).matches, "painted raster comparison allows widespread differences")
+	_check(not _compare_raster(Image.create(17, 16, false, Image.FORMAT_RGBA8), reference, true).matches, "painted raster comparison allows changed bounds")
+
 func _run() -> void:
+	_check_comparison_bounds()
 	var atlas := Image.load_from_file("res://assets/vfx/combat_textures.png")
 	var images := CombatSpriteTextures.standard_images()
 	_check(images.size() == CombatSpriteTextures.PREPARED.REGIONS.size(), "baked player/loot variants are stale")
@@ -20,7 +56,10 @@ func _run() -> void:
 		if texture == null:
 			continue
 		var prepared := atlas.get_region(Rect2i(texture.region))
-		_check(prepared.get_data() == images[key].get_data() and prepared.get_size() == images[key].get_size(), "combat raster changed: " + key)
+		var comparison := _compare_raster(prepared, images[key], key.begins_with("shot:") or key.begins_with("rocket:"))
+		_check(comparison.matches, "combat raster changed: %s (changed channels=%d, maximum channel error=%d/255)" % [key, comparison.changed, comparison.maximum])
+		if comparison.matches and comparison.changed > 0:
+			print("Painted resize rounding: %s, %d channels, maximum %d/255" % [key, comparison.changed, comparison.maximum])
 		_check(texture.atlas == CombatSpriteTextures.PREPARED.ATLAS, "combat textures do not share one atlas")
 	CombatSpriteTextures.textures.clear()
 	CombatSpriteTextures.standard_textures()

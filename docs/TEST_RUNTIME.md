@@ -29,6 +29,15 @@ Pro Test bleiben Ausgabe- und Engine-Logs erhalten. `.godot/test_results.json` e
 
 ## Befehle
 
+Der Test `prepared_combat_textures` vergleicht den eingecheckten Atlas mit den
+neu berechneten Motiven. Bei CPU-skalierten, gemalten Projektilen sind einzelne
+Rundungsabweichungen zwischen Windows und Linux zulässig: höchstens 1/255 je
+Kanal und höchstens 0,5 % der Kanäle. Bildgröße und Pixelformat bleiben exakt;
+Loot- und prozedurale Texturen werden weiterhin bytegenau verglichen. Eigene
+Negativfälle prüfen, dass größere und flächige Abweichungen abgelehnt werden.
+Bei Fehlern protokolliert der Test die Zahl abweichender Kanäle und den maximalen
+Kanalfehler, damit eine veraltete Grafik nicht als Rundungsfehler durchgeht.
+
 ```powershell
 python tools/run_tests.py --godot Godot_v4.7.2-stable_win64_console.exe
 python tools/run_tests.py --godot Godot_v4.7.2-stable_win64_console.exe --jobs 1
