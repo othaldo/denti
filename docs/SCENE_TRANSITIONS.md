@@ -5,7 +5,7 @@ Zahnsilhouette mit plastischer Goldkante, weichem Lichtschein und Glanzreflex.
 Die vorherige Ansicht zoomt bis zu 5,5 % hinein und wird pflaumenfarben abgetönt.
 Die neue Ansicht beginnt mit 7,5 % Vergrößerung und gleitet weich auf ihre
 normale Größe zurück. Der ganze Effekt bleibt proportional, auch im Hochformat.
-Es gibt keine zusätzliche Ladepause, kein Blinken und keinen dauerhaften Effekt.
+Es gibt keine feste zusätzliche Ladepause, kein Blinken und keinen dauerhaften Effekt.
 
 Übergänge verbinden Hauptmenü, Waffenauswahl, Kampf, die Belohnungsphase, Shop,
 Storydialog und Reise sowie Sieg/Niederlage. Ein Neustart und Fortsetzen verwenden
@@ -36,6 +36,37 @@ beim bestehenden Spiel-/Belohnungskoordinator. Darstellung und Spiellogik änder
 sich sofort; die Blende verzögert keine Auswahl und öffnet keine Modals.
 Auch beim Fortsetzen wird die aktuelle Ansicht als Darstellungsziel registriert.
 
+## Starten und Fortsetzen
+
+Die Run-Szene wird bereits beim Spielstart geladen und gehalten, bevor das
+Hauptmenü bedienbar ist. Ihr großer Ressourcenbaum wird dadurch nicht erst
+beim Klick auf Starten/Fortsetzen synchron geladen. Das gilt auch für den
+Web-Export ohne Threads. Der vorhandene Grafik-Warmup bereitet zusätzlich
+Lebenszahn, Schild, Level-Medaillon, Bossrahmen und Statusbilder vor.
+
+Bei echten Szenenwechseln erscheint zunächst ein leichtes Hineinzoomen des
+ausgehenden Bilds auf einem gerenderten Frame. Erst danach wird die neue Szene
+eingehängt; die Zahnblende öffnet sie, sobald ihr Layout bereit ist. Es gibt
+keine vorgeschaltete Warteanimation mit fester Dauer. Headless-Prüfungen und
+reduzierte Bewegung benötigen keinen Render-Wartepunkt.
+
+Das F4-Testmenü bleibt auf lokale Desktop-Debug-Builds beschränkt
+(`OS.is_debug_build()`); Web und Release aktivieren es nicht. Sein Katalog
+mit den verkleinerten Item-Bildern entsteht erst beim ersten Öffnen mit F4,
+anschließend wird dieselbe Oberfläche wiederverwendet.
+
+Native Messung bei 960×540 und 60 FPS auf RTX 4070, ohne feste Simulationszeit
+oder Screenshot-Aufzeichnung: Vorher erschien der erste Frame nach rund
+1.870 ms beim neuen Run und 970 ms beim Fortsetzen. Nach der Änderung erscheint
+die Klick-Rückmeldung bei beiden nach rund 17 ms. Der verbleibende einzelne
+Aufbau-Frame lag bei rund 65–80 ms bzw. 53–55 ms. Das sind lokale Messwerte, keine
+Leistungsgarantie für andere Geräte; die Vorbereitung wandert in den Spielstart.
+
+Reproduzierbar mit isoliertem Spielstand über
+`Godot_v4.7.2-stable_win64_console.exe --path . --script res://tools/measure_run_startup.gd`.
+Das Werkzeug gibt Klickverarbeitung, erste sichtbare Rückmeldung, ersten
+Frame der Run-Szene und längsten Frame getrennt aus.
+
 ## Prüfung
 
 Die gezielten Tests `scene_transitions`, `progression_menu`, `upgrade_resume`, `post_wave_rewards`,
@@ -45,6 +76,9 @@ bestanden nach der Einbindung. Der Übergangstest prüft insbesondere Lebensdaue
 Textur und Eingaben, pausierte Menüs, Resize und reduzierte Bewegung.
 Der vollständige Lauf der Einbindung bestand mit 117/117 Tests; nach der
 visuellen Verfeinerung bestanden die Übergangs-, Menü- und Touchprüfungen erneut.
+Nach der Optimierung von Starten/Fortsetzen bestanden erneut alle 117 Tests,
+einschließlich der Prüfungen für den verzögerten Aufbau des Debug-Menüs und
+den erweiterten Grafik-Warmup.
 
 Die [native Vorschau](screenshots/scene_transitions/flow.gif) zeigt Hauptmenü →
 Waffenauswahl → Kampf → Aufstiege → Shop → Kampf → Hauptmenü. Sie verwendet

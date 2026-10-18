@@ -6,6 +6,11 @@ signal completed
 const DURATION := 0.6
 const REVEAL: Shader = preload("res://scripts/ui/scene_tooth_reveal.gdshader")
 const TOOTH_DISTANCE: Texture2D = preload("res://assets/ui/tooth_transition_distance.res")
+# Keep run resources ready before the menu becomes interactive. Loading this
+# large dependency tree on a Start/Continue click stalls the main thread,
+# especially in the single-threaded Web export.
+const RUN_SCENE_PATH := "res://scenes/game/game.tscn"
+const RUN_SCENE: PackedScene = preload("res://scenes/game/game.tscn")
 var enabled := true
 var active := false
 var screen_key: StringName = &""
@@ -82,6 +87,7 @@ func play_snapshot(texture: Texture2D, block_input: bool = true) -> void:
 	snapshot.texture = texture
 	snapshot.modulate = Color.WHITE
 	snapshot.material.set_shader_parameter("progress", 0.0)
+	snapshot.material.set_shader_parameter("departure", 0.0)
 	_captured_extent = get_viewport().get_visible_rect().size
 	snapshot.material.set_shader_parameter("viewport_size", _captured_extent)
 	active = true
@@ -159,7 +165,26 @@ func change_scene(path: String) -> Error:
 	_scene_epoch += 1
 	var previous_key := screen_key
 	screen_key = &""
-	var result := get_tree().change_scene_to_file(path)
+	if active and DisplayServer.get_name() != "headless":
+		# Acknowledge the click on a real rendered frame before scene _ready()
+		# does its remaining work. This adds no timed loading/animation wait.
+		snapshot.material.set_shader_parameter("departure", 1.0)
+		_replace_after_feedback(path, _scene_epoch, previous_key)
+		return OK
+	return _replace_scene(path, previous_key)
+
+
+func _replace_after_feedback(path: String, epoch: int, previous_key: StringName) -> void:
+	await RenderingServer.frame_post_draw
+	await get_tree().process_frame
+	if epoch == _scene_epoch:
+		var result := _replace_scene(path, previous_key)
+		if result != OK:
+			push_error("Scene replacement failed: %s (%s)" % [path, error_string(result)])
+
+
+func _replace_scene(path: String, previous_key: StringName) -> Error:
+	var result := get_tree().change_scene_to_packed(RUN_SCENE) if path == RUN_SCENE_PATH else get_tree().change_scene_to_file(path)
 	if result != OK:
 		_scene_pending = false
 		screen_key = previous_key

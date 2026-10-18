@@ -45,9 +45,7 @@ func _ready() -> void:
 		set_process_input(false)
 		return
 	controls = DebugRunControls.new(get_parent() as Node2D)
-	_build_ui()
 	get_viewport().size_changed.connect(_fit_panel)
-	_fit_panel()
 
 
 func _input(event: InputEvent) -> void:
@@ -65,6 +63,11 @@ func _input(event: InputEvent) -> void:
 func open_menu() -> void:
 	if not DebugRunControls.allowed() or visible:
 		return
+	# The hidden developer catalogue must not resize every item icon on run
+	# startup. Build it once, only when F4 actually opens the menu.
+	if root_control == null:
+		_build_ui()
+		_fit_panel()
 	was_paused = get_tree().paused
 	get_tree().paused = true
 	visible = true
@@ -185,6 +188,8 @@ func _build_ui() -> void:
 
 
 func _fit_panel() -> void:
+	if panel == null:
+		return
 	var extent := get_viewport().get_visible_rect().size
 	panel.size = Vector2(minf(760, extent.x - 32), minf(560, extent.y - 32))
 	panel.position = (extent - panel.size) / 2.0

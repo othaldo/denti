@@ -19,6 +19,9 @@ func _run() -> void:
 	root.add_child(game)
 	current_scene = game
 	var menu: DebugCheatMenu = game.get_node("DebugCheatMenu")
+	if menu.root_control != null or not menu.item_list.is_empty():
+		_fail("hidden developer catalogue was built during run startup")
+		return
 	var cheats: DebugRunControls = menu.controls
 	if cheats.start_wave(5):
 		_fail("started a test wave without a weapon")
@@ -27,6 +30,7 @@ func _run() -> void:
 	if not menu.visible or not paused:
 		_fail("F4 did not open during starter selection")
 		return
+	var built_root := menu.root_control
 	_key(menu, KEY_ESCAPE)
 	if menu.visible or not paused:
 		_fail("closing cheats dismissed the underlying starter pause")
@@ -72,6 +76,9 @@ func _run() -> void:
 	cheats.set_coins(1234)
 	game._open_shop()
 	menu.open_menu()
+	if menu.root_control != built_root:
+		_fail("reopening the test menu rebuilt its catalogue")
+		return
 	menu.close_menu()
 	if not paused or not game.shop_panel.visible:
 		_fail("closing cheats resumed a paused shop")

@@ -5,10 +5,11 @@ uniform sampler2D tooth_distance : filter_linear, repeat_disable;
 uniform sampler2D incoming_screen : hint_screen_texture, filter_linear, repeat_disable;
 uniform vec2 viewport_size = vec2(1280.0, 720.0);
 uniform float progress : hint_range(0.0, 1.0) = 0.0;
+uniform float departure : hint_range(0.0, 1.0) = 0.0;
 
 void fragment() {
 	float easing = smoothstep(0.0, 0.8, progress);
-	float old_zoom = 1.0 + 0.055 * easing;
+	float old_zoom = 1.0 + 0.055 * easing + 0.015 * departure * (1.0 - easing);
 	float new_zoom = 1.0 + 0.075 * (1.0 - smoothstep(0.2, 1.0, progress));
 	vec4 previous = texture(TEXTURE, (UV - vec2(0.5)) / old_zoom + vec2(0.5));
 	vec4 incoming = texture(incoming_screen, (SCREEN_UV - vec2(0.5)) / new_zoom + vec2(0.5));
