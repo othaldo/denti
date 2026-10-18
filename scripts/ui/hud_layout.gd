@@ -4,6 +4,7 @@ extends RefCounted
 const MARGIN := 12.0
 const TIMER_HEIGHT := 44.0
 const BOSS_HEIGHT := 22.0
+const BOSS_TEXT_OPTICAL_OFFSET := 2.0
 
 
 static func apply(hud: GameHUD, extent: Vector2, pause_button: Button = null) -> void:
@@ -64,9 +65,12 @@ static func apply(hud: GameHUD, extent: Vector2, pause_button: Button = null) ->
 		_place(hud.boss_frames[index], Rect2(0, 0, width, BOSS_HEIGHT))
 		var inset := hud.boss_frames[index].cap_width() + 2
 		var fill_inset := hud.boss_frames[index].cap_width() * 0.68
-		_place(hud.boss_bars[index], Rect2(fill_inset, 1, width - fill_inset * 2, 20))
-		_place(hud.boss_labels[index], Rect2(inset + 2, 2, width - inset * 2 - 52, 18))
-		_place(hud.boss_percentages[index], Rect2(width - inset - 46, 2, 42, 18))
+		_place(hud.boss_bars[index], Rect2(fill_inset, 0, width - fill_inset * 2, BOSS_HEIGHT))
+		# Fredoka's visible glyphs sit above the centre of its line box. Align
+		# their ink with the painted track, applying the same offset to both.
+		var text_top := (BOSS_HEIGHT - 18) * 0.5 + BOSS_TEXT_OPTICAL_OFFSET
+		_place(hud.boss_labels[index], Rect2(inset + 2, text_top, width - inset * 2 - 52, 18))
+		_place(hud.boss_percentages[index], Rect2(width - inset - 46, text_top, 42, 18))
 		hud.boss_labels[index].add_theme_font_size_override("font_size", 13)
 	_place(hud.get_node("Root/Progression"), Rect2(Vector2.ZERO, extent))
 	_place(hud.xp_bar, Rect2(safe.position.x + 8, safe.end.y - 8, safe.size.x - 16, 5))
