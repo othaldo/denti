@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 func _initialize() -> void:
 	call_deferred("_run")
@@ -90,7 +90,7 @@ func _run() -> void:
 	session.clear_run()
 	paused = false
 	print("Denti level rerolls test passed")
-	quit(0)
+	finish(0)
 
 func _choices(game: Node2D) -> Array[String]:
 	var result: Array[String] = []
@@ -111,4 +111,4 @@ func _fail(message: String) -> void:
 	paused = false
 	root.get_node("GameSession").clear_run()
 	push_error(message)
-	quit(1)
+	finish(1)

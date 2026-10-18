@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 func _initialize() -> void:
 	call_deferred("_run")
 
@@ -85,4 +85,4 @@ func _run() -> void:
 	session.clear_run()
 	paused = false
 	print("PASS expanded slots, stat effects, weak progress, rare Mk, snapshots and wave counter")
-	quit(0)
+	finish(0)

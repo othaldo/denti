@@ -2,6 +2,10 @@
 
 # Denti: Divine Dentistry
 
+## Working directory
+
+Work directly in the user's existing checkout at `/home/othaldo/projects/denti/`, on its currently checked-out branch. Do not create or switch to a separate Git worktree unless the user explicitly requests one. If a chat starts in a managed worktree, use the local checkout as the working directory for repository reads, edits and tests. Check its Git status first and preserve existing user changes.
+
 Denti: Divine Dentistry is a small 2D arena-survivor / roguelite inspired by Brotato and Vampire Survivors.
 
 The player directly controls Denti, a small divine tooth. Movement is manual; attacks are mostly automatic. The tone is humorous, charming, slightly absurd, and strongly dentistry-themed.

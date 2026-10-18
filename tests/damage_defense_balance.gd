@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var failures := 0
 
@@ -22,11 +22,11 @@ func _run() -> void:
 	root.get_node("GameSession").clear_run()
 	if failures == 0:
 		print("PASS damage_defense_balance")
-	quit(0 if failures == 0 else 1)
+	finish(0 if failures == 0 else 1)
 
 
 func _test_damage_and_armor() -> void:
-	var stats := PlayerStats.new()
+	var stats := new_stats()
 	_check(stats.damage_bonus == 0.0 and stats.melee_damage == 0.0 and stats.ranged_damage == 0.0, "new damage stats do not start at zero")
 	stats.apply_upgrade(&"damage_bonus", 20.0)
 	stats.apply_upgrade(&"damage_bonus", 30.0)
@@ -58,7 +58,7 @@ func _test_damage_and_armor() -> void:
 
 
 func _test_weapon_scaling() -> void:
-	var stats := PlayerStats.new()
+	var stats := new_stats()
 	stats.crit_chance = 0.0
 	for weapon in WeaponCatalog.ALL:
 		_check(weapon.damage_stat in ["melee", "ranged"] and weapon.stat_scaling > 0.0, "weapon lacks a declared stat/scaling")
@@ -88,7 +88,7 @@ func _test_weapon_scaling() -> void:
 
 
 func _test_migrations() -> void:
-	var stats := PlayerStats.new()
+	var stats := new_stats()
 	stats.load_save_data({"stat_model_version": 2, "damage": 42.0, "attack_speed": 25.0, "speed_bonus": -12.0, "regen": 3.0, "regen_progress": 0.6, "armor": 15.0})
 	_check(is_equal_approx(stats.scale_damage(18.0), 42.0), "legacy raw damage changed during migration")
 	_check(stats.attack_speed == 25.0 and stats.speed_bonus == -12.0 and stats.regen == 3.0 and stats.regen_progress == 0.6, "version-2 migration repeated the previous tempo/regen conversion")

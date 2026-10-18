@@ -23,9 +23,17 @@ Jeder Test erhält ein frisches, eigenes Godot-Benutzerdatenverzeichnis unter `.
 
 Assets müssen zuvor einmal importiert sein. Während der Tests wird kein Editor-Import gestartet; alle Prozesse lesen denselben Import-Cache. Jeder Test behält eine eigene SceneTree-/Autoload-Instanz und einen festen Simulationsschritt.
 
-Nicht-null Exit-Code, `SCRIPT ERROR:` auch bei Exit-Code null und ein Timeout von standardmäßig 180 Sekunden lassen den Testlauf fehlschlagen. Beim Timeout wird der gestartete Prozess einschließlich seiner Kinder beendet. Die anderen Tests liefern weiterhin ihre Ergebnisse. Vier Python-Integrationstests prüfen Parallel-Isolation, beide Fehlerwege, Prozess-Timeouts und Filter einschließlich einer versehentlich leeren Auswahl.
+Nicht-null Exit-Code, `SCRIPT ERROR:`, Engine-`ERROR:` auch bei Exit-Code null, Leak-Warnungen und ein Timeout von standardmäßig 180 Sekunden lassen den Testlauf fehlschlagen. Normale Warnungen, etwa bekannte Atlas-Rundungshinweise, bleiben sichtbar und werden nicht pauschal als Fehler gewertet. Beim Timeout wird der gestartete Prozess einschließlich seiner Kinder beendet. Die anderen Tests liefern weiterhin ihre Ergebnisse. Sechs Python-Integrationstests prüfen Parallel-Isolation, Exit-/Skript-/Engine-Fehler, Leak-Warnungen, Prozess-Timeouts und Filter einschließlich einer versehentlich leeren Auswahl.
 
 Pro Test bleiben Ausgabe- und Engine-Logs erhalten. `.godot/test_results.json` enthält den letzten Lauf einschließlich Einzelzeiten; jeder Lauf erhält zusätzlich seine eigene `results.json`. Die zehn langsamsten Tests erscheinen im Terminal und in der GitHub-Jobzusammenfassung. CI lädt Logs und Zeiten auch bei einem fehlgeschlagenen Test als `godot-test-results` hoch (sieben Tage Aufbewahrung). Die längsten Tests werden zuerst gestartet: frische CI-Jobs verwenden die eingecheckte Zeitmessung, lokale Läufe bevorzugen ihre letzten Einzelzeiten. Dadurch warten am Ende weniger Prozesse ungenutzt auf einen langen Test.
+
+## Gemeinsamer Testabschluss
+
+`tests/support/test_runtime.gd` stellt `finish(exit_code)` und `new_stats()` bereit. Die Unterstützung liegt außerhalb des vom Runner entdeckten Musters `tests/*.gd`. `finish()` stoppt Audio, gibt losgelöste Test-Stats und Szenen frei und lässt die aufgeschobene Bereinigung und den Audiomixer abschließen. Das ist bei `--fixed-fps 60` nötig, weil Simulationsframes wesentlich schneller als die reale Audioverarbeitung laufen können. Tests verwenden auch bei Fehlern diesen Abschluss. Der Waffen-DPS-Benchmark nutzt denselben Ablauf, weil ein Verhaltenstest darauf aufbaut.
+
+Szenen können während eines Resume-Tests weiterhin bewusst ersetzt werden. Der letzte noch aktive Szenenbaum wird vom gemeinsamen Abschluss bereinigt. Isolierte Regeltests wie `run_flow`, `run_storage` und `catalogs` benötigen keine Spielszene. Die bisherigen Kampf-, Layout- und JSON-Roundtrip-Prüfungen bleiben erhalten.
+
+Pull Requests gegen `main` durchlaufen Tests und Web-Export. Nur Pushes auf `main` und manuelle Workflow-Aufrufe veröffentlichen die Pages-Artefakte; die Schreibrechte für Pages liegen im Deployment-Job.
 
 ## Befehle
 

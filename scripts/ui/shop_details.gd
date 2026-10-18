@@ -34,8 +34,8 @@ func _ready() -> void:
 	var titles := VBoxContainer.new()
 	titles.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(titles)
-	heading = _label(titles, "", 21)
-	subtitle = _label(titles, "", 15)
+	heading = DentiUIComponents.label(titles, "", 21)
+	subtitle = DentiUIComponents.label(titles, "", 15)
 	close_button = Button.new()
 	close_button.text = "×"
 	close_button.custom_minimum_size = Vector2(36, 36)
@@ -49,8 +49,8 @@ func _ready() -> void:
 	values_grid.add_theme_constant_override("h_separation", 14)
 	values_grid.add_theme_constant_override("v_separation", 2)
 	add_child(values_grid)
-	effect = _label(self, "", 15)
-	synergy = _label(self, "", 14)
+	effect = DentiUIComponents.label(self, "", 15)
+	synergy = DentiUIComponents.label(self, "", 14)
 	synergy.add_theme_color_override("font_color", DentiUIStyle.MINT)
 	affix_rows = VBoxContainer.new()
 	affix_rows.add_theme_constant_override("separation", 3)
@@ -67,8 +67,8 @@ func _ready() -> void:
 	compare.clip_text = true
 	compare.fit_to_longest_item = false
 	add_child(compare)
-	compare_text = _label(self, "", 15)
-	action_hint = _label(self, "", 16)
+	compare_text = DentiUIComponents.label(self, "", 15)
+	action_hint = DentiUIComponents.label(self, "", 16)
 	merge_button = _button("Fusionieren", true)
 	sell_button = _button("Verkaufen")
 	confirm_button = _button("Verkauf bestätigen")
@@ -112,13 +112,13 @@ func show_weapon(data: WeaponData, tier: int, player: Player, equipped: bool, eq
 
 func show_affixes(weapon: WeaponInstance, stats: PlayerStats, items: ItemInventory = null) -> void:
 	heading.text = WeaponPresentation.weapon_name(weapon) + " · " + WeaponPresentation.tier_text(weapon.data, weapon.tier)
-	_label(affix_rows, "Verzauberungen · %d/%d Plätze" % [weapon.affixes.size(), weapon.affix_slots], 14)
+	DentiUIComponents.label(affix_rows, "Verzauberungen · %d/%d Plätze" % [weapon.affixes.size(), weapon.affix_slots], 14)
 	for affix in weapon.affixes:
 		var data := WeaponAffixes.by_id(StringName(affix.id))
-		var label := _label(affix_rows, "%s +%s %s" % [data.display_name, WeaponAffixes.value_text(float(affix.damage), data.id, weapon.data, stats, items), WeaponAffixes.damage_unit(data.id, items)], 14)
-		label.tooltip_text = WeaponAffixes.effect_description(data.id) + "\n" + WeaponAffixes.mechanics_text(data.id)
+		var label := DentiUIComponents.label(affix_rows, "%s +%s %s" % [data.display_name, AffixPresentation.value_text(float(affix.damage), data.id, weapon.data, stats, items), AffixPresentation.damage_unit(data.id, items)], 14)
+		label.tooltip_text = AffixPresentation.effect_description(data.id) + "\n" + AffixPresentation.mechanics_text(data.id)
 		label.add_theme_color_override("font_color", data.color)
-		var rarity := _label(affix_rows, WeaponAffixes.progress_text(affix), 12)
+		var rarity := DentiUIComponents.label(affix_rows, AffixPresentation.progress_text(affix), 12)
 		DentiUIStyle.style_affix_rarity_label(rarity, affix.rarity)
 
 
@@ -152,11 +152,11 @@ func clear_actions() -> void:
 
 func show_evolutions(recipes: Array[WeaponEvolutionRecipe]) -> void:
 	for recipe in recipes:
-		_label(evolution_options, recipe.result.description, 14)
+		DentiUIComponents.label(evolution_options, recipe.result.description, 14)
 		var consumed := WeaponCatalog.by_id(recipe.base_weapon).display_name
 		if recipe.partner_weapon != &"":
 			consumed += " + " + WeaponCatalog.by_id(recipe.partner_weapon).display_name
-		_label(evolution_options, "Ersetzt %s · %s\nItems bleiben erhalten" % [consumed, recipe.result.roots_text()], 13)
+		DentiUIComponents.label(evolution_options, "Ersetzt %s · %s\nItems bleiben erhalten" % [consumed, recipe.result.roots_text()], 13)
 		var button := Button.new()
 		button.text = "Fusionieren · " + recipe.result.display_name
 		button.icon = recipe.result.sprite
@@ -199,10 +199,10 @@ func _value(key: String, value: String) -> Label:
 		image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		values_grid.add_child(image)
 	else:
-		var label := _label(values_grid, key, 15)
+		var label := DentiUIComponents.label(values_grid, key, 15)
 		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		label.add_theme_color_override("font_color", DentiUIStyle.MUTED)
-	var number := _label(values_grid, value, 15)
+	var number := DentiUIComponents.label(values_grid, value, 15)
 	number.autowrap_mode = TextServer.AUTOWRAP_OFF
 	number.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	number.tooltip_text = key + " · " + value
@@ -236,13 +236,3 @@ func _button(text: String, primary: bool = false) -> Button:
 	DentiUIStyle.style_button(button, primary)
 	add_child(button)
 	return button
-
-
-static func _label(parent: Node, text: String, font_size: int) -> Label:
-	var label := Label.new()
-	label.text = text
-	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label.add_theme_color_override("font_color", DentiUIStyle.INK)
-	label.add_theme_font_size_override("font_size", font_size)
-	parent.add_child(label)
-	return label

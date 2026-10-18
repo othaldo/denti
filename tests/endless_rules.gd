@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 func _initialize() -> void:
 	for row in [[20, 0.0], [21, 0.02], [25, 0.30], [30, 1.10], [35, 2.40], [36, 2.992], [40, 6.30], [50, 23.25]]:
@@ -43,8 +43,8 @@ func _initialize() -> void:
 		bosses.clear()
 	wave.free()
 	print("Denti endless rules test passed")
-	quit(0)
+	finish(0)
 
 func _fail(message: String) -> void:
 	push_error(message)
-	quit(1)
+	finish(1)

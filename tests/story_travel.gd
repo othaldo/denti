@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 const GAME: PackedScene = preload("res://scenes/game/game.tscn")
 var session: Node
@@ -110,7 +110,7 @@ func _run() -> void:
 			return
 		await _capture("menu_%dx%d" % [extent.x, extent.y])
 	print("Denti animated chapter travel, reveal/fog, save/resume, reduced motion and menu logo test passed")
-	quit(0)
+	finish(0)
 
 func _fog(game: Node2D, known: int) -> bool:
 	for index in 4:
@@ -150,5 +150,5 @@ func _check(ok: bool, message: String) -> bool:
 	paused = false
 	session.clear_run()
 	push_error(message)
-	quit(1)
+	finish(1)
 	return false

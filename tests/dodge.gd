@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var failures := 0
 
@@ -20,7 +20,7 @@ func _seed_for(stats: PlayerStats, evade: bool) -> void:
 	_check(false, "could not find deterministic incoming-hit roll")
 
 func _run() -> void:
-	var plain := PlayerStats.new()
+	var plain := new_stats()
 	_check(plain.dodge_chance == 0.0 and plain.effective_dodge_chance() == 0.0, "base Denti gained free evasion")
 	plain.apply_upgrade(&"dodge_chance", 0.8)
 	plain.apply_upgrade(&"dodge_chance", -0.1)
@@ -151,4 +151,4 @@ func _run() -> void:
 	session.clear_run()
 	if failures == 0:
 		print("PASS dodge")
-	quit(0 if failures == 0 else 1)
+	finish(0 if failures == 0 else 1)

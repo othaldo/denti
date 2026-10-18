@@ -87,10 +87,15 @@ def run_one(godot: str, test: Path, run_dir: Path, timeout: float) -> dict:
     text = log_path.read_text(encoding="utf-8", errors="replace")
     # Godot can emit script errors and still return exit code zero.
     script_error = "SCRIPT ERROR:" in text
+    engine_errors = [line for line in text.splitlines() if line.startswith("ERROR:")]
+    leak_warnings = [line for line in text.splitlines()
+                     if line.startswith("WARNING:") and "leaked" in line]
     return {"test": test.stem, "seconds": round(time.perf_counter() - started, 3),
-            "passed": process.returncode == 0 and not timed_out and not script_error,
+            "passed": process.returncode == 0 and not timed_out and not script_error
+                      and not engine_errors and not leak_warnings,
             "exit_code": process.returncode, "timed_out": timed_out,
-            "script_error": script_error, "log": str(log_path)}
+            "script_error": script_error, "engine_errors": engine_errors,
+            "leak_warnings": leak_warnings, "log": str(log_path)}
 
 
 def positive_int(value: str) -> int:

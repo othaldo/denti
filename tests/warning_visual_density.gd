@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var failures := 0
 var batch: EnemySpatialIndex
@@ -89,4 +89,4 @@ func _run() -> void:
 	batch.free()
 	if failures == 0:
 		print("Warning visual density: overlap opacity, isolated visibility, unchanged attacks and cleanup passed")
-	quit(0 if failures == 0 else 1)
+	finish(0 if failures == 0 else 1)

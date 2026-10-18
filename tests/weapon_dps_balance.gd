@@ -37,4 +37,4 @@ func _run() -> void:
 	_cleanup()
 	if failures == 0:
 		print("PASS weapon_dps_balance: live tier I-IV contact throughput, risk premium, AoE payoff and evolution chassis")
-	quit(0 if failures == 0 else 1)
+	finish(0 if failures == 0 else 1)

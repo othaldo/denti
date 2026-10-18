@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var failures: Array[String] = []
 var events: Array[int] = []
@@ -91,7 +91,7 @@ func _run() -> void:
 				if drop.global_position.distance_to(expected[drop.get_instance_id()]) > 0.01:
 					_check(false, "grid changed magnet/sweep movement at tick %d: actual %s, expected %s" % [tick, drop.global_position, expected[drop.get_instance_id()]])
 					game.free()
-					quit(1)
+					finish(1)
 					return
 		await process_frame
 	for drop in grid.get_children():
@@ -149,4 +149,4 @@ func _run() -> void:
 	paused = false
 	if failures.is_empty():
 		print("Denti loot spatial index regression test passed")
-	quit(0 if failures.is_empty() else 1)
+	finish(0 if failures.is_empty() else 1)

@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var failures := 0
 
@@ -27,4 +27,4 @@ func _run() -> void:
 			_check(image.get_pixel(tile * 384, edge).a == 0.0 and image.get_pixel(tile * 384 + 383, edge).a == 0.0, "ground atlas has no transparent horizontal padding")
 	if failures == 0:
 		print("Ground effects: radius, readability and atlas padding passed")
-	quit(0 if failures == 0 else 1)
+	finish(0 if failures == 0 else 1)

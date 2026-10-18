@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 
 func _initialize() -> void:
@@ -63,7 +63,7 @@ func _run() -> void:
 	if stats.recent_dps() != 0.0 or stats.recent_kps() != 0.0 or stats.taken_per_minute() != 0.0 or stats.peak_dps < 10.0:
 		_fail("rolling combat rates did not expire")
 		return
-	var lethal_stats := PlayerStats.new()
+	var lethal_stats := new_stats()
 	var damage_order: Array[String] = []
 	lethal_stats.damage_taken.connect(func(_amount: float) -> void: damage_order.append("damage"))
 	lethal_stats.died.connect(func() -> void: damage_order.append("death"))
@@ -101,11 +101,11 @@ func _run() -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(report_path))
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(session.report_dir))
 	print("Denti run telemetry test passed")
-	quit(0)
+	finish(0)
 
 
 func _fail(message: String) -> void:
 	paused = false
 	root.get_node("GameSession").clear_run()
 	push_error(message)
-	quit(1)
+	finish(1)

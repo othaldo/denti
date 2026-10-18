@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 
 func _initialize() -> void:
@@ -78,7 +78,7 @@ func _run() -> void:
 	session.clear_run()
 	paused = false
 	print("Denti queued level rarity test passed")
-	quit(0)
+	finish(0)
 
 
 func _check_choices(game: Node2D, earned_level: int, expected_tier: int) -> bool:
@@ -96,4 +96,4 @@ func _fail(message: String) -> void:
 	paused = false
 	root.get_node("GameSession").clear_run()
 	push_error(message)
-	quit(1)
+	finish(1)

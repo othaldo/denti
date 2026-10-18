@@ -47,18 +47,18 @@ const ACID_VOLLEY_WAVE_3 := 7
 const ACID_VOLLEY_WAVE_5 := 14
 const RANGED_INTERVAL_WAVE_STEP := 0.025
 const RANGED_INTERVAL_MIN := 0.65
-const PLAQUE: EnemyData = preload("res://data/enemies/plaque.tres")
-const BACTERIA: EnemyData = preload("res://data/enemies/bacteria.tres")
-const SUGAR: EnemyData = preload("res://data/enemies/sugar.tres")
-const ACID_SPITTER: EnemyData = preload("res://data/enemies/acid_spitter.tres")
-const POISON_GERM: EnemyData = preload("res://data/enemies/poison_germ.tres")
-const GUM_BITER: EnemyData = preload("res://data/enemies/gum_biter.tres")
-const ACID_CROWN: EnemyData = preload("res://data/enemies/acid_crown.tres")
-const HUNT_GERM: EnemyData = preload("res://data/enemies/hunt_germ.tres")
-const CAVITY_COUNT: EnemyData = preload("res://data/enemies/cavity_count.tres")
-const CAVITY_PRINCE: EnemyData = preload("res://data/enemies/cavity_prince.tres")
-const CAVITY_KING: EnemyData = preload("res://data/enemies/cavity_king.tres")
-const CAVITY_EMPEROR: EnemyData = preload("res://data/enemies/cavity_emperor.tres")
+const PLAQUE: EnemyData = EnemyCatalog.PLAQUE
+const BACTERIA: EnemyData = EnemyCatalog.BACTERIA
+const SUGAR: EnemyData = EnemyCatalog.SUGAR
+const ACID_SPITTER: EnemyData = EnemyCatalog.ACID_SPITTER
+const POISON_GERM: EnemyData = EnemyCatalog.POISON_GERM
+const GUM_BITER: EnemyData = EnemyCatalog.GUM_BITER
+const ACID_CROWN: EnemyData = EnemyCatalog.ACID_CROWN
+const HUNT_GERM: EnemyData = EnemyCatalog.HUNT_GERM
+const CAVITY_COUNT: EnemyData = EnemyCatalog.CAVITY_COUNT
+const CAVITY_PRINCE: EnemyData = EnemyCatalog.CAVITY_PRINCE
+const CAVITY_KING: EnemyData = EnemyCatalog.CAVITY_KING
+const CAVITY_EMPEROR: EnemyData = EnemyCatalog.CAVITY_EMPEROR
 # Compatibility aliases for older tests/tools that refer to the first and final boss.
 const BOSS: EnemyData = CAVITY_COUNT
 const FINAL_BOSS: EnemyData = CAVITY_EMPEROR
@@ -398,3 +398,60 @@ func _roll_profile(wave_number: int, avoid_id: StringName = &"") -> StringName:
 	if (wave_number > MAX_WAVES and not endless_enabled) or is_boss_wave(wave_number):
 		return &""
 	return WaveProfileCatalog.roll_for_wave(wave_number, avoid_id)
+
+
+func save_state() -> Dictionary:
+	return {
+		"difficulty_id": str(difficulty_id),
+		"endless_enabled": endless_enabled,
+		"wave": current_wave, "duration": duration, "remaining": remaining,
+		"spawn_cooldown": spawn_cooldown, "active": active,
+		"horde_waves": horde_waves, "horde_spawned": horde_spawned,
+		"burst_times": burst_times, "burst_index": burst_index,
+		"elite_times": elite_times.duplicate(), "elite_counts": elite_counts.duplicate(), "elite_index": elite_index,
+		"current_profile_id": str(current_profile_id), "next_profile_id": str(next_profile_id),
+	}
+
+
+func restore_state(saved: Dictionary, story_enabled: bool = false) -> void:
+	difficulty_id = DifficultyCatalog.by_id(StringName(str(saved.get("difficulty_id", "normal")))).id
+	endless_enabled = bool(saved.get("endless_enabled", false))
+	current_wave = maxi(int(saved.get("wave", 1)), 1) if endless_enabled else clampi(int(saved.get("wave", 1)), 1, WaveController.MAX_WAVES)
+	if story_enabled and int(saved.get("wave", 1)) == 0:
+		current_wave = 0
+	duration = clampf(float(saved.get("duration", WaveController.DURATION)), 1.0, 120.0)
+	remaining = clampf(float(saved.get("remaining", duration)), 0.0, duration)
+	spawn_cooldown = maxf(float(saved.get("spawn_cooldown", 0.0)), 0.0)
+	active = bool(saved.get("active", true))
+	horde_waves.clear()
+	for value in saved.get("horde_waves", []):
+		horde_waves.append(int(value))
+	if horde_waves.is_empty():
+		plan_hordes()
+	horde_spawned = bool(saved.get("horde_spawned", false))
+	if saved.has("burst_times"):
+		burst_times.clear()
+		for value in saved.get("burst_times", []):
+			burst_times.append(float(value))
+		burst_index = clampi(int(saved.get("burst_index", 0)), 0, burst_times.size())
+	else:
+		plan_bursts()
+		while burst_index < burst_times.size() and burst_times[burst_index] <= duration - remaining:
+			burst_index += 1
+	elite_times.clear()
+	elite_counts.clear()
+	if saved.has("elite_times"):
+		var saved_times: Array = saved.get("elite_times", [])
+		var saved_counts: Array = saved.get("elite_counts", [])
+		for index in mini(saved_times.size(), saved_counts.size()):
+			elite_times.append(clampf(float(saved_times[index]), 0.0, duration))
+			elite_counts.append(clampi(int(saved_counts[index]), 1, EndlessRules.MAX_ELITE_GROUP if endless_enabled else 3))
+		elite_index = clampi(int(saved.get("elite_index", 0)), 0, elite_times.size())
+	else:
+		var old_elite_time := float(saved.get("elite_time", -1.0))
+		if old_elite_time >= 0.0:
+			elite_times.append(clampf(old_elite_time, 0.0, duration))
+			elite_counts.append(1)
+		elite_index = 1 if bool(saved.get("elite_spawned", false)) and not elite_times.is_empty() else 0
+	current_profile_id = StringName(str(saved.get("current_profile_id", "")))
+	next_profile_id = StringName(str(saved.get("next_profile_id", "")))

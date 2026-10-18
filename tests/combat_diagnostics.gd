@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var failures: Array[String] = []
 
@@ -83,4 +83,4 @@ func _run() -> void:
 	paused = false
 	if failures.is_empty():
 		print("Denti combat diagnostics and isolation test passed")
-	quit(0 if failures.is_empty() else 1)
+	finish(0 if failures.is_empty() else 1)

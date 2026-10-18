@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var game: Node2D
 var failed := false
@@ -68,7 +68,7 @@ func _run() -> void:
 	await _automatic_attacks()
 	session.clear_run()
 	print("PASS enchantment roles, item bridges, bounded procs, utility, telemetry, drops and resume" if not failed else "FAIL enchantment synergies")
-	quit(1 if failed else 0)
+	finish(1 if failed else 0)
 
 func _electric() -> void:
 	await _reset()
@@ -163,7 +163,7 @@ func _bleed() -> void:
 	_hit(source, ["bleed"])
 	_check(source.has_bleeding() and source.bleed_stacks == 1 and source.bleed_dps > 0, "floss item does not strengthen enchanted bleeding on a non-cut weapon")
 	_check(source.affix_effects.pending.bleed.size() == 8, "hourglass did not extend enchanted bleeding")
-	_check(WeaponAffixes.damage_unit(&"bleed", game.items).contains("4 s"), "preview ignores hourglass duration")
+	_check(AffixPresentation.damage_unit(&"bleed", game.items).contains("4 s"), "preview ignores hourglass duration")
 	var normal := _enemy(Vector2(0, 300))
 	_check(game.items.modify_damage(source, brush, 10) > game.items.modify_damage(normal, brush, 10), "scalpel wax ignores enchanted bleeding")
 	source.take_damage(20000)

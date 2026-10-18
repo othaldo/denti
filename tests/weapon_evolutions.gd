@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var failures: Array[String] = []
 var game: Node2D
@@ -14,7 +14,7 @@ func check(condition: bool, message: String) -> void:
 func fixture(recipe: WeaponEvolutionRecipe) -> void:
 	game.player.loadout.restore([])
 	game.items.restore({})
-	game.player.stats.load_save_data(PlayerStats.new().to_save_data())
+	game.player.stats.load_save_data(new_stats().to_save_data())
 	game.player.loadout.acquire(WeaponCatalog.by_id(recipe.base_weapon), 4, 80)
 	if recipe.partner_weapon != &"":
 		game.player.loadout.acquire(WeaponCatalog.by_id(recipe.partner_weapon), 4, 70)
@@ -222,4 +222,4 @@ func _run() -> void:
 	session.clear_run()
 	if failures.is_empty():
 		print("Denti weapon evolutions test passed")
-	quit(0 if failures.is_empty() else 1)
+	finish(0 if failures.is_empty() else 1)

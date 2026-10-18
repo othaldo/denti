@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var failures: Array[String] = []
 
@@ -27,6 +27,14 @@ func _run() -> void:
 		check(not str(entry).contains(WeaponEvolutions.ALL[index].result.display_name), "secret weapon name exposed")
 	for category in DentipediaData.CATEGORIES.size():
 		check(not DentipediaData.entries(category, []).is_empty(), "empty category")
+	var items := DentipediaData.entries(DentipediaData.CATEGORIES.find("Items"), [])
+	var expected_items := 0
+	for offer in ShopController.CATALOG:
+		if offer.weapon_data == null:
+			expected_items += 1
+	check(items.size() == expected_items, "item category includes weapon offers")
+	for weapon in WeaponCatalog.ALL:
+		check(not items.any(func(entry: Dictionary) -> bool: return entry.title == weapon.display_name), "weapon leaked into item category")
 	var enchantment_category := DentipediaData.CATEGORIES.find("Verzauberungen")
 	check(enchantment_category >= 0, "dedicated enchantment category missing")
 	var enchantments := DentipediaData.entries(enchantment_category, [])
@@ -180,4 +188,4 @@ func _run() -> void:
 	check(main_entry and main_menu.page == &"dentipedia", "main menu Dentipedia entry missing")
 	if failures.is_empty():
 		print("Denti Dentipedia test passed")
-	quit(0 if failures.is_empty() else 1)
+	finish(0 if failures.is_empty() else 1)

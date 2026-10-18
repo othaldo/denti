@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 
 func _initialize() -> void:
@@ -93,17 +93,17 @@ func _run() -> void:
 		return
 	session.clear_run()
 	print("Denti weapon rework test passed")
-	quit(0)
+	finish(0)
 
 
 func _fail(message: String) -> void:
 	root.get_node("GameSession").clear_run()
 	push_error(message)
-	quit(1)
+	finish(1)
 
 
 func _base_dps(weapon: WeaponData, tier: int) -> float:
-	var stats := PlayerStats.new()
+	var stats := new_stats()
 	stats.crit_chance = 0.0
 	var result := weapon.estimated_dps(tier, stats)
 	stats.free()

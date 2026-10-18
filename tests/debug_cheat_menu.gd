@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var game: Node2D
 
@@ -127,7 +127,7 @@ func _run() -> void:
 	game.free()
 	paused = false
 	print("PASS debug_cheat_menu")
-	quit()
+	finish()
 
 
 func _key(menu: DebugCheatMenu, key: Key) -> void:
@@ -139,4 +139,4 @@ func _key(menu: DebugCheatMenu, key: Key) -> void:
 
 func _fail(message: String) -> void:
 	push_error(message)
-	quit(1)
+	finish(1)

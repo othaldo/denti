@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 
 func _initialize() -> void:
@@ -72,7 +72,7 @@ func _run() -> void:
 		return
 	session.clear_run()
 	print("Denti mob curve test passed")
-	quit(0)
+	finish(0)
 
 
 func _check_opening_curve() -> bool:
@@ -107,4 +107,4 @@ func _fail(message: String) -> void:
 	paused = false
 	root.get_node("GameSession").clear_run()
 	push_error(message)
-	quit(1)
+	finish(1)

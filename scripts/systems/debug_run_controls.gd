@@ -38,7 +38,7 @@ func set_weapon_tier(index: int, tier: int) -> void:
 
 
 func add_item(id: StringName, copies: int) -> int:
-	var item := ShopController.by_id(id)
+	var item := ItemCatalog.by_id(id)
 	if not allowed() or item == null or item.weapon_data != null:
 		return 0
 	var added := 0

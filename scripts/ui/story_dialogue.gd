@@ -44,7 +44,7 @@ func _ready() -> void:
 	var rows := VBoxContainer.new()
 	rows.add_theme_constant_override("separation", 10)
 	margin.add_child(rows)
-	location_label = ShopDetails._label(rows, "", 14)
+	location_label = DentiUIComponents.label(rows, "", 14)
 	location_label.add_theme_color_override("font_color", DentiUIStyle.GOLD)
 	var header := HBoxContainer.new()
 	header.add_theme_constant_override("separation", 12)
@@ -53,11 +53,11 @@ func _ready() -> void:
 	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	header.add_child(portrait)
-	speaker_label = ShopDetails._label(header, "", 25)
+	speaker_label = DentiUIComponents.label(header, "", 25)
 	speaker_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	speaker_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	speaker_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	body_label = ShopDetails._label(rows, "", 21)
+	body_label = DentiUIComponents.label(rows, "", 21)
 	body_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	body_label.visible_characters_behavior = TextServer.VC_CHARS_AFTER_SHAPING
 	body_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -69,7 +69,7 @@ func _ready() -> void:
 	)
 	var actions := HBoxContainer.new()
 	rows.add_child(actions)
-	counter = ShopDetails._label(actions, "", 14)
+	counter = DentiUIComponents.label(actions, "", 14)
 	counter.autowrap_mode = TextServer.AUTOWRAP_OFF
 	counter.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	counter.size_flags_vertical = Control.SIZE_SHRINK_CENTER

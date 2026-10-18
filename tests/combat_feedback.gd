@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 
 func _initialize() -> void:
@@ -74,7 +74,7 @@ func _run() -> void:
 		return
 	session.clear_run()
 	print("Denti combat feedback test passed")
-	quit(0)
+	finish(0)
 
 
 func _wait_for_attack(sound: SoundController, effect: AudioStreamWAV) -> void:
@@ -94,4 +94,4 @@ func _has_sound(sound: SoundController, effect: AudioStreamWAV) -> bool:
 func _fail(message: String) -> void:
 	root.get_node("GameSession").clear_run()
 	push_error(message)
-	quit(1)
+	finish(1)

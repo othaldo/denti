@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 # Actual attacks at 60 Hz, including projectiles, focus, innate crit and bleed.
 # Anchored targets isolate throughput; knockback, enemy AI and guard are excluded.
@@ -35,13 +35,13 @@ func _run() -> void:
 	var file := FileAccess.open(output, FileAccess.WRITE)
 	if file == null:
 		push_error("Cannot write " + output)
-		quit(1)
+		finish(1)
 		return
 	file.store_string(JSON.stringify(report, "\t") + "\n")
 	file.close()
 	_cleanup()
 	print("Weapon DPS report: " + output)
-	quit(0)
+	finish(0)
 
 
 func _setup() -> void:
@@ -60,7 +60,6 @@ func _setup() -> void:
 
 func _cleanup() -> void:
 	root.get_node("GameSession").clear_run()
-	game.free()
 	paused = false
 
 

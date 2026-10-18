@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var failures := 0
 const MAGIC: WeaponData = preload("res://data/weapons/magic_toothbrush.tres")
@@ -23,7 +23,7 @@ func _run() -> void:
 	_check_live_pool()
 	if failures == 0:
 		print("Animated enchantments: combined effects, shared atlas, bounded cache, pooling, preparation and save/resume passed")
-	quit(0 if failures == 0 else 1)
+	finish(0 if failures == 0 else 1)
 
 func _check_images_and_bounds() -> void:
 	var cache := ProjectileEnchantmentSkins.new()

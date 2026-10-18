@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var game: Node2D
 var failures := 0
@@ -117,4 +117,4 @@ func _run() -> void:
 	paused = false
 	if failures == 0:
 		print("PASS wet_slow: movement, resistance, refresh/expiry, haste/overtime, charges, sources, save/resume and descriptions")
-	quit(0 if failures == 0 else 1)
+	finish(0 if failures == 0 else 1)

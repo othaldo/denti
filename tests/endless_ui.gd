@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 func _initialize() -> void:
 	call_deferred("_run")
@@ -33,8 +33,8 @@ func _run() -> void:
 					return
 	panel.free()
 	print("Denti endless UI test passed")
-	quit(0)
+	finish(0)
 
 func _fail(message: String) -> void:
 	push_error(message)
-	quit(1)
+	finish(1)

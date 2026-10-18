@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var session: Node
 var capture: bool
@@ -160,7 +160,7 @@ func _run() -> void:
 		_export_voice_demo()
 	session.clear_run()
 	print("Denti dialogue typing, speaker synthesis/mute, skip/pause, resume, boss gating and revised text layouts test passed")
-	quit(0)
+	finish(0)
 
 func _export_voice_demo() -> void:
 	var pcm := PackedByteArray()
@@ -201,5 +201,5 @@ func _check(ok: bool, message: String) -> bool:
 	paused = false
 	session.clear_run()
 	push_error(message)
-	quit(1)
+	finish(1)
 	return false

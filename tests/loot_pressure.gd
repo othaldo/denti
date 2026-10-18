@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 
 func _initialize() -> void:
@@ -30,7 +30,7 @@ func _run() -> void:
 		return
 	session.clear_run()
 	print("Denti loot pressure test passed; XP drops per 100 kills: %d / %d" % [early_xp, late_xp])
-	quit(0)
+	finish(0)
 
 
 func _xp_drops(game: Node2D) -> int:
@@ -44,4 +44,4 @@ func _xp_drops(game: Node2D) -> int:
 func _fail(message: String) -> void:
 	root.get_node("GameSession").clear_run()
 	push_error(message)
-	quit(1)
+	finish(1)

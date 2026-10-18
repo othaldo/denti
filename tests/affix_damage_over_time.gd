@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 var game: Node2D
 
 func _initialize() -> void:
@@ -114,8 +114,8 @@ func _run() -> void:
 	assert(target.affix_effects.save_data() == state, "resume reset duration or rerolled DoT")
 	target.affix_effects.advance(target, 1.75)
 	assert(is_equal_approx(before - target.health, 3), "resume applied resistance twice or lost tick")
-	assert(WeaponAffixes.damage_unit(&"poison").contains("5 s") and WeaponAffixes.damage_unit(&"electric") == "Schaden/Treffer")
+	assert(AffixPresentation.damage_unit(&"poison").contains("5 s") and AffixPresentation.damage_unit(&"electric") == "Schaden/Treffer")
 	session.clear_run()
 	paused = false
 	print("PASS DoT budgets, stacking, resistance, fractional ticks, guards, overkill and resume")
-	quit(0)
+	finish(0)

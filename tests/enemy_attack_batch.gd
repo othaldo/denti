@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var failures := 0
 
@@ -93,4 +93,4 @@ func _run() -> void:
 	paused = false
 	if failures == 0:
 		print("Denti batched attack visuals and swept contacts test passed")
-	quit(0 if failures == 0 else 1)
+	finish(0 if failures == 0 else 1)

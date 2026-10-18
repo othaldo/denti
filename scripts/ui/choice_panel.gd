@@ -18,7 +18,7 @@ const UPGRADE_COUNT := 4
 @onready var level_actions: HBoxContainer = $Root/Center/Panel/Margin/Rows/LevelActions
 @onready var level_coins: Label = $Root/Center/Panel/Margin/Rows/LevelActions/Coins
 @onready var reroll_button: Button = $Root/Center/Panel/Margin/Rows/LevelActions/Reroll
-@onready var buttons: Array[Button] = [
+@onready var buttons: Array[UpgradeCard] = [
 	$Root/Center/Panel/Margin/Rows/Cards/Choice1,
 	$Root/Center/Panel/Margin/Rows/Cards/Choice2,
 	$Root/Center/Panel/Margin/Rows/Cards/Choice3,
@@ -170,7 +170,7 @@ func show_upgrades(options: Array[UpgradeData]) -> void:
 	for index in buttons.size():
 		buttons[index].visible = index < options.size()
 		if index < options.size():
-			buttons[index].call("show_upgrade", options[index])
+			buttons[index].show_upgrade(options[index])
 	_update_layout()
 	visible = true
 	buttons[0].grab_focus()
@@ -187,7 +187,7 @@ func show_starters(options: Array[WeaponData]) -> void:
 	for index in buttons.size():
 		buttons[index].visible = index < options.size()
 		if index < options.size():
-			buttons[index].call("show_weapon", options[index])
+			buttons[index].show_weapon(options[index])
 	_update_layout()
 	visible = true
 	buttons[0].grab_focus()
@@ -198,9 +198,9 @@ func show_chest(item: ShopOfferData, scrap_coins: int) -> void:
 	chest_item = item
 	title_label.text = "Upgrade-Kapsel!"
 	subtitle_label.text = item.limit_text()
-	buttons[0].call("show_item", item)
+	buttons[0].show_item(item)
 	buttons[0].visible = true
-	buttons[1].call("show_action", "Für %d Münzen zerlegen" % scrap_coins)
+	buttons[1].show_action("Für %d Münzen zerlegen" % scrap_coins)
 	buttons[1].visible = true
 	buttons[2].visible = false
 	buttons[3].visible = false
@@ -220,7 +220,7 @@ func show_relics(options: Array[RelicData]) -> void:
 	for index in buttons.size():
 		buttons[index].visible = index < options.size()
 		if index < options.size():
-			buttons[index].call("show_relic", options[index])
+			buttons[index].show_relic(options[index])
 	visible = true
 	buttons[0].grab_focus()
 
@@ -238,14 +238,14 @@ func show_end(won: bool, coins: int, recap: Dictionary = {}) -> void:
 	subtitle_label.add_theme_font_size_override("font_size", 17)
 	subtitle_label.text = _end_summary(won, coins, end_recap)
 	subtitle_label.custom_minimum_size.y = 270.0
-	buttons[0].call("show_action", "Noch einmal spielen", true)
+	buttons[0].show_action("Noch einmal spielen", true)
 	buttons[0].visible = true
-	buttons[1].call("show_action", "Credits")
+	buttons[1].show_action("Credits")
 	buttons[1].visible = true
-	buttons[2].call("show_action", "Hauptmenü")
+	buttons[2].show_action("Hauptmenü")
 	buttons[2].visible = true
 	buttons[3].visible = won and not bool(recap.get("endless_enabled", false)) and int(recap.get("wave_reached", 0)) == WaveController.MAX_WAVES
-	buttons[3].call("show_action", "Endlos weiterspielen", true)
+	buttons[3].show_action("Endlos weiterspielen", true)
 	buttons[3].tooltip_text = "Mit diesem Build in Welle 21 weiterspielen. Dein Sieg bleibt erhalten."
 	_update_layout()
 	visible = true
@@ -364,7 +364,7 @@ func _show_credits() -> void:
 	title_label.text = "Credits"
 	subtitle_label.text = "Schrift: Fredoka · The Fredoka Project Authors\nSIL Open Font License 1.1\n\nDenti-, Waffen-, Gegner-, Arena- und Icon-Grafiken: OpenAI ImageGen\nMusik: othaldo · erstellt mit Suno\nSoundeffekte: eigens synthetisiert\nUI-Elemente: eigenes Godot-Design"
 	subtitle_label.custom_minimum_size.y = 120.0
-	buttons[0].call("show_action", "Zurück", true)
+	buttons[0].show_action("Zurück", true)
 	buttons[1].visible = false
 	buttons[2].visible = false
 	buttons[3].visible = false

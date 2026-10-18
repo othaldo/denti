@@ -71,7 +71,7 @@ func _ready() -> void:
 	rows.add_child(target_summary)
 	replacement = VBoxContainer.new()
 	rows.add_child(replacement)
-	ShopDetails._label(replacement, "Alle Plätze belegt. Für einen neuen Effekt Ersatz wählen:", 13)
+	DentiUIComponents.label(replacement, "Alle Plätze belegt. Für einen neuen Effekt Ersatz wählen:", 13)
 	replacement_grid = GridContainer.new()
 	replacement_grid.columns = 2
 	replacement_grid.add_theme_constant_override("h_separation", 6)
@@ -97,7 +97,7 @@ func _ready() -> void:
 
 
 func _label(value: String, font_size: int) -> Label:
-	return ShopDetails._label(rows, value, font_size)
+	return DentiUIComponents.label(rows, value, font_size)
 
 
 func show_chest(chest: Dictionary, loadout: WeaponLoadout, player_stats: PlayerStats, scrap_coins: int, items: ItemInventory = null) -> void:
@@ -115,7 +115,7 @@ func show_chest(chest: Dictionary, loadout: WeaponLoadout, player_stats: PlayerS
 		var button := Button.new()
 		button.custom_minimum_size = Vector2(0, 66)
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		button.tooltip_text = WeaponPresentation.weapon_name(weapon) + "\n" + WeaponAffixes.summary(weapon, stats, item_context) + "\n" + weapon.data.stats_text(weapon.tier)
+		button.tooltip_text = WeaponPresentation.weapon_name(weapon) + "\n" + AffixPresentation.summary(weapon, stats, item_context) + "\n" + weapon.data.stats_text(weapon.tier)
 		weapon_grid.add_child(button)
 		var margin := MarginContainer.new()
 		margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -137,9 +137,9 @@ func show_chest(chest: Dictionary, loadout: WeaponLoadout, player_stats: PlayerS
 		text_rows.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		text_rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		line.add_child(text_rows)
-		var name_label := ShopDetails._label(text_rows, WeaponPresentation.weapon_name(weapon), 14)
+		var name_label := DentiUIComponents.label(text_rows, WeaponPresentation.weapon_name(weapon), 14)
 		name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		var info := ShopDetails._label(text_rows, "%s · %d/%d Effekte" % [WeaponPresentation.tier_text(weapon.data, weapon.tier), weapon.affixes.size(), weapon.affix_slots], 12)
+		var info := DentiUIComponents.label(text_rows, "%s · %d/%d Effekte" % [WeaponPresentation.tier_text(weapon.data, weapon.tier), weapon.affixes.size(), weapon.affix_slots], 12)
 		info.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		button.set_meta("labels", [name_label, info])
 		button.set_meta("art", art)
@@ -185,10 +185,10 @@ func _select_weapon(index: int, reset_replace: bool = true) -> void:
 		text_rows.alignment = BoxContainer.ALIGNMENT_CENTER
 		text_rows.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		button.add_child(text_rows)
-		var effect := ShopDetails._label(text_rows, "%s +%s%s" % [data.display_name, WeaponAffixes.value_text(float(affix.damage), data.id, weapon.data, stats, item_context), " %" if data.stat_key != &"" else (" s" if data.effect_kind == "wet" else (" HP" if data.effect_kind == "leech" else ""))], 13)
+		var effect := DentiUIComponents.label(text_rows, "%s +%s%s" % [data.display_name, AffixPresentation.value_text(float(affix.damage), data.id, weapon.data, stats, item_context), " %" if data.stat_key != &"" else (" s" if data.effect_kind == "wet" else (" HP" if data.effect_kind == "leech" else ""))], 13)
 		effect.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		effect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		var rarity := ShopDetails._label(text_rows, WeaponAffixes.progress_text(affix), 12)
+		var rarity := DentiUIComponents.label(text_rows, AffixPresentation.progress_text(affix), 12)
 		rarity.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		rarity.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		DentiUIStyle.style_affix_rarity_label(rarity, affix.rarity)
@@ -225,9 +225,9 @@ func _refresh_cards() -> void:
 	for index in buttons.size():
 		var option: Dictionary = reward.options[index]
 		var replace := int(reward.get("replace", -1))
-		var preview := WeaponAffixes.comparison(weapon, option, stats, replace, true, item_context)
+		var preview := AffixPresentation.comparison(weapon, option, stats, replace, true, item_context)
 		var hint := WeaponPresentation.enchantment_hint(StringName(option.id), weapon, item_context, replace)
-		buttons[index].show_affix(option, preview + ("\n" + hint if not hint.is_empty() else ""), WeaponAffixes.comparison(weapon, option, stats, replace, false, item_context))
+		buttons[index].show_affix(option, preview + ("\n" + hint if not hint.is_empty() else ""), AffixPresentation.comparison(weapon, option, stats, replace, false, item_context))
 		buttons[index].disabled = not WeaponAffixes.can_apply(weapon, option, int(reward.get("replace", -1)))
 		var badge := "Verzaubern"
 		if option.id == "slot":
@@ -324,7 +324,7 @@ func _layout() -> void:
 		button.custom_minimum_size.y = maxf(140, height + maxi(visible_children - 1, 0) * 2 + 24)
 	for index in replacement_buttons.size():
 		var label: Label = replacement_buttons[index].get_meta("rarity_label")
-		label.text = WeaponAffixes.progress_text(weapons[selected_weapon].affixes[index])
+		label.text = AffixPresentation.progress_text(weapons[selected_weapon].affixes[index])
 		if narrow:
 			label.text = label.text.replace("Ungewöhnlich", "Ungew.").replace(".0 %", " %")
 

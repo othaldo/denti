@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 
 func _initialize() -> void:
@@ -29,10 +29,10 @@ func _run() -> void:
 		_fail("enemy remained after deferred death cleanup")
 		return
 	print("Denti player death cleanup test passed")
-	quit(0)
+	finish(0)
 
 
 func _fail(message: String) -> void:
 	paused = false
 	push_error(message)
-	quit(1)
+	finish(1)

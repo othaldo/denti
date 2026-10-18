@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 
 func _initialize() -> void:
@@ -66,7 +66,7 @@ func _run() -> void:
 			_fail("focus fill washes out button text")
 			return
 	print("Denti UI text contrast test passed")
-	quit(0)
+	finish(0)
 
 
 func _contrast(first: Color, second: Color) -> float:
@@ -87,4 +87,4 @@ func _luminance(color: Color) -> float:
 
 func _fail(message: String) -> void:
 	push_error(message)
-	quit(1)
+	finish(1)

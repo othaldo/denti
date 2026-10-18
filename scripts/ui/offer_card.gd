@@ -322,6 +322,7 @@ func _build_content() -> void:
 	buy_content.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	buy_caption = Label.new()
 	buy_caption.text = "Kaufen"
+	buy_caption.clip_text = true
 	buy_caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	buy_caption.add_theme_font_size_override("font_size", 12)
 	buy_caption.add_theme_color_override("font_color", DentiUIStyle.GOLD_INK)
@@ -340,6 +341,9 @@ func _build_content() -> void:
 	coin_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	price_row.add_child(coin_icon)
 	price_label = Label.new()
+	price_label.clip_text = true
+	price_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	price_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	price_label.add_theme_color_override("font_color", DentiUIStyle.GOLD)
 	price_label.add_theme_font_size_override("font_size", 19)
 	price_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -400,6 +404,7 @@ func show_weapon_values(data: WeaponData, tier: int, player: Player) -> void:
 
 func _stat_cell(texture: Texture2D, value: String, meaning: String, primary: bool) -> HBoxContainer:
 	var row := HBoxContainer.new()
+	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.set_meta("primary", primary)
 	row.add_theme_constant_override("separation", 3)
 	row.tooltip_text = meaning + " · " + value
@@ -411,8 +416,10 @@ func _stat_cell(texture: Texture2D, value: String, meaning: String, primary: boo
 	image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	image.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_child(image)
-	var number := ShopDetails._label(row, value, stat_font_size if primary else secondary_font_size)
+	var number := DentiUIComponents.label(row, value, stat_font_size if primary else secondary_font_size)
 	number.autowrap_mode = TextServer.AUTOWRAP_OFF
+	number.clip_text = true
+	number.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	number.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return row
 

@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var failures: Array[String] = []
 var game: Node2D
@@ -90,7 +90,7 @@ func _run() -> void:
 	game.free()
 	if failures.is_empty():
 		print("Denti combat performance regression test passed")
-	quit(0 if failures.is_empty() else 1)
+	finish(0 if failures.is_empty() else 1)
 
 func _compare_circle(index: EnemySpatialIndex, at: Vector2, radius: float, include_radius: bool) -> void:
 	var expected: Array[Enemy] = []

@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 
 func _initialize() -> void:
@@ -86,7 +86,7 @@ func _run() -> void:
 			_fail("chest layout escaped into boss relics")
 			return
 	print("Denti chest layout test passed")
-	quit(0)
+	finish(0)
 
 
 func _plain(text: String) -> String:
@@ -95,4 +95,4 @@ func _plain(text: String) -> String:
 
 func _fail(message: String) -> void:
 	push_error(message)
-	quit(1)
+	finish(1)

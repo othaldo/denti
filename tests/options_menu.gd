@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 
 func _initialize() -> void:
@@ -182,9 +182,9 @@ func _run() -> void:
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(session.settings_path))
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(legacy_path))
 	print("Denti options menu test passed")
-	quit(0)
+	finish(0)
 
 
 func _fail(message: String) -> void:
 	push_error(message)
-	quit(1)
+	finish(1)

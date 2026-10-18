@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var failures := 0
 
@@ -17,7 +17,7 @@ func _run() -> void:
 	var atlas := Image.load_from_file("res://assets/vfx/enemy_projectiles.png")
 	_check(atlas != null and not atlas.is_empty(), "prepared projectile atlas is missing")
 	if atlas == null or atlas.is_empty():
-		quit(1)
+		finish(1)
 		return
 	EnemyProjectileVisuals.textures.clear()
 	for spec in EnemyProjectileVisuals.standard_specs():
@@ -36,4 +36,4 @@ func _run() -> void:
 	_check(custom == EnemyProjectileVisuals.body(Color(0.3, 0.5, 0.7), 12.3), "fallback texture is not cached")
 	if failures == 0:
 		print("Denti prepared projectile atlas test passed")
-	quit(0 if failures == 0 else 1)
+	finish(0 if failures == 0 else 1)

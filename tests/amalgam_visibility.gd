@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var failures: Array[String] = []
 
@@ -42,7 +42,7 @@ func _run() -> void:
 	game.player.stats.apply_upgrade(&"armor", 15)
 	_check(chip.text == "+50 %", "armor recovery did not restore calculated bonus")
 	var found := false
-	for entry in game.items.all_items():
+	for entry in BuildPresentation.item_entries(game.items):
 		if entry.name == "Amalgamkern":
 			found = entry.description.contains("Aktuell: +50 % Waffenschaden")
 	_check(found, "owned item details omitted current contribution")
@@ -56,4 +56,4 @@ func _run() -> void:
 	session.clear_run()
 	if failures.is_empty():
 		print("Denti amalgam visibility test passed")
-	quit(0 if failures.is_empty() else 1)
+	finish(0 if failures.is_empty() else 1)

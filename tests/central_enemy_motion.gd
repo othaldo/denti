@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var failures: Array[String] = []
 var legacy_events: Array[String] = []
@@ -146,4 +146,4 @@ func _run() -> void:
 	paused = false
 	if failures.is_empty():
 		print("Denti central enemy motion matches individual simulation")
-	quit(0 if failures.is_empty() else 1)
+	finish(0 if failures.is_empty() else 1)

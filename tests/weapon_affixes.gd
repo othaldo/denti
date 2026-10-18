@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 
 func _initialize() -> void:
@@ -229,7 +229,7 @@ func _run() -> void:
 	session.clear_run()
 	paused = false
 	print("Denti weapon affixes test passed")
-	quit(0)
+	finish(0)
 
 
 func _expect(condition: bool, message: String) -> bool:
@@ -237,5 +237,5 @@ func _expect(condition: bool, message: String) -> bool:
 		paused = false
 		root.get_node("GameSession").clear_run()
 		push_error(message)
-		quit(1)
+		finish(1)
 	return condition

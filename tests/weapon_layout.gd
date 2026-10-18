@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var game: Node2D
 
@@ -84,7 +84,7 @@ func _run() -> void:
 	game.free()
 	paused = false
 	print("PASS weapon_layout")
-	quit()
+	finish()
 
 
 func _equip_six() -> void:
@@ -113,4 +113,4 @@ func _clear_enemies() -> void:
 
 func _fail(message: String) -> void:
 	push_error(message)
-	quit(1)
+	finish(1)

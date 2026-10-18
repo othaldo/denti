@@ -1,100 +1,7 @@
 class_name ShopController
 extends Node
 
-const CATALOG: Array[ShopOfferData] = [
-	preload("res://data/items/metal_crown.tres"),
-	preload("res://data/items/fluoride_gel.tres"),
-	preload("res://data/items/gold_filling.tres"),
-	preload("res://data/items/mouthwash.tres"),
-	preload("res://data/items/implant.tres"),
-	preload("res://data/items/polish_paste.tres"),
-	preload("res://data/items/saliva_fountain.tres"),
-	preload("res://data/items/ceramic_shell.tres"),
-	preload("res://data/items/mint_essence.tres"),
-	preload("res://data/items/lucky_molar.tres"),
-	preload("res://data/items/floss_reel.tres"),
-	preload("res://data/items/cavity_bounty.tres"),
-	preload("res://data/items/radiant_filling.tres"),
-	preload("res://data/items/tooth_fairy_pact.tres"),
-	preload("res://data/items/amalgam_core.tres"),
-	preload("res://data/items/scalpel_wax.tres"),
-	preload("res://data/items/holy_flash.tres"),
-	preload("res://data/items/divine_seal.tres"),
-	preload("res://data/items/contagious_floss.tres"),
-	preload("res://data/items/conductive_varnish.tres"),
-	preload("res://data/items/forbidden_lollipop.tres"),
-	preload("res://data/items/tooth_fairy_deposit.tres"),
-	preload("res://data/items/bleeding_hourglass.tres"),
-	preload("res://data/items/rinse_valve.tres"),
-	preload("res://data/items/shine_prism.tres"),
-	preload("res://data/items/shard_crown.tres"),
-	preload("res://data/items/interest_tooth.tres"),
-	preload("res://data/items/return_drill.tres"),
-	preload("res://data/items/saliva_chalice.tres"),
-	preload("res://data/items/sugar_shock.tres"),
-	preload("res://data/items/gold_probe.tres"),
-	preload("res://data/items/gold_extractor.tres"),
-	preload("res://data/items/health_1.tres"),
-	preload("res://data/items/health_2.tres"),
-	preload("res://data/items/health_4.tres"),
-	preload("res://data/items/armor_2.tres"),
-	preload("res://data/items/armor_3.tres"),
-	preload("res://data/items/armor_4.tres"),
-	preload("res://data/items/damage_1.tres"),
-	preload("res://data/items/damage_2.tres"),
-	preload("res://data/items/damage_3.tres"),
-	preload("res://data/items/tempo_2.tres"),
-	preload("res://data/items/tempo_3.tres"),
-	preload("res://data/items/tempo_4.tres"),
-	preload("res://data/items/crit_1.tres"),
-	preload("res://data/items/crit_3.tres"),
-	preload("res://data/items/crit_4.tres"),
-	preload("res://data/items/regen_1.tres"),
-	preload("res://data/items/regen_3.tres"),
-	preload("res://data/items/regen_4.tres"),
-	preload("res://data/items/mobility_2.tres"),
-	preload("res://data/items/mobility_3.tres"),
-	preload("res://data/items/mobility_4.tres"),
-	preload("res://data/items/luck_1.tres"),
-	preload("res://data/items/luck_3.tres"),
-	preload("res://data/items/luck_4.tres"),
-	preload("res://data/items/bleed_2.tres"),
-	preload("res://data/items/bleed_3.tres"),
-	preload("res://data/items/bleed_4.tres"),
-	preload("res://data/items/chain_1.tres"),
-	preload("res://data/items/chain_3.tres"),
-	preload("res://data/items/chain_4.tres"),
-	preload("res://data/items/shield_2.tres"),
-	preload("res://data/items/shield_3.tres"),
-	preload("res://data/items/shield_4.tres"),
-	preload("res://data/items/coins_1.tres"),
-	preload("res://data/items/coins_2.tres"),
-	preload("res://data/items/coins_4.tres"),
-	preload("res://data/items/return_1.tres"),
-	preload("res://data/items/return_2.tres"),
-	preload("res://data/items/return_4.tres"),
-	preload("res://data/items/burst_1.tres"),
-	preload("res://data/items/burst_2.tres"),
-	preload("res://data/items/burst_4.tres"),
-	preload("res://data/items/sugar_1.tres"),
-	preload("res://data/items/sugar_2.tres"),
-	preload("res://data/items/sugar_4.tres"),
-	preload("res://data/items/xp_heal_1.tres"),
-	preload("res://data/items/xp_heal_3.tres"),
-	preload("res://data/items/xp_heal_4.tres"),
-	preload("res://data/items/mythic_heart.tres"),
-	preload("res://data/items/mythic_armor.tres"),
-	preload("res://data/items/mythic_bite.tres"),
-	preload("res://data/items/mythic_tempo.tres"),
-	preload("res://data/items/mythic_crit.tres"),
-	preload("res://data/items/mythic_regen.tres"),
-	preload("res://data/items/mythic_speed.tres"),
-	preload("res://data/items/mythic_luck.tres"),
-	preload("res://data/items/dodge_1.tres"),
-	preload("res://data/items/dodge_2.tres"),
-	preload("res://data/items/dodge_3.tres"),
-	preload("res://data/items/dodge_4.tres"),
-	preload("res://data/items/mythic_dodge.tres"),
+const WEAPON_OFFERS: Array[ShopOfferData] = [
 	preload("res://data/weapons/shop_magic_toothbrush.tres"),
 	preload("res://data/weapons/shop_turbo_drill.tres"),
 	preload("res://data/weapons/shop_floss_whip.tres"),
@@ -114,6 +21,9 @@ const CATALOG: Array[ShopOfferData] = [
 	preload("res://data/weapons/shop_prophylaxis_polisher.tres"),
 	preload("res://data/weapons/shop_fluoride_rocket.tres"),
 ]
+# Compatibility view for existing tools; gameplay uses the explicit catalogs.
+const CATALOG: Array[ShopOfferData] = ItemCatalog.ALL + WEAPON_OFFERS
+
 const WEAPON_CHANCE := 0.35
 const SAME_WEAPON_CHANCE := 0.30
 const SAME_MODE_CHANCE := 0.15
@@ -165,11 +75,13 @@ func can_reroll() -> bool:
 
 
 static func by_id(id: StringName) -> ShopOfferData:
-	for offer in CATALOG:
+	var item := ItemCatalog.by_id(id)
+	if item != null:
+		return item
+	for offer in WEAPON_OFFERS:
 		if offer.id == id:
 			return offer
 	return null
-
 
 static func weapon_offer(template: ShopOfferData, tier: int) -> ShopOfferData:
 	var offer := template.duplicate() as ShopOfferData
@@ -218,7 +130,7 @@ func _pick_item(tier: int, items: ItemInventory, loadout: WeaponLoadout) -> Shop
 	for candidate_tier in range(tier, 0, -1):
 		var pool: Array[ShopOfferData] = []
 		var tagged: Array[ShopOfferData] = []
-		for template in CATALOG:
+		for template in ItemCatalog.ALL:
 			if template.weapon_data == null and template.rarity_tier == candidate_tier and not _already_offered(template.id, 0) and (items == null or items.can_acquire(template)):
 				pool.append(template)
 				for tag in template.tags:
@@ -233,7 +145,7 @@ func _pick_item(tier: int, items: ItemInventory, loadout: WeaponLoadout) -> Shop
 
 func _pick_weapon(tier: int, loadout: WeaponLoadout, allow_unavailable: bool = false) -> ShopOfferData:
 	var candidates: Array[ShopOfferData] = []
-	for template in CATALOG:
+	for template in WEAPON_OFFERS:
 		if template.weapon_data != null and (allow_unavailable or loadout.can_acquire(template.weapon_data, tier)) and not _already_offered(template.id, tier):
 			candidates.append(template)
 	if candidates.is_empty():
@@ -264,3 +176,38 @@ func _already_offered(id: StringName, tier: int) -> bool:
 		if offer != null and offer.id == id and (tier == 0 or offer.weapon_tier == tier):
 			return true
 	return false
+
+
+func save_state() -> Dictionary:
+	var offer_data: Array[Dictionary] = []
+	for index in offers.size():
+		var offer: ShopOfferData = offers[index]
+		offer_data.append({"id": str(offer.id), "tier": offer.weapon_tier, "rolls": offer.weapon_data.rolls.duplicate(true) if offer.weapon_data != null else {}, "price": offer.price, "reserved": reserved[index]} if offer != null else {})
+	return {"offers": offer_data, "reroll_cost": reroll_cost}
+
+
+func restore_state(saved: Dictionary, wave_number: int) -> void:
+	reroll_cost = maxi(int(saved.get("reroll_cost", 2)), 2)
+	reroll_step = EndlessRules.shop_reroll_step(wave_number)
+	offers.clear()
+	reserved = [false, false, false, false]
+	for value in saved.get("offers", []):
+		var offer_id := str(value.get("id", "")) if value is Dictionary else str(value)
+		if offer_id == "floss":
+			offer_id = "floss_whip"
+		elif offer_id == "drill":
+			offer_id = "turbo_drill"
+		var template := ShopController.by_id(StringName(offer_id))
+		var found: ShopOfferData = null
+		if template != null:
+			if template.weapon_data != null and value is Dictionary:
+				found = ShopController.weapon_offer(template, int(value.get("tier", 1)))
+				found.weapon_data = WeaponRolls.resolve(template.weapon_data, value.get("rolls", {}))
+			else:
+				found = template.duplicate() as ShopOfferData
+			if value is Dictionary:
+				found.price = maxi(int(value.get("price", found.price)), 1)
+		if offers.size() >= ShopController.OFFER_COUNT:
+			break
+		reserved[offers.size()] = found != null and value is Dictionary and bool(value.get("reserved", false))
+		offers.append(found)

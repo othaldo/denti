@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 
 func _initialize() -> void:
@@ -78,10 +78,10 @@ func _run() -> void:
 	session.clear_run()
 	paused = false
 	print("Denti projectile rendering test passed")
-	quit(0)
+	finish(0)
 
 
 func _fail(message: String) -> void:
 	push_error(message)
 	paused = false
-	quit(1)
+	finish(1)

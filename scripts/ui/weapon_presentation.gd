@@ -44,7 +44,7 @@ static func enchantment_hint(kind: StringName, weapon: WeaponInstance, items: It
 			if weapon.data.attack_mode in [&"area", &"sweep", &"cone"] or weapon.data.splash_radius > 0:
 				parts.append("Flächenwaffe")
 		&"ice", &"holy":
-			if items != null and (items.player.stats.crit_chance + weapon.data.crit_bonus >= 0.10 or items._power(&"crit_burst") > 0 or items._power(&"crit_beam") > 0):
+			if items != null and (items.player.stats.crit_chance + weapon.data.crit_bonus >= 0.10 or items.power(&"crit_burst") > 0 or items.power(&"crit_beam") > 0):
 				parts.append("Krit-Build")
 			if kind == &"holy" and WeaponAffixes.find(selected_affixes, &"ice") >= 0:
 				parts.append("Eis")
@@ -54,20 +54,20 @@ static func enchantment_hint(kind: StringName, weapon: WeaponInstance, items: It
 		&"bleed":
 			if weapon.data.bleed_dps > 0:
 				parts.append("Schnitt-Blutung")
-			if items != null and (items._power(&"bleed") > 0 or items._power(&"bleed_clock") > 0 or items._power(&"bleed_bonus") > 0 or items._power(&"bleed_spread") > 0):
+			if items != null and (items.power(&"bleed") > 0 or items.power(&"bleed_clock") > 0 or items.power(&"bleed_bonus") > 0 or items.power(&"bleed_spread") > 0):
 				parts.append("Blutungsitems")
 		&"electric":
 			if wet_build:
 				parts.append("Nässe im Build")
-			if items != null and items._power(&"chain") > 0:
+			if items != null and items.power(&"chain") > 0:
 				parts.append("Kettenitems")
 		&"wet":
 			if electric_build:
 				parts.append("Elektro im Build")
-			if items != null and (items._power(&"conductive_wet") > 0 or items._power(&"water_puddle") > 0):
+			if items != null and (items.power(&"conductive_wet") > 0 or items.power(&"water_puddle") > 0):
 				parts.append("Wasseritems")
 		&"leech":
-			if items != null and items._power(&"overheal_shield") > 0:
+			if items != null and items.power(&"overheal_shield") > 0:
 				parts.append("Speichelkelch")
 	return "Passt zu: " + ", ".join(parts) if not parts.is_empty() else ""
 

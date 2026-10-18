@@ -3,10 +3,13 @@ extends Node
 signal fps_display_changed(enabled: bool)
 signal graphics_changed
 
-const SAVE_VERSION := 1
+const SAVE_VERSION := RunStore.VERSION
 const ADAPTIVE_GRAPHICS: Script = preload("res://scripts/systems/adaptive_graphics.gd")
 const BOSS_PROJECTILE_WARMUP: Script = preload("res://scripts/enemies/boss_projectile_warmup.gd")
 enum GraphicsMode { AUTOMATIC, ECONOMY, FULL }
+
+var settings_data := SessionSettings.new()
+var progression_data := ProgressionStore.new()
 
 var save_path: String = "user://run_save.json"
 var report_dir: String = "user://run_reports"
@@ -15,21 +18,41 @@ var progression_path: String = "user://progression.cfg"
 var resume_requested: bool = false
 var selected_difficulty_id: StringName = &"normal"
 var selected_story_mode: bool = false
-var hell_unlocked: bool = false
-var discovered_fusions: Array[String] = []
-var master_volume_percent: int = 100
-var music_volume_percent: int = 100
-var sfx_volume_percent: int = 100
-var show_fps: bool = false
-var ui_sounds: bool = true
-var reduced_ui_motion: bool = false
-var graphics_mode: GraphicsMode = GraphicsMode.AUTOMATIC
+var hell_unlocked: bool:
+	get: return progression_data.hell_unlocked
+	set(value): progression_data.hell_unlocked = value
+var discovered_fusions: Array[String]:
+	get: return progression_data.discovered_fusions
+	set(value): progression_data.discovered_fusions = value
+var master_volume_percent: int:
+	get: return settings_data.master_volume_percent
+	set(value): settings_data.master_volume_percent = value
+var music_volume_percent: int:
+	get: return settings_data.music_volume_percent
+	set(value): settings_data.music_volume_percent = value
+var sfx_volume_percent: int:
+	get: return settings_data.sfx_volume_percent
+	set(value): settings_data.sfx_volume_percent = value
+var show_fps: bool:
+	get: return settings_data.show_fps
+	set(value): settings_data.show_fps = value
+var ui_sounds: bool:
+	get: return settings_data.ui_sounds
+	set(value): settings_data.ui_sounds = value
+var reduced_ui_motion: bool:
+	get: return settings_data.reduced_ui_motion
+	set(value): settings_data.reduced_ui_motion = value
+var graphics_mode: GraphicsMode:
+	get: return settings_data.graphics_mode
+	set(value): settings_data.graphics_mode = value
 var adaptive_graphics: AdaptiveGraphics = ADAPTIVE_GRAPHICS.new()
 var graphics_sample_us: int = -1
 var application_focused: bool = true
 var ui_voice: AudioStreamPlayer
 var last_ui_cue_ms: int = -1000
-var code_entry_unlocked: bool = false
+var code_entry_unlocked: bool:
+	get: return settings_data.code_entry_unlocked
+	set(value): settings_data.code_entry_unlocked = value
 var settings_visit_streak: int = 0
 var test_scenario_id: StringName = &""
 var test_save_path: String = "user://test_arena_run.json"
@@ -41,18 +64,9 @@ func _ready() -> void:
 		_update_mobile_scale()
 		get_tree().root.size_changed.connect(_update_mobile_scale)
 	load_progression()
-	var config := ConfigFile.new()
-	if config.load(settings_path) == OK:
-		master_volume_percent = clampi(int(config.get_value("audio", "master", config.get_value("audio", "volume", 100))), 0, 100)
-		music_volume_percent = clampi(int(config.get_value("audio", "music", 100)), 0, 100)
-		sfx_volume_percent = clampi(int(config.get_value("audio", "sfx", 100)), 0, 100)
-		show_fps = bool(config.get_value("display", "show_fps", false))
-		ui_sounds = bool(config.get_value("ui", "sounds", true))
-		reduced_ui_motion = bool(config.get_value("ui", "reduced_motion", false))
-		graphics_mode = clampi(int(config.get_value("display", "graphics_mode", 0)), 0, 2) as GraphicsMode
-		code_entry_unlocked = bool(config.get_value("debug", "code_entry_unlocked", false))
-		if bool(config.get_value("display", "fullscreen", false)):
-			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+	settings_data.load_from(settings_path)
+	if settings_data.fullscreen:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	apply_volume()
 	apply_graphics()
 	if DisplayServer.get_name() != "headless":
@@ -168,41 +182,22 @@ func end_test_run() -> void:
 
 
 func load_run() -> Dictionary:
-	if not FileAccess.file_exists(save_path):
-		return {}
-	var file := FileAccess.open(save_path, FileAccess.READ)
-	if file == null:
-		return {}
-	var parsed: Variant = JSON.parse_string(file.get_as_text())
-	if typeof(parsed) != TYPE_DICTIONARY or parsed.get("version", -1) != SAVE_VERSION:
-		return {}
-	if not parsed.has("wave") or not parsed.has("player"):
-		return {}
-	return parsed
+	return RunStore.load_run(save_path)
 
 
-func save_run(data: Dictionary) -> void:
+func save_run(data: Dictionary) -> Error:
 	data["version"] = SAVE_VERSION
-	var file := FileAccess.open(save_path, FileAccess.WRITE)
-	if file != null:
-		file.store_string(JSON.stringify(data))
+	var error := RunStore.save_run(save_path, data)
+	if error != OK:
+		push_warning("Spielstand konnte nicht gespeichert werden: %s" % save_path)
+	return error
 
 
 func clear_run() -> void:
-	if FileAccess.file_exists(save_path):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(save_path))
-
+	RunStore.clear(save_path)
 
 func load_progression() -> void:
-	var config := ConfigFile.new()
-	var loaded := config.load(progression_path) == OK
-	hell_unlocked = loaded and bool(config.get_value("difficulty", "hell_unlocked", false))
-	discovered_fusions.clear()
-	if loaded:
-		for id in config.get_value("dentipedia", "fusions", []):
-			if WeaponEvolutions.by_id(StringName(str(id))) != null and not discovered_fusions.has(str(id)):
-				discovered_fusions.append(str(id))
-
+	progression_data.load_from(progression_path)
 
 func discover_fusion(id: StringName) -> void:
 	if test_scenario_id != &"" or WeaponEvolutions.by_id(id) == null or discovered_fusions.has(str(id)):
@@ -212,13 +207,7 @@ func discover_fusion(id: StringName) -> void:
 
 
 func _save_progression() -> void:
-	var config := ConfigFile.new()
-	config.load(progression_path)
-	config.set_value("difficulty", "hell_unlocked", hell_unlocked)
-	config.set_value("dentipedia", "fusions", discovered_fusions)
-	if config.save(progression_path) != OK:
-		push_warning("Fortschritt konnte nicht gespeichert werden: %s" % progression_path)
-
+	progression_data.save_to(progression_path)
 
 func can_select_difficulty(id: StringName) -> bool:
 	return DifficultyCatalog.by_id(id).id == id and (id != &"hell" or hell_unlocked)
@@ -300,18 +289,8 @@ func set_show_fps(enabled: bool) -> void:
 
 
 func _save_settings() -> void:
-	var config := ConfigFile.new()
-	config.set_value("audio", "master", master_volume_percent)
-	config.set_value("audio", "music", music_volume_percent)
-	config.set_value("audio", "sfx", sfx_volume_percent)
-	config.set_value("display", "fullscreen", is_fullscreen())
-	config.set_value("display", "show_fps", show_fps)
-	config.set_value("display", "graphics_mode", graphics_mode)
-	config.set_value("ui", "sounds", ui_sounds)
-	config.set_value("ui", "reduced_motion", reduced_ui_motion)
-	config.set_value("debug", "code_entry_unlocked", code_entry_unlocked)
-	config.save(settings_path)
-
+	if settings_data.save_to(settings_path, is_fullscreen()) != OK:
+		push_warning("Einstellungen konnten nicht gespeichert werden: %s" % settings_path)
 
 func set_ui_sounds(enabled: bool) -> void:
 	ui_sounds = enabled

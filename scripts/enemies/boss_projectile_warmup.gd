@@ -64,7 +64,7 @@ func _ready() -> void:
 
 static func art_textures() -> Array[Texture2D]:
 	var result: Array[Texture2D] = [DentiExpressions.BODY, DentiExpressions.ATLAS]
-	for data in [WaveController.PLAQUE, WaveController.BACTERIA, WaveController.SUGAR, WaveController.ACID_SPITTER, WaveController.POISON_GERM, WaveController.GUM_BITER, WaveController.ACID_CROWN, WaveController.HUNT_GERM, WaveController.CAVITY_COUNT, WaveController.CAVITY_PRINCE, WaveController.CAVITY_KING, WaveController.CAVITY_EMPEROR]:
+	for data in EnemyCatalog.ALL:
 		result.append(data.sprite)
 	var weapons: Array[WeaponData] = WeaponCatalog.ALL.duplicate()
 	for recipe in WeaponEvolutions.ALL:

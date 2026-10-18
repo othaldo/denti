@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var failures: Array[String] = []
 
@@ -157,7 +157,7 @@ func _run() -> void:
 	paused = false
 	if failures.is_empty():
 		print("Denti hidden test arenas regression test passed")
-	quit(0 if failures.is_empty() else 1)
+	finish(0 if failures.is_empty() else 1)
 
 func _inside(control: Control, size: Vector2i) -> bool:
 	var rect := control.get_global_rect()

@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var game: Node2D
 
@@ -201,9 +201,8 @@ func _run() -> void:
 		return
 	session.clear_run()
 	paused = false
-	game.free()
 	print("Denti weapon expansion test passed")
-	call_deferred("quit", 0)
+	finish(0)
 
 
 func _enemy(offset: Vector2) -> Enemy:
@@ -235,7 +234,7 @@ func _fail(message: String) -> void:
 	root.get_node("GameSession").clear_run()
 	paused = false
 	push_error(message)
-	quit(1)
+	finish(1)
 
 
 func _attack(weapon: WeaponInstance) -> void:

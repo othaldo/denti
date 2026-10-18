@@ -23,7 +23,7 @@ static func roll_item(wave_number: int, luck: float, inventory: ItemInventory, r
 	var tier := DentiRarity.roll_item(wave_number, luck, rng)
 	for candidate_tier in range(tier, 0, -1):
 		var pool: Array[ShopOfferData] = []
-		for item in ShopController.CATALOG:
+		for item in ItemCatalog.ALL:
 			if item.weapon_data == null and item.rarity_tier == candidate_tier and inventory.can_acquire(item):
 				pool.append(item)
 		if not pool.is_empty():

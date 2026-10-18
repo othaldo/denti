@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var failures := 0
 
@@ -41,7 +41,7 @@ func _run() -> void:
 	_check_world_heading()
 	if failures == 0:
 		print("Painted projectiles: all tiers/evolutions, collision anchors, heading and no runtime rasterization passed")
-	quit(0 if failures == 0 else 1)
+	finish(0 if failures == 0 else 1)
 
 func _check_world_heading() -> void:
 	var parent := Node2D.new()

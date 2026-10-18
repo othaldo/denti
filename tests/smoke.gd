@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 
 func _initialize() -> void:
@@ -266,7 +266,7 @@ func _run() -> void:
 		return
 	paused = false
 	print("Denti smoke test passed")
-	quit(0)
+	finish(0)
 
 
 func _complete_intermission(game: Node2D) -> bool:
@@ -284,7 +284,7 @@ func _complete_intermission(game: Node2D) -> bool:
 func _fail(message: String) -> void:
 	paused = false
 	push_error(message)
-	quit(1)
+	finish(1)
 
 
 func _contrast(first: Color, second: Color) -> float:

@@ -45,7 +45,7 @@ static func entries(category: int, discovered: Array[String]) -> Array[Dictionar
 					# No name, recipe, stats or search keywords until actually discovered.
 					result.append({"title": "Unbekannte Spezialwaffe", "icon": recipe.result.sprite, "locked": true, "body": "Noch nicht fusioniert."})
 		1:
-			for item in ShopController.CATALOG:
+			for item in ItemCatalog.ALL:
 				result.append({"title": item.display_name, "icon": item.icon_texture if item.icon_texture != null else DentiUIIcons.item(item.icon_index), "body": item.effect_text() + "\n\n" + item.limit_text()})
 		2:
 			for relic in RelicCatalog.CATALOG:
@@ -69,12 +69,12 @@ static func enchantment_overview() -> String:
 	return ENCHANTMENT_OVERVIEW + "\n\nAlle Verzauberungen: " + ", ".join(names) + "."
 
 static func _enchantment(data: WeaponAffixData) -> Dictionary:
-	var body := WeaponAffixes.effect_description(data.id)
+	var body := AffixPresentation.effect_description(data.id)
 	if data.dot_duration > 0:
 		body += "\n\nJeder Treffer verursacht zusätzlichen Schaden über %.0f Sekunden. Weitere Treffer addieren ihren eigenen Schaden, ohne den bereits laufenden Schaden erneut zu multiplizieren." % data.dot_duration
 	if data.slow_fraction > 0:
 		body += "\n\nVerlangsamt normale Gegner um %.0f %% für %.1f Sekunden. Gegen Eliten und Bosse ist die Verlangsamung schwächer. Angekündigte Anstürme werden nicht verlangsamt." % [data.slow_fraction * 100, data.slow_duration]
-	var mechanics := WeaponAffixes.mechanics_text(data.id).replace("eines Trefferbudgets", "des Feuerschadens eines Treffers")
+	var mechanics := AffixPresentation.mechanics_text(data.id).replace("eines Trefferbudgets", "des Feuerschadens eines Treffers")
 	if not mechanics.is_empty():
 		body += "\n\n" + mechanics
 	if data.stat_key != &"":
@@ -97,12 +97,12 @@ static func ingredients(recipe: WeaponEvolutionRecipe) -> Array[Dictionary]:
 			var data := WeaponCatalog.by_id(id)
 			result.append({"title": data.display_name + " IV", "icon": data.sprite})
 	for family in recipe.families:
-		for item in ShopController.CATALOG:
+		for item in ItemCatalog.ALL:
 			if item.family_id == family:
 				var family_name: String = {&"chain": "Ketten", &"bleed": "Blutung", &"damage": "Bisskraft", &"return": "Rückflug"}.get(family, str(family))
 				result.append({"title": family_name + "-Familie\nJede Seltenheit", "icon": item.icon_texture if item.icon_texture != null else DentiUIIcons.item(item.icon_index)})
 				break
 	for id in recipe.items:
-		var item := ShopController.by_id(id)
+		var item := ItemCatalog.by_id(id)
 		result.append({"title": item.display_name, "icon": item.icon_texture if item.icon_texture != null else DentiUIIcons.item(item.icon_index)})
 	return result

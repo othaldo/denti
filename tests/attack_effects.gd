@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var failures := 0
 
@@ -52,4 +52,4 @@ func _run() -> void:
 		_check(is_equal_approx(points[index].length(), 1.0), "spray extends past its attack range")
 	if failures == 0:
 		print("Attack effects: atlas, boundaries, timer phases, world alignment and prepared spray passed")
-	quit(0 if failures == 0 else 1)
+	finish(0 if failures == 0 else 1)

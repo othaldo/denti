@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var spawn_count: int = 0
 var burst_count: int = 0
@@ -130,7 +130,7 @@ func _run() -> void:
 	wave.free()
 	session.clear_run()
 	print("Denti wave balance test passed; wave 1: %d, wave 10: %d, wave 19: %d, boss wave 20: %d, mini-boss: %.1fs" % [early_count, middle_count, late_count, boss_wave_count, float(frames) / 60.0])
-	quit(0)
+	finish(0)
 
 
 func _count_spawn(_data: EnemyData) -> void:
@@ -151,4 +151,4 @@ func _fail(message: String) -> void:
 	paused = false
 	root.get_node("GameSession").clear_run()
 	push_error(message)
-	quit(1)
+	finish(1)

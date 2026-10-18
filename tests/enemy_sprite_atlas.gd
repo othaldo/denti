@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 const PREPARED = preload("res://scripts/enemies/prepared_enemy_sprites.gd")
 const TYPES: Array[EnemyData] = [WaveController.PLAQUE, WaveController.BACTERIA, WaveController.SUGAR, WaveController.ACID_SPITTER, WaveController.POISON_GERM, WaveController.GUM_BITER, WaveController.ACID_CROWN, WaveController.HUNT_GERM]
@@ -30,4 +30,4 @@ func _run() -> void:
 			push_error("enemy atlas unexpectedly changed a boss image")
 	if failures == 0:
 		print("Denti enemy sprite atlas test passed")
-	quit(0 if failures == 0 else 1)
+	finish(0 if failures == 0 else 1)

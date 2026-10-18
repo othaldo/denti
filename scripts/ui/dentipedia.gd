@@ -129,29 +129,29 @@ func _show(entry: Dictionary) -> void:
 	for button in listing.get_children():
 		button.set_pressed_no_signal(button.get_meta("entry") == entry)
 	if entry.is_empty():
-		ShopDetails._label(detail, "Keine Einträge gefunden", 17)
+		DentiUIComponents.label(detail, "Keine Einträge gefunden", 17)
 		return
 	var header := HBoxContainer.new()
 	detail.add_child(header)
 	var compact := get_viewport_rect().size.y < 420
 	if entry.has("icon"):
 		_image(header, entry.icon, entry.get("locked", false), 40 if compact else 80)
-	var title := ShopDetails._label(header, entry.title, 18 if compact else 22)
+	var title := DentiUIComponents.label(header, entry.title, 18 if compact else 22)
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if entry.get("evolved", false):
 		title.add_theme_color_override("font_color", WeaponPresentation.EVOLUTION_COLOR)
-	ShopDetails._label(detail, entry.body, 16)
+	DentiUIComponents.label(detail, entry.body, 16)
 	if entry.has("recipe"):
-		ShopDetails._label(detail, "Fusion", 20)
+		DentiUIComponents.label(detail, "Fusion", 20)
 		var ingredients := HFlowContainer.new()
 		ingredients.add_theme_constant_override("h_separation", 8)
 		detail.add_child(ingredients)
 		for ingredient in DentipediaData.ingredients(entry.recipe):
 			if ingredients.get_child_count() > 0:
-				ShopDetails._label(ingredients, "+", 20)
+				DentiUIComponents.label(ingredients, "+", 20)
 			var cell := VBoxContainer.new()
 			cell.custom_minimum_size.x = 115
 			ingredients.add_child(cell)
 			_image(cell, ingredient.icon, false, 52)
-			ShopDetails._label(cell, ingredient.title, 14).custom_minimum_size.x = 115
-		ShopDetails._label(detail, "→ " + str(entry.title) + "\nItems bleiben erhalten; die beteiligten Waffen werden ersetzt.", 16)
+			DentiUIComponents.label(cell, ingredient.title, 14).custom_minimum_size.x = 115
+		DentiUIComponents.label(detail, "→ " + str(entry.title) + "\nItems bleiben erhalten; die beteiligten Waffen werden ersetzt.", 16)

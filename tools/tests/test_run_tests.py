@@ -28,6 +28,10 @@ if name == "timeout":
     time.sleep(10)
 if name == "script_error":
     print("SCRIPT ERROR: deliberately simulated", flush=True)
+elif name == "engine_error":
+    print("ERROR: deliberately simulated", flush=True)
+elif name == "leak_warning":
+    print("WARNING: 2 ObjectDB instances were leaked at exit", flush=True)
 elif name == "exit_failure":
     sys.exit(1)
 else:
@@ -74,6 +78,18 @@ else:
         self.assertTrue(result["timed_out"])
         self.assertFalse(result["passed"])
         self.assertLess(result["seconds"], 5)
+
+    def test_zero_exit_engine_errors_fail(self):
+        result = self.run_test("engine_error")
+        self.assertEqual(result["exit_code"], 0)
+        self.assertEqual(result["engine_errors"], ["ERROR: deliberately simulated"])
+        self.assertFalse(result["passed"])
+
+    def test_zero_exit_leak_warnings_fail(self):
+        result = self.run_test("leak_warning")
+        self.assertEqual(result["exit_code"], 0)
+        self.assertEqual(len(result["leak_warnings"]), 1)
+        self.assertFalse(result["passed"])
 
     def test_filter_keeps_all_matches_and_rejects_empty_suite(self):
         tests = self.root / "tests"

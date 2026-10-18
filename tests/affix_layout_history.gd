@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 func _initialize() -> void:
 	call_deferred("_run")
@@ -34,18 +34,18 @@ func _run() -> void:
 					for label: Label in selector.get_meta("labels"):
 						if not selector.get_global_rect().grow(0.5).encloses(label.get_global_rect()):
 							push_error("Enchanted weapon name escapes selector at %s: %s" % [extent, label.text])
-							quit(1)
+							finish(1)
 							return
 						for line in label.text.split("\n"):
 							if label.get_theme_font("font").get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1, label.get_theme_font_size("font_size")).x > label.size.x + 1:
 								push_error("Enchanted weapon name is clipped at %s: %s" % [extent, label.text])
-								quit(1)
+								finish(1)
 								return
 				for card in panel.buttons:
 					for control in [card.icon_rect, card.name_label, card.keep_label, card.rarity_label, card.effect_label, card.progress_bar]:
 						if control.visible and not card.get_global_rect().grow(0.5).encloses(control.get_global_rect()):
 							push_error("Affix content escapes card at %s: %s / %s" % [extent, control.get_global_rect(), card.get_global_rect()])
-							quit(1)
+							finish(1)
 							return
 				if "--capture" in OS.get_cmdline_user_args() and target == 0:
 					await RenderingServer.frame_post_draw
@@ -60,11 +60,11 @@ func _run() -> void:
 						await process_frame
 					if _snapshot(panel) != expected:
 						push_error("Affix layout depends on selection history at %s, weapon %d: %s != %s" % [extent, target, _snapshot(panel), expected])
-						quit(1)
+						finish(1)
 						return
 	session.clear_run()
 	print("PASS affix layout is independent of weapon selection history")
-	quit(0)
+	finish(0)
 
 func _snapshot(panel: WeaponChestPanel) -> Array:
 	var result: Array = []

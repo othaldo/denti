@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var game: Node2D
 var failures: Array[String] = []
@@ -151,4 +151,4 @@ func _run() -> void:
 		audit_sheet.save_png("res://.godot/weapon-audit/all-weapons.png")
 	if failures.is_empty():
 		print("PASS weapon_visual_contract: 24 weapons, 5 directions, 2 densities; tracking, resume and impact")
-	quit(0 if failures.is_empty() else 1)
+	finish(0 if failures.is_empty() else 1)

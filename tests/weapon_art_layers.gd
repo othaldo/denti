@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 
 func _initialize() -> void:
@@ -54,9 +54,9 @@ func _run() -> void:
 				_fail("refined icon touches its atlas cell border: " + str(data.id))
 				return
 	print("PASS weapon_art_layers")
-	quit()
+	finish()
 
 
 func _fail(message: String) -> void:
 	push_error(message)
-	quit(1)
+	finish(1)

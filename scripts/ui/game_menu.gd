@@ -53,7 +53,7 @@ func open_pause() -> void:
 
 func close_pause() -> void:
 	visible = false
-	get_tree().paused = game != null and (game.shop_panel.visible or game.choice_panel.visible or game.weapon_chest_panel.visible or game.story_dialogue.visible or game.story_travel.visible)
+	get_tree().paused = game != null and game.run_flow.requires_pause()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -288,7 +288,7 @@ func _show_home() -> void:
 
 
 func _compact_title(title: String) -> void:
-	ShopDetails._label(rows, title, 24)
+	DentiUIComponents.label(rows, title, 24)
 	rows.add_theme_constant_override("separation", 6)
 
 
@@ -340,10 +340,10 @@ func _show_stats() -> void:
 	_compact_title("Stats")
 	var stats: PlayerStats = game.player.stats
 	var wave_text := "Endlos · Welle %d" % game.wave.current_wave if game.wave.endless_enabled else "Welle %d / %d" % [game.wave.current_wave, WaveController.MAX_WAVES]
-	ShopDetails._label(rows, "Leben %.0f / %.0f · Schild %d · Level %d\nXP %d / %d · %s" % [stats.health, stats.max_health, stats.shield_charges, game.level, game.xp, game.xp_goal, wave_text], 16)
+	DentiUIComponents.label(rows, "Leben %.0f / %.0f · Schild %d · Level %d\nXP %d / %d · %s" % [stats.health, stats.max_health, stats.shield_charges, game.level, game.xp, game.xp_goal, wave_text], 16)
 	var wallet := HBoxContainer.new()
 	rows.add_child(wallet)
-	ShopDetails._label(wallet, str(game.coins), 18).autowrap_mode = TextServer.AUTOWRAP_OFF
+	DentiUIComponents.label(wallet, str(game.coins), 18).autowrap_mode = TextServer.AUTOWRAP_OFF
 	var coin := TextureRect.new()
 	coin.texture = DentiUIIcons.hud(2)
 	coin.custom_minimum_size = Vector2(24, 24)
@@ -367,7 +367,7 @@ func _show_stats() -> void:
 		chip.add_theme_font_size_override("font_size", 14)
 		grid.add_child(chip)
 		chip.pressed.connect(func() -> void: DentiDentikon.open_attribute(chip, type))
-	ShopDetails._label(rows, "Wurzeln · %d/6" % game.player.loadout.used_slots(), 16)
+	DentiUIComponents.label(rows, "Wurzeln · %d/6" % game.player.loadout.used_slots(), 16)
 	var weapons := HBoxContainer.new()
 	weapons.add_theme_constant_override("separation", 4)
 	rows.add_child(weapons)
@@ -380,7 +380,7 @@ func _show_stats() -> void:
 		chip.custom_minimum_size = Vector2(0, 52)
 		chip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		chip.size_flags_stretch_ratio = float(weapon.data.hands)
-		chip.tooltip_text = "%s\n%s\n%s" % [WeaponPresentation.weapon_name(weapon), weapon.data.stats_text(weapon.tier), weapon.data.combat_text() + "\n" + WeaponAffixes.summary(weapon, game.player.stats, game.items)]
+		chip.tooltip_text = "%s\n%s\n%s" % [WeaponPresentation.weapon_name(weapon), weapon.data.stats_text(weapon.tier), weapon.data.combat_text() + "\n" + AffixPresentation.summary(weapon, game.player.stats, game.items)]
 		DentiUIStyle.style_card(chip, weapon.tier, WeaponPresentation.special_color(weapon.data))
 		weapons.add_child(chip)
 		chip.pressed.connect(_show_weapon_details.bind(weapon.data, weapon.tier, weapon))
@@ -404,13 +404,9 @@ func _show_items() -> void:
 	page = &"items"
 	_clear_rows()
 	_compact_title("Items & Relikte")
-	var owned: Array[Dictionary] = game.items.all_items()
-	for id in game.relics.owned:
-		var relic := RelicCatalog.by_id(StringName(id))
-		if relic != null:
-			owned.append({"name": relic.display_name, "count": 1, "description": DentiAttributes.resolve_text(relic.description), "icon": DentiUIIcons.relic(relic.icon_index), "relic": true})
+	var owned := BuildPresentation.collected_entries(game.items, game.relics)
 	if owned.is_empty():
-		ShopDetails._label(rows, "Keine Items oder Relikte", 16)
+		DentiUIComponents.label(rows, "Keine Items oder Relikte", 16)
 	else:
 		build_scroll = ScrollContainer.new()
 		build_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED

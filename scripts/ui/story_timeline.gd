@@ -13,7 +13,7 @@ var route: Control
 func _ready() -> void:
 	add_theme_constant_override("separation", 4)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	heading = ShopDetails._label(self, "", 14)
+	heading = DentiUIComponents.label(self, "", 14)
 	heading.add_theme_color_override("font_color", DentiUIStyle.GOLD)
 	previews = HBoxContainer.new()
 	previews.add_theme_constant_override("separation", 6)

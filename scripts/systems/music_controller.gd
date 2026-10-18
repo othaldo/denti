@@ -32,6 +32,10 @@ func _ready() -> void:
 		track.loop = false
 
 
+func _exit_tree() -> void:
+	stop_music()
+
+
 func _process(delta: float) -> void:
 	if fade_state == FadeState.IDLE:
 		return

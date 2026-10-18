@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var failures := 0
 
@@ -123,4 +123,4 @@ func _run() -> void:
 	session.clear_run()
 	if failures == 0:
 		print("PASS status_enemy_distribution")
-	quit(0 if failures == 0 else 1)
+	finish(0 if failures == 0 else 1)

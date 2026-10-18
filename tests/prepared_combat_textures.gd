@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var failures := 0
 const MAX_PAINTED_CHANNEL_ERROR := 1
@@ -109,4 +109,4 @@ func _run() -> void:
 			_check(image.get_pixel(middle + radius * 2, middle).a > 0.9 and image.get_pixel(middle, middle).a == 0.0, "evolution mark lost radius/stroke or clear center")
 	if failures == 0:
 		print("Denti prepared combat textures and geometry test passed")
-	quit(0 if failures == 0 else 1)
+	finish(0 if failures == 0 else 1)

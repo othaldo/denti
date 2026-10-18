@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 func _initialize() -> void:
 	call_deferred("_run")
@@ -37,4 +37,4 @@ func _run() -> void:
 			assert(actual > previous * 1.15 and actual < previous * 1.30, "HP compensation is missing or makes enemies sponges")
 	assert(is_equal_approx(ChestRewards.drop_chance(100), 0.04))
 	print("PASS affix compensation: HP, density and bounded chest economy")
-	quit(0)
+	finish(0)

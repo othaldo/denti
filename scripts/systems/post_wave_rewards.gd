@@ -44,7 +44,7 @@ func mark_chest_spawned() -> void:
 
 
 func queue_chest(item_id: StringName, scrap_coins: int) -> void:
-	var item := ShopController.by_id(item_id)
+	var item := ItemCatalog.by_id(item_id)
 	if item == null or item.weapon_data != null:
 		return
 	pending_chests.append({"item_id": str(item_id), "scrap_coins": maxi(scrap_coins, 1)})
@@ -129,7 +129,7 @@ func restore(saved: Dictionary) -> void:
 		if entry.get("kind", "") == "affix":
 			queue_affix_chest(entry)
 			continue
-		var item := ShopController.by_id(StringName(str(entry.get("item_id", ""))))
+		var item := ItemCatalog.by_id(StringName(str(entry.get("item_id", ""))))
 		if item != null and item.weapon_data == null:
 			pending_chests.append({"item_id": str(item.id), "scrap_coins": maxi(int(entry.get("scrap_coins", 1)), 1)})
 	pending_relics.clear()

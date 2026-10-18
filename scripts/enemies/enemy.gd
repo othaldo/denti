@@ -47,6 +47,7 @@ var boss_dash_end: Vector2 = Vector2.ZERO
 var boss_dash_origin: Vector2 = Vector2.ZERO
 var pulse_flash_time: float = 0.0
 var dying: bool = false
+var death_resolved: bool = false
 var death_elapsed: float = 0.0
 var is_enraged: bool = false
 var overtime_active: bool = false
@@ -344,39 +345,15 @@ func _process_special(delta: float, direction: Vector2) -> void:
 
 # Overtime is independent of the existing half-health rage phase.
 func start_overtime() -> void:
-	if not data.is_boss or overtime_active or dying or health <= 0.0:
-		return
-	overtime_active = true
-	is_enraged = true
-	sync_inflammation_aura()
-	enraged.emit(global_position)
-	queue_redraw()
+	BossAttackController.start_overtime(self)
 
 
 func _tick_overtime(delta: float) -> void:
-	if not overtime_active or dying or health <= 0.0 or target == null or target.stats.health <= 0.0:
-		return
-	overtime_tick += maxf(delta, 0.0)
-	var ticks := floori(overtime_tick + 0.000001)
-	if ticks > 0:
-		overtime_tick = maxf(overtime_tick - ticks, 0.0)
-		advance_overtime(ticks)
+	BossAttackController.tick_overtime(self, delta)
 
 
 func advance_overtime(seconds: int) -> void:
-	if not data.is_boss or seconds <= 0:
-		return
-	var next := overtime_seconds + seconds
-	var damage_factor := (1.0 + data.overtime_damage_per_second * next) / (1.0 + data.overtime_damage_per_second * overtime_seconds)
-	var health_factor := (1.0 + data.overtime_health_per_second * next) / (1.0 + data.overtime_health_per_second * overtime_seconds)
-	contact_damage *= damage_factor
-	attack_damage *= damage_factor
-	max_health *= health_factor
-	health *= health_factor
-	boss_damage_budget *= health_factor
-	overtime_seconds = next
-	sync_inflammation_aura()
-	queue_redraw()
+	BossAttackController.advance_overtime(self, seconds)
 
 
 func sync_inflammation_aura(delta: float = 0.0, death_progress: float = 0.0) -> void:
@@ -428,8 +405,7 @@ func _pulse_aura() -> void:
 
 
 func _boss_dash_target(direction: Vector2) -> Vector2:
-	var margin := DentiArena.WALL_WIDTH + data.radius + 6.0
-	return (global_position + direction * data.attack_speed * data.attack_duration).clamp(Vector2.ONE * margin, target.arena.arena_size - Vector2.ONE * margin)
+	return BossAttackController.boss_dash_target(self, direction)
 
 
 func _activate_special() -> void:
@@ -499,42 +475,19 @@ func _dash_impact() -> void:
 
 
 func _fire_phase_burst() -> void:
-	boss_radial_volleys_remaining = maxi(data.boss_radial_volley_count + difficulty.boss_volley_bonus, 1)
-	boss_radial_volley_timer = 0.0
-	boss_radial_volley_index = 0
-	_fire_next_boss_radial_volley()
+	BossAttackController.fire_phase_burst(self)
 
 
 func _fire_next_boss_radial_volley() -> void:
-	var root := _projectile_root()
-	var volley_angle := boss_phase_gap_angle + deg_to_rad(data.boss_radial_angle_step_degrees * float(boss_radial_volley_index))
-	if root != null:
-		EnemyProjectilePatterns.fire_radial(root, global_position, data.boss_radial_count + boss_phase * 2, volley_angle, data.boss_projectile_speed * overtime_speed_factor(), attack_damage * 0.55, target, EnemyProjectilePatterns.BOSS_COLOR, inflicted_statuses)
-	boss_radial_volley_index += 1
-	boss_radial_volleys_remaining -= 1
-	if boss_radial_volleys_remaining > 0:
-		boss_radial_volley_timer += data.boss_radial_volley_interval
-	elif boss_phase >= 2:
-		_fire_boss_signature(Vector2.RIGHT.rotated(boss_phase_gap_angle))
+	BossAttackController.fire_next_boss_radial_volley(self)
 
 
 func _fire_boss_fan() -> void:
-	_fire_boss_signature(special_direction)
+	BossAttackController.fire_boss_fan(self)
 
 
 func _fire_boss_signature(charge_direction: Vector2) -> void:
-	var root := _projectile_root()
-	if root == null:
-		return
-	match data.boss_signature:
-		EnemyData.BossSignature.AIMED_FAN:
-			EnemyProjectilePatterns.fire_aimed_fan(root, global_position, target.global_position - global_position, maxi(data.boss_fan_count + difficulty.boss_volley_bonus * 2, 1), data.boss_projectile_speed * overtime_speed_factor(), attack_damage * 0.45, target, EnemyProjectilePatterns.BOSS_COLOR, 3.0, inflicted_statuses)
-		EnemyData.BossSignature.TRAIL_FAN:
-			EnemyProjectilePatterns.fire_aimed_fan(root, global_position, -charge_direction, maxi(data.boss_fan_count + difficulty.boss_volley_bonus * 2, 1), data.boss_projectile_speed * overtime_speed_factor(), attack_damage * 0.45, target, EnemyProjectilePatterns.BOSS_COLOR, 3.0, inflicted_statuses)
-		EnemyData.BossSignature.LANE:
-			EnemyProjectilePatterns.fire_lane(root, global_position, charge_direction, maxi(data.boss_signature_projectile_count + difficulty.boss_volley_bonus, 1), data.boss_signature_projectile_spacing, data.boss_projectile_speed * overtime_speed_factor(), attack_damage * 0.45, target, EnemyProjectilePatterns.BOSS_COLOR, inflicted_statuses)
-		EnemyData.BossSignature.SPACE_ORB:
-			EnemyProjectilePatterns.fire_space_orb(root, global_position, charge_direction, data.boss_projectile_speed * overtime_speed_factor(), attack_damage * 0.5, data.boss_signature_orb_radius, target, inflicted_statuses)
+	BossAttackController.fire_boss_signature(self, charge_direction)
 
 
 func _projectile_root() -> Node2D:
@@ -641,26 +594,16 @@ func take_damage(amount: float, weapon: WeaponData = null, critical: bool = fals
 			affix_effects.ice_power = maxf(affix_effects.ice_power, float(addition.damage))
 	if weapon != null:
 		weapon_hit.emit(self, applied * normal_share, weapon, critical)
+	# A synchronous on-hit effect can kill this enemy in a nested damage call.
+	if death_resolved:
+		return counted
 	if data.is_boss and not is_enraged and health > 0.0 and health <= max_health * 0.5:
 		is_enraged = true
 		enraged.emit(global_position)
 	if data.is_boss and boss_phase < 2 and health <= _boss_phase_floor() + 0.01:
 		_start_boss_phase()
 	if health <= 0.0:
-		health = 0.0
-		for addition in delayed:
-			if addition.id == &"fire":
-				affix_effects.remember_fire(addition.damage, addition.can_spread)
-		died.emit(self, counted)
-		remove_from_group("enemies")
-		if data.is_boss:
-			dying = true
-			death_elapsed = 0.0
-			death_started.emit(global_position)
-			queue_redraw()
-		else:
-			defeated.emit(global_position, data)
-			queue_free()
+		_finish_death(counted, delayed)
 	else:
 		# Ordinary enemies have no health/guard bar; hit flash uses modulate.
 		if data.is_boss or data.is_elite:
@@ -671,31 +614,36 @@ func take_damage(amount: float, weapon: WeaponData = null, critical: bool = fals
 	return counted
 
 
+func _finish_death(amount: float, delayed: Array[Dictionary]) -> void:
+	if death_resolved:
+		return
+	death_resolved = true
+	health = 0.0
+	for addition in delayed:
+		if addition.id == &"fire":
+			affix_effects.remember_fire(addition.damage, addition.can_spread)
+	died.emit(self, amount)
+	remove_from_group("enemies")
+	if data.is_boss:
+		dying = true
+		death_elapsed = 0.0
+		death_started.emit(global_position)
+		queue_redraw()
+	else:
+		defeated.emit(global_position, data)
+		queue_free()
+
+
 func _boss_phase_floor() -> float:
-	return max_health * (2.0 - float(boss_phase)) / 3.0
+	return BossAttackController.boss_phase_floor(self)
 
 
 func _start_boss_phase() -> void:
-	boss_phase += 1
-	boss_phase_timer = data.boss_phase_duration
-	boss_phase_burst_fired = false
-	boss_radial_volleys_remaining = 0
-	boss_radial_volley_timer = 0.0
-	boss_radial_volley_index = 0
-	boss_phase_gap_angle = global_position.angle_to_point(target.global_position)
-	special_direction = Vector2.RIGHT.rotated(boss_phase_gap_angle)
-	special_phase = SpecialPhase.COOLDOWN
-	special_timer = data.special_interval * (0.72 if is_enraged else 1.0)
-	boss_phase_started.emit(global_position, boss_phase)
-	reinforcements_requested.emit(data.boss_phase_adds)
-	queue_redraw()
+	BossAttackController.start_boss_phase(self)
 
 
 func _guard_boss_hit() -> void:
-	if boss_guard_feedback_time <= 0.0:
-		boss_guarded.emit(global_position)
-		boss_guard_feedback_time = 0.8
-	queue_redraw()
+	BossAttackController.guard_boss_hit(self)
 
 
 func _guard_elite_hit() -> void:
@@ -706,186 +654,36 @@ func _guard_elite_hit() -> void:
 
 
 func _draw() -> void:
-	if data != null and health > 0.0:
-		for index in inflicted_statuses.size():
-			var kind := int(inflicted_statuses[index]["kind"])
-			var at := Vector2((index - (inflicted_statuses.size() - 1) * 0.5) * 15.0, -data.radius - 7.0)
-			draw_circle(at, 5.0, DentiStatus.COLORS[kind])
-			if kind == DentiStatus.Type.BLEED:
-				draw_line(at + Vector2(-2, 2), at + Vector2(2, -2), Color.WHITE, 2.0)
-			else:
-				draw_circle(at, 2.0, Color(0.13, 0.35, 0.13))
-	if data == null:
-		return
-	if treasure_carrier and health > 0.0:
-		draw_arc(Vector2.ZERO, data.radius + 6.0, 0, TAU, 24, Color(1, 0.8, 0.25, 0.75), 2.0)
-		for index in 4:
-			var point := Vector2.RIGHT.rotated(animation_time * 0.4 + index * TAU / 4.0) * (data.radius + 11.0)
-			var shine := 3.0 + sin(animation_time + index) * 1.5
-			draw_line(point - Vector2(shine, 0), point + Vector2(shine, 0), Color(1, 0.95, 0.6), 2.0)
-			draw_line(point - Vector2(0, shine), point + Vector2(0, shine), Color(1, 0.95, 0.6), 2.0)
-	if dying:
-		var progress := clampf(death_elapsed / BOSS_DEATH_DURATION, 0.0, 1.0)
-		var fade := 1.0 - progress
-		draw_circle(Vector2.ZERO, data.radius * (1.0 + progress * 3.0), Color(0.56, 0.15, 0.42, 0.18 * fade))
-		CombatDrawCache.arc(self, Vector2.ZERO, data.radius * (0.8 + progress * 3.4), 0.0, TAU, 48, Color(1.0, 0.78, 0.38, 0.95 * fade), 11.0 * fade + 2.0)
-		for index in 12:
-			var ray := Vector2.RIGHT.rotated(TAU * float(index) / 12.0 + 0.2)
-			var shard_at := ray * (data.radius * 0.7 + progress * 180.0)
-			draw_line(shard_at, shard_at + ray * (16.0 + 26.0 * fade), Color(1.0, 0.76, 0.35, fade), 6.0 * fade + 1.0)
-		return
-	if data.is_boss and data.boss_guard_recharge_seconds > 0.0:
-		if boss_phase_timer > 0.0 or boss_radial_volleys_remaining > 0:
-			CombatDrawCache.arc(self, Vector2.ZERO, data.radius + 19.0, 0.0, TAU, 48, Color(0.95, 0.32, 0.63, 0.9), 7.0)
-			if not boss_phase_burst_fired or boss_radial_volleys_remaining > 0:
-				var first_preview_index := boss_radial_volley_index if boss_phase_burst_fired else 0
-				var preview_count := boss_radial_volleys_remaining if boss_phase_burst_fired else data.boss_radial_volley_count
-				var current_gap_angle := boss_phase_gap_angle + deg_to_rad(data.boss_radial_angle_step_degrees * float(first_preview_index))
-				for ray in EnemyProjectilePatterns.radial_directions(data.boss_radial_count + boss_phase * 2, current_gap_angle):
-					AttackEffects.aim(self, ray * data.radius, ray * 290.0, Color(0.95, 0.25, 0.42, 0.6), 0.5)
-				for volley_offset in preview_count:
-					var preview_angle := boss_phase_gap_angle + deg_to_rad(data.boss_radial_angle_step_degrees * float(first_preview_index + volley_offset))
-					var gap_marker := Vector2.RIGHT.rotated(preview_angle) * 290.0
-					CombatDrawCache.arc(self, gap_marker, 10.0, 0.0, TAU, 20, Color(1.0, 0.78, 0.3, 0.88), 3.0)
-				if boss_phase >= 2:
-					var phase_aim := Vector2.RIGHT.rotated(boss_phase_gap_angle)
-					match data.boss_signature:
-						EnemyData.BossSignature.AIMED_FAN:
-							for ray in EnemyProjectilePatterns.fan_directions(phase_aim, data.boss_fan_count):
-								AttackEffects.aim(self, ray * data.radius, ray * 320.0, Color(1.0, 0.65, 0.3, 0.7), 0.5)
-						EnemyData.BossSignature.TRAIL_FAN:
-							for ray in EnemyProjectilePatterns.fan_directions(-phase_aim, data.boss_fan_count):
-								AttackEffects.aim(self, ray * data.radius, ray * 320.0, Color(1.0, 0.65, 0.3, 0.7), 0.5)
-						EnemyData.BossSignature.LANE:
-							var lane_half_width := data.boss_signature_projectile_spacing * float(data.boss_signature_projectile_count - 1) * 0.5 + 21.0
-							var lane_end := phase_aim * 520.0
-							AttackEffects.lane(self, Vector2.ZERO, lane_end, lane_half_width, Color(1.0, 0.35, 0.48, 0.8), 0.5)
-						EnemyData.BossSignature.SPACE_ORB:
-							var orb_end := phase_aim * 520.0
-							AttackEffects.lane(self, Vector2.ZERO, orb_end, data.boss_signature_orb_radius * 0.7, Color(1.0, 0.43, 0.25, 0.65), 0.5)
-							GroundEffects.draw(self, GroundEffects.Shape.DANGER, orb_end, data.boss_signature_orb_radius, Color(1.0, 0.48, 0.3, 0.85))
-		elif boss_damage_budget <= max_health * 0.01:
-			CombatDrawCache.arc(self, Vector2.ZERO, data.radius + 19.0, 0.0, TAU, 48, Color(0.43, 0.84, 0.94, 0.8), 5.0)
-	if data.is_elite and data.elite_guard_fraction > 0.0:
-		var guard_ratio := clampf(elite_damage_budget / (max_health * data.elite_guard_fraction), 0.0, 1.0)
-		CombatDrawCache.arc(self, Vector2.ZERO, data.radius + 18.0, 0.0, TAU, 40, Color(0.43, 0.84, 0.94, 0.22), 4.0)
-		if guard_ratio > 0.0:
-			CombatDrawCache.arc(self, Vector2.ZERO, data.radius + 18.0, -PI / 2.0, -PI / 2.0 + TAU * guard_ratio, 40, Color(0.43, 0.84, 0.94, 0.85), 4.0)
-	if spatial_index == null:
-		draw_attack_visuals(self)
-	if pulse_flash_time > 0.0:
-		var flash_radius := data.dash_impact_radius if active_special_attack == EnemyData.SpecialAttack.DASH and data.dash_impact_radius > 0.0 else data.attack_radius
-		CombatDrawCache.arc(self, Vector2.ZERO, flash_radius, 0.0, TAU, 64, Color(1.0, 0.72, 0.27, pulse_flash_time / PULSE_FLASH_DURATION), 8.0)
-	affix_effects.draw_markers(self)
-	if bleed_stacks > 0:
-		CombatDrawCache.arc(self, Vector2.ZERO, data.radius + 4.0, 0.0, TAU, 24, Color(0.78, 0.25, 0.48, 0.85), 2.5 + bleed_stacks)
-	if wet_time > 0.0:
-		CombatDrawCache.arc(self, Vector2.ZERO, data.radius + 8.0, 0.0, TAU, 24, Color(0.36, 0.86, 1.0, 0.88), 3.0)
-	if exposure_time > 0.0:
-		CombatDrawCache.arc(self, Vector2.ZERO, data.radius + 6.0, 0.0, TAU, 24, Color(0.65, 1.0, 0.70, 0.8), 2.0)
-	if haste_time > 0.0:
-		CombatDrawCache.arc(self, Vector2.ZERO, data.radius + 8.0, 0.0, TAU, 24, Color(1.0, 0.46, 0.73, 0.9), 3.0)
-	if data.is_elite:
-		CombatDrawCache.arc(self, Vector2.ZERO, data.radius + 12.0, 0.0, TAU, 40, Color(1.0, 0.73, 0.24, 0.95), 4.0)
-	if data.aura_radius > 0.0:
-		CombatDrawCache.arc(self, Vector2.ZERO, data.aura_radius, 0.0, TAU, 48, Color(1.0, 0.46, 0.73, 0.45), 2.0)
-	if is_enraged and not overtime_active:
-		CombatDrawCache.arc(self, Vector2.ZERO, data.radius + 12.0, 0.0, TAU, 40, Color(1.0, 0.26, 0.23, 0.85), 4.0)
-	if spatial_index == null:
-		draw_circle(Vector2(0.0, data.radius * 0.7), data.radius * 0.7, Color(0.17, 0.13, 0.17, 0.17))
-	if data.is_boss:
-		draw_rect(Rect2(Vector2(-data.radius, data.radius + 11.0), Vector2(data.radius * 2.0, 8.0)), Color(0.18, 0.13, 0.2))
-		draw_rect(Rect2(Vector2(-data.radius + 1.0, data.radius + 12.0), Vector2((data.radius * 2.0 - 2.0) * health / max_health, 6.0)), Color(0.92, 0.49, 0.25))
-
+	EnemyVisuals.draw(self)
 
 
 func _warning_rays(mode: int, count: int) -> Array[Vector2]:
-	if mode != warning_ray_mode or count != warning_ray_count or special_direction != warning_ray_direction:
-		warning_rays = EnemyProjectilePatterns.fan_directions(special_direction, count) if mode == EnemyData.SpecialAttack.SHOOT else EnemyProjectilePatterns.radial_directions(count, special_direction.angle() + PI)
-		warning_ray_mode = mode
-		warning_ray_count = count
-		warning_ray_direction = special_direction
-	return warning_rays
+	return EnemyVisuals.warning_rays(self, mode, count)
 
 
 func warning_lane_start() -> Vector2:
-	return special_direction * data.radius * 0.5 if active_special_attack == EnemyData.SpecialAttack.BOSS and boss_move == BossMove.CHARGE else Vector2.ZERO
+	return EnemyVisuals.warning_lane_start(self)
+
 
 func warning_lane_end() -> Vector2:
-	match active_special_attack:
-		EnemyData.SpecialAttack.DASH:
-			if target == null:
-				return Vector2.ZERO
-			var margin := DentiArena.WALL_WIDTH + data.radius + 6.0
-			return (global_position + special_direction * data.attack_speed * data.attack_duration).clamp(Vector2.ONE * margin, target.arena.arena_size - Vector2.ONE * margin) - global_position
-		EnemyData.SpecialAttack.BOSS:
-			return boss_dash_end - global_position
-		EnemyData.SpecialAttack.LANE, EnemyData.SpecialAttack.SPACE_ORB:
-			return special_direction.normalized() * 550.0
-	return Vector2.ZERO
+	return EnemyVisuals.warning_lane_end(self)
+
 
 func warning_lane_half_width() -> float:
-	match active_special_attack:
-		EnemyData.SpecialAttack.DASH:
-			return data.radius
-		EnemyData.SpecialAttack.BOSS:
-			return data.radius + 19.0 if boss_move == BossMove.CHARGE else 0.0
-		EnemyData.SpecialAttack.LANE:
-			return data.lane_projectile_spacing * float(data.lane_projectile_count - 1) * 0.5 + 21.0
-		EnemyData.SpecialAttack.SPACE_ORB:
-			return data.space_orb_radius * 0.7
-	return 0.0
+	return EnemyVisuals.warning_lane_half_width(self)
+
 
 func draw_warning_fill(canvas: CanvasItem, base: Transform2D = Transform2D.IDENTITY, fill_scales: PackedFloat32Array = PackedFloat32Array()) -> void:
-	if special_phase != SpecialPhase.WARNING or warning_lane_half_width() <= 0.0:
-		return
-	var tint := Color(0.73, 0.20, 0.19, 0.85)
-	match active_special_attack:
-		EnemyData.SpecialAttack.BOSS:
-			tint = Color(1.0, 0.3, 0.32, 0.95)
-		EnemyData.SpecialAttack.LANE:
-			tint = Color(0.50, 0.88, 0.14, 0.9)
-		EnemyData.SpecialAttack.SPACE_ORB:
-			tint = Color(1.0, 0.43, 0.25, 0.65)
-	if canvas != self:
-		tint *= modulate * self_modulate
-	var progress := 1.0 - clampf(special_timer / maxf(data.warning_time, 0.01), 0.0, 1.0)
-	AttackEffects.lane(canvas, warning_lane_start(), warning_lane_end(), warning_lane_half_width(), tint, progress, base, fill_scales)
+	EnemyVisuals.draw_warning_fill(self, canvas, base, fill_scales)
+
 
 func draw_attack_visuals(canvas: CanvasItem, base: Transform2D = Transform2D.IDENTITY, fill_scales: PackedFloat32Array = PackedFloat32Array(), draw_fill: bool = true) -> void:
-	var visual_tint := modulate * self_modulate if canvas != self else Color.WHITE
-	if draw_fill:
-		draw_warning_fill(canvas, base, fill_scales)
-	if special_phase == SpecialPhase.WARNING:
-		var warning_color := Color(0.73, 0.20, 0.19, 0.85)
-		var warning_progress := 1.0 - clampf(special_timer / maxf(data.warning_time, 0.01), 0.0, 1.0)
-		if active_special_attack == EnemyData.SpecialAttack.DASH or active_special_attack == EnemyData.SpecialAttack.BOSS and boss_move == BossMove.CHARGE:
-			var dash_path := warning_lane_end()
-			if active_special_attack == EnemyData.SpecialAttack.DASH and data.dash_impact_radius > 0.0:
-				AttackEffects.danger(canvas, dash_path, data.dash_impact_radius, warning_color * visual_tint)
-			else:
-				AttackEffects.flash(canvas, dash_path, data.radius * 0.55 if data.is_boss else 9.0, Color(1.0, 0.4, 0.32, 0.6) * visual_tint)
-			AttackEffects.warning_ring(canvas, Vector2.ZERO, data.radius + 7.0, warning_progress, Color(1.0, 0.72, 0.27) * visual_tint)
-		elif active_special_attack == EnemyData.SpecialAttack.SHOOT:
-			var shot_color := Color(DentiStatus.COLORS[int(inflicted_statuses[0]["kind"])], 0.9) if not inflicted_statuses.is_empty() else Color(data.projectile_color, 0.9)
-			for ray in _warning_rays(EnemyData.SpecialAttack.SHOOT, _aimed_projectile_count()):
-				AttackEffects.aim(canvas, ray * data.radius, ray * 150.0, shot_color * visual_tint, warning_progress, base)
-			AttackEffects.warning_ring(canvas, Vector2.ZERO, data.radius + 8.0, warning_progress, shot_color * visual_tint)
-		elif active_special_attack == EnemyData.SpecialAttack.RADIAL:
-			var shot_color := Color(1.0, 0.48, 0.19, 0.9)
-			for ray in _warning_rays(EnemyData.SpecialAttack.RADIAL, data.radial_count):
-				AttackEffects.aim(canvas, ray * data.radius, ray * 235.0, Color(shot_color, 0.3 + warning_progress * 0.35) * visual_tint, warning_progress, base)
-			AttackEffects.warning_ring(canvas, Vector2.ZERO, data.radius + 9.0, warning_progress, shot_color * visual_tint)
-		elif active_special_attack == EnemyData.SpecialAttack.LANE:
-			var lane_color := Color(0.50, 0.88, 0.14, 0.9)
-			AttackEffects.warning_ring(canvas, Vector2.ZERO, data.radius + 8.0, warning_progress, lane_color * visual_tint)
-		elif active_special_attack == EnemyData.SpecialAttack.SPACE_ORB:
-			var orb_color := Color(1.0, 0.43, 0.25, 0.88)
-			var orb_end := warning_lane_end()
-			AttackEffects.danger(canvas, orb_end, data.space_orb_radius, orb_color * visual_tint)
-			AttackEffects.warning_ring(canvas, Vector2.ZERO, data.radius + 8.0, warning_progress, orb_color * visual_tint)
-		else:
-			AttackEffects.danger(canvas, Vector2.ZERO, data.attack_radius, Color(1.0, 0.34, 0.29, 0.8 + warning_progress * 0.2) * visual_tint)
-			AttackEffects.warning_ring(canvas, Vector2.ZERO, data.attack_radius - 8.0, warning_progress, Color(1.0, 0.72, 0.27) * visual_tint)
-	elif special_phase == SpecialPhase.ACTIVE and (active_special_attack == EnemyData.SpecialAttack.DASH or active_special_attack == EnemyData.SpecialAttack.BOSS and boss_move == BossMove.CHARGE):
-		AttackEffects.strip(canvas, AttackEffects.Shape.TRAIL, boss_dash_origin - global_position if data.is_boss else -special_direction * data.radius, Vector2.ZERO, 32.0 if data.is_boss else 16.0, Color(1.0, 0.72, 0.27, 0.7) * visual_tint, animation_time, base)
+	EnemyVisuals.draw_attack_visuals(self, canvas, base, fill_scales, draw_fill)
+
+
+func save_state() -> Dictionary:
+	return EnemySnapshot.capture(self)
+
+
+func restore_state(saved: Dictionary, boss_pending: bool = false) -> void:
+	EnemySnapshot.restore(self, saved, boss_pending)

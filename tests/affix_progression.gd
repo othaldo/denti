@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 func _initialize() -> void:
 	call_deferred("_run")
@@ -63,17 +63,17 @@ func _run() -> void:
 	var rows: VBoxContainer = game.shop_panel.details.affix_rows
 	var rarity_label := rows.get_child(-1) as Label
 	assert(rarity_label.text == "Legendär III+" and rarity_label.get_theme_color("font_color") == DentiRarity.color_for(4), "weapon details use wrong rarity color")
-	assert(WeaponAffixes.comparison(weapon, chest.options[0], game.player.stats, -1).contains("Legendär III+"))
+	assert(AffixPresentation.comparison(weapon, chest.options[0], game.player.stats, -1).contains("Legendär III+"))
 	var offer := {"id": "ice", "rarity": 2, "damage": 7.0}
 	var original_offer := offer.duplicate(true)
-	var brush_text := WeaponAffixes.comparison(weapon, offer, game.player.stats, -1)
+	var brush_text := AffixPresentation.comparison(weapon, offer, game.player.stats, -1)
 	loadout.acquire(WeaponCatalog.by_id(&"uv_lamp"))
 	var lamp: WeaponInstance = loadout.equipped()[-1]
-	var lamp_text := WeaponAffixes.comparison(lamp, offer, game.player.stats, -1)
+	var lamp_text := AffixPresentation.comparison(lamp, offer, game.player.stats, -1)
 	assert(brush_text.get_slice("\n", 0) == "Fundwert: +7.0 Basisschaden" and brush_text.get_slice("\n", 0) == lamp_text.get_slice("\n", 0), "weapon selection changes advertised fund value")
 	assert(brush_text.get_slice("\n", 1) != lamp_text.get_slice("\n", 1) and lamp_text.contains("Auf dieser Waffe:"), "weapon-specific damage is not identified separately")
 	assert(offer == original_offer, "preview changed the drop")
-	var upgrade_text := WeaponAffixes.comparison(weapon, chest.options[0], game.player.stats, -1)
+	var upgrade_text := AffixPresentation.comparison(weapon, chest.options[0], game.player.stats, -1)
 	assert(upgrade_text.begins_with("Fundwert: +25.0 Basisschaden") and upgrade_text.get_slice("\n", 1).contains("->"), "upgrade preview lost fixed fund or before/after damage")
 	# Check the bundled font itself: system fallback can hide missing glyphs on desktop.
 	var glyph_chest := {"kind": "affix", "options": [chest.options[0], {"id": "slot", "rarity": 3}, {"id": "mk", "rarity": 4}], "scrap_coins": 5}
@@ -85,7 +85,7 @@ func _run() -> void:
 				var code: int = text.unicode_at(index)
 				if code > 32 and not DentiUIStyle.FONT.has_char(code):
 					push_error("Affix card uses an unsupported glyph: U+%04X" % code)
-					quit(1)
+					finish(1)
 					return
 	# Names belong to individual weapons, and use development rather than raw
 	# values (a legacy damage roll must not beat a higher-tier tempo effect).
@@ -110,14 +110,14 @@ func _run() -> void:
 	for data in WeaponAffixes.ALL:
 		assert(not data.name_suffix.is_empty())
 		var option := {"id": str(data.id), "rarity": 2, "damage": 7}
-		var compact := WeaponAffixes.comparison(weapon, option, game.player.stats, -1, true)
-		assert(compact.begins_with(WeaponAffixes.effect_description(data.id)) and not compact.contains("Fundwert:"))
-		assert(WeaponAffixes.comparison(weapon, option, game.player.stats, -1).contains("Fundwert: +7.0" if data.effect_kind == "damage" else "Fundstärke: 7.0"))
-	assert(WeaponAffixes.effect_description(&"tempo").contains("schneller"))
+		var compact := AffixPresentation.comparison(weapon, option, game.player.stats, -1, true)
+		assert(compact.begins_with(AffixPresentation.effect_description(data.id)) and not compact.contains("Fundwert:"))
+		assert(AffixPresentation.comparison(weapon, option, game.player.stats, -1).contains("Fundwert: +7.0" if data.effect_kind == "damage" else "Fundstärke: 7.0"))
+	assert(AffixPresentation.effect_description(&"tempo").contains("schneller"))
 	game.shop_panel.details.show_weapon(weapon.data, weapon.tier, game.player, true, equipment)
 	game.shop_panel.details.show_affixes(weapon, game.player.stats)
 	assert(game.shop_panel.details.heading.text.begins_with(WeaponPresentation.weapon_name(weapon)))
 	session.clear_run()
 	paused = false
 	print("PASS ranked affixes, upgrades, matching rewards, migration and Mk colors")
-	quit(0)
+	finish(0)

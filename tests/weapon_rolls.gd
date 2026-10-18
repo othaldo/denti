@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 func _initialize() -> void:
 	call_deferred("_run")
@@ -171,7 +171,7 @@ func _run() -> void:
 	paused = false
 	session.clear_run()
 	print("PASS weapon rolls, shop/fusion/save and chest frequency")
-	quit(0)
+	finish(0)
 
 func _fusion_regressions(loadout: WeaponLoadout, template: WeaponData, rolled: WeaponData, weak: WeaponData) -> void:
 	var specialist := WeaponRolls.resolve(template, {"quality": 3, "damage": 1.7, "interval": 1.35, "range": 1.25, "crit": 0})

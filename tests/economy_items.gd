@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 func _initialize() -> void:
 	call_deferred("_run")
@@ -80,10 +80,10 @@ func _run() -> void:
 	session.clear_run()
 	paused = false
 	print("Denti economy items test passed")
-	quit(0)
+	finish(0)
 
 func _fail(message: String) -> void:
 	paused = false
 	root.get_node("GameSession").clear_run()
 	push_error(message)
-	quit(1)
+	finish(1)

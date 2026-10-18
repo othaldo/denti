@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var failures := 0
 
@@ -109,7 +109,7 @@ func _run() -> void:
 	session.clear_run()
 	if failures == 0:
 		print("PASS denti_expressions")
-	quit(0 if failures == 0 else 1)
+	finish(0 if failures == 0 else 1)
 
 func _visible_bounds(image: Image) -> Rect2i:
 	# Ignore near-transparent generation/antialiasing dust, which is invisible at

@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var game: Node2D
 
@@ -154,7 +154,7 @@ func _run() -> void:
 	paused = false
 	game.free()
 	print("Denti weapon motion test passed")
-	quit(0)
+	finish(0)
 
 func _equip(id: StringName) -> WeaponInstance:
 	game.player.loadout.restore([{"id": str(id), "tier": 1}])
@@ -181,4 +181,4 @@ func _clear() -> void:
 func _fail(message: String) -> void:
 	push_error(message)
 	paused = false
-	quit(1)
+	finish(1)

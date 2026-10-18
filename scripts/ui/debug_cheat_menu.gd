@@ -144,7 +144,7 @@ func _build_ui() -> void:
 	DentiUIStyle.style_button(item_select, false, true)
 	item_select.add_theme_constant_override("icon_max_width", 32)
 	row.add_child(item_select)
-	for item in ShopController.CATALOG:
+	for item in ItemCatalog.ALL:
 		if item.weapon_data == null:
 			item_list.append(item)
 			item_select.add_icon_item(_small_icon(item.icon_texture if item.icon_texture != null else DentiUIIcons.item(item.icon_index)), item.display_name)
@@ -259,7 +259,7 @@ func refresh() -> void:
 		_button(row, "Entfernen", func() -> void: controls.remove_weapon(index); call_deferred("refresh"))
 	for child in owned_rows.get_children():
 		child.free()
-	for item in game.items.all_items():
+	for item in BuildPresentation.item_entries(game.items):
 		var label := _label("%s ×%d" % [item["name"], item["count"]])
 		label.tooltip_text = item["description"]
 		owned_rows.add_child(label)

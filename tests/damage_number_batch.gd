@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 const SCENE := preload("res://scenes/ui/damage_number.tscn")
 var failures := 0
@@ -75,7 +75,7 @@ func _run() -> void:
 		await _render_comparison()
 	if failures == 0:
 		print("Denti shared damage text test passed")
-	quit(0 if failures == 0 else 1)
+	finish(0 if failures == 0 else 1)
 
 func _render_comparison() -> void:
 	var viewport := SubViewport.new()

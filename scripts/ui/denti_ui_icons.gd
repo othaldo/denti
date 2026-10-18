@@ -26,6 +26,26 @@ const STAT_REGIONS: Array[Rect2] = [
 	Rect2(1189, 426, 379, 335), Rect2(1575, 416, 366, 347),
 ]
 const STAT_FRAME_SIZE := Vector2(512, 512)
+# These painted sheets have uneven gutters: a uniform grid cuts motifs and
+# includes fragments from neighboring rows. Keep their source pixels intact.
+const ITEM_FRAME_SIZE := Vector2(384, 384)
+const EXPANSION_FRAME_SIZE := Vector2(480, 480)
+const ITEM_REGIONS: Array[Rect2] = [
+	Rect2(46, 48, 296, 282), Rect2(401, 14, 323, 348), Rect2(724, 77, 334, 265), Rect2(1151, 15, 237, 347),
+	Rect2(77, 368, 236, 343), Rect2(362, 368, 362, 345), Rect2(767, 368, 285, 349), Rect2(1121, 395, 281, 292),
+	Rect2(62, 724, 294, 328), Rect2(369, 722, 331, 318), Rect2(754, 725, 329, 316), Rect2(1119, 699, 314, 357),
+]
+
+const EXPANSION_REGIONS: Array[Rect2] = [
+	Rect2(31, 30, 400, 397), Rect2(480, 44, 372, 364), Rect2(900, 0, 430, 426), Rect2(1330, 15, 416, 411),
+	Rect2(23, 458, 384, 385), Rect2(461, 450, 414, 423), Rect2(916, 444, 380, 431), Rect2(1349, 440, 400, 435),
+]
+
+const EXPANSION_2_REGIONS: Array[Rect2] = [
+	Rect2(53, 0, 368, 422), Rect2(443, 27, 436, 398), Rect2(908, 29, 431, 392), Rect2(1350, 10, 381, 428),
+	Rect2(59, 433, 360, 424), Rect2(448, 447, 435, 411), Rect2(883, 421, 446, 440), Rect2(1342, 450, 419, 406),
+]
+
 const ITEM_COLUMNS := 4
 const ITEM_ROWS := 3
 const HUD_COLUMNS := 3
@@ -42,10 +62,10 @@ static func item(index: int) -> Texture2D:
 	if index >= 28:
 		return _region(ITEM_ECONOMY, clampi(index - 28, 0, 1), 2, 1)
 	if index >= 20:
-		return _region(ITEM_EXPANSION_2, clampi(index - 20, 0, 7), 4, 2)
+		return _framed_region(ITEM_EXPANSION_2, EXPANSION_2_REGIONS[clampi(index - 20, 0, 7)], EXPANSION_FRAME_SIZE)
 	if index >= ITEM_COLUMNS * ITEM_ROWS:
-		return _region(ITEM_EXPANSION, clampi(index - ITEM_COLUMNS * ITEM_ROWS, 0, 7), 4, 2)
-	return _region(ITEM_ATLAS, clampi(index, 0, ITEM_COLUMNS * ITEM_ROWS - 1), ITEM_COLUMNS, ITEM_ROWS)
+		return _framed_region(ITEM_EXPANSION, EXPANSION_REGIONS[clampi(index - ITEM_COLUMNS * ITEM_ROWS, 0, 7)], EXPANSION_FRAME_SIZE)
+	return _framed_region(ITEM_ATLAS, ITEM_REGIONS[clampi(index, 0, ITEM_COLUMNS * ITEM_ROWS - 1)], ITEM_FRAME_SIZE)
 
 
 static func hud(index: int) -> Texture2D:
@@ -57,13 +77,7 @@ static func stat(index: int) -> Texture2D:
 		var dodge := _region(DODGE_ATLAS, 5, 3, 2) as AtlasTexture
 		dodge.filter_clip = true
 		return dodge
-	var texture := AtlasTexture.new()
-	texture.atlas = STAT_ATLAS
-	texture.region = STAT_REGIONS[clampi(index, 0, STAT_REGIONS.size() - 1)]
-	var padding := STAT_FRAME_SIZE - texture.region.size
-	texture.margin = Rect2(padding * 0.5, padding)
-	texture.filter_clip = true
-	return texture
+	return _framed_region(STAT_ATLAS, STAT_REGIONS[clampi(index, 0, STAT_REGIONS.size() - 1)], STAT_FRAME_SIZE)
 
 
 static func relic(index: int) -> Texture2D:
@@ -75,4 +89,15 @@ static func _region(atlas: Texture2D, index: int, columns: int, rows: int) -> Te
 	var texture := AtlasTexture.new()
 	texture.atlas = atlas
 	texture.region = Rect2(Vector2(index % columns, floori(float(index) / float(columns))) * size, size)
+	texture.filter_clip = true
+	return texture
+
+
+static func _framed_region(atlas: Texture2D, region: Rect2, frame_size: Vector2) -> AtlasTexture:
+	var texture := AtlasTexture.new()
+	texture.atlas = atlas
+	texture.region = region
+	var padding := frame_size - region.size
+	texture.margin = Rect2(padding * 0.5, padding)
+	texture.filter_clip = true
 	return texture

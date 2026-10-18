@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 const GAME_SCENE: PackedScene = preload("res://scenes/game/game.tscn")
 
@@ -96,4 +96,4 @@ func _finish(game: Node2D, session: Node) -> void:
 	game.free()
 	if failures.is_empty():
 		print("Denti upgrade resume test passed: %d deterministic cases" % cases)
-	quit(0 if failures.is_empty() else 1)
+	finish(0 if failures.is_empty() else 1)

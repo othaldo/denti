@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var failures := 0
 
@@ -22,11 +22,11 @@ func _run() -> void:
 	root.get_node("GameSession").clear_run()
 	if failures == 0:
 		print("PASS stat_balance")
-	quit(0 if failures == 0 else 1)
+	finish(0 if failures == 0 else 1)
 
 
 func _test_scaling() -> void:
-	var stats := PlayerStats.new()
+	var stats := new_stats()
 	_check(stats.max_health == 100.0 and stats.attack_speed == 0.0 and stats.speed_bonus == 0.0 and stats.regen == 0.0, "base stats changed unexpectedly")
 	stats.apply_upgrade(&"attack_speed", 50.0)
 	_check(is_equal_approx(stats.attack_interval, 0.65 / 1.5), "+50% attack speed is not 1.5x attacks")
@@ -53,7 +53,7 @@ func _test_scaling() -> void:
 
 
 func _test_regeneration() -> void:
-	var stats := PlayerStats.new()
+	var stats := new_stats()
 	for entry in [[-5.0, 0.0], [0.0, 0.0], [1.0, 0.2], [10.0, 1.0], [21.0, 22.25 / 11.25], [33.0, 34.25 / 11.25]]:
 		stats.regen = entry[0]
 		_check(is_equal_approx(stats.regen_per_second(), entry[1]), "regen rate differs from reference curve")
@@ -96,13 +96,13 @@ func _test_regeneration() -> void:
 
 
 func _test_save_data() -> void:
-	var stats := PlayerStats.new()
+	var stats := new_stats()
 	stats.health = 80.0
 	stats.regen = 1.0
 	stats.speed_bonus = -90.0
 	stats.attack_speed = -20.0
 	stats._process(4.0)
-	var restored := PlayerStats.new()
+	var restored := new_stats()
 	var saved: Dictionary = JSON.parse_string(JSON.stringify(stats.to_save_data()))
 	restored.load_save_data(saved)
 	restored._process(1.0)

@@ -37,17 +37,34 @@ const UPGRADES: Array[UpgradeData] = [
 @onready var game_menu: GameMenu = $GameMenu
 @onready var session: Node = get_node("/root/GameSession")
 
+var run_flow := RunFlow.new()
+
 var xp: int = 0
 var xp_goal: int = 5
 var level: int = 1
 var coins: int = 0
-var ended: bool = false
+# Compatibility accessor: the phase is the only stored source of truth.
+var ended: bool:
+	get: return run_flow.phase == RunFlow.Phase.ENDED
+	set(value): run_flow.set_phase_flag(RunFlow.Phase.ENDED, value)
 var base_victory: bool = false
-var in_shop: bool = false
-var starter_pending: bool = false
+# Compatibility accessor: the phase is the only stored source of truth.
+var in_shop: bool:
+	get: return run_flow.phase == RunFlow.Phase.SHOP
+	set(value): run_flow.set_phase_flag(RunFlow.Phase.SHOP, value)
+# Compatibility accessor: the phase is the only stored source of truth.
+var starter_pending: bool:
+	get: return run_flow.phase == RunFlow.Phase.STARTER
+	set(value): run_flow.set_phase_flag(RunFlow.Phase.STARTER, value)
 var boss: Enemy
-var boss_pending: bool = false
-var collecting_wave_loot: bool = false
+# Compatibility accessor: the phase is the only stored source of truth.
+var boss_pending: bool:
+	get: return run_flow.phase == RunFlow.Phase.BOSS_OVERTIME
+	set(value): run_flow.set_phase_flag(RunFlow.Phase.BOSS_OVERTIME, value)
+# Compatibility accessor: the phase is the only stored source of truth.
+var collecting_wave_loot: bool:
+	get: return run_flow.phase == RunFlow.Phase.COLLECTING
+	set(value): run_flow.set_phase_flag(RunFlow.Phase.COLLECTING, value)
 var wave_loot_remaining: int = 0
 var autosave_timer: float = 0.0
 var camera_shake_time: float = 0.0
@@ -56,6 +73,7 @@ var telemetry := RunTelemetry.new()
 var rewards := PostWaveRewards.new()
 var weapon_chest_panel: WeaponChestPanel
 var story := StoryProgress.new()
+var story_controller := StoryRunController.new()
 var story_dialogue: StoryDialogue
 var story_travel: StoryTravel
 
@@ -79,6 +97,10 @@ func _ready() -> void:
 	story_travel.arrived.connect(_on_story_arrived)
 	story_travel.finished.connect(_on_story_travel_finished)
 	story_travel.reveal_finished.connect(_save_run)
+	story_controller.configure(story, story_dialogue, story_travel, arena, player)
+	story_controller.presenting.connect(_present_story)
+	story_controller.finished.connect(_finish_story)
+	story_controller.save_requested.connect(_save_run)
 	wave.difficulty_id = session.selected_difficulty_id
 	wave.enemy_requested.connect(_spawn_enemy)
 	wave.boss_requested.connect(_spawn_enemy)
@@ -157,38 +179,23 @@ func _show_starters() -> void:
 	_save_run()
 
 
-func _show_story_line() -> void:
-	var lines := StoryCatalog.dialogue(story.dialogue_id)
-	if lines.is_empty():
-		return
+func _present_story() -> void:
+	run_flow.enter(RunFlow.Phase.STORY)
 	choice_panel.visible = false
 	shop_panel.visible = false
 	hud.visible = false
-	var line := lines[story.dialogue_line]
-	story_dialogue.show_line(line, StoryCatalog.chapter(story.chapter_index), story.dialogue_line, lines.size())
 	get_tree().paused = true
-	_save_run()
+
+
+func _show_story_line() -> void:
+	story_controller.show_line()
 
 
 func _on_story_advance() -> void:
-	if not story_dialogue.visible or story.dialogue_id == &"":
-		return
-	var lines := StoryCatalog.dialogue(story.dialogue_id)
-	var line := lines[story.dialogue_line]
-	if line.has("enter") and story.chapter_index < int(line.enter):
-		story.travel_target = int(line.enter)
-		story.travel_progress = 0
-		_show_story_travel()
-		return
-	if story.dialogue_line + 1 < lines.size():
-		story.dialogue_line += 1
-		_show_story_line()
-		return
-	var next := story.followup
-	story.dialogue_id = &""
-	story.dialogue_line = 0
-	story.followup = &""
-	story_dialogue.visible = false
+	story_controller.advance()
+
+
+func _finish_story(next: StringName) -> void:
 	hud.visible = true
 	if next == &"starter":
 		_show_starters()
@@ -201,31 +208,15 @@ func _on_story_advance() -> void:
 
 
 func _show_story_travel() -> void:
-	story_dialogue.visible = false
-	choice_panel.visible = false
-	shop_panel.visible = false
-	hud.visible = false
-	get_tree().paused = true
-	story_travel.present(story)
-	_save_run()
+	story_controller.show_travel()
 
 
 func _on_story_arrived(index: int) -> void:
-	story.arrive(index)
-	arena.set_story_chapter(StoryCatalog.chapter(index))
-	player.global_position = arena.arena_size / 2.0
-	var camera: Camera2D = player.get_node("Camera2D")
-	camera.reset_smoothing()
-	camera.force_update_scroll()
-	_save_run()
+	story_controller.arrive(index)
 
 
 func _on_story_travel_finished() -> void:
-	story.travel_target = -1
-	story.travel_progress = 0
-	story_travel.visible = false
-	story.dialogue_line += 1
-	_show_story_line()
+	story_controller.finish_travel()
 
 
 func _on_starter_chosen(weapon: WeaponData) -> void:
@@ -237,6 +228,7 @@ func _on_starter_chosen(weapon: WeaponData) -> void:
 
 
 func _start_combat_wave() -> void:
+	run_flow.enter(RunFlow.Phase.COMBAT)
 	rewards.begin_wave()
 	var profile_id := wave.prepare_next_wave_profile()
 	telemetry.begin_wave(wave.current_wave + 1, profile_id)
@@ -250,7 +242,7 @@ func _start_combat_wave() -> void:
 
 
 func _process(delta: float) -> void:
-	var combat_active := not ended and not in_shop and not starter_pending and not collecting_wave_loot and not choice_panel.visible and not weapon_chest_panel.visible and not shop_panel.visible and not story_dialogue.visible and not story_travel.visible and not game_menu.visible and (wave.active or boss_pending)
+	var combat_active := run_flow.is_combat() and not get_tree().paused and (wave.active or boss_pending)
 	mobile_controls.set_combat_active(combat_active)
 	session.update_graphics_performance(combat_active)
 	if not ended and (wave.active or boss_pending):
@@ -278,7 +270,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		hud.toggle_telemetry()
 		get_viewport().set_input_as_handled()
 		return
-	if event.is_action_pressed("ui_cancel") and not ended and not collecting_wave_loot and not choice_panel.visible and not weapon_chest_panel.visible and not shop_panel.visible and not story_dialogue.visible and not story_travel.visible and not game_menu.visible:
+	if event.is_action_pressed("ui_cancel") and run_flow.is_combat() and not game_menu.visible:
 		get_viewport().set_input_as_handled()
 		game_menu.open_pause()
 
@@ -559,6 +551,7 @@ func _award_xp(amount: int) -> void:
 
 
 func _show_level_choice() -> void:
+	run_flow.enter(RunFlow.Phase.REWARDS)
 	var pool: Array[UpgradeData] = []
 	var equipped_stats: Array[StringName] = []
 	for weapon in player.loadout.equipped():
@@ -722,6 +715,8 @@ func _finish_loot_collection() -> void:
 
 
 func _advance_post_wave_rewards() -> void:
+	if rewards.step in [PostWaveRewards.Step.LEVELS, PostWaveRewards.Step.CHESTS, PostWaveRewards.Step.RELICS]:
+		run_flow.enter(RunFlow.Phase.REWARDS)
 	match rewards.step:
 		PostWaveRewards.Step.LEVELS:
 			_show_level_choice()
@@ -846,29 +841,9 @@ func _open_shop() -> void:
 
 func _update_shop_panel() -> void:
 	shop_panel.story_timeline.show_progress(story, wave.current_wave)
-	var equipment: Array[Dictionary] = []
-	var weapons := player.loadout.equipped()
-	for index in weapons.size():
-		var weapon := weapons[index]
-		equipment.append({"data": weapon.data, "hands": weapon.data.hands, "icon": weapon.data.sprite, "uid": weapon.get_instance_id(), "name": WeaponPresentation.weapon_name(weapon), "tier": weapon.tier, "refund": player.loadout.refund_for(index), "stats": weapon.data.stats_text(weapon.tier), "combat": weapon.data.combat_text() + "\n" + WeaponAffixes.summary(weapon, player.stats, items), "description": weapon.data.description, "dps": _weapon_dps(weapon.data, weapon.tier), "mergeable": player.loadout.can_merge(index)})
-	var buyable: Array[bool] = []
-	var offer_dps: Array[float] = []
-	for offer in shop.offers:
-		buyable.append(offer == null or (player.loadout.can_acquire(offer.weapon_data, offer.weapon_tier) if offer.weapon_data != null else items.can_acquire(offer)))
-		offer_dps.append(_weapon_dps(offer.weapon_data, offer.weapon_tier) if offer != null and offer.weapon_data != null else 0.0)
-	var owned_display := items.all_items()
-	for id in relics.owned:
-		var relic := RelicCatalog.by_id(StringName(id))
-		if relic != null:
-			owned_display.append({"name": "Relikt: " + relic.display_name, "count": 1, "description": DentiAttributes.resolve_text(relic.description), "tier": 4, "icon": DentiUIIcons.relic(relic.icon_index), "relic": true})
 	shop_panel.set_build_context(player)
-	shop_panel.show_shop(wave.current_wave, coins, shop.reroll_cost, shop.offers, equipment, player.loadout.used_slots(), WeaponLoadout.CAPACITY, buyable, player.stats.luck, owned_display, items.owned, offer_dps, shop.reserved)
+	shop_panel.present(BuildPresentation.shop_view(player, shop, items, relics, wave.current_wave, coins))
 	_refresh_hud()
-
-
-func _weapon_dps(data: WeaponData, tier: int) -> float:
-	return data.estimated_dps(tier, player.stats, items.attack_interval_factor(), items.base_weapon_damage_bonus())
-
 
 func _on_shop_buy(index: int) -> void:
 	if not in_shop:
@@ -1078,3 +1053,11 @@ func _sync_music() -> void:
 		music.play_boss_overtime(wave.current_wave)
 	else:
 		music.play_wave(wave.current_wave)
+
+
+func restore_intermission(saved: Dictionary) -> void:
+	RunIntermission.restore(self, saved)
+
+
+func save_reward_choices() -> Array[Dictionary]:
+	return RunIntermission.capture_choices(choice_panel)

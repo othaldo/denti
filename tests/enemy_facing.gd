@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/test_runtime.gd"
 
 var failures: int = 0
 var game: Node2D
@@ -98,4 +98,4 @@ func _run() -> void:
 	paused = false
 	if failures == 0:
 		print("PASS enemy_facing")
-	quit(0 if failures == 0 else 1)
+	finish(0 if failures == 0 else 1)
