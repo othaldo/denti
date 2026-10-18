@@ -1,604 +1,257 @@
-# Denti v0.2 Roadmap — Pressure + Build Depth
+# Denti — Roadmap
 
-Version **0.3.0** bundles the implemented changes through 2026-10-08, including a gentler opening health curve for ordinary enemies that rejoins the existing curve at wave 10; see the [patch history](../CHANGELOG.md). This document keeps the design rationale, progress notes and remaining plans. The six secret weapon evolutions are implemented as a first playable iteration; meta progression and other unfinished stages below remain future work.
+Stand: **18.10.2026**, auf Basis des spielbaren Stands 0.5.0 und der anschließenden Refactorings und UI-Korrekturen. Die folgenden Ausbaustufen sind **geplant**. Zahlenwerte sind Startwerte für Prototypen und werden erst nach Messung und Spieltests festgelegt.
 
-This roadmap captures the current player feedback and the intended next development loop for Denti: Divine Dentistry.
+Das nächste Ziel: ein kompakteres Kampf-HUD, eine bewusste Dash-Entscheidung, vier eigenständige Bosskämpfe und mehr unterschiedliche Starts. Denti darf sehr mächtig werden; Positionierung, freie Wege und lesbare Gefahren sollen trotzdem wichtig bleiben.
 
-## Current progress
+## Vorhandene Grundlage
 
-- Per-wave telemetry and completed-run JSON reports are available for balance review.
-- Timed bursts, denser late waves and wider ranged volleys add pressure without universal health inflation.
-- Bosses have damage pacing, telegraphed projectile phases and reinforcements. Playtesting reports that their mechanics are now more noticeable.
-- Sugar enemies gain a telegraphed long charge with a marked landing area from wave 7, addressing their inability to reach a strong build.
-- Post-wave rewards now queue all level-ups and rare chest choices after the loot sweep. Chest items are rolled when dropped, luck is bounded, and the queue survives save/resume.
-- The item pool has grown from 18 to 30 with bleed duration, wet puddles, crit beams, shield retaliation, capped savings interest, returning projectiles, overheal shields and sugar rush alongside earlier synergies. The effects survive save/resume.
-- Two elite roles now alternate in late non-boss waves: Säurekrone fires a telegraphed radial attack, while Jagdkeim arrives with three bacteria and speeds up nearby ordinary enemies from wave 12. Elite groups grow from one in wave 8 to up to six across three events in waves 17-19, with up to three arriving together. Both have limited bonus chest chances; elite spawns and kills appear in per-wave telemetry.
-- A current save showed about 445 average DPS, 148 kills from 158 spawns and only 61 damage taken in wave 12; elites were still dying in one hit. From wave 7 onward, normal enemies and elites now gain additional health, speed, damage and modest capped defense. Elites have a visible, recharging burst-damage guard so their attacks can occur before they die.
-- Brotato balance research now guides a further normal-enemy pass: Plaque stays disposable, while Zuckerstück and Säurespucker use their own steeper health curves. Late non-boss waves shift toward those roles, gain an extra burst and a faster spawn floor; loot chance falls modestly to limit the added economy. Boss stats and boss-wave spawn pacing stay unchanged.
-- Wave length now ramps from 35 to 44 seconds in waves 1-4, is 42 seconds in waves 6-9, 46 seconds in waves 11-14 and 50 seconds in waves 16-19. Boss waves stay at 45 seconds. Bursts, hordes and elites use relative timing, and save/resume preserves the current wave's duration, including legacy 45-second saves.
-- Boss relics now appear after the defeated milestone bosses in waves 5, 10 and 15, after level-ups and chests but before the shop. Five distinct relics alter bleed kills, water hits, shield blocks, crits and moving attacks. Choices, ownership and active effects survive save/resume; relics use a new painted icon atlas.
-- The run-end screen now summarizes run length, wave, level, kills, bosses, damage, loot and chest decisions, with the top three weapons and top two synergy sources. Completed-run JSON reports and the in-game summary use the same telemetry snapshot.
-- Normal waves use a randomized spawn profile and vary the role mix across Swarm, Crossfire, Rush and Sugar Flood. Profiles only reweight the existing normal spawn choices, leave spawn cadence and enemy stats unchanged, skip boss waves and persist through save/resume. The shop's profile subtitle has since been removed to simplify the header.
-- Phase 3 now adds two reusable telegraphed projectile patterns: Säurespucker fire a parallel lane from wave 13, and Säurekrone launches a slow, large space-denial orb from wave 15. Both use the common projectile scene, and the orb’s size and collision radius survive save/resume.
-- Relic card names now wrap to two centered lines so long German names stay inside their cards.
-- Phase 4 now gives the Prince a trailing fan, the King a charge-aligned projectile lane and the Emperor a slow space orb. At each health threshold, radial bursts add projectiles; the final phase combines that burst with the boss's signature pattern and telegraphs the added danger.
-- Boss radial attacks now arrive as staggered volleys: one for the Graf, then three, five and nine on later milestone bosses. Each volley shifts the safe gap slightly, and the sequence plus its timing survives save/resume. Normal Säurespucker projectiles deal slightly more damage.
-- Next: playtest the boss volley sequences and signature combinations. Check that their moving safe gaps remain readable and dodgeable, then compare boss time-to-kill and damage taken before adding more mechanics.
+- 20 Wellen, anschließend optional Endlos; Bossabschlüsse in Welle 5, 10, 15 und 20. Wellenlängen variieren, Bosswellen dauern vor der Entzündung 45 Sekunden.
+- Vier Story-Areas mit Dialogen und Ortswechseln: **Unter dem Kissen**, **Das süße Verderben**, **Tief im Säurestrom**, **Die letzte Krone**.
+- 18 reguläre Waffen, sechs geheime Evolutionen, 93 Shop-Items, fünf Relikte und elf Grundattribute. Startwaffen sind bisher Zauberbürste, Turbo-Bohrer und Wasserflosser.
+- Ununterbrochener Kampf; danach Beutesammlung, Levelaufstiege, Upgrade-Kapseln, gegebenenfalls Relikt und Story-Übergang, anschließend Shop. Dieser Ablauf bleibt erhalten.
+- Gegnerdruck, Projektilmuster, Bossphasen und Entzündung sind vorhanden. Die vier Bosse teilen aber weiterhin den wesentlichen Kampfablauf; andere Projektile und mehr Salven reichen als Unterscheidung noch nicht aus.
+- Telemetrie, Run-Rückblick, Speichern/Fortsetzen und automatisierte Tests bilden die Grundlage für weitere Änderungen. Shopgrößen und Atlas-Ausschnitte wurden zuletzt korrigiert; entsprechende Layoutgrenzen sollen auch im Kampf gelten.
 
-## Why v0.2 exists
+Details zum Iststand: [README](../README.md), [Story-Modus](STORY_MODE.md), [Waffen](waffen.md), [Items](items.md), [Codebase-Review](CODEBASE_REVIEW.md). Die ausführliche frühere Planung bleibt im [historischen Planungsstand](ROADMAP_V02.md) erhalten.
 
-The prototype loop works, but current playtesting shows a clear balance problem:
+## Prioritäten
 
-- Denti outpaces enemy scaling too easily.
-- Late-run normal enemies frequently become universal one-shots.
-- Bosses can die in roughly 2-5 seconds.
-- Once the build comes online, movement and positioning become too unimportant.
-- Waves need more bodies, more bursts/hordes and more projectile pressure.
-- Mid-wave modal interruptions should be reduced: level-ups and chest choices belong in the intermission after combat.
+| Priorität | Vorhaben | Ergebnis |
+| --- | --- | --- |
+| P0 | Kampf-HUD vereinheitlichen | Gleich hohe Ressourcenleisten und ein kompakter Timer ohne springendes Layout |
+| P1 | Wurzelkraft und Dash | Eine gezielte Bewegung mit einer Ladung, eigener Erholung und verbindlichem Cooldown |
+| P1 | Vier Bossidentitäten | Jeder Story-Abschluss verlangt eine andere Positionierungsentscheidung |
+| P2 | Alle Standardwaffen als Starts | Kompaktes Iconraster mit Details und ausdrücklicher Auswahlbestätigung |
+| Danach | Synergien und Feinschliff | Begrenzte Dash-Synergien, eventuell Cooldown-Reduktion und Balance aller Starts |
 
-The goal is not to make Denti feel weak. The goal is to let the player become absurdly powerful while the arena remains dangerous enough that they still have to move, read attacks and make build decisions.
+Jede Stufe wird einzeln umgesetzt, getestet und gespielt. Bossumsetzung erfolgt pro Encounter; der spielbare Build bleibt während der Überarbeitung erhalten.
 
-Think: **power fantasy under pressure**, not HP-sponges.
+## 1. Kampf-HUD: feste Maße, weniger belegte Fläche
 
-A wave should feel like one uninterrupted combat segment. The reward-processing rhythm should happen afterwards:
+### HP, XP und später Wurzelkraft
 
-```text
-WAVE COMBAT
--> timer ends
--> collect all remaining XP / coins / chest drops
--> resolve earned level-ups
--> resolve chest loot (KEEP / SCRAP)
--> resolve boss relic if a milestone boss was defeated
--> shop
--> next wave
-```
+Aktuell reserviert die Szene 31 Pixel für HP und 22 Pixel für XP. Icons, Schrift und Abstände sind ebenfalls unterschiedlich. Daraus soll eine gemeinsame Ressourcenzeile entstehen:
 
-This post-wave reward pipeline is a core design decision for v0.2.
+- HP und XP erhalten dieselbe sichtbare Leistenhöhe, Breite, Iconfläche, Innenabstände und Textausrichtung. Startwert: **28 logische Pixel Höhe**, Iconfläche 24 Pixel; eine kompakte Variante skaliert beide gemeinsam.
+- Wurzelkraft verwendet später dieselbe Zeilenkomponente. HP bleibt durch Farbe und Gewichtung sofort erkennbar; Ressourcen unterscheiden sich zusätzlich durch Icon und Beschriftung.
+- Werte stehen innerhalb ihrer reservierten Flächen. Schildladungen, große HP-Zahlen und vorgemerkte Level vergrößern keine Leiste. Zusätzliche Informationen erhalten feste Plätze oder stehen in den Stats.
+- Statusanzeigen werden unter dem tatsächlichen Ressourcenblock angeordnet. Sie dürfen bei einer zusätzlichen Leiste weder den Block noch das Spielfeld unkontrolliert überlagern.
 
----
+### Timer oben in der Mitte
 
-## Phase 1 — Measure before balancing
+Das derzeitige übereinander angeordnete Paket aus Welle, Timer, Kapselzähler und Bossanzeige wird entzerrt:
 
-Add a developer-only combat telemetry overlay / instrumentation.
+- Im normalen Kampf eine kompakte Zeile: **`Welle 12 · 0:27`**. Zielhöhe inklusive Rahmen: höchstens 44 logische Pixel im Standardlayout.
+- Der Kapselzähler zieht in die bestehende Münz-/Levelzeile und erhält dort einen festen Platz. Er braucht keine eigene Zeile unter dem Timer.
+- Bossname und Bossleben erhalten einen eigenen schmalen Bereich unter der Timerzeile. Der Timer behält seine Maße. Lange Namen kürzen die Darstellung, ohne die volle Information in Pause/Details zu verlieren.
+- Entzündung ersetzt den Zeitwert durch eine kurze Anzeige wie **`Entzündet +12 s`** innerhalb desselben reservierten Bereichs. Warnfarbe und Icon ergänzen den Text; eine größere Schriftbox ist dafür unnötig.
+- Für zwei Endlosbosse gibt es eine explizite kompakte Anordnung mit höchstens zwei Bossleisten. Der normale Timerbereich wächst dadurch nicht weiter.
+- In schmalen Ansichten ordnet ein gemeinsames HUD-Layout die Bereiche ohne Überschneidungen an. Pause, FPS, Statusanzeigen und Touchsteuerung werden dabei berücksichtigt.
 
-Useful metrics:
+**Abnahme:** HP- und XP-Leisten sind pixelgleich hoch. Zahlenwechsel, erste Kapsel, Schild und Entzündung verändern ihre Geometrie nicht. Timer und Bossleisten bleiben bei 320×568, 568×320, 720×1280, 1040×600, 1280×720 und 1920×1080 im sichtbaren Bereich. Automatische Layoutprüfungen werden durch native Aufnahmen mit großen Zahlen, langen Bossnamen und aktivierter Touchsteuerung ergänzt.
 
-- rolling DPS over the last 5-10 seconds
-- peak DPS
-- kills per second
-- enemies currently alive
-- enemies spawned per wave / per minute
-- damage taken per minute
-- coins and XP gained per wave
-- boss time-to-kill
-- optional: average hit damage / crit rate / active projectile count
+## 2. Wurzelkraft und Dash
 
-Purpose:
+### Name und Attribut
 
-- identify where scaling explodes
-- compare builds objectively
-- balance bosses against real player output
-- catch performance problems when increasing enemy density
+**Wurzelkraft** ist der Arbeitsname für Dentis Stamina. Er passt zu seiner Bewegung auf Wurzeln und lässt sich kurz beschriften. Der aktive Move heißt zunächst **Dash**, mit dem möglichen Anzeigenamen **Wurzelsprung**.
 
-Do not expose all of this in normal gameplay.
+Es gibt eine Ressource und einen investierbaren Wert:
 
-### Telemetry must also power the end-of-run recap
+- **Wurzelkraft:** feste Kapazität von 100; jeder Dash verbraucht die gesamte Ladung. Teilfüllung erlaubt keinen Dash. Es gibt zunächst weder zusätzliche Ladungen noch ein Upgrade auf die Kapazität.
+- **Wurzelkraft-Erholung:** das neue Grundattribut erhöht die Nachladerate additiv in Prozent. Beispiel: `+25 % Erholung` verkürzt die reine Auffüllzeit von 4 auf 3,2 Sekunden. Stats und Level-up-Text zeigen neben dem Bonus die resultierende Auffüllzeit.
+- Das Attribut wird in denselben Statkatalog wie die elf vorhandenen Werte aufgenommen und über Levelaufstiege sowie ausgewählte Items angeboten. Bestehende Einträge behalten ihre IDs.
+- **Speichel** regeneriert weiterhin Leben; **Zahnflutsch** bleibt die passive Ausweichchance. Beide bleiben mechanisch von Wurzelkraft getrennt.
 
-Do not build combat telemetry as a disposable debug-only system. The same underlying run statistics should later feed a player-facing **"So war dein Run"** summary after victory or death.
+Die feste Kapazität verhindert, dass ein vermeintliches Kapazitätsupgrade die Wartezeit bis zur zwingend vollen Ladung verlängert. Build-Investition verbessert gezielt die Erholung.
 
-Damage events should carry enough attribution to distinguish at least:
+### Verbindliche Ablaufregeln
 
-- direct weapon damage, identified by weapon type / stable weapon id
-- item/proc damage, e.g. bleed, chain lightning, holy flash, retaliation
-- other damage sources if they become relevant later
+1. Ein Dash startet nur im aktiven Kampf, bei voller Wurzelkraft und abgelaufenem Cooldown. Boss-Entzündung zählt zum aktiven Kampf.
+2. Desktop-Auslöser ist eine neue Eingabeaktion `dash`, zunächst auf **Shift**. Gedrückthalten löst keinen weiteren Dash aus; es gibt keine automatische Wiederholung oder wartende Dash-Eingabe.
+3. Die Richtung wird beim Auslösen festgelegt: aktuelle Bewegungsrichtung, sonst letzte Bewegungsrichtung, vor der ersten Bewegung nach unten. Mausziel und automatische Waffen ändern sie nicht.
+4. Der Dash bewegt Denti kurz und geradlinig. Startwerte: **150 Welteinheiten in 0,16 Sekunden**. Bewegungstempo erhöht zunächst weder Strecke noch Dauer; Diagonalen sind gleich schnell.
+5. Die Ladung fällt beim Start auf null. Nach dem Dash und einer kurzen Erholungspause lädt sie kontinuierlich nach. Bewegung und Schaden setzen den Ladefortschritt nicht zurück.
+6. Ein neuer Dash braucht **beides**: volle Ladung und abgelaufenen Cooldown. Ein volles Ressourcenfeld bei noch laufendem Cooldown zeigt die verbleibende Sperre; „bereit“ erscheint erst bei erfüllten Bedingungen.
+7. Ungültige Eingaben verbrauchen nichts. Ein gestarteter Dash, der an einem Hindernis endet, verbraucht seine Ladung und erhält keine Erstattung.
+8. Vor der ersten Welle und beim tatsächlichen Start einer neuen Welle ist die Ladung voll und der Cooldown frei. Menü, Pause, Shop-Aufruf oder Laden eines laufenden Kampfes geben keine zusätzliche Ladung.
 
-A water-flosser hit that triggers chain lightning should count the direct hit toward the weapon and the chained damage toward the proc. Avoid double-counting proc damage as weapon damage unless a design decision explicitly says otherwise.
+### Startwerte und Begrenzung
 
-Accumulate total damage per source over the full run. The first player-facing recap should be able to show something like:
+| Parameter | Prototyp |
+| --- | ---: |
+| Kapazität / Kosten | 100 / 100 |
+| Dashdauer / Strecke | 0,16 s / 150 Welteinheiten |
+| Erholungspause nach Dashende | 0,35 s |
+| Basis-Nachladerate | 25 pro Sekunde; reine Auffüllzeit 4 s |
+| Cooldown ab Dashstart | 1,5 s |
+| Wirksamer Erholungsbonus | zunächst 0 bis +400 % |
 
-- wave reached / run completed
-- total play time
-- final level
-- enemies killed
-- total damage dealt
-- damage taken
-- coins collected
-- XP collected
-- bosses defeated
-- chests found
-- chest items kept vs. scrapped
-- accumulated damage per weapon
-- percentage of total weapon damage per weapon
-- optional separate synergy/proc damage section
-- strongest weapon of the run
-
-Example weapon breakdown:
+Ohne Blockierung gilt zwischen zwei Dashstarts:
 
 ```text
-Zahnseidenpeitsche IV   162,884   38%
-Wasserflosser III       101,337   24%
-Turbo-Bohrer II          72,441   17%
+Auffüllzeit = 4 s / (1 + wirksamer Erholungsbonus / 100)
+Frühester nächster Dash = max(Cooldown, Dashdauer + Erholungspause + Auffüllzeit)
 ```
 
-Example proc breakdown:
+Bei den Startwerten sind das rund **4,51 s** ohne Bonus, **2,51 s** bei +100 % und **1,50 s** bei +400 %. Der Cooldown begrenzt also auch einen stark ausgebauten Erholungswert. Über dem wirksamen Limit wird kein weiterer Erholungsbonus angeboten.
 
-```text
-Blutung                  58,220
-Kettenblitz              41,992
-Zahnblitz                18,770
-```
+**Cooldown-Reduktion bleibt eine spätere Erweiterung.** Zuerst wird geprüft, ob schnellere Erholung allein genug Build-Entscheidungen schafft. Falls nötig, reduzieren wenige seltene Items den separaten Cooldown, mit einer absoluten Untergrenze von zunächst **1,0 s**. Sie ändern weder Ladungskosten noch die Bedingung „voll geladen“ und werden im HUD gemeinsam mit der Erholung erklärt.
 
-The debug overlay and the run recap are different presentations of the same measurement layer:
+### Dash durch Gegner bleibt gefährlich
 
-- debug view = rolling/technical numbers for balancing
-- run recap = accumulated, understandable numbers for the player
+Der Dash dient dazu, einen noch freien Weg rechtzeitig zu nutzen. Er räumt keine Horde weg und verleiht **keine zusätzlichen Unverwundbarkeitsframes**, keine Unberührbarkeit, keinen Rückstoß und keinen eigenen Schaden.
 
-Run statistics should survive save/resume so quitting to the menu and continuing does not reset the eventual recap. Keep the measurement API centralized enough that future achievements can consume the same data without every weapon/item inventing its own counters.
+- **Körperkontakt mit einem lebenden Gegner stoppt den Dash am ersten Kontakt.** Denti landet vor dessen Körper, niemals auf der anderen Seite. Wände und Arenagrenzen begrenzen ihn ebenfalls.
+- Beginnt Denti bereits überlappend in einer Horde, schafft der Dash keinen Fluchtweg durch diese Gegner. Vorhandene Schilde, passive Ausweichchance und laufende Trefferpausen heben die Bewegungsblockierung nicht auf.
+- Kontakt wird entlang der gesamten bewegten Strecke geprüft. Ein hoher Dashspeed oder ein langsamer Frame darf weder Gegner noch Projektile oder aktive Schadensflächen überspringen.
+- Bei Kontakt greift die normale Schadensverarbeitung einschließlich Härte, Schild, Zahnflutsch und bereits bestehender Trefferpausen. Der Dash setzt diese Schutzmechanismen weder neu noch verlängert er sie. Laufendes Gift und Blutung ticken weiter.
+- Der Kontakt erzeugt höchstens einen unmittelbaren Treffer über den vorhandenen Schadensweg; die normale Gegnerberührung darf denselben Kontakt nicht noch einmal abrechnen.
+- **Zusätzlicher Kontaktschaden ist eine gezielte Playtest-Variante:** Ausgangswert +25 % auf den beim Dash-Kontakt ausgelösten Treffer, vor Härte. Die erste Variante testet zunächst Stopp plus normalen Schaden. Nur falls Horden dadurch noch zu leicht umgangen werden, wird der Aufschlag aktiviert. Er erhöht weder sämtliche Projektile noch laufenden Statusschaden.
 
-Do not turn the recap into an unreadable spreadsheet. Prefer a concise summary plus the weapon damage breakdown, with deeper proc details only where they remain useful and fun to inspect.
+Ein Kontaktstopp mit verlorener Ladung bestraft schlechte Planung bereits deutlich. Ein zusätzlicher Schadensaufschlag braucht deshalb einen erkennbaren Nutzen im Spieltest und verständliches Feedback.
 
----
+### Mobile Steuerung
 
-## Phase 2 — Increase enemy pressure
+- Ein eigener **Dash-Button unten rechts**, zunächst 64×64 logische Pixel, mindestens 56×56 im kompakten Layout. Er berücksichtigt Bildschirmränder, Pause und andere Bedienelemente; im Stillstand gilt dieselbe Richtungsregel wie am Desktop.
+- Der Bewegungsfinger behält seine Geste. Ein zweiter Finger kann Dash drücken, ohne den Joystick-Ursprung oder die Bewegungsrichtung zu übernehmen. Die Buttonfläche startet selbst keine Bewegungsgeste.
+- Der Button zeigt den Füllstand als Ring und die Einsatzbereitschaft durch Form/Icon plus Farbe. Bei vollem Ring und noch aktivem Cooldown bleibt die Sperre sichtbar.
+- Ungültiges Antippen startet keine spätere Aktion. Pause, Fokusverlust, Fingerfreigabe und Bildschirmdrehung hinterlassen keine festhängende Eingabe.
+- Swipe und Doppeltippen werden erst nach Touch-Spieltests als optionale Alternativen bewertet. Der erste Prototyp verwendet den klar erreichbaren Button.
 
-### More enemies
+### Integration und Abnahme
 
-Later waves should contain substantially more enemies. Trash mobs may still die instantly if the build is strong; the pressure should come from volume and mixed threats.
+Die Dash-Logik erhält eine kleine eigene Bewegungskomponente. `PlayerStats` bleibt die Quelle des Erholungsbonus; HUD und Touchbutton lesen denselben Dash-Zustand. Werte liegen in einer gemeinsamen konfigurierbaren Ressource.
 
-Avoid only increasing HP.
+Speichern/Fortsetzen erhält Ladung, Cooldown, Erholungspause und bei aktivem Dash Richtung sowie Restdauer. Alte Saves starten mit Basis-Erholung und einer vollen Ladung; bestehende Zahlen-IDs der Attribute bleiben kompatibel. Pausierte Spielzeit und Offlinezeit laden den Dash nicht nach. Beim Laden einer Bewegung wird die verbleibende Strecke wieder regulär auf Kontakt geprüft.
 
-### More frequent hordes
+**Abnahme:** Tests für volle/teilweise Ladung, gleichzeitige Sperren, gehaltenes Shift, Diagonalen, Randkontakt, Start innerhalb einer Horde und Kontakt trotz Schild/Dodge/Trefferpause. Streckenprüfungen decken auch Projektile und Schadensflächen bei längeren Frames ab. Dazu Pause/Fortsetzen mitten im Dash und Cooldown, alte Saves, Mehrfingereingabe und Drehung des Displays. Telemetrie erfasst Dashanzahl, Kontaktabbrüche und Schaden während des Dashs; normale Spielanzeigen bleiben kompakt.
 
-Hordes should become a normal part of wave rhythm instead of a rare surprise.
+## 3. Vier Story-Areas, vier unterschiedliche Bosskämpfe
 
-Example 45-second wave rhythm (timings scale with wave length):
+Die Herrschertitel und ihre Storyfunktion bleiben erhalten. Jeder Boss erhält eine eigene Silhouette, ein eigenes Bewegungsverhalten, einen charakteristischen Angriffsablauf und eine andere Antwort des Spielers. Die folgende Matrix beschreibt die geplante Identität, keine bereits vorhandenen Angriffe.
 
-- 0s: baseline spawns
-- 8s: small horde
-- 17s: ranged pressure added
-- 24s: large horde
-- 32s: elite or heavy group
-- 39s: final rush
-- 45s: wave ends
+| Area / Boss | Kampfidee | Typische Antwort |
+| --- | --- | --- |
+| Unter dem Kissen / Karies-Graf | Kissenstürze und wandernde Falten bilden angekündigte Bahnen | Freie Bahn lesen, rechtzeitig die Seite wechseln |
+| Das süße Verderben / Karies-Prinz | Geworfene Zuckerbomben hinterlassen begrenzte Karamellfelder | Freien Boden erhalten, Ablageorte der Bomben planen |
+| Tief im Säurestrom / Karies-König | Säureströme verändern vorhersehbar die sicheren Ufer | Nächste sichere Position vorausplanen |
+| Die letzte Krone / Karies-Imperator | Eine gerichtete Kronenwache und wechselnde Hofsektoren | Verwundbare Seite erreichen und sichere Sektoren nutzen |
 
-This should not be identical every wave. Use randomized event slots / wave profiles.
+### Karies-Graf: Herr unter dem Kissen
 
-### Wave profiles
+- Der Graf kämpft an wenigen gut sichtbaren Positionen. Er markiert einen breiten Kissensturz als Rechteck auf dem Boden; erst danach schlägt das Kissen ein.
+- Nach dem Einschlag wandert eine klar angekündigte Falte durch eine Bahn. Eine benachbarte Bahn bleibt frei. Die Spielerentscheidung ist ein Seitenwechsel statt dauerhaftes Kreisen um den Boss.
+- Eine spätere Phase lässt zwei versetzte Stürze folgen. Sie überlappen zeitlich so, dass ein lesbarer Weg bestehen bleibt; es gibt immer eine Erholungspause mit erreichbarem Boss.
+- Optische Richtung: Kissenumhang, Stofffalten und verlorene Zahnfee-Münzen. Kleine Staub-/Krümelgruppen können Druck geben, ersetzen aber den Kissenablauf nicht.
 
-Potential wave archetypes:
+**Abnahme:** Schon der erste Angriff erklärt das Bahnenprinzip. Ein Basis-Denti kann jede Folge mit normaler Bewegung lösen. Reihenfolge und Rhythmus sind erkennbar anders als die bisherigen Charge-/Ringkombinationen.
 
-- Swarm: huge amount of weak enemies
-- Fortress: fewer tanks + ranged support
-- Crossfire: more projectile enemies
-- Rush: fast enemies in bursts
-- Elite hunt: fewer enemies but multiple elites
-- Sugar flood: single-type thematic horde
-- Mixed panic: everything in the final 10 seconds
+### Karies-Prinz: Die Karamellküche
 
----
+- Der bewegliche Prinz wirft Zuckerbomben auf zuvor markierte Spielerpositionen. Nach dem Einschlag bleiben zeitlich begrenzte, verlangsamende Karamellfelder zurück; die Flugbahn und Landefläche sind sichtbar.
+- Denti kann neue Felder bewusst an Rändern ablegen. Es gelten eine feste Obergrenze für aktive Felder und eine feste Lebensdauer; der Boden kann nicht dauerhaft vollständig verkleben.
+- Später wirft der Prinz kurze Bombenfolgen und lässt zerstörbare Zuckerkerne wachsen. Ein zerstörter Kern verhindert den nächsten lokalen Karamellguss und schafft eine bessere Angriffsgelegenheit.
+- Kerne sind optionale Kontrollziele, keine Pflicht für Schaden am Boss. Automatische Waffen müssen sie zuverlässig erfassen können; ein bestimmter Waffentyp wird nicht vorausgesetzt.
+- Optische Richtung: Zuckergusskrone, Karamellkessel und Bonbonwürfe. Klebeflächen und gefährliche Einschläge haben unterschiedliche Markierungen.
 
-## Phase 3 — Bullet-hell foundation
+**Abnahme:** Feldobergrenze und Ablauf verhindern Sackgassen. Keine Fläche erscheint sofort aktiv unter Denti. Der Kampf lässt sich auch ohne Kernzerstörung gewinnen; gezieltes Freihalten von Boden lohnt sich sichtbar.
 
-Build reusable projectile-pattern components so bosses and ranged enemies can share them.
+### Karies-König: Der Säuresammler
 
-Patterns worth supporting:
+- Der König steuert Säurerinnen durch die Arena, statt selbst ständig anzustürmen. Die Ströme wandern langsam entlang angekündigter Routen; sichere Ufer bleiben erreichbar.
+- Ein sichtbarer Pegel kündigt einen Richtungswechsel an. Alte Rinnen laufen aus, bevor der nächste gefährliche Abschnitt entsteht. Säure verursacht Schaden über den normalen Gefahrenpfad; ein Dash bietet keinen Schutz davor.
+- Während der König seinen Vorrat abgibt, öffnet sich ein klares Angriffsfenster. Eine spätere Phase verzweigt die Rinnen und verschiebt sichere Flächen, ohne alle Wege gleichzeitig zu schließen.
+- Optische Richtung: säuregefüllte Herrscherinsignien und Zahn-Trophäen als sichtbare Leitpunkte. Seine Sammlerrolle aus dem bestehenden Dialog erhält damit eine Entsprechung in der Arena.
 
-- aimed single shot
-- aimed 3/5-shot volley
-- fan/spread
-- radial burst
-- rotating radial / spiral
-- slow large space-denial orb
-- telegraphed line / lane shot
-- delayed floor marker -> projectile / explosion
-- ring with safe gaps
+**Abnahme:** Der Spieler kann den nächsten sicheren Ort vor dem Umschalten erkennen. Spawnpositionen, Randkontakt und langsamere Builds behalten eine Route. Mobile Ansichten zeigen Strömungsrichtung und Vorwarnung ebenso klar wie Desktop.
 
-Design rules:
+### Karies-Imperator: Das Kronengericht
 
-- hazards must be readable before they become dangerous
-- enemy bullets must be visually distinct from Denti's bullets
-- patterns should combine in interesting ways rather than becoming pure screen noise
-- heavy VFX must not hide danger zones
-- maintain performance under high density
+- Der Imperator besitzt eine erkennbare gerichtete Kronenwache: geschützte Vorderseite, verwundbare Seiten beziehungsweise Rückseite. Die Orientierung wechselt angekündigt; Schutz bedeutet Schadensreduktion, keine unbegrenzte Immunität.
+- Ein Erlass markiert Hofsektoren, die nacheinander gefährlich werden. Denti sucht einen sicheren Sektor, von dem aus zugleich ein günstiger Angriffswinkel erreichbar ist.
+- In späteren Phasen dreht sich die Kronenwache zwischen den Erlassen. Die abschließende Phase verbindet höchstens zwei dieser eigenen Mechaniken und öffnet deutliche Gegenangriffsfenster.
+- Optische Richtung: große bewegliche Kronensegmente, Zepter und die Portal-/Gefängnismagie der Zahnfee. Die Arena und ihre Warnungen tragen den Kampf; der Imperator ist mehr als eine dichtere Version der ersten drei Bosse.
 
----
+**Abnahme:** Die verwundbare Seite ist mit automatischen Nah- und Fernwaffen nutzbar. Kein Erlass zwingt zur Passage durch einen Gegner. Ein erlaubter sicherer Sektor bleibt auch bei laufender Kronendrehung rechtzeitig erreichbar.
 
-## Phase 4 — Bosses that actually get to fight
+### Gemeinsame Regeln, eigenständige Abläufe
 
-Current boss time-to-kill can be only a few seconds. That prevents the mechanics from mattering.
+- Vorwarnung, Bewegung und aktive Gefahr sind klar unterscheidbar. Alle Encounter bleiben mit Grundbewegung und ohne Dash-Upgrades lösbar. Wurzelkraft schafft Handlungsspielraum und wird nicht zur Pflichtinvestition.
+- Phasen verändern Verhalten und sichere Räume. Die Anzahl der Phasen und ihre Auslöser werden pro Boss definiert; es gibt keinen vorgeschriebenen identischen Ring-/Charge-Zyklus für alle vier.
+- Verstärkung unterstützt die Mechanik und besitzt ein eigenes Mengenlimit. Bossangriff, normale Wellengegner und Telegraphe dürfen zusammen keine unlösbare Situation erzeugen.
+- Angestrebte Kampfzeiten auf Normal mit einem mittleren Build: ungefähr **20–40 Sekunden** für die ersten drei Bosse, **35–55 Sekunden** für den Imperator. Das sind Messziele. Starke Builds dürfen deutlich schneller sein; zusätzliche starre Mindestkampfzeiten werden daraus nicht abgeleitet.
+- Die bestehende Entzündung beginnt weiterhin nach der Bosswellenzeit. Neue Mechaniken erhalten passende Eskalationen mit begrenzter gleichzeitiger Gefahr; Vorwarnung und erreichbare Wege bleiben erhalten. Falls normale Builds regelmäßig erst tief in der Entzündung gewinnen können, werden Encounter und Zeitbudget gemeinsam nachjustiert.
+- Die Story-Area bestimmt das Bossprofil. Freier Run und Endlos verwenden dieselben Profile über ihre Wellenzuordnung. Zwei Endlosbosse koordinieren Flächen und Warnungen, statt unabhängig sämtliche sicheren Wege zu schließen.
+- Neue Grafiken erweitern die vorhandene gemalte Bildsprache. Originalreferenzen und bestehende Art bleiben erhalten; Attacken und Silhouetten werden vor aufwendigen Effektvarianten lesbar gemacht.
 
-Desired direction:
+### Technische Umsetzung und Messung
 
-- minibosses should usually survive for a meaningful chunk of the wave, roughly tens of seconds
-- final boss should sustain a real encounter, potentially 45-90+ seconds depending on build strength and tuning
+Die vorhandenen Systeme für Projektile, Warnungen, Schaden, Bossanzeige und Encounter-Abschluss werden weiterverwendet. Eigene Verhaltenskomponenten pro Boss steuern den Ablauf; Resource-Profile enthalten Zeiten, Grenzen und Phasenwerte. Ein gemeinsamer Controller wächst dadurch nicht zu einer Sammlung aller Boss-Sonderfälle.
 
-These are tuning targets, not rigid guarantees.
+Speichern/Fortsetzen bewahrt aktive Angriffsschritte, Warnzeiten, Orientierung, Flächen, Feldlebensdauer und Entzündung. Laufende alte Boss-Saves benötigen einen ausdrücklich versionierten Übergang; eine gespeicherte Warnung darf beim Laden nicht zu einem sofortigen neuen Angriff werden. Bossgebundene Gefahren werden bei Tod/Encounter-Ende zuverlässig entfernt, bevor Belohnungen beginnen.
 
-Use more than HP:
+Pro Boss werden TTK, Schaden nach Angriffsquelle, Treffer während Vorwarnung/aktiver Phase, aktive Gefahren und Dash-Nutzung ausgewertet. Geprüft werden schwache, mittlere und starke Builds, Nah-/Fernkampf, langsame Bewegung, verschiedene Schwierigkeiten und zwei Bosse im Endlosmodus. Native Aufnahmen und Spieltests unter hoher Effektdichte ergänzen automatische Ablauf-, Kollisions- und Save-Tests.
 
-- attack phases at health thresholds
-- charge + telegraph
-- radial projectile bursts
-- aimed bullet patterns
-- adds
-- temporary armor / vulnerability windows
-- movement changes
-- arena hazards
-- phase transitions
+## 4. Alle Standardwaffen als Startauswahl
 
-Bosses should each have a recognizable signature mechanic, then escalate it during the encounter. Later milestone bosses should introduce additional patterns or combine earlier ones, so the threat visibly grows as the run progresses. Health thresholds should change the fight: add a new attack, layer a pattern, increase pressure, or alter safe space instead of only raising damage or projectile count.
+**Alle aktuell 18 Standardwaffen sind von Anfang an auswählbar.** Die Auswahl liest den regulären Waffenkatalog; eine zusätzliche begrenzte Starterliste entfällt. Künftige Standardwaffen erscheinen ebenfalls dort. Geheime Evolutionen gehören weiterhin zu ihrer eigenen Progression und erscheinen nicht als Starts.
 
-Escalation must remain readable and dodgeable. Telegraph changes before each new danger, preserve escape routes, and avoid combining attacks in ways that leave no viable response. The final boss can test mastery of earlier patterns, but should still have its own identity and phase changes.
+### Ablauf: Icon → Details → Bestätigung
 
-Suggested progression: the first boss teaches one signature attack; the next adds a second pattern; later bosses combine patterns with adds or temporary arena hazards; the final boss escalates those combinations across distinct phases. Exact mechanics should stay data-driven so each boss can be tuned independently.
+1. Ein kompaktes Raster zeigt die vorhandenen Waffenbilder als kleine Icons. Die Reihenfolge bleibt stabil; Namen können als kurze Beschriftung oder Tooltip ergänzt werden.
+2. Ein Klick beziehungsweise Antippen markiert das Icon und öffnet die Details der Waffe. Weitere Icons wechseln die Vorschau, ohne eine Waffe zu vergeben oder den Kampf zu starten.
+3. Die Detailansicht zeigt Bild, Namen, Rolle, Wurzelkosten, Schaden, Angriffspause, Reichweite und besondere Effekte. Grundlage sind die tatsächlichen Mk-I-Startwerte.
+4. Erst **„Mit dieser Waffe starten“** bestätigt die Auswahl, vergibt genau diese Waffe und startet Welle 1. Bis eine Waffe angeklickt wurde, ist die Bestätigung deaktiviert.
 
-A strong build should kill bosses noticeably faster than a weak build, but not delete them before they can execute their kit.
+### Layout und Bedienung
 
----
+- Desktop: Iconraster mit Detailbereich daneben und fest erreichbarer Bestätigung.
+- Mobile: mehrere Spalten mit kleinen Bildern und ausreichend großen Touchflächen; Zielgröße mindestens 48×48 logische Pixel pro Iconbutton. Die Anzahl der Spalten folgt der verfügbaren Breite.
+- Bei wenig Platz stehen die Details unter dem Raster oder in einer eigenen Detailansicht mit Rückweg zur Auswahl. Scrollen bleibt auf den Inhaltsbereich begrenzt; die Bestätigung bleibt erreichbar.
+- Ausgewähltes Icon und Detailansicht stimmen jederzeit überein. Lange Namen und Beschreibungen verändern weder Icongrößen noch die äußeren Fenstergrenzen. Details sind auch ohne Hover vollständig erreichbar.
 
-## Phase 5 — Post-wave rewards and Zahnfee chests
+### Startwerte und Balance
 
-The important design change: **do not interrupt active combat with level-up or chest-choice screens.**
+- Jede Auswahl beginnt mit genau einer normalen Mk-I-Waffe, ohne Zufallsrollen oder Verzauberungen. Wurzelkosten bleiben unverändert. Alle Standardwaffen sind ohne Freischaltung oder vorherigen Sieg verfügbar.
+- Die ersten drei Wellen auf Normal werden mit jeder Waffe geprüft, einschließlich langsamer Flächen- und Unterstützungswaffen. Schwache Starts erhalten gezielte Balanceanpassungen; die Auswahl wird dadurch nicht wieder auf eine Teilmenge eingeschränkt.
+- Eine noch unbestätigte Vorschau wird beim Speichern als Auswahlzustand behandelt. Fortsetzen darf daraus keine bereits ausgerüstete Waffe machen; nach bestätigtem Start wird keine zweite Waffe vergeben.
+- Optional später: „Zufällig“ aus allen Standardwaffen. Auch eine zufällige Vorschau braucht die Bestätigung und bleibt beim Fortsetzen stabil.
 
-The current wave should be allowed to build pressure continuously. Level-ups and chest rewards are earned during combat but resolved only after the wave ends.
+**Abnahme:** Das Raster enthält jede Standardwaffe genau einmal und keine Evolution. Alle Icons und vollständigen Details sind bei den HUD-Testauflösungen erreichbar. Ein Iconklick vergibt nichts; die Bestätigung übernimmt genau die angezeigte Waffe. Doppelklicks, Intro, Neustart und Fortsetzen starten Welle 1 genau einmal. Frühe Überlebensrate, erlittene Treffer und erste Kaufmöglichkeiten werden pro Starter verglichen.
 
-### Post-wave reward pipeline
+## Umsetzung in spielbaren Schritten
 
-When the wave timer reaches zero:
+| Schritt | Lieferumfang | Prüfung vor dem nächsten Schritt |
+| --- | --- | --- |
+| 1 | Gemeinsame HP-/XP-Zeile, kompakter Timer, getrennte Bossanzeige | Größen, Textgrenzen, Statusanzeigen, sechs Auflösungen und native Bilder |
+| 2 | Dash-Basis inklusive Touchbutton, Kontaktstopp und Save/Resume | Eine Ladung, beide Sperren, keine neuen Schutzframes, vollständige Streckenprüfung |
+| 3 | Erholungsattribut, wenige passende Angebote und Telemetrie | Wartezeiten, Stat-/Save-Kompatibilität, maximaler Bonus, Vergleich mit/ohne Investition |
+| 4 | Karies-Graf als erster eigener Encounter | Bahnenprinzip, Bossabschluss, Alt-Saves, Nah-/Fernkampf und Mobile |
+| 5 | Karies-Prinz, dann Karies-König, dann Karies-Imperator | Je Boss erst eigener Ablauf samt Grenzen und Tests, dann nächster Encounter |
+| 6 | Alle 18 Standardwaffen im Iconraster mit Details und Bestätigung | Vollständiger Katalog, Auswahlablauf, frühe Wellen und UI pro Start prüfen |
+| 7 | Balance aller Starts und gegebenenfalls Dash-Cooldown-Items | Endlos-/Schwierigkeitsvergleich wiederholen |
 
-1. stop spawning / finish the combat segment
-2. run the existing loot-collection phase
-3. pull all remaining XP, coins and chest drops to Denti
-4. update XP and determine how many level-ups were earned
-5. resolve all pending level-up choices
-6. resolve all pending Zahnfee chest rewards
-7. later, insert milestone rewards such as boss relics into this same intermission pipeline
-8. open the shop
-9. continue to the next wave
+Nach Schritt 3 wird geprüft, ob Dash die bisherige Gegnerdichte zu stark entwertet. Nach jedem Boss folgt ein eigener Druck-/TTK-Vergleich. Mehr HP und zusätzliche Projektile ersetzen diese Prüfung nicht.
 
-The flow should feel like a deliberate **"time to loot and level up"** break after the action, not a chain of interruptions during it.
+## Weiterer Backlog
 
-### Deferred level-ups
+- **Build-Tiefe:** Zusätzliche Items nur mit klarer Wechselwirkung. Blutung, Nässe/Elektro, Crit/Weihe, Schild/Vergeltung, Heilung, Ökonomie und Zucker-Risiko bleiben die Build-Familien. Der frühere Mengenplan „30–35 Items“ ist mit 93 Items überholt.
+- **Dash-Synergien:** Nach der Basis etwa begrenzte Erholung durch tatsächliche Schildblocks oder ein Zucker-Item mit schnellerer Erholung und klarer Gegenleistung prüfen. Keine automatischen Vollaufladungen durch jede Tötung, keine endlosen Proc-Ketten und kein Durchqueren von Gegnern durch ein Item.
+- **Gegnerdruck:** Dichte, gemischte Rollen, Burst-Rhythmus und Projektilräume weiter messen. Neue Bossmechaniken und Dash werden gemeinsam mit den vorhandenen Drucksystemen getestet.
+- **Risiko-/Belohnungswellen:** Freiwillig erschwerte Wellen mit vorher sichtbaren Zusatzbelohnungen. Auswahl bleibt zwischen Wellen.
+- **Meta und weitere Inhalte:** Zusätzliche Arenen und neue Entscheidungen. Standardwaffen bleiben vollständig als Starts verfügbar. Schwierigkeit, Story, Endlos, Relikte und Evolutionen sind bereits vorhanden und werden weiter abgestimmt.
+- **Run-Rückblick und Telemetrie:** Bestehende gemeinsame Messung um Dash und Boss-Angriffsquellen ergänzen. Direkte Waffen-, Item- und Proc-Schäden bleiben getrennt und werden nicht doppelt gezählt; Werte überleben Fortsetzen.
+- **Performance und Lesbarkeit:** Neue Flächen, Kollisionsprüfungen und Bossdarstellung unter hoher Gegnerzahl sowie im Web-Build messen. Warnungen bleiben auch unter Waffen- und Verzauberungseffekten sichtbar.
 
-Crossing an XP threshold during active combat must no longer pause the game.
+## Leitplanken
 
-Instead:
-
-- XP keeps accumulating normally
-- each crossed threshold increments a pending level-up count
-- multiple levels may be earned in one wave
-- after the end-of-wave loot sweep, present one three-choice level-up selection per pending level
-- preserve overflow XP and threshold progression correctly
-
-This is especially important once waves become denser and more bullet-hell-like. A modal popping up in the middle of a dodge sequence would destroy combat rhythm.
-
-### Chest drops during combat
-
-A Zahnfee chest may still physically drop during the wave. It can be exciting to see and collect, but **picking it up must not open a choice screen immediately**.
-
-Preferred behavior:
-
-- chest appears as a visible rare drop
-- touching/collecting it queues a pending chest reward
-- if it remains on the ground when the wave ends, the end-of-wave loot sweep collects it automatically like XP/coins
-- the item reveal happens only in the post-wave reward phase
-
-To avoid ordering exploits, the chest reward/rarity should preferably be rolled using the relevant luck state when the chest is generated/collected, or otherwise use a clearly defined luck snapshot. Do not let the player change luck during post-wave level-ups and thereby reroll already-earned chest quality accidentally.
-
-### Core chest interaction
-
-When a queued chest is resolved, reveal one item:
-
-- **KEEP**: gain the item for free
-- **SCRAP**: convert the item into coins
-
-This ensures even a poor build-match is still useful.
-
-If multiple chests are ever possible, resolve them sequentially or through one compact reward screen. Do not create a separate combat interruption per chest.
-
-### Luck interaction
-
-Luck may influence:
-
-- chance for a random chest to drop during the wave
-- item rarity inside the chest
-
-Keep this bounded to avoid runaway snowballing. A good starting rule is at most one ordinary random chest per wave.
-
-Possible later rules:
-
-- elites have a meaningful chest chance
-- milestone bosses guarantee a reward chest or stronger reward
-- scrap value scales with rarity
-- dedicated item can improve scrap value
-
-### Architecture / save-state requirement
-
-Treat this as a generic **post-wave reward queue**, not as several unrelated systems each calling `get_tree().paused`.
-
-The game should know which intermission state it is in, for example conceptually:
-
-```text
-COLLECTING_LOOT
--> LEVEL_UP_REWARDS
--> CHEST_REWARDS
--> BOSS_REWARD (optional/later)
--> SHOP
-```
-
-Save/resume should preserve:
-
-- pending level-up count / unresolved choices
-- pending chest rewards
-- which reward is currently being resolved
-- completion state before the shop
-
-This makes later boss relics and special rewards much easier to add without turning the game flow into nested pause logic.
-
-### Why this helps
-
-- combat remains uninterrupted and can become much denser
-- the end of a wave gets a satisfying payoff rhythm
-- all XP and coins are known before making post-wave decisions
-- chest loot and level-ups feel like rewards for surviving the wave
-- the shop stays the final build-planning step before the next fight
-
----
-
-## Phase 6 — Expand from 18 to about 30-35 items
-
-Do not add filler just to hit a number.
-
-Each new item should preferably connect to at least two existing mechanics.
-
-### Cut / Bleed
-
-Ideas:
-
-- extra bleed stack capacity
-- bleed can crit
-- killing a bleeding enemy spreads one bleed stack
-- bonus movement/attack speed while near bleeding enemies
-- stronger payoff after maintaining bleed for a duration
-
-### Water / Electricity
-
-Ideas:
-
-- wet status increases chain range
-- water impacts create temporary puddles
-- electricity arcs through wet enemies / puddles
-- chain damage grows with number of wet targets
-
-### Crit / Shine / Holy
-
-Ideas:
-
-- crits emit a light beam
-- holy damage temporarily raises crit chance
-- excess crit chance above 100% converts into bonus crit damage or secondary proc chance
-- consecutive crits build a short "glow" buff
-
-### Armor / Shield / Retaliation
-
-Ideas:
-
-- shield break causes AoE
-- taking damage fires enamel shards
-- armor contributes to attack scaling with a cap
-- gaining a shield temporarily raises damage
-
-### Economy / Luck
-
-Ideas:
-
-- coins collected during a wave grant temporary power
-- unspent coins earn a small end-wave bonus
-- better scrap value
-- chest rarity bias
-- kill streaks have a low chance to mint extra coins
-
-### Projectile
-
-Ideas:
-
-- more pierce
-- split on kill
-- larger/slower projectiles with more damage
-- projectile return / boomerang-like secondary pass
-
-### AoE / Explosions
-
-Ideas:
-
-- larger blast radius with reduced direct damage
-- kills by AoE prime nearby enemies
-- chained explosions with cooldown safeguards
-
-### Healing / Saliva
-
-Ideas:
-
-- overheal becomes shield
-- full HP grants damage
-- regeneration accelerates after avoiding damage for several seconds
-- healing events trigger a small holy pulse
-
-### Sugar / Caries risk-reward build
-
-A deliberately unhealthy build family is strongly desired.
-
-Examples:
-
-**Verbotener Lolli**
-- large damage increase
-- meaningful defensive drawback
-- optionally accumulates "Karies" per wave
-
-**Zuckerschock**
-- large attack-speed boost
-- later movement or defense crash
-
-**Cola-Infusion**
-- strong bonus at full health
-- heavily reduced regeneration
-
-These should be powerful enough to tempt the player, not joke-only traps.
-
----
-
-## Phase 7 — Elites
-
-Introduce elite variants to create priority targets without needing many completely new enemy species.
-
-Possible elite modifiers:
-
-- larger + tougher
-- aura that buffs nearby enemies
-- periodic radial shots
-- leaves acid trail
-- splits on death
-- shielded until nearby minions die
-- enrages when low HP
-
-Elites are good candidates for better chest-drop chances.
-
----
-
-## Phase 8 — Boss relics / Divine Blessings
-
-After milestone bosses (for example waves 5, 10 and 15), offer one of three rare rule-changing relics.
-
-These are not normal shop items. Resolve them inside the post-wave reward pipeline, after loot collection and before the shop.
-
-Examples:
-
-- bleeding enemies explode on death and spread bleed
-- every fifth water hit emits a circular wave
-- shield break grants a temporary major damage buff
-- crits leave holy marks that detonate after several hits
-
-Purpose: create a third in-run progression layer:
-
-- XP = stats
-- coins = shop build
-- boss relics = rule changes
-
-Keep the relic pool small and distinctive before expanding it.
-
----
-
-## Phase 9 — Weapon evolutions
-
-Implemented: six optional, secret recipes, special attacks, generated weapon art and save/resume. Recipes are revealed only when fully satisfied. See [weapon evolutions](WEAPON_EVOLUTIONS.md) for developer-only recipes, values and tests. The first balance pass still needs run playtests.
-
-Only after core balance and pressure are healthy.
-
-Evolution concept:
-
-Tier-IV weapon + compatible item(s) -> special evolved weapon.
-
-Examples / placeholders:
-
-- Zahnseidenpeitsche IV + Zahnseide-Spule + Skalpellwachs -> holy bleed evolution
-- Wasserflosser IV + Funkensonde + Mundspülung -> electric water evolution
-- Turbo-Bohrer IV + Implantat -> boss-killing drill evolution
-
-The important part is not the exact names. Evolutions should give the player explicit mid-run goals and make shop rerolls emotionally meaningful.
-
----
-
-## Phase 10 — Risk/reward waves
-
-Before selected waves, present optional difficulty modifiers.
-
-Example:
-
-- Normal treatment
-- Emergency treatment: +35% enemies, one elite, +50% coins
-
-Possible modifiers:
-
-- double horde
-- extra projectile enemies
-- no healing this wave
-- stronger enemies for increased chest chance
-- elite guaranteed
-
-These choices let players voluntarily test whether their build is ahead of the curve.
-
----
-
-## Phase 11 — Replayability / meta layer
-
-After the in-run loop is strong:
-
-### Unlock-focused meta progression
-
-Prefer unlocking:
-
-- new items
-- new weapons
-- relics
-- challenge modifiers
-- arenas
-- alternate starting loadouts
-
-Avoid relying primarily on permanent +damage/+HP upgrades, because they can undermine the balance work.
-
-### Difficulty tiers / Kariesgrad
-
-After the first victory, unlock escalating difficulty tiers.
-
-Potential effects:
-
-- denser waves
-- additional elite modifiers
-- harder boss patterns
-- reduced healing
-- new enemy combinations
-- additional reward/unlock opportunities
-
-### Arena chapters
-
-The existing 5-wave boss cadence naturally supports four chapters:
-
-- waves 1-5: Plaque
-- 6-10: Sugar
-- 11-15: Acid
-- 16-20: Caries
-
-Visual tint, spawn profile, hazards and music can change without requiring four entirely new maps.
-
----
-
-## Balancing principles
-
-1. Do not make every enemy a sponge.
-2. Let trash mobs explode under a strong build.
-3. Preserve danger through quantity, mixed roles, projectiles and elites.
-4. Bosses must live long enough to show their mechanics.
-5. Strong builds should feel visibly stronger than weak ones.
-6. Avoid uncapped multiplicative scaling where possible.
-7. Test interactions between weapon tiers, crit, boss multipliers, armor-to-damage and item procs.
-8. Use cooldowns/limits to prevent proc chains from creating infinite or unreadable cascades.
-9. Measure before and after tuning.
-10. Keep the game readable at maximum intended enemy/projectile density.
-11. Do not use modal reward screens to relieve combat pressure; let the wave breathe only after it actually ends.
-
-## Definition of a healthier run
-
-A successful v0.2 run should feel approximately like this:
-
-- early: Denti is vulnerable and building identity
-- mid: synergies begin to come online; hordes become satisfying but dangerous
-- late: Denti destroys huge amounts of trash, but must still dodge patterns and respect elites
-- each active wave: uninterrupted movement/combat with no level-up or chest modal stopping a dodge sequence
-- wave end: everything flies in, then there is a satisfying loot/level-up/chest reward break
-- bosses: strong builds shorten the fight, but do not erase the encounter in a few seconds
-- shops/chests/relics create recognizable build goals and difficult decisions
-- replaying immediately suggests another build to try
-
-The desired fantasy is:
-
-> Denti becomes outrageously powerful. The arena becomes outrageously hostile too.
+1. Gewöhnliche Gegner dürfen unter einem starken Build schnell sterben. Gefahr entsteht durch Positionierung, Dichte, Rollen und Angriffe.
+2. Jeder Boss verändert, worauf der Spieler achten und wie er sich bewegen muss.
+3. Dash belohnt einen freien Weg und gutes Timing. Gegnerkontakt bleibt ein Hindernis.
+4. Grundmechaniken funktionieren ohne Pflicht-Item, Pflicht-Starter oder Pflicht-Dash-Investition.
+5. UI-Komponenten haben feste Zustandsgrenzen; Inhalte dürfen ihre Umgebung nicht unerwartet vergrößern.
+6. Kampf bleibt ununterbrochen. Beute und Pflichtentscheidungen werden nach der Welle abgearbeitet.
+7. Stats, Ablauf und Speichern haben jeweils eine maßgebliche Quelle; neue Systeme verwenden klare Schnittstellen.
+8. Jede Ausbaustufe wird implementiert, getestet, gespielt und gemessen, bevor die nächste mehr Komplexität hinzufügt.
