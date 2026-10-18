@@ -19,6 +19,7 @@ static func restore(game, saved: Dictionary) -> void:
 		game._begin_loot_collection()
 		return
 	if game.starter_pending:
+		game.get_node("/root/SceneTransitions").present(&"starter")
 		game.run_flow.enter(RunFlow.Phase.STARTER)
 		game.choice_panel.show_starters(WeaponCatalog.STARTERS)
 		game.get_tree().paused = true
@@ -51,6 +52,7 @@ static func restore(game, saved: Dictionary) -> void:
 					options.append(upgrade.with_tier(1))
 					break
 		if options.size() == upgrade_data.size():
+			game.get_node("/root/SceneTransitions").present(&"rewards")
 			game.run_flow.enter(RunFlow.Phase.REWARDS)
 			game.choice_panel.show_upgrades(options)
 			game._update_level_reroll()
@@ -62,6 +64,7 @@ static func restore(game, saved: Dictionary) -> void:
 	elif game.rewards.step == PostWaveRewards.Step.LEVELS:
 		game._advance_post_wave_rewards()
 	elif game.in_shop or game.rewards.step == PostWaveRewards.Step.SHOP:
+		game.get_node("/root/SceneTransitions").present(&"shop")
 		if shop.offers.size() != ShopController.OFFER_COUNT:
 			shop.complete_saved_offers(wave.current_wave, player.stats.luck, player.loadout, game.items)
 		game.in_shop = true

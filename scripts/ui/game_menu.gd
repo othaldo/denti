@@ -34,6 +34,7 @@ func _ready() -> void:
 	_build_ui()
 	visible = not overlay
 	if not overlay:
+		get_node("/root/SceneTransitions").present(&"menu")
 		session.end_test_run()
 		session.settings_visit_streak = 0
 		menu_music = MusicController.new()
@@ -532,7 +533,7 @@ func _activate_test_code(code: String) -> void:
 		return
 	code_input.release_focus()
 	get_tree().paused = false
-	get_tree().change_scene_to_file("res://scenes/game/game.tscn")
+	get_node("/root/SceneTransitions").change_scene("res://scenes/game/game.tscn")
 
 
 func _ui_options() -> void:
@@ -622,7 +623,7 @@ func _start_new_game(difficulty_id: StringName) -> void:
 	session.clear_run()
 	session.resume_requested = false
 	get_tree().paused = false
-	get_tree().change_scene_to_file("res://scenes/game/game.tscn")
+	get_node("/root/SceneTransitions").change_scene("res://scenes/game/game.tscn")
 
 
 func _continue_game() -> void:
@@ -630,10 +631,10 @@ func _continue_game() -> void:
 		return
 	session.resume_requested = true
 	get_tree().paused = false
-	get_tree().change_scene_to_file("res://scenes/game/game.tscn")
+	get_node("/root/SceneTransitions").change_scene("res://scenes/game/game.tscn")
 
 
 func _to_main_menu() -> void:
 	game._save_run()
 	get_tree().paused = false
-	get_tree().change_scene_to_file("res://scenes/ui/game_menu.tscn")
+	get_node("/root/SceneTransitions").change_scene("res://scenes/ui/game_menu.tscn")

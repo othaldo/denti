@@ -1,12 +1,15 @@
 extends SceneTree
 
 # Derived shader data only; the painted tooth source is never modified.
-const SIDE := 512
+var _side := 512
 const PADDING := 0.25
 const LARGE := 1.0e12
 
 
 func _initialize() -> void:
+	var transition := "--transition" in OS.get_cmdline_user_args()
+	if transition:
+		_side = 2048
 	var source := load("res://assets/ui/tooth_vessel_frame.png") as Texture2D
 	var bitmap := BitMap.new()
 	bitmap.create_from_image_alpha(source.get_image(), 0.3)
@@ -41,10 +44,10 @@ func _initialize() -> void:
 		smooth = refined
 	var polygon := PackedVector2Array()
 	for point in smooth:
-		polygon.append((point + Vector2.ONE * PADDING) * SIDE / (1.0 + PADDING * 2.0))
+		polygon.append((point + Vector2.ONE * PADDING) * _side / (1.0 + PADDING * 2.0))
 	var mask := PackedByteArray()
-	mask.resize(SIDE * SIDE)
-	for y in SIDE:
+	mask.resize(_side * _side)
+	for y in _side:
 		var scan_y := y + 0.5
 		var hits: Array[float] = []
 		for index in polygon.size():
@@ -54,21 +57,21 @@ func _initialize() -> void:
 				hits.append(a.x + (scan_y - a.y) * (b.x - a.x) / (b.y - a.y))
 		hits.sort()
 		for pair in range(0, hits.size() - 1, 2):
-			for x in range(maxi(0, ceili(hits[pair] - 0.5)), mini(SIDE, floori(hits[pair + 1] - 0.5) + 1)):
-				mask[y * SIDE + x] = 1
+			for x in range(maxi(0, ceili(hits[pair] - 0.5)), mini(_side, floori(hits[pair + 1] - 0.5) + 1)):
+				mask[y * _side + x] = 1
 	var outside := _distance(mask, 1)
 	var inside := _distance(mask, 0)
 	var pixels := PackedByteArray()
-	pixels.resize(SIDE * SIDE * 2)
+	pixels.resize(_side * _side * 2)
 	for index in mask.size():
 		var distance := -sqrt(inside[index]) if mask[index] == 1 else sqrt(outside[index])
 		# Store signed distance in source-tooth units, packed as 16-bit RG.
-		var encoded := clampi(roundi((0.5 + distance * 1.5 / SIDE * 2.0) * 65535.0), 0, 65535)
+		var encoded := clampi(roundi((0.5 + distance * 1.5 / _side * 2.0) * 65535.0), 0, 65535)
 		pixels[index * 2] = encoded >> 8
 		pixels[index * 2 + 1] = encoded & 255
-	var image := Image.create_from_data(SIDE, SIDE, false, Image.FORMAT_RG8, pixels)
+	var image := Image.create_from_data(_side, _side, false, Image.FORMAT_RG8, pixels)
 	var texture := ImageTexture.create_from_image(image)
-	var path := "res://assets/ui/tooth_shield_distance.res"
+	var path := "res://assets/ui/tooth_transition_distance.res" if transition else "res://assets/ui/tooth_shield_distance.res"
 	var error := ResourceSaver.save(texture, path, ResourceSaver.FLAG_COMPRESS)
 	if error != OK:
 		push_error("Could not save shield distance data: %s" % error)
@@ -80,35 +83,35 @@ func _initialize() -> void:
 
 func _distance(mask: PackedByteArray, feature: int) -> PackedFloat64Array:
 	var result := PackedFloat64Array()
-	result.resize(SIDE * SIDE)
-	for y in SIDE:
+	result.resize(_side * _side)
+	for y in _side:
 		var row := PackedFloat64Array()
-		row.resize(SIDE)
-		for x in SIDE:
-			row[x] = 0.0 if mask[y * SIDE + x] == feature else LARGE
+		row.resize(_side)
+		for x in _side:
+			row[x] = 0.0 if mask[y * _side + x] == feature else LARGE
 		var transformed := _edt(row)
-		for x in SIDE:
-			result[y * SIDE + x] = transformed[x]
-	for x in SIDE:
+		for x in _side:
+			result[y * _side + x] = transformed[x]
+	for x in _side:
 		var column := PackedFloat64Array()
-		column.resize(SIDE)
-		for y in SIDE:
-			column[y] = result[y * SIDE + x]
+		column.resize(_side)
+		for y in _side:
+			column[y] = result[y * _side + x]
 		var transformed := _edt(column)
-		for y in SIDE:
-			result[y * SIDE + x] = transformed[y]
+		for y in _side:
+			result[y * _side + x] = transformed[y]
 	return result
 
 
 func _edt(values: PackedFloat64Array) -> PackedFloat64Array:
 	var sites := PackedInt32Array()
-	sites.resize(SIDE)
+	sites.resize(_side)
 	var breaks := PackedFloat64Array()
-	breaks.resize(SIDE + 1)
+	breaks.resize(_side + 1)
 	breaks[0] = -INF
 	breaks[1] = INF
 	var k := 0
-	for q in range(1, SIDE):
+	for q in range(1, _side):
 		var p := sites[k]
 		var boundary := ((values[q] + q * q) - (values[p] + p * p)) / (2.0 * (q - p))
 		while boundary <= breaks[k]:
@@ -120,9 +123,9 @@ func _edt(values: PackedFloat64Array) -> PackedFloat64Array:
 		breaks[k] = boundary
 		breaks[k + 1] = INF
 	var result := PackedFloat64Array()
-	result.resize(SIDE)
+	result.resize(_side)
 	k = 0
-	for q in SIDE:
+	for q in _side:
 		while breaks[k + 1] < q:
 			k += 1
 		var offset := q - sites[k]

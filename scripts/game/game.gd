@@ -174,13 +174,15 @@ func _ready() -> void:
 
 
 func _show_starters() -> void:
+	get_node("/root/SceneTransitions").present(&"starter")
 	starter_pending = true
 	choice_panel.show_starters(WeaponCatalog.STARTERS)
 	get_tree().paused = true
 	_save_run()
 
 
-func _present_story() -> void:
+func _present_story(screen: StringName) -> void:
+	get_node("/root/SceneTransitions").present(screen)
 	run_flow.enter(RunFlow.Phase.STORY)
 	choice_panel.visible = false
 	shop_panel.visible = false
@@ -229,6 +231,7 @@ func _on_starter_chosen(weapon: WeaponData) -> void:
 
 
 func _start_combat_wave() -> void:
+	get_node("/root/SceneTransitions").present(&"combat", false)
 	run_flow.enter(RunFlow.Phase.COMBAT)
 	rewards.begin_wave()
 	var profile_id := wave.prepare_next_wave_profile()
@@ -542,6 +545,7 @@ func _award_xp(amount: int) -> void:
 
 
 func _show_level_choice() -> void:
+	get_node("/root/SceneTransitions").present(&"rewards")
 	run_flow.enter(RunFlow.Phase.REWARDS)
 	var pool: Array[UpgradeData] = []
 	var equipped_stats: Array[StringName] = []
@@ -707,6 +711,7 @@ func _finish_loot_collection() -> void:
 
 func _advance_post_wave_rewards() -> void:
 	if rewards.step in [PostWaveRewards.Step.LEVELS, PostWaveRewards.Step.CHESTS, PostWaveRewards.Step.RELICS]:
+		get_node("/root/SceneTransitions").present(&"rewards")
 		run_flow.enter(RunFlow.Phase.REWARDS)
 	match rewards.step:
 		PostWaveRewards.Step.LEVELS:
@@ -793,6 +798,7 @@ func _clear_combat(keep_boss: bool = false) -> void:
 func _finish_run() -> void:
 	if ended:
 		return
+	get_node("/root/SceneTransitions").present(&"end")
 	rewards.step = PostWaveRewards.Step.END
 	ended = true
 	player.status_effects.clear()
@@ -821,6 +827,7 @@ func _on_endless_requested() -> void:
 
 
 func _open_shop() -> void:
+	get_node("/root/SceneTransitions").present(&"shop")
 	rewards.step = PostWaveRewards.Step.SHOP
 	in_shop = true
 	_sync_music()
@@ -926,6 +933,7 @@ func _on_shop_continue() -> void:
 func _on_player_died() -> void:
 	if ended:
 		return
+	get_node("/root/SceneTransitions").present(&"end")
 	ended = true
 	player.status_effects.clear()
 	hud.chests_label.text = str(telemetry.wave_chests_found)
@@ -1013,12 +1021,12 @@ func debug_start_wave(number: int) -> void:
 func _restart() -> void:
 	session.clear_run()
 	get_tree().paused = false
-	get_tree().reload_current_scene()
+	get_node("/root/SceneTransitions").change_scene("res://scenes/game/game.tscn")
 
 
 func _on_end_main_menu() -> void:
 	get_tree().paused = false
-	get_tree().change_scene_to_file("res://scenes/ui/game_menu.tscn")
+	get_node("/root/SceneTransitions").change_scene("res://scenes/ui/game_menu.tscn")
 
 
 func _save_run() -> void:
@@ -1033,6 +1041,8 @@ func _save_run() -> void:
 
 func _restore_run(saved: Dictionary) -> void:
 	RUN_SNAPSHOT.restore(self, saved)
+	if run_flow.is_combat():
+		get_node("/root/SceneTransitions").present(&"combat", false)
 	session.selected_difficulty_id = wave.difficulty_id
 	_sync_music()
 

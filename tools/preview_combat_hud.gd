@@ -6,6 +6,7 @@ func _initialize() -> void:
 
 
 func _run() -> void:
+	root.get_node("SceneTransitions").enabled = false
 	var session: Node = root.get_node("GameSession")
 	session.save_path = "user://combat_hud_preview.json"
 	session.resume_requested = false

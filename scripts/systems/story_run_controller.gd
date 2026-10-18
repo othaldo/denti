@@ -1,7 +1,7 @@
 class_name StoryRunController
 extends RefCounted
 
-signal presenting
+signal presenting(screen: StringName)
 signal finished(followup: StringName)
 signal save_requested
 
@@ -24,7 +24,7 @@ func show_line() -> void:
 	var lines := StoryCatalog.dialogue(progress.dialogue_id)
 	if lines.is_empty():
 		return
-	presenting.emit()
+	presenting.emit(&"dialogue")
 	dialogue.show_line(lines[progress.dialogue_line], StoryCatalog.chapter(progress.chapter_index), progress.dialogue_line, lines.size())
 	save_requested.emit()
 
@@ -52,7 +52,7 @@ func advance() -> void:
 
 
 func show_travel() -> void:
-	presenting.emit()
+	presenting.emit(&"travel")
 	dialogue.visible = false
 	travel.present(progress)
 	save_requested.emit()
