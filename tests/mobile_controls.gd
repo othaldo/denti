@@ -98,6 +98,13 @@ func _run() -> void:
 	root.push_input(_touch(6, playfield, true), true)
 	_check(controls.touch_index == 6, "real playfield touch never reached direct controls")
 	root.push_input(_touch(6, playfield, false), true)
+	# Decorative HUD elements must pass touches through to the movement gesture.
+	game.hud.status_badges[0].show_amount(5)
+	game.hud.health_vessel.show_shield(5)
+	for control: Control in [game.hud.health_vessel, game.hud.health_label, game.hud.xp_bar, game.hud.level_label, game.hud.coins_label, game.hud.status_badges[0].icon, game.hud.health_vessel.shield_aura]:
+		root.push_input(_touch(8, control.get_global_rect().get_center(), true), true)
+		_check(controls.touch_index == 8, "HUD intercepted a movement touch: " + control.name)
+		root.push_input(_touch(8, control.get_global_rect().get_center(), false), true)
 	var pause_at := controls.pause_button.get_global_rect().get_center()
 	root.push_input(_touch(7, pause_at, true), true)
 	root.push_input(_touch(7, pause_at, false), true)

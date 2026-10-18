@@ -1,0 +1,8 @@
+Mode: built-in image_gen; generate; transparent_background=true.
+Asset: assets/ui/boss_hud_frame.png.
+
+Use case: stylized-concept.
+Asset type: painted 2D game HUD boss bar frame, transparent PNG.
+Create ONE wide horizontal ornamental boss-health bar frame for Denti, a charming cartoon dental arena roguelite. Front-facing orthographic interface asset, approximately 7:1 width-to-height, centered with narrow transparent margins. Simple long straight central section with warm plum-black inset face and a narrow gold-enamel rim, rounded ends. The large uninterrupted dark interior must be blank for live boss name and health bar overlay. Matching subtly rounded ivory ceramic end caps, each with one tiny tooth-root curve engraved into the gold edge. Both ends mirror one another, equal size, restrained ornament. Top and bottom horizontal edges must be straight and uniform through the middle 65 percent, suitable for horizontal nine-slice stretching. No giant crests, no central decorations.
+Hand-painted glossy cartoon game art, warm gold #d5aa55, ivory highlights #fff4df, dark plum enamel #251c2d, soft brush shading, top-left sheen. Readable at only 35 pixels high, so thick clean silhouette, small amount of detail.
+ONLY this empty frame/backplate. No text, no letters, no icons, no numbers, no red health fill. Transparent background, no scenery, no checkerboard, no watermark. Friendly divine dentistry aesthetic, not gothic realism.

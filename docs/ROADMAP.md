@@ -1,6 +1,6 @@
 # Denti — Roadmap
 
-Stand: **18.10.2026**, auf Basis des spielbaren Stands 0.5.0 und der anschließenden Refactorings und UI-Korrekturen. Die folgenden Ausbaustufen sind **geplant**. Zahlenwerte sind Startwerte für Prototypen und werden erst nach Messung und Spieltests festgelegt.
+Stand: **18.10.2026**, auf Basis des spielbaren Stands 0.5.0 und der anschließenden Refactorings und UI-Korrekturen. **Schritt 1 (Kampf-HUD) ist umgesetzt**, die weiteren Ausbaustufen sind geplant. Zahlenwerte sind Startwerte für Prototypen und werden erst nach Messung und Spieltests festgelegt.
 
 Das nächste Ziel: ein kompakteres Kampf-HUD, eine bewusste Dash-Entscheidung, vier eigenständige Bosskämpfe und mehr unterschiedliche Starts. Denti darf sehr mächtig werden; Positionierung, freie Wege und lesbare Gefahren sollen trotzdem wichtig bleiben.
 
@@ -19,7 +19,7 @@ Details zum Iststand: [README](../README.md), [Story-Modus](STORY_MODE.md), [Waf
 
 | Priorität | Vorhaben | Ergebnis |
 | --- | --- | --- |
-| P0 | Kampf-HUD vereinheitlichen | Gleich hohe Ressourcenleisten und ein kompakter Timer ohne springendes Layout |
+| P0 · umgesetzt | Kampf-HUD vereinheitlichen | Animiertes Zahngefäß, dezente XP-Linie und feste Anzeigegrenzen; [Prüfung und Aufnahmen](COMBAT_HUD.md) |
 | P1 | Wurzelkraft und Dash | Eine gezielte Bewegung mit einer Ladung, eigener Erholung und verbindlichem Cooldown |
 | P1 | Vier Bossidentitäten | Jeder Story-Abschluss verlangt eine andere Positionierungsentscheidung |
 | P2 | Alle Standardwaffen als Starts | Kompaktes Iconraster mit Details und ausdrücklicher Auswahlbestätigung |
@@ -29,27 +29,18 @@ Jede Stufe wird einzeln umgesetzt, getestet und gespielt. Bossumsetzung erfolgt 
 
 ## 1. Kampf-HUD: feste Maße, weniger belegte Fläche
 
-### HP, XP und später Wurzelkraft
+**Umgesetzt und nach visuellem Feedback überarbeitet:** Statt gleicher HP-/XP-Balken gilt jetzt der vom Spieler gewählte **Zahn-HUD-Entwurf**. Ein gemaltes Zahngefäß enthält animierte korallrote Lebensfüllung mit Wellengang, Bläschen und kurzer Schadensspur. Aktuelles Leben steht groß in der Zahnkrone, darunter das Maximum mit Schrägstrich. Münzen und Kapseln stehen rechts daneben. Schildladungen bilden eine transparente blaue Hülle mit einer vollständigen Kontur pro Ladung. XP ist eine pflaumenbraun hinterlegte Randlinie mit Level-Medaillon. Welle und Timer bilden eine zentrierte Gruppe. [Aufbau, Grafikprompt, native Bilder und Animation](COMBAT_HUD.md).
 
-Aktuell reserviert die Szene 31 Pixel für HP und 22 Pixel für XP. Icons, Schrift und Abstände sind ebenfalls unterschiedlich. Daraus soll eine gemeinsame Ressourcenzeile entstehen:
+- Leben ist das wichtigste Element; Schilde und negative Effekte stehen direkt am Zahn.
+- In allen Formaten: Zahn, Statussymbole, Münzen, Kapseln und Level unten; XP als Linie am unteren Rand.
+- Zahlen, Schildladungen, vorgemerkte Level und Kapseln haben feste Anker. Die Aufstiegs-Pille passt ihre Breite dem Inhalt an, ohne das Level-Medaillon zu verschieben; ab 100 zeigt sie `99+`.
+- Welle und Zeit teilen einen festen 44-Pixel-Bereich: Welle klein über der größeren Zeit. Entzündung ersetzt den Zeitwert durch oranges Symbol und `+n s`.
+- Bossrahmen sind bei 1280 Pixeln 450×22 Pixel groß. Die Füllung reicht bis an beide gebogenen Zahnenden; Name links und Prozent rechts verwenden 13 Pixel. Zwei Bosse stehen mit vier Pixeln Abstand untereinander, bei 1920 Pixeln nebeneinander. Endstücke bleiben proportional, nur der Mittelteil wird wiederholt.
+- Exakte Werte und vollständige Bossnamen sind ohne Hover im Pausenmenü zugänglich.
+- Pause hält die Animation an. Die vorhandene Option für reduzierte UI-Animationen schaltet die Bewegungen ab.
+- Alle HUD-Elemente außer Pause lassen mobile Bewegungsgesten durch. Safe Areas werden berücksichtigt.
 
-- HP und XP erhalten dieselbe sichtbare Leistenhöhe, Breite, Iconfläche, Innenabstände und Textausrichtung. Startwert: **28 logische Pixel Höhe**, Iconfläche 24 Pixel; eine kompakte Variante skaliert beide gemeinsam.
-- Wurzelkraft verwendet später dieselbe Zeilenkomponente. HP bleibt durch Farbe und Gewichtung sofort erkennbar; Ressourcen unterscheiden sich zusätzlich durch Icon und Beschriftung.
-- Werte stehen innerhalb ihrer reservierten Flächen. Schildladungen, große HP-Zahlen und vorgemerkte Level vergrößern keine Leiste. Zusätzliche Informationen erhalten feste Plätze oder stehen in den Stats.
-- Statusanzeigen werden unter dem tatsächlichen Ressourcenblock angeordnet. Sie dürfen bei einer zusätzlichen Leiste weder den Block noch das Spielfeld unkontrolliert überlagern.
-
-### Timer oben in der Mitte
-
-Das derzeitige übereinander angeordnete Paket aus Welle, Timer, Kapselzähler und Bossanzeige wird entzerrt:
-
-- Im normalen Kampf eine kompakte Zeile: **`Welle 12 · 0:27`**. Zielhöhe inklusive Rahmen: höchstens 44 logische Pixel im Standardlayout.
-- Der Kapselzähler zieht in die bestehende Münz-/Levelzeile und erhält dort einen festen Platz. Er braucht keine eigene Zeile unter dem Timer.
-- Bossname und Bossleben erhalten einen eigenen schmalen Bereich unter der Timerzeile. Der Timer behält seine Maße. Lange Namen kürzen die Darstellung, ohne die volle Information in Pause/Details zu verlieren.
-- Entzündung ersetzt den Zeitwert durch eine kurze Anzeige wie **`Entzündet +12 s`** innerhalb desselben reservierten Bereichs. Warnfarbe und Icon ergänzen den Text; eine größere Schriftbox ist dafür unnötig.
-- Für zwei Endlosbosse gibt es eine explizite kompakte Anordnung mit höchstens zwei Bossleisten. Der normale Timerbereich wächst dadurch nicht weiter.
-- In schmalen Ansichten ordnet ein gemeinsames HUD-Layout die Bereiche ohne Überschneidungen an. Pause, FPS, Statusanzeigen und Touchsteuerung werden dabei berücksichtigt.
-
-**Abnahme:** HP- und XP-Leisten sind pixelgleich hoch. Zahlenwechsel, erste Kapsel, Schild und Entzündung verändern ihre Geometrie nicht. Timer und Bossleisten bleiben bei 320×568, 568×320, 720×1280, 1040×600, 1280×720 und 1920×1080 im sichtbaren Bereich. Automatische Layoutprüfungen werden durch native Aufnahmen mit großen Zahlen, langen Bossnamen und aktivierter Touchsteuerung ergänzt.
+**Abnahme:** Stabile Anordnung ohne Überschneidungen bei 320×568, 568×320, 720×1280, 1040×600, 1280×720 und 1920×1080. Große Werte, lange Bossnamen, zwei Bosse, Schilde, Statussymbole und Entzündung werden gleichzeitig geprüft. Native Aufnahmen und eine vergrößerte Animation ergänzen automatische Layout-, Eingabe- und Animationstests. Die frühere Vorgabe gleich hoher HP-/XP-Leisten ist durch diesen Entwurf ersetzt.
 
 ## 2. Wurzelkraft und Dash
 
@@ -225,7 +216,7 @@ Pro Boss werden TTK, Schaden nach Angriffsquelle, Treffer während Vorwarnung/ak
 
 | Schritt | Lieferumfang | Prüfung vor dem nächsten Schritt |
 | --- | --- | --- |
-| 1 | Gemeinsame HP-/XP-Zeile, kompakter Timer, getrennte Bossanzeige | Größen, Textgrenzen, Statusanzeigen, sechs Auflösungen und native Bilder |
+| 1 · umgesetzt | Animiertes Zahngefäß, XP-Randlinie, kompakter Timer, getrennte Bossanzeigen | Größen, Textgrenzen, Statusanzeigen, sechs Auflösungen und native Bilder; [Nachweis](COMBAT_HUD.md) |
 | 2 | Dash-Basis inklusive Touchbutton, Kontaktstopp und Save/Resume | Eine Ladung, beide Sperren, keine neuen Schutzframes, vollständige Streckenprüfung |
 | 3 | Erholungsattribut, wenige passende Angebote und Telemetrie | Wartezeiten, Stat-/Save-Kompatibilität, maximaler Bonus, Vergleich mit/ohne Investition |
 | 4 | Karies-Graf als erster eigener Encounter | Bahnenprinzip, Bossabschluss, Alt-Saves, Nah-/Fernkampf und Mobile |

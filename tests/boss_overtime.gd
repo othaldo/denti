@@ -67,7 +67,7 @@ func _run() -> void:
 		_fail("enrage shortened the readable warning")
 		return
 	game._refresh_hud()
-	if not game.hud.timer_label.text.contains("ENTZÜNDET +10s"):
+	if game.hud.timer_label.text != "+10 s" or not game.hud.clock_icon.visible:
 		_fail("HUD does not show overtime escalation")
 		return
 	var damage_saved := boss.attack_damage

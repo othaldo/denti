@@ -41,7 +41,9 @@ func _run() -> void:
 				return
 	player.global_position = Vector2.ONE * DentiArena.PLAYER_MARGIN
 	camera.force_update_scroll()
-	var hud_bottom: float = maxf(game.hud.get_node("Root/VitalsFrame").get_global_rect().end.y, game.hud.wave_frame.get_global_rect().end.y)
+	# Life now lives at the bottom on desktop; only the top timer is relevant
+	# when checking the upper wall's reserved camera space.
+	var hud_bottom: float = game.hud.wave_frame.get_global_rect().end.y
 	var top_wall_screen := (arena.get_global_transform_with_canvas() * Vector2.ZERO).y
 	if top_wall_screen <= hud_bottom:
 		_fail("HUD still overlaps the arena when Denti reaches the top wall")

@@ -87,6 +87,7 @@ func _enter_tree() -> void:
 
 
 func _ready() -> void:
+	hud.bind_mobile_controls(mobile_controls)
 	randomize()
 	session.begin_graphics_run()
 	story_dialogue = StoryDialogue.new()
@@ -283,22 +284,12 @@ func _notification(what: int) -> void:
 func _refresh_hud() -> void:
 	boss = BossEncounter.primary($Enemies)
 	var visible_boss: Enemy = boss if is_instance_valid(boss) else null
-	hud.update_status(player.stats, xp, xp_goal, level, coins, wave.current_wave, wave.remaining, in_shop, visible_boss, boss_pending, collecting_wave_loot, rewards.pending_levels)
+	hud.update_status(player.stats, xp, xp_goal, level, coins, wave.current_wave, wave.remaining, in_shop, visible_boss, boss_pending, collecting_wave_loot, rewards.pending_levels, wave.endless_enabled)
+	hud.set_reward_focus(rewards.step == PostWaveRewards.Step.LEVELS)
 	hud.chests_label.text = str(telemetry.wave_chests_found)
 	hud.chests_label.tooltip_text = "In dieser Welle eingesammelt"
 	hud.update_ailments(player.status_effects)
-	if wave.endless_enabled:
-		hud.wave_label.text = "ENDLOS · %d" % wave.current_wave
-	var encounter_bosses := BossEncounter.remaining($Enemies)
-	if encounter_bosses.size() > 1:
-		var encounter_health := 0.0
-		var encounter_max_health := 0.0
-		for member in encounter_bosses:
-			encounter_health += member.health
-			encounter_max_health += member.max_health
-		hud.boss_label.text = "%d Bosse · %.0f / %.0f" % [encounter_bosses.size(), encounter_health, encounter_max_health]
-		hud.boss_bar.max_value = encounter_max_health
-		hud.boss_bar.value = encounter_health
+	hud.update_bosses(BossEncounter.remaining($Enemies))
 	hud.update_telemetry(telemetry, $Enemies.get_child_count(), $Projectiles.get_child_count() + $EnemyProjectiles.get_child_count())
 	if session.test_scenario_id != &"":
 		hud.timer_label.text = "TEST"

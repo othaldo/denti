@@ -74,7 +74,7 @@ func _run() -> void:
 	_check(stats.health == 87.0, "bleed did not use armor or fractional tick damage")
 	_check(float(game.telemetry.status_damage.get("poison", 0.0)) == 2.0 and float(game.telemetry.status_damage.get("bleed", 0.0)) == 1.0, "status damage was not attributed separately")
 	game._refresh_hud()
-	_check(game.hud.ailments_label.visible and game.hud.ailments_label.text.contains("Vergiftet") and game.hud.ailments_label.text.contains("Blutung"), "HUD omitted active statuses/durations")
+	_check(game.hud.status_badges[0].visible and game.hud.status_badges[1].visible and game.hud.status_badges[0].amount > 0 and game.hud.status_badges[1].amount > 0, "HUD omitted active statuses/durations")
 	var state := effects.save_data()
 	game._save_run()
 	game.free()
@@ -107,7 +107,7 @@ func _run() -> void:
 	paused = true
 	_check(stats.health == 98.0 and effects.active[DentiStatus.Type.POISON]["remaining"] < 3.0, "live physics did not run poison ticks and duration")
 	game._begin_loot_collection()
-	_check(effects.active.is_empty() and not game.hud.ailments_label.visible, "post-wave loot/rewards retained damaging ailments")
+	_check(effects.active.is_empty() and not game.hud.status_badges[0].visible and not game.hud.status_badges[1].visible, "post-wave loot/rewards retained damaging ailments")
 	var before_hp := stats.health
 	effects.advance(10.0)
 	_check(stats.health == before_hp, "post-wave rewards suffered status damage")

@@ -34,7 +34,7 @@ func _run() -> void:
 	var hud: GameHUD = game.get_node("HUD")
 	var vitals: Control = hud.get_node("Root/Vitals")
 	var wave_info: Control = hud.get_node("Root/WaveInfo")
-	if vitals.size.x > 270.0 or vitals.size.y > 120.0 or wave_info.size.x > 160.0 or hud.wave_frame.size.x > 180.0:
+	if vitals.size.x > 150.0 or vitals.size.y > 160.0 or wave_info.size.x > 320.0 or hud.wave_frame.size.y > 44.0:
 		_fail("wave HUD takes too much arena space")
 		return
 	if hud.health_label.get_theme_constant("outline_size") < 3 or hud.timer_label.get_theme_constant("outline_size") < 4:
@@ -183,7 +183,7 @@ func _run() -> void:
 	if paused or game.wave.current_wave != 2 or not game.wave.active or game.get_node("ShopPanel").visible:
 		_fail("shop continue did not start wave two")
 		return
-	if game.get_node("HUD").wave_label.text != "WELLE 2" or game.get_node("HUD").timer_label.text != str(ceili(game.wave.duration)):
+	if game.get_node("HUD").wave_label.text != "Welle 2" or game.get_node("HUD").timer_label.text != "%d:%02d" % [ceili(game.wave.duration) / 60, ceili(game.wave.duration) % 60]:
 		_fail("HUD did not show wave number and countdown")
 		return
 	if game.get_node("Enemies").get_child_count() != 0:
@@ -241,7 +241,7 @@ func _run() -> void:
 		if expected_wave < WaveController.MAX_WAVES and not game.get_node("ShopPanel").visible:
 			_fail("shop missing between waves")
 			return
-	if game.ended or not game.boss_pending or not game.boss.overtime_active or not game.get_node("HUD").timer_label.text.begins_with("ENTZÜNDET +"):
+	if game.ended or not game.boss_pending or not game.boss.overtime_active or not game.get_node("HUD").timer_label.text.begins_with("+"):
 		_fail("final timer ended the run before the boss was defeated")
 		return
 	var boss: Enemy = game.boss

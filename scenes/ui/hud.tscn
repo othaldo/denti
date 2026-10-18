@@ -14,208 +14,50 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="VitalsFrame" type="Panel" parent="Root"]
-offset_left = 14.0
-offset_top = 14.0
-offset_right = 276.0
-offset_bottom = 126.0
+[node name="Vitals" type="Control" parent="Root"]
 mouse_filter = 2
 
-[node name="Vitals" type="VBoxContainer" parent="Root"]
-offset_left = 24.0
-offset_top = 21.0
-offset_right = 266.0
-offset_bottom = 119.0
-mouse_filter = 2
-theme_override_constants/separation = 5
-
-[node name="HealthArea" type="Control" parent="Root/Vitals"]
-custom_minimum_size = Vector2(242, 31)
-layout_mode = 2
+[node name="Progression" type="Control" parent="Root"]
 mouse_filter = 2
 
-[node name="HealthBar" type="ProgressBar" parent="Root/Vitals/HealthArea"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 29.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-show_percentage = false
-
-[node name="Health" type="Label" parent="Root/Vitals/HealthArea"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 29.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-horizontal_alignment = 1
-vertical_alignment = 1
-text = "100 / 100"
-
-[node name="HealthIcon" type="TextureRect" parent="Root/Vitals/HealthArea"]
-offset_top = 2.0
-offset_right = 25.0
-offset_bottom = 27.0
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="XPArea" type="Control" parent="Root/Vitals"]
-custom_minimum_size = Vector2(242, 22)
-layout_mode = 2
+[node name="Statuses" type="Control" parent="Root"]
 mouse_filter = 2
 
-[node name="XP" type="ProgressBar" parent="Root/Vitals/XPArea"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 29.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-max_value = 5.0
-show_percentage = false
-
-[node name="XPLabel" type="Label" parent="Root/Vitals/XPArea"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 29.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-horizontal_alignment = 1
-vertical_alignment = 1
-text = "XP 0 / 5"
-
-[node name="XPIcon" type="TextureRect" parent="Root/Vitals/XPArea"]
-offset_right = 24.0
-offset_bottom = 24.0
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="CoinArea" type="HBoxContainer" parent="Root/Vitals"]
-custom_minimum_size = Vector2(242, 25)
-layout_mode = 2
-mouse_filter = 2
-theme_override_constants/separation = 4
-
-[node name="CoinIcon" type="TextureRect" parent="Root/Vitals/CoinArea"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Coins" type="Label" parent="Root/Vitals/CoinArea"]
-layout_mode = 2
-mouse_filter = 2
-text = "0"
-
-[node name="Spacer" type="Control" parent="Root/Vitals/CoinArea"]
-layout_mode = 2
-size_flags_horizontal = 3
+[node name="Economy" type="Control" parent="Root"]
 mouse_filter = 2
 
-[node name="LevelIcon" type="TextureRect" parent="Root/Vitals/CoinArea"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Level" type="Label" parent="Root/Vitals/CoinArea"]
-layout_mode = 2
-mouse_filter = 2
-text = "Lv. 1"
-
-[node name="WaveFrame" type="Panel" parent="Root"]
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -82.0
-offset_top = 14.0
-offset_right = 82.0
-offset_bottom = 86.0
-grow_horizontal = 2
+[node name="WaveFrame" type="Control" parent="Root"]
 mouse_filter = 2
 
-[node name="WaveInfo" type="VBoxContainer" parent="Root"]
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -74.0
-offset_top = 19.0
-offset_right = 74.0
-offset_bottom = 82.0
-grow_horizontal = 2
+[node name="WaveInfo" type="Control" parent="Root"]
 mouse_filter = 2
-theme_override_constants/separation = 0
 
 [node name="Wave" type="Label" parent="Root/WaveInfo"]
-custom_minimum_size = Vector2(0, 25)
-layout_mode = 2
 mouse_filter = 2
+clip_text = true
+text_overrun_behavior = 3
 horizontal_alignment = 1
 vertical_alignment = 1
-text = "WELLE 1"
+text = "Welle 1"
 
-[node name="WaveIcon" type="TextureRect" parent="Root/WaveInfo/Wave"]
-offset_left = 3.0
-offset_top = 2.0
-offset_right = 24.0
-offset_bottom = 23.0
+[node name="ClockIcon" type="TextureRect" parent="Root/WaveInfo"]
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
 [node name="Timer" type="Label" parent="Root/WaveInfo"]
-custom_minimum_size = Vector2(0, 36)
-layout_mode = 2
 mouse_filter = 2
+clip_text = true
+text_overrun_behavior = 3
 horizontal_alignment = 1
 vertical_alignment = 1
-text = "45"
+text = "0:45"
 
-[node name="ClockIcon" type="TextureRect" parent="Root/WaveInfo/Timer"]
-offset_left = 14.0
-offset_top = 6.0
-offset_right = 38.0
-offset_bottom = 30.0
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="BossArea" type="Control" parent="Root/WaveInfo"]
+[node name="BossArea" type="Control" parent="Root"]
 visible = false
-custom_minimum_size = Vector2(0, 27)
-layout_mode = 2
 mouse_filter = 2
 
-[node name="BossHealth" type="ProgressBar" parent="Root/WaveInfo/BossArea"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-show_percentage = false
-
-[node name="BossName" type="Label" parent="Root/WaveInfo/BossArea"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-horizontal_alignment = 1
-vertical_alignment = 1
-text = "Karies-König"
-
-[node name="FPSPanel" type="Panel" parent="Root"]
+[node name="FPSPanel" type="Control" parent="Root"]
 visible = false
 anchor_left = 1.0
 anchor_right = 1.0

@@ -323,6 +323,8 @@ func _update_build_layout() -> void:
 		if dentipedia != null:
 			dentipedia.custom_minimum_size.y = maxf(80, minf(570, extent.y - 180))
 		return
+	if page == &"boss_details" and build_scroll != null:
+		build_scroll.custom_minimum_size.y = maxf(60, minf(200, extent.y - 180))
 	if page not in [&"stats", &"items"]:
 		build_panel.custom_minimum_size.x = minf(480, extent.x - 32)
 	if page not in [&"stats", &"items"]:
@@ -340,7 +342,7 @@ func _show_stats() -> void:
 	_compact_title("Stats")
 	var stats: PlayerStats = game.player.stats
 	var wave_text := "Endlos · Welle %d" % game.wave.current_wave if game.wave.endless_enabled else "Welle %d / %d" % [game.wave.current_wave, WaveController.MAX_WAVES]
-	DentiUIComponents.label(rows, "Leben %.0f / %.0f · Schild %d · Level %d\nXP %d / %d · %s" % [stats.health, stats.max_health, stats.shield_charges, game.level, game.xp, game.xp_goal, wave_text], 16)
+	DentiUIComponents.label(rows, "Leben %.0f / %.0f · Schild %d · Level %d\nXP %d / %d · %s\nOffene Aufstiege: %d" % [stats.health, stats.max_health, stats.shield_charges, game.level, game.xp, game.xp_goal, wave_text, game.rewards.pending_levels], 16)
 	var wallet := HBoxContainer.new()
 	rows.add_child(wallet)
 	DentiUIComponents.label(wallet, str(game.coins), 18).autowrap_mode = TextServer.AUTOWRAP_OFF
@@ -350,6 +352,12 @@ func _show_stats() -> void:
 	coin.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	coin.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	wallet.add_child(coin)
+	if not BossEncounter.remaining(game.get_node("Enemies")).is_empty():
+		var boss_details := LinkButton.new()
+		boss_details.text = "Bossdetails"
+		boss_details.add_theme_color_override("font_color", DentiUIStyle.GOLD)
+		boss_details.pressed.connect(_show_boss_details)
+		wallet.add_child(boss_details)
 	var grid := GridContainer.new()
 	grid.columns = 3
 	grid.add_theme_constant_override("h_separation", 14)
@@ -385,6 +393,23 @@ func _show_stats() -> void:
 		weapons.add_child(chip)
 		chip.pressed.connect(_show_weapon_details.bind(weapon.data, weapon.tier, weapon))
 	_button("Zurück", _show_home, true)
+	_update_build_layout()
+
+
+func _show_boss_details() -> void:
+	page = &"boss_details"
+	_clear_rows()
+	_compact_title("Bossdetails")
+	build_scroll = ScrollContainer.new()
+	build_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	rows.add_child(build_scroll)
+	var content := VBoxContainer.new()
+	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	content.add_theme_constant_override("separation", 12)
+	build_scroll.add_child(content)
+	for boss: Enemy in BossEncounter.remaining(game.get_node("Enemies")):
+		DentiUIComponents.label(content, "%s\nLeben %.0f / %.0f" % [boss.data.display_name, boss.health, boss.max_health], 16)
+	_button("Zurück", _show_stats, true)
 	_update_build_layout()
 
 
