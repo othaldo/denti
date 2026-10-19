@@ -44,6 +44,7 @@ var shield_charges: int = 0
 var dodge_chance: float = 0.0
 var dodge_rng := RandomNumberGenerator.new()
 var last_roll_critical: bool = false
+# Legacy save/resource key; now additive stamina points, not a percentage.
 var dash_recovery_bonus: float = 0.0
 
 
@@ -97,12 +98,16 @@ func load_save_data(saved: Dictionary) -> void:
 	changed.emit()
 
 
-func effective_dash_recovery() -> float:
-	return clampf(dash_recovery_bonus, 0, DASH_CONFIG.max_recovery_bonus)
+func stamina_bonus() -> float:
+	return clampf(dash_recovery_bonus, 0, DASH_CONFIG.max_stamina_bonus)
 
 
-func dash_recovery_text() -> String:
-	return "+%.0f %% · %.2f s Auffüllzeit%s" % [effective_dash_recovery(), DASH_CONFIG.refill_seconds(dash_recovery_bonus), " (max.)" if dash_recovery_bonus >= DASH_CONFIG.max_recovery_bonus else ""]
+func max_stamina() -> float:
+	return DASH_CONFIG.capacity + stamina_bonus()
+
+
+func stamina_text() -> String:
+	return "%.0f Wurzelkraft · %.2f/s · %.0f s Auffüllzeit%s" % [max_stamina(), DASH_CONFIG.recharge_per_second(max_stamina()), DASH_CONFIG.refill_duration, " (max.)" if dash_recovery_bonus >= DASH_CONFIG.max_stamina_bonus else ""]
 
 
 func _process(delta: float) -> void:

@@ -139,6 +139,7 @@ static func build(view: ShopPanel) -> void:
 		chip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		chip.custom_minimum_size = Vector2(0, 34)
 		chip.icon = DentiUIIcons.stat(DentiAttributes.ICONS[type])
+		chip.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 		chip.expand_icon = true
 		chip.add_theme_constant_override("icon_max_width", 23)
 		chip.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS

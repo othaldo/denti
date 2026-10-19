@@ -16,7 +16,7 @@ const RELIC_ATLAS: Texture2D = preload("res://assets/relics/relic_icons_atlas.pn
 const HUD_ATLAS: Texture2D = preload("res://assets/ui/hud_icons_atlas.png")
 const STAT_ATLAS: Texture2D = preload("res://assets/ui/stat_icons_atlas.png")
 const RANGE: Texture2D = preload("res://assets/ui/range.svg")
-const STAMINA_RECOVERY: Texture2D = preload("res://assets/ui/stamina_recovery_icon.png")
+const STAMINA: Texture2D = preload("res://assets/ui/stamina_icon.png")
 # Generated motifs are not exactly aligned to a uniform grid. Select each full
 # motif, then center it in the same transparent frame instead of cutting a cell.
 const STAT_REGIONS: Array[Rect2] = [
@@ -75,7 +75,7 @@ static func hud(index: int) -> Texture2D:
 
 static func stat(index: int) -> Texture2D:
 	if index == 11:
-		return STAMINA_RECOVERY
+		return STAMINA
 	if index == 10:
 		var dodge := _region(DODGE_ATLAS, 5, 3, 2) as AtlasTexture
 		dodge.filter_clip = true

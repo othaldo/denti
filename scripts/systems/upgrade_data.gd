@@ -9,7 +9,6 @@ extends Resource
 @export var tier_amounts: Array[float] = []
 
 var tier: int = 1
-var resulting_dash_refill: float = -1.0
 
 
 func with_tier(new_tier: int) -> UpgradeData:
@@ -23,8 +22,7 @@ func with_tier(new_tier: int) -> UpgradeData:
 
 func with_stat_context(stats: PlayerStats) -> UpgradeData:
 	if stat == &"dash_recovery_bonus":
-		amount = minf(amount, PlayerStats.DASH_CONFIG.max_recovery_bonus - stats.effective_dash_recovery())
-		resulting_dash_refill = PlayerStats.DASH_CONFIG.refill_seconds(stats.effective_dash_recovery() + amount)
+		amount = minf(amount, PlayerStats.DASH_CONFIG.max_stamina_bonus - stats.stamina_bonus())
 	return self
 
 
@@ -36,8 +34,6 @@ func effect_text() -> String:
 			text += " (HP) + Heilung"
 		elif type in [DentiAttributes.Type.MELEE_DAMAGE, DentiAttributes.Type.RANGED_DAMAGE]:
 			text += " (Waffenskalierung)"
-		elif type == DentiAttributes.Type.DASH_RECOVERY:
-			text += "\nAuffüllzeit: %.2f s" % (resulting_dash_refill if resulting_dash_refill >= 0 else PlayerStats.DASH_CONFIG.refill_seconds(amount))
 		return text
 	return description
 

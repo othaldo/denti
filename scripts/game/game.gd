@@ -563,7 +563,7 @@ func _show_level_choice() -> void:
 	for weapon in player.loadout.equipped():
 		equipped_stats.append(StringName(weapon.data.damage_stat + "_damage"))
 	for upgrade in UPGRADES:
-		if upgrade.stat == &"dash_recovery_bonus" and player.stats.effective_dash_recovery() >= player.dash.config.max_recovery_bonus:
+		if upgrade.stat == &"dash_recovery_bonus" and player.stats.stamina_bonus() >= player.dash.config.max_stamina_bonus:
 			continue
 		if upgrade.stat in [&"melee_damage", &"ranged_damage"] and not equipped_stats.has(upgrade.stat):
 			continue

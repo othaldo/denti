@@ -12,7 +12,7 @@ const KEYS: Array[StringName] = [
 const NAMES: Array[String] = [
 	"Bisskraft", "Härte", "Schmelz", "Putzeifer", "Glanz", "Speichel",
 	"Bewegung", "Zahnglück", "Nahschaden", "Fernschaden", "Zahnflutsch",
-	"Wurzelkraft-Erholung",
+	"Wurzelkraft",
 ]
 const MEANINGS: Array[String] = [
 	"Schadensbonus für Waffen", "Rüstung: reduziert erlittenen Schaden",
@@ -20,7 +20,7 @@ const MEANINGS: Array[String] = [
 	"Regenerationspunkte und Heilung pro Sekunde", "Bewegungstempo", "Glück bei Beute und Seltenheiten",
 	"Zusätzlicher Nahschaden nach Waffenskalierung", "Zusätzlicher Fernschaden nach Waffenskalierung",
 	"Chance, einem Treffer auszuweichen; maximal 60 %. Bewahrt Schildladungen.",
-	"Lädt Wurzelkraft schneller auf. 100 Wurzelkraft pro Dash; volle Ladung und freier Cooldown nötig. Maximal +400 % Erholung. Keine zusätzlichen Schutzframes.",
+	"Maximale Ausdauer. Ein Dash kostet 100 Wurzelkraft. Der gesamte Vorrat lädt in 4 Sekunden nach; mehr Wurzelkraft erhöht auch die Nachladerate. Maximal 500. Zwischen Dashes gilt ein Cooldown. Keine zusätzlichen Schutzframes.",
 ]
 const ICONS: Array[int] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 const ACTIVE: Array[Type] = [Type.DAMAGE, Type.ARMOR, Type.MAX_HEALTH, Type.ATTACK_SPEED,
@@ -60,7 +60,7 @@ static func is_fraction(type: Type) -> bool:
 	return type in [Type.CRIT_CHANCE, Type.DODGE]
 
 static func is_percent(type: Type) -> bool:
-	return is_fraction(type) or type in [Type.DAMAGE, Type.ATTACK_SPEED, Type.MOVEMENT, Type.DASH_RECOVERY]
+	return is_fraction(type) or type in [Type.DAMAGE, Type.ATTACK_SPEED, Type.MOVEMENT]
 
 static func number(value: float, signed: bool = false) -> String:
 	return ("%+.0f" if signed else "%.0f") % value if is_equal_approx(value, roundf(value)) else ("%+.1f" if signed else "%.1f") % value
@@ -73,7 +73,7 @@ static func value_text(stats: PlayerStats, type: Type) -> String:
 	match type:
 		Type.ARMOR: return stats.armor_text()
 		Type.REGEN: return stats.regen_text()
-		Type.DASH_RECOVERY: return stats.dash_recovery_text()
+		Type.DASH_RECOVERY: return stats.stamina_text()
 		Type.MAX_HEALTH: return "%.0f HP" % stats.max_health
 		Type.DODGE: return "%s %%" % number(stats.effective_dodge_chance() * 100.0) + (" (max.)" if stats.dodge_chance >= PlayerStats.MAX_DODGE_CHANCE else "")
 	var value: float = float(stats.get(key_for(type)))
@@ -96,7 +96,7 @@ static func compact_value_text(stats: PlayerStats, type: Type) -> String:
 		Type.ARMOR: return number(stats.armor)
 		Type.REGEN: return "%.2f/s" % stats.regen_per_second()
 		Type.MAX_HEALTH: return "%.0f" % stats.max_health
-		Type.DASH_RECOVERY: return "+%.0f %% · %.1f s" % [stats.effective_dash_recovery(), PlayerStats.DASH_CONFIG.refill_seconds(stats.dash_recovery_bonus)]
+		Type.DASH_RECOVERY: return number(stats.max_stamina())
 	return value_text(stats, type).trim_suffix(" (max.)")
 
 static func resolve_text(source: String) -> String:

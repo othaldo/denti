@@ -5,14 +5,33 @@ Keine CLI/API-Fallbacks und keine gezeichneten Ersatz-Icons. Originale Referenze
 bleiben erhalten. Die Alpha-Kanäle der generierten PNGs wurden übernommen.
 
 - HUD-Rahmen: [`assets/ui/stamina_vessel_frame.png`](../assets/ui/stamina_vessel_frame.png)
-- Erholungsattribut: [`assets/ui/stamina_recovery_icon.png`](../assets/ui/stamina_recovery_icon.png)
+- Aktuelles Stat-Icon: [`assets/ui/stamina_icon.png`](../assets/ui/stamina_icon.png)
+- Früherer Entwurf (ersetzt, nicht mehr eingebunden): [`stamina_recovery_icon.png`](../assets/ui/stamina_recovery_icon.png)
 - Referenz: bestehender [`tooth_vessel_frame.png`](../assets/ui/tooth_vessel_frame.png)
 
 Der grüne Innenbereich des HUD-Rahmens ist eine Ersatzmaske für die dynamische
 Füllung, keine Spielfarbe. Der Shader zeichnet dort Türkis; Gold und Elfenbein
 bleiben aus dem generierten Bild. Der Rahmen wird ausschließlich proportional
-verkleinert. Die Erholungsgrafik ist ein fertiges gemaltes Icon mit türkisfarbener
-Flüssigkeit und goldenem Kreis-Pfeil für die Karten/Stats.
+verkleinert. Das aktuelle Stat-Icon zeigt einen elfenbeinfarbenen Zahn mit
+türkisfarbenem Energieblitz, passend zu den übrigen gemalten Stat-Symbolen.
+Es ersetzt den zu detailreichen Gefäß-/Kreispfeil-Entwurf. Referenz ist jetzt
+der bestehende Stat-Atlas, nicht der große HUD-Rahmen. Die generierte PNG bleibt
+unverändert; der Import erzeugt Mipmaps und Karten, Stat-Chips sowie Detailfenster
+verwenden lineare Filterung mit Mipmaps. Die Importdatei ist ausdrücklich
+versioniert, damit die kleine Darstellung auch in frischen Builds erhalten bleibt.
+
+Native Größenprüfung mit 23, 40 und 56 Pixeln sowie Karten/Stat-Kacheln:
+`tools/preview_stamina_stats.gd`; Ausgabe unter `.godot/stamina_stats/`.
+[Vergleich in Originalgrößen](screenshots/dash/stamina_icons.png).
+
+## Prompt: aktuelles Wurzelkraft-Stat-Icon
+
+Integriertes Imagegen-Werkzeug, transparenter Hintergrund aktiviert.
+Referenzbild (nur Stil): `assets/ui/stat_icons_atlas.png`.
+
+```text
+Use case: stylized-concept. Asset type: ONE transparent painted stat icon for Denti, a cartoon dental arena game. Input image is STYLE REFERENCE ONLY: existing stat icon atlas, do not reproduce the sheet. Generate a new stamina / Wurzelkraft emblem that belongs next to those existing ivory tooth, heart, clover and droplet icons. Subject: one compact ivory molar tooth with a single broad mint-turquoise lightning bolt laid diagonally across its crown, suggesting stored energy. Two rounded root tips stay clearly recognizable. Simple bold silhouette, thick warm dark-brown outline, creamy highlights and soft painted shading, same glossy playful cartoon finish as reference. Tooth remains ivory; bolt is vivid turquoise with pale mint highlight. Very few large readable shapes, optimized to read at 24, 32 and 56 pixels. Center composition in a square with about 15 percent clear transparent margin on every edge; object occupies about 70 percent of frame. No gold rim, no frame, no glass vessel, no liquid, no circular recovery arrow, no jewelry, no microdetails, no external glow, no sparkles, no text, no extra icons. Genuinely transparent alpha background, clean antialiased edges. A finished game stat icon, not a mockup.
+```
 
 ## Prompt: Gefäßrahmen
 

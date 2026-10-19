@@ -410,6 +410,7 @@ func _stat_cell(texture: Texture2D, value: String, meaning: String, primary: boo
 	row.tooltip_text = meaning + " · " + value
 	summary_row.add_child(row)
 	var image := TextureRect.new()
+	image.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	image.texture = texture
 	image.custom_minimum_size = Vector2(22, 22)
 	image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE

@@ -75,9 +75,34 @@ func _run() -> void:
 		player.stats.dash_recovery_bonus = sample[0]
 		player.dash.request(Vector2.RIGHT, true)
 		player._physics_process(sample[1] - 0.01)
-		_check(not player.dash.ready_to_dash(), "dash became ready before both gates elapsed")
+		_check(not player.dash.ready_to_dash(), "dash became ready before cost and cooldown were available")
 		player._physics_process(0.01001)
 		_check(player.dash.ready_to_dash(), "dash did not recharge at its expected time")
+	# A larger pool stores multiple fixed-cost dashes and refills in four seconds.
+	_reset()
+	player.stats.apply_upgrade(&"dash_recovery_bonus", 100)
+	_check(player.dash.capacity == 200 and player.dash.charge == 100, "capacity upgrade granted free charge or failed to expand the pool")
+	player.dash.reset_wave()
+	_check(player.dash.request(Vector2.RIGHT, true) and player.dash.charge == 100, "dash did not spend exactly 100 from a 200-point pool")
+	_check(not player.try_dash() and player.dash.charge == 100, "stored second dash bypassed cooldown")
+	player._physics_process(1.5)
+	_check(player.dash.charge < 200 and player.try_dash(), "second dash required a full pool instead of 100 points")
+	player._physics_process(0.51)
+	player.dash.charge = 0
+	player._physics_process(4.0)
+	_check(is_equal_approx(player.dash.charge, 200), "larger pool did not completely refill in four seconds")
+	player.dash.charge = 0
+	player._physics_process(1.0)
+	_check(is_equal_approx(player.dash.charge, 50), "200 stamina did not regenerate 50 points per second")
+	game.hud.dash_indicator.refresh()
+	_check(game.hud.dash_indicator.vessel.label.text == "50" and game.hud.dash_indicator.caption.text == "/ 200", "HUD does not use the current stamina capacity")
+	_check(is_equal_approx(game.hud.dash_indicator.vessel.displayed_ratio, 0.25), "stamina fill still uses the old fixed maximum")
+	player.stats.apply_upgrade(&"dash_recovery_bonus", -100)
+	player.dash.charge = 100
+	player.stats.apply_upgrade(&"dash_recovery_bonus", 100)
+	player.dash.charge = 200
+	player.stats.apply_upgrade(&"dash_recovery_bonus", -100)
+	_check(player.dash.charge == 100, "capacity loss left the pool overfilled")
 	_reset()
 	player.stats.dash_recovery_bonus = 400
 	player.dash.request(Vector2.RIGHT, true)
@@ -199,6 +224,8 @@ func _run() -> void:
 	pulse._process_special(0.16, Vector2.ZERO)
 	_check(player.stats.health == 10000, "a warning dealt damage retroactively after dash escaped it")
 	_reset()
+	player.stats.dash_recovery_bonus = 150
+	player.dash.reset_wave()
 	player.dash.request(Vector2.RIGHT, true)
 	player._physics_process(0.06)
 	var saved: Dictionary = game.RUN_SNAPSHOT.capture(game)
@@ -214,7 +241,7 @@ func _run() -> void:
 	root.add_child(game)
 	current_scene = game
 	player = game.player
-	_check(is_equal_approx(player.dash.remaining, remainder) and is_equal_approx(player.dash.cooldown, cooldown) and player.dash.charge == 0, "resume refilled or lost active dash")
+	_check(is_equal_approx(player.dash.remaining, remainder) and is_equal_approx(player.dash.cooldown, cooldown) and player.dash.charge == 150 and player.dash.capacity == 250, "resume refilled or lost active dash and stored stamina")
 	paused = false
 	game.wave.set_process(false)
 	player.set_physics_process(false)
@@ -238,14 +265,15 @@ func _run() -> void:
 	_check(DentiAttributes.Type.DODGE == 10 and DentiAttributes.Type.DASH_RECOVERY == 11, "dash changed existing attribute IDs")
 	player.stats.dash_recovery_bonus = 390
 	var upgrade: UpgradeData = load("res://data/upgrades/wurzelkraft.tres").with_tier(4).with_stat_context(player.stats)
-	_check(upgrade.amount == 10 and upgrade.effect_text().contains("0.80 s"), "upgrade cap or resulting refill time is wrong")
-	player.dash.charge = 41
+	_check(upgrade.amount == 10 and upgrade.effect_text() == "+10 Wurzelkraft", "upgrade cap or stamina unit is wrong")
+	player.dash.charge = 241
 	player.dash.remaining = 0
 	player.dash.cooldown = 0.5
 	player.dash.recovery = 0.1
 	var restored := PlayerDash.new()
+	restored.stats = player.stats
 	restored.restore(JSON.parse_string(JSON.stringify(player.dash.save_data())))
-	_check(restored.charge == 41 and restored.cooldown == 0.5 and restored.recovery == 0.1 and not restored.active, "partly recharging cooldown save changed phase")
+	_check(restored.charge == 241 and restored.cooldown == 0.5 and restored.recovery == 0.1 and not restored.active, "partly recharging cooldown save changed phase or truncated stored stamina")
 	player.stats.dash_recovery_bonus = 0
 	game.items.acquire(ItemCatalog.by_id(&"mint_essence"))
 	game.items.acquire(ItemCatalog.by_id(&"sugar_2"))

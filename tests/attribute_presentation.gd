@@ -19,6 +19,12 @@ func _run() -> void:
 	_check(DentiAttributes.resolve_text("XP heilt 0,35 Leben je Punkt. -8 maximales Leben.").ends_with("-8 Schmelz."), "HP penalty or healing prose was damaged")
 	_check(DentiAttributes.bonus_text(DentiAttributes.Type.CRIT_CHANCE, 0.03) == "+3 % Glanz", "fractional crit displayed in the wrong unit")
 	_check(DentiAttributes.ACTIVE.has(DentiAttributes.Type.DODGE), "Zahnflutsch is absent from the live stat pool")
+	var stamina_stats := PlayerStats.new()
+	_check(DentiAttributes.compact_value_text(stamina_stats, DentiAttributes.Type.DASH_RECOVERY) == "100", "base stamina chip should show only 100")
+	stamina_stats.apply_upgrade(&"dash_recovery_bonus", 25)
+	_check(DentiAttributes.compact_value_text(stamina_stats, DentiAttributes.Type.DASH_RECOVERY) == "125", "stamina chip should show the upgraded maximum without extra text")
+	_check(DentiAttributes.bonus_text(DentiAttributes.Type.DASH_RECOVERY, 25) == "+25 Wurzelkraft", "stamina upgrade still uses percentages")
+	stamina_stats.free()
 	var session: Node = root.get_node("GameSession")
 	session.save_path = "user://test_attribute_presentation.json"
 	session.resume_requested = false

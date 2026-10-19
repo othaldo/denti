@@ -46,6 +46,7 @@ static func open(source: Control, title: String, explanation: String, icon: Text
 	rows.add_child(header)
 	if icon != null:
 		var image := TextureRect.new()
+		image.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 		image.texture = icon
 		image.custom_minimum_size = Vector2(36, 36)
 		image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE

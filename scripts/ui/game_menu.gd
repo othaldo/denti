@@ -367,6 +367,7 @@ func _show_stats() -> void:
 	for type in DentiAttributes.ACTIVE:
 		var chip := Button.new()
 		chip.icon = DentiUIIcons.stat(DentiAttributes.ICONS[type])
+		chip.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 		chip.expand_icon = true
 		chip.add_theme_constant_override("icon_max_width", 26)
 		chip.text = DentiAttributes.compact_value_text(stats, type)

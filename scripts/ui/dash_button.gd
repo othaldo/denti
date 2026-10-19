@@ -43,13 +43,13 @@ func _process(_delta: float) -> void:
 func refresh() -> void:
 	if not is_instance_valid(player) or not is_instance_valid(player.stats): return
 	var dash := player.dash
-	var full := dash.charge >= dash.config.capacity - 0.00001
-	vessel.show_value(dash.charge, dash.config.capacity, "%d / %d" % [roundi(dash.config.capacity) if full else floori(dash.charge), roundi(dash.config.capacity)])
-	# Spending stamina empties immediately; continuous refill supplies the
+	var full := dash.charge >= dash.capacity - 0.00001
+	vessel.show_value(dash.charge, dash.capacity, "%d / %d" % [roundi(dash.capacity) if full else floori(dash.charge), roundi(dash.capacity)])
+	# Spending stamina updates immediately; continuous refill supplies the
 	# animation. Keep health-only damage lag/flash out of the stamina vessel.
-	vessel.displayed_ratio = dash.charge / dash.config.capacity
+	vessel.displayed_ratio = dash.charge / dash.capacity
 	vessel.trailing_ratio = vessel.displayed_ratio
 	vessel.impact = 0.0
 	vessel._upload()
-	caption.text = "%.1f s" % dash.cooldown if full and dash.cooldown > 0 else "/ %d" % roundi(dash.config.capacity)
-	tooltip_text = "Wurzelkraft · Wurzelsprung (%s)\n%d / %d · %.2f s Auffüllzeit · %.1f s Cooldown\nFreier Weg nötig. Du bleibst verwundbar." % ["Tippen" if touch_mode else "Shift", roundi(dash.charge), roundi(dash.config.capacity), dash.config.refill_seconds(player.stats.dash_recovery_bonus), dash.cooldown]
+	caption.text = "%.1f s" % dash.cooldown if dash.charge >= dash.config.cost and dash.cooldown > 0 else "/ %d" % roundi(dash.capacity)
+	tooltip_text = "Wurzelkraft · Wurzelsprung (%s)\n%d / %d · %d pro Dash · %.2f/s · voll in %.0f s\n%.1f s Cooldown · Freier Weg nötig. Du bleibst verwundbar." % ["Tippen" if touch_mode else "Shift", roundi(dash.charge), roundi(dash.capacity), roundi(dash.config.cost), dash.config.recharge_per_second(dash.capacity), dash.config.refill_duration, dash.cooldown]

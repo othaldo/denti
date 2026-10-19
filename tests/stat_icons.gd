@@ -59,8 +59,12 @@ func _run() -> void:
 		_fail("Zahnflutsch motif is clipped or lacks transparent padding")
 		return
 	var stamina_upgrade: UpgradeData = load("res://data/upgrades/wurzelkraft.tres")
-	if stamina_upgrade.attribute_icon() != 11 or DentiUIIcons.stat(11) != DentiUIIcons.STAMINA_RECOVERY:
-		_fail("Wurzelkraft-Erholung is missing its own generated painted icon")
+	if stamina_upgrade.attribute_icon() != 11 or DentiUIIcons.stat(11) != DentiUIIcons.STAMINA:
+		_fail("Wurzelkraft is missing its own generated painted icon")
+		return
+	var stamina_image := DentiUIIcons.STAMINA.get_image()
+	if not stamina_image.detect_alpha() or not stamina_image.has_mipmaps():
+		_fail("Wurzelkraft icon lacks transparency or mipmaps for small sizes")
 		return
 	print("Denti stat icons test passed")
 	finish(0)

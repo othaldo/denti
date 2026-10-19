@@ -4,7 +4,7 @@
 script = ExtResource("1")
 id = &"sugar_2"
 display_name = "Kariesbonbon"
-description = "Während du dich bewegst: +14 % Waffenschaden. +15 % Wurzelkraft-Erholung, -1 Härte, -1 Regeneration."
+description = "Während du dich bewegst: +14 % Waffenschaden. +15 Wurzelkraft, -1 Härte, -1 Regeneration."
 rarity_tier = 2
 price = 9
 icon_index = 73

@@ -51,6 +51,8 @@ func _ready() -> void:
 	expressions.configure(stats)
 	status_effects.configure(self)
 	stats.dodged.connect(_on_dodged)
+	dash.stats = stats
+	stats.changed.connect(dash.clamp_charge)
 	dash_trail = DashTrail.new()
 	dash_trail.z_index = -1
 	add_child(dash_trail)

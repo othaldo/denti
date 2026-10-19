@@ -1,6 +1,6 @@
 # Denti — Roadmap
 
-Stand: **19.10.2026**, auf Basis des spielbaren Stands 0.5.0 und der anschließenden Refactorings und UI-Korrekturen. **Kampf-HUD und Dash-Prototyp einschließlich Erholungsattribut sind umgesetzt**; weitere Ausbaustufen und Druck-/Balance-Playtests sind offen. Zahlenwerte bleiben Startwerte, bis Messung und Spieltests abgeschlossen sind.
+Stand: **19.10.2026**, auf Basis des spielbaren Stands 0.5.0 und der anschließenden Refactorings und UI-Korrekturen. **Kampf-HUD und Dash-Prototyp einschließlich ausbaubarem Wurzelkraft-Vorrat sind umgesetzt**; weitere Ausbaustufen und Druck-/Balance-Playtests sind offen. Zahlenwerte bleiben Startwerte, bis Messung und Spieltests abgeschlossen sind.
 
 Das nächste Ziel: ein kompakteres Kampf-HUD, eine bewusste Dash-Entscheidung, vier eigenständige Bosskämpfe und mehr unterschiedliche Starts. Denti darf sehr mächtig werden; Positionierung, freie Wege und lesbare Gefahren sollen trotzdem wichtig bleiben.
 
@@ -20,7 +20,7 @@ Details zum Iststand: [README](../README.md), [Story-Modus](STORY_MODE.md), [Waf
 | Priorität | Vorhaben | Ergebnis |
 | --- | --- | --- |
 | P0 · umgesetzt | Kampf-HUD vereinheitlichen | Animiertes Zahngefäß, dezente XP-Linie und feste Anzeigegrenzen; [Prüfung und Aufnahmen](COMBAT_HUD.md) |
-| P1 · Prototyp umgesetzt | Wurzelkraft und Dash | Eine Ladung, eigene Erholung und verbindlicher Cooldown; [Umsetzung und Prüfung](DASH.md) |
+| P1 · Prototyp umgesetzt | Wurzelkraft und Dash | 100 Punkte pro Dash, ausbaubarer Vorrat und verbindlicher Cooldown; [Umsetzung und Prüfung](DASH.md) |
 | P1 | Vier Bossidentitäten | Jeder Story-Abschluss verlangt eine andere Positionierungsentscheidung |
 | P2 | Alle Standardwaffen als Starts | Kompaktes Iconraster mit Details und ausdrücklicher Auswahlbestätigung |
 | Danach | Synergien und Feinschliff | Begrenzte Dash-Synergien, eventuell Cooldown-Reduktion und Balance aller Starts |
@@ -45,55 +45,47 @@ Jede Stufe wird einzeln umgesetzt, getestet und gespielt. Bossumsetzung erfolgt 
 ## 2. Wurzelkraft und Dash
 
 **Prototyp umgesetzt:** Shift, Touchbutton, Kontaktstopp, zeitlich geprüfte Treffer,
-Save/Resume, Erholungsattribut, zwei passende Item-Ergänzungen und Telemetrie.
+Save/Resume, Wurzelkraft-Attribut, zwei passende Item-Ergänzungen und Telemetrie.
 [Details, Prüfungen und native Animation](DASH.md). Der menschliche Vergleich
-des Gegnerdrucks mit/ohne Dash und Erholungsinvestition steht noch aus.
+des Gegnerdrucks mit/ohne Dash und Wurzelkraft-Investition steht noch aus.
 
 ### Name und Attribut
 
 **Wurzelkraft** ist der Arbeitsname für Dentis Stamina. Er passt zu seiner Bewegung auf Wurzeln und lässt sich kurz beschriften. Der aktive Move heißt zunächst **Dash**, mit dem möglichen Anzeigenamen **Wurzelsprung**.
 
-Es gibt eine Ressource und einen investierbaren Wert:
-
-- **Wurzelkraft:** feste Kapazität von 100; jeder Dash verbraucht die gesamte Ladung. Teilfüllung erlaubt keinen Dash. Es gibt zunächst weder zusätzliche Ladungen noch ein Upgrade auf die Kapazität.
-- **Wurzelkraft-Erholung:** das neue Grundattribut erhöht die Nachladerate additiv in Prozent. Beispiel: `+25 % Erholung` verkürzt die reine Auffüllzeit von 4 auf 3,2 Sekunden. Stats und Level-up-Text zeigen neben dem Bonus die resultierende Auffüllzeit.
-- Das Attribut wird in denselben Statkatalog wie die elf vorhandenen Werte aufgenommen und über Levelaufstiege sowie ausgewählte Items angeboten. Bestehende Einträge behalten ihre IDs.
-- **Speichel** regeneriert weiterhin Leben; **Zahnflutsch** bleibt die passive Ausweichchance. Beide bleiben mechanisch von Wurzelkraft getrennt.
-
-Die feste Kapazität verhindert, dass ein vermeintliches Kapazitätsupgrade die Wartezeit bis zur zwingend vollen Ladung verlängert. Build-Investition verbessert gezielt die Erholung.
+Es gibt einen investierbaren Wert: **Wurzelkraft**, also maximale Ausdauer.
+Die Stat-Kachel zeigt nur den Vorrat, anfangs **100**. Aufstiege und passende
+Items erhöhen ihn in festen Punkten, etwa **+25 Wurzelkraft**. Speichel bleibt
+Lebensregeneration; Zahnflutsch bleibt passive Ausweichchance.
 
 ### Verbindliche Ablaufregeln
 
-1. Ein Dash startet nur im aktiven Kampf, bei voller Wurzelkraft und abgelaufenem Cooldown. Boss-Entzündung zählt zum aktiven Kampf.
-2. Desktop-Auslöser ist eine neue Eingabeaktion `dash`, zunächst auf **Shift**. Gedrückthalten löst keinen weiteren Dash aus; es gibt keine automatische Wiederholung oder wartende Dash-Eingabe.
-3. Die Richtung wird beim Auslösen festgelegt: aktuelle Bewegungsrichtung, sonst letzte Bewegungsrichtung, vor der ersten Bewegung nach unten. Mausziel und automatische Waffen ändern sie nicht.
-4. Der Dash bewegt Denti kurz und geradlinig. Startwerte: **150 Welteinheiten in 0,16 Sekunden**. Bewegungstempo erhöht zunächst weder Strecke noch Dauer; Diagonalen sind gleich schnell.
-5. Die Ladung fällt beim Start auf null. Nach dem Dash und einer kurzen Erholungspause lädt sie kontinuierlich nach. Bewegung und Schaden setzen den Ladefortschritt nicht zurück.
-6. Ein neuer Dash braucht **beides**: volle Ladung und abgelaufenen Cooldown. Ein volles Ressourcenfeld bei noch laufendem Cooldown zeigt die verbleibende Sperre; „bereit“ erscheint erst bei erfüllten Bedingungen.
-7. Ungültige Eingaben verbrauchen nichts. Ein gestarteter Dash, der an einem Hindernis endet, verbraucht seine Ladung und erhält keine Erstattung.
-8. Vor der ersten Welle und beim tatsächlichen Start einer neuen Welle ist die Ladung voll und der Cooldown frei. Menü, Pause, Shop-Aufruf oder Laden eines laufenden Kampfes geben keine zusätzliche Ladung.
+1. Ein Dash startet nur im aktiven Kampf (einschließlich Boss-Entzündung), bei mindestens **100 Wurzelkraft** und abgelaufenem Cooldown.
+2. **Shift** am Desktop oder Tippen auf den rechten Ressourcen-Zahn. Gedrückthalten wiederholt den Dash nicht; ungültige Eingaben werden nicht vorgemerkt.
+3. Richtung: aktuelle Bewegung, sonst letzte Bewegung, anfangs nach unten. Maus und Waffen ändern sie nicht.
+4. **150 Welteinheiten in 0,16 Sekunden**, unabhängig von Bewegungstempo und Diagonale.
+5. Jeder Dash zieht genau **100 Punkte** ab. Restvorrat bleibt verfügbar; vollständige Füllung ist nicht erforderlich.
+6. Nach Dashende und **0,35 s Erholungspause** lädt der gesamte Vorrat in **4 s** nach. Nachladerate = maximale Wurzelkraft / 4. Bewegung und Schaden setzen den Fortschritt nicht zurück.
+7. **1,5 s Cooldown ab Dashstart** gilt auch bei gespeichertem Vorrat. Genug Ausdauer bei noch laufendem Cooldown zeigt dessen Restzeit im Zahn.
+8. Ein Kontaktstopp erstattet die Kosten nicht. Tatsächlich neue Wellen starten voll; Pause, Shop und Fortsetzen gewähren keine Gratisladung.
 
 ### Startwerte und Begrenzung
 
 | Parameter | Prototyp |
 | --- | ---: |
-| Kapazität / Kosten | 100 / 100 |
+| Basisvorrat / Kosten pro Dash | 100 / 100 |
+| Maximal ausgebauter Vorrat | 500 |
 | Dashdauer / Strecke | 0,16 s / 150 Welteinheiten |
 | Erholungspause nach Dashende | 0,35 s |
-| Basis-Nachladerate | 25 pro Sekunde; reine Auffüllzeit 4 s |
+| Auffüllzeit leer auf voll | immer 4 s |
+| Nachladerate bei 100 / 200 / 500 Vorrat | 25 / 50 / 125 pro Sekunde |
 | Cooldown ab Dashstart | 1,5 s |
-| Wirksamer Erholungsbonus | zunächst 0 bis +400 % |
 
-Ohne Blockierung gilt zwischen zwei Dashstarts:
-
-```text
-Auffüllzeit = 4 s / (1 + wirksamer Erholungsbonus / 100)
-Frühester nächster Dash = max(Cooldown, Dashdauer + Erholungspause + Auffüllzeit)
-```
-
-Bei den Startwerten sind das rund **4,51 s** ohne Bonus, **2,51 s** bei +100 % und **1,50 s** bei +400 %. Der Cooldown begrenzt also auch einen stark ausgebauten Erholungswert. Über dem wirksamen Limit wird kein weiterer Erholungsbonus angeboten.
-
-**Cooldown-Reduktion bleibt eine spätere Erweiterung.** Zuerst wird geprüft, ob schnellere Erholung allein genug Build-Entscheidungen schafft. Falls nötig, reduzieren wenige seltene Items den separaten Cooldown, mit einer absoluten Untergrenze von zunächst **1,0 s**. Sie ändern weder Ladungskosten noch die Bedingung „voll geladen“ und werden im HUD gemeinsam mit der Erholung erklärt.
+Levelaufstiege geben +25/40/60/90 Punkte je Seltenheit, begrenzt auf den
+verbleibenden Platz bis 500. Am Limit wird das Attribut nicht mehr angeboten.
+Mehr Vorrat speichert mehrere Dashes und lädt zugleich mehr Punkte pro Sekunde
+nach. Ein größerer Vorrat muss vor einem Dash nicht vollständig gefüllt sein.
+**Cooldown-Reduktion bleibt eine spätere Erweiterung.**
 
 ### Dash durch Gegner bleibt gefährlich
 
@@ -112,17 +104,17 @@ Ein Kontaktstopp mit verlorener Ladung bestraft schlechte Planung bereits deutli
 
 - Das **generierte Wurzelkraft-Zahngefäß unten rechts** ist zugleich die Dash-Touchfläche: 80, 88 oder 100 logische Pixel je Layout. Es gehört als türkis gefülltes Gegenstück zum roten Lebenszahn. Im Stillstand gilt dieselbe Richtungsregel wie am Desktop.
 - Der Bewegungsfinger behält seine Geste. Ein zweiter Finger kann Dash drücken, ohne den Joystick-Ursprung oder die Bewegungsrichtung zu übernehmen. Die Buttonfläche startet selbst keine Bewegungsgeste.
-- Die animierte Flüssigkeit zeigt den Füllstand; die Zahlen stehen wie beim Leben innerhalb der Zahnkrone. Bei voller Ladung und noch aktivem Cooldown steht dessen Restzeit in der zweiten Zahlenzeile. Es gibt keine frei platzierten Titel, Ladehinweise oder Tastaturtexte im Kampfbild.
+- Die animierte Flüssigkeit zeigt den Füllstand; die Zahlen stehen wie beim Leben innerhalb der Zahnkrone. Bei mindestens 100 Wurzelkraft und noch aktivem Cooldown steht dessen Restzeit in der zweiten Zahlenzeile. Es gibt keine frei platzierten Titel, Ladehinweise oder Tastaturtexte im Kampfbild.
 - Ungültiges Antippen startet keine spätere Aktion. Pause, Fokusverlust, Fingerfreigabe und Bildschirmdrehung hinterlassen keine festhängende Eingabe.
 - Swipe und Doppeltippen werden erst nach Touch-Spieltests als optionale Alternativen bewertet. Der erste Prototyp verwendet den klar erreichbaren Button.
 
 ### Integration und Abnahme
 
-Die Dash-Logik erhält eine kleine eigene Bewegungskomponente. `PlayerStats` bleibt die Quelle des Erholungsbonus; HUD und Touchbutton lesen denselben Dash-Zustand. Werte liegen in einer gemeinsamen konfigurierbaren Ressource.
+Die Dash-Logik erhält eine kleine eigene Bewegungskomponente. `PlayerStats` bleibt die Quelle der maximalen Wurzelkraft; HUD und Touchbutton lesen denselben Dash-Zustand. Werte liegen in einer gemeinsamen konfigurierbaren Ressource.
 
-Speichern/Fortsetzen erhält Ladung, Cooldown, Erholungspause und bei aktivem Dash Richtung sowie Restdauer. Alte Saves starten mit Basis-Erholung und einer vollen Ladung; bestehende Zahlen-IDs der Attribute bleiben kompatibel. Pausierte Spielzeit und Offlinezeit laden den Dash nicht nach. Beim Laden einer Bewegung wird die verbleibende Strecke wieder regulär auf Kontakt geprüft.
+Speichern/Fortsetzen erhält Ladung, Cooldown, Erholungspause und bei aktivem Dash Richtung sowie Restdauer. Alte Saves starten mit 100 Wurzelkraft ohne Bonus; bestehende Zahlen-IDs der Attribute bleiben kompatibel. Pausierte Spielzeit und Offlinezeit laden den Dash nicht nach. Beim Laden einer Bewegung wird die verbleibende Strecke wieder regulär auf Kontakt geprüft.
 
-**Abnahme:** Tests für volle/teilweise Ladung, gleichzeitige Sperren, gehaltenes Shift, Diagonalen, Randkontakt, Start innerhalb einer Horde und Kontakt trotz Schild/Dodge/Trefferpause. Streckenprüfungen decken auch Projektile und Schadensflächen bei längeren Frames ab. Dazu Pause/Fortsetzen mitten im Dash und Cooldown, alte Saves, Mehrfingereingabe und Drehung des Displays. Telemetrie erfasst Dashanzahl, Kontaktabbrüche und Schaden während des Dashs; normale Spielanzeigen bleiben kompakt.
+**Abnahme:** Tests für 100-Punkte-Kosten, ausbaubaren Vorrat, feste Auffüllzeit, gespeicherte Dashes, gleichzeitige Sperren, gehaltenes Shift, Diagonalen, Randkontakt, Start innerhalb einer Horde und Kontakt trotz Schild/Dodge/Trefferpause. Streckenprüfungen decken auch Projektile und Schadensflächen bei längeren Frames ab. Dazu Pause/Fortsetzen mitten im Dash und Cooldown, alte Saves, Mehrfingereingabe und Drehung des Displays. Telemetrie erfasst Dashanzahl, Kontaktabbrüche und Schaden während des Dashs; normale Spielanzeigen bleiben kompakt.
 
 ## 3. Vier Story-Areas, vier unterschiedliche Bosskämpfe
 
@@ -223,7 +215,7 @@ Pro Boss werden TTK, Schaden nach Angriffsquelle, Treffer während Vorwarnung/ak
 | --- | --- | --- |
 | 1 · umgesetzt | Animiertes Zahngefäß, XP-Randlinie, kompakter Timer, getrennte Bossanzeigen | Größen, Textgrenzen, Statusanzeigen, sechs Auflösungen und native Bilder; [Nachweis](COMBAT_HUD.md) |
 | 2 · umgesetzt | Dash-Basis inklusive Touchbutton, Kontaktstopp und Save/Resume | Eine Ladung, beide Sperren, keine neuen Schutzframes, Streckenprüfung und native Darstellung geprüft |
-| 3 · Prototyp umgesetzt | Erholungsattribut, wenige passende Angebote und Telemetrie | Wartezeiten, Stat-/Save-Kompatibilität und Limit geprüft; Druck-/Balance-Playtest noch offen |
+| 3 · Prototyp umgesetzt | Wurzelkraft-Attribut, wenige passende Angebote und Telemetrie | Wartezeiten, Stat-/Save-Kompatibilität und Limit geprüft; Druck-/Balance-Playtest noch offen |
 | 4 | Karies-Graf als erster eigener Encounter | Bahnenprinzip, Bossabschluss, Alt-Saves, Nah-/Fernkampf und Mobile |
 | 5 | Karies-Prinz, dann Karies-König, dann Karies-Imperator | Je Boss erst eigener Ablauf samt Grenzen und Tests, dann nächster Encounter |
 | 6 | Alle 18 Standardwaffen im Iconraster mit Details und Bestätigung | Vollständiger Katalog, Auswahlablauf, frühe Wellen und UI pro Start prüfen |

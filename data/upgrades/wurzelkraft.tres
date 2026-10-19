@@ -2,9 +2,9 @@
 [ext_resource type="Script" path="res://scripts/systems/upgrade_data.gd" id="1"]
 [resource]
 script = ExtResource("1")
-display_name = "Wurzelkraft-Erholung"
+display_name = "Wurzelkraft"
 icon_index = 11
-description = "+25 % Wurzelkraft-Erholung"
+description = "+25 Wurzelkraft"
 stat = &"dash_recovery_bonus"
 amount = 25.0
 tier_amounts = Array[float]([25.0, 40.0, 60.0, 90.0])

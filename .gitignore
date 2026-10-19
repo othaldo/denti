@@ -9,3 +9,6 @@ __pycache__/
 
 # Upgrade capsule uses a small runtime import with mipmaps.
 !assets/loot/upgrade_capsule.png.import
+
+# Keep the small stat icon's mipmap import settings in fresh checkouts/exports.
+!assets/ui/stamina_icon.png.import

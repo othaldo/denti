@@ -291,6 +291,7 @@ func _build_content() -> void:
 	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	margin.add_child(content)
 	icon_rect = TextureRect.new()
+	icon_rect.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	icon_rect.custom_minimum_size = Vector2(0, 56)
 	icon_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
