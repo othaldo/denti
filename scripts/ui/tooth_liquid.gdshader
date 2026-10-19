@@ -8,6 +8,12 @@ uniform float impact : hint_range(0.0, 1.0) = 0.0;
 uniform float motion : hint_range(0.0, 1.0) = 1.0;
 uniform vec2 cavity_y = vec2(0.09, 0.91);
 uniform bool frame_pass = false;
+uniform vec3 liquid_dark = vec3(0.48, 0.065, 0.13);
+uniform vec3 liquid_light = vec3(1.0, 0.37, 0.40);
+uniform vec3 shimmer_tint = vec3(0.18, 0.055, 0.04);
+uniform vec3 surface_tint = vec3(0.48, 0.28, 0.17);
+uniform vec3 bubble_tint = vec3(0.30, 0.16, 0.13);
+uniform vec3 trail_tint = vec3(0.75, 0.39, 0.25);
 
 void fragment() {
 	vec4 source = texture(TEXTURE, UV);
@@ -20,19 +26,19 @@ void fragment() {
 	float wet = smoothstep(level - 0.003, level + 0.003, UV.y) * step(0.0001, fill);
 	float lost = smoothstep(trail_level - 0.003, trail_level + 0.003, UV.y) * step(0.0001, trail);
 	vec3 empty_color = mix(vec3(0.07, 0.04, 0.10), vec3(0.16, 0.10, 0.20), 1.0 - UV.y);
-	vec3 liquid = mix(vec3(0.48, 0.065, 0.13), vec3(1.0, 0.37, 0.40), clamp((1.0 - UV.y) * 1.1, 0.0, 1.0));
-	liquid += vec3(0.18, 0.055, 0.04) * (0.5 + 0.5 * sin(UV.x * 8.0 + UV.y * 12.0 + phase * 0.7)) * motion;
+	vec3 liquid = mix(liquid_dark, liquid_light, clamp((1.0 - UV.y) * 1.1, 0.0, 1.0));
+	liquid += shimmer_tint * (0.5 + 0.5 * sin(UV.x * 8.0 + UV.y * 12.0 + phase * 0.7)) * motion;
 	float surface = (1.0 - smoothstep(0.0, 0.018, abs(UV.y - level))) * wet;
-	liquid += surface * vec3(0.48, 0.28, 0.17);
+	liquid += surface * surface_tint;
 	// Four small, independently drifting bubbles; no spawned nodes or particles.
 	for (int i = 0; i < 4; i++) {
 		float n = float(i);
 		vec2 bubble = vec2(0.27 + n * 0.15 + sin(phase * 0.6 + n * 2.1) * 0.018, 0.90 - fract(phase * (0.035 + n * 0.009) + n * 0.237) * 0.78);
 		float distance_to_bubble = length((UV - bubble) * vec2(1.0, 1.1));
 		float ring = 1.0 - smoothstep(0.002, 0.005, abs(distance_to_bubble - 0.012));
-		liquid += ring * vec3(0.30, 0.16, 0.13) * motion;
+		liquid += ring * bubble_tint * motion;
 	}
-	vec3 interior = mix(empty_color, vec3(0.75, 0.39, 0.25), lost * 0.55);
+	vec3 interior = mix(empty_color, trail_tint, lost * 0.55);
 	interior = mix(interior, liquid + impact * vec3(0.25, 0.12, 0.08), wet);
 	// A faint glass reflection makes the empty half feel like a vessel too.
 	interior += exp(-pow((UV.x - 0.30) * 30.0, 2.0)) * 0.045;

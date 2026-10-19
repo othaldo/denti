@@ -175,6 +175,10 @@ func _check_layout(hud: GameHUD, mobile: MobileControls, extent: Vector2, contex
 		regions.append(hud.fps_panel)
 	if mobile.is_visible_in_tree() and mobile.pause_button.visible:
 		regions.append(mobile.pause_button)
+		regions.append(mobile.dash_button)
+		_check(mobile.dash_button.size.x >= 56 and mobile.dash_button.size.y >= 56, "dash touch target is too small")
+	elif hud.dash_indicator.visible:
+		regions.append(hud.dash_indicator)
 	for index in regions.size():
 		var rect := regions[index].get_global_rect()
 		_check(Rect2(Vector2.ZERO, extent).encloses(rect), "%s outside viewport at %s: %s" % [regions[index].name, context, rect])

@@ -52,6 +52,8 @@ static func restore(game, saved: Dictionary) -> void:
 					options.append(upgrade.with_tier(1))
 					break
 		if options.size() == upgrade_data.size():
+			for option in options:
+				option.with_stat_context(player.stats)
 			game.get_node("/root/SceneTransitions").present(&"rewards")
 			game.run_flow.enter(RunFlow.Phase.REWARDS)
 			game.choice_panel.show_upgrades(options)

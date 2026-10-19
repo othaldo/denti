@@ -19,7 +19,7 @@ func _run() -> void:
 	root.add_child(warmup)
 	_check(warmup.size == Vector2i(8, 8) and warmup.world_2d != null and warmup.world_2d != root.world_2d and warmup.gui_disable_input, "warmup is not isolated from the game viewport/input")
 	_check(warmup.render_target_update_mode == SubViewport.UPDATE_ONCE and warmup.get_child_count() == EnemyProjectileVisuals.standard_specs().size() + CombatSpriteTextures.PREPARED.REGIONS.size() + BossProjectileWarmup.art_textures().size() + 7, "warmup did not schedule enemy/player/loot textures, art, ground/warning/attack atlases, HUD and charge primitives for rendering")
-	_check(warmup.has_node("CombatHUDWarmup") and warmup.get_node("CombatHUDWarmup").get_child_count() == 3, "tooth/level/boss graphics were omitted from the initial warmup")
+	_check(warmup.has_node("CombatHUDWarmup") and warmup.get_node("CombatHUDWarmup").get_child_count() == 4, "life/stamina/level/boss graphics were omitted from the initial warmup")
 	var has_ground_atlas := false
 	var has_attack_atlas := false
 	for child in warmup.get_children():

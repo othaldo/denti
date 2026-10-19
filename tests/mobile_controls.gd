@@ -95,6 +95,25 @@ func _run() -> void:
 	await process_frame
 	controls.set_combat_active(true)
 	var playfield := Vector2(root.size) * 0.5
+	# The movement gesture remains owned by finger 10 while finger 11 dashes.
+	game.player.dash.reset_wave()
+	root.push_input(_touch(10, playfield, true), true)
+	root.push_input(_drag(10, playfield + Vector2(40, 0)), true)
+	var gesture_origin := controls.touch_origin
+	root.push_input(_touch(11, controls.dash_button.get_global_rect().get_center(), true), true)
+	_check(game.player.dash.active and game.player.dash.direction == Vector2.RIGHT, "second-finger dash failed or used the wrong direction")
+	_check(controls.touch_index == 10 and controls.touch_origin == gesture_origin and controls.held_direction == Vector2.RIGHT, "dash finger stole the movement gesture")
+	root.push_input(_touch(11, controls.dash_button.get_global_rect().get_center(), false), true)
+	_check(controls.touch_index == 10 and controls.dash_touch_index == -1, "dash release dropped the movement finger")
+	root.push_input(_touch(10, playfield, false), true)
+	game.player.dash.reset_wave()
+	game.player.dash.cooldown = 0.4
+	controls.dash_button._process(0)
+	_check(controls.dash_button.caption.text.contains("0.4"), "full ring hides an active cooldown")
+	root.push_input(_touch(12, controls.dash_button.get_global_rect().get_center(), true), true)
+	_check(not game.player.dash.active and controls.touch_index == -1, "invalid dash touch queued motion or started movement")
+	root.push_input(_touch(12, controls.dash_button.get_global_rect().get_center(), false), true)
+	game.player.dash.reset_wave()
 	root.push_input(_touch(6, playfield, true), true)
 	_check(controls.touch_index == 6, "real playfield touch never reached direct controls")
 	root.push_input(_touch(6, playfield, false), true)

@@ -20,6 +20,7 @@ const UPGRADES: Array[UpgradeData] = [
 	preload("res://data/upgrades/glanz.tres"),
 	preload("res://data/upgrades/zahnglueck.tres"),
 	preload("res://data/upgrades/zahnflutsch.tres"),
+	preload("res://data/upgrades/wurzelkraft.tres"),
 ]
 
 @onready var player: Player = $Player
@@ -109,7 +110,9 @@ func _ready() -> void:
 	wave.elite_requested.connect(_spawn_elite)
 	wave.wave_finished.connect(_on_wave_finished)
 	player.stats.died.connect(_on_player_died)
-	player.stats.damage_taken.connect(telemetry.record_taken)
+	player.stats.damage_taken.connect(_record_player_damage)
+	player.dash.started.connect(telemetry.record_dash)
+	player.dash.contact_stopped.connect(telemetry.record_dash_contact)
 	player.stats.shield_blocked.connect(items.on_shield_blocked)
 	player.stats.shield_blocked.connect(relics.on_shield_blocked)
 	player.stats.healed.connect(items.on_healed)
@@ -234,6 +237,7 @@ func _start_combat_wave() -> void:
 	get_node("/root/SceneTransitions").present(&"combat", false)
 	run_flow.enter(RunFlow.Phase.COMBAT)
 	rewards.begin_wave()
+	player.dash.reset_wave()
 	var profile_id := wave.prepare_next_wave_profile()
 	telemetry.begin_wave(wave.current_wave + 1, profile_id)
 	wave.start_next_wave()
@@ -285,6 +289,7 @@ func _notification(what: int) -> void:
 
 
 func _refresh_hud() -> void:
+	hud.update_dash()
 	boss = BossEncounter.primary($Enemies)
 	var visible_boss: Enemy = boss if is_instance_valid(boss) else null
 	hud.update_status(player.stats, xp, xp_goal, level, coins, wave.current_wave, wave.remaining, in_shop, visible_boss, boss_pending, collecting_wave_loot, rewards.pending_levels, wave.endless_enabled)
@@ -521,6 +526,12 @@ func _on_status_damage_taken(kind: DentiStatus.Type, amount: float) -> void:
 	_show_item_feedback("-%s" % DentiAttributes.number(amount), player.global_position + Vector2(0, -42 - kind * 20), DentiStatus.COLORS[kind])
 
 
+func _record_player_damage(amount: float) -> void:
+	telemetry.record_taken(amount)
+	if player.dash.active or player.swept_dash_this_frame():
+		telemetry.record_dash_damage(amount)
+
+
 func _show_item_feedback(message: String, at: Vector2, color: Color) -> void:
 	var number: DamageNumber = $DamageNumbers.acquire(DAMAGE_NUMBER_SCENE)
 	number.show_message(at, message, color)
@@ -552,6 +563,8 @@ func _show_level_choice() -> void:
 	for weapon in player.loadout.equipped():
 		equipped_stats.append(StringName(weapon.data.damage_stat + "_damage"))
 	for upgrade in UPGRADES:
+		if upgrade.stat == &"dash_recovery_bonus" and player.stats.effective_dash_recovery() >= player.dash.config.max_recovery_bonus:
+			continue
 		if upgrade.stat in [&"melee_damage", &"ranged_damage"] and not equipped_stats.has(upgrade.stat):
 			continue
 		pool.append(upgrade)
@@ -560,7 +573,8 @@ func _show_level_choice() -> void:
 	# Pending levels include this choice; resolve their earned levels oldest first.
 	var earned_level := level - maxi(rewards.pending_levels - 1, 0)
 	for index in ChoicePanel.UPGRADE_COUNT:
-		choices.append(pool[index].with_tier(DentiRarity.upgrade_tier(earned_level, player.stats.luck)))
+		var choice := pool[index].with_tier(DentiRarity.upgrade_tier(earned_level, player.stats.luck))
+		choices.append(choice.with_stat_context(player.stats))
 	choice_panel.show_upgrades(choices)
 	_update_level_reroll()
 	get_tree().paused = true
@@ -1005,6 +1019,7 @@ func debug_start_wave(number: int) -> void:
 	player.stats.load_save_data(configured_stats)
 	# A pending strike may still retain a reference to a removed enemy.
 	player.loadout.restore(player.loadout.save_data())
+	player.dash.reset_wave()
 	rewards.begin_wave()
 	wave.current_wave = clampi(number, 1, WaveController.MAX_WAVES) - 1
 	wave.next_profile_id = &""

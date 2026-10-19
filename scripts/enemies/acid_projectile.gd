@@ -14,6 +14,7 @@ var body_sprite: Sprite2D
 var halo_sprite: Sprite2D
 var inflicted_statuses: Array[Dictionary] = []
 var pool: EnemyProjectilePool
+var launch_serial := -1
 
 
 func launch(at: Vector2, aim: Vector2, projectile_speed: float, amount: float, player: Player, tint: Color = Color(0.53, 0.88, 0.13), collision_radius: float = 21.0, draw_radius: float = 9.0, statuses: Array[Dictionary] = []) -> void:
@@ -24,6 +25,7 @@ func launch(at: Vector2, aim: Vector2, projectile_speed: float, amount: float, p
 	speed = projectile_speed
 	damage = amount
 	target = player
+	launch_serial = player.motion_serial if player != null else -1
 	inflicted_statuses = DentiStatus.sanitize_attacks(statuses).duplicate(true)
 	projectile_color = DentiStatus.COLORS[int(inflicted_statuses[0]["kind"])] if not inflicted_statuses.is_empty() else tint
 	hit_radius = collision_radius
@@ -46,12 +48,13 @@ func launch(at: Vector2, aim: Vector2, projectile_speed: float, amount: float, p
 
 
 func _physics_process(delta: float) -> void:
+	var before := global_position
 	global_position += direction * speed * delta
 	lifetime -= delta
 	animation_time += delta * 15.0
 	if body_sprite != null:
 		body_sprite.scale = Vector2.ONE * (visual_radius + sin(animation_time) * 1.5) / EnemyProjectileVisuals.BODY_RADIUS / EnemyProjectileVisuals.RESOLUTION
-	if target != null and global_position.distance_squared_to(target.global_position) < hit_radius * hit_radius:
+	if target != null and target.projectile_crosses(before, global_position, hit_radius, delta, launch_serial):
 		var hit_target := target
 		var hit_statuses := inflicted_statuses
 		var hit_damage := damage

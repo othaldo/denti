@@ -13,6 +13,8 @@ var combat_active: bool = false
 var player: Player
 var touch_origin: Vector2
 var held_direction: Vector2 = Vector2.ZERO
+var dash_button: DashButton
+var dash_touch_index := -1
 
 
 func _ready() -> void:
@@ -22,6 +24,11 @@ func _ready() -> void:
 	pause_button.custom_minimum_size = Vector2(96, 52)
 	DentiUIStyle.style_button(pause_button)
 	pause_button.pressed.connect(func() -> void: pause_requested.emit())
+	dash_button = DashButton.new()
+	dash_button.name = "Dash"
+	dash_button.touch_mode = true
+	dash_button.visible = false
+	add_child(dash_button)
 	get_viewport().size_changed.connect(_release_touch)
 
 
@@ -30,6 +37,8 @@ func set_combat_active(active: bool) -> void:
 	if not active:
 		_release_touch()
 	pause_button.visible = active
+	dash_button.visible = active
+	dash_button.player = player
 
 
 func _notification(what: int) -> void:
@@ -48,6 +57,18 @@ func _input(event: InputEvent) -> void:
 	elif event is InputEventScreenDrag and event.index == touch_index:
 		_update_direction(event.position)
 		get_viewport().set_input_as_handled()
+	elif event is InputEventScreenTouch and event.index == dash_touch_index and not event.pressed:
+		dash_touch_index = -1
+		get_viewport().set_input_as_handled()
+	elif event is InputEventScreenDrag and event.index == dash_touch_index:
+		get_viewport().set_input_as_handled()
+	elif event is InputEventScreenTouch and event.pressed and dash_button.visible and dash_button.get_global_rect().has_point(event.position):
+		# ScreenTouch is handled explicitly: a second finger must work even
+		# when Godot's emulated mouse is already owned by the movement finger.
+		if dash_touch_index < 0 and event.index != touch_index:
+			dash_touch_index = event.index
+			player.try_dash()
+		get_viewport().set_input_as_handled()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -56,7 +77,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not visible or not combat_active or get_tree().paused or not is_instance_valid(player):
 		return
 	if event is InputEventScreenTouch and event.pressed and touch_index == -1:
-		if pause_button.get_global_rect().has_point(event.position):
+		if pause_button.get_global_rect().has_point(event.position) or dash_button.get_global_rect().has_point(event.position):
 			return
 		touch_index = event.index
 		touch_origin = event.position
@@ -81,4 +102,5 @@ func movement_direction(_delta: float) -> Vector2:
 
 func _release_touch() -> void:
 	touch_index = -1
+	dash_touch_index = -1
 	held_direction = Vector2.ZERO

@@ -39,6 +39,8 @@ var boss_label: Label
 var boss_bar: ProgressBar
 var fps_refresh_time: float = 0.0
 var _pause_button: Button
+var dash_indicator: DashButton
+var _dash_touch_button: DashButton
 
 
 func _ready() -> void:
@@ -56,6 +58,9 @@ func _ready() -> void:
 	_build_progression()
 	_build_economy()
 	_build_bosses()
+	dash_indicator = DashButton.new()
+	dash_indicator.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	$Root.add_child(dash_indicator)
 	DentiUIStyle.style_hud_panel(telemetry_panel)
 	for caption: Label in [wave_label, timer_label, fps_label, telemetry_label]:
 		DentiUIStyle.style_hud_text(caption, DentiUIStyle.INK, 12, 4, DentiUIStyle.BACKGROUND)
@@ -164,6 +169,9 @@ func _build_bosses() -> void:
 
 
 func bind_mobile_controls(controls: MobileControls) -> void:
+	_dash_touch_button = controls.dash_button
+	dash_indicator.player = controls.player
+	controls.dash_button.player = controls.player
 	_pause_button = controls.pause_button
 	_pause_button.text = ""
 	_pause_button.icon = HUDStatusIcons.texture(&"pause")
@@ -189,7 +197,14 @@ func bind_mobile_controls(controls: MobileControls) -> void:
 func _layout() -> void:
 	if health_vessel == null:
 		return
-	HUDLayout.apply(self, $Root.size, _pause_button)
+	dash_indicator.visible = _dash_touch_button == null or not _dash_touch_button.get_parent().visible
+	HUDLayout.apply(self, $Root.size, _pause_button, _dash_touch_button)
+
+
+func update_dash() -> void:
+	dash_indicator.refresh()
+	if _dash_touch_button != null:
+		_dash_touch_button.refresh()
 
 
 func _process(delta: float) -> void:
@@ -221,6 +236,7 @@ func update_telemetry(stats: RunTelemetry, enemies_alive: int, projectiles_alive
 		stats.last_boss_ttk, stats.wave_coins, stats.wave_xp, stats.total_damage,
 	]
 	telemetry_label.text += "\nZahnflutsch: %d Welle · %d Run" % [stats.wave_dodges, stats.dodges]
+	telemetry_label.text += "\nDash: %d · Kontaktstopps: %d · HP: %.1f" % [stats.dashes, stats.dash_contacts, stats.dash_damage]
 	telemetry_label.text += "\nGift/Blutung HP: %.1f / %.1f" % [stats.status_damage.get("poison", 0.0), stats.status_damage.get("bleed", 0.0)]
 	telemetry_label.text += "\nKette %.0f · Eis %.0f · Weihe %.0f" % [stats.proc_damage.get("affix_electric_chain", 0.0), stats.proc_damage.get("affix_ice_shatter", 0.0), stats.proc_damage.get("affix_holy", 0.0)]
 	telemetry_label.text += "\nLebensraub %.1f HP · Nässe %.0f" % [stats.enchantment_support.get("leech_healing", 0.0), stats.enchantment_support.get("wet_hits", 0.0)]

@@ -254,7 +254,6 @@ func _physics_process(delta: float) -> void:
 			_pulse_aura()
 	var direction := global_position.direction_to(target.global_position) if active_special_attack == EnemyData.SpecialAttack.NONE or special_phase == SpecialPhase.COOLDOWN else special_direction
 	var before_move := global_position
-	var charging := special_phase == SpecialPhase.ACTIVE and (active_special_attack == EnemyData.SpecialAttack.DASH or active_special_attack == EnemyData.SpecialAttack.BOSS and boss_move == BossMove.CHARGE)
 	contact_timer = maxf(contact_timer - delta, 0.0)
 	if active_special_attack == EnemyData.SpecialAttack.NONE:
 		global_position += direction * _movement_speed() * delta
@@ -276,9 +275,15 @@ func _physics_process(delta: float) -> void:
 		if player_at.x >= minf(before_move.x, global_position.x) - contact_radius and player_at.x <= maxf(before_move.x, global_position.x) + contact_radius and player_at.y >= minf(before_move.y, global_position.y) - contact_radius and player_at.y <= maxf(before_move.y, global_position.y) + contact_radius:
 			var closest := Geometry2D.get_closest_point_to_segment(player_at, before_move, global_position)
 			if closest.distance_squared_to(player_at) < contact_radius * contact_radius:
-				var damage := attack_damage if charging else contact_damage
-				contact_timer = 0.8 / overtime_attack_factor()
-				target.take_hit(damage, inflicted_statuses)
+				try_contact_hit()
+
+
+func try_contact_hit() -> void:
+	if contact_timer > 0.0 or health <= 0.0 or is_queued_for_deletion() or target == null:
+		return
+	var charging := special_phase == SpecialPhase.ACTIVE and (active_special_attack == EnemyData.SpecialAttack.DASH or active_special_attack == EnemyData.SpecialAttack.BOSS and boss_move == BossMove.CHARGE)
+	contact_timer = 0.8 / overtime_attack_factor()
+	target.take_hit(attack_damage if charging else contact_damage, inflicted_statuses)
 
 
 func _update_sprite_facing(direction: Vector2) -> void:
@@ -318,12 +323,14 @@ func _process_special(delta: float, direction: Vector2) -> void:
 				else:
 					global_position += direction * chase_speed * (1.25 if is_enraged else 1.0) * delta
 		SpecialPhase.WARNING:
+			var activates_after := maxf(special_timer, 0.0)
 			special_timer -= delta
 			if spatial_index == null:
 				queue_redraw()
 			if special_timer <= 0.0:
-				_activate_special()
+				_activate_special(activates_after)
 		SpecialPhase.ACTIVE:
+			var impact_after := minf(maxf(special_timer, 0), delta)
 			if active_special_attack == EnemyData.SpecialAttack.BOSS:
 				global_position = global_position.move_toward(boss_dash_end, data.attack_speed * overtime_speed_factor() * delta)
 			else:
@@ -339,7 +346,7 @@ func _process_special(delta: float, direction: Vector2) -> void:
 				if active_special_attack == EnemyData.SpecialAttack.BOSS:
 					_fire_boss_fan()
 				elif active_special_attack == EnemyData.SpecialAttack.DASH and data.dash_impact_radius > 0.0:
-					_dash_impact()
+					_dash_impact(impact_after)
 				_reset_special()
 
 
@@ -408,7 +415,7 @@ func _boss_dash_target(direction: Vector2) -> Vector2:
 	return BossAttackController.boss_dash_target(self, direction)
 
 
-func _activate_special() -> void:
+func _activate_special(seconds_into_frame: float = -1.0) -> void:
 	if active_special_attack == EnemyData.SpecialAttack.BOSS:
 		if boss_move == BossMove.CHARGE:
 			special_phase = SpecialPhase.ACTIVE
@@ -417,7 +424,7 @@ func _activate_special() -> void:
 			contact_timer = 0.0
 			attack_performed.emit(&"boss_charge")
 		else:
-			if global_position.distance_to(target.global_position) <= data.attack_radius:
+			if target.damage_circle_at(global_position, data.attack_radius, seconds_into_frame):
 				target.take_hit(attack_damage, inflicted_statuses)
 			pulse_flash_time = PULSE_FLASH_DURATION
 			attack_performed.emit(&"boss_pulse")
@@ -450,7 +457,7 @@ func _activate_special() -> void:
 		attack_performed.emit(&"acid")
 		_reset_special()
 	else:
-		if global_position.distance_to(target.global_position) <= data.attack_radius:
+		if target.damage_circle_at(global_position, data.attack_radius, seconds_into_frame):
 			target.take_hit(attack_damage, inflicted_statuses)
 		pulse_flash_time = PULSE_FLASH_DURATION
 		_reset_special()
@@ -467,8 +474,8 @@ func _reset_special() -> void:
 	queue_redraw()
 
 
-func _dash_impact() -> void:
-	if global_position.distance_to(target.global_position) <= data.dash_impact_radius:
+func _dash_impact(seconds_into_frame: float = -1.0) -> void:
+	if target.damage_circle_at(global_position, data.dash_impact_radius, seconds_into_frame):
 		target.take_hit(attack_damage, inflicted_statuses)
 	pulse_flash_time = PULSE_FLASH_DURATION
 	queue_redraw()

@@ -22,7 +22,7 @@ static func normalize(value: Variant) -> Dictionary:
 	if not _valid_structure(value):
 		return {}
 	var result: Dictionary = value.duplicate(true)
-	for section in ["stats", "presentation", "status_effects"]:
+	for section in ["stats", "presentation", "status_effects", "dash"]:
 		if result.player.has(section) and not result.player[section] is Dictionary:
 			return {}
 	for key in ["offers", "upgrades"]:
@@ -76,6 +76,16 @@ static func _containers(value: Dictionary, dictionaries: Array, arrays: Array) -
 static func _valid_structure(value: Dictionary) -> bool:
 	# Check container contracts before passing JSON values to typed subsystem APIs.
 	var player: Dictionary = value.player
+	if not _containers(player, ["dash"], []): return false
+	var dash: Dictionary = player.get("dash", {})
+	if not _containers(dash, [], ["direction", "last_direction"]): return false
+	for key in ["direction", "last_direction"]:
+		if dash.has(key):
+			if dash[key].size() != 2: return false
+			for coordinate in dash[key]:
+				if not (coordinate is float or coordinate is int): return false
+	for key in ["charge", "cooldown", "recovery", "remaining"]:
+		if dash.has(key) and not (dash[key] is float or dash[key] is int): return false
 	if not _containers(player, ["stats", "presentation", "status_effects"], ["position"]) or not _numeric_values(player.get("stats", {})):
 		return false
 	for state in player.get("status_effects", {}).values():

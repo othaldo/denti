@@ -135,7 +135,8 @@ func _run() -> void:
 	_check(game.shop_panel.stats_label.text.contains("Zahnflutsch 60 % (max.)"), "shop shows uncapped dodge")
 	var icon := DentiUIIcons.stat(10) as AtlasTexture
 	_check(icon.atlas == DentiUIIcons.DODGE_ATLAS and icon.get_size() == Vector2(512, 512), "dodge attribute lacks dedicated painted icon")
-	_check(game.UPGRADES.back().stat == &"dodge_chance" and game.UPGRADES.back().with_tier(4).effect_text() == "+12 % Zahnflutsch", "dodge level-up has wrong stat or percent units")
+	var dodge_upgrades: Array[UpgradeData] = game.UPGRADES.filter(func(upgrade: UpgradeData) -> bool: return upgrade.stat == &"dodge_chance")
+	_check(dodge_upgrades.size() == 1 and dodge_upgrades[0].with_tier(4).effect_text() == "+12 % Zahnflutsch", "dodge level-up has wrong stat or percent units")
 	var debug_menu: DebugCheatMenu = game.get_node("DebugCheatMenu")
 	debug_menu.open_menu()
 	_check(is_equal_approx(debug_menu.stats["dodge_chance"].value, 70.0), "debug menu displays a fraction instead of percent")

@@ -150,8 +150,7 @@ func step(index: EnemySpatialIndex, delta: float) -> void:
 			continue
 		var closest := Geometry2D.get_closest_point_to_segment(player_at, before, after)
 		if closest.distance_squared_to(player_at) < radius * radius:
-			enemy.contact_timer = 0.8
-			player.take_hit(enemy.contact_damage, enemy.inflicted_statuses)
+			enemy.try_contact_hit()
 			# Hurt/item callbacks can change the player's location or state.
 			player_at = player.global_position
 	stepping = false

@@ -20,6 +20,7 @@ const REGEN_INTERVAL_SCALE := 11.25
 const REGEN_POINT_OFFSET := 1.25
 const LEGACY_REGEN_POINT_FACTOR := 2.0
 const MAX_DODGE_CHANCE := 0.60
+const DASH_CONFIG: DashData = preload("res://data/player/dash.tres")
 
 var max_health: float = 100.0
 var health: float = 100.0
@@ -43,6 +44,7 @@ var shield_charges: int = 0
 var dodge_chance: float = 0.0
 var dodge_rng := RandomNumberGenerator.new()
 var last_roll_critical: bool = false
+var dash_recovery_bonus: float = 0.0
 
 
 func _init() -> void:
@@ -58,6 +60,7 @@ func to_save_data() -> Dictionary:
 		"regen": regen, "regen_progress": regen_progress,
 		"crit_chance": crit_chance, "luck": luck, "shield_charges": shield_charges,
 		"dodge_chance": dodge_chance,
+		"dash_recovery_bonus": dash_recovery_bonus,
 	}
 
 
@@ -90,7 +93,16 @@ func load_save_data(saved: Dictionary) -> void:
 	luck = maxf(float(saved.get("luck", 0.0)), 0.0)
 	shield_charges = clampi(int(saved.get("shield_charges", 0)), 0, 5)
 	dodge_chance = float(saved.get("dodge_chance", 0.0))
+	dash_recovery_bonus = float(saved.get("dash_recovery_bonus", 0.0))
 	changed.emit()
+
+
+func effective_dash_recovery() -> float:
+	return clampf(dash_recovery_bonus, 0, DASH_CONFIG.max_recovery_bonus)
+
+
+func dash_recovery_text() -> String:
+	return "+%.0f %% · %.2f s Auffüllzeit%s" % [effective_dash_recovery(), DASH_CONFIG.refill_seconds(dash_recovery_bonus), " (max.)" if dash_recovery_bonus >= DASH_CONFIG.max_recovery_bonus else ""]
 
 
 func _process(delta: float) -> void:
@@ -225,4 +237,6 @@ func apply_upgrade(stat: StringName, amount: float) -> void:
 			luck = maxf(luck + amount, 0.0)
 		&"dodge_chance":
 			dodge_chance += amount
+		&"dash_recovery_bonus":
+			dash_recovery_bonus += amount
 	changed.emit()

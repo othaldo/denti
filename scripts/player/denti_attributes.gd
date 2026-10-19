@@ -2,15 +2,17 @@ class_name DentiAttributes
 extends RefCounted
 
 # Stable enum identities for gameplay/UI; resource and save keys stay compatible.
-enum Type { DAMAGE, ARMOR, MAX_HEALTH, ATTACK_SPEED, CRIT_CHANCE, REGEN, MOVEMENT, LUCK, MELEE_DAMAGE, RANGED_DAMAGE, DODGE }
+enum Type { DAMAGE, ARMOR, MAX_HEALTH, ATTACK_SPEED, CRIT_CHANCE, REGEN, MOVEMENT, LUCK, MELEE_DAMAGE, RANGED_DAMAGE, DODGE, DASH_RECOVERY }
 
 const KEYS: Array[StringName] = [
 	&"damage_bonus", &"armor", &"max_health", &"attack_speed", &"crit_chance",
 	&"regen", &"speed_bonus", &"luck", &"melee_damage", &"ranged_damage", &"dodge_chance",
+	&"dash_recovery_bonus",
 ]
 const NAMES: Array[String] = [
 	"Bisskraft", "Härte", "Schmelz", "Putzeifer", "Glanz", "Speichel",
 	"Bewegung", "Zahnglück", "Nahschaden", "Fernschaden", "Zahnflutsch",
+	"Wurzelkraft-Erholung",
 ]
 const MEANINGS: Array[String] = [
 	"Schadensbonus für Waffen", "Rüstung: reduziert erlittenen Schaden",
@@ -18,15 +20,17 @@ const MEANINGS: Array[String] = [
 	"Regenerationspunkte und Heilung pro Sekunde", "Bewegungstempo", "Glück bei Beute und Seltenheiten",
 	"Zusätzlicher Nahschaden nach Waffenskalierung", "Zusätzlicher Fernschaden nach Waffenskalierung",
 	"Chance, einem Treffer auszuweichen; maximal 60 %. Bewahrt Schildladungen.",
+	"Lädt Wurzelkraft schneller auf. 100 Wurzelkraft pro Dash; volle Ladung und freier Cooldown nötig. Maximal +400 % Erholung. Keine zusätzlichen Schutzframes.",
 ]
-const ICONS: Array[int] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+const ICONS: Array[int] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 const ACTIVE: Array[Type] = [Type.DAMAGE, Type.ARMOR, Type.MAX_HEALTH, Type.ATTACK_SPEED,
-	Type.CRIT_CHANCE, Type.REGEN, Type.MOVEMENT, Type.LUCK, Type.MELEE_DAMAGE, Type.RANGED_DAMAGE, Type.DODGE]
+	Type.CRIT_CHANCE, Type.REGEN, Type.MOVEMENT, Type.LUCK, Type.MELEE_DAMAGE, Type.RANGED_DAMAGE, Type.DODGE, Type.DASH_RECOVERY]
 const SHOP_ROWS: Array = [
 	[Type.DAMAGE, Type.ARMOR, Type.MAX_HEALTH],
 	[Type.ATTACK_SPEED, Type.CRIT_CHANCE, Type.REGEN],
 	[Type.MOVEMENT, Type.LUCK, Type.DODGE],
 	[Type.MELEE_DAMAGE, Type.RANGED_DAMAGE],
+	[Type.DASH_RECOVERY],
 ]
 # Legacy prose in Resources is resolved at presentation boundaries. These aliases
 # never change effect identifiers or damage calculations.
@@ -56,7 +60,7 @@ static func is_fraction(type: Type) -> bool:
 	return type in [Type.CRIT_CHANCE, Type.DODGE]
 
 static func is_percent(type: Type) -> bool:
-	return is_fraction(type) or type in [Type.DAMAGE, Type.ATTACK_SPEED, Type.MOVEMENT]
+	return is_fraction(type) or type in [Type.DAMAGE, Type.ATTACK_SPEED, Type.MOVEMENT, Type.DASH_RECOVERY]
 
 static func number(value: float, signed: bool = false) -> String:
 	return ("%+.0f" if signed else "%.0f") % value if is_equal_approx(value, roundf(value)) else ("%+.1f" if signed else "%.1f") % value
@@ -69,6 +73,7 @@ static func value_text(stats: PlayerStats, type: Type) -> String:
 	match type:
 		Type.ARMOR: return stats.armor_text()
 		Type.REGEN: return stats.regen_text()
+		Type.DASH_RECOVERY: return stats.dash_recovery_text()
 		Type.MAX_HEALTH: return "%.0f HP" % stats.max_health
 		Type.DODGE: return "%s %%" % number(stats.effective_dodge_chance() * 100.0) + (" (max.)" if stats.dodge_chance >= PlayerStats.MAX_DODGE_CHANCE else "")
 	var value: float = float(stats.get(key_for(type)))
@@ -91,6 +96,7 @@ static func compact_value_text(stats: PlayerStats, type: Type) -> String:
 		Type.ARMOR: return number(stats.armor)
 		Type.REGEN: return "%.2f/s" % stats.regen_per_second()
 		Type.MAX_HEALTH: return "%.0f" % stats.max_health
+		Type.DASH_RECOVERY: return "+%.0f %% · %.1f s" % [stats.effective_dash_recovery(), PlayerStats.DASH_CONFIG.refill_seconds(stats.dash_recovery_bonus)]
 	return value_text(stats, type).trim_suffix(" (max.)")
 
 static func resolve_text(source: String) -> String:

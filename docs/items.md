@@ -86,7 +86,7 @@ Gemeinsames Familienlimit: **12**.
 
 | Seltenheit | Item | Vollständiger Effekt | Basispreis |
 | --- | --- | --- | ---: |
-| Common | Minz-Essenz | +5 % Bewegung, -5 % Angriffstempo. +55 Beutereichweite. | 4 |
+| Common | Minz-Essenz | +5 % Bewegung, +10 % Wurzelkraft-Erholung, -5 % Angriffstempo. +55 Beutereichweite. | 4 |
 | Uncommon | Minzsohlen | +7 % Bewegung, -1 Härte. +65 Beutereichweite. | 9 |
 | Rare | Mentholwirbel | +9 % Bewegung, -12 Leben. +80 Beutereichweite. | 14 |
 | Legendary | Minzkomet | +12 % Bewegung, -6 % Schaden. +100 Beutereichweite. | 22 |
@@ -175,7 +175,7 @@ Gemeinsames Familienlimit: **12**.
 | Seltenheit | Item | Vollständiger Effekt | Basispreis |
 | --- | --- | --- | ---: |
 | Common | Zuckerwürfel | Während du dich bewegst: +8 % Waffenschaden. -6 Leben. | 5 |
-| Uncommon | Kariesbonbon | Während du dich bewegst: +14 % Waffenschaden. -1 Härte, -1 Regeneration. | 9 |
+| Uncommon | Kariesbonbon | Während du dich bewegst: +14 % Waffenschaden. +15 % Wurzelkraft-Erholung, -1 Härte, -1 Regeneration. | 9 |
 | Rare | Verbotener Lolli | Während du dich bewegst: +20 % Waffenschaden. -15 Leben, -2 Härte. | 13 |
 | Legendary | Sündenlolli | Während du dich bewegst: +28 % Waffenschaden. -20 Leben, -3 Härte. | 22 |
 

@@ -15,6 +15,7 @@ const STAT_FIELDS := [
 	[DentiAttributes.KEYS[DentiAttributes.Type.LUCK], "", 0.0, 10000.0, 1.0],
 	[DentiAttributes.KEYS[DentiAttributes.Type.DODGE], "", -100.0, 200.0, 1.0],
 	["shield_charges", "Schild", 0.0, 5.0, 1.0],
+	["dash_recovery_bonus", "", 0.0, 400.0, 10.0],
 ]
 
 var controls: DebugRunControls

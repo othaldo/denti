@@ -16,7 +16,7 @@ func _check(condition: bool, message: String) -> void:
 func _run() -> void:
 	var ids := {}
 	var item_paths := {}
-	var stat_keys: Array[StringName] = [&"damage_bonus", &"melee_damage", &"ranged_damage", &"armor", &"max_health", &"speed_bonus", &"attack_speed", &"regen", &"crit_chance", &"luck", &"dodge_chance"]
+	var stat_keys: Array[StringName] = DentiAttributes.KEYS
 	for item in ItemCatalog.ALL:
 		_check(item.id != &"" and not ids.has(item.id), "duplicate/empty item ID: " + str(item.id))
 		_check(item.weapon_data == null and ItemCatalog.by_id(item.id) == item and ShopController.by_id(item.id) == item, "item catalog boundary broken: " + str(item.id))

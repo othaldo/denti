@@ -45,6 +45,7 @@ static func capture(game) -> Dictionary:
 		"upgrades": game.save_reward_choices(), "boss_pending": game.boss_pending,
 	}
 	result.merge(game.wave.save_state())
+	result.player["dash"] = game.player.dash.save_data()
 	result.merge(game.shop.save_state())
 	return result
 
@@ -70,6 +71,7 @@ static func restore(game, saved: Dictionary) -> void:
 	player.dodge_time = clampf(float(player_data.get("dodge_time", 0.0)), 0.0, Player.DODGE_IFRAMES)
 	player.expressions.restore(player_data.get("presentation", {}))
 	player.status_effects.restore(player_data.get("status_effects", {}))
+	player.dash.restore(player_data.get("dash", {}))
 	game.xp = maxi(int(saved.get("xp", 0)), 0)
 	game.xp_goal = maxi(int(saved.get("xp_goal", 5)), 1)
 	game.level = maxi(int(saved.get("level", 1)), 1)

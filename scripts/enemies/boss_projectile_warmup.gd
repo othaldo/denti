@@ -77,6 +77,10 @@ func _ready() -> void:
 	var boss_frame := HUDPaintedFrame.new(GameHUD.BOSS_ART)
 	boss_frame.size = Vector2(6, 2)
 	hud.add_child(boss_frame)
+	var stamina := HUDToothVessel.new("res://assets/ui/stamina_vessel_frame.png")
+	stamina.size = Vector2(108, 108)
+	stamina.scale = Vector2.ONE * 0.05
+	hud.add_child(stamina)
 	for id: StringName in HUDStatusIcons.SOURCES:
 		HUDStatusIcons.texture(id)
 	_release_after_render()

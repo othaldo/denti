@@ -3,8 +3,10 @@ extends Control
 
 const LIQUID: Shader = preload("res://scripts/ui/tooth_liquid.gdshader")
 const FRAME_PATH := "res://assets/ui/tooth_vessel_frame.png"
-static var _frame: Texture2D
-static var _outline: PackedVector2Array
+static var _frames: Dictionary[String, Texture2D] = {}
+static var _outlines: Dictionary[String, PackedVector2Array] = {}
+var _frame: Texture2D
+var _outline: PackedVector2Array
 
 var value: float = 100.0
 var max_value: float = 100.0
@@ -22,11 +24,12 @@ var _target: float = 1.0
 var _trail_delay: float = 0.0
 var _initialized := false
 var _compact := false
+var artwork_size: float = 0.0
 
 
-func _init() -> void:
+func _init(frame_path: String = FRAME_PATH) -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_prepare_frame()
+	_prepare_frame(frame_path)
 	liquid = ShaderMaterial.new()
 	liquid.shader = LIQUID
 	_fluid = Polygon2D.new()
@@ -65,10 +68,12 @@ func _init() -> void:
 	resized.connect(_layout)
 
 
-static func _prepare_frame() -> void:
-	if _frame != null:
+func _prepare_frame(path: String) -> void:
+	if _frames.has(path):
+		_frame = _frames[path]
+		_outline = _outlines[path]
 		return
-	_frame = load(FRAME_PATH)
+	_frame = load(path)
 	var bitmap := BitMap.new()
 	bitmap.create_from_image_alpha(_frame.get_image(), 0.3)
 	var largest_area := 0.0
@@ -80,6 +85,8 @@ static func _prepare_frame() -> void:
 		if absf(area) > largest_area:
 			largest_area = absf(area)
 			_outline = polygon
+	_frames[path] = _frame
+	_outlines[path] = _outline
 
 
 func show_value(amount: float, maximum: float, caption: String) -> void:
@@ -110,7 +117,7 @@ func show_shield(charges: int) -> void:
 
 
 func _layout() -> void:
-	var art_size := Vector2.ONE * (96 if _compact else 108)
+	var art_size: Vector2 = Vector2.ONE * (artwork_size if artwork_size > 0 else (96 if _compact else 108))
 	glass.position = Vector2((size.x - art_size.x) * 0.5, 0)
 	glass.size = art_size
 	_fluid.position = glass.position

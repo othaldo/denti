@@ -1,6 +1,6 @@
 # Denti — Roadmap
 
-Stand: **18.10.2026**, auf Basis des spielbaren Stands 0.5.0 und der anschließenden Refactorings und UI-Korrekturen. **Schritt 1 (Kampf-HUD) ist umgesetzt**, die weiteren Ausbaustufen sind geplant. Zahlenwerte sind Startwerte für Prototypen und werden erst nach Messung und Spieltests festgelegt.
+Stand: **19.10.2026**, auf Basis des spielbaren Stands 0.5.0 und der anschließenden Refactorings und UI-Korrekturen. **Kampf-HUD und Dash-Prototyp einschließlich Erholungsattribut sind umgesetzt**; weitere Ausbaustufen und Druck-/Balance-Playtests sind offen. Zahlenwerte bleiben Startwerte, bis Messung und Spieltests abgeschlossen sind.
 
 Das nächste Ziel: ein kompakteres Kampf-HUD, eine bewusste Dash-Entscheidung, vier eigenständige Bosskämpfe und mehr unterschiedliche Starts. Denti darf sehr mächtig werden; Positionierung, freie Wege und lesbare Gefahren sollen trotzdem wichtig bleiben.
 
@@ -20,7 +20,7 @@ Details zum Iststand: [README](../README.md), [Story-Modus](STORY_MODE.md), [Waf
 | Priorität | Vorhaben | Ergebnis |
 | --- | --- | --- |
 | P0 · umgesetzt | Kampf-HUD vereinheitlichen | Animiertes Zahngefäß, dezente XP-Linie und feste Anzeigegrenzen; [Prüfung und Aufnahmen](COMBAT_HUD.md) |
-| P1 | Wurzelkraft und Dash | Eine gezielte Bewegung mit einer Ladung, eigener Erholung und verbindlichem Cooldown |
+| P1 · Prototyp umgesetzt | Wurzelkraft und Dash | Eine Ladung, eigene Erholung und verbindlicher Cooldown; [Umsetzung und Prüfung](DASH.md) |
 | P1 | Vier Bossidentitäten | Jeder Story-Abschluss verlangt eine andere Positionierungsentscheidung |
 | P2 | Alle Standardwaffen als Starts | Kompaktes Iconraster mit Details und ausdrücklicher Auswahlbestätigung |
 | Danach | Synergien und Feinschliff | Begrenzte Dash-Synergien, eventuell Cooldown-Reduktion und Balance aller Starts |
@@ -43,6 +43,11 @@ Jede Stufe wird einzeln umgesetzt, getestet und gespielt. Bossumsetzung erfolgt 
 **Abnahme:** Stabile Anordnung ohne Überschneidungen bei 320×568, 568×320, 720×1280, 1040×600, 1280×720 und 1920×1080. Große Werte, lange Bossnamen, zwei Bosse, Schilde, Statussymbole und Entzündung werden gleichzeitig geprüft. Native Aufnahmen und eine vergrößerte Animation ergänzen automatische Layout-, Eingabe- und Animationstests. Die frühere Vorgabe gleich hoher HP-/XP-Leisten ist durch diesen Entwurf ersetzt.
 
 ## 2. Wurzelkraft und Dash
+
+**Prototyp umgesetzt:** Shift, Touchbutton, Kontaktstopp, zeitlich geprüfte Treffer,
+Save/Resume, Erholungsattribut, zwei passende Item-Ergänzungen und Telemetrie.
+[Details, Prüfungen und native Animation](DASH.md). Der menschliche Vergleich
+des Gegnerdrucks mit/ohne Dash und Erholungsinvestition steht noch aus.
 
 ### Name und Attribut
 
@@ -105,9 +110,9 @@ Ein Kontaktstopp mit verlorener Ladung bestraft schlechte Planung bereits deutli
 
 ### Mobile Steuerung
 
-- Ein eigener **Dash-Button unten rechts**, zunächst 64×64 logische Pixel, mindestens 56×56 im kompakten Layout. Er berücksichtigt Bildschirmränder, Pause und andere Bedienelemente; im Stillstand gilt dieselbe Richtungsregel wie am Desktop.
+- Das **generierte Wurzelkraft-Zahngefäß unten rechts** ist zugleich die Dash-Touchfläche: 80, 88 oder 100 logische Pixel je Layout. Es gehört als türkis gefülltes Gegenstück zum roten Lebenszahn. Im Stillstand gilt dieselbe Richtungsregel wie am Desktop.
 - Der Bewegungsfinger behält seine Geste. Ein zweiter Finger kann Dash drücken, ohne den Joystick-Ursprung oder die Bewegungsrichtung zu übernehmen. Die Buttonfläche startet selbst keine Bewegungsgeste.
-- Der Button zeigt den Füllstand als Ring und die Einsatzbereitschaft durch Form/Icon plus Farbe. Bei vollem Ring und noch aktivem Cooldown bleibt die Sperre sichtbar.
+- Die animierte Flüssigkeit zeigt den Füllstand; die Zahlen stehen wie beim Leben innerhalb der Zahnkrone. Bei voller Ladung und noch aktivem Cooldown steht dessen Restzeit in der zweiten Zahlenzeile. Es gibt keine frei platzierten Titel, Ladehinweise oder Tastaturtexte im Kampfbild.
 - Ungültiges Antippen startet keine spätere Aktion. Pause, Fokusverlust, Fingerfreigabe und Bildschirmdrehung hinterlassen keine festhängende Eingabe.
 - Swipe und Doppeltippen werden erst nach Touch-Spieltests als optionale Alternativen bewertet. Der erste Prototyp verwendet den klar erreichbaren Button.
 
@@ -217,8 +222,8 @@ Pro Boss werden TTK, Schaden nach Angriffsquelle, Treffer während Vorwarnung/ak
 | Schritt | Lieferumfang | Prüfung vor dem nächsten Schritt |
 | --- | --- | --- |
 | 1 · umgesetzt | Animiertes Zahngefäß, XP-Randlinie, kompakter Timer, getrennte Bossanzeigen | Größen, Textgrenzen, Statusanzeigen, sechs Auflösungen und native Bilder; [Nachweis](COMBAT_HUD.md) |
-| 2 | Dash-Basis inklusive Touchbutton, Kontaktstopp und Save/Resume | Eine Ladung, beide Sperren, keine neuen Schutzframes, vollständige Streckenprüfung |
-| 3 | Erholungsattribut, wenige passende Angebote und Telemetrie | Wartezeiten, Stat-/Save-Kompatibilität, maximaler Bonus, Vergleich mit/ohne Investition |
+| 2 · umgesetzt | Dash-Basis inklusive Touchbutton, Kontaktstopp und Save/Resume | Eine Ladung, beide Sperren, keine neuen Schutzframes, Streckenprüfung und native Darstellung geprüft |
+| 3 · Prototyp umgesetzt | Erholungsattribut, wenige passende Angebote und Telemetrie | Wartezeiten, Stat-/Save-Kompatibilität und Limit geprüft; Druck-/Balance-Playtest noch offen |
 | 4 | Karies-Graf als erster eigener Encounter | Bahnenprinzip, Bossabschluss, Alt-Saves, Nah-/Fernkampf und Mobile |
 | 5 | Karies-Prinz, dann Karies-König, dann Karies-Imperator | Je Boss erst eigener Ablauf samt Grenzen und Tests, dann nächster Encounter |
 | 6 | Alle 18 Standardwaffen im Iconraster mit Details und Bestätigung | Vollständiger Katalog, Auswahlablauf, frühe Wellen und UI pro Start prüfen |

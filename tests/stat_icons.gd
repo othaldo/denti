@@ -58,6 +58,10 @@ func _run() -> void:
 	if painted_bounds.size.x < 100 or painted_bounds.size.y < 100 or painted_bounds.position.x < 40 or painted_bounds.position.y < 40 or painted_bounds.end.x > 472 or painted_bounds.end.y > 472:
 		_fail("Zahnflutsch motif is clipped or lacks transparent padding")
 		return
+	var stamina_upgrade: UpgradeData = load("res://data/upgrades/wurzelkraft.tres")
+	if stamina_upgrade.attribute_icon() != 11 or DentiUIIcons.stat(11) != DentiUIIcons.STAMINA_RECOVERY:
+		_fail("Wurzelkraft-Erholung is missing its own generated painted icon")
+		return
 	print("Denti stat icons test passed")
 	finish(0)
 

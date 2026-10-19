@@ -7,7 +7,7 @@ const BOSS_HEIGHT := 22.0
 const BOSS_TEXT_OPTICAL_OFFSET := 2.0
 
 
-static func apply(hud: GameHUD, extent: Vector2, pause_button: Button = null) -> void:
+static func apply(hud: GameHUD, extent: Vector2, pause_button: Button = null, dash_button: DashButton = null) -> void:
 	var safe := safe_rect(extent)
 	var bounds := safe.grow(-MARGIN)
 	var portrait := extent.y > extent.x
@@ -24,6 +24,16 @@ static func apply(hud: GameHUD, extent: Vector2, pause_button: Button = null) ->
 	var vitals_rect := Rect2(bounds.position.x, safe.end.y - 48 - vital_height, 128, vital_height)
 	var statuses_rect := Rect2(bounds.position.x + 22, vitals_rect.position.y - 64, 84, 44)
 	var economy_rect := Rect2(vitals_rect.end.x + 16, vitals_rect.position.y + (40 if desktop else 34), 116, 52)
+	# Match the life vessel's centre height and outside margin. Wurzelkraft is
+	# slightly smaller, keeping life primary and clearing the pending-level pill.
+	var stamina_side := vital_height - 8
+	var life_side_padding := (vitals_rect.size.x - vital_height) * 0.5
+	var dash_rect := Rect2(bounds.end.x - life_side_padding - stamina_side, vitals_rect.position.y + 4, stamina_side, stamina_side)
+	if extent.x < 420:
+		stamina_side = 80
+		dash_rect = Rect2(bounds.end.x - stamina_side, vitals_rect.position.y + (vital_height - stamina_side) * 0.5, stamina_side, stamina_side)
+	if economy_rect.end.x > dash_rect.position.x - 6:
+		economy_rect.size.x = dash_rect.position.x - economy_rect.position.x - 6
 	if portrait:
 		timer_left = bounds.position.x + 58
 		timer_width = bounds.size.x - 110
@@ -45,11 +55,15 @@ static func apply(hud: GameHUD, extent: Vector2, pause_button: Button = null) ->
 	for index in 2:
 		_place(hud.status_badges[index], Rect2(index * statuses_rect.size.x * 0.5, 0, statuses_rect.size.x * 0.5, 44))
 	_place(hud.economy, economy_rect)
+	_place(hud.dash_indicator, dash_rect)
+	if dash_button != null:
+		_place(dash_button, dash_rect)
 	for index in 2:
 		var cell := hud.economy.get_child(index) as Control
 		var width := economy_rect.size.x
 		_place(cell, Rect2(0, index * 28, width, 24))
 		(cell.get_child(1) as Label).size.x = width - 22
+		(cell.get_child(1) as Label).add_theme_font_size_override("font_size", 12 if width < 80 else 13)
 	_place(hud.wave_frame, Rect2(timer_left, bounds.position.y, timer_width, TIMER_HEIGHT))
 	_place(hud.wave_info, hud.wave_frame.get_rect())
 	_place(hud.wave_label, Rect2(0, 0, timer_width, 16))
