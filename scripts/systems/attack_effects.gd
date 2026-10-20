@@ -11,8 +11,6 @@ const LANE_EDGE := 0.86
 enum Shape { BEAM, THREAD, SLASH, LANE, AIM, FLASH, SPRAY, TRAIL, UV }
 static var cones: Dictionary[float, PackedVector2Array] = {}
 static var cone_uvs: Dictionary[float, Array] = {}
-static var warning_slice_points: Array[PackedVector2Array] = []
-static var warning_slice_uvs: Array = []
 
 static func region(shape: Shape, seconds: float) -> Rect2:
 	return Rect2(Vector2(posmod(floori(seconds * FPS), FRAMES) * CELL.x, shape * CELL.y), CELL)
@@ -34,44 +32,7 @@ static func strip(canvas: CanvasItem, shape: Shape, start: Vector2, end: Vector2
 	canvas.draw_set_transform_matrix(base)
 
 static func lane(canvas: CanvasItem, start: Vector2, end: Vector2, half_width: float, tint: Color, progress: float, base: Transform2D = Transform2D.IDENTITY, fill_scales: PackedFloat32Array = PackedFloat32Array()) -> void:
-	# A disturbed-ground decal fills the warning width without runway-like rails.
-	tint.a *= lerpf(0.55, 1.0, progress)
-	if fill_scales.size() == WarningVisualDensity.SLICES + 1:
-		_faded_lane(canvas, start, end, half_width, tint, progress * 0.6, base, fill_scales)
-	else:
-		strip(canvas, Shape.LANE, start, end, half_width * 2.0 / LANE_EDGE, tint, progress * 0.6, base)
-
-static func prepare_warning_slices() -> void:
-	if not warning_slice_points.is_empty():
-		return
-	for index in WarningVisualDensity.SLICES:
-		var left := CONTENT.position.x + CONTENT.size.x * index / WarningVisualDensity.SLICES
-		var right := CONTENT.position.x + CONTENT.size.x * (index + 1) / WarningVisualDensity.SLICES
-		warning_slice_points.append(PackedVector2Array([Vector2(left, 0), Vector2(right, 0), Vector2(right, CELL.y), Vector2(left, CELL.y)]))
-	for frame in FRAMES:
-		var variants: Array[PackedVector2Array] = []
-		var offset := Vector2(frame * CELL.x, Shape.LANE * CELL.y)
-		for points in warning_slice_points:
-			var uv := PackedVector2Array()
-			for point in points:
-				uv.append((offset + point) / ATLAS.get_size())
-			variants.append(uv)
-		warning_slice_uvs.append(variants)
-
-static func _faded_lane(canvas: CanvasItem, start: Vector2, end: Vector2, half_width: float, tint: Color, seconds: float, base: Transform2D, values: PackedFloat32Array) -> void:
-	var length := start.distance_to(end)
-	if length < 0.01 or half_width <= 0.0 or tint.a <= 0.0:
-		return
-	prepare_warning_slices()
-	var scale := Vector2(length / CONTENT.size.x, half_width * 2.0 / LANE_EDGE / CONTENT.size.y)
-	var offset := Vector2(-CONTENT.position.x * scale.x, -CELL.y * scale.y * 0.5)
-	canvas.draw_set_transform_matrix(strip_transform(start, end, base) * Transform2D(0, scale, 0, offset))
-	var frame := posmod(floori(seconds * FPS), FRAMES)
-	for index in WarningVisualDensity.SLICES:
-		var left := Color(tint, tint.a * values[index])
-		var right := Color(tint, tint.a * values[index + 1])
-		canvas.draw_primitive(warning_slice_points[index], PackedColorArray([left, right, right, left]), warning_slice_uvs[frame][index], ATLAS)
-	canvas.draw_set_transform_matrix(base)
+	WarningEffects.lane(canvas, start, end, half_width, tint, progress, base, fill_scales)
 
 static func aim(canvas: CanvasItem, start: Vector2, end: Vector2, tint: Color, progress: float, base: Transform2D = Transform2D.IDENTITY) -> void:
 	strip(canvas, Shape.AIM, start, end, 12.0, Color(tint, tint.a * lerpf(0.4, 0.9, progress)), progress * 0.6, base)

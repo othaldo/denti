@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="de"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Denti · Graf C im Kampf</title>
+<style>*{box-sizing:border-box}body{margin:0;background:#241c2d;color:#f8eedc;font:16px/1.6 system-ui,sans-serif}main{max-width:1100px;padding:28px 24px;margin:auto}h1{font-size:30px;margin:5px 0 12px}p{color:#d6c3d9;max-width:850px}.tag{color:#e6bb6b;letter-spacing:.12em;font-size:12px}video{display:block;width:100%;height:auto;border:1px solid #614a66;border-radius:16px}a{color:#e6bb6b}.note{font-size:14px}button{background:#4b354f;color:#f8eedc;border:1px solid #c29a68;border-radius:20px;padding:9px 18px;font:inherit;cursor:pointer;margin:15px 0}</style>
+<style>.shapes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:20px 0}.shape{background:#302336;border:1px solid #614a66;border-radius:12px;overflow:hidden}.shape img{display:block;width:100%;height:auto}.shape h2{font-size:18px;margin:12px 14px 4px}.shape p{font-size:14px;margin:0 14px 14px}@media(max-width:650px){.shapes{grid-template-columns:1fr}}</style>
+<main><div class="tag">DENTI · GRAF C · IM SPIEL INTEGRIERT</div><h1>Ein Graf, drei Schläge.</h1>
+<p>Ein breiter Fächer, ein schmaler Umhangstoß und ein Saumschlag rund um den Grafen. Jede Form bekommt ihre eigene Ausholbewegung. Vor dem nächsten Schlag sucht er den passenden Abstand.</p>
+<video id="preview" src="fight.mp4?v=textured-warnings" controls muted loop playsinline aria-label="Godot-Aufnahme mit animierten Texturwarnungen für Fächer, Umhangstoß und Saumschlag"></video>
+<button id="toggle" aria-pressed="false">Abspielen</button>
+<p>Die Gefahrengrenze bleibt fest. Der goldene Saum wandert innerhalb der vollständigen Warnfläche nach außen. Die Formen kommen jetzt aus vorbereiteten Texturen; die freie Ringmitte bleibt erhalten. <a href="../warning-effects/">Charge-Warnungen vorher und nachher ansehen</a>.</p>
+<div class="shapes">
+<article class="shape"><a href="fan-area.png?v=textured"><img src="fan-area.png?v=textured" alt="Breite fächerförmige Warnfläche vor dem Grafen"></a><h2>Umhangfächer</h2><p>80° breit, 340 Einheiten weit. Seitlich heraus oder über den Außenrand.</p></article>
+<article class="shape"><a href="thrust-area.png?v=textured"><img src="thrust-area.png?v=textured" alt="Schmale lange Warnfläche des Umhangstoßes"></a><h2>Umhangstoß</h2><p>28° breit, 420 Einheiten weit. Seitlich ausweichen; bloßes Zurücklaufen ist riskanter.</p></article>
+<article class="shape"><a href="ring-area.png?v=textured"><img src="ring-area.png?v=textured" alt="Ringförmige Warnfläche mit freiem Innenbereich um den Grafen"></a><h2>Saumschlag</h2><p>Ring von 130 bis 290 Einheiten. Nach innen in die freie Mitte oder ganz nach außen.</p></article>
+</div>
+<p>Zwei Schläge zu Beginn: Fächer, danach abwechselnd Stoß oder Ring. Später folgen alle drei. Während Warnung und Schlag steht der Graf fest. Schaden und Vorwarnzeit bleiben gleich; sein Rückzug bleibt zeitlich begrenzt.</p>
+<p class="note">Arrangierte Aufnahme aus Godot: Denti bewegt sich mit Grundtempo, ohne Dash oder Waffen. Sie zeigt den echten Kampfablauf, ersetzt aber keinen menschlichen Spieltest einer vollständigen Welle.</p>
+<p><a href="rig.html">Skelett und Stoffnetz ansehen</a> · <a href="fight.mp4">Video in Originalgröße</a></p>
+</main><script>
+const button=document.getElementById('toggle'),video=document.getElementById('preview');
+function sync(){button.textContent=video.paused?'Abspielen':'Anhalten';button.setAttribute('aria-pressed',String(!video.paused));}
+button.onclick=()=>{if(video.paused)video.play().catch(sync);else video.pause();};video.addEventListener('play',sync);video.addEventListener('pause',sync);
+if(!matchMedia('(prefers-reduced-motion: reduce)').matches)video.play().catch(sync);
+</script></html>

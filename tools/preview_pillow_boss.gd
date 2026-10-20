@@ -25,7 +25,11 @@ func _run() -> void:
 	game.player.global_position = Vector2(900, 600)
 	game.player.stats.max_health = 1000
 	game.player.stats.health = 1000
-	game._create_enemy(EnemyCatalog.CAVITY_COUNT, Vector2(1040, 530))
+	var legacy := EnemyCatalog.CAVITY_COUNT.duplicate() as EnemyData
+	legacy.cloak_profile = null
+	legacy.pillow_profile = load("res://data/encounters/count_pillow.tres")
+	legacy.sprite = load("res://assets/enemies/cavity_count_pillow.png")
+	game._create_enemy(legacy, Vector2(1040, 530))
 	boss = game.boss
 	boss.boss_phase = 1
 	game.get_node("Enemies").set_physics_process(false)

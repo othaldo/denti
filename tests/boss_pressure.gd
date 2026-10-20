@@ -47,7 +47,7 @@ func _run() -> void:
 		seconds += 0.1
 		if boss.boss_phase == 1 and boss.boss_phase_burst_fired and not phase_saved:
 			var projectile_count: int = game.get_node("EnemyProjectiles").get_child_count()
-			if projectile_count != 0 or boss.pillow_encounter == null or game.get_node("Enemies").get_child_count() < 3:
+			if projectile_count != 0 or boss.cloak_encounter == null or game.get_node("Enemies").get_child_count() < 3:
 				_fail("count phase lacks its own encounter or bounded reinforcements, or still fires generic rings")
 				return
 			var phase_time: float = boss.boss_phase_timer
@@ -59,8 +59,8 @@ func _run() -> void:
 			await process_frame
 			game = current_scene
 			boss = game.boss
-			if boss == null or boss.boss_phase != 1 or not boss.boss_phase_burst_fired or absf(boss.boss_phase_timer - phase_time) > 0.1 or boss.pillow_encounter == null:
-				_fail("save/resume lost the boss phase or its pillow encounter")
+			if boss == null or boss.boss_phase != 1 or not boss.boss_phase_burst_fired or absf(boss.boss_phase_timer - phase_time) > 0.1 or boss.cloak_encounter == null:
+				_fail("save/resume lost the boss phase or its cloak encounter")
 				return
 			boss.set_simulation_enabled(false)
 			phase_saved = true

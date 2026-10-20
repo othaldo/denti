@@ -69,7 +69,10 @@ func _run() -> void:
 		var sprite_enemy: Enemy = enemy_scene.instantiate()
 		sprite_enemy.configure(enemy_data, player)
 		game.get_node("Enemies").add_child(sprite_enemy)
-		if enemy_data.sprite == null or sprite_enemy.sprite.texture != enemy_data.sprite:
+		var visual_loaded := sprite_enemy.sprite.texture == enemy_data.sprite
+		if enemy_data.cloak_profile != null:
+			visual_loaded = sprite_enemy.cloak_encounter != null and is_instance_valid(sprite_enemy.cloak_encounter.rig)
+		if enemy_data.sprite == null or not visual_loaded:
 			_fail("enemy sprite was not loaded: " + path)
 			return
 		sprite_enemy.free()

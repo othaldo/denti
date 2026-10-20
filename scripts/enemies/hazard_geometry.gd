@@ -3,6 +3,50 @@ extends RefCounted
 
 const PLAYER_RADIUS := 20.0
 
+static func circle_sector(point: Vector2, center: Vector2, direction: Vector2, radius: float, half_angle: float) -> bool:
+	var relative := point - center
+	if relative.length() <= PLAYER_RADIUS:
+		return true
+	if absf(direction.angle_to(relative)) <= half_angle and relative.length() <= radius + PLAYER_RADIUS:
+		return true
+	for sign_side in [-1, 1]:
+		var end := center + direction.rotated(half_angle * sign_side) * radius
+		if point.distance_to(Geometry2D.get_closest_point_to_segment(point, center, end)) <= PLAYER_RADIUS:
+			return true
+	return false
+
+static func swept_sector(player: Player, center: Vector2, direction: Vector2, radius: float, half_angle: float, first: float, last: float) -> bool:
+	var start := player_at(player, first)
+	var end := player_at(player, last)
+	if circle_sector(start, center, direction, radius, half_angle) or circle_sector(end, center, direction, radius, half_angle):
+		return true
+	# A moving player circle intersects either a radial edge capsule or the outer arc.
+	for sign_side in [-1, 1]:
+		var ray_end := center + direction.rotated(half_angle * sign_side) * radius
+		if Geometry2D.segment_intersects_segment(start, end, center, ray_end) != null:
+			return true
+		for point in [start, end]:
+			if point.distance_to(Geometry2D.get_closest_point_to_segment(point, center, ray_end)) <= PLAYER_RADIUS:
+				return true
+		for point in [center, ray_end]:
+			if point.distance_to(Geometry2D.get_closest_point_to_segment(point, start, end)) <= PLAYER_RADIUS:
+				return true
+	var entry := DashCollision.circle_fraction(start, end - start, center, radius + PLAYER_RADIUS)
+	return entry != INF and absf(direction.angle_to(start.lerp(end, entry) - center)) <= half_angle
+
+static func circle_ring(point: Vector2, center: Vector2, inner: float, outer: float) -> bool:
+	var distance := point.distance_to(center)
+	return distance >= maxf(inner - PLAYER_RADIUS, 0) and distance <= outer + PLAYER_RADIUS
+
+static func swept_ring(player: Player, center: Vector2, inner: float, outer: float, first: float, last: float) -> bool:
+	var start := player_at(player, first)
+	var end := player_at(player, last)
+	# Distance along a segment is continuous: it crosses the annulus iff its
+	# minimum is within the outer circle and its maximum reaches the inner rim.
+	var nearest := Geometry2D.get_closest_point_to_segment(center, start, end).distance_to(center)
+	var farthest := maxf(start.distance_to(center), end.distance_to(center))
+	return nearest <= outer + PLAYER_RADIUS and farthest >= maxf(inner - PLAYER_RADIUS, 0)
+
 static func player_at(player: Player, seconds: float) -> Vector2:
 	if player.swept_dash_this_frame():
 		return player.motion_start.lerp(player.motion_end, clampf(seconds / maxf(player.dash_motion_seconds, 0.000001), 0, 1))

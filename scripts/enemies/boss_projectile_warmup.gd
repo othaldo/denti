@@ -14,10 +14,14 @@ class ChargePreview extends Node2D:
 	func _draw() -> void:
 		# Exercise the actual textured strip, sector, timer and shadow paths.
 		AttackEffects.lane(self, Vector2(1, 4), Vector2(7, 4), 2.0, Color.WHITE, 0.5)
+		WarningEffects.charge(self, Vector2(1, 4), Vector2(7, 4), 2.0, 4, Color.WHITE, 0.5)
+		WarningEffects.charge_impact(self, Vector2(4, 4), 2, 0.5)
 		AttackEffects.lane(self, Vector2(1, 4), Vector2(7, 4), 2.0, Color.WHITE, 0.5, Transform2D.IDENTITY, PackedFloat32Array([1, 1, 0.5, 0.3, 0.2, 0.3, 0.5, 1, 1]))
 		AttackEffects.spray(self, Vector2(1, 4), Vector2.RIGHT, 6.0, 65.0, Color.WHITE, 0.0)
 		AttackEffects.warning_ring(self, Vector2(4, 4), 2.0, 0.5, Color.WHITE)
 		AttackEffects.danger(self, Vector2(4, 4), 2.0, Color.WHITE)
+		WarningEffects.sector(self, Vector2(1, 4), Vector2.RIGHT, 4, deg_to_rad(40), 0.5, false, false)
+		WarningEffects.ring(self, Vector2(4, 4), 1, 2, 0.5, false, false)
 		draw_multimesh(shadow.multimesh, shadow.texture)
 
 
@@ -35,6 +39,7 @@ func _ready() -> void:
 	var textures := EnemyProjectileVisuals.standard_textures()
 	textures.append_array(CombatSpriteTextures.standard_textures())
 	CombatDrawCache.prepare()
+	WarningEffects.prepare()
 	textures.append(CombatGlyphs.ATLAS)
 	textures.append(GroundEffects.ATLAS)
 	textures.append(AttackEffects.ATLAS)
@@ -47,6 +52,12 @@ func _ready() -> void:
 		sprite.scale = Vector2.ONE * (6.0 / maxf(texture.get_width(), texture.get_height()))
 		add_child(sprite)
 	add_child(ChargePreview.new())
+	var cloak: CountCloakRig = CloakEncounter.RIG.instantiate()
+	cloak.name = &"CloakRigWarmup"
+	cloak.position = Vector2(4, 7)
+	cloak.scale = Vector2.ONE * 0.02
+	add_child(cloak)
+	cloak.sample(1.09)
 	var numbers: Label = preload("res://scenes/ui/damage_number.tscn").instantiate()
 	numbers.name = "CombatFontWarmup"
 	numbers.text = "0123456789-+!"
@@ -88,7 +99,7 @@ func _ready() -> void:
 
 static func art_textures() -> Array[Texture2D]:
 	var result: Array[Texture2D] = [DentiExpressions.BODY, DentiExpressions.ATLAS]
-	result.append(PillowEncounter.ART)
+	result.append(CountCloakRig.ART)
 	for data in EnemyCatalog.ALL:
 		result.append(data.sprite)
 	var weapons: Array[WeaponData] = WeaponCatalog.ALL.duplicate()

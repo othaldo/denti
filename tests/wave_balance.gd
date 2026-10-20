@@ -87,19 +87,20 @@ func _run() -> void:
 		_fail("armor did not reduce damage by a moderate amount")
 		return
 	boss.health = boss.max_health
-	boss.pillow_encounter.cooldown = 0.0
+	boss.global_position = boss.cloak_encounter._placement_goal()
+	boss.cloak_encounter.remaining = 0.0
 	var player_health: float = game.player.stats.health
 	boss._physics_process(0.01)
-	if not boss.pillow_encounter.active or boss.pillow_encounter.elapsed != 0 or game.player.stats.health != player_health:
+	if not boss.cloak_encounter.active or boss.cloak_encounter.elapsed != 0 or game.player.stats.health != player_health:
 		_fail("boss attack was not announced")
 		return
-	boss._physics_process(boss.pillow_encounter.profile.warning_seconds - 0.01)
+	boss._physics_process(boss.cloak_encounter.profile.warning_seconds - 0.01)
 	if game.player.stats.health != player_health:
-		_fail("boss pillow hit before its announced area became active")
+		_fail("boss cloak hit before its announced area became active")
 		return
-	boss._physics_process(0.02)
+	boss._physics_process(0.06)
 	if game.player.stats.health >= player_health:
-		_fail("announced boss pillow did not hit")
+		_fail("announced boss cloak did not hit")
 		return
 	game.player.stats.max_health = 10000.0
 	game.player.stats.health = 10000.0

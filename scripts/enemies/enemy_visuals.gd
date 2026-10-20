@@ -72,7 +72,10 @@ static func draw(enemy: Enemy) -> void:
 		enemy.draw_attack_visuals(enemy)
 	if enemy.pulse_flash_time > 0.0:
 		var flash_radius := enemy.data.dash_impact_radius if enemy.active_special_attack == EnemyData.SpecialAttack.DASH and enemy.data.dash_impact_radius > 0.0 else enemy.data.attack_radius
-		CombatDrawCache.arc(enemy, Vector2.ZERO, flash_radius, 0.0, TAU, 64, Color(1.0, 0.72, 0.27, enemy.pulse_flash_time / Enemy.PULSE_FLASH_DURATION), 8.0)
+		if enemy.active_special_attack == EnemyData.SpecialAttack.DASH and enemy.data.dash_impact_radius > 0.0:
+			WarningEffects.charge_impact(enemy, Vector2.ZERO, flash_radius, 1, Color(1, 1, 1, enemy.pulse_flash_time / Enemy.PULSE_FLASH_DURATION))
+		else:
+			CombatDrawCache.arc(enemy, Vector2.ZERO, flash_radius, 0.0, TAU, 64, Color(1.0, 0.72, 0.27, enemy.pulse_flash_time / Enemy.PULSE_FLASH_DURATION), 8.0)
 	enemy.affix_effects.draw_markers(enemy)
 	if enemy.bleed_stacks > 0:
 		CombatDrawCache.arc(enemy, Vector2.ZERO, enemy.data.radius + 4.0, 0.0, TAU, 24, Color(0.78, 0.25, 0.48, 0.85), 2.5 + enemy.bleed_stacks)
@@ -114,7 +117,7 @@ static func warning_lane_end(enemy: Enemy) -> Vector2:
 			if enemy.target == null:
 				return Vector2.ZERO
 			var margin := DentiArena.WALL_WIDTH + enemy.data.radius + 6.0
-			return (enemy.global_position + enemy.special_direction * enemy.data.attack_speed * enemy.data.attack_duration).clamp(Vector2.ONE * margin, enemy.target.arena.arena_size - Vector2.ONE * margin) - enemy.global_position
+			return (enemy.global_position + enemy.special_direction * enemy.data.attack_speed * enemy.overtime_speed_factor() * enemy.data.attack_duration).clamp(Vector2.ONE * margin, enemy.target.arena.arena_size - Vector2.ONE * margin) - enemy.global_position
 		EnemyData.SpecialAttack.BOSS:
 			return enemy.boss_dash_end - enemy.global_position
 		EnemyData.SpecialAttack.LANE, EnemyData.SpecialAttack.SPACE_ORB:
@@ -138,7 +141,7 @@ static func warning_lane_half_width(enemy: Enemy) -> float:
 static func draw_warning_fill(enemy: Enemy, canvas: CanvasItem, base: Transform2D = Transform2D.IDENTITY, fill_scales: PackedFloat32Array = PackedFloat32Array()) -> void:
 	if enemy.special_phase != Enemy.SpecialPhase.WARNING or enemy.warning_lane_half_width() <= 0.0:
 		return
-	var tint := Color(0.73, 0.20, 0.19, 0.85)
+	var tint := Color(1.0, 0.28, 0.18, 0.95)
 	match enemy.active_special_attack:
 		EnemyData.SpecialAttack.BOSS:
 			tint = Color(1.0, 0.3, 0.32, 0.95)
@@ -149,7 +152,10 @@ static func draw_warning_fill(enemy: Enemy, canvas: CanvasItem, base: Transform2
 	if canvas != enemy:
 		tint *= enemy.modulate * enemy.self_modulate
 	var progress := 1.0 - clampf(enemy.special_timer / maxf(enemy.data.warning_time, 0.01), 0.0, 1.0)
-	AttackEffects.lane(canvas, enemy.warning_lane_start(), enemy.warning_lane_end(), enemy.warning_lane_half_width(), tint, progress, base, fill_scales)
+	if enemy.active_special_attack == EnemyData.SpecialAttack.DASH or enemy.active_special_attack == EnemyData.SpecialAttack.BOSS and enemy.boss_move == Enemy.BossMove.CHARGE:
+		WarningEffects.charge(canvas, enemy.warning_lane_start(), enemy.warning_lane_end(), enemy.warning_lane_half_width(), enemy.charge_aim_distance, tint, progress, base, fill_scales)
+	else:
+		AttackEffects.lane(canvas, enemy.warning_lane_start(), enemy.warning_lane_end(), enemy.warning_lane_half_width(), tint, progress, base, fill_scales)
 
 
 static func draw_attack_visuals(enemy: Enemy, canvas: CanvasItem, base: Transform2D = Transform2D.IDENTITY, fill_scales: PackedFloat32Array = PackedFloat32Array(), draw_fill: bool = true) -> void:
@@ -162,10 +168,9 @@ static func draw_attack_visuals(enemy: Enemy, canvas: CanvasItem, base: Transfor
 		if enemy.active_special_attack == EnemyData.SpecialAttack.DASH or enemy.active_special_attack == EnemyData.SpecialAttack.BOSS and enemy.boss_move == Enemy.BossMove.CHARGE:
 			var dash_path := enemy.warning_lane_end()
 			if enemy.active_special_attack == EnemyData.SpecialAttack.DASH and enemy.data.dash_impact_radius > 0.0:
-				AttackEffects.danger(canvas, dash_path, enemy.data.dash_impact_radius, warning_color * visual_tint)
+				WarningEffects.charge_impact(canvas, dash_path, enemy.data.dash_impact_radius, warning_progress, visual_tint)
 			else:
-				AttackEffects.flash(canvas, dash_path, enemy.data.radius * 0.55 if enemy.data.is_boss else 9.0, Color(1.0, 0.4, 0.32, 0.6) * visual_tint)
-			AttackEffects.warning_ring(canvas, Vector2.ZERO, enemy.data.radius + 7.0, warning_progress, Color(1.0, 0.72, 0.27) * visual_tint)
+				AttackEffects.flash(canvas, dash_path, enemy.data.radius * 0.55 if enemy.data.is_boss else 9.0, Color(1.0, 0.4, 0.32, 0.3) * visual_tint)
 		elif enemy.active_special_attack == EnemyData.SpecialAttack.SHOOT:
 			var shot_color := Color(DentiStatus.COLORS[int(enemy.inflicted_statuses[0]["kind"])], 0.9) if not enemy.inflicted_statuses.is_empty() else Color(enemy.data.projectile_color, 0.9)
 			for ray in enemy._warning_rays(EnemyData.SpecialAttack.SHOOT, enemy._aimed_projectile_count()):

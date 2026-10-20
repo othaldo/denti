@@ -12,7 +12,7 @@ func _check(condition: bool, message: String) -> void:
 
 func _run() -> void:
 	var image := Image.load_from_file("res://assets/vfx/attack_effects.png")
-	_check(image.get_size() == Vector2i(1024, 1680), "attack atlas dimensions no longer match the packed regions")
+	_check(image.get_size() == Vector2i(2048, 1792), "attack atlas dimensions no longer match the packed regions")
 	for kind in 9:
 		for frame in AttackEffects.FRAMES:
 			var source := AttackEffects.region(kind, (frame + 0.1) / AttackEffects.FPS)

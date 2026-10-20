@@ -29,7 +29,8 @@ func _run() -> void:
 				player.stats.health = 10000
 				var data := EnemyCatalog.CAVITY_COUNT.duplicate() as EnemyData
 				data.boss_phase_adds = 0
-				if legacy: data.pillow_profile = null
+				data.cloak_profile = null
+				data.pillow_profile = null if legacy else load("res://data/encounters/count_pillow.tres")
 				game._create_enemy(data, player.global_position + Vector2(250, 0))
 				var boss: Enemy = game.boss
 				game.get_node("Enemies").set_physics_process(false)

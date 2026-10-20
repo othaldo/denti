@@ -1,0 +1,61 @@
+{
+	"method": "Native Compatibility, VSync off, RTX 4070, 40 warmup + 300 samples each, alternating twice. Previous procedural ring versus new atlas style. Isolated rendering, not full-game/mobile FPS.",
+	"results": [
+		{
+			"atlas": false,
+			"draw_calls": 73.0,
+			"draw_ms": 0.323,
+			"frame_ms": 0.971,
+			"rings": 1
+		},
+		{
+			"atlas": true,
+			"draw_calls": 1.0,
+			"draw_ms": 0.004,
+			"frame_ms": 0.313,
+			"rings": 1
+		},
+		{
+			"atlas": false,
+			"draw_calls": 73.0,
+			"draw_ms": 0.315,
+			"frame_ms": 0.937,
+			"rings": 1
+		},
+		{
+			"atlas": true,
+			"draw_calls": 1.0,
+			"draw_ms": 0.004,
+			"frame_ms": 0.292,
+			"rings": 1
+		},
+		{
+			"atlas": false,
+			"draw_calls": 146.0,
+			"draw_ms": 0.634,
+			"frame_ms": 1.652,
+			"rings": 2
+		},
+		{
+			"atlas": true,
+			"draw_calls": 1.0,
+			"draw_ms": 0.005,
+			"frame_ms": 0.289,
+			"rings": 2
+		},
+		{
+			"atlas": false,
+			"draw_calls": 146.0,
+			"draw_ms": 0.636,
+			"frame_ms": 1.669,
+			"rings": 2
+		},
+		{
+			"atlas": true,
+			"draw_calls": 1.0,
+			"draw_ms": 0.005,
+			"frame_ms": 0.311,
+			"rings": 2
+		}
+	]
+}

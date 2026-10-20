@@ -1,5 +1,11 @@
 # Weapon effects and attack warnings
 
+**Update 20.10.2026:** Charge/Lane warnings now use fixed end caps and a tiled
+middle; the Count's fans/ring share the same atlas and animated inner light.
+See [current implementation, measurements and validation](TEXTURED_WARNINGS.md).
+The following records the preceding painted-decal revision. Its texture size,
+appearance and performance figures are historical, not the current path.
+
 The remaining simple weapon beams, cone polygons, contact trails and enemy
 warning lanes now use `AttackEffects`. Damage, aim, attack timing, wall clamping,
 projectile patterns and save data are unchanged.

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="de">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Denti · Der neue Karies-Graf</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#211b28;color:#f8eddb;font:16px/1.5 system-ui,sans-serif}main{max-width:1450px;margin:auto;padding:32px 24px}h1{font-size:32px;margin:5px 0 10px}p{color:#cdbfd0;max-width:820px}small,.eyebrow{color:#e8bc6b}.eyebrow{letter-spacing:.13em;font-size:12px}nav{display:flex;gap:12px;flex-wrap:wrap;margin:24px 0}button{font:inherit;color:#f8eddb;background:#3c3048;border:1px solid #8e7165;border-radius:20px;padding:8px 16px;cursor:pointer}button[aria-pressed=true]{background:#66503c;border-color:#efc77d}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.card{border:1px solid #5b465d;border-radius:18px;overflow:hidden;background:#302638}.head{padding:18px 20px 0}h2{font-size:19px;margin:0 0 6px}.head p{font-size:14px;min-height:64px;margin:0}.pair{height:245px;display:flex;align-items:end;justify-content:center;gap:8px;padding:18px;background:#acaba8}.sample{display:flex;justify-content:space-evenly;gap:12px;align-items:center;background:#acaba8;min-height:145px;padding:16px 8px}.sample.small{min-height:96px}.label{margin:0;padding:7px 14px;font-size:12px;color:#e3d2bf;letter-spacing:.04em}.sprite{position:relative;overflow:hidden;flex-shrink:0}.sprite img{position:absolute;max-width:none;user-select:none;pointer-events:none}.silhouette .sprite img{filter:brightness(0)}.dark .pair,.dark .sample{background:#362b40}footer{margin-top:22px;border-left:3px solid #d7ac66;padding:0 18px}footer p{margin:6px 0;font-size:14px}@media(max-width:850px){.grid{grid-template-columns:1fr}.head p{min-height:0}.pair{height:220px}}@media(prefers-reduced-motion:no-preference){button{transition:background .15s}}
+</style>
+<main>
+<div class="eyebrow">DENTI · FIGURENENTWURF · 20.10.2026</div>
+<h1>Der Umhang-Graf · Entwurf C</h1>
+<p>Drei Bettwanzen-Vampire, jeweils links in Ruhe und rechts mit geöffnetem Umhang. Große Flächen, ein Fangzahn, keine Krone. C ist ausgewählt: Die versetzten Umhangseiten geben dem Grafen eine eigene Form und eine klare Schlagrichtung.</p>
+<p><a style="color:#edc780" href="rig.html">→ Neue Knochenanimation aus Godot ansehen</a></p>
+<p><a style="color:#edc780" href="motion.html">→ Bewegungsstudie von Entwurf C ansehen</a></p>
+<p><a style="color:#edc780" href="fight.html">→ Den neuen Kampf aus dem Spiel ansehen</a></p>
+<nav aria-label="Darstellung"><button id="outline" aria-pressed="false">Schwarze Silhouetten</button><button id="floor" aria-pressed="false">Dunkler Hintergrund</button></nav>
+<div id="gallery" class="grid"></div>
+<footer><strong>Der Kampf braucht Biss.</strong><p>Annähern → Umhang öffnen → Schlag → neu ausrichten → Gegenschlag → kurze Erholung. Eine neue Warnung pro Schlag: Ein früher Seitenschritt erledigt nicht die ganze Folge.</p><p>Dies sind gemalte Posen und Größenvergleiche. Der weiterentwickelte Umhang-Graf ist inzwischen im regulären Kampf aktiv. 64 / 112 px beziehen sich auf die längste sichtbare Bildkante, ohne transparenten Rand.</p><p><a style="color:#edc780" href="../count-bedbug.md">Entwurf und Prüfziele</a> · <a style="color:#edc780" href="../count-bedbug-prompts.md">Imagegen-Prompts und Referenzen</a></p></footer>
+</main>
+<script src="manifest.js"></script>
+<script>
+const data=[...window.COUNT_DESIGNS].sort((a,b)=>(a.file==='c.png'?-1:0)-(b.file==='c.png'?-1:0));
+function sprite(item,pose,size){const [x,y,r,b]=item.boxes[pose],w=r-x,h=b-y,k=size/Math.max(w,h);const el=document.createElement('div');el.className='sprite';el.style.width=w*k+'px';el.style.height=h*k+'px';const image=document.createElement('img');image.src=item.file;image.alt=item.name+(pose?' – Umhang geöffnet':' – Ruhepose');image.style.width=item.width*k+'px';image.style.height=item.height*k+'px';image.style.left=-x*k+'px';image.style.top=-y*k+'px';if(item.file==='c.png')image.style.clipPath=pose?'polygon(39.46% 0,100% 0,100% 100%,33.46% 100%)':'polygon(0 0,39.46% 0,33.46% 100%,0 100%)';el.append(image);return el;}
+for(const item of data){const card=document.createElement('article');card.className='card';const head=document.createElement('div');head.className='head';const title=document.createElement('h2');title.textContent=item.name;const text=document.createElement('p');text.textContent=item.description;head.append(title,text);card.append(head);for(const [size,label,cls] of [[188,'RUHE → AUFFÄCHERN','pair'],[112,'112 PX · SPIELGRÖSSE','sample'],[64,'64 PX · KLEINE DARSTELLUNG','sample small']]){const l=document.createElement('div');l.className='label';l.textContent=label;const row=document.createElement('div');row.className=cls;row.append(sprite(item,0,size),sprite(item,1,size));card.append(l,row);}document.querySelector('#gallery').append(card);}
+for(const [id,cls] of [['outline','silhouette'],['floor','dark']])document.getElementById(id).onclick=e=>{const active=document.body.classList.toggle(cls);e.currentTarget.setAttribute('aria-pressed',String(active));};
+</script>
+</html>

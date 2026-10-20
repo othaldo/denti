@@ -41,6 +41,7 @@ var animation_time: float = 0.0
 var special_phase: SpecialPhase = SpecialPhase.COOLDOWN
 var special_timer: float = 0.0
 var special_direction: Vector2 = Vector2.ZERO
+var charge_aim_distance: float = 0.0
 var boss_move: BossMove = BossMove.CHARGE
 var boss_charge_next: bool = true
 var boss_dash_end: Vector2 = Vector2.ZERO
@@ -82,6 +83,7 @@ var active_special_attack: int = EnemyData.SpecialAttack.NONE
 var active_trigger_range: float = 0.0
 var inflammation_aura: BossInflammationAura
 var pillow_encounter: PillowEncounter
+var cloak_encounter: CloakEncounter
 var inflicted_statuses: Array[Dictionary] = []
 var spatial_index: EnemySpatialIndex
 var hit_flash_time: float = 0.0
@@ -148,7 +150,12 @@ func _ready() -> void:
 		inflammation_aura = BossInflammationAura.new()
 		inflammation_aura.configure(data)
 		add_child(inflammation_aura)
-		if data.pillow_profile != null:
+		if data.cloak_profile != null:
+			cloak_encounter = CloakEncounter.new()
+			cloak_encounter.enemy = self
+			cloak_encounter.profile = data.cloak_profile
+			add_child(cloak_encounter)
+		elif data.pillow_profile != null:
 			pillow_encounter = PillowEncounter.new()
 			pillow_encounter.enemy = self
 			pillow_encounter.profile = data.pillow_profile
@@ -224,7 +231,7 @@ func _physics_process(delta: float) -> void:
 			queue_redraw()
 		if boss_phase_timer > 0.0:
 			boss_phase_timer = maxf(boss_phase_timer - delta, 0.0)
-			if pillow_encounter == null and not boss_phase_burst_fired and boss_phase_timer <= data.boss_phase_duration * 0.5:
+			if pillow_encounter == null and cloak_encounter == null and not boss_phase_burst_fired and boss_phase_timer <= data.boss_phase_duration * 0.5:
 				boss_phase_burst_fired = true
 				_fire_phase_burst()
 		if boss_radial_volleys_remaining > 0:
@@ -300,6 +307,9 @@ func _update_sprite_facing(direction: Vector2) -> void:
 
 
 func _process_special(delta: float, direction: Vector2) -> void:
+	if cloak_encounter != null:
+		cloak_encounter.advance(delta)
+		return
 	if pillow_encounter != null:
 		pillow_encounter.advance(delta)
 		return
@@ -314,6 +324,8 @@ func _process_special(delta: float, direction: Vector2) -> void:
 				special_phase = SpecialPhase.WARNING
 				special_timer = data.warning_time
 				special_direction = direction
+				# The advancing warning ends at the position aimed at now, not a moving target.
+				charge_aim_distance = sqrt(distance_squared)
 				if active_special_attack == EnemyData.SpecialAttack.BOSS:
 					boss_move = BossMove.CHARGE if distance_squared > (data.attack_radius + 45.0) * (data.attack_radius + 45.0) or boss_charge_next else BossMove.PULSE
 					boss_charge_next = boss_move != BossMove.CHARGE
@@ -637,6 +649,8 @@ func _finish_death(amount: float, delayed: Array[Dictionary]) -> void:
 	health = 0.0
 	if pillow_encounter != null:
 		pillow_encounter.cancel()
+	if cloak_encounter != null:
+		cloak_encounter.cancel()
 	for addition in delayed:
 		if addition.id == &"fire":
 			affix_effects.remember_fire(addition.damage, addition.can_spread)

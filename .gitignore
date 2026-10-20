@@ -12,3 +12,6 @@ __pycache__/
 
 # Keep the small stat icon's mipmap import settings in fresh checkouts/exports.
 !assets/ui/stamina_icon.png.import
+
+# The modular Count artwork uses mipmaps at combat sprite sizes.
+!assets/enemies/count_rig/parts.png.import

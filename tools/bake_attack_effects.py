@@ -11,7 +11,7 @@ def bell(value, width):
 
 
 def bake():
-    atlas = Image.new("RGBA", (CELL_W * FRAMES, 1680))
+    atlas = Image.new("RGBA", (2048, 1792))
     for kind in (4, 7):  # Aiming wisps and active movement afterimages.
         for frame in range(FRAMES):
             phase = frame * 2 * pi / FRAMES
@@ -38,6 +38,8 @@ def bake():
     pack_painted(atlas)
     pack_ground(atlas)
     pack_warnings(atlas)
+    warning_source = Path(__file__).resolve().parents[1] / "assets/vfx/warning_shapes.png"
+    atlas.paste(Image.open(warning_source).convert("RGBA"), (1024, 0))
     target = Path(__file__).resolve().parents[1] / "assets/vfx/attack_effects.png"
     atlas.save(target)
     print(f"Attack atlas: {atlas.size}, {target.stat().st_size} bytes")

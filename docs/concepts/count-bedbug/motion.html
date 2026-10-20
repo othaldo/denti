@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="de">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Denti · Umhang-Graf · Bewegungsstudie</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#211b28;color:#f8eddb;font:16px/1.5 system-ui,sans-serif}main{max-width:1040px;margin:auto;padding:28px 24px}h1{margin:4px 0 12px;font-size:30px}p{color:#cebdcf;max-width:780px}.eyebrow{font-size:12px;color:#e4b965;letter-spacing:.12em}.stage{height:320px;border-radius:18px;background:#aaa9a5;position:relative;display:flex;justify-content:center;align-items:end;padding-bottom:30px;overflow:hidden}.actor{position:relative;overflow:hidden;flex-shrink:0}.actor img{position:absolute;max-width:none}.actions{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}button,a{color:#f8eddb}button{font:inherit;background:#403047;border:1px solid #9a7b70;border-radius:20px;padding:8px 16px;cursor:pointer}button[aria-pressed=true]{background:#705638;border-color:#efc77d}.track{height:5px;border-radius:5px;overflow:hidden;background:#544557}.track div{height:100%;background:#efc77d;width:0}.status{height:32px;margin:10px 0;color:#edc780}.smallstage{display:flex;align-items:end;justify-content:center;min-height:140px;background:#aaa9a5;border-radius:14px;padding:16px}.note{font-size:14px}a{color:#edc780}.atlas{width:100%;height:auto;margin-top:12px;border-radius:14px;background:#aaa9a5}
+</style>
+<main><div class="eyebrow">ENTWURF C · AUSGEWÄHLT</div><h1>Auffächern. Schlag. Gegenschlag.</h1><p><a href="rig.html">→ Weiter zur neuen Knochenanimation aus Godot</a></p><p>Vier gemalte Posen zeigen die Richtung: Der Graf öffnet seinen Umhang und schlägt mit den beiden Seiten zu. Kurze Schläge, erneutes Ausholen und eine erkennbare Erholung.</p>
+<div class="stage" id="stage"></div><div class="status" id="status" aria-live="off">Ruhe</div><div class="track"><div id="progress"></div></div>
+<div class="actions"><button id="play" aria-pressed="false">Abspielen</button><button data-frame="0">Ruhe</button><button data-frame="1">Auffächern</button><button data-frame="2">Schlag</button><button data-frame="3">Gegenschlag</button></div>
+<p class="note">112 px · alle Posen mit demselben Maßstab:</p><div class="smallstage" id="smallstage"></div>
+<p class="note">Bewegungsstudie mit vier Posen, noch keine fertige Spielanimation und kein spielbarer Kampf. Der gezeigte Rhythmus ist ein Entwurf. Dies ist die frühere Posenstudie; den inzwischen integrierten Kampf zeigt fight.html.</p>
+<p><a href="index.html">Drei Entwürfe vergleichen</a> · <a href="../count-bedbug.md">Kampfentwurf</a></p>
+<details><summary>Die vier generierten Originalposen</summary><img class="atlas" src="c-poses.png" alt="Graf C: Ruhe, Auffächern, Schlag und Gegenschlag auf transparentem Grund"></details>
+</main><script src="poses.js"></script><script>
+const poses=window.COUNT_POSES;const labels=['Ruhe','Auffächern','Schlag','Gegenschlag'];let playing=false,elapsed=0,last=0,current=-1;
+const maxSide=Math.max(...poses.boxes.map(([x,y,r,b])=>Math.max(r-x,b-y)));
+function makeActor(size){const actor=document.createElement('div');actor.className='actor';actor.style.width=size+'px';actor.style.height=size+'px';const image=document.createElement('img');image.src='c-poses.png';image.alt='Umhang-Graf';const scale=size/maxSide;image.style.width=poses.width*scale+'px';image.style.height=poses.height*scale+'px';actor.append(image);return{actor,image,size,scale};}
+const big=makeActor(250),small=makeActor(112);document.getElementById('stage').append(big.actor);document.getElementById('smallstage').append(small.actor);
+function show(frame){current=frame;const[x,y,r,b]=poses.boxes[frame];for(const a of [big,small]){a.image.style.left=(a.size-(r-x)*a.scale)/2-x*a.scale+'px';a.image.style.top=a.size-b*a.scale+'px';a.image.style.clipPath=`inset(${y/poses.height*100}% ${(poses.width-r)/poses.width*100}% ${(poses.height-b)/poses.height*100}% ${x/poses.width*100}%)`;}document.getElementById('status').textContent=labels[frame];document.querySelectorAll('[data-frame]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.frame)===frame)));}
+function setPlaying(value){playing=value;document.getElementById('play').textContent=value?'Anhalten':'Abspielen';document.getElementById('play').setAttribute('aria-pressed',String(value));last=0;}
+document.getElementById('play').onclick=()=>setPlaying(!playing);document.querySelectorAll('[data-frame]').forEach(b=>b.onclick=()=>{setPlaying(false);show(Number(b.dataset.frame));});
+function tick(now){if(playing){if(last)elapsed+=(now-last)/1000;const t=elapsed%3.4;const frame=t<.25?0:t<1.1?1:t<1.25?2:t<2?1:t<2.15?3:0;if(frame!==current)show(frame);document.getElementById('progress').style.width=t/3.4*100+'%';last=now;}requestAnimationFrame(tick);}show(0);if(!matchMedia('(prefers-reduced-motion: reduce)').matches)setPlaying(true);requestAnimationFrame(tick);
+</script></html>

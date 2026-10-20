@@ -2,10 +2,12 @@ extends SceneTree
 
 class LocalWarning extends Node2D:
 	var enemy: Enemy
+	var faded := false
 	func _draw() -> void:
-		enemy.draw_attack_visuals(self)
+		enemy.draw_attack_visuals(self, Transform2D.IDENTITY, Preview.TEST_DENSITY if faded else WarningVisualDensity.NO_SCALES)
 
 class Preview extends Node2D:
+	static var TEST_DENSITY := PackedFloat32Array([1, 1, 0.5, 0.3, 0.2, 0.3, 0.5, 1, 1])
 	var entries: Array[Enemy] = []
 	var atlas_fill := false
 	var total_us := 0
@@ -13,6 +15,7 @@ class Preview extends Node2D:
 	var verify_local := false
 	var faded_raster := false
 	var use_density := false
+	var painted_baseline := false
 	var density := WarningVisualDensity.new()
 	func _process(delta: float) -> void:
 		if use_density and atlas_fill:
@@ -22,17 +25,27 @@ class Preview extends Node2D:
 		if verify_local:
 			return
 		var start := Time.get_ticks_usec()
-		if use_density and atlas_fill:
+		if atlas_fill:
 			for enemy in entries:
 				draw_set_transform_matrix(enemy.transform)
-				enemy.draw_warning_fill(self, enemy.transform, density.scales.get(enemy.get_instance_id(), WarningVisualDensity.FULL_SCALES))
+				var opacity: PackedFloat32Array = TEST_DENSITY if faded_raster else (density.scales.get(enemy.get_instance_id(), WarningVisualDensity.FULL_SCALES) if use_density else WarningVisualDensity.NO_SCALES)
+				enemy.draw_warning_fill(self, enemy.transform, opacity)
+		elif painted_baseline:
+			for enemy in entries:
+				draw_set_transform_matrix(enemy.transform)
+				var progress := 1.0 - clampf(enemy.special_timer / maxf(enemy.data.warning_time, 0.01), 0, 1)
+				var tint := Color(0.50, 0.88, 0.14, 0.9) * enemy.modulate * enemy.self_modulate
+				tint.a *= lerpf(0.55, 1, progress)
+				AttackEffects.strip(self, AttackEffects.Shape.LANE, enemy.warning_lane_start(), enemy.warning_lane_end(), enemy.warning_lane_half_width() * 2.0 / AttackEffects.LANE_EDGE, tint, progress * 0.6, enemy.transform)
 		for enemy in entries:
 			var base := enemy.transform
 			draw_set_transform_matrix(base)
-			if use_density:
+			if painted_baseline and not atlas_fill:
+				enemy.draw_attack_visuals(self, base, WarningVisualDensity.NO_SCALES, false)
+			elif use_density:
 				enemy.draw_attack_visuals(self, base, WarningVisualDensity.NO_SCALES, not atlas_fill)
 			elif atlas_fill:
-				enemy.draw_attack_visuals(self, base, WarningVisualDensity.FULL_SCALES if faded_raster else WarningVisualDensity.NO_SCALES)
+				enemy.draw_attack_visuals(self, base, WarningVisualDensity.NO_SCALES, false)
 			else:
 				var lane_color := Color(0.50, 0.88, 0.14, 0.9)
 				var progress := 1.0 - clampf(enemy.special_timer / maxf(enemy.data.warning_time, 0.01), 0.0, 1.0)
@@ -61,6 +74,7 @@ func _run() -> void:
 	CombatDrawCache.prepare()
 	var preview := Preview.new()
 	preview.use_density = "--density" in OS.get_cmdline_user_args()
+	preview.painted_baseline = "--painted" in OS.get_cmdline_user_args()
 	for index in (20 if preview.use_density else 60):
 		var enemy := Enemy.new()
 		enemy.configure(WaveController.ACID_SPITTER, null, 17)
@@ -110,6 +124,7 @@ func _verify(preview: Preview) -> void:
 	for enemy in preview.entries:
 		var local := LocalWarning.new()
 		local.enemy = enemy
+		local.faded = preview.faded_raster
 		preview.add_child(local)
 	for progress in [0.05, 0.5, 0.95]:
 		for transform in [Transform2D.IDENTITY, Transform2D(0.3, Vector2(0.7, 1.2), 0.15, Vector2.ZERO), Transform2D(-0.2, Vector2(-1.0, 0.8), 0.0, Vector2.ZERO)]:

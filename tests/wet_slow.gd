@@ -21,6 +21,7 @@ func _enemy(data: EnemyData) -> Enemy:
 	enemy.set_physics_process(false)
 	enemy.special_timer = 100.0
 	if enemy.pillow_encounter != null: enemy.pillow_encounter.cooldown = 100.0
+	if enemy.cloak_encounter != null: enemy.cloak_encounter.remaining = 100.0
 	return enemy
 
 
@@ -74,7 +75,7 @@ func _run() -> void:
 	boss.start_overtime()
 	boss.advance_overtime(10)
 	boss.apply_wet(2.5)
-	var rage_speed := 1.0 if boss.pillow_encounter != null else 1.25
+	var rage_speed := boss.cloak_encounter.profile.chase_factor if boss.cloak_encounter != null else (1.0 if boss.pillow_encounter != null else 1.25)
 	_check(_distance_matches(_travel(boss), boss.move_speed * boss.overtime_speed_factor() * 0.95 * rage_speed * STEP), "wet discarded boss overtime/rage speed")
 	boss.free()
 	# Locked dashes keep their advertised travel/timing even when wet.

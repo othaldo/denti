@@ -9,6 +9,7 @@ static func capture(enemy: Enemy) -> Dictionary:
 		"inflicted_statuses": enemy.inflicted_statuses.duplicate(true),
 		"health": enemy.health, "phase": enemy.special_phase,
 		"timer": enemy.special_timer, "direction": SnapshotValues.vector_data(enemy.special_direction),
+		"charge_aim_distance": enemy.charge_aim_distance,
 		"boss_move": enemy.boss_move, "boss_charge_next": enemy.boss_charge_next,
 		"boss_dash_end": SnapshotValues.vector_data(enemy.boss_dash_end), "boss_dash_origin": SnapshotValues.vector_data(enemy.boss_dash_origin),
 		"dying": enemy.dying, "death_elapsed": enemy.death_elapsed, "enraged": enemy.is_enraged,
@@ -28,6 +29,7 @@ static func capture(enemy: Enemy) -> Dictionary:
 		"boss_radial_volley_timer": enemy.boss_radial_volley_timer,
 		"boss_radial_volley_index": enemy.boss_radial_volley_index,
 		"pillow": enemy.pillow_encounter.save_data() if enemy.pillow_encounter != null else {},
+		"cloak": enemy.cloak_encounter.save_data() if enemy.cloak_encounter != null else {},
 	}
 
 
@@ -46,6 +48,8 @@ static func restore(enemy: Enemy, entry: Dictionary, boss_pending: bool = false)
 	enemy.special_phase = clampi(int(entry.get("phase", 0)), 0, 2) as Enemy.SpecialPhase
 	enemy.special_timer = maxf(float(entry.get("timer", 0.0)), 0.0)
 	enemy.special_direction = SnapshotValues.read_vector(entry.get("direction", [0.0, 0.0]))
+	# Old saves keep the already announced direction and reveal its full path.
+	enemy.charge_aim_distance = maxf(float(entry.get("charge_aim_distance", 0.0)), 0.0)
 	enemy.boss_move = clampi(int(entry.get("boss_move", Enemy.BossMove.PULSE)), 0, 1) as Enemy.BossMove
 	enemy.boss_charge_next = bool(entry.get("boss_charge_next", true))
 	enemy.boss_dash_end = SnapshotValues.read_vector(entry.get("boss_dash_end", [0.0, 0.0]))
@@ -80,4 +84,6 @@ static func restore(enemy: Enemy, entry: Dictionary, boss_pending: bool = false)
 		enemy.boss_radial_volley_index = clampi(int(entry.get("boss_radial_volley_index", 0)), 0, maxi(enemy.data.boss_radial_volley_count + enemy.difficulty.boss_volley_bonus, 1))
 	if enemy.pillow_encounter != null:
 		enemy.pillow_encounter.restore(entry.get("pillow", {}))
+	if enemy.cloak_encounter != null:
+		enemy.cloak_encounter.restore(entry.get("cloak", {}))
 	enemy.queue_redraw()

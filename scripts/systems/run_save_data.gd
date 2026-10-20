@@ -122,6 +122,16 @@ static func _valid_structure(value: Dictionary) -> bool:
 		if not _containers(entry, ["motion"], []):
 			return false
 	for entry in value.get("enemies", []):
+		if not _containers(entry, ["cloak"], []): return false
+		var cloak: Dictionary = entry.get("cloak", {})
+		if not _containers(cloak, [], ["origin", "direction"]): return false
+		for key in ["origin", "direction"]:
+			if cloak.has(key):
+				if cloak[key].size() != 2: return false
+				for coordinate in cloak[key]:
+					if not (coordinate is float or coordinate is int): return false
+		for key in ["version", "state", "remaining", "elapsed", "strike_index", "count", "hit_mask", "cycle", "variant", "half_angle"]:
+			if cloak.has(key) and not (cloak[key] is float or cloak[key] is int): return false
 		if not _containers(entry, ["pillow"], []): return false
 		var pillow: Dictionary = entry.get("pillow", {})
 		if not _containers(pillow, [], ["origin", "forward"]): return false
@@ -147,7 +157,7 @@ static func _valid_structure(value: Dictionary) -> bool:
 static func _valid_scalars(value: Variant, field: String = "") -> bool:
 	# These fields are numeric maps or arrays; other primitive fields may be bools/IDs.
 	const NUMBER_ARRAYS := ["position", "direction", "boss_dash_end", "boss_dash_origin", "horde_waves", "burst_times", "elite_times", "elite_counts", "hits", "orbit_hits", "kill_events"]
-	const NUMBER_FIELDS := ["wave", "xp", "xp_goal", "level", "coins", "duration", "remaining", "spawn_cooldown", "burst_index", "elite_index", "elite_time", "reroll_cost", "tier", "price", "invested_coins", "affix_slots", "x", "y", "dx", "dy", "damage", "health", "timer", "phase", "boss_move", "cooldown", "focus_target", "focus_hits", "focus_time", "pending_levels", "level_rerolls", "step", "scrap_coins"]
+	const NUMBER_FIELDS := ["wave", "xp", "xp_goal", "level", "coins", "duration", "remaining", "spawn_cooldown", "burst_index", "elite_index", "elite_time", "reroll_cost", "tier", "price", "invested_coins", "affix_slots", "x", "y", "dx", "dy", "damage", "health", "timer", "phase", "boss_move", "cooldown", "focus_target", "focus_hits", "focus_time", "pending_levels", "level_rerolls", "step", "scrap_coins", "charge_aim_distance"]
 	if field in NUMBER_ARRAYS:
 		if not value is Array:
 			return false

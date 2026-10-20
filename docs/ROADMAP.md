@@ -10,7 +10,7 @@ Das nächste Ziel: ein kompakteres Kampf-HUD, eine bewusste Dash-Entscheidung, v
 - Vier Story-Areas mit Dialogen und Ortswechseln: **Unter dem Kissen**, **Das süße Verderben**, **Tief im Säurestrom**, **Die letzte Krone**.
 - 18 reguläre Waffen, sechs geheime Evolutionen, 93 Shop-Items, fünf Relikte und zwölf Grundattribute. Startwaffen sind bisher Zauberbürste, Turbo-Bohrer und Wasserflosser. Die Wurzelanzahl ist ein gespeicherter Spielerparameter, Standard 6; [Konfiguration](PLAYER_ROOTS.md).
 - Ununterbrochener Kampf; danach Beutesammlung, Levelaufstiege, Upgrade-Kapseln, gegebenenfalls Relikt und Story-Übergang, anschließend Shop. Dieser Ablauf bleibt erhalten.
-- Gegnerdruck, Projektilmuster, Bossphasen und Entzündung sind vorhanden. Der Graf besitzt einen eigenen Kissen-/Faltenablauf; Prinz, König und Imperator teilen noch den alten wesentlichen Kampfablauf. Andere Projektile und mehr Salven reichen als Unterscheidung noch nicht aus.
+- Gegnerdruck, Projektilmuster, Bossphasen und Entzündung sind vorhanden. Der Graf besitzt einen eigenen Umhang-/Sektorenablauf; Prinz, König und Imperator teilen noch den alten wesentlichen Kampfablauf. Andere Projektile und mehr Salven reichen als Unterscheidung noch nicht aus.
 - Telemetrie, Run-Rückblick, Speichern/Fortsetzen und automatisierte Tests bilden die Grundlage für weitere Änderungen. Shopgrößen und Atlas-Ausschnitte wurden zuletzt korrigiert; entsprechende Layoutgrenzen sollen auch im Kampf gelten.
 
 Details zum Iststand: [README](../README.md), [Story-Modus](STORY_MODE.md), [Waffen](waffen.md), [Items](items.md), [Codebase-Review](CODEBASE_REVIEW.md). Die ausführliche frühere Planung bleibt im [historischen Planungsstand](ROADMAP_V02.md) erhalten.
@@ -21,7 +21,7 @@ Details zum Iststand: [README](../README.md), [Story-Modus](STORY_MODE.md), [Waf
 | --- | --- | --- |
 | P0 · umgesetzt | Kampf-HUD vereinheitlichen | Animiertes Zahngefäß, dezente XP-Linie und feste Anzeigegrenzen; [Prüfung und Aufnahmen](COMBAT_HUD.md) |
 | P1 · Prototyp umgesetzt | Wurzelkraft und Dash | 100 Punkte pro Dash, ausbaubarer Vorrat und verbindlicher Cooldown; [Umsetzung und Prüfung](DASH.md) |
-| P1 · Graf als Prototyp umgesetzt | Vier Bossidentitäten | Graf: Kissenbahnen und Seitenwechsel; als Nächstes Karies-Prinz mit Karamellfeldern |
+| P1 · Graf als Prototyp umgesetzt | Vier Bossidentitäten | Graf: Umhang-Rig mit erneut zielenden Schlagfolgen; als Nächstes Karies-Prinz mit Karamellfeldern |
 | P2 | Alle Standardwaffen als Starts | Kompaktes Iconraster mit Details und ausdrücklicher Auswahlbestätigung |
 | Danach | Synergien und Feinschliff | Begrenzte Dash-Synergien, eventuell Cooldown-Reduktion und Balance aller Starts |
 
@@ -122,26 +122,33 @@ Die Herrschertitel und ihre Storyfunktion bleiben erhalten. Jeder Boss erhält e
 
 | Area / Boss | Kampfidee | Typische Antwort |
 | --- | --- | --- |
-| Unter dem Kissen / Karies-Graf | Kissenstürze und wandernde Falten bilden angekündigte Bahnen | Freie Bahn lesen, rechtzeitig die Seite wechseln |
+| Unter dem Kissen / Karies-Graf | Neu zielende Umhangschläge mit Knochenanimation | Warnsektoren verlassen, jeden Nachschlag neu lesen |
 | Das süße Verderben / Karies-Prinz | Geworfene Zuckerbomben hinterlassen begrenzte Karamellfelder | Freien Boden erhalten, Ablageorte der Bomben planen |
 | Tief im Säurestrom / Karies-König | Säureströme verändern vorhersehbar die sicheren Ufer | Nächste sichere Position vorausplanen |
 | Die letzte Krone / Karies-Imperator | Eine gerichtete Kronenwache und wechselnde Hofsektoren | Verwundbare Seite erreichen und sichere Sektoren nutzen |
 
-### Karies-Graf: Herr unter dem Kissen
+### Karies-Graf: der Umhang-Graf
 
-**Prototyp umgesetzt:** Eigene generierte Silhouette, angekündigte Kissenstürze,
-wandernde Stofffalten, versetzte zweite Bahn, Nahkampf-Pausen, Save/Resume und
-Migration alter Graf-Zustände. [Ablauf, Aufnahmen, Prompts und Messwerte](COUNT_PILLOW.md).
-Der isolierte Nahkampfvergleich mit Grundbewegung liegt bei rund 29 Sekunden;
-Fernkampf mit ständiger Reichweite bei knapp 19 Sekunden. Menschliche Tests der
-kompletten Welle, Touch-Steuerung und Web-Performance bleiben offen.
+**Im Kampf integriert:** Der vom Spieler ausgewählte Bettwanzen-Vampir C
+verwendet zwölf Knochen und zwei gewichtete Stoffnetze. Die zu langsamen
+Kissenbahnen wurden durch zwei, später drei schnell ausgeführte Umhangschläge
+mit erneutem Zielen und kurzem Nachsetzen ersetzt. Eine Zustandsmaschine
+synchronisiert Animation, Warnfläche und tatsächliches Trefferfenster.
+[Ablauf, Aufnahmen, Prüfungen und Vergleich](COUNT_CLOAK.md).
 
-- Der Graf kämpft an wenigen gut sichtbaren Positionen. Er markiert einen breiten Kissensturz als Rechteck auf dem Boden; erst danach schlägt das Kissen ein.
-- Nach dem Einschlag wandert eine klar angekündigte Falte durch eine Bahn. Eine benachbarte Bahn bleibt frei. Die Spielerentscheidung ist ein Seitenwechsel statt dauerhaftes Kreisen um den Boss.
-- Eine spätere Phase lässt zwei versetzte Stürze folgen. Sie überlappen zeitlich so, dass ein lesbarer Weg bestehen bleibt; es gibt immer eine Erholungspause mit erreichbarem Boss.
-- Optische Richtung: Kissenumhang, Stofffalten und verlorene Zahnfee-Münzen. Kleine Staub-/Krümelgruppen können Druck geben, ersetzen aber den Kissenablauf nicht.
+- Erste Vorwarnung 0,85 s, Nachschläge jeweils 0,75 s; jede Ankündigung bleibt
+  anschließend orts- und richtungsfest. Nur die Erholung verkürzt sich bei Entzündung.
+- Die Sektoren sind an Wänden schmaler. Grundtempo-Routen, Dashstrecken,
+  Einmaltreffer, zwei Grafen, Pause und Fortsetzen sind geprüft.
+- Keine zusätzlichen HP oder generischen Phasenringe. Im isolierten Vergleich
+  kündigt der neue Graf neun statt drei Angriffe an. Nur einmaliges Ausweichen
+  reicht dort nicht mehr; auf jede Warnung reagierende Grundbewegung bleibt schadensfrei.
+- Rig und neues Porträt werden auch im echten Run beziehungsweise Storydialog verwendet.
+  Die frühere Kissenfassung bleibt als historischer Vergleich dokumentiert.
 
-**Abnahme:** Schon der erste Angriff erklärt das Bahnenprinzip. Ein Basis-Denti kann jede Folge mit normaler Bewegung lösen. Reihenfolge und Rhythmus sind erkennbar anders als die bisherigen Charge-/Ringkombinationen.
+**Offene Abnahme:** Der isolierte Kampf mit synthetischen 120 Roh-DPS liegt
+bei knapp 19 s. Menschlicher Vergleich der vollen Welle, langsame Builds,
+Touch und Web-Performance bleiben offen; das ist noch keine Balancefreigabe.
 
 ### Karies-Prinz: Die Karamellküche
 
@@ -223,7 +230,7 @@ Pro Boss werden TTK, Schaden nach Angriffsquelle, Treffer während Vorwarnung/ak
 | 1 · umgesetzt | Animiertes Zahngefäß, XP-Randlinie, kompakter Timer, getrennte Bossanzeigen | Größen, Textgrenzen, Statusanzeigen, sechs Auflösungen und native Bilder; [Nachweis](COMBAT_HUD.md) |
 | 2 · umgesetzt | Dash-Basis inklusive Touchbutton, Kontaktstopp und Save/Resume | Eine Ladung, beide Sperren, keine neuen Schutzframes, Streckenprüfung und native Darstellung geprüft |
 | 3 · Prototyp umgesetzt | Wurzelkraft-Attribut, wenige passende Angebote und Telemetrie | Wartezeiten, Stat-/Save-Kompatibilität und Limit geprüft; Druck-/Balance-Playtest noch offen |
-| 4 · Prototyp umgesetzt | Karies-Graf als erster eigener Encounter | Bahnen, Streckenprüfung, Bossabschluss, Alt-Saves, native Mobile-Ansichten und isolierter Nah-/Fernvergleich; menschliche Abnahme offen |
+| 4 · Prototyp umgesetzt | Karies-Graf als erster eigener Encounter | Umhang-Rig, Warnsektoren, Nachschläge, Dash-Streckenprüfung, Fortsetzen und nativer Nah-/Fernvergleich; menschliche Abnahme offen |
 | 5 | Karies-Prinz, dann Karies-König, dann Karies-Imperator | Je Boss erst eigener Ablauf samt Grenzen und Tests, dann nächster Encounter |
 | 6 | Alle 18 Standardwaffen im Iconraster mit Details und Bestätigung | Vollständiger Katalog, Auswahlablauf, frühe Wellen und UI pro Start prüfen |
 | 7 | Balance aller Starts und gegebenenfalls Dash-Cooldown-Items | Endlos-/Schwierigkeitsvergleich wiederholen |

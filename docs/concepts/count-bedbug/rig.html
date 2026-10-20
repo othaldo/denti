@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="de"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Denti · Graf C · Das erste Rig</title>
+<style>*{box-sizing:border-box}body{margin:0;background:#241c2d;color:#f8eedc;font:16px/1.6 system-ui,sans-serif}main{max-width:1100px;padding:28px 24px;margin:auto}h1{font-size:30px;margin:4px 0 12px}p{color:#d6c3d9;max-width:850px}.tag{color:#e6bb6b;letter-spacing:.12em;font-size:12px}img,video{display:block;width:100%;height:auto;border:1px solid #614a66;border-radius:16px}button{background:#4b354f;color:#f8eedc;border:1px solid #c29a68;border-radius:20px;padding:9px 18px;font:inherit;cursor:pointer;margin:15px 0}a{color:#e6bb6b}.note{font-size:14px}strong{color:#f8eedc}</style>
+<main><div class="tag">DENTI · GRAF C · NATIVER GODOT-PROTOTYP</div><h1>Jetzt bewegt sich das Skelett.</h1><p><a href="fight.html">→ Den integrierten Kampf im Spiel ansehen</a></p>
+<p>Zwölf Knochen bewegen Körper, Kopf, Fühler, Füße und beide Umhangseiten. Der Stoff folgt über zwei gewichtete Netze. Links die Figur, rechts dieselbe Bewegung mit eingeblendetem Skelett; unten der kleine Spielmaßstab.</p>
+<video id="preview" src="rig.mp4" poster="rig-open.png" controls muted loop playsinline aria-label="Native Godot-Aufnahme der Knochenanimation mit Stoffnetz"></video>
+<button id="toggle" aria-pressed="false">Animation abspielen</button>
+<p><strong>Der schnelle Schlag und das Nachschwingen kommen aus dem Rig.</strong> In dieser Aufnahme werden keine Ganzkörperbilder ausgetauscht. Gesicht und Körper behalten ihre Proportionen; die Stoffseiten dürfen sich kontrolliert biegen.</p>
+<p class="note">Die Aufnahme stammt aus Godot und zeigt einen visuellen Prototyp. Das Rig ist inzwischen im regulären Bosskampf integriert. Diese ältere Aufnahme zeigt die isolierte Animation; oben geht es zur aktuellen Kampfaufnahme.</p>
+<p><a href="../count-rig.md">Umsetzung, Prüfung und Grafikprompt</a> · <a href="index.html">Frühere Entwürfe</a> · <a href="rig.mp4">Video in Originalgröße</a></p>
+</main><script>
+const button=document.getElementById('toggle'),video=document.getElementById('preview');
+function sync(){button.textContent=video.paused?'Animation abspielen':'Animation anhalten';button.setAttribute('aria-pressed',String(!video.paused));}
+button.onclick=()=>{if(video.paused)video.play().catch(sync);else video.pause();};
+video.addEventListener('play',sync);video.addEventListener('pause',sync);
+if(!matchMedia('(prefers-reduced-motion: reduce)').matches)video.play().catch(sync);
+</script></html>

@@ -1,0 +1,126 @@
+{
+	"date": "2026-10-20",
+	"method": "Isolated wave 5 Normal; 120 raw DPS while in range, no weapons/items/adds/dash; seeded setup, fixed 60 Hz, capped at 90 seconds (defeated=false is not a kill time). Scripted movement, not human play or full-wave balance. One sidestep reacts only to the first cloak warning per combo; each warning uses the nearest radial/edge-normal exit including body radius. Melee closes to 120 outside warnings. Old pillow movement leaves its original parallel lanes.",
+	"results": [
+		{
+			"attack_uptime": 0.999,
+			"damage_taken": 151.8,
+			"defeated": true,
+			"movement": "stationary",
+			"profile": "old pillow",
+			"range": "melee 148",
+			"ttk_seconds": 18.82,
+			"warnings": 3
+		},
+		{
+			"attack_uptime": 0.657,
+			"damage_taken": 0.0,
+			"defeated": true,
+			"movement": "one sidestep",
+			"profile": "old pillow",
+			"range": "melee 148",
+			"ttk_seconds": 28.6,
+			"warnings": 4
+		},
+		{
+			"attack_uptime": 0.657,
+			"damage_taken": 0.0,
+			"defeated": true,
+			"movement": "each warning",
+			"profile": "old pillow",
+			"range": "melee 148",
+			"ttk_seconds": 28.6,
+			"warnings": 4
+		},
+		{
+			"attack_uptime": 1.0,
+			"damage_taken": 151.8,
+			"defeated": true,
+			"movement": "stationary",
+			"profile": "old pillow",
+			"range": "ranged 600",
+			"ttk_seconds": 18.8,
+			"warnings": 3
+		},
+		{
+			"attack_uptime": 1.0,
+			"damage_taken": 23.6,
+			"defeated": true,
+			"movement": "one sidestep",
+			"profile": "old pillow",
+			"range": "ranged 600",
+			"ttk_seconds": 18.8,
+			"warnings": 3
+		},
+		{
+			"attack_uptime": 1.0,
+			"damage_taken": 23.6,
+			"defeated": true,
+			"movement": "each warning",
+			"profile": "old pillow",
+			"range": "ranged 600",
+			"ttk_seconds": 18.8,
+			"warnings": 3
+		},
+		{
+			"attack_uptime": 0.0,
+			"damage_taken": 1547.5,
+			"defeated": false,
+			"movement": "stationary",
+			"profile": "cloak",
+			"range": "melee 148",
+			"ttk_seconds": 90.0,
+			"warnings": 52
+		},
+		{
+			"attack_uptime": 0.943,
+			"damage_taken": 178.6,
+			"defeated": true,
+			"movement": "one sidestep",
+			"profile": "cloak",
+			"range": "melee 148",
+			"ttk_seconds": 19.93,
+			"warnings": 9
+		},
+		{
+			"attack_uptime": 0.891,
+			"damage_taken": 208.3,
+			"defeated": true,
+			"movement": "each warning",
+			"profile": "cloak",
+			"range": "melee 148",
+			"ttk_seconds": 21.1,
+			"warnings": 9
+		},
+		{
+			"attack_uptime": 1.0,
+			"damage_taken": 267.8,
+			"defeated": true,
+			"movement": "stationary",
+			"profile": "cloak",
+			"range": "ranged 600",
+			"ttk_seconds": 18.8,
+			"warnings": 9
+		},
+		{
+			"attack_uptime": 1.0,
+			"damage_taken": 148.8,
+			"defeated": true,
+			"movement": "one sidestep",
+			"profile": "cloak",
+			"range": "ranged 600",
+			"ttk_seconds": 18.8,
+			"warnings": 9
+		},
+		{
+			"attack_uptime": 1.0,
+			"damage_taken": 0.0,
+			"defeated": true,
+			"movement": "each warning",
+			"profile": "cloak",
+			"range": "ranged 600",
+			"ttk_seconds": 18.8,
+			"warnings": 9
+		}
+	]
+}

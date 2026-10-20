@@ -31,6 +31,10 @@ func _reset() -> PillowEncounter:
 	return boss.pillow_encounter
 
 func _run() -> void:
+	var count_source: EnemyData = EnemyCatalog.CAVITY_COUNT
+	var original_cloak := count_source.cloak_profile
+	count_source.cloak_profile = null
+	count_source.pillow_profile = load("res://data/encounters/count_pillow.tres")
 	var session: Node = root.get_node("GameSession")
 	session.save_path = "user://pillow_encounter_test.json"
 	session.resume_requested = false
@@ -168,4 +172,6 @@ func _run() -> void:
 	paused = false
 	session.clear_run()
 	if failures.is_empty(): print("Pillow boss warnings, swept damage, safe routes, shields, phases, pause, death and save compatibility passed")
+	count_source.cloak_profile = original_cloak
+	count_source.pillow_profile = null
 	finish(0 if failures.is_empty() else 1)

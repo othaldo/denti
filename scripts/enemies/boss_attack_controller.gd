@@ -100,6 +100,9 @@ static func start_boss_phase(enemy: Enemy) -> void:
 	if enemy.pillow_encounter != null:
 		enemy.pillow_encounter.cancel()
 		enemy.boss_phase_burst_fired = true
+	if enemy.cloak_encounter != null:
+		enemy.cloak_encounter.cancel()
+		enemy.boss_phase_burst_fired = true
 	enemy.boss_phase_started.emit(enemy.global_position, enemy.boss_phase)
 	enemy.reinforcements_requested.emit(enemy.data.boss_phase_adds)
 	enemy.queue_redraw()

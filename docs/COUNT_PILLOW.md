@@ -1,5 +1,8 @@
 # Karies-Graf: Herr unter dem Kissen
 
+**Historischer Prototyp.** Im regulären Run durch den [Umhang-Grafen](COUNT_CLOAK.md)
+ersetzt. Die folgenden Aufnahmen und Messwerte dokumentieren den früheren Stand.
+
 Roadmap-Schritt 4 ist als erster eigener Boss-Encounter umgesetzt. Der Graf in
 Welle 5 verwendet dieselbe Ressourcen-ID wie bisher, aber einen eigenen Ablauf.
 Prinz, König und Imperator behalten vorerst ihre bisherigen Attacken.
