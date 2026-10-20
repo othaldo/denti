@@ -1,0 +1,94 @@
+{
+	"date": "2026-10-20",
+	"method": "Isolated wave-5 Normal fixture with seeded setup; 120 raw DPS only within attack range, no items/adds/dash, fixed 60 Hz. Stationary dummy versus scripted base-speed warning avoidance. This is a pressure/uptime comparison, not a human playtest, full-wave balance result or win rate.",
+	"results": [
+		{
+			"attack": "melee 148",
+			"attack_uptime": 0.779,
+			"damage_taken": 525.0,
+			"defeated": true,
+			"movement": "stationary",
+			"peak_projectiles": 16,
+			"profile": "legacy shared charge",
+			"raw_dps_in_range": 120,
+			"ttk_seconds": 24.13
+		},
+		{
+			"attack": "melee 148",
+			"attack_uptime": 0.819,
+			"damage_taken": 40.2,
+			"defeated": true,
+			"movement": "read warnings, base speed",
+			"peak_projectiles": 19,
+			"profile": "legacy shared charge",
+			"raw_dps_in_range": 120,
+			"ttk_seconds": 22.97
+		},
+		{
+			"attack": "ranged 600",
+			"attack_uptime": 1.0,
+			"damage_taken": 479.6,
+			"defeated": true,
+			"movement": "stationary",
+			"peak_projectiles": 3,
+			"profile": "legacy shared charge",
+			"raw_dps_in_range": 120,
+			"ttk_seconds": 18.8
+		},
+		{
+			"attack": "ranged 600",
+			"attack_uptime": 1.0,
+			"damage_taken": 318.7,
+			"defeated": true,
+			"movement": "read warnings, base speed",
+			"peak_projectiles": 3,
+			"profile": "legacy shared charge",
+			"raw_dps_in_range": 120,
+			"ttk_seconds": 18.8
+		},
+		{
+			"attack": "melee 148",
+			"attack_uptime": 0.953,
+			"damage_taken": 151.8,
+			"defeated": true,
+			"movement": "stationary",
+			"peak_projectiles": 0,
+			"profile": "pillow count",
+			"raw_dps_in_range": 120,
+			"ttk_seconds": 19.73
+		},
+		{
+			"attack": "melee 148",
+			"attack_uptime": 0.651,
+			"damage_taken": 0.0,
+			"defeated": true,
+			"movement": "read warnings, base speed",
+			"peak_projectiles": 0,
+			"profile": "pillow count",
+			"raw_dps_in_range": 120,
+			"ttk_seconds": 28.9
+		},
+		{
+			"attack": "ranged 600",
+			"attack_uptime": 1.0,
+			"damage_taken": 151.8,
+			"defeated": true,
+			"movement": "stationary",
+			"peak_projectiles": 0,
+			"profile": "pillow count",
+			"raw_dps_in_range": 120,
+			"ttk_seconds": 18.8
+		},
+		{
+			"attack": "ranged 600",
+			"attack_uptime": 1.0,
+			"damage_taken": 23.6,
+			"defeated": true,
+			"movement": "read warnings, base speed",
+			"peak_projectiles": 0,
+			"profile": "pillow count",
+			"raw_dps_in_range": 120,
+			"ttk_seconds": 18.8
+		}
+	]
+}

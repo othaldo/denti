@@ -1,6 +1,6 @@
 # Denti — Roadmap
 
-Stand: **19.10.2026**, auf Basis des spielbaren Stands 0.5.0 und der anschließenden Refactorings und UI-Korrekturen. **Kampf-HUD und Dash-Prototyp einschließlich ausbaubarem Wurzelkraft-Vorrat sind umgesetzt**; weitere Ausbaustufen und Druck-/Balance-Playtests sind offen. Zahlenwerte bleiben Startwerte, bis Messung und Spieltests abgeschlossen sind.
+Stand: **20.10.2026**, auf Basis des spielbaren Stands 0.5.0 und der anschließenden Refactorings und UI-Korrekturen. **Kampf-HUD, Dash-Prototyp und der erste eigenständige Boss-Encounter (Karies-Graf) sind umgesetzt**; die übrigen drei Bossidentitäten und menschliche Druck-/Balance-Playtests sind offen. Zahlenwerte bleiben Startwerte, bis Messung und Spieltests abgeschlossen sind.
 
 Das nächste Ziel: ein kompakteres Kampf-HUD, eine bewusste Dash-Entscheidung, vier eigenständige Bosskämpfe und mehr unterschiedliche Starts. Denti darf sehr mächtig werden; Positionierung, freie Wege und lesbare Gefahren sollen trotzdem wichtig bleiben.
 
@@ -8,9 +8,9 @@ Das nächste Ziel: ein kompakteres Kampf-HUD, eine bewusste Dash-Entscheidung, v
 
 - 20 Wellen, anschließend optional Endlos; Bossabschlüsse in Welle 5, 10, 15 und 20. Wellenlängen variieren, Bosswellen dauern vor der Entzündung 45 Sekunden.
 - Vier Story-Areas mit Dialogen und Ortswechseln: **Unter dem Kissen**, **Das süße Verderben**, **Tief im Säurestrom**, **Die letzte Krone**.
-- 18 reguläre Waffen, sechs geheime Evolutionen, 93 Shop-Items, fünf Relikte und elf Grundattribute. Startwaffen sind bisher Zauberbürste, Turbo-Bohrer und Wasserflosser.
+- 18 reguläre Waffen, sechs geheime Evolutionen, 93 Shop-Items, fünf Relikte und zwölf Grundattribute. Startwaffen sind bisher Zauberbürste, Turbo-Bohrer und Wasserflosser. Die Wurzelanzahl ist ein gespeicherter Spielerparameter, Standard 6; [Konfiguration](PLAYER_ROOTS.md).
 - Ununterbrochener Kampf; danach Beutesammlung, Levelaufstiege, Upgrade-Kapseln, gegebenenfalls Relikt und Story-Übergang, anschließend Shop. Dieser Ablauf bleibt erhalten.
-- Gegnerdruck, Projektilmuster, Bossphasen und Entzündung sind vorhanden. Die vier Bosse teilen aber weiterhin den wesentlichen Kampfablauf; andere Projektile und mehr Salven reichen als Unterscheidung noch nicht aus.
+- Gegnerdruck, Projektilmuster, Bossphasen und Entzündung sind vorhanden. Der Graf besitzt einen eigenen Kissen-/Faltenablauf; Prinz, König und Imperator teilen noch den alten wesentlichen Kampfablauf. Andere Projektile und mehr Salven reichen als Unterscheidung noch nicht aus.
 - Telemetrie, Run-Rückblick, Speichern/Fortsetzen und automatisierte Tests bilden die Grundlage für weitere Änderungen. Shopgrößen und Atlas-Ausschnitte wurden zuletzt korrigiert; entsprechende Layoutgrenzen sollen auch im Kampf gelten.
 
 Details zum Iststand: [README](../README.md), [Story-Modus](STORY_MODE.md), [Waffen](waffen.md), [Items](items.md), [Codebase-Review](CODEBASE_REVIEW.md). Die ausführliche frühere Planung bleibt im [historischen Planungsstand](ROADMAP_V02.md) erhalten.
@@ -21,7 +21,7 @@ Details zum Iststand: [README](../README.md), [Story-Modus](STORY_MODE.md), [Waf
 | --- | --- | --- |
 | P0 · umgesetzt | Kampf-HUD vereinheitlichen | Animiertes Zahngefäß, dezente XP-Linie und feste Anzeigegrenzen; [Prüfung und Aufnahmen](COMBAT_HUD.md) |
 | P1 · Prototyp umgesetzt | Wurzelkraft und Dash | 100 Punkte pro Dash, ausbaubarer Vorrat und verbindlicher Cooldown; [Umsetzung und Prüfung](DASH.md) |
-| P1 | Vier Bossidentitäten | Jeder Story-Abschluss verlangt eine andere Positionierungsentscheidung |
+| P1 · Graf als Prototyp umgesetzt | Vier Bossidentitäten | Graf: Kissenbahnen und Seitenwechsel; als Nächstes Karies-Prinz mit Karamellfeldern |
 | P2 | Alle Standardwaffen als Starts | Kompaktes Iconraster mit Details und ausdrücklicher Auswahlbestätigung |
 | Danach | Synergien und Feinschliff | Begrenzte Dash-Synergien, eventuell Cooldown-Reduktion und Balance aller Starts |
 
@@ -118,7 +118,7 @@ Speichern/Fortsetzen erhält Ladung, Cooldown, Erholungspause und bei aktivem Da
 
 ## 3. Vier Story-Areas, vier unterschiedliche Bosskämpfe
 
-Die Herrschertitel und ihre Storyfunktion bleiben erhalten. Jeder Boss erhält eine eigene Silhouette, ein eigenes Bewegungsverhalten, einen charakteristischen Angriffsablauf und eine andere Antwort des Spielers. Die folgende Matrix beschreibt die geplante Identität, keine bereits vorhandenen Angriffe.
+Die Herrschertitel und ihre Storyfunktion bleiben erhalten. Jeder Boss erhält eine eigene Silhouette, ein eigenes Bewegungsverhalten, einen charakteristischen Angriffsablauf und eine andere Antwort des Spielers. Der Graf ist als erster eigener Encounter spielbar; die übrigen Zeilen der Matrix beschreiben geplante Angriffe.
 
 | Area / Boss | Kampfidee | Typische Antwort |
 | --- | --- | --- |
@@ -128,6 +128,13 @@ Die Herrschertitel und ihre Storyfunktion bleiben erhalten. Jeder Boss erhält e
 | Die letzte Krone / Karies-Imperator | Eine gerichtete Kronenwache und wechselnde Hofsektoren | Verwundbare Seite erreichen und sichere Sektoren nutzen |
 
 ### Karies-Graf: Herr unter dem Kissen
+
+**Prototyp umgesetzt:** Eigene generierte Silhouette, angekündigte Kissenstürze,
+wandernde Stofffalten, versetzte zweite Bahn, Nahkampf-Pausen, Save/Resume und
+Migration alter Graf-Zustände. [Ablauf, Aufnahmen, Prompts und Messwerte](COUNT_PILLOW.md).
+Der isolierte Nahkampfvergleich mit Grundbewegung liegt bei rund 29 Sekunden;
+Fernkampf mit ständiger Reichweite bei knapp 19 Sekunden. Menschliche Tests der
+kompletten Welle, Touch-Steuerung und Web-Performance bleiben offen.
 
 - Der Graf kämpft an wenigen gut sichtbaren Positionen. Er markiert einen breiten Kissensturz als Rechteck auf dem Boden; erst danach schlägt das Kissen ein.
 - Nach dem Einschlag wandert eine klar angekündigte Falte durch eine Bahn. Eine benachbarte Bahn bleibt frei. Die Spielerentscheidung ist ein Seitenwechsel statt dauerhaftes Kreisen um den Boss.
@@ -216,7 +223,7 @@ Pro Boss werden TTK, Schaden nach Angriffsquelle, Treffer während Vorwarnung/ak
 | 1 · umgesetzt | Animiertes Zahngefäß, XP-Randlinie, kompakter Timer, getrennte Bossanzeigen | Größen, Textgrenzen, Statusanzeigen, sechs Auflösungen und native Bilder; [Nachweis](COMBAT_HUD.md) |
 | 2 · umgesetzt | Dash-Basis inklusive Touchbutton, Kontaktstopp und Save/Resume | Eine Ladung, beide Sperren, keine neuen Schutzframes, Streckenprüfung und native Darstellung geprüft |
 | 3 · Prototyp umgesetzt | Wurzelkraft-Attribut, wenige passende Angebote und Telemetrie | Wartezeiten, Stat-/Save-Kompatibilität und Limit geprüft; Druck-/Balance-Playtest noch offen |
-| 4 | Karies-Graf als erster eigener Encounter | Bahnenprinzip, Bossabschluss, Alt-Saves, Nah-/Fernkampf und Mobile |
+| 4 · Prototyp umgesetzt | Karies-Graf als erster eigener Encounter | Bahnen, Streckenprüfung, Bossabschluss, Alt-Saves, native Mobile-Ansichten und isolierter Nah-/Fernvergleich; menschliche Abnahme offen |
 | 5 | Karies-Prinz, dann Karies-König, dann Karies-Imperator | Je Boss erst eigener Ablauf samt Grenzen und Tests, dann nächster Encounter |
 | 6 | Alle 18 Standardwaffen im Iconraster mit Details und Bestätigung | Vollständiger Katalog, Auswahlablauf, frühe Wellen und UI pro Start prüfen |
 | 7 | Balance aller Starts und gegebenenfalls Dash-Cooldown-Items | Endlos-/Schwierigkeitsvergleich wiederholen |

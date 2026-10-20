@@ -20,6 +20,7 @@ func _enemy(data: EnemyData) -> Enemy:
 	var enemy: Enemy = game.get_node("Enemies").get_child(-1)
 	enemy.set_physics_process(false)
 	enemy.special_timer = 100.0
+	if enemy.pillow_encounter != null: enemy.pillow_encounter.cooldown = 100.0
 	return enemy
 
 
@@ -73,10 +74,11 @@ func _run() -> void:
 	boss.start_overtime()
 	boss.advance_overtime(10)
 	boss.apply_wet(2.5)
-	_check(_distance_matches(_travel(boss), boss.move_speed * boss.overtime_speed_factor() * 0.95 * 1.25 * STEP), "wet discarded boss overtime/rage speed")
+	var rage_speed := 1.0 if boss.pillow_encounter != null else 1.25
+	_check(_distance_matches(_travel(boss), boss.move_speed * boss.overtime_speed_factor() * 0.95 * rage_speed * STEP), "wet discarded boss overtime/rage speed")
 	boss.free()
 	# Locked dashes keep their advertised travel/timing even when wet.
-	for data in [WaveController.BACTERIA, WaveController.BOSS]:
+	for data in [WaveController.BACTERIA, WaveController.CAVITY_KING]:
 		var charger := _enemy(data)
 		charger.special_direction = Vector2.LEFT
 		charger.boss_move = Enemy.BossMove.CHARGE

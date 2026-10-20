@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/enemies/cavity_count.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/enemies/cavity_count_pillow.png" id="2"]
+[ext_resource type="Resource" path="res://data/encounters/count_pillow.tres" id="3"]
 
 [resource]
 script = ExtResource("1")
@@ -16,6 +17,7 @@ xp_drop = 0
 coin_drop = 0
 sprite = ExtResource("2")
 is_boss = true
+pillow_profile = ExtResource("3")
 inflammation_color = Color(1.0, 0.32, 0.12, 1.0)
 inflammation_intensity = 0.65
 inflammation_aura_size = 3.2
@@ -34,4 +36,4 @@ boss_radial_count = 12
 boss_radial_volley_count = 1
 boss_fan_count = 3
 boss_projectile_speed = 240.0
-boss_phase_adds = 5
+boss_phase_adds = 2

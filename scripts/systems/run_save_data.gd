@@ -122,6 +122,17 @@ static func _valid_structure(value: Dictionary) -> bool:
 		if not _containers(entry, ["motion"], []):
 			return false
 	for entry in value.get("enemies", []):
+		if not _containers(entry, ["pillow"], []): return false
+		var pillow: Dictionary = entry.get("pillow", {})
+		if not _containers(pillow, [], ["origin", "forward"]): return false
+		for key in ["origin", "forward"]:
+			if pillow.has(key):
+				if pillow[key].size() != 2: return false
+				for coordinate in pillow[key]:
+					if not (coordinate is float or coordinate is int): return false
+		for key in ["elapsed", "cooldown", "second_offset", "count", "cycle", "hit_mask"]:
+			if pillow.has(key) and not (pillow[key] is float or pillow[key] is int): return false
+		if pillow.has("active") and not pillow.active is bool: return false
 		if not _containers(entry, ["affix_effects"], ["position", "direction", "boss_dash_end", "boss_dash_origin", "inflicted_statuses"]):
 			return false
 	for entry in value.get("loot", []):

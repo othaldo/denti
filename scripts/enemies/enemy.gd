@@ -81,6 +81,7 @@ var spawn_wave: int = 1
 var active_special_attack: int = EnemyData.SpecialAttack.NONE
 var active_trigger_range: float = 0.0
 var inflammation_aura: BossInflammationAura
+var pillow_encounter: PillowEncounter
 var inflicted_statuses: Array[Dictionary] = []
 var spatial_index: EnemySpatialIndex
 var hit_flash_time: float = 0.0
@@ -147,6 +148,11 @@ func _ready() -> void:
 		inflammation_aura = BossInflammationAura.new()
 		inflammation_aura.configure(data)
 		add_child(inflammation_aura)
+		if data.pillow_profile != null:
+			pillow_encounter = PillowEncounter.new()
+			pillow_encounter.enemy = self
+			pillow_encounter.profile = data.pillow_profile
+			add_child(pillow_encounter)
 
 
 func _notification(what: int) -> void:
@@ -218,7 +224,7 @@ func _physics_process(delta: float) -> void:
 			queue_redraw()
 		if boss_phase_timer > 0.0:
 			boss_phase_timer = maxf(boss_phase_timer - delta, 0.0)
-			if not boss_phase_burst_fired and boss_phase_timer <= data.boss_phase_duration * 0.5:
+			if pillow_encounter == null and not boss_phase_burst_fired and boss_phase_timer <= data.boss_phase_duration * 0.5:
 				boss_phase_burst_fired = true
 				_fire_phase_burst()
 		if boss_radial_volleys_remaining > 0:
@@ -294,6 +300,9 @@ func _update_sprite_facing(direction: Vector2) -> void:
 
 
 func _process_special(delta: float, direction: Vector2) -> void:
+	if pillow_encounter != null:
+		pillow_encounter.advance(delta)
+		return
 	if data.is_boss and boss_phase_timer > 0.0:
 		return
 	var chase_speed := _movement_speed()
@@ -626,6 +635,8 @@ func _finish_death(amount: float, delayed: Array[Dictionary]) -> void:
 		return
 	death_resolved = true
 	health = 0.0
+	if pillow_encounter != null:
+		pillow_encounter.cancel()
 	for addition in delayed:
 		if addition.id == &"fire":
 			affix_effects.remember_fire(addition.damage, addition.can_spread)

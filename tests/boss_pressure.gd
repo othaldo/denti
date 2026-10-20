@@ -47,12 +47,8 @@ func _run() -> void:
 		seconds += 0.1
 		if boss.boss_phase == 1 and boss.boss_phase_burst_fired and not phase_saved:
 			var projectile_count: int = game.get_node("EnemyProjectiles").get_child_count()
-			if projectile_count < 8 or game.get_node("Enemies").get_child_count() < 6:
-				_fail("boss phase lacked telegraphed projectiles or reinforcements")
-				return
-			var projectile: AcidProjectile = game.get_node("EnemyProjectiles").get_child(-1)
-			if projectile.projectile_color.r < 0.9 or projectile.projectile_color.b < 0.5:
-				_fail("boss projectiles are not visually distinct")
+			if projectile_count != 0 or boss.pillow_encounter == null or game.get_node("Enemies").get_child_count() < 3:
+				_fail("count phase lacks its own encounter or bounded reinforcements, or still fires generic rings")
 				return
 			var phase_time: float = boss.boss_phase_timer
 			game._save_run()
@@ -63,8 +59,8 @@ func _run() -> void:
 			await process_frame
 			game = current_scene
 			boss = game.boss
-			if boss == null or boss.boss_phase != 1 or not boss.boss_phase_burst_fired or absf(boss.boss_phase_timer - phase_time) > 0.1 or game.get_node("EnemyProjectiles").get_child_count() == 0:
-				_fail("save/resume lost the boss phase or its projectiles")
+			if boss == null or boss.boss_phase != 1 or not boss.boss_phase_burst_fired or absf(boss.boss_phase_timer - phase_time) > 0.1 or boss.pillow_encounter == null:
+				_fail("save/resume lost the boss phase or its pillow encounter")
 				return
 			boss.set_simulation_enabled(false)
 			phase_saved = true

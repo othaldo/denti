@@ -27,6 +27,7 @@ static func capture(enemy: Enemy) -> Dictionary:
 		"boss_radial_volleys_remaining": enemy.boss_radial_volleys_remaining,
 		"boss_radial_volley_timer": enemy.boss_radial_volley_timer,
 		"boss_radial_volley_index": enemy.boss_radial_volley_index,
+		"pillow": enemy.pillow_encounter.save_data() if enemy.pillow_encounter != null else {},
 	}
 
 
@@ -77,4 +78,6 @@ static func restore(enemy: Enemy, entry: Dictionary, boss_pending: bool = false)
 		enemy.boss_radial_volleys_remaining = clampi(int(entry.get("boss_radial_volleys_remaining", 0)), 0, maxi(enemy.data.boss_radial_volley_count + enemy.difficulty.boss_volley_bonus, 1))
 		enemy.boss_radial_volley_timer = clampf(float(entry.get("boss_radial_volley_timer", 0.0)), 0.0, enemy.data.boss_radial_volley_interval)
 		enemy.boss_radial_volley_index = clampi(int(entry.get("boss_radial_volley_index", 0)), 0, maxi(enemy.data.boss_radial_volley_count + enemy.difficulty.boss_volley_bonus, 1))
+	if enemy.pillow_encounter != null:
+		enemy.pillow_encounter.restore(entry.get("pillow", {}))
 	enemy.queue_redraw()

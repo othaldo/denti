@@ -60,10 +60,9 @@ func _run() -> void:
 	if boss.overtime_seconds != 10:
 		_fail("restarting enrage reset its escalation")
 		return
-	boss.special_phase = Enemy.SpecialPhase.WARNING
-	boss.special_timer = boss.data.warning_time
+	boss.pillow_encounter.begin()
 	boss._process_special(0.1, Vector2.RIGHT)
-	if not is_equal_approx(boss.special_timer, boss.data.warning_time - 0.1):
+	if not is_equal_approx(boss.pillow_encounter.elapsed, 0.1) or boss.pillow_encounter.profile.warning_seconds < 1.0:
 		_fail("enrage shortened the readable warning")
 		return
 	game._refresh_hud()

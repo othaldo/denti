@@ -97,6 +97,9 @@ static func start_boss_phase(enemy: Enemy) -> void:
 	enemy.special_direction = Vector2.RIGHT.rotated(enemy.boss_phase_gap_angle)
 	enemy.special_phase = Enemy.SpecialPhase.COOLDOWN
 	enemy.special_timer = enemy.data.special_interval * (0.72 if enemy.is_enraged else 1.0)
+	if enemy.pillow_encounter != null:
+		enemy.pillow_encounter.cancel()
+		enemy.boss_phase_burst_fired = true
 	enemy.boss_phase_started.emit(enemy.global_position, enemy.boss_phase)
 	enemy.reinforcements_requested.emit(enemy.data.boss_phase_adds)
 	enemy.queue_redraw()

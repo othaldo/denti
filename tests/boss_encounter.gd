@@ -19,7 +19,8 @@ func _run() -> void:
 	game.player.stats.health = 1000.0
 	var center: Vector2 = game.arena.arena_size / 2.0
 	game.player.global_position = center
-	game._create_enemy(WaveController.BOSS, center + Vector2(300.0, 0.0))
+	# The unconverted king still owns the legacy charge/pulse contract.
+	game._create_enemy(WaveController.CAVITY_KING, center + Vector2(300.0, 0.0))
 	var boss: Enemy = game.boss
 	boss.special_timer = 0.0
 	boss._physics_process(0.01)
@@ -53,7 +54,7 @@ func _run() -> void:
 		return
 
 	game.player.hurt_time = 0.0
-	boss.global_position = center + Vector2(80.0, 0.0)
+	boss.global_position = center + Vector2(120.0, 0.0)
 	boss.boss_charge_next = false
 	boss.special_timer = 0.0
 	boss._physics_process(0.01)
