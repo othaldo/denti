@@ -2,6 +2,7 @@ class_name DebugCheatMenu
 extends CanvasLayer
 
 const STAT_FIELDS := [
+	["root_capacity", "Wurzeln", 1.0, 64.0, 1.0],
 	["health", "Leben", 1.0, 100000.0, 1.0],
 	[DentiAttributes.KEYS[DentiAttributes.Type.MAX_HEALTH], "", 1.0, 100000.0, 1.0],
 	[DentiAttributes.KEYS[DentiAttributes.Type.DAMAGE], "", -1000.0, 10000.0, 1.0],
@@ -253,7 +254,7 @@ func refresh() -> void:
 	for child in equipped_rows.get_children():
 		child.free()
 	var equipped: Array[WeaponInstance] = game.player.loadout.equipped()
-	equipped_rows.add_child(_label("Wurzeln · %d/%d" % [game.player.loadout.used_slots(), WeaponLoadout.CAPACITY]))
+	equipped_rows.add_child(_label("Wurzeln · %d/%d" % [game.player.loadout.used_slots(), game.player.loadout.capacity]))
 	for index in equipped.size():
 		var row := HBoxContainer.new()
 		equipped_rows.add_child(row)
@@ -277,7 +278,7 @@ func refresh() -> void:
 
 func _refresh_weapon_button() -> void:
 	var data: WeaponData = WeaponCatalog.ALL[weapon_select.selected]
-	add_weapon_button.disabled = controls.game.player.loadout.used_slots() + data.hands > WeaponLoadout.CAPACITY
+	add_weapon_button.disabled = controls.game.player.loadout.used_slots() + data.hands > controls.game.player.loadout.capacity
 	add_weapon_button.tooltip_text = "Keine freien Wurzeln" if add_weapon_button.disabled else ""
 
 

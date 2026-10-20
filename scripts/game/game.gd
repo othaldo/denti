@@ -110,6 +110,7 @@ func _ready() -> void:
 	wave.elite_requested.connect(_spawn_elite)
 	wave.wave_finished.connect(_on_wave_finished)
 	player.stats.died.connect(_on_player_died)
+	player.stats.root_capacity_changed.connect(_on_root_capacity_changed)
 	player.stats.damage_taken.connect(_record_player_damage)
 	player.dash.started.connect(telemetry.record_dash)
 	player.dash.contact_stopped.connect(telemetry.record_dash_contact)
@@ -176,10 +177,23 @@ func _ready() -> void:
 	_show_starters()
 
 
+func _on_root_capacity_changed() -> void:
+	if in_shop:
+		_update_shop_panel()
+	if game_menu.visible and game_menu.page == &"stats":
+		game_menu._show_stats()
+	if starter_pending:
+		_show_starters()
+
+
 func _show_starters() -> void:
 	get_node("/root/SceneTransitions").present(&"starter")
 	starter_pending = true
-	choice_panel.show_starters(WeaponCatalog.STARTERS)
+	var starters: Array[WeaponData] = []
+	for weapon in WeaponCatalog.STARTERS:
+		if player.loadout.can_acquire(weapon):
+			starters.append(weapon)
+	choice_panel.show_starters(starters)
 	get_tree().paused = true
 	_save_run()
 
@@ -228,7 +242,9 @@ func _on_story_travel_finished() -> void:
 func _on_starter_chosen(weapon: WeaponData) -> void:
 	if not starter_pending:
 		return
-	player.loadout.acquire(weapon)
+	if not player.loadout.acquire(weapon):
+		_show_starters()
+		return
 	starter_pending = false
 	_start_combat_wave()
 

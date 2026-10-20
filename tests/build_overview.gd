@@ -32,7 +32,7 @@ func _run() -> void:
 		if not bounds.encloses(menu.build_panel.get_global_rect()) or menu.rows.get_child(0).text != "Stats":
 			_fail("compact stats exceed viewport %s" % extent)
 			return
-		var weapons: HBoxContainer = menu.rows.get_child(5)
+		var weapons: HBoxContainer = menu.rows.get_node("WeaponScroll").get_child(0)
 		weapons.get_child(0).pressed.emit()
 		for frame in 3:
 			await process_frame

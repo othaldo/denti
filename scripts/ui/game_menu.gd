@@ -377,17 +377,24 @@ func _show_stats() -> void:
 		chip.add_theme_font_size_override("font_size", 14)
 		grid.add_child(chip)
 		chip.pressed.connect(func() -> void: DentiDentikon.open_attribute(chip, type))
-	DentiUIComponents.label(rows, "Wurzeln · %d/6" % game.player.loadout.used_slots(), 16)
+	DentiUIComponents.label(rows, "Wurzeln · %d/%d" % [game.player.loadout.used_slots(), game.player.loadout.capacity], 16)
+	var weapon_scroll := ScrollContainer.new()
+	weapon_scroll.name = "WeaponScroll"
+	weapon_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	weapon_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	weapon_scroll.custom_minimum_size.y = 68
+	rows.add_child(weapon_scroll)
 	var weapons := HBoxContainer.new()
 	weapons.add_theme_constant_override("separation", 4)
-	rows.add_child(weapons)
+	weapons.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	weapon_scroll.add_child(weapons)
 	for weapon in game.player.loadout.equipped():
 		var chip := Button.new()
 		chip.text = WeaponPresentation.tier_text(weapon.data, weapon.tier)
 		chip.icon = weapon.data.sprite
 		chip.expand_icon = true
 		chip.add_theme_constant_override("icon_max_width", 32)
-		chip.custom_minimum_size = Vector2(0, 52)
+		chip.custom_minimum_size = Vector2(76, 52)
 		chip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		chip.size_flags_stretch_ratio = float(weapon.data.hands)
 		chip.tooltip_text = "%s\n%s\n%s" % [WeaponPresentation.weapon_name(weapon), weapon.data.stats_text(weapon.tier), weapon.data.combat_text() + "\n" + AffixPresentation.summary(weapon, game.player.stats, game.items)]

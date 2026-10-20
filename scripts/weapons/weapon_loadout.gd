@@ -1,8 +1,11 @@
 class_name WeaponLoadout
 extends Node2D
 
-const CAPACITY := 6
 const MAX_TIER := 4
+
+var stats: PlayerStats
+var capacity: int:
+	get: return stats.root_capacity if is_instance_valid(stats) else PlayerStats.DEFAULT_ROOT_CAPACITY
 
 
 func evolution_ready(index: int, recipe: WeaponEvolutionRecipe, items: ItemInventory) -> bool:
@@ -24,7 +27,7 @@ func evolution_ready(index: int, recipe: WeaponEvolutionRecipe, items: ItemInven
 			return false
 	if partner != null and not _affixes_fit(selected, partner):
 		return false
-	return used_slots() - selected.data.hands - (partner.data.hands if partner != null else 0) + recipe.result.hands <= CAPACITY
+	return used_slots() - selected.data.hands - (partner.data.hands if partner != null else 0) + recipe.result.hands <= capacity
 
 
 func ready_evolutions(index: int, items: ItemInventory) -> Array[WeaponEvolutionRecipe]:
@@ -90,14 +93,14 @@ func used_slots() -> int:
 func can_acquire(data: WeaponData, tier: int = 1) -> bool:
 	if data.evolution_kind != &"":
 		return false
-	return used_slots() + data.hands <= CAPACITY or (tier < MAX_TIER and _find_tier(data.id, tier) != null)
+	return used_slots() + data.hands <= capacity or (tier < MAX_TIER and _find_tier(data.id, tier) != null)
 
 
 func acquire(data: WeaponData, tier: int = 1, paid_coins: int = -1) -> bool:
 	if not can_acquire(data, tier):
 		return false
 	var value := paid_coins if paid_coins >= 0 else _legacy_value(data, tier)
-	if used_slots() + data.hands <= CAPACITY:
+	if used_slots() + data.hands <= capacity:
 		_add(data, tier, value)
 	else:
 		var matching := purchase_fusion_target(data, tier)
@@ -110,7 +113,7 @@ func acquire(data: WeaponData, tier: int = 1, paid_coins: int = -1) -> bool:
 
 
 func purchase_fusion_target(data: WeaponData, tier: int = 1) -> WeaponInstance:
-	if tier >= MAX_TIER or used_slots() + data.hands <= CAPACITY:
+	if tier >= MAX_TIER or used_slots() + data.hands <= capacity:
 		return null
 	return _best_fusion_partner(data, tier)
 
@@ -159,14 +162,14 @@ func merge(index: int) -> bool:
 	return true
 
 
-func restore(saved: Array) -> void:
+func restore(saved: Array, enforce_capacity: bool = true) -> void:
 	for weapon in equipped():
 		weapon.free()
 	for entry in saved:
 		if not entry is Dictionary:
 			continue
 		var data := WeaponCatalog.by_id(StringName(str(entry.get("id", ""))))
-		if data != null and used_slots() + data.hands <= CAPACITY:
+		if data != null and (not enforce_capacity or used_slots() + data.hands <= capacity):
 			var tier := clampi(int(entry.get("tier", 1)), 1, MAX_TIER)
 			var weapon := _add(WeaponRolls.resolve(data, entry.get("rolls", {}), entry.get("upgrades", {})), tier, maxi(int(entry.get("invested_coins", _legacy_value(data, tier))), 0))
 			weapon.affixes = WeaponAffixes.sanitize(entry.get("affixes", []))

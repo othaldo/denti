@@ -48,7 +48,7 @@ static func shop_view(player: Player, shop: ShopController, items: ItemInventory
 	model.offers = shop.offers
 	model.equipment = equipment
 	model.used_slots = player.loadout.used_slots()
-	model.capacity = WeaponLoadout.CAPACITY
+	model.capacity = player.loadout.capacity
 	model.buyable = buyable
 	model.luck = player.stats.luck
 	model.collected = owned_display

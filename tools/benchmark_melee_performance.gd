@@ -61,7 +61,7 @@ func _run() -> void:
 					_clear_projectiles(pool)
 					var loadout: Array[Dictionary] = []
 					var data := WeaponCatalog.by_id(id)
-					for number in int(WeaponLoadout.CAPACITY / data.hands):
+					for number in int(game.player.loadout.capacity / data.hands):
 						loadout.append({"id": str(id), "tier": 4})
 					game.player.loadout.restore(loadout)
 					var weapons: Array[WeaponInstance] = game.player.loadout.equipped()
@@ -172,7 +172,7 @@ func _run_rendered() -> void:
 			seed(20261006)
 			var data := WeaponCatalog.by_id(id)
 			var loadout: Array[Dictionary] = []
-			for number in int(WeaponLoadout.CAPACITY / data.hands):
+			for number in int(game.player.loadout.capacity / data.hands):
 				loadout.append({"id": str(id), "tier": 4})
 			game.player.loadout.restore(loadout)
 			for number in 110:

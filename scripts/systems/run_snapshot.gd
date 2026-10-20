@@ -77,7 +77,8 @@ static func restore(game, saved: Dictionary) -> void:
 	game.level = maxi(int(saved.get("level", 1)), 1)
 	game.coins = maxi(int(saved.get("coins", 0)), 0)
 	if saved.has("weapons"):
-		player.loadout.restore(saved.get("weapons", []))
+		# A lowered class/challenge limit never silently deletes owned equipment.
+		player.loadout.restore(saved.get("weapons", []), false)
 		# Existing saves with a successfully fused weapon also earn its encyclopedia entry.
 		for weapon in player.loadout.equipped():
 			for recipe in WeaponEvolutions.ALL:

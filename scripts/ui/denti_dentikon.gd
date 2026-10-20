@@ -8,7 +8,7 @@ const MECHANICS := {
 	"Nass": "Wasserangriffe können Gegner durchnässen. Passende Items verändern Dauer und Wechselwirkungen; die konkreten Werte stehen beim Item.",
 	"Blutung": "Blutungsverzauberungen verteilen ihren Schaden über 3 Sekunden. Weitere Treffer addieren ihren Schaden. Zahnseide, Blutungsuhr, Skalpellwachs, Verbreitung und Blutmond unterstützen auch diese Verzauberung. Bei Denti reduziert Härte den Schaden.",
 	"Gift": "Gift an Gegnern verteilt den Zusatzschaden über 5 Sekunden. Wiederholtes Vergiften baut bis zu fünf Stufen auf; neue Anwendungen verursachen bis zu 60 % mehr Schaden. Gift an Denti ignoriert Härte. Laufende Effekte enden nach dem Kampf.",
-	"Wurzeln": "Denti hat sechs Wurzeln. Waffen belegen eine oder zwei. Gleiche Waffen derselben Stufe können bis Stufe IV fusionieren; dabei werden Wurzeln frei.",
+	"Wurzeln": "Die Anzahl deiner Wurzeln bestimmt, wie viele Waffen du ausrüsten kannst. Den aktuellen Vorrat siehst du unter Stats und im Shop. Waffen belegen eine oder zwei. Gleiche Waffen derselben Stufe können bis Stufe IV fusionieren; dabei werden Wurzeln frei.",
 	"Münzen": "Währung für Waffen, Items und Neuwürfeln. Der Pin merkt ein Angebot kostenlos und hält seinen Preis fest.",
 }
 

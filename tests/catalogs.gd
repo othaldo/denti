@@ -33,7 +33,7 @@ func _run() -> void:
 		_check(ShopController.by_id(offer.id) == offer, "weapon offer lookup broken: " + str(offer.id))
 		ids[offer.id] = true
 	for weapon in WeaponCatalog.ALL:
-		_check(ids.has(weapon.id) and weapon.hands > 0 and weapon.hands <= WeaponLoadout.CAPACITY, "weapon lacks valid offer/root cost: " + str(weapon.id))
+		_check(ids.has(weapon.id) and weapon.hands > 0 and weapon.hands <= PlayerStats.DEFAULT_ROOT_CAPACITY, "weapon lacks valid offer/root cost for the default player: " + str(weapon.id))
 		for tier in range(1, 5):
 			_check(weapon.damage_at_tier(tier) > 0 and weapon.interval_at_tier(tier) > 0 and weapon.range_at_tier(tier) > 0, "invalid weapon tier values: " + str(weapon.id))
 	var enemy_paths := {}

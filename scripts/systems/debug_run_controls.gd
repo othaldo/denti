@@ -14,7 +14,7 @@ func _init(run: Node2D) -> void:
 
 func add_weapon(id: StringName, tier: int) -> bool:
 	var data := WeaponCatalog.by_id(id)
-	if not allowed() or data == null or game.player.loadout.used_slots() + data.hands > WeaponLoadout.CAPACITY:
+	if not allowed() or data == null or game.player.loadout.used_slots() + data.hands > game.player.loadout.capacity:
 		return false
 	game.player.loadout.acquire(data, clampi(tier, 1, WeaponLoadout.MAX_TIER), 0)
 	changed()

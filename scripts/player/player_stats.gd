@@ -2,6 +2,7 @@ class_name PlayerStats
 extends Node
 
 signal changed
+signal root_capacity_changed
 signal died
 signal shield_blocked
 signal damage_taken(amount: float)
@@ -20,7 +21,17 @@ const REGEN_INTERVAL_SCALE := 11.25
 const REGEN_POINT_OFFSET := 1.25
 const LEGACY_REGEN_POINT_FACTOR := 2.0
 const MAX_DODGE_CHANCE := 0.60
+const DEFAULT_ROOT_CAPACITY := 6
 const DASH_CONFIG: DashData = preload("res://data/player/dash.tres")
+
+@export_range(1, 64, 1, "or_greater") var root_capacity: int = DEFAULT_ROOT_CAPACITY:
+	set(value):
+		var normalized := maxi(value, 1)
+		if root_capacity == normalized:
+			return
+		root_capacity = normalized
+		root_capacity_changed.emit()
+		changed.emit()
 
 var max_health: float = 100.0
 var health: float = 100.0
@@ -55,6 +66,7 @@ func _init() -> void:
 func to_save_data() -> Dictionary:
 	return {
 		"stat_model_version": STAT_MODEL_VERSION,
+		"root_capacity": root_capacity,
 		"max_health": max_health, "health": health, "damage_bonus": damage_bonus,
 		"melee_damage": melee_damage, "ranged_damage": ranged_damage,
 		"armor": armor, "speed_bonus": speed_bonus, "attack_speed": attack_speed,
@@ -66,6 +78,7 @@ func to_save_data() -> Dictionary:
 
 
 func load_save_data(saved: Dictionary) -> void:
+	root_capacity = int(saved.get("root_capacity", DEFAULT_ROOT_CAPACITY))
 	max_health = maxf(float(saved.get("max_health", max_health)), 1.0)
 	health = clampf(float(saved.get("health", health)), 1.0, max_health)
 	var saved_version := int(saved.get("stat_model_version", 1))

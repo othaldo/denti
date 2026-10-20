@@ -144,7 +144,7 @@ func _update_layout() -> void:
 	left_scroll.size_flags_vertical = Control.SIZE_SHRINK_BEGIN if compact else Control.SIZE_EXPAND_FILL
 	offer_scroll.size_flags_vertical = Control.SIZE_SHRINK_BEGIN if compact else Control.SIZE_EXPAND_FILL
 	main_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO if compact else ScrollContainer.SCROLL_MODE_SHOW_NEVER
-	left_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	left_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO if wide else ScrollContainer.SCROLL_MODE_DISABLED
 	offer_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	offers_grid.columns = 4 if side_by_side else (2 if extent.x >= 600 else 1)
 	offers_section.size_flags_vertical = Control.SIZE_SHRINK_BEGIN if compact else Control.SIZE_EXPAND_FILL
@@ -212,7 +212,7 @@ func _layout_inventory() -> void:
 	inventory_scroll.custom_minimum_size.y = inventory_row.layout_slots(maxf(inventory_scroll.size.x, 180), columns, 44.0 if dense_layout or $Root.size.y < 700 else 56.0)
 
 
-func show_shop(wave_number: int, coins: int, reroll_cost: int, new_offers: Array[ShopOfferData], new_equipment: Array[Dictionary] = [], used_slots: int = 0, capacity: int = 6, buyable: Array[bool] = [], luck: float = 0.0, collected: Array[Dictionary] = [], counts: Dictionary = {}, offer_dps: Array[float] = [], reserved: Array[bool] = []) -> void:
+func show_shop(wave_number: int, coins: int, reroll_cost: int, new_offers: Array[ShopOfferData], new_equipment: Array[Dictionary] = [], used_slots: int = 0, capacity: int = PlayerStats.DEFAULT_ROOT_CAPACITY, buyable: Array[bool] = [], luck: float = 0.0, collected: Array[Dictionary] = [], counts: Dictionary = {}, offer_dps: Array[float] = [], reserved: Array[bool] = []) -> void:
 	var model := ShopViewData.new()
 	model.wave_number = wave_number
 	model.coins = coins

@@ -4,6 +4,10 @@ Zusätzlich gibt es sechs geheime Mk-IV-Evolutionen. Ihre Option erscheint erst,
 
 Denti beginnt ohne fest ins Charakterbild eingebaute Waffe. Vor Welle 1 wählt man Zauberbürste, Turbo-Bohrer oder Wasserflosser. Die übrigen Waffen sowie weitere Exemplare gibt es im Shop.
 
+Standardmäßig besitzt Denti **6 Wurzeln**. Die Kapazität ist ein gespeicherter
+Spielerparameter und kann für Klassen oder Challenges abweichen; angebotene
+Startwaffen müssen in das aktuelle Limit passen. [Konfiguration und Regeln](PLAYER_ROOTS.md).
+
 Bisskraft verstärkt alle Waffen prozentual. Nah- oder Fernschaden ergänzt ihren Basisschaden mit einem individuellen Gewicht; die Waffenkarte zeigt den passenden Stat und seine Skalierung. Schnelle Flächenwaffen erhalten kleinere Gewichte als schwere Einzelangriffe. Fusion erhöht die Waffenbasis, ohne die rohen Stat-Beiträge zusätzlich zu vervielfachen. Die vollständigen Faktoren und Messungen stehen im [Schadens- und Verteidigungsbericht](DAMAGE_DEFENSE_BALANCE.md).
 
 Der aktuelle [DPS-Balancepass vom 4. Oktober 2026](WEAPON_DPS_BALANCE.md) vergleicht alle 18 Waffen auf Stufe I–IV vor und nach den Buffs, einschließlich Blutung, Fokus, Gruppen und DPS pro Wurzel. Nahkampf erhält mehr Schaden für das Risiko; schwächere Fernwaffen erhalten gezielte Verbesserungen. Die Zauberbürste bleibt unverändert.

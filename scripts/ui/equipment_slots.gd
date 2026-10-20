@@ -90,17 +90,37 @@ func show_entries(entries: Array[Dictionary], player: Player, used_slots: int, c
 
 
 func layout_slots(width: float, columns: int, slot_height: float) -> float:
+	# The visible cells come from this player's inventory, including empty roots.
+	# Find contiguous space per row rather than assuming a six-cell backing array.
+	var cells := 0
+	var widest := 1
 	var gap := 5.0
-	var unit := floorf((width - gap * (columns - 1)) / columns)
-	var occupied: Array[bool] = []
-	occupied.resize(WeaponLoadout.CAPACITY)
-	occupied.fill(false)
+	var minimum_unit := 1.0
 	for slot in get_children():
 		var button: Button = slot.get_child(0)
-		var roots := int(button.get_meta("hands", 1))
+		var roots := maxi(int(button.get_meta("hands", 1)), 1)
+		cells += roots
+		widest = maxi(widest, roots)
+		minimum_unit = maxf(minimum_unit, (button.get_minimum_size().x - gap * (roots - 1)) / roots)
+	columns = maxi(widest, mini(maxi(columns, 1), maxi(cells, 1)))
+	columns = maxi(widest, mini(columns, floori((width + gap) / (minimum_unit + gap))))
+	var unit := floorf((width - gap * (columns - 1)) / columns)
+	var occupied: Array[bool] = []
+	for slot in get_children():
+		var button: Button = slot.get_child(0)
+		var roots := maxi(int(button.get_meta("hands", 1)), 1)
 		var position_index := 0
-		while position_index < occupied.size():
-			if position_index % columns + roots <= columns and not occupied[position_index] and (roots == 1 or not occupied[position_index + 1]):
+		while true:
+			if position_index % columns + roots > columns:
+				position_index += columns - position_index % columns
+			if occupied.size() < position_index + roots:
+				occupied.resize(position_index + roots)
+			var fits := true
+			for offset in roots:
+				if occupied[position_index + offset]:
+					fits = false
+					break
+			if fits:
 				break
 			position_index += 1
 		for offset in roots:
@@ -109,7 +129,7 @@ func layout_slots(width: float, columns: int, slot_height: float) -> float:
 		var desired := Vector2(unit * roots + gap * (roots - 1), slot_height)
 		button.custom_minimum_size = desired
 		slot.size = desired
-	var height := ceili(float(WeaponLoadout.CAPACITY) / columns) * (slot_height + gap) - gap
+	var height := maxf(ceili(float(occupied.size()) / columns) * (slot_height + gap) - gap, 0)
 	custom_minimum_size = Vector2(0, height)
 	return height + 4
 
