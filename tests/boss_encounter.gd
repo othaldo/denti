@@ -12,7 +12,7 @@ func _run() -> void:
 	var game: Node2D = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(game)
 	current_scene = game
-	game.choice_panel._on_choice_pressed(0)
+	choose_panel(game.choice_panel, 0)
 	game.wave.active = false
 	game.wave.current_wave = 5
 	game.player.stats.max_health = 1000.0
@@ -70,7 +70,7 @@ func _run() -> void:
 	if game.boss != null or game.choice_panel.mode != &"relic" or not paused or game.shop_panel.visible:
 		_fail("relic choice did not follow the boss death sequence")
 		return
-	game.choice_panel._on_choice_pressed(0)
+	choose_panel(game.choice_panel, 0)
 	if not game.shop_panel.visible:
 		_fail("shop did not follow the boss relic choice")
 		return

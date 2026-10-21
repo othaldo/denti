@@ -23,7 +23,7 @@ func _run() -> void:
 	root.add_child(game)
 	current_scene = game
 	_finish_dialogue(game)
-	game.choice_panel.buttons[0].pressed.emit()
+	choose_panel(game.choice_panel, 0)
 	for milestone in [5, 10, 15, 20]:
 		paused = true
 		game.wave.active = false

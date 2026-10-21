@@ -25,7 +25,7 @@ func _run() -> void:
 	var game: Node2D = GAME_SCENE.instantiate()
 	root.add_child(game)
 	current_scene = game
-	game.choice_panel.buttons[0].pressed.emit()
+	choose_panel(game.choice_panel, 0)
 	paused = true
 	game.wave.active = false
 	# Keep the same cap-reaching late-run build that exposed the flaky layout test.
@@ -78,7 +78,7 @@ func _run() -> void:
 					expected["crit_chance"] = minf(float(expected["crit_chance"]), 0.65)
 				elif chosen.stat == &"max_health":
 					expected["health"] = minf(float(before["health"]) + chosen.amount, float(expected["max_health"]))
-				game.choice_panel.buttons[3].pressed.emit()
+				choose_panel(game.choice_panel, 3)
 				_check_stats(game.player.stats.to_save_data(), expected, "fourth choice effect differs: " + label)
 				_check(game.rewards.pending_levels == 0 and game.in_shop and game.shop_panel.visible, "fourth choice did not resolve before shop: " + label)
 				cases += 1

@@ -24,9 +24,10 @@ func _run() -> void:
 	root.add_child(menu)
 	current_scene = menu
 	await _idle(20)
-	await _measure("new_run", menu._start_new_game.bind(&"normal"))
+	menu._start_new_game(&"normal")
+	menu.setup_selector.select_weapon(0)
+	await _measure("new_run", menu.setup_selector.confirm_selection)
 	var game: Node2D = current_scene
-	game.choice_panel._on_choice_pressed(0)
 	await _idle(48)
 	game._save_run()
 	game.game_menu._to_main_menu()

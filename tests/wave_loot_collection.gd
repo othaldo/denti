@@ -12,7 +12,7 @@ func _run() -> void:
 	var game: Node2D = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(game)
 	current_scene = game
-	game.choice_panel._on_choice_pressed(0)
+	choose_panel(game.choice_panel, 0)
 	var start: Vector2 = game.player.global_position
 	game._spawn_loot(start + Vector2(300.0, 0.0), &"xp", 5)
 	game._spawn_loot(start + Vector2(650.0, 0.0), &"coin", 2)
@@ -37,7 +37,7 @@ func _run() -> void:
 	if not paused or not game.choice_panel.visible or game.shop_panel.visible or game.collecting_wave_loot or game.get_node("Loot").get_child_count() != 0 or game.coins != 2 or game.level != 2:
 		_fail("all drops were not collected before the level-up")
 		return
-	game.choice_panel._on_choice_pressed(0)
+	choose_panel(game.choice_panel, 0)
 	if not paused or not game.shop_panel.visible:
 		_fail("shop did not wait for the level-up choice")
 		return
@@ -90,7 +90,7 @@ func _run() -> void:
 	if not paused or game.coins != 6 or game.choice_panel.mode != &"relic" or game.shop_panel.visible:
 		_fail("boss relic did not wait for the final drop")
 		return
-	game.choice_panel._on_choice_pressed(0)
+	choose_panel(game.choice_panel, 0)
 	if not game.shop_panel.visible:
 		_fail("boss wave shop did not follow the relic choice")
 		return
@@ -118,11 +118,11 @@ func _run() -> void:
 	if game.ended or game.coins != 7 or game.rewards.pending_levels != 1 or game.rewards.pending_chests.size() != 1 or game.choice_panel.mode != &"upgrade":
 		_fail("final rewards did not wait for all drops before victory")
 		return
-	game.choice_panel._on_choice_pressed(0)
+	choose_panel(game.choice_panel, 0)
 	if game.ended or game.choice_panel.mode != &"chest":
 		_fail("final chest choice did not follow the level-up")
 		return
-	game.choice_panel._on_choice_pressed(1)
+	choose_panel(game.choice_panel, 1)
 	if not game.ended or game.coins != 10 or game.choice_panel.mode != &"end":
 		_fail("final chest scrap did not finish before victory")
 		return

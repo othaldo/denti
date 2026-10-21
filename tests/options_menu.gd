@@ -107,7 +107,7 @@ func _run() -> void:
 	root.add_child(game)
 	current_scene = game
 	menu.queue_free()
-	game.choice_panel.buttons[0].pressed.emit()
+	choose_panel(game.choice_panel, 0)
 	if game.hud.fps_panel.visible != selected_fps:
 		_fail("HUD did not apply saved FPS visibility")
 		return

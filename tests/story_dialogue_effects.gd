@@ -141,7 +141,7 @@ func _run() -> void:
 	game.arena.set_story_chapter(StoryCatalog.chapter(game.story.chapter_index))
 	while game.story_dialogue.visible:
 		game._on_story_advance()
-	game.choice_panel.buttons[0].pressed.emit()
+	choose_panel(game.choice_panel, 0)
 	game.wave.active = false
 	game.wave.current_wave = 4
 	game._clear_arena(false)

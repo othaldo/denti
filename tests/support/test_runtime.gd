@@ -49,3 +49,20 @@ func _stop_audio(node: Node) -> void:
 		node.stream = null
 	for child in node.get_children():
 		_stop_audio(child)
+
+
+# Existing gameplay fixtures retain their original three starting loadouts.
+# Exercise the real preview + explicit confirmation flow before combat.
+func choose_panel(panel: ChoicePanel, index: int) -> void:
+	if panel.mode == &"starter":
+		var legacy_ids := [&"magic_toothbrush", &"turbo_drill", &"water_jet"]
+		var selected := panel.starter_options[index].id
+		if index < legacy_ids.size() and WeaponCatalog.by_id(legacy_ids[index]) in panel.starter_options:
+			selected = legacy_ids[index]
+		for option in panel.starter_options.size():
+			if panel.starter_options[option].id == selected:
+				panel.starter_selection.select_weapon(option)
+				panel.starter_selection.confirm_selection()
+				return
+	else:
+		panel._on_choice_pressed(index)

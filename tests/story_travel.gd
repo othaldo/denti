@@ -27,7 +27,7 @@ func _run() -> void:
 	current_scene = game
 	while game.story_dialogue.visible:
 		game._on_story_advance()
-	game.choice_panel.buttons[0].pressed.emit()
+	choose_panel(game.choice_panel, 0)
 	game.wave.active = false
 	game._clear_arena(false)
 	await process_frame

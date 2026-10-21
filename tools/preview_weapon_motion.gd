@@ -47,6 +47,7 @@ func _run() -> void:
 		var game: Node2D = load("res://scenes/game/game.tscn").instantiate()
 		viewport.add_child(game)
 		game.choice_panel.buttons[0].pressed.emit()
+		if game.choice_panel.mode == &"starter": game.choice_panel.starter_selection.confirm_selection()
 		game.wave.active = false
 		var equipment: Array[Dictionary] = []
 		for slot in (6 if loadouts else 1):

@@ -28,6 +28,8 @@ Die vier Farbstufen der Boss-Entzündung. Die Vorschau zeigt einen Frame der Ani
 
 [Neue Waffengrafiken und animierte Vorschau](docs/WEAPON_ART_REFINEMENT.md): klarere Geräteformen, separat rotierende Arbeitsköpfe und eine Schleuder mit beweglichen Gummibändern und Beutel.
 
+[Startwaffe wählen](docs/STARTER_SELECTION.md): Schwierigkeit und eine von 18 Standardwaffen im Menü vorbereiten, mit Zurück/Weiter und ausdrücklichem Run-Start.
+
 ## Spielen
 
 Für Performance-Tests im Web-Build: Im Hauptmenü siebenmal **Einstellungen → Zurück**, dann **Code eingeben**. `debug map` startet die volle Welle-17-Testarena, `boss charge` den Boss-Test. Der normale Spielstand bleibt erhalten. [Testarenen und Messwerte](docs/TEST_ARENAS.md).

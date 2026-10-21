@@ -43,7 +43,7 @@ func _run() -> void:
 	game = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(game)
 	current_scene = game
-	game.choice_panel.buttons[0].pressed.emit()
+	choose_panel(game.choice_panel, 0)
 	AudioServer.set_bus_mute(AudioServer.get_bus_index(&"Master"), true)
 	game.wave.active = false
 	game._open_shop()

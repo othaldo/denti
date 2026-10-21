@@ -23,13 +23,15 @@ func _run() -> void:
 	var menu: GameMenu = load("res://scenes/ui/game_menu.tscn").instantiate()
 	root.add_child(menu)
 	menu._new_game()
-	var hell_button: Button
-	for child in menu.rows.get_children():
-		if child is Button and child.text.begins_with("Hell"):
-			hell_button = child
-	if menu.page != &"difficulty" or hell_button == null or not hell_button.disabled:
+	var hell_button: Button = menu.difficulty_buttons[&"hell"]
+	if menu.page != &"difficulty" or hell_button == null or not hell_button.get_meta("locked", false):
 		_fail("new-game menu did not lock Hell")
 		return
+	hell_button.pressed.emit()
+	if menu.setup.difficulty_id == &"hell" or not menu.setup_selector.details.visible:
+		_fail("locked difficulty changed the selection or hid its requirement")
+		return
+	menu.setup_selector.details.dismiss()
 	menu.free()
 	if not session.select_difficulty(&"hard"):
 		_fail("Hard could not be selected")
@@ -40,7 +42,7 @@ func _run() -> void:
 	if game.wave.difficulty_id != &"hard" or session.load_run().get("difficulty_id", "") != "hard":
 		_fail("new run did not save Hard before starter selection")
 		return
-	game.choice_panel._on_choice_pressed(0)
+	choose_panel(game.choice_panel, 0)
 	game.wave.active = false
 	game.wave.current_wave = 7
 	game.wave.start_next_wave()

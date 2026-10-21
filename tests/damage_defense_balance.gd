@@ -109,7 +109,7 @@ func _test_live_build() -> void:
 	var game: Node2D = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(game)
 	current_scene = game
-	game.choice_panel._on_choice_pressed(0)
+	choose_panel(game.choice_panel, 0)
 	game.wave.active = false
 	paused = true
 	game._create_enemy(WaveController.PLAQUE, game.player.position + Vector2(100.0, 0.0))
@@ -164,6 +164,6 @@ func _test_live_build() -> void:
 	_check(game.player.stats.melee_damage == 4.0 and game.player.stats.ranged_damage == 2.0, "continue lost specialization values")
 	_check(game.choice_panel.current_upgrades.size() == 3, "legacy Bisskraft choice disappeared")
 	if game.choice_panel.current_upgrades.size() == 3:
-		game.choice_panel._on_choice_pressed(0)
+		choose_panel(game.choice_panel, 0)
 		_check(game.player.stats.damage_bonus == 28.0, "legacy choice applied raw damage instead of its new percentage")
 	game.free()

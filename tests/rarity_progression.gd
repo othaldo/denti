@@ -31,7 +31,7 @@ func _run() -> void:
 	var game: Node2D = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(game)
 	current_scene = game
-	game.choice_panel._on_choice_pressed(1)
+	choose_panel(game.choice_panel, 1)
 	game.wave.active = false
 	var drill := WeaponCatalog.by_id(&"turbo_drill")
 	game.player.loadout.restore([{"id": "turbo_drill", "tier": 2}])

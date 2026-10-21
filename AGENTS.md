@@ -272,6 +272,14 @@ See `docs/items.md` for current effects.
 
 Keep HUD/cards/buttons coherent with the warm cartoon dental style. Combat readability is more important than decorative complexity, especially as enemy/projectile density rises.
 
+UI copy must stay minimal. Do not add recurring instruction sentences, explanatory
+paragraphs, duplicate headings or repeated stat descriptions to ordinary screens.
+Use layout, painted art, icons and distinct interaction states to guide the player.
+Expose detailed mechanics on request; keep a short explanation visible only when
+it is needed for a concrete decision or blocked action. Review actual screen use
+and native visual quality as well as overflow tests. See `docs/UI_UX_PLAN.md` for
+the current design direction and acceptance criteria.
+
 For bullet hell:
 
 - enemy projectiles must remain visually distinct from player projectiles

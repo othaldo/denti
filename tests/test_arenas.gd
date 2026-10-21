@@ -37,7 +37,7 @@ func _run() -> void:
 	var normal: Node2D = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(normal)
 	current_scene = normal
-	normal.choice_panel.buttons[0].pressed.emit()
+	choose_panel(normal.choice_panel, 0)
 	normal.coins = 37
 	normal._save_run()
 	var protected_bytes := FileAccess.get_file_as_string(session.save_path)

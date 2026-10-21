@@ -32,6 +32,7 @@ static func capture(game) -> Dictionary:
 		"player": {"position": SnapshotValues.vector_data(game.player.position), "stats": game.player.stats.to_save_data(), "hurt_time": game.player.hurt_time, "dodge_time": game.player.dodge_time, "presentation": game.player.expressions.save_data(), "status_effects": game.player.status_effects.save_data()},
 		"xp": game.xp, "xp_goal": game.xp_goal, "level": game.level, "coins": game.coins,
 		"weapons": game.player.loadout.save_data(), "starter_pending": game.starter_pending,
+		"starter_preview": str(game.choice_panel.starter_selection.selected_id) if game.starter_pending else "",
 		"weapon_runtime": weapon_runtime,
 		"player_projectiles": player_projectiles,
 		"items": game.items.save_data(),

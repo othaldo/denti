@@ -417,7 +417,7 @@ func restore_state(saved: Dictionary, story_enabled: bool = false) -> void:
 	difficulty_id = DifficultyCatalog.by_id(StringName(str(saved.get("difficulty_id", "normal")))).id
 	endless_enabled = bool(saved.get("endless_enabled", false))
 	current_wave = maxi(int(saved.get("wave", 1)), 1) if endless_enabled else clampi(int(saved.get("wave", 1)), 1, WaveController.MAX_WAVES)
-	if story_enabled and int(saved.get("wave", 1)) == 0:
+	if (story_enabled or bool(saved.get("starter_pending", false))) and int(saved.get("wave", 1)) == 0:
 		current_wave = 0
 	duration = clampf(float(saved.get("duration", WaveController.DURATION)), 1.0, 120.0)
 	remaining = clampf(float(saved.get("remaining", duration)), 0.0, duration)

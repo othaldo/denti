@@ -2,7 +2,7 @@
 
 Zusätzlich gibt es sechs geheime Mk-IV-Evolutionen. Ihre Option erscheint erst, wenn alle Voraussetzungen erfüllt sind; normale Angebote verraten keine Rezepte. Mehrere freiwillige Evolutionen pro Run sind möglich, auch vom gleichen Typ. [Entwicklungsdokumentation mit Rezepten und Tests](WEAPON_EVOLUTIONS.md).
 
-Denti beginnt ohne fest ins Charakterbild eingebaute Waffe. Vor Welle 1 wählt man Zauberbürste, Turbo-Bohrer oder Wasserflosser. Die übrigen Waffen sowie weitere Exemplare gibt es im Shop.
+Denti beginnt ohne fest ins Charakterbild eingebaute Waffe. Vor Welle 1 kann jede der 18 Standardwaffen gewählt werden: Icon antippen, Mk-I-Details ansehen und mit „Run starten“ bestätigen. Weitere Exemplare gibt es im Shop. Geheime Evolutionen bleiben ausgeschlossen. [Startauswahl](STARTER_SELECTION.md).
 
 Standardmäßig besitzt Denti **6 Wurzeln**. Die Kapazität ist ein gespeicherter
 Spielerparameter und kann für Klassen oder Challenges abweichen; angebotene
@@ -60,7 +60,7 @@ pro Treffer und Ziel, nicht der Gesamtschaden eines Kegels oder einer Explosion.
 | Fluorid-Rakete | 70 | 2,40 s | 550 | 18 |
 
 Alle zehn Waffen sind im normalen Shop erhältlich und unterstützen vier Stufen,
-Fusion, Verkauf und Fortsetzen. Die drei Startwaffen bleiben wie bisher.
+Fusion, Verkauf und Fortsetzen. Alle Standardwaffen stehen auch als Mk-I-Start zur Wahl.
 Die Erweiterung nutzt individuelle Schadenskurven; Speer, Bürste, Sprüher,
 Turbine, UV-Lampe und Garotte gewinnen Reichweite. Schleuder und Rakete
 gewinnen Explosionsradius, Turbine Rückstoß, Fräse Bossbonus.

@@ -22,11 +22,8 @@ const ALL: Array[WeaponData] = [
 	preload("res://data/weapons/fluoride_rocket.tres"),
 ]
 
-const STARTERS: Array[WeaponData] = [
-	preload("res://data/weapons/magic_toothbrush.tres"),
-	preload("res://data/weapons/turbo_drill.tres"),
-	preload("res://data/weapons/water_jet.tres"),
-]
+# Compatibility alias: starters always follow the regular catalog, never evolutions.
+const STARTERS: Array[WeaponData] = ALL
 
 
 static func by_id(id: StringName) -> WeaponData:

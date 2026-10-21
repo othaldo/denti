@@ -75,7 +75,7 @@ func _run() -> void:
 	var normal: Node2D = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(normal)
 	current_scene = normal
-	normal.choice_panel._on_choice_pressed(0)
+	choose_panel(normal.choice_panel, 0)
 	normal._create_enemy(WaveController.PLAQUE, Vector2.ZERO)
 	check(not normal.has_node("CombatDiagnostics") and normal.get_node("Enemies").get_child(-1).get_script().resource_path == "res://scripts/enemies/enemy.gd" and normal.player.loadout.equipped()[0].get_script().resource_path == "res://scripts/weapons/weapon_instance.gd", "normal combat retained timing wrappers")
 	session.clear_run()

@@ -21,6 +21,7 @@ func _run() -> void:
 	current_scene = game
 	seed(20261003)
 	game.choice_panel.buttons[0].pressed.emit()
+	if game.choice_panel.mode == &"starter": game.choice_panel.starter_selection.confirm_selection()
 	game.wave.active = false
 	game.player.stats.max_health = 1e9
 	game.player.stats.health = 1e9

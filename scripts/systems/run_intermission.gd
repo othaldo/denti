@@ -19,10 +19,7 @@ static func restore(game, saved: Dictionary) -> void:
 		game._begin_loot_collection()
 		return
 	if game.starter_pending:
-		game.get_node("/root/SceneTransitions").present(&"starter")
-		game.run_flow.enter(RunFlow.Phase.STARTER)
-		game.choice_panel.show_starters(WeaponCatalog.STARTERS)
-		game.get_tree().paused = true
+		game._show_starters(StringName(str(saved.get("starter_preview", ""))))
 		game._refresh_hud()
 		return
 	if game.story.enabled and game.story.travel_target >= 1:

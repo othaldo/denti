@@ -27,7 +27,7 @@ func _run() -> void:
 		return
 	root.size = Vector2i(1280, 720)
 	await process_frame
-	game.choice_panel.buttons[0].pressed.emit()
+	choose_panel(game.choice_panel, 0)
 	game._on_loot_collected(&"xp", game.xp_goal)
 	if paused or game.choice_panel.visible:
 		_fail("XP opened the level-up overlay during combat")
@@ -52,7 +52,7 @@ func _run() -> void:
 		if button.get("icon_rect").texture == null or button.get("effect_label").text.is_empty():
 			_fail("upgrade card is missing icon or effect")
 			return
-	game.choice_panel.buttons[0].pressed.emit()
+	choose_panel(game.choice_panel, 0)
 	if not paused or game.choice_panel.visible or not game.shop_panel.visible:
 		_fail("choosing a level-up card did not open the shop")
 		return
@@ -142,7 +142,7 @@ func _run() -> void:
 	game.shop_panel.visible = false
 	game.choice_panel.show_starters(WeaponCatalog.STARTERS)
 	await process_frame
-	if game.choice_panel.cards.columns != 1 or not _inside(game.choice_panel.dialog_panel.get_global_rect(), Vector2(720, 1280)):
+	if not _starter_fits(game.choice_panel):
 		_fail("portrait starter choice exceeds the phone viewport")
 		return
 	game.choice_panel.show_chest(ShopController.by_id(&"metal_crown"), 3)
@@ -172,13 +172,9 @@ func _run() -> void:
 	await process_frame
 	await process_frame
 	var landscape_size: Vector2 = game.choice_panel.get_node("Root").size
-	if game.choice_panel.cards.columns != 3 or not _inside(game.choice_panel.dialog_panel.get_global_rect(), landscape_size):
-		_fail("landscape starter choice exceeds the phone viewport: %s / %s" % [game.choice_panel.dialog_panel.get_global_rect(), landscape_size])
+	if not _starter_fits(game.choice_panel):
+		_fail("landscape starter selection exceeds the phone viewport")
 		return
-	for button: UpgradeCard in game.choice_panel.buttons:
-		if not _within(button.effect_label.get_global_rect(), button.get_global_rect()):
-			_fail("landscape starter text exceeds its card: %s (visible %s), effect %s / card %s" % [button.name_label.text, button.visible, button.effect_label.get_global_rect(), button.get_global_rect()])
-			return
 	game.choice_panel.show_relics(relic_choices)
 	await process_frame
 	if not _inside(game.choice_panel.dialog_panel.get_global_rect(), landscape_size):
@@ -218,14 +214,8 @@ func _within(inner: Rect2, outer: Rect2) -> bool:
 
 func _starter_fits(panel: ChoicePanel) -> bool:
 	var viewport_size: Vector2 = panel.get_node("Root").size
-	if not _inside(panel.dialog_panel.get_global_rect(), viewport_size):
-		return false
-	for button: UpgradeCard in panel.buttons:
-		var card_rect := button.get_global_rect()
-		var effect_rect := button.effect_label.get_global_rect()
-		if not _inside(card_rect, viewport_size) or effect_rect.position.y < card_rect.position.y or effect_rect.end.y > card_rect.end.y:
-			return false
-	return true
+	var view := panel.starter_selection
+	return _inside(view.panel.get_global_rect(), viewport_size) and _within(view.confirm_button.get_global_rect(), view.panel.get_global_rect())
 
 
 func _fail(message: String) -> void:

@@ -12,7 +12,7 @@ func _run() -> void:
 	var game: Node2D = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(game)
 	current_scene = game
-	game.choice_panel._on_choice_pressed(0)
+	choose_panel(game.choice_panel, 0)
 	game.wave.spawn_cooldown = 100.0
 	game._on_loot_collected(&"xp", 25)
 	game._on_loot_collected(&"chest", 4, &"metal_crown")
@@ -47,12 +47,12 @@ func _run() -> void:
 		if game.choice_panel.mode != &"upgrade" or game.rewards.pending_levels != 3 - index or game.shop_panel.visible:
 			_fail("pending level-ups were skipped or shop opened early")
 			return
-		game.choice_panel._on_choice_pressed(0)
+		choose_panel(game.choice_panel, 0)
 	if game.rewards.step != PostWaveRewards.Step.CHESTS or game.choice_panel.mode != &"chest" or game.choice_panel.chest_item.id != &"metal_crown":
 		_fail("chest choices did not follow all level-ups")
 		return
 	var armor_before: float = game.player.stats.armor
-	game.choice_panel._on_choice_pressed(0)
+	choose_panel(game.choice_panel, 0)
 	if game.items.count(&"metal_crown") != 1 or game.player.stats.armor != armor_before + 3.0 or game.choice_panel.chest_item.id != &"fluoride_gel" or game.rewards.pending_chests.size() != 1:
 		_fail("KEEP did not grant the item or advance to the next chest")
 		return
@@ -66,7 +66,7 @@ func _run() -> void:
 	if not paused or game.rewards.step != PostWaveRewards.Step.CHESTS or game.choice_panel.mode != &"chest" or game.choice_panel.chest_item.id != &"fluoride_gel" or game.items.count(&"metal_crown") != 1:
 		_fail("continue lost the pending chest decision")
 		return
-	game.choice_panel._on_choice_pressed(1)
+	choose_panel(game.choice_panel, 1)
 	if not paused or not game.shop_panel.visible or game.coins != 7 or game.items.count(&"fluoride_gel") != 0 or game.telemetry.chests_found != 2 or game.telemetry.chests_kept != 1 or game.telemetry.chests_scrapped != 1:
 		_fail("SCRAP did not grant coins and finish the reward queue before shop")
 		return

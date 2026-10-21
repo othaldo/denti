@@ -12,7 +12,7 @@ func _run() -> void:
 	var game: Node2D = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(game)
 	current_scene = game
-	game.choice_panel._on_choice_pressed(0)
+	choose_panel(game.choice_panel, 0)
 	game.player.loadout.sell(0)
 	game.player.stats.max_health = 10000.0
 	game.player.stats.health = 10000.0

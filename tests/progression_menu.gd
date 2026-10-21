@@ -33,23 +33,25 @@ func _run() -> void:
 		_fail("new game was not selected when no save exists")
 		return
 	menu._new_game()
-	if menu.page != &"difficulty" or (menu.rows.get_child(4) as Button).text != "Normal":
+	if menu.page != &"difficulty" or menu.difficulty_buttons[&"normal"].get_node("Title").text != "Normal":
 		_fail("new game did not offer difficulty selection")
 		return
-	(menu.rows.get_child(4) as Button).pressed.emit()
+	menu.difficulty_buttons[&"normal"].pressed.emit()
+	menu._advance_setup()
+	if current_scene != menu or menu.page != &"weapon" or session.has_run():
+		_fail("preparation loaded the arena or created a run")
+		return
+	menu.setup_selector.select_weapon(0)
+	menu.setup_selector.confirm_button.pressed.emit()
 	await process_frame
 	await process_frame
 	var game: Node2D = current_scene
 	if game == null or game.name != "Game" or not session.has_run():
 		_fail("new game did not start and save")
 		return
-	if not paused or game.choice_panel.mode != &"starter":
-		_fail("new game did not offer starter weapons")
+	if paused or not game.wave.active or game.wave.current_wave != 1 or game.player.loadout.equipped().size() != 1:
+		_fail("prepared run did not begin wave one")
 		return
-	if not bool(session.load_run().get("starter_pending", false)):
-		_fail("starter choice was not saved for continue")
-		return
-	game.choice_panel._on_choice_pressed(0)
 	game.wave.active = false
 	game.game_menu.open_pause()
 	if not paused or not game.game_menu.visible:
@@ -181,7 +183,7 @@ func _run() -> void:
 	if not paused or game.rewards.pending_levels != 1 or not game.choice_panel.visible or game.choice_panel.current_upgrades.size() != 4:
 		_fail("continue lost a post-wave level-up choice")
 		return
-	game.choice_panel._on_choice_pressed(0)
+	choose_panel(game.choice_panel, 0)
 	if not paused or not game.shop_panel.visible:
 		_fail("shop did not open before saving")
 		return
@@ -205,11 +207,14 @@ func _run() -> void:
 	if menu.page != &"difficulty":
 		_fail("confirmed new game did not offer difficulty selection")
 		return
-	(menu.rows.get_child(4) as Button).pressed.emit()
+	menu.difficulty_buttons[&"normal"].pressed.emit()
+	menu._advance_setup()
+	menu.setup_selector.select_weapon(0)
+	menu.setup_selector.confirm_button.pressed.emit()
 	await process_frame
 	await process_frame
 	game = current_scene
-	if not paused or game.choice_panel.mode != &"starter" or game.coins != 0 or game.in_shop or not session.has_run():
+	if paused or not game.wave.active or game.coins != 0 or game.in_shop or not session.has_run():
 		_fail("confirmed new game did not replace the previous run")
 		return
 	session.clear_run()

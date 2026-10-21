@@ -127,7 +127,7 @@ func _test_build_and_resume() -> void:
 	var game: Node2D = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(game)
 	current_scene = game
-	game.choice_panel._on_choice_pressed(0)
+	choose_panel(game.choice_panel, 0)
 	paused = true
 	game.wave.active = false
 	var stats: PlayerStats = game.player.stats
@@ -176,7 +176,7 @@ func _test_build_and_resume() -> void:
 	_check(game.choice_panel.mode == &"upgrade" and game.choice_panel.current_upgrades.size() == 3, "legacy pending choices vanished on continue")
 	if game.choice_panel.current_upgrades.size() == 3:
 		_check(game.choice_panel.current_upgrades[0].stat == &"attack_speed" and game.choice_panel.current_upgrades[1].stat == &"speed_bonus", "legacy choices use obsolete stat names")
-		game.choice_panel._on_choice_pressed(0)
+		choose_panel(game.choice_panel, 0)
 		_check(game.player.stats.attack_speed == 30.0 and game.player.stats.regen == 2.0 and game.player.stats.speed_bonus == -2.0, "resume reapplied item stats or used an old level-up amount")
 	game.free()
 

@@ -138,6 +138,7 @@ func _ready() -> void:
 	weapon_chest_panel.selection_changed.connect(_save_run)
 	choice_panel.relic_chosen.connect(_on_relic_chosen)
 	choice_panel.starter_chosen.connect(_on_starter_chosen)
+	choice_panel.starter_preview_changed.connect(_save_run)
 	choice_panel.restart_requested.connect(_restart)
 	choice_panel.main_menu_requested.connect(_on_end_main_menu)
 	choice_panel.endless_requested.connect(_on_endless_requested)
@@ -162,13 +163,26 @@ func _ready() -> void:
 		test_arena.name = "TestArena"
 		add_child(test_arena)
 		return
+	var prepared_weapon := WeaponCatalog.by_id(session.pending_start_weapon_id)
+	session.pending_start_weapon_id = &""
 	if session.resume_requested:
 		session.resume_requested = false
 		var saved: Dictionary = session.load_run()
 		if not saved.is_empty():
 			_restore_run(saved)
+			if starter_pending and prepared_weapon in WeaponCatalog.ALL:
+				_on_starter_chosen(prepared_weapon)
 			return
 	player.global_position = arena.arena_size / 2.0
+	if prepared_weapon in WeaponCatalog.ALL and player.loadout.acquire(prepared_weapon):
+		if session.selected_story_mode:
+			story.start()
+			story.followup = &"wave"
+			arena.set_story_chapter(StoryCatalog.chapter(0))
+			_show_story_line()
+		else:
+			_start_combat_wave()
+		return
 	if session.selected_story_mode:
 		story.start()
 		arena.set_story_chapter(StoryCatalog.chapter(0))
@@ -186,14 +200,14 @@ func _on_root_capacity_changed() -> void:
 		_show_starters()
 
 
-func _show_starters() -> void:
+func _show_starters(selected_id: StringName = &"") -> void:
 	get_node("/root/SceneTransitions").present(&"starter")
 	starter_pending = true
 	var starters: Array[WeaponData] = []
-	for weapon in WeaponCatalog.STARTERS:
+	for weapon in WeaponCatalog.ALL:
 		if player.loadout.can_acquire(weapon):
 			starters.append(weapon)
-	choice_panel.show_starters(starters)
+	choice_panel.show_starters(starters, selected_id)
 	get_tree().paused = true
 	_save_run()
 
@@ -242,7 +256,7 @@ func _on_story_travel_finished() -> void:
 func _on_starter_chosen(weapon: WeaponData) -> void:
 	if not starter_pending:
 		return
-	if not player.loadout.acquire(weapon):
+	if weapon not in WeaponCatalog.ALL or not player.loadout.acquire(weapon):
 		_show_starters()
 		return
 	starter_pending = false
@@ -1052,7 +1066,11 @@ func debug_start_wave(number: int) -> void:
 func _restart() -> void:
 	session.clear_run()
 	get_tree().paused = false
-	get_node("/root/SceneTransitions").change_scene("res://scenes/game/game.tscn")
+	if session.test_scenario_id != &"":
+		get_node("/root/SceneTransitions").change_scene("res://scenes/game/game.tscn")
+	else:
+		session.setup_requested = true
+		get_node("/root/SceneTransitions").change_scene("res://scenes/ui/game_menu.tscn")
 
 
 func _on_end_main_menu() -> void:

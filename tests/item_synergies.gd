@@ -12,7 +12,7 @@ func _run() -> void:
 	var game: Node2D = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(game)
 	current_scene = game
-	game.choice_panel._on_choice_pressed(2)
+	choose_panel(game.choice_panel, 2)
 	game.wave.active = false
 	for item_id in [&"contagious_floss", &"conductive_varnish", &"forbidden_lollipop", &"tooth_fairy_deposit"]:
 		var item := ShopController.by_id(item_id)
@@ -114,7 +114,7 @@ func _run() -> void:
 		_fail("chest choice did not show the deposit bonus")
 		return
 	var coins_before: int = resumed.coins
-	resumed.choice_panel._on_choice_pressed(1)
+	choose_panel(resumed.choice_panel, 1)
 	if resumed.coins != coins_before + 15 or resumed.rewards.step != PostWaveRewards.Step.SHOP:
 		_fail("scrapping a chest did not grant the displayed bonus")
 		return

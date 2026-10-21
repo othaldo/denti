@@ -55,7 +55,7 @@ func _run() -> void:
 	game = await _resume(game)
 	if not _check(game.starter_pending and game.wave.current_wave == 0 and not game.story_dialogue.visible, "resume replayed intro after completion"):
 		return
-	game.choice_panel.buttons[0].pressed.emit()
+	choose_panel(game.choice_panel, 0)
 	if not _check(game.wave.active and game.wave.current_wave == 1 and not paused, "story starter must begin wave one"):
 		return
 	await _resize(Vector2i(1280, 720))
@@ -74,13 +74,13 @@ func _run() -> void:
 	if not _check(game.rewards.step == PostWaveRewards.Step.LEVELS and game.rewards.pending_story == &"arrival_1" and not game.story_dialogue.visible, "story must queue after levels/chests/relics"):
 		return
 	game = await _resume(game)
-	game.choice_panel.buttons[0].pressed.emit()
+	choose_panel(game.choice_panel, 0)
 	if not _check(game.rewards.step == PostWaveRewards.Step.CHESTS and not game.story_dialogue.visible, "story interrupted chest decision"):
 		return
-	game.choice_panel.buttons[0].pressed.emit()
+	choose_panel(game.choice_panel, 0)
 	if not _check(game.rewards.step == PostWaveRewards.Step.RELICS and not game.story_dialogue.visible, "story interrupted relic decision"):
 		return
-	game.choice_panel.buttons[0].pressed.emit()
+	choose_panel(game.choice_panel, 0)
 	if not _check(game.rewards.step == PostWaveRewards.Step.STORY and game.story_dialogue.visible and game.story.chapter_index == 0 and game.story.revealed_chapters == 1, "next world revealed before arrival"):
 		return
 	game = await _resume(game)
@@ -127,7 +127,7 @@ func _run() -> void:
 		await process_frame
 		game._begin_loot_collection()
 		if game.rewards.step == PostWaveRewards.Step.RELICS:
-			game.choice_panel.buttons[0].pressed.emit()
+			choose_panel(game.choice_panel, 0)
 		var previous: int = game.story.chapter_index
 		if not _check(game.story_dialogue.visible and previous == milestone / 5 - 1, "chapter advanced before arrival dialogue"):
 			return
@@ -147,7 +147,7 @@ func _run() -> void:
 	game._begin_loot_collection()
 	if not _check(not game.ended and game.rewards.step == PostWaveRewards.Step.LEVELS, "finale skipped final rewards"):
 		return
-	game.choice_panel.buttons[0].pressed.emit()
+	choose_panel(game.choice_panel, 0)
 	if not _check(game.story.dialogue_id == &"finale" and not game.ended, "victory appeared before epilogue"):
 		return
 	_finish_dialogue(game)

@@ -15,7 +15,7 @@ func _run() -> void:
 	if not paused or not game.player.loadout.equipped().is_empty():
 		_fail("Denti was armed before starter selection")
 		return
-	game.choice_panel._on_choice_pressed(2)
+	choose_panel(game.choice_panel, 2)
 	if paused or game.player.loadout.equipped()[0].data.id != &"water_jet":
 		_fail("starter selection did not equip the water jet")
 		return

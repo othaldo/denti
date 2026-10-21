@@ -13,7 +13,7 @@ func _run() -> void:
 	await process_frame
 	await process_frame
 	var game: Node2D = current_scene
-	game.choice_panel.buttons[0].pressed.emit()
+	choose_panel(game.choice_panel, 0)
 	game.wave.active = false
 	game.wave.current_wave = 20
 	game._clear_arena(false)
@@ -26,17 +26,17 @@ func _run() -> void:
 	if game.ended or game.choice_panel.mode != &"upgrade":
 		_fail("victory skipped pending levels")
 		return
-	game.choice_panel.buttons[0].pressed.emit()
+	choose_panel(game.choice_panel, 0)
 	if game.choice_panel.mode != &"chest" or game.ended:
 		_fail("victory skipped pending chest rewards")
 		return
-	game.choice_panel.buttons[0].pressed.emit()
+	choose_panel(game.choice_panel, 0)
 	if not game.ended or not game.base_victory or not game.choice_panel.buttons[3].visible or session.has_run():
 		_fail("normal victory did not offer an optional endless continuation")
 		return
 	var stats_before: Dictionary = game.player.stats.to_save_data()
 	var weapons_before: Array[Dictionary] = game.player.loadout.save_data()
-	game.choice_panel.buttons[3].pressed.emit()
+	choose_panel(game.choice_panel, 3)
 	if game.ended or not game.wave.endless_enabled or not game.in_shop or game.coins != 100 or game.wave.current_wave != 20 or game.player.stats.to_save_data() != stats_before or game.player.loadout.save_data() != weapons_before:
 		_fail("entering endless changed the completed build or skipped the wave 20 shop")
 		return
@@ -87,7 +87,7 @@ func _run() -> void:
 	if game.boss_pending or game.ended or game.coins != 107 or game.rewards.step != PostWaveRewards.Step.RELICS:
 		_fail("second boss did not collect loot before the milestone reward")
 		return
-	game.choice_panel.buttons[0].pressed.emit()
+	choose_panel(game.choice_panel, 0)
 	if not game.in_shop or game.wave.current_wave != 30 or game.rewards.final_wave:
 		_fail("endless milestone did not return to the shop")
 		return

@@ -14,10 +14,10 @@ func _run() -> void:
 	game = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(game)
 	current_scene = game
-	game.choice_panel._on_choice_pressed(0)
+	choose_panel(game.choice_panel, 0)
 	game.wave.active = false
 	game.player.stats.crit_chance = 0.0
-	if WeaponCatalog.ALL.size() != 18 or WeaponCatalog.STARTERS.size() != 3:
+	if WeaponCatalog.ALL.size() != 18 or WeaponCatalog.STARTERS != WeaponCatalog.ALL:
 		_fail("catalog or starter count changed incorrectly")
 		return
 	for index in range(8, 18):

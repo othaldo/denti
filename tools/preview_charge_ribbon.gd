@@ -19,6 +19,7 @@ func _run() -> void:
 	root.add_child(game)
 	current_scene = game
 	game.choice_panel._on_choice_pressed(0)
+	if game.choice_panel.mode == &"starter": game.choice_panel.starter_selection.confirm_selection()
 	game.wave.set_process(false)
 	game.wave.current_wave = 8
 	game.player.loadout.restore([])

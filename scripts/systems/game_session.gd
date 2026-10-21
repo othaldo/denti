@@ -16,6 +16,8 @@ var report_dir: String = "user://run_reports"
 var settings_path: String = "user://settings.cfg"
 var progression_path: String = "user://progression.cfg"
 var resume_requested: bool = false
+var pending_start_weapon_id: StringName = &""
+var setup_requested := false
 var selected_difficulty_id: StringName = &"normal"
 var selected_story_mode: bool = false
 var hell_unlocked: bool:

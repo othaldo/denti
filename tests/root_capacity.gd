@@ -35,7 +35,7 @@ func _run() -> void:
 		_check(starter.hands <= 1, "one-root challenge offered an unusable starter")
 	game._on_starter_chosen(WeaponCatalog.by_id(&"magic_toothbrush"))
 	_check(game.starter_pending and loadout.equipped().is_empty(), "invalid starter began a weaponless run")
-	game.choice_panel._on_choice_pressed(0)
+	choose_panel(game.choice_panel, 0)
 	_check(not game.starter_pending and loadout.used_slots() == 1, "one-root challenge could not begin with a valid weapon")
 	game.wave.active = false
 	game.wave.set_process(false)

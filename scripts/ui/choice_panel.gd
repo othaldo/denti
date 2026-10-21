@@ -6,6 +6,7 @@ signal level_reroll_requested
 signal chest_resolved(keep: bool)
 signal relic_chosen(id: StringName)
 signal starter_chosen(weapon: WeaponData)
+signal starter_preview_changed
 signal restart_requested
 signal main_menu_requested
 signal endless_requested
@@ -24,6 +25,8 @@ const UPGRADE_COUNT := 4
 	$Root/Center/Panel/Margin/Rows/Cards/Choice3,
 	$Root/Center/Panel/Margin/Rows/Cards/Choice4,
 ]
+
+var starter_selection: StarterSelection
 
 var current_upgrades: Array[UpgradeData] = []
 var starter_options: Array[WeaponData] = []
@@ -50,14 +53,25 @@ func _ready() -> void:
 	reroll_button.pressed.connect(func() -> void: level_reroll_requested.emit())
 	for index in buttons.size():
 		buttons[index].pressed.connect(_on_choice_pressed.bind(index))
+	starter_selection = StarterSelection.new()
+	$Root.add_child(starter_selection)
+	starter_selection.chosen.connect(func(weapon: WeaponData) -> void:
+		visible = false
+		starter_chosen.emit(weapon))
+	starter_selection.selection_changed.connect(func() -> void: starter_preview_changed.emit())
 	get_viewport().size_changed.connect(_update_layout)
 	_update_layout()
 
 
 func _update_layout() -> void:
+	level_actions.visible = mode == &"upgrade"
+	dialog_panel.visible = mode != &"starter"
+	if starter_selection != null:
+		starter_selection.visible = mode == &"starter"
+	if mode == &"starter":
+		return
 	var viewport_size: Vector2 = $Root.size
 	var portrait := viewport_size.y > viewport_size.x and viewport_size.x < 800.0
-	level_actions.visible = mode == &"upgrade"
 	if mode == &"end":
 		_layout_end(viewport_size)
 		return
@@ -99,8 +113,6 @@ func _update_layout() -> void:
 	for button in buttons:
 		(button as UpgradeCard).reset_card_layout()
 		(button as UpgradeCard).set_mobile_text(portrait or viewport_size.y <= 620.0)
-		if mode == &"starter":
-			button.custom_minimum_size.y = 285.0 if portrait or viewport_size.y <= 620.0 else 250.0
 
 
 func _layout_chest(viewport_size: Vector2) -> void:
@@ -176,21 +188,14 @@ func show_upgrades(options: Array[UpgradeData]) -> void:
 	buttons[0].grab_focus()
 
 
-func show_starters(options: Array[WeaponData]) -> void:
+func show_starters(options: Array[WeaponData], selected_id: StringName = &"") -> void:
 	mode = &"starter"
 	starter_options = options
-	dialog_panel.custom_minimum_size = Vector2(900, 440)
-	_update_layout()
-	title_label.text = "Dentis erste Waffe"
-	subtitle_label.text = "Wähle eine Waffe. Weitere findest du später in der Zahnklinik."
-	subtitle_label.custom_minimum_size.y = 40.0
-	for index in buttons.size():
-		buttons[index].visible = index < options.size()
-		if index < options.size():
-			buttons[index].show_weapon(options[index])
+	for button in buttons:
+		button.visible = false
+	starter_selection.show_options(options, selected_id)
 	_update_layout()
 	visible = true
-	buttons[0].grab_focus()
 
 
 func show_chest(item: ShopOfferData, scrap_coins: int) -> void:
@@ -255,8 +260,7 @@ func show_end(won: bool, coins: int, recap: Dictionary = {}) -> void:
 func _on_choice_pressed(index: int) -> void:
 	match mode:
 		&"starter":
-			visible = false
-			starter_chosen.emit(starter_options[index])
+			starter_selection.select_weapon(index)
 		&"upgrade":
 			if index >= current_upgrades.size():
 				return

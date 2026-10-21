@@ -18,7 +18,9 @@ func _run() -> void:
 	var menu: GameMenu = load("res://scenes/ui/game_menu.tscn").instantiate()
 	root.add_child(menu)
 	current_scene = menu
-	menu._new_game()
+	menu._start_new_game(&"normal")
+	menu.setup_selector.select_weapon(0)
+	menu.setup_selector.confirm_selection()
 	await process_frame
 	await process_frame
 	var game: Node2D = current_scene

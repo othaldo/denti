@@ -17,6 +17,7 @@ func _run() -> void:
 	root.add_child(game)
 	current_scene = game
 	game.choice_panel.buttons[0].pressed.emit()
+	if game.choice_panel.mode == &"starter": game.choice_panel.starter_selection.confirm_selection()
 	game.wave.active = false
 	game.player.position = game.arena.arena_size * 0.5
 	game.player.loadout.restore([{"id": "magic_toothbrush", "tier": 2}, {"id": "water_jet", "tier": 2}])

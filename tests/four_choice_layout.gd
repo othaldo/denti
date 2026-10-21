@@ -11,7 +11,7 @@ func _run() -> void:
 	var game: Node2D = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(game)
 	current_scene = game
-	game.choice_panel.buttons[0].pressed.emit()
+	choose_panel(game.choice_panel, 0)
 	game.wave.active = false
 	game.coins = 100
 	game.player.loadout.restore([{"id": "turbo_drill", "tier": 1}, {"id": "floss_whip", "tier": 1}, {"id": "water_jet", "tier": 1}, {"id": "toothpick_spear", "tier": 1}, {"id": "prophylaxis_polisher", "tier": 1}, {"id": "plaque_scaler", "tier": 1}])
@@ -194,7 +194,7 @@ func _run() -> void:
 	if restored_fourth.stat != fourth.stat or restored_fourth.resource_path != fourth.resource_path or restored_fourth.tier != fourth.tier or not is_equal_approx(restored_fourth.amount, fourth.amount):
 		_fail("fourth level-up offer changed identity or tier after resume")
 		return
-	game.choice_panel.buttons[3].pressed.emit()
+	choose_panel(game.choice_panel, 3)
 	# This late-run build already reaches the crit cap. A random Glanz offer
 	# remains valid, but cannot raise the chance past 65%.
 	var expected := minf(before + fourth.amount, 0.65) if fourth.stat == &"crit_chance" else before + fourth.amount

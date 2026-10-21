@@ -35,6 +35,7 @@ func _sample(profile: Dictionary, sample_seed: int) -> Dictionary:
 	root.add_child(game)
 	current_scene = game
 	game.choice_panel.buttons[0].pressed.emit()
+	if game.choice_panel.mode == &"starter": game.choice_panel.starter_selection.confirm_selection()
 	paused = true
 	game.wave.active = false
 	game._clear_arena(false)

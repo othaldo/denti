@@ -12,7 +12,7 @@ func _run() -> void:
 	var game: Node2D = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(game)
 	current_scene = game
-	game.choice_panel._on_choice_pressed(0)
+	choose_panel(game.choice_panel, 0)
 	game.wave.current_wave = 5
 	game.wave.active = false
 	game.rewards.earn_level()
@@ -21,11 +21,11 @@ func _run() -> void:
 	if game.rewards.step != PostWaveRewards.Step.LEVELS or game.choice_panel.mode != &"upgrade":
 		_fail("boss relic appeared before pending level-up")
 		return
-	game.choice_panel._on_choice_pressed(0)
+	choose_panel(game.choice_panel, 0)
 	if game.rewards.step != PostWaveRewards.Step.CHESTS or game.choice_panel.mode != &"chest":
 		_fail("boss relic appeared before chest decision")
 		return
-	game.choice_panel._on_choice_pressed(1)
+	choose_panel(game.choice_panel, 1)
 	if game.rewards.step != PostWaveRewards.Step.RELICS or game.choice_panel.mode != &"relic" or game.rewards.pending_relics.size() != 3 or game.shop_panel.visible:
 		_fail("milestone boss did not offer three relics after other rewards")
 		return
@@ -40,7 +40,7 @@ func _run() -> void:
 	if not paused or game.rewards.step != PostWaveRewards.Step.RELICS or game.choice_panel.mode != &"relic" or game.rewards.pending_relics != wave_five_options:
 		_fail("resume rerolled or lost the relic choice")
 		return
-	game.choice_panel._on_choice_pressed(0)
+	choose_panel(game.choice_panel, 0)
 	if game.relics.owned.size() != 1 or game.relics.owned[0] != wave_five_options[0] or game.rewards.step != PostWaveRewards.Step.SHOP or not game.shop_panel.visible:
 		_fail("relic selection did not grant one relic before opening shop")
 		return
@@ -55,7 +55,7 @@ func _run() -> void:
 		if game.rewards.step != PostWaveRewards.Step.RELICS or game.rewards.pending_relics.size() != 3 or game.rewards.pending_relics.has(first_relic):
 			_fail("later milestone offered fewer than three choices or repeated an owned relic")
 			return
-		game.choice_panel._on_choice_pressed(0)
+		choose_panel(game.choice_panel, 0)
 	if game.relics.owned.size() != 3 or game.relics.owned[0] == game.relics.owned[1] or game.relics.owned[1] == game.relics.owned[2]:
 		_fail("relics were not unique across milestone bosses")
 		return

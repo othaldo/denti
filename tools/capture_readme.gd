@@ -32,6 +32,7 @@ func _run() -> void:
 	current_scene = game
 	await _capture("startwaffe.png")
 	game.choice_panel._on_choice_pressed(0)
+	if game.choice_panel.mode == &"starter": game.choice_panel.starter_selection.confirm_selection()
 	game.wave.active = false
 	game.wave.current_wave = 4
 	game.wave.remaining = 29.0

@@ -28,7 +28,7 @@ func _run() -> void:
 	game = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(game)
 	current_scene = game
-	game.choice_panel.buttons[0].pressed.emit()
+	choose_panel(game.choice_panel, 0)
 	game.choice_panel.hide()
 	game.wave.active = false
 	paused = true

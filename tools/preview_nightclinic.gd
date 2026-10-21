@@ -16,6 +16,7 @@ func _run() -> void:
 	root.add_child(game)
 	current_scene = game
 	game.choice_panel.buttons[0].pressed.emit()
+	if game.choice_panel.mode == &"starter": game.choice_panel.starter_selection.confirm_selection()
 	game.wave.active = false
 	game.coins = 146
 	game.player.loadout.restore([{"id": "magic_toothbrush", "tier": 1}, {"id": "magic_toothbrush", "tier": 1}, {"id": "amalgam_slingshot", "tier": 1}])

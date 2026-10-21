@@ -16,7 +16,7 @@ func _run() -> void:
 		await process_frame
 		await process_frame
 		var game: Node2D = current_scene
-		game.choice_panel._on_choice_pressed(0)
+		choose_panel(game.choice_panel, 0)
 		game.wave.spawn_cooldown = 100.0
 		game.level = levels.x
 		game.xp = 0
@@ -71,7 +71,7 @@ func _run() -> void:
 			var selected_index := 0
 			while game.choice_panel.current_upgrades[selected_index].stat == &"luck":
 				selected_index += 1
-			game.choice_panel._on_choice_pressed(selected_index)
+			choose_panel(game.choice_panel, selected_index)
 		if game.rewards.pending_levels != 0 or not game.in_shop or not game.shop_panel.visible:
 			_fail("batched level-up rewards did not finish before opening the shop")
 			return

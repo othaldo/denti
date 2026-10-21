@@ -12,7 +12,7 @@ func _run() -> void:
 	var game: Node2D = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(game)
 	current_scene = game
-	game.choice_panel._on_choice_pressed(0)
+	choose_panel(game.choice_panel, 0)
 	game.wave.set_process(false)
 	game.wave.active = false
 	var loadout: WeaponLoadout = game.player.loadout
@@ -172,7 +172,7 @@ func _run() -> void:
 	if not _expect(game.get_node("Loot").get_child_count() == 0 and game.rewards.pending_chests.size() == 2 and not game.weapon_chest_panel.visible, "chest choices preceded loot sweep and level-ups"):
 		return
 	while game.rewards.pending_levels > 0:
-		game.choice_panel._on_choice_pressed(0)
+		choose_panel(game.choice_panel, 0)
 	if not _expect(paused and game.weapon_chest_panel.visible and not game.shop_panel.visible, "affix choices did not precede the shop"):
 		return
 	game.weapon_chest_panel._select_weapon(1)

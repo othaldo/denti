@@ -55,6 +55,7 @@ func _run() -> void:
 		var game: Node2D = load("res://scenes/game/game.tscn").instantiate()
 		view.add_child(game)
 		game.choice_panel._on_choice_pressed(0)
+		if game.choice_panel.mode == &"starter": game.choice_panel.starter_selection.confirm_selection()
 		game.wave.active = false
 		game.player.loadout.restore([{"id": str(data.id), "tier": 1}])
 		game.hud.get_node("Root").visible = false

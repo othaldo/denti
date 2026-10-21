@@ -12,7 +12,7 @@ func _run() -> void:
 	var game: Node2D = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(game)
 	current_scene = game
-	game.choice_panel._on_choice_pressed(2)
+	choose_panel(game.choice_panel, 2)
 	game.wave.active = false
 	game.coins = 100
 	game._open_shop()

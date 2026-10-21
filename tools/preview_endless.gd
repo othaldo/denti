@@ -15,6 +15,7 @@ func _run() -> void:
 	root.add_child(game)
 	current_scene = game
 	game.choice_panel.buttons[0].pressed.emit()
+	if game.choice_panel.mode == &"starter": game.choice_panel.starter_selection.confirm_selection()
 	paused = true
 	game.wave.active = false
 	game._clear_arena(false)
@@ -37,6 +38,7 @@ func _run() -> void:
 		DisplayServer.window_set_size(extent)
 		await _capture("victory_%dx%d.png" % [extent.x, extent.y])
 	game.choice_panel.buttons[3].pressed.emit()
+	if game.choice_panel.mode == &"starter": game.choice_panel.starter_selection.confirm_selection()
 	root.content_scale_size = Vector2i(1280, 720)
 	root.size = Vector2i(1280, 720)
 	DisplayServer.window_set_size(root.size)

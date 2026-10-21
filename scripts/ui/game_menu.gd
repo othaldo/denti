@@ -3,6 +3,11 @@ extends CanvasLayer
 
 @export var overlay: bool = false
 
+var setup: RunSetup
+var setup_selector: RunSetupScreen
+var difficulty_buttons: Dictionary = {}
+var launching_run := false
+
 var page: StringName = &"home"
 var root_control: Control
 var rows: VBoxContainer
@@ -40,7 +45,21 @@ func _ready() -> void:
 		menu_music = MusicController.new()
 		add_child(menu_music)
 		menu_music.play_menu()
+		setup = RunSetup.load_from(_draft_path())
+		setup_selector = preload("res://scenes/ui/run_setup_screen.tscn").instantiate()
+		root_control.add_child(setup_selector)
+		setup_selector.visible = false
+		setup_selector.back_button.visible = true
+		setup_selector.back_requested.connect(_setup_back)
+		setup_selector.selection_changed.connect(_save_weapon_preview)
+		setup_selector.chosen.connect(_launch_prepared_run)
+		setup_selector.difficulty_chosen.connect(_select_setup_difficulty)
+		setup_selector.next_requested.connect(_advance_setup)
+		setup_selector.step_requested.connect(_visit_setup_step)
 		_show_home()
+		if session.setup_requested:
+			session.setup_requested = false
+			_choose_new_run()
 
 
 func open_pause() -> void:
@@ -61,7 +80,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not visible or not event.is_action_pressed("ui_cancel"):
 		return
 	get_viewport().set_input_as_handled()
-	if overlay and page == &"home":
+	if not overlay and page in RunSetup.STEPS:
+		_setup_back()
+	elif overlay and page == &"home":
 		close_pause()
 	else:
 		_show_home()
@@ -108,6 +129,12 @@ func _build_ui() -> void:
 
 
 func _clear_rows() -> void:
+	menu_stage.visible = true
+	for edge in ["left", "right"]:
+		rows.get_parent().add_theme_constant_override("margin_" + edge, 32)
+	rows.get_parent().add_theme_constant_override("margin_top", 22)
+	rows.get_parent().add_theme_constant_override("margin_bottom", 24)
+	if setup_selector != null: setup_selector.visible = false
 	if not overlay and page not in [&"home", &"options"] and not session.code_entry_unlocked:
 		session.settings_visit_streak = 0
 	for child in rows.get_children():
@@ -272,7 +299,7 @@ func _show_home() -> void:
 		_button("Hauptmenü", _to_main_menu)
 	else:
 		_text("Divine Dentistry")
-		if session.has_run():
+		if session.has_run() or FileAccess.file_exists(_draft_path()):
 			_button("Fortsetzen", _continue_game, true)
 			_button("Neues Spiel", _new_game)
 		else:
@@ -592,6 +619,12 @@ func _new_story_game() -> void:
 
 
 func _choose_new_run() -> void:
+	if setup == null or setup.story_mode != session.selected_story_mode:
+		setup = RunSetup.new()
+		setup.story_mode = session.selected_story_mode
+		setup.difficulty_id = session.selected_difficulty_id
+	setup.resume_pending = false
+	setup.root_capacity = PlayerStats.DEFAULT_ROOT_CAPACITY
 	if session.has_run():
 		_show_new_game_confirmation()
 		return
@@ -602,41 +635,141 @@ func _show_new_game_confirmation() -> void:
 	page = &"confirm_new_game"
 	_clear_rows()
 	_title("Neues Spiel?")
-	_text("Dein aktueller Spielstand wird gelöscht.")
+	_text("Dein aktueller Run wird erst ersetzt, wenn du den neuen Run startest.")
 	_button("Abbrechen", _show_home, true)
 	_button("Weiter zur Schwierigkeitswahl", _show_difficulty)
 
 
+func _draft_path() -> String:
+	return session.save_path + ".setup.json"
+
+
 func _show_difficulty() -> void:
-	page = &"difficulty"
+	if setup == null:
+		setup = RunSetup.new()
+		setup.story_mode = session.selected_story_mode
+	if not session.can_select_difficulty(setup.difficulty_id): setup.difficulty_id = &"normal"
+	setup.step = &"difficulty"
+	page = setup.step
 	_clear_rows()
-	_title("Schwierigkeitsgrad")
-	_text("Wähle den Gegnerdruck für diesen Run.")
-	var default_button: Button
-	for difficulty in DifficultyCatalog.ALL:
-		var unlocked: bool = session.can_select_difficulty(difficulty.id)
-		var label := difficulty.display_name if unlocked else "%s · Nach Sieg auf Hard" % difficulty.display_name
-		var button := _button(label, _start_new_game.bind(difficulty.id), difficulty.id == &"normal", not unlocked)
-		button.tooltip_text = difficulty.description
-		if difficulty.id == &"normal":
-			default_button = button
-	_button("Zurück", _show_home)
-	if default_button != null:
-		default_button.grab_focus()
+	menu_stage.visible = false
+	setup_selector.visible = true
+	setup_selector.show_difficulty(setup, Callable(session, "can_select_difficulty"))
+	difficulty_buttons = setup_selector.difficulty_view.buttons
+	setup.save_to(_draft_path())
 
 
+func _select_setup_difficulty(id: StringName) -> void:
+	if setup == null or not session.can_select_difficulty(id): return
+	setup.difficulty_id = id
+	setup_selector.current_difficulty = id
+	setup_selector.difficulty_view.selected_id = id
+	setup_selector.difficulty_view.refresh()
+	setup.save_to(_draft_path())
+
+
+func _visit_setup_step(id: StringName) -> void:
+	if setup == null or not setup.can_visit(id) or setup_selector.details.visible: return
+	setup.step = id
+	_show_setup_step()
+
+
+func _advance_setup() -> void:
+	if setup == null or not session.can_select_difficulty(setup.difficulty_id): return
+	setup.next_step()
+	_show_setup_step()
+
+
+func _setup_back() -> void:
+	if setup != null and setup.previous_step():
+		_show_setup_step()
+	else:
+		_show_home()
+
+
+func _show_setup_step() -> void:
+	match setup.step:
+		&"difficulty": _show_difficulty()
+		&"weapon": _show_setup_weapons()
+
+
+func _show_setup_weapons() -> void:
+	page = &"weapon"
+	setup.step = page
+	_clear_rows()
+	menu_stage.visible = false
+	setup_selector.visible = true
+	var options: Array[WeaponData] = []
+	for weapon in WeaponCatalog.ALL:
+		if weapon.hands <= setup.root_capacity: options.append(weapon)
+	setup.mark_reached(page)
+	setup_selector.show_preparation(setup, options)
+	setup.weapon_id = setup_selector.selected_id
+	setup.save_to(_draft_path())
+
+
+func _save_weapon_preview() -> void:
+	if setup == null or page != &"weapon": return
+	setup.weapon_id = setup_selector.selected_id
+	setup.save_to(_draft_path())
+
+
+# Kept for preview/timing tools: selecting difficulty only advances preparation.
 func _start_new_game(difficulty_id: StringName) -> void:
-	if not session.select_difficulty(difficulty_id):
+	if setup == null: setup = RunSetup.new()
+	_select_setup_difficulty(difficulty_id)
+	_advance_setup()
+
+
+func _launch_prepared_run(weapon: WeaponData) -> void:
+	if launching_run or setup == null or weapon not in WeaponCatalog.ALL or weapon.hands > setup.root_capacity:
 		return
-	session.clear_run()
-	session.resume_requested = false
+	if not session.select_difficulty(setup.difficulty_id):
+		_show_difficulty()
+		return
+	launching_run = true
+	session.selected_story_mode = setup.story_mode
+	session.pending_start_weapon_id = weapon.id
+	var saved: Dictionary = session.load_run() if setup.resume_pending else {}
+	if not saved.is_empty() and bool(saved.get("starter_pending", false)):
+		saved["difficulty_id"] = str(setup.difficulty_id)
+		session.save_run(saved)
+		session.resume_requested = true
+	else:
+		session.clear_run()
+		session.resume_requested = false
+	RunStore.clear(_draft_path())
 	get_tree().paused = false
 	get_node("/root/SceneTransitions").change_scene("res://scenes/game/game.tscn")
 
 
 func _continue_game() -> void:
-	if not session.has_run():
+	var saved: Dictionary = session.load_run()
+	if not saved.is_empty() and bool(saved.get("starter_pending", false)):
+		var draft := RunSetup.load_from(_draft_path())
+		if draft != null and draft.resume_pending:
+			setup = draft
+			_show_setup_step()
+			return
+		# Migrate old pre-wave saves into the menu without loading the arena.
+		setup = RunSetup.new()
+		setup.step = &"weapon"
+		setup.difficulty_id = DifficultyCatalog.by_id(StringName(str(saved.get("difficulty_id", "normal")))).id
+		setup.weapon_id = StringName(str(saved.get("starter_preview", "")))
+		setup.story_mode = bool(saved.get("story", {}).get("enabled", false))
+		setup.root_capacity = int(saved.get("player", {}).get("stats", {}).get("root_capacity", PlayerStats.DEFAULT_ROOT_CAPACITY))
+		setup.resume_pending = true
+		_show_setup_step()
 		return
+	if saved.is_empty():
+		setup = RunSetup.load_from(_draft_path())
+		if setup != null:
+			if not session.can_select_difficulty(setup.difficulty_id):
+				setup.difficulty_id = &"normal"
+				setup.step = &"difficulty"
+			_show_setup_step()
+		return
+	session.pending_start_weapon_id = &""
 	session.resume_requested = true
 	get_tree().paused = false
 	get_node("/root/SceneTransitions").change_scene("res://scenes/game/game.tscn")

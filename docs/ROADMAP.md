@@ -1,6 +1,6 @@
 # Denti — Roadmap
 
-Stand: **21.10.2026**, auf Basis des spielbaren Stands 0.5.0 und der anschließenden Refactorings und UI-Korrekturen. **Kampf-HUD, Dash-Prototyp und alle vier eigenständigen Boss-Encounter sind umgesetzt**. Menschliche Druck-/Balance-Playtests mit echten Nah-/Fernkampf-Builds und vollständigen Wellen sind die nächste Abnahme. Zahlenwerte bleiben Startwerte, bis Messung und Spieltests abgeschlossen sind.
+Stand: **22.10.2026**, auf Basis des spielbaren Stands 0.5.0 und der anschließenden Refactorings und UI-Korrekturen. **Kampf-HUD, Dash-Prototyp und alle vier eigenständigen Boss-Encounter sind umgesetzt**. Menschliche Druck-/Balance-Playtests mit echten Nah-/Fernkampf-Builds und vollständigen Wellen sind die nächste Abnahme. Zahlenwerte bleiben Startwerte, bis Messung und Spieltests abgeschlossen sind.
 
 Das nächste Ziel: ein kompakteres Kampf-HUD, eine bewusste Dash-Entscheidung, vier eigenständige Bosskämpfe und mehr unterschiedliche Starts. Denti darf sehr mächtig werden; Positionierung, freie Wege und lesbare Gefahren sollen trotzdem wichtig bleiben.
 
@@ -8,7 +8,7 @@ Das nächste Ziel: ein kompakteres Kampf-HUD, eine bewusste Dash-Entscheidung, v
 
 - 20 Wellen, anschließend optional Endlos; Bossabschlüsse in Welle 5, 10, 15 und 20. Wellenlängen variieren, Bosswellen dauern vor der Entzündung 45 Sekunden.
 - Vier Story-Areas mit Dialogen und Ortswechseln: **Unter dem Kissen**, **Das süße Verderben**, **Tief im Säurestrom**, **Die letzte Krone**.
-- 18 reguläre Waffen, sechs geheime Evolutionen, 93 Shop-Items, fünf Relikte und zwölf Grundattribute. Startwaffen sind bisher Zauberbürste, Turbo-Bohrer und Wasserflosser. Die Wurzelanzahl ist ein gespeicherter Spielerparameter, Standard 6; [Konfiguration](PLAYER_ROOTS.md).
+- 18 reguläre Waffen, sechs geheime Evolutionen, 93 Shop-Items, fünf Relikte und zwölf Grundattribute. Alle 18 Standardwaffen sind als Mk-I-Start auswählbar; geheime Evolutionen bleiben ausgeschlossen. Die Wurzelanzahl ist ein gespeicherter Spielerparameter, Standard 6; [Konfiguration](PLAYER_ROOTS.md).
 - Ununterbrochener Kampf; danach Beutesammlung, Levelaufstiege, Upgrade-Kapseln, gegebenenfalls Relikt und Story-Übergang, anschließend Shop. Dieser Ablauf bleibt erhalten.
 - Gegnerdruck, Projektilmuster, Bossphasen und Entzündung sind vorhanden. Der Graf besitzt einen Umhang-/Sektorenablauf, der Prinz eine Karamellküche, der König Säurerinnen/Pegelwechsel/Splitterstampf und der Imperator Kronenwache/Hofurteile/Portalstiche/Nerventakt. Eigene Abläufe, alle vier Schwierigkeitsgrade, Speicherung und native Vergleichsaufnahmen sind vorhanden; vollständige Build-Abnahme bleibt offen.
 - Telemetrie, Run-Rückblick, Speichern/Fortsetzen und automatisierte Tests bilden die Grundlage für weitere Änderungen. Shopgrößen und Atlas-Ausschnitte wurden zuletzt korrigiert; entsprechende Layoutgrenzen sollen auch im Kampf gelten.
@@ -17,12 +17,17 @@ Details zum Iststand: [README](../README.md), [Story-Modus](STORY_MODE.md), [Waf
 
 ## Prioritäten
 
+Die Run-Vorbereitung ist nun als gemeinsame native Auswahlbühne umgesetzt:
+vier gemalte Schwierigkeitsmotive, 18 Waffen, kompakte Vorschau und Details auf Abruf.
+[Nutzerfeedback, Gestaltungsplan und native Prüfung](UI_UX_PLAN.md).
+Als Nächstes bleiben menschliche Build-/Druckvergleiche und frühe Starter-Balance.
+
 | Priorität | Vorhaben | Ergebnis |
 | --- | --- | --- |
 | P0 · umgesetzt | Kampf-HUD vereinheitlichen | Animiertes Zahngefäß, dezente XP-Linie und feste Anzeigegrenzen; [Prüfung und Aufnahmen](COMBAT_HUD.md) |
 | P1 · Prototyp umgesetzt | Wurzelkraft und Dash | 100 Punkte pro Dash, ausbaubarer Vorrat und verbindlicher Cooldown; [Umsetzung und Prüfung](DASH.md) |
 | P1 · Alle vier als Prototyp umgesetzt | Vier Bossidentitäten | Graf: Umhang-Rig; Prinz: Karamellküche; König: Säuresammler; Imperator: Kronengericht; als Nächstes echte Build-/Wellenvergleiche |
-| P2 | Alle Standardwaffen als Starts | Kompaktes Iconraster mit Details und ausdrücklicher Auswahlbestätigung |
+| P2 · umgesetzt | Alle Standardwaffen als Starts | Iconraster, Details, ausdrückliche Bestätigung und gespeicherte Vorschau; [Umsetzung](STARTER_SELECTION.md). Frühe Build-Balance bleibt offen |
 | Danach | Synergien und Feinschliff | Begrenzte Dash-Synergien, eventuell Cooldown-Reduktion und Balance aller Starts |
 
 Jede Stufe wird einzeln umgesetzt, getestet und gespielt. Bossumsetzung erfolgt pro Encounter; der spielbare Build bleibt während der Überarbeitung erhalten.
@@ -214,18 +219,27 @@ Pro Boss werden TTK, Schaden nach Angriffsquelle, Treffer während Vorwarnung/ak
 
 ## 4. Alle Standardwaffen als Startauswahl
 
-**Alle aktuell 18 Standardwaffen sind von Anfang an auswählbar.** Die Auswahl liest den regulären Waffenkatalog; eine zusätzliche begrenzte Starterliste entfällt. Künftige Standardwaffen erscheinen ebenfalls dort. Geheime Evolutionen gehören weiterhin zu ihrer eigenen Progression und erscheinen nicht als Starts.
+**Umgesetzt: Alle aktuell 18 Standardwaffen sind von Anfang an auswählbar.** Die Auswahl liest den regulären Waffenkatalog; eine zusätzliche begrenzte Starterliste entfällt. Künftige Standardwaffen erscheinen ebenfalls dort. Geheime Evolutionen gehören weiterhin zu ihrer eigenen Progression und erscheinen nicht als Starts.
 
-### Ablauf: Icon → Details → Bestätigung
+### Ablauf im Menü: Schwierigkeit → Waffe → Start
+
+Die Vorbereitung bleibt im Hauptmenü. Schwierigkeit markieren, mit Weiter zur
+Waffenauswahl und bei Bedarf wieder zurück; beide Auswahlen bleiben erhalten.
+Arena und Kampf-HUD werden erst nach „Run starten“ geladen. Ein separater
+Vorbereitungsentwurf erhält Schritt und Auswahl, ohne einen bestehenden Run zu
+ersetzen. Die Schrittreihenfolge erlaubt später eine Klassenauswahl dazwischen.
+[Umsetzung und Abnahme](STARTER_SELECTION.md).
+
+### Waffe: Icon → Details → Bestätigung
 
 1. Ein kompaktes Raster zeigt die vorhandenen Waffenbilder als kleine Icons. Die Reihenfolge bleibt stabil; Namen können als kurze Beschriftung oder Tooltip ergänzt werden.
-2. Ein Klick beziehungsweise Antippen markiert das Icon und öffnet die Details der Waffe. Weitere Icons wechseln die Vorschau, ohne eine Waffe zu vergeben oder den Kampf zu starten.
-3. Die Detailansicht zeigt Bild, Namen, Rolle, Wurzelkosten, Schaden, Angriffspause, Reichweite und besondere Effekte. Grundlage sind die tatsächlichen Mk-I-Startwerte.
-4. Erst **„Mit dieser Waffe starten“** bestätigt die Auswahl, vergibt genau diese Waffe und startet Welle 1. Bis eine Waffe angeklickt wurde, ist die Bestätigung deaktiviert.
+2. Ein Klick beziehungsweise Antippen markiert das Icon und wechselt die kompakte Waffenvorschau. Weitere Icons wechseln die Vorschau, ohne eine Waffe zu vergeben oder den Kampf zu starten.
+3. Die Vorschau zeigt Bild, Namen, Wurzelkosten und drei Iconwerte für Schaden, Angriffspause und Reichweite. Grundlage sind die tatsächlichen Mk-I-Startwerte. Mechaniken, Skalierung und weitere Daten öffnen sich über „Details“.
+4. Erst **„Run starten“** bestätigt die Auswahl, vergibt genau diese Waffe und startet Welle 1. Bis eine Waffe angeklickt wurde, ist die Bestätigung deaktiviert.
 
 ### Layout und Bedienung
 
-- Desktop: Iconraster mit Detailbereich daneben und fest erreichbarer Bestätigung.
+- Desktop: 6×3-Iconraster mit kompakter Vorschau daneben und fest erreichbarer Bestätigung.
 - Mobile: mehrere Spalten mit kleinen Bildern und ausreichend großen Touchflächen; Zielgröße mindestens 48×48 logische Pixel pro Iconbutton. Die Anzahl der Spalten folgt der verfügbaren Breite.
 - Bei wenig Platz stehen die Details unter dem Raster oder in einer eigenen Detailansicht mit Rückweg zur Auswahl. Scrollen bleibt auf den Inhaltsbereich begrenzt; die Bestätigung bleibt erreichbar.
 - Ausgewähltes Icon und Detailansicht stimmen jederzeit überein. Lange Namen und Beschreibungen verändern weder Icongrößen noch die äußeren Fenstergrenzen. Details sind auch ohne Hover vollständig erreichbar.
@@ -248,7 +262,7 @@ Pro Boss werden TTK, Schaden nach Angriffsquelle, Treffer während Vorwarnung/ak
 | 3 · Prototyp umgesetzt | Wurzelkraft-Attribut, wenige passende Angebote und Telemetrie | Wartezeiten, Stat-/Save-Kompatibilität und Limit geprüft; Druck-/Balance-Playtest noch offen |
 | 4 · Prototyp umgesetzt | Karies-Graf als erster eigener Encounter | Umhang-Rig, Warnsektoren, Nachschläge, Dash-Streckenprüfung, Fortsetzen und nativer Nah-/Fernvergleich; menschliche Abnahme offen |
 | 5 | Vier Boss-Encounter als Prototyp umgesetzt; Build-Abnahme folgt | Eigene Abläufe samt Grenzen und Tests vorhanden; Nah-/Fernkampf, Kernfenster, vollständige Wellen und mobile Performance vergleichen |
-| 6 | Alle 18 Standardwaffen im Iconraster mit Details und Bestätigung | Vollständiger Katalog, Auswahlablauf, frühe Wellen und UI pro Start prüfen |
+| 6 · umgesetzt | Alle 18 Standardwaffen im Iconraster mit Details und Bestätigung | Katalog, Vorschau, einmaliger Start, Fortsetzen und sechs Layoutgrößen geprüft; frühe Wellen-/Build-Balance bleibt offen |
 | 7 | Balance aller Starts und gegebenenfalls Dash-Cooldown-Items | Endlos-/Schwierigkeitsvergleich wiederholen |
 
 Nach Schritt 3 wird geprüft, ob Dash die bisherige Gegnerdichte zu stark entwertet. Nach jedem Boss folgt ein eigener Druck-/TTK-Vergleich. Mehr HP und zusätzliche Projektile ersetzen diese Prüfung nicht.

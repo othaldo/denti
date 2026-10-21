@@ -17,7 +17,7 @@ func _run() -> void:
 	if game.coins != 50 or game.choice_panel.level_actions.visible:
 		_fail("starter screen offered or charged a level reroll")
 		return
-	game.choice_panel.buttons[0].pressed.emit()
+	choose_panel(game.choice_panel, 0)
 	game._on_level_reroll()
 	if game.coins != 50 or paused:
 		_fail("level reroll interrupted combat")
@@ -63,7 +63,7 @@ func _run() -> void:
 		return
 	if not _check_tier(game, 1):
 		return
-	game.choice_panel.buttons[0].pressed.emit()
+	choose_panel(game.choice_panel, 0)
 	if game.rewards.pending_levels != 1 or game.rewards.level_rerolls != 0 or game.choice_panel.reroll_button.text != "5":
 		_fail("next queued level inherited the preceding reroll cost")
 		return
@@ -71,12 +71,12 @@ func _run() -> void:
 	if game.coins != 34 or not _check_tier(game, 3):
 		_fail("reroll lost the level 10 epic milestone")
 		return
-	game.choice_panel.buttons[0].pressed.emit()
+	choose_panel(game.choice_panel, 0)
 	game._on_level_reroll()
 	if game.coins != 34 or game.choice_panel.mode != &"chest" or game.choice_panel.level_actions.visible:
 		_fail("chest screen offered or charged a level reroll")
 		return
-	game.choice_panel.buttons[1].pressed.emit()
+	choose_panel(game.choice_panel, 1)
 	game._on_level_reroll()
 	if game.coins != 38 or not game.in_shop:
 		_fail("shop consumed a stale level reroll")

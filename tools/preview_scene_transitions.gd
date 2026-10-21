@@ -30,9 +30,10 @@ func _run() -> void:
 	current_scene = menu
 	await _record(24)
 	menu._start_new_game(&"normal")
+	menu.setup_selector.select_weapon(0)
+	menu.setup_selector.confirm_selection()
 	await _record(30)
 	var game: Node2D = current_scene
-	game.choice_panel._on_choice_pressed(0)
 	await _record(30)
 	game.wave.active = false
 	game._award_xp(13)
@@ -40,6 +41,7 @@ func _run() -> void:
 	await _record(30)
 	while game.rewards.pending_levels > 0:
 		game.choice_panel._on_choice_pressed(0)
+		if game.choice_panel.mode == &"starter": game.choice_panel.starter_selection.confirm_selection()
 		await _record(15)
 	await _record(15)
 	game._on_shop_continue()

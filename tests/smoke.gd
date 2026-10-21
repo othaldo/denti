@@ -21,7 +21,7 @@ func _run() -> void:
 	if not paused or game.choice_panel.mode != &"starter" or not player.loadout.equipped().is_empty():
 		_fail("new run did not start with an unarmed weapon choice")
 		return
-	game.choice_panel._on_choice_pressed(0)
+	choose_panel(game.choice_panel, 0)
 	if paused or player.loadout.equipped().size() != 1 or player.loadout.equipped()[0].data.id != &"magic_toothbrush":
 		_fail("starter weapon selection did not equip the toothbrush")
 		return
@@ -283,7 +283,7 @@ func _complete_intermission(game: Node2D) -> bool:
 		if game.weapon_chest_panel.visible:
 			game._on_affix_scrapped()
 		if game.choice_panel.visible and (game.choice_panel.mode == &"upgrade" or game.choice_panel.mode == &"chest" or game.choice_panel.mode == &"relic"):
-			game.choice_panel._on_choice_pressed(0)
+			choose_panel(game.choice_panel, 0)
 		if game.shop_panel.visible or game.ended:
 			return true
 		await physics_frame

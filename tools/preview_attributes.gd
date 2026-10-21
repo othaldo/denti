@@ -15,6 +15,7 @@ func _run() -> void:
 	root.content_scale_size = Vector2i(1040, 600)
 	await _capture("attribute_starters_landscape", Vector2i(896, 414))
 	game.choice_panel.buttons[0].pressed.emit()
+	if game.choice_panel.mode == &"starter": game.choice_panel.starter_selection.confirm_selection()
 	game.wave.active = false
 	game.coins = 1000
 	game._open_shop()
