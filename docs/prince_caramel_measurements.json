@@ -1,0 +1,186 @@
+{
+	"date": "2026-10-20",
+	"method": "Isolated wave 10 Normal, 120 raw DPS when in range, no weapons/items/adds/dash, seed 102026, fixed 60 Hz, maximum 90 seconds. Camera scroll explicitly updated. Scripted movement; not a human playtest or full-wave balance approval. defeated=false is not a kill time. Stationary melee is intentionally a range failure case.",
+	"results": [
+		{
+			"attacks_seen": [],
+			"damage_taken": 1732.7,
+			"defeated": true,
+			"movement": "stationary",
+			"peak_hearts": 0,
+			"peak_pools": 0,
+			"profile": "old generic",
+			"range": "melee 148",
+			"seconds": 48.93,
+			"slow_seconds": 0.0,
+			"warnings": 13
+		},
+		{
+			"attacks_seen": [],
+			"damage_taken": 1666.4,
+			"defeated": true,
+			"movement": "circle",
+			"peak_hearts": 0,
+			"peak_pools": 0,
+			"profile": "old generic",
+			"range": "melee 148",
+			"seconds": 45.95,
+			"slow_seconds": 0.0,
+			"warnings": 13
+		},
+		{
+			"attacks_seen": [],
+			"damage_taken": 203.7,
+			"defeated": true,
+			"movement": "read warning",
+			"peak_hearts": 0,
+			"peak_pools": 0,
+			"profile": "old generic",
+			"range": "melee 148",
+			"seconds": 45.25,
+			"slow_seconds": 0.0,
+			"warnings": 12
+		},
+		{
+			"attacks_seen": [],
+			"damage_taken": 1238.6,
+			"defeated": true,
+			"movement": "stationary",
+			"peak_hearts": 0,
+			"peak_pools": 0,
+			"profile": "old generic",
+			"range": "ranged 600",
+			"seconds": 36.15,
+			"slow_seconds": 0.0,
+			"warnings": 9
+		},
+		{
+			"attacks_seen": [],
+			"damage_taken": 1236.8,
+			"defeated": true,
+			"movement": "circle",
+			"peak_hearts": 0,
+			"peak_pools": 0,
+			"profile": "old generic",
+			"range": "ranged 600",
+			"seconds": 36.15,
+			"slow_seconds": 0.0,
+			"warnings": 10
+		},
+		{
+			"attacks_seen": [],
+			"damage_taken": 576.6,
+			"defeated": true,
+			"movement": "read warning",
+			"peak_hearts": 0,
+			"peak_pools": 0,
+			"profile": "old generic",
+			"range": "ranged 600",
+			"seconds": 36.15,
+			"slow_seconds": 0.0,
+			"warnings": 9
+		},
+		{
+			"attacks_seen": [
+				"0",
+				"1",
+				"2"
+			],
+			"damage_taken": 682.1,
+			"defeated": true,
+			"movement": "stationary",
+			"peak_hearts": 17,
+			"peak_pools": 3,
+			"profile": "caramel repertoire",
+			"range": "melee 148",
+			"seconds": 44.9,
+			"slow_seconds": 28.3,
+			"warnings": 21
+		},
+		{
+			"attacks_seen": [
+				"0",
+				"1",
+				"2"
+			],
+			"damage_taken": 733.4,
+			"defeated": false,
+			"movement": "circle",
+			"peak_hearts": 16,
+			"peak_pools": 3,
+			"profile": "caramel repertoire",
+			"range": "melee 148",
+			"seconds": 90.0,
+			"slow_seconds": 6.68,
+			"warnings": 41
+		},
+		{
+			"attacks_seen": [
+				"0",
+				"1",
+				"2"
+			],
+			"damage_taken": 114.3,
+			"defeated": true,
+			"movement": "read warning",
+			"peak_hearts": 17,
+			"peak_pools": 3,
+			"profile": "caramel repertoire",
+			"range": "melee 148",
+			"seconds": 54.42,
+			"slow_seconds": 7.43,
+			"warnings": 26
+		},
+		{
+			"attacks_seen": [
+				"0",
+				"1",
+				"2"
+			],
+			"damage_taken": 640.8,
+			"defeated": true,
+			"movement": "stationary",
+			"peak_hearts": 17,
+			"peak_pools": 3,
+			"profile": "caramel repertoire",
+			"range": "ranged 600",
+			"seconds": 36.15,
+			"slow_seconds": 21.92,
+			"warnings": 17
+		},
+		{
+			"attacks_seen": [
+				"0",
+				"1",
+				"2"
+			],
+			"damage_taken": 475.6,
+			"defeated": true,
+			"movement": "circle",
+			"peak_hearts": 18,
+			"peak_pools": 3,
+			"profile": "caramel repertoire",
+			"range": "ranged 600",
+			"seconds": 36.15,
+			"slow_seconds": 3.12,
+			"warnings": 17
+		},
+		{
+			"attacks_seen": [
+				"0",
+				"1",
+				"2"
+			],
+			"damage_taken": 45.7,
+			"defeated": true,
+			"movement": "read warning",
+			"peak_hearts": 18,
+			"peak_pools": 3,
+			"profile": "caramel repertoire",
+			"range": "ranged 600",
+			"seconds": 36.15,
+			"slow_seconds": 0.0,
+			"warnings": 17
+		}
+	]
+}

@@ -1,0 +1,45 @@
+{
+  "method": "40 seconds per difficulty, wave 10, fixed second health phase, stationary unarmed target, no normal enemies/adds, 60 Hz, no player damage dealt. Hearts are counted at actual release transitions; movement is summed world distance. Structural pressure comparison, not a human difficulty rating.",
+  "results": [
+    {
+      "damage": 424.1,
+      "difficulty": "easy",
+      "distance": 1646.9,
+      "hearts_launched": 45,
+      "kinds": 3,
+      "peak_hearts": 10,
+      "seconds": 40,
+      "warnings": 17
+    },
+    {
+      "damage": 659.0,
+      "difficulty": "normal",
+      "distance": 2191.6,
+      "hearts_launched": 84,
+      "kinds": 3,
+      "peak_hearts": 14,
+      "seconds": 40,
+      "warnings": 21
+    },
+    {
+      "damage": 1035.2,
+      "difficulty": "hard",
+      "distance": 2509.8,
+      "hearts_launched": 99,
+      "kinds": 3,
+      "peak_hearts": 24,
+      "seconds": 40,
+      "warnings": 24
+    },
+    {
+      "damage": 1394.2,
+      "difficulty": "hell",
+      "distance": 3308.8,
+      "hearts_launched": 176,
+      "kinds": 3,
+      "peak_hearts": 39,
+      "seconds": 40,
+      "warnings": 27
+    }
+  ]
+}

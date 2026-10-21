@@ -15,3 +15,10 @@ __pycache__/
 
 # The modular Count artwork uses mipmaps at combat sprite sizes.
 !assets/enemies/count_rig/parts.png.import
+!assets/enemies/prince_caramel/parts.png.import
+
+!assets/enemies/king_acid/parts.png.import
+!assets/enemies/king_acid/acid_stream.png.import
+!assets/enemies/king_acid/portrait.png.import
+!assets/enemies/emperor_court/parts.png.import
+!assets/enemies/emperor_court/portrait.png.import

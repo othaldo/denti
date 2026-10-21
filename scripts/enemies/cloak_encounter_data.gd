@@ -16,14 +16,22 @@ extends Resource
 @export var position_samples := 24
 @export var chase_factor := 2.5
 @export var visual_scale := 1.0
+@export var action_bonus: int = 0
 @export var strikes: Array[CloakStrikeData] = [preload("res://data/encounters/count_fan.tres"), preload("res://data/encounters/count_thrust.tres"), preload("res://data/encounters/count_ring.tres")]
 
 var reach: float:
 	get: return strike(0).reach
+
 var half_angle_degrees: float:
 	get: return strike(0).half_angle_degrees
 var edge_half_angle_degrees: float:
 	get: return strike(0).edge_half_angle_degrees
+
+func for_difficulty(difficulty: DifficultyData) -> CloakEncounterData:
+	var result := duplicate() as CloakEncounterData
+	result.action_bonus = clampi(difficulty.boss_volley_bonus, -1, 2)
+	result.recovery_seconds *= difficulty.boss_recovery_multiplier
+	return result
 
 func warning(index: int) -> float:
 	return warning_seconds if index == 0 else followup_warning_seconds

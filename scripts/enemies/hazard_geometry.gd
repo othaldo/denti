@@ -3,6 +3,17 @@ extends RefCounted
 
 const PLAYER_RADIUS := 20.0
 
+static func swept_capsule(player: Player, a: Vector2, b: Vector2, radius: float, first: float, last: float) -> bool:
+	var start := player_at(player, first)
+	var end := player_at(player, last)
+	var margin := radius + PLAYER_RADIUS
+	if Geometry2D.segment_intersects_segment(start, end, a, b) != null: return true
+	for point in [start, end]:
+		if point.distance_to(Geometry2D.get_closest_point_to_segment(point, a, b)) <= margin: return true
+	for point in [a, b]:
+		if point.distance_to(Geometry2D.get_closest_point_to_segment(point, start, end)) <= margin: return true
+	return false
+
 static func circle_sector(point: Vector2, center: Vector2, direction: Vector2, radius: float, half_angle: float) -> bool:
 	var relative := point - center
 	if relative.length() <= PLAYER_RADIUS:
@@ -51,6 +62,20 @@ static func player_at(player: Player, seconds: float) -> Vector2:
 	if player.swept_dash_this_frame():
 		return player.motion_start.lerp(player.motion_end, clampf(seconds / maxf(player.dash_motion_seconds, 0.000001), 0, 1))
 	return player.global_position
+
+static func moving_circle(player: Player, from: Vector2, to: Vector2, radius: float, first: float, last: float) -> bool:
+	# Split at dash end, then sweep relative motion on each linear interval.
+	var times: Array[float] = [first, last]
+	if player.swept_dash_this_frame() and player.dash_motion_seconds > first and player.dash_motion_seconds < last:
+		times.insert(1, player.dash_motion_seconds)
+	for index in times.size() - 1:
+		var a := (times[index] - first) / maxf(last - first, 0.000001)
+		var b := (times[index + 1] - first) / maxf(last - first, 0.000001)
+		var relative_start := player_at(player, times[index]) - from.lerp(to, a)
+		var relative_end := player_at(player, times[index + 1]) - from.lerp(to, b)
+		var nearest := Geometry2D.get_closest_point_to_segment(Vector2.ZERO, relative_start, relative_end)
+		if nearest.length_squared() <= pow(radius + PLAYER_RADIUS, 2): return true
+	return false
 
 static func circle_box(point: Vector2, box: Rect2) -> bool:
 	return point.distance_squared_to(point.clamp(box.position, box.end)) <= PLAYER_RADIUS * PLAYER_RADIUS

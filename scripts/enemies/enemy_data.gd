@@ -32,6 +32,9 @@ enum SpriteFacing { FRONT, RIGHT, LEFT }
 @export var is_elite: bool = false
 @export var pillow_profile: PillowEncounterData
 @export var cloak_profile: CloakEncounterData
+@export var caramel_profile: CaramelEncounterData
+@export var acid_king_profile: AcidKingData
+@export var crown_court_profile: CrownCourtData
 @export_group("Elite")
 @export var aura_radius: float = 0.0
 @export_range(0.0, 1.0, 0.01) var aura_move_bonus: float = 0.0

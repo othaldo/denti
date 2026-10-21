@@ -42,9 +42,12 @@ static func move(player: Player, travel: Vector2, seconds: float) -> bool:
 	return wall != null or obstacle != null or not destination.is_equal_approx(start + travel)
 
 static func _charge_movement(enemy: Enemy, seconds: float) -> Vector2:
+	if enemy.caramel_encounter != null:
+		return enemy.caramel_encounter.rush_movement(seconds)
 	if enemy.special_phase != Enemy.SpecialPhase.ACTIVE: return Vector2.ZERO
 	var distance := enemy.data.attack_speed * enemy.overtime_speed_factor() * seconds
 	if enemy.active_special_attack == EnemyData.SpecialAttack.BOSS and enemy.boss_move == Enemy.BossMove.CHARGE:
+		distance *= enemy.difficulty.boss_movement_multiplier
 		return enemy.global_position.move_toward(enemy.boss_dash_end, distance) - enemy.global_position
 	if enemy.active_special_attack == EnemyData.SpecialAttack.DASH:
 		var margin := DentiArena.WALL_WIDTH + enemy.data.radius + 6

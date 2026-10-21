@@ -72,6 +72,12 @@ func _run() -> void:
 		var visual_loaded := sprite_enemy.sprite.texture == enemy_data.sprite
 		if enemy_data.cloak_profile != null:
 			visual_loaded = sprite_enemy.cloak_encounter != null and is_instance_valid(sprite_enemy.cloak_encounter.rig)
+		if enemy_data.caramel_profile != null:
+			visual_loaded = sprite_enemy.caramel_encounter != null and is_instance_valid(sprite_enemy.caramel_encounter.rig)
+		if enemy_data.acid_king_profile != null:
+			visual_loaded = sprite_enemy.acid_king_encounter != null and is_instance_valid(sprite_enemy.acid_king_encounter.rig)
+		if enemy_data.crown_court_profile != null:
+			visual_loaded = sprite_enemy.crown_court_encounter != null and is_instance_valid(sprite_enemy.crown_court_encounter.rig)
 		if enemy_data.sprite == null or not visual_loaded:
 			_fail("enemy sprite was not loaded: " + path)
 			return

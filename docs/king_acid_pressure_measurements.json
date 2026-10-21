@@ -1,0 +1,66 @@
+{
+  "results": [
+    {
+      "channels": 7,
+      "damage_acid": 463.7,
+      "damage_shards": 77.3,
+      "damage_stomp": 0.0,
+      "difficulty": "easy",
+      "kinds": 3,
+      "movement": 1587.5,
+      "peak_fields": 1,
+      "peak_shards": 12,
+      "projectiles": 75,
+      "rows": 15,
+      "seconds": 60,
+      "warnings": 12
+    },
+    {
+      "channels": 14,
+      "damage_acid": 772.8,
+      "damage_shards": 38.6,
+      "damage_stomp": 55.2,
+      "difficulty": "normal",
+      "kinds": 3,
+      "movement": 1941.9,
+      "peak_fields": 2,
+      "peak_shards": 28,
+      "projectiles": 140,
+      "rows": 20,
+      "seconds": 60,
+      "warnings": 13
+    },
+    {
+      "channels": 18,
+      "damage_acid": 1582.4,
+      "damage_shards": 29.1,
+      "damage_stomp": 0.0,
+      "difficulty": "hard",
+      "kinds": 3,
+      "movement": 2412.7,
+      "peak_fields": 2,
+      "peak_shards": 45,
+      "projectiles": 225,
+      "rows": 25,
+      "seconds": 60,
+      "warnings": 14
+    },
+    {
+      "channels": 22,
+      "damage_acid": 2060.2,
+      "damage_shards": 0.0,
+      "damage_stomp": 111.4,
+      "difficulty": "hell",
+      "kinds": 3,
+      "movement": 3349.9,
+      "peak_fields": 2,
+      "peak_shards": 66,
+      "projectiles": 264,
+      "rows": 24,
+      "seconds": 60,
+      "warnings": 15
+    }
+  ],
+  "method": "60 seconds per difficulty, isolated stationary Denti, final health phase forced, AcidKingEncounter.advance at fixed 60 Hz; no boss damage, phase transitions, adds or contact attacks. Counters from actual runtime fields and shard batch. This isolates repertoire pressure and does not measure human survival.",
+  "date": "2026-10-21"
+}

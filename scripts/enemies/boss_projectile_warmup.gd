@@ -18,6 +18,7 @@ class ChargePreview extends Node2D:
 		WarningEffects.charge_impact(self, Vector2(4, 4), 2, 0.5)
 		AttackEffects.lane(self, Vector2(1, 4), Vector2(7, 4), 2.0, Color.WHITE, 0.5, Transform2D.IDENTITY, PackedFloat32Array([1, 1, 0.5, 0.3, 0.2, 0.3, 0.5, 1, 1]))
 		AttackEffects.spray(self, Vector2(1, 4), Vector2.RIGHT, 6.0, 65.0, Color.WHITE, 0.0)
+		CrownCourtVisuals._sector(self, Vector2(1, 4), Vector2.RIGHT, 6.0, 60.0, Color.WHITE, Transform2D.IDENTITY)
 		AttackEffects.warning_ring(self, Vector2(4, 4), 2.0, 0.5, Color.WHITE)
 		AttackEffects.danger(self, Vector2(4, 4), 2.0, Color.WHITE)
 		WarningEffects.sector(self, Vector2(1, 4), Vector2.RIGHT, 4, deg_to_rad(40), 0.5, false, false)
@@ -58,6 +59,19 @@ func _ready() -> void:
 	cloak.scale = Vector2.ONE * 0.02
 	add_child(cloak)
 	cloak.sample(1.09)
+	var collector := KingAcidRig.new()
+	collector.name = &"KingRigWarmup"
+	collector.position = Vector2(4, 7)
+	collector.scale = Vector2.ONE * 0.02
+	add_child(collector)
+	collector.sample(0, 1, 0, 0, false, true)
+	collector.show_acid_level(0.5)
+	var emperor := EmperorCourtRig.new()
+	emperor.name = &"EmperorRigWarmup"
+	emperor.scale = Vector2.ONE * 0.02
+	emperor.position = Vector2(4, 7)
+	add_child(emperor)
+	emperor.sample(0, 1, 2, Vector2.DOWN, true)
 	var numbers: Label = preload("res://scenes/ui/damage_number.tscn").instantiate()
 	numbers.name = "CombatFontWarmup"
 	numbers.text = "0123456789-+!"
@@ -100,6 +114,10 @@ func _ready() -> void:
 static func art_textures() -> Array[Texture2D]:
 	var result: Array[Texture2D] = [DentiExpressions.BODY, DentiExpressions.ATLAS]
 	result.append(CountCloakRig.ART)
+	result.append(PrinceCaramelArt.ATLAS)
+	result.append(KingAcidArt.ATLAS)
+	result.append(KingAcidArt.STREAM)
+	result.append(EmperorCourtArt.ATLAS)
 	for data in EnemyCatalog.ALL:
 		result.append(data.sprite)
 	var weapons: Array[WeaponData] = WeaponCatalog.ALL.duplicate()

@@ -1,6 +1,6 @@
 # Denti — Roadmap
 
-Stand: **20.10.2026**, auf Basis des spielbaren Stands 0.5.0 und der anschließenden Refactorings und UI-Korrekturen. **Kampf-HUD, Dash-Prototyp und der erste eigenständige Boss-Encounter (Karies-Graf) sind umgesetzt**; die übrigen drei Bossidentitäten und menschliche Druck-/Balance-Playtests sind offen. Zahlenwerte bleiben Startwerte, bis Messung und Spieltests abgeschlossen sind.
+Stand: **21.10.2026**, auf Basis des spielbaren Stands 0.5.0 und der anschließenden Refactorings und UI-Korrekturen. **Kampf-HUD, Dash-Prototyp und alle vier eigenständigen Boss-Encounter sind umgesetzt**. Menschliche Druck-/Balance-Playtests mit echten Nah-/Fernkampf-Builds und vollständigen Wellen sind die nächste Abnahme. Zahlenwerte bleiben Startwerte, bis Messung und Spieltests abgeschlossen sind.
 
 Das nächste Ziel: ein kompakteres Kampf-HUD, eine bewusste Dash-Entscheidung, vier eigenständige Bosskämpfe und mehr unterschiedliche Starts. Denti darf sehr mächtig werden; Positionierung, freie Wege und lesbare Gefahren sollen trotzdem wichtig bleiben.
 
@@ -10,7 +10,7 @@ Das nächste Ziel: ein kompakteres Kampf-HUD, eine bewusste Dash-Entscheidung, v
 - Vier Story-Areas mit Dialogen und Ortswechseln: **Unter dem Kissen**, **Das süße Verderben**, **Tief im Säurestrom**, **Die letzte Krone**.
 - 18 reguläre Waffen, sechs geheime Evolutionen, 93 Shop-Items, fünf Relikte und zwölf Grundattribute. Startwaffen sind bisher Zauberbürste, Turbo-Bohrer und Wasserflosser. Die Wurzelanzahl ist ein gespeicherter Spielerparameter, Standard 6; [Konfiguration](PLAYER_ROOTS.md).
 - Ununterbrochener Kampf; danach Beutesammlung, Levelaufstiege, Upgrade-Kapseln, gegebenenfalls Relikt und Story-Übergang, anschließend Shop. Dieser Ablauf bleibt erhalten.
-- Gegnerdruck, Projektilmuster, Bossphasen und Entzündung sind vorhanden. Der Graf besitzt einen eigenen Umhang-/Sektorenablauf; Prinz, König und Imperator teilen noch den alten wesentlichen Kampfablauf. Andere Projektile und mehr Salven reichen als Unterscheidung noch nicht aus.
+- Gegnerdruck, Projektilmuster, Bossphasen und Entzündung sind vorhanden. Der Graf besitzt einen Umhang-/Sektorenablauf, der Prinz eine Karamellküche, der König Säurerinnen/Pegelwechsel/Splitterstampf und der Imperator Kronenwache/Hofurteile/Portalstiche/Nerventakt. Eigene Abläufe, alle vier Schwierigkeitsgrade, Speicherung und native Vergleichsaufnahmen sind vorhanden; vollständige Build-Abnahme bleibt offen.
 - Telemetrie, Run-Rückblick, Speichern/Fortsetzen und automatisierte Tests bilden die Grundlage für weitere Änderungen. Shopgrößen und Atlas-Ausschnitte wurden zuletzt korrigiert; entsprechende Layoutgrenzen sollen auch im Kampf gelten.
 
 Details zum Iststand: [README](../README.md), [Story-Modus](STORY_MODE.md), [Waffen](waffen.md), [Items](items.md), [Codebase-Review](CODEBASE_REVIEW.md). Die ausführliche frühere Planung bleibt im [historischen Planungsstand](ROADMAP_V02.md) erhalten.
@@ -21,7 +21,7 @@ Details zum Iststand: [README](../README.md), [Story-Modus](STORY_MODE.md), [Waf
 | --- | --- | --- |
 | P0 · umgesetzt | Kampf-HUD vereinheitlichen | Animiertes Zahngefäß, dezente XP-Linie und feste Anzeigegrenzen; [Prüfung und Aufnahmen](COMBAT_HUD.md) |
 | P1 · Prototyp umgesetzt | Wurzelkraft und Dash | 100 Punkte pro Dash, ausbaubarer Vorrat und verbindlicher Cooldown; [Umsetzung und Prüfung](DASH.md) |
-| P1 · Graf als Prototyp umgesetzt | Vier Bossidentitäten | Graf: Umhang-Rig mit erneut zielenden Schlagfolgen; als Nächstes Karies-Prinz mit Karamellfeldern |
+| P1 · Alle vier als Prototyp umgesetzt | Vier Bossidentitäten | Graf: Umhang-Rig; Prinz: Karamellküche; König: Säuresammler; Imperator: Kronengericht; als Nächstes echte Build-/Wellenvergleiche |
 | P2 | Alle Standardwaffen als Starts | Kompaktes Iconraster mit Details und ausdrücklicher Auswahlbestätigung |
 | Danach | Synergien und Feinschliff | Begrenzte Dash-Synergien, eventuell Cooldown-Reduktion und Balance aller Starts |
 
@@ -118,14 +118,14 @@ Speichern/Fortsetzen erhält Ladung, Cooldown, Erholungspause und bei aktivem Da
 
 ## 3. Vier Story-Areas, vier unterschiedliche Bosskämpfe
 
-Die Herrschertitel und ihre Storyfunktion bleiben erhalten. Jeder Boss erhält eine eigene Silhouette, ein eigenes Bewegungsverhalten, einen charakteristischen Angriffsablauf und eine andere Antwort des Spielers. Der Graf ist als erster eigener Encounter spielbar; die übrigen Zeilen der Matrix beschreiben geplante Angriffe.
+Die Herrschertitel und ihre Storyfunktion bleiben erhalten. Jeder Boss erhält eine eigene Silhouette, ein eigenes Bewegungsverhalten, einen charakteristischen Angriffsablauf und eine andere Antwort des Spielers. Alle vier sind als eigene Encounter spielbar; die folgenden Abnahmeziele erfordern noch echte Build- und vollständige Wellenvergleiche.
 
 | Area / Boss | Kampfidee | Typische Antwort |
 | --- | --- | --- |
 | Unter dem Kissen / Karies-Graf | Neu zielende Umhangschläge mit Knochenanimation | Warnsektoren verlassen, jeden Nachschlag neu lesen |
-| Das süße Verderben / Karies-Prinz | Geworfene Zuckerbomben hinterlassen begrenzte Karamellfelder | Freien Boden erhalten, Ablageorte der Bomben planen |
-| Tief im Säurestrom / Karies-König | Säureströme verändern vorhersehbar die sicheren Ufer | Nächste sichere Position vorausplanen |
-| Die letzte Krone / Karies-Imperator | Eine gerichtete Kronenwache und wechselnde Hofsektoren | Verwundbare Seite erreichen und sichere Sektoren nutzen |
+| Das süße Verderben / Karies-Prinz | Bomben, Karamellherzfächer, Zuckerrausch mit Herzkranz | Boden freihalten, Schussrichtungen lesen, Ansturm und Gasse beantworten |
+| Tief im Säurestrom / Karies-König | Säurerinnen, Pegelwechsel, Splitterstampf und Sammlerzug | Ufer und Übergänge vorausplanen, Öffnung nach dem Entleeren nutzen |
+| Die letzte Krone / Karies-Imperator | Kronenwache, Hofurteil, Portalstich und Nerventakt | Orientierung, Sektoren und feste Rhythmen kombinieren |
 
 ### Karies-Graf: der Umhang-Graf
 
@@ -152,6 +152,10 @@ Touch und Web-Performance bleiben offen; das ist noch keine Balancefreigabe.
 
 ### Karies-Prinz: Die Karamellküche
 
+**Nach dem Varianten-Feedback erweitert:** Drei eigene Angriffsabläufe bereits ab Phase 1: Bombenfolge, Herzfächer und Zuckerrausch mit gesondert angekündigtem Herzkranz. Das generierte Herzmotiv ist ein echtes Projektil. Spätere Phasen verändern Strahlzahl und Folgesalven; neue Vorwarnungen bleiben erhalten. [Gemeinsam überarbeitete und inzwischen umgesetzte Repertoires für Prinz, König und Imperator](BOSS_ATTACK_DIRECTION.md).
+
+**Erster Prototyp im Spiel:** Generierter Karamellprinz im Kupferkessel, fünf Gelenke, zwei beziehungsweise drei sichtbare Zuckerwürfe, begrenzter Vorhalt beim zweiten Wurf und eine stehende Nahkampfpause. Einschläge hinterlassen fünf Sekunden Karamell (72 % normale Bewegung), höchstens vier Felder gemeinsam bei zwei Prinzen. Keine zusätzlichen HP und keine generischen Phasensalven. Pause, Fortsetzen, Eckrouten und zeitgenaue Dash-Treffer sind geprüft. [Umsetzung, Werte, Aufnahmen und Grenzen](PRINCE_CARAMEL.md). Zerstörbare Zuckerkerne bleiben die spätere Erweiterung; ihr Herzmotiv wird inzwischen für Projektile genutzt; die folgenden Punkte beschreiben die Gesamtrichtung.
+
 - Der bewegliche Prinz wirft Zuckerbomben auf zuvor markierte Spielerpositionen. Nach dem Einschlag bleiben zeitlich begrenzte, verlangsamende Karamellfelder zurück; die Flugbahn und Landefläche sind sichtbar.
 - Denti kann neue Felder bewusst an Rändern ablegen. Es gelten eine feste Obergrenze für aktive Felder und eine feste Lebensdauer; der Boden kann nicht dauerhaft vollständig verkleben.
 - Später wirft der Prinz kurze Bombenfolgen und lässt zerstörbare Zuckerkerne wachsen. Ein zerstörter Kern verhindert den nächsten lokalen Karamellguss und schafft eine bessere Angriffsgelegenheit.
@@ -162,17 +166,21 @@ Touch und Web-Performance bleiben offen; das ist noch keine Balancefreigabe.
 
 ### Karies-König: Der Säuresammler
 
-- Der König steuert Säurerinnen durch die Arena, statt selbst ständig anzustürmen. Die Ströme wandern langsam entlang angekündigter Routen; sichere Ufer bleiben erreichbar.
+**Im Spiel umgesetzt:** Säurerinnen, Pegelwechsel, versetzter Splitterstampf mit echten Projektilen und Sammlerzug mit verwundbarer Brust. Generierter gepanzerter König mit sechs Gelenken und animierten Behältern; alle vier Schwierigkeiten skalieren Bewegung, Aktionsmenge und Splitter. Feste runde Bahnenden und zugehörige Trefferflächen bleiben beim Kameranachlaufen unverändert. [Umsetzung, Werte, Aufnahmen, Messung und offene Abnahme](KING_ACID.md).
+
+- Der König steuert Säurerinnen durch die Arena, statt selbst ständig anzustürmen. Gemalte Texturen fließen entlang fest angekündigter Bahnen; Pegelwechsel markieren neue Rinnensätze.
 - Ein sichtbarer Pegel kündigt einen Richtungswechsel an. Alte Rinnen laufen aus, bevor der nächste gefährliche Abschnitt entsteht. Säure verursacht Schaden über den normalen Gefahrenpfad; ein Dash bietet keinen Schutz davor.
-- Während der König seinen Vorrat abgibt, öffnet sich ein klares Angriffsfenster. Eine spätere Phase verzweigt die Rinnen und verschiebt sichere Flächen, ohne alle Wege gleichzeitig zu schließen.
+- Nachdem der König seinen Vorrat zurückzieht, öffnet sich ein klares Angriffsfenster. Die letzte Phase kombiniert den finalen Rinnensatz mit einem angekündigten Stampf. Langsame Eckrouten der getrennten Angriffe sind geprüft; kombinierte Endphase und vollständige Builds benötigen weitere Spieltests.
 - Optische Richtung: säuregefüllte Herrscherinsignien und Zahn-Trophäen als sichtbare Leitpunkte. Seine Sammlerrolle aus dem bestehenden Dialog erhält damit eine Entsprechung in der Arena.
 
 **Abnahme:** Der Spieler kann den nächsten sicheren Ort vor dem Umschalten erkennen. Spawnpositionen, Randkontakt und langsamere Builds behalten eine Route. Mobile Ansichten zeigen Strömungsrichtung und Vorwarnung ebenso klar wie Desktop.
 
 ### Karies-Imperator: Das Kronengericht
 
+**Im Spiel umgesetzt:** Acht Gelenke, generierter schwebender Imperator, drei gerichtete Kronenplatten, feste wechselnde Hofurteile, echte Portal-Wurzellanzen und vollständige Nervensalven mit offenem Kern. Alle vier Schwierigkeiten skalieren Bewegung, Aktionsmenge und Projektile. Erste langsame Eckrouten einschließlich kombinierter letzter Phase, Pause, tatsächliches Fortsetzen, zwei Imperatoren und Begrenzungen sind geprüft. [Werte, native Aufnahmen, Messung und offene Build-Balance](EMPEROR_COURT.md).
+
 - Der Imperator besitzt eine erkennbare gerichtete Kronenwache: geschützte Vorderseite, verwundbare Seiten beziehungsweise Rückseite. Die Orientierung wechselt angekündigt; Schutz bedeutet Schadensreduktion, keine unbegrenzte Immunität.
-- Ein Erlass markiert Hofsektoren, die nacheinander gefährlich werden. Denti sucht einen sicheren Sektor, von dem aus zugleich ein günstiger Angriffswinkel erreichbar ist.
+- Ein Erlass markiert gegenüberliegende Hofsektoren, die nacheinander gefährlich werden. Die übrigen Flächen bleiben unabhängig von Dentis Position offen; Denti sucht einen Platz mit günstigem Angriffswinkel.
 - In späteren Phasen dreht sich die Kronenwache zwischen den Erlassen. Die abschließende Phase verbindet höchstens zwei dieser eigenen Mechaniken und öffnet deutliche Gegenangriffsfenster.
 - Optische Richtung: große bewegliche Kronensegmente, Zepter und die Portal-/Gefängnismagie der Zahnfee. Die Arena und ihre Warnungen tragen den Kampf; der Imperator ist mehr als eine dichtere Version der ersten drei Bosse.
 
@@ -189,6 +197,14 @@ Touch und Web-Performance bleiben offen; das ist noch keine Balancefreigabe.
 - Neue Grafiken erweitern die vorhandene gemalte Bildsprache. Originalreferenzen und bestehende Art bleiben erhalten; Attacken und Silhouetten werden vor aufwendigen Effektvarianten lesbar gemacht.
 
 ### Technische Umsetzung und Messung
+
+**Umgesetzt: Bossdruck auf allen vier Schwierigkeiten.** Easy, Normal, Hard
+und Hell skalieren Bewegung, Aktionsmenge und Projektile. Prinz-Fächer und
+Herzkränze sowie die eigenen Imperator-Nervensalven lassen keine
+Geschosse mehr für eine auf Denti ausgerichtete Sicherheitsgasse aus.
+Vorwarnungen bleiben erhalten. Tatsächlicher Druck, vollständige Ringe,
+verlangsamte Eckrouten, Budgets und Save/Resume sind geprüft.
+[Werte aller vier Stufen und Messungen](PRINCE_CARAMEL.md#schwierigkeit-easy-normal-hard-und-hell).
 
 Die vorhandenen Systeme für Projektile, Warnungen, Schaden, Bossanzeige und Encounter-Abschluss werden weiterverwendet. Eigene Verhaltenskomponenten pro Boss steuern den Ablauf; Resource-Profile enthalten Zeiten, Grenzen und Phasenwerte. Ein gemeinsamer Controller wächst dadurch nicht zu einer Sammlung aller Boss-Sonderfälle.
 
@@ -231,7 +247,7 @@ Pro Boss werden TTK, Schaden nach Angriffsquelle, Treffer während Vorwarnung/ak
 | 2 · umgesetzt | Dash-Basis inklusive Touchbutton, Kontaktstopp und Save/Resume | Eine Ladung, beide Sperren, keine neuen Schutzframes, Streckenprüfung und native Darstellung geprüft |
 | 3 · Prototyp umgesetzt | Wurzelkraft-Attribut, wenige passende Angebote und Telemetrie | Wartezeiten, Stat-/Save-Kompatibilität und Limit geprüft; Druck-/Balance-Playtest noch offen |
 | 4 · Prototyp umgesetzt | Karies-Graf als erster eigener Encounter | Umhang-Rig, Warnsektoren, Nachschläge, Dash-Streckenprüfung, Fortsetzen und nativer Nah-/Fernvergleich; menschliche Abnahme offen |
-| 5 | Karies-Prinz, dann Karies-König, dann Karies-Imperator | Je Boss erst eigener Ablauf samt Grenzen und Tests, dann nächster Encounter |
+| 5 | Vier Boss-Encounter als Prototyp umgesetzt; Build-Abnahme folgt | Eigene Abläufe samt Grenzen und Tests vorhanden; Nah-/Fernkampf, Kernfenster, vollständige Wellen und mobile Performance vergleichen |
 | 6 | Alle 18 Standardwaffen im Iconraster mit Details und Bestätigung | Vollständiger Katalog, Auswahlablauf, frühe Wellen und UI pro Start prüfen |
 | 7 | Balance aller Starts und gegebenenfalls Dash-Cooldown-Items | Endlos-/Schwierigkeitsvergleich wiederholen |
 

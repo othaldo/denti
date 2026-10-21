@@ -76,7 +76,7 @@ func _physics_process(delta: float) -> void:
 	else:
 		dash.finish()
 	if not was_dashing:
-		velocity = direction * stats.move_speed
+		velocity = direction * stats.move_speed * floor_movement_factor()
 		move_and_slide()
 	global_position = global_position.clamp(Vector2.ONE * DentiArena.PLAYER_MARGIN, arena.arena_size - Vector2.ONE * DentiArena.PLAYER_MARGIN)
 	motion_end = global_position
@@ -93,6 +93,15 @@ func movement_direction() -> Vector2:
 	if mobile_controls.visible and mobile_controls.combat_active and mobile_controls.touch_index >= 0:
 		return mobile_controls.movement_direction(0.0)
 	return Input.get_vector("move_left", "move_right", "move_up", "move_down")
+
+
+func floor_movement_factor() -> float:
+	# Environmental slow is positional, never a permanent change to PlayerStats.
+	# Overlapping fields use the strongest effect, without multiplying slows.
+	var factor := 1.0
+	for encounter: CaramelEncounter in get_tree().get_nodes_in_group("caramel_encounters"):
+		factor = minf(factor, encounter.speed_factor_at(global_position))
+	return factor
 
 
 func combat_active() -> bool:

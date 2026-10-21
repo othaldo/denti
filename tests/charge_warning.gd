@@ -23,7 +23,10 @@ func _run() -> void:
 	game.wave.current_wave = 10
 	paused = true
 	game.player.global_position = Vector2(1050, 650)
-	for data in [EnemyCatalog.SUGAR, EnemyCatalog.CAVITY_PRINCE]:
+	# Keep the generic charge renderer covered after all four bosses migrated.
+	var legacy := EnemyCatalog.CAVITY_EMPEROR.duplicate() as EnemyData
+	legacy.crown_court_profile = null
+	for data in [EnemyCatalog.SUGAR, legacy]:
 		game._create_enemy(data, Vector2(730, 650))
 		var enemy: Enemy = game.get_node("Enemies").get_child(-1)
 		enemy.set_simulation_enabled(false)

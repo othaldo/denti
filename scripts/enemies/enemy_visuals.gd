@@ -36,14 +36,9 @@ static func draw(enemy: Enemy) -> void:
 			CombatDrawCache.arc(enemy, Vector2.ZERO, enemy.data.radius + 19.0, 0.0, TAU, 48, Color(0.95, 0.32, 0.63, 0.9), 7.0)
 			if not enemy.boss_phase_burst_fired or enemy.boss_radial_volleys_remaining > 0:
 				var first_preview_index := enemy.boss_radial_volley_index if enemy.boss_phase_burst_fired else 0
-				var preview_count := enemy.boss_radial_volleys_remaining if enemy.boss_phase_burst_fired else enemy.data.boss_radial_volley_count
-				var current_gap_angle := enemy.boss_phase_gap_angle + deg_to_rad(enemy.data.boss_radial_angle_step_degrees * float(first_preview_index))
-				for ray in EnemyProjectilePatterns.radial_directions(enemy.data.boss_radial_count + enemy.boss_phase * 2, current_gap_angle):
+				var current_angle := deg_to_rad(enemy.data.boss_radial_angle_step_degrees * float(first_preview_index))
+				for ray in EnemyProjectilePatterns.circle_directions(maxi(enemy.data.boss_radial_count + enemy.boss_phase * 2 + enemy.difficulty.boss_volley_bonus * 2, 4), current_angle):
 					AttackEffects.aim(enemy, ray * enemy.data.radius, ray * 290.0, Color(0.95, 0.25, 0.42, 0.6), 0.5)
-				for volley_offset in preview_count:
-					var preview_angle := enemy.boss_phase_gap_angle + deg_to_rad(enemy.data.boss_radial_angle_step_degrees * float(first_preview_index + volley_offset))
-					var gap_marker := Vector2.RIGHT.rotated(preview_angle) * 290.0
-					CombatDrawCache.arc(enemy, gap_marker, 10.0, 0.0, TAU, 20, Color(1.0, 0.78, 0.3, 0.88), 3.0)
 				if enemy.boss_phase >= 2:
 					var phase_aim := Vector2.RIGHT.rotated(enemy.boss_phase_gap_angle)
 					match enemy.data.boss_signature:

@@ -1,7 +1,8 @@
 [gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://cg66v2rbuesal"]
 
 [ext_resource type="Script" uid="uid://b17lxqmiqu3h8" path="res://scripts/enemies/enemy_data.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://bsymo2ujwr11r" path="res://assets/enemies/cavity_prince.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/enemies/prince_caramel/portrait.png" id="2"]
+[ext_resource type="Resource" path="res://data/encounters/prince_caramel.tres" id="3"]
 
 [resource]
 script = ExtResource("1")
@@ -16,6 +17,7 @@ xp_drop = 0
 coin_drop = 0
 sprite = ExtResource("2")
 is_boss = true
+caramel_profile = ExtResource("3")
 inflammation_color = Color(1.0, 0.08, 0.18, 1.0)
 inflammation_intensity = 0.75
 inflammation_aura_size = 3.4

@@ -79,7 +79,9 @@ func _run() -> void:
 	_check(_distance_matches(_travel(boss), boss.move_speed * boss.overtime_speed_factor() * 0.95 * rage_speed * STEP), "wet discarded boss overtime/rage speed")
 	boss.free()
 	# Locked dashes keep their advertised travel/timing even when wet.
-	for data in [WaveController.BACTERIA, WaveController.CAVITY_KING]:
+	var legacy := WaveController.CAVITY_EMPEROR.duplicate() as EnemyData
+	legacy.crown_court_profile = null
+	for data in [WaveController.BACTERIA, legacy]:
 		var charger := _enemy(data)
 		charger.special_direction = Vector2.LEFT
 		charger.boss_move = Enemy.BossMove.CHARGE

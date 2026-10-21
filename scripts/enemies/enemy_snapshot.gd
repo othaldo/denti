@@ -8,6 +8,7 @@ static func capture(enemy: Enemy) -> Dictionary:
 		"sprite_flip_h": enemy.sprite.flip_h,
 		"inflicted_statuses": enemy.inflicted_statuses.duplicate(true),
 		"health": enemy.health, "phase": enemy.special_phase,
+		"contact_timer": enemy.contact_timer,
 		"timer": enemy.special_timer, "direction": SnapshotValues.vector_data(enemy.special_direction),
 		"charge_aim_distance": enemy.charge_aim_distance,
 		"boss_move": enemy.boss_move, "boss_charge_next": enemy.boss_charge_next,
@@ -30,6 +31,9 @@ static func capture(enemy: Enemy) -> Dictionary:
 		"boss_radial_volley_index": enemy.boss_radial_volley_index,
 		"pillow": enemy.pillow_encounter.save_data() if enemy.pillow_encounter != null else {},
 		"cloak": enemy.cloak_encounter.save_data() if enemy.cloak_encounter != null else {},
+		"caramel": enemy.caramel_encounter.save_data() if enemy.caramel_encounter != null else {},
+		"acid_king": enemy.acid_king_encounter.save_data() if enemy.acid_king_encounter != null else {},
+		"crown_court": enemy.crown_court_encounter.save_data() if enemy.crown_court_encounter != null else {},
 	}
 
 
@@ -47,6 +51,7 @@ static func restore(enemy: Enemy, entry: Dictionary, boss_pending: bool = false)
 	enemy.health = 0.0 if enemy.dying else clampf(float(entry.get("health", enemy.max_health)), 1.0, enemy.max_health)
 	enemy.special_phase = clampi(int(entry.get("phase", 0)), 0, 2) as Enemy.SpecialPhase
 	enemy.special_timer = maxf(float(entry.get("timer", 0.0)), 0.0)
+	enemy.contact_timer = clampf(float(entry.get("contact_timer", 0.0)), 0, 2)
 	enemy.special_direction = SnapshotValues.read_vector(entry.get("direction", [0.0, 0.0]))
 	# Old saves keep the already announced direction and reveal its full path.
 	enemy.charge_aim_distance = maxf(float(entry.get("charge_aim_distance", 0.0)), 0.0)
@@ -86,4 +91,10 @@ static func restore(enemy: Enemy, entry: Dictionary, boss_pending: bool = false)
 		enemy.pillow_encounter.restore(entry.get("pillow", {}))
 	if enemy.cloak_encounter != null:
 		enemy.cloak_encounter.restore(entry.get("cloak", {}))
+	if enemy.caramel_encounter != null:
+		enemy.caramel_encounter.restore(entry.get("caramel", {}))
+	if enemy.acid_king_encounter != null:
+		enemy.acid_king_encounter.restore(entry.get("acid_king", {}))
+	if enemy.crown_court_encounter != null:
+		enemy.crown_court_encounter.restore(entry.get("crown_court", {}))
 	enemy.queue_redraw()

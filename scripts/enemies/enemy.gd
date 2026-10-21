@@ -84,6 +84,9 @@ var active_trigger_range: float = 0.0
 var inflammation_aura: BossInflammationAura
 var pillow_encounter: PillowEncounter
 var cloak_encounter: CloakEncounter
+var caramel_encounter: CaramelEncounter
+var acid_king_encounter: AcidKingEncounter
+var crown_court_encounter: CrownCourtEncounter
 var inflicted_statuses: Array[Dictionary] = []
 var spatial_index: EnemySpatialIndex
 var hit_flash_time: float = 0.0
@@ -111,8 +114,11 @@ func configure(enemy_data: EnemyData, player: Player, wave_number: int = 1, diff
 	contact_damage = data.contact_damage * WaveController.enemy_damage_multiplier(data, wave_number) * difficulty.damage_factor(wave_number)
 	attack_damage = data.attack_damage * WaveController.enemy_damage_multiplier(data, wave_number) * difficulty.damage_factor(wave_number)
 	move_speed = data.move_speed * WaveController.enemy_speed_multiplier(data, wave_number) * difficulty.speed_factor(wave_number)
+	if data.is_boss:
+		move_speed *= difficulty.boss_movement_multiplier
 	special_phase = SpecialPhase.COOLDOWN
 	var interval := data.special_interval * (WaveController.ranged_interval_multiplier(wave_number) * difficulty.ranged_interval_multiplier if active_special_attack == EnemyData.SpecialAttack.SHOOT else 1.0)
+	if data.is_boss: interval *= difficulty.boss_recovery_multiplier
 	if data.is_elite:
 		special_timer = randf_range(0.35, 0.55)
 	else:
@@ -150,10 +156,25 @@ func _ready() -> void:
 		inflammation_aura = BossInflammationAura.new()
 		inflammation_aura.configure(data)
 		add_child(inflammation_aura)
-		if data.cloak_profile != null:
+		if data.crown_court_profile != null:
+			crown_court_encounter = CrownCourtEncounter.new()
+			crown_court_encounter.enemy = self
+			crown_court_encounter.profile = data.crown_court_profile.for_difficulty(difficulty)
+			add_child(crown_court_encounter)
+		elif data.acid_king_profile != null:
+			acid_king_encounter = AcidKingEncounter.new()
+			acid_king_encounter.enemy = self
+			acid_king_encounter.profile = data.acid_king_profile.for_difficulty(difficulty)
+			add_child(acid_king_encounter)
+		elif data.caramel_profile != null:
+			caramel_encounter = CaramelEncounter.new()
+			caramel_encounter.enemy = self
+			caramel_encounter.profile = data.caramel_profile.for_difficulty(difficulty)
+			add_child(caramel_encounter)
+		elif data.cloak_profile != null:
 			cloak_encounter = CloakEncounter.new()
 			cloak_encounter.enemy = self
-			cloak_encounter.profile = data.cloak_profile
+			cloak_encounter.profile = data.cloak_profile.for_difficulty(difficulty)
 			add_child(cloak_encounter)
 		elif data.pillow_profile != null:
 			pillow_encounter = PillowEncounter.new()
@@ -231,7 +252,7 @@ func _physics_process(delta: float) -> void:
 			queue_redraw()
 		if boss_phase_timer > 0.0:
 			boss_phase_timer = maxf(boss_phase_timer - delta, 0.0)
-			if pillow_encounter == null and cloak_encounter == null and not boss_phase_burst_fired and boss_phase_timer <= data.boss_phase_duration * 0.5:
+			if pillow_encounter == null and cloak_encounter == null and caramel_encounter == null and acid_king_encounter == null and crown_court_encounter == null and not boss_phase_burst_fired and boss_phase_timer <= data.boss_phase_duration * 0.5:
 				boss_phase_burst_fired = true
 				_fire_phase_burst()
 		if boss_radial_volleys_remaining > 0:
@@ -295,6 +316,7 @@ func try_contact_hit() -> void:
 	if contact_timer > 0.0 or health <= 0.0 or is_queued_for_deletion() or target == null:
 		return
 	var charging := special_phase == SpecialPhase.ACTIVE and (active_special_attack == EnemyData.SpecialAttack.DASH or active_special_attack == EnemyData.SpecialAttack.BOSS and boss_move == BossMove.CHARGE)
+	charging = charging or caramel_encounter != null and caramel_encounter.state == CaramelEncounter.State.RUSH_ACTIVE
 	contact_timer = 0.8 / overtime_attack_factor()
 	target.take_hit(attack_damage if charging else contact_damage, inflicted_statuses)
 
@@ -307,6 +329,15 @@ func _update_sprite_facing(direction: Vector2) -> void:
 
 
 func _process_special(delta: float, direction: Vector2) -> void:
+	if crown_court_encounter != null:
+		crown_court_encounter.advance(delta)
+		return
+	if acid_king_encounter != null:
+		acid_king_encounter.advance(delta)
+		return
+	if caramel_encounter != null:
+		caramel_encounter.advance(delta)
+		return
 	if cloak_encounter != null:
 		cloak_encounter.advance(delta)
 		return
@@ -353,7 +384,7 @@ func _process_special(delta: float, direction: Vector2) -> void:
 		SpecialPhase.ACTIVE:
 			var impact_after := minf(maxf(special_timer, 0), delta)
 			if active_special_attack == EnemyData.SpecialAttack.BOSS:
-				global_position = global_position.move_toward(boss_dash_end, data.attack_speed * overtime_speed_factor() * delta)
+				global_position = global_position.move_toward(boss_dash_end, data.attack_speed * difficulty.boss_movement_multiplier * overtime_speed_factor() * delta)
 			else:
 				global_position += special_direction * data.attack_speed * overtime_speed_factor() * delta
 				var margin := DentiArena.WALL_WIDTH + data.radius + 6.0
@@ -492,6 +523,7 @@ func _aimed_projectile_count() -> int:
 func _reset_special() -> void:
 	special_phase = SpecialPhase.COOLDOWN
 	special_timer = data.special_interval * (0.72 if is_enraged else (WaveController.ranged_interval_multiplier(spawn_wave) * difficulty.ranged_interval_multiplier if active_special_attack == EnemyData.SpecialAttack.SHOOT else 1.0))
+	if data.is_boss: special_timer *= difficulty.boss_recovery_multiplier
 	queue_redraw()
 
 
@@ -551,7 +583,7 @@ func has_bleeding() -> bool:
 	return bleed_stacks > 0 or affix_effects.pending.has("bleed")
 
 
-func take_damage(amount: float, weapon: WeaponData = null, critical: bool = false, proc_id: StringName = &"", additions: Array[Dictionary] = []) -> float:
+func take_damage(amount: float, weapon: WeaponData = null, critical: bool = false, proc_id: StringName = &"", additions: Array[Dictionary] = [], incoming_direction: Vector2 = Vector2.ZERO) -> float:
 	if health <= 0.0:
 		return 0.0
 	var direct: Array[Dictionary] = []
@@ -578,6 +610,8 @@ func take_damage(amount: float, weapon: WeaponData = null, critical: bool = fals
 		return 0.0
 	additions = direct
 	var applied := maxf(total * (1.0 - damage_reduction) / overtime_defense_factor(), 1.0 if amount > 0 else 0.0)
+	if acid_king_encounter != null: applied *= acid_king_encounter.damage_factor()
+	if crown_court_encounter != null: applied *= crown_court_encounter.damage_factor(incoming_direction, proc_id.is_empty())
 	if data.is_boss and data.boss_guard_recharge_seconds > 0.0:
 		if boss_phase_timer > 0.0:
 			_guard_boss_hit()
@@ -651,6 +685,12 @@ func _finish_death(amount: float, delayed: Array[Dictionary]) -> void:
 		pillow_encounter.cancel()
 	if cloak_encounter != null:
 		cloak_encounter.cancel()
+	if caramel_encounter != null:
+		caramel_encounter.cancel()
+	if acid_king_encounter != null:
+		acid_king_encounter.cancel()
+	if crown_court_encounter != null:
+		crown_court_encounter.cancel()
 	for addition in delayed:
 		if addition.id == &"fire":
 			affix_effects.remember_fire(addition.damage, addition.can_spread)

@@ -30,7 +30,7 @@ static func hit(enemy: Enemy, weapon: WeaponData, tier: int, damage: float, crit
 	var additions: Array[Dictionary] = []
 	if items != null and not affixes.is_empty():
 		additions = WeaponEnchantmentEffects.packets(items.effect_context, enemy, weapon, affixes, affix_factor)
-	var dealt := enemy.take_damage(weapon.damage_against(enemy, value, tier), weapon, critical, &"", additions)
+	var dealt := enemy.take_damage(weapon.damage_against(enemy, value, tier), weapon, critical, &"", additions, direction)
 	if items != null:
 		WeaponEnchantmentEffects.after_hit(items.effect_context, enemy, weapon, affixes, critical, dealt, affix_factor, was_chilled)
 	if enemy.health > 0.0:

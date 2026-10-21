@@ -40,7 +40,7 @@ static func advance_overtime(enemy: Enemy, seconds: int) -> void:
 
 static func boss_dash_target(enemy: Enemy, direction: Vector2) -> Vector2:
 	var margin := DentiArena.WALL_WIDTH + enemy.data.radius + 6.0
-	return (enemy.global_position + direction * enemy.data.attack_speed * enemy.data.attack_duration).clamp(Vector2.ONE * margin, enemy.target.arena.arena_size - Vector2.ONE * margin)
+	return (enemy.global_position + direction * enemy.data.attack_speed * enemy.difficulty.boss_movement_multiplier * enemy.data.attack_duration).clamp(Vector2.ONE * margin, enemy.target.arena.arena_size - Vector2.ONE * margin)
 
 
 static func fire_phase_burst(enemy: Enemy) -> void:
@@ -52,9 +52,9 @@ static func fire_phase_burst(enemy: Enemy) -> void:
 
 static func fire_next_boss_radial_volley(enemy: Enemy) -> void:
 	var root := enemy._projectile_root()
-	var volley_angle := enemy.boss_phase_gap_angle + deg_to_rad(enemy.data.boss_radial_angle_step_degrees * float(enemy.boss_radial_volley_index))
+	var volley_angle := deg_to_rad(enemy.data.boss_radial_angle_step_degrees * float(enemy.boss_radial_volley_index))
 	if root != null:
-		EnemyProjectilePatterns.fire_radial(root, enemy.global_position, enemy.data.boss_radial_count + enemy.boss_phase * 2, volley_angle, enemy.data.boss_projectile_speed * enemy.overtime_speed_factor(), enemy.attack_damage * 0.55, enemy.target, EnemyProjectilePatterns.BOSS_COLOR, enemy.inflicted_statuses)
+		EnemyProjectilePatterns.fire_radial(root, enemy.global_position, maxi(enemy.data.boss_radial_count + enemy.boss_phase * 2 + enemy.difficulty.boss_volley_bonus * 2, 4), volley_angle, enemy.data.boss_projectile_speed * enemy.difficulty.boss_projectile_speed_multiplier * enemy.overtime_speed_factor(), enemy.attack_damage * 0.55, enemy.target, EnemyProjectilePatterns.BOSS_COLOR, enemy.inflicted_statuses, true)
 	enemy.boss_radial_volley_index += 1
 	enemy.boss_radial_volleys_remaining -= 1
 	if enemy.boss_radial_volleys_remaining > 0:
@@ -73,13 +73,13 @@ static func fire_boss_signature(enemy: Enemy, charge_direction: Vector2) -> void
 		return
 	match enemy.data.boss_signature:
 		EnemyData.BossSignature.AIMED_FAN:
-			EnemyProjectilePatterns.fire_aimed_fan(root, enemy.global_position, enemy.target.global_position - enemy.global_position, maxi(enemy.data.boss_fan_count + enemy.difficulty.boss_volley_bonus * 2, 1), enemy.data.boss_projectile_speed * enemy.overtime_speed_factor(), enemy.attack_damage * 0.45, enemy.target, EnemyProjectilePatterns.BOSS_COLOR, 3.0, enemy.inflicted_statuses)
+			EnemyProjectilePatterns.fire_aimed_fan(root, enemy.global_position, enemy.target.global_position - enemy.global_position, maxi(enemy.data.boss_fan_count + enemy.difficulty.boss_volley_bonus * 2, 1), enemy.data.boss_projectile_speed * enemy.difficulty.boss_projectile_speed_multiplier * enemy.overtime_speed_factor(), enemy.attack_damage * 0.45, enemy.target, EnemyProjectilePatterns.BOSS_COLOR, 3.0, enemy.inflicted_statuses)
 		EnemyData.BossSignature.TRAIL_FAN:
-			EnemyProjectilePatterns.fire_aimed_fan(root, enemy.global_position, -charge_direction, maxi(enemy.data.boss_fan_count + enemy.difficulty.boss_volley_bonus * 2, 1), enemy.data.boss_projectile_speed * enemy.overtime_speed_factor(), enemy.attack_damage * 0.45, enemy.target, EnemyProjectilePatterns.BOSS_COLOR, 3.0, enemy.inflicted_statuses)
+			EnemyProjectilePatterns.fire_aimed_fan(root, enemy.global_position, -charge_direction, maxi(enemy.data.boss_fan_count + enemy.difficulty.boss_volley_bonus * 2, 1), enemy.data.boss_projectile_speed * enemy.difficulty.boss_projectile_speed_multiplier * enemy.overtime_speed_factor(), enemy.attack_damage * 0.45, enemy.target, EnemyProjectilePatterns.BOSS_COLOR, 3.0, enemy.inflicted_statuses)
 		EnemyData.BossSignature.LANE:
-			EnemyProjectilePatterns.fire_lane(root, enemy.global_position, charge_direction, maxi(enemy.data.boss_signature_projectile_count + enemy.difficulty.boss_volley_bonus, 1), enemy.data.boss_signature_projectile_spacing, enemy.data.boss_projectile_speed * enemy.overtime_speed_factor(), enemy.attack_damage * 0.45, enemy.target, EnemyProjectilePatterns.BOSS_COLOR, enemy.inflicted_statuses)
+			EnemyProjectilePatterns.fire_lane(root, enemy.global_position, charge_direction, maxi(enemy.data.boss_signature_projectile_count + enemy.difficulty.boss_volley_bonus, 1), enemy.data.boss_signature_projectile_spacing, enemy.data.boss_projectile_speed * enemy.difficulty.boss_projectile_speed_multiplier * enemy.overtime_speed_factor(), enemy.attack_damage * 0.45, enemy.target, EnemyProjectilePatterns.BOSS_COLOR, enemy.inflicted_statuses)
 		EnemyData.BossSignature.SPACE_ORB:
-			EnemyProjectilePatterns.fire_space_orb(root, enemy.global_position, charge_direction, enemy.data.boss_projectile_speed * enemy.overtime_speed_factor(), enemy.attack_damage * 0.5, enemy.data.boss_signature_orb_radius, enemy.target, enemy.inflicted_statuses)
+			EnemyProjectilePatterns.fire_space_orb(root, enemy.global_position, charge_direction, enemy.data.boss_projectile_speed * enemy.difficulty.boss_projectile_speed_multiplier * enemy.overtime_speed_factor(), enemy.attack_damage * 0.5, enemy.data.boss_signature_orb_radius, enemy.target, enemy.inflicted_statuses)
 
 
 static func boss_phase_floor(enemy: Enemy) -> float:
@@ -97,11 +97,21 @@ static func start_boss_phase(enemy: Enemy) -> void:
 	enemy.special_direction = Vector2.RIGHT.rotated(enemy.boss_phase_gap_angle)
 	enemy.special_phase = Enemy.SpecialPhase.COOLDOWN
 	enemy.special_timer = enemy.data.special_interval * (0.72 if enemy.is_enraged else 1.0)
+	enemy.special_timer *= enemy.difficulty.boss_recovery_multiplier
 	if enemy.pillow_encounter != null:
 		enemy.pillow_encounter.cancel()
 		enemy.boss_phase_burst_fired = true
 	if enemy.cloak_encounter != null:
 		enemy.cloak_encounter.cancel()
+		enemy.boss_phase_burst_fired = true
+	if enemy.caramel_encounter != null:
+		enemy.caramel_encounter.cancel(false)
+		enemy.boss_phase_burst_fired = true
+	if enemy.acid_king_encounter != null:
+		enemy.acid_king_encounter.cancel()
+		enemy.boss_phase_burst_fired = true
+	if enemy.crown_court_encounter != null:
+		enemy.crown_court_encounter.cancel()
 		enemy.boss_phase_burst_fired = true
 	enemy.boss_phase_started.emit(enemy.global_position, enemy.boss_phase)
 	enemy.reinforcements_requested.emit(enemy.data.boss_phase_adds)

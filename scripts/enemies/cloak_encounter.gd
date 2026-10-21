@@ -45,7 +45,7 @@ func cancel() -> void:
 
 func begin() -> void:
 	strike_index = 0
-	count = 3 if enemy.boss_phase >= 1 else 2
+	count = (3 if enemy.boss_phase >= 1 else 2) + profile.action_bonus
 	hit_mask = 0
 	elapsed = 0
 	cycle += 1
@@ -132,6 +132,7 @@ func _next(seconds_in_frame: float) -> void:
 			elapsed = 0
 
 func _variant_for(index: int) -> int:
+	if index >= 3: return posmod(index, 3)
 	if index == 0: return CloakStrikeData.Kind.FAN
 	if index >= 2: return CloakStrikeData.Kind.RING
 	return CloakStrikeData.Kind.THRUST if count == 3 or cycle % 2 == 1 else CloakStrikeData.Kind.RING
@@ -237,7 +238,7 @@ func restore(saved: Dictionary) -> void:
 		cancel()
 	else:
 		state = clampi(int(saved.get("state", 0)), 0, 4) as State
-		count = clampi(int(saved.get("count", 2)), 2, 3)
+		count = clampi(int(saved.get("count", 2)), 1, maxi(3, 3 + profile.action_bonus))
 		strike_index = clampi(int(saved.get("strike_index", 0)), 0, count - 1 if state in [State.WARNING, State.STRIKE, State.STEP] else count)
 		var limit := profile.recovery_seconds
 		match state:
@@ -246,7 +247,7 @@ func restore(saved: Dictionary) -> void:
 			State.STEP: limit = profile.step_seconds
 		remaining = clampf(float(saved.get("remaining", 0)), 0, limit)
 		elapsed = maxf(float(saved.get("elapsed", 0)), 0)
-		hit_mask = clampi(int(saved.get("hit_mask", 0)), 0, 7)
+		hit_mask = clampi(int(saved.get("hit_mask", 0)), 0, (1 << count) - 1)
 		cycle = maxi(int(saved.get("cycle", 0)), 0)
 		# Saves from the single-shape version finish their already announced fan.
 		variant = clampi(int(saved.get("variant", 0)), 0, 2)

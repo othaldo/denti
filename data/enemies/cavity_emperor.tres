@@ -1,7 +1,8 @@
 [gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://cr5l0h3sd1j32"]
 
 [ext_resource type="Script" uid="uid://b17lxqmiqu3h8" path="res://scripts/enemies/enemy_data.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://dd8gxpyd4gr7i" path="res://assets/enemies/cavity_emperor.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/enemies/emperor_court/portrait.png" id="2"]
+[ext_resource type="Resource" path="res://data/encounters/emperor_court.tres" id="3"]
 
 [resource]
 script = ExtResource("1")
@@ -16,6 +17,7 @@ xp_drop = 0
 coin_drop = 0
 sprite = ExtResource("2")
 is_boss = true
+crown_court_profile = ExtResource("3")
 inflammation_color = Color(0.68, 0.18, 1.0, 1.0)
 inflammation_intensity = 0.95
 inflammation_aura_size = 3.8

@@ -13,6 +13,10 @@ extends Resource
 @export var ranged_interval_multiplier: float = 1.0
 @export var boss_volley_bonus: int = 0
 @export var reward_chance_multiplier: float = 1.0
+@export_group("Boss pressure")
+@export var boss_movement_multiplier: float = 1.0
+@export var boss_recovery_multiplier: float = 1.0
+@export var boss_projectile_speed_multiplier: float = 1.0
 @export_group("Player ailments")
 @export var poison_first_wave: int = 6
 @export var bleed_first_wave: int = 8

@@ -1,0 +1,42 @@
+{
+  "date": "2026-10-21",
+  "method": "60 seconds per difficulty, isolated stationary Denti, final health phase forced, actual CrownCourtEncounter.advance at 60 Hz. No boss damage, phase transitions, contact or adds. Counts include guard-turn warnings; movement uses the actual configured difficulty and speed. Not a human survival test.",
+  "results": [
+    {
+      "difficulty": "easy",
+      "movement": 760.5,
+      "peak_shots": 28,
+      "portals": 11,
+      "projectiles": 92,
+      "seconds": 60,
+      "warnings": 28
+    },
+    {
+      "difficulty": "normal",
+      "movement": 919.9,
+      "peak_shots": 48,
+      "portals": 12,
+      "projectiles": 176,
+      "seconds": 60,
+      "warnings": 32
+    },
+    {
+      "difficulty": "hard",
+      "movement": 1260.0,
+      "peak_shots": 53,
+      "portals": 16,
+      "projectiles": 220,
+      "seconds": 60,
+      "warnings": 35
+    },
+    {
+      "difficulty": "hell",
+      "movement": 1713.3,
+      "peak_shots": 59,
+      "portals": 19,
+      "projectiles": 280,
+      "seconds": 60,
+      "warnings": 38
+    }
+  ]
+}

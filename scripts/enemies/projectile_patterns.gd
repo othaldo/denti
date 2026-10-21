@@ -20,18 +20,25 @@ static func radial_directions(count: int, gap_angle: float) -> Array[Vector2]:
 	return directions
 
 
-static func fire_radial(parent: Node2D, at: Vector2, count: int, gap_angle: float, speed: float, damage: float, target: Player, tint: Color = BOSS_COLOR, statuses: Array[Dictionary] = []) -> void:
-	for direction in radial_directions(count, gap_angle):
+static func circle_directions(count: int, offset: float = 0.0) -> Array[Vector2]:
+	var result: Array[Vector2] = []
+	for index in maxi(count, 0):
+		result.append(Vector2.from_angle(offset + TAU * index / count))
+	return result
+
+
+static func fire_radial(parent: Node2D, at: Vector2, count: int, gap_angle: float, speed: float, damage: float, target: Player, tint: Color = BOSS_COLOR, statuses: Array[Dictionary] = [], full_circle: bool = false) -> void:
+	for direction in (circle_directions(count, gap_angle) if full_circle else radial_directions(count, gap_angle)):
 		_spawn(parent, at, direction, speed, damage, target, tint, 3.0, statuses)
 
 
-static func fan_directions(aim: Vector2, count: int) -> Array[Vector2]:
+static func fan_directions(aim: Vector2, count: int, step_angle: float = 0.17) -> Array[Vector2]:
 	var directions: Array[Vector2] = []
 	if count <= 0:
 		return directions
 	var center := aim.normalized() if aim.length_squared() > 0.01 else Vector2.RIGHT
 	for index in count:
-		var angle := (float(index) - float(count - 1) * 0.5) * 0.17
+		var angle := (float(index) - float(count - 1) * 0.5) * step_angle
 		directions.append(center.rotated(angle))
 	return directions
 

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="de"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Denti · Karies-Prinz</title>
+<style>*{box-sizing:border-box}body{margin:0;background:#241c2d;color:#f9efd9;font:16px/1.6 system-ui,sans-serif}main{max-width:1080px;margin:auto;padding:28px 24px 50px}.tag{font-size:12px;color:#efbc69;letter-spacing:.14em}h1{font-size:clamp(27px,5vw,42px);line-height:1.15;margin:12px 0}p{color:#d8c4d4;max-width:850px}video{width:100%;height:auto;display:block;background:#33283a;border:1px solid #63475b;border-radius:15px}.intro{display:grid;grid-template-columns:170px 1fr;gap:24px;align-items:center;margin:12px 0 25px}.portrait{width:170px;height:170px;object-fit:contain}.controls{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 20px}button,a.button{font:inherit;color:#faedda;background:#4b3446;border:1px solid #ad8055;border-radius:22px;padding:8px 16px;cursor:pointer;text-decoration:none}button:hover,a.button:hover{background:#65444b}button[aria-pressed="true"]{background:#76503c;border-color:#f4c76b}a{color:#efbc69}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:22px 0}.steps div{background:#302237;border:1px solid #574053;border-radius:13px;padding:17px}.steps strong{color:#f4c76b}.steps p{font-size:14px;margin:6px 0}.shots{display:flex;gap:16px;align-items:flex-start}.shots img{max-width:100%;height:auto;border-radius:12px;border:1px solid #63475b}.mobile{width:240px}.landscape{width:568px}.variants{display:grid;grid-template-columns:repeat(3,1fr);margin:20px 0}.variants img{width:100%}.note{font-size:13px}summary{color:#efbc69;cursor:pointer;margin:22px 0 14px}@media(max-width:650px){main{padding:20px 15px}.intro{grid-template-columns:105px 1fr;gap:10px}.portrait{width:105px;height:125px}.steps{grid-template-columns:1fr}.shots{flex-direction:column}}</style>
+<main><div class="tag">DENTI · ZWEITER BOSS · SPIELBARER PROTOTYP</div>
+<div class="intro"><img class="portrait" src="portrait.png" alt="Karamellprinz mit Zuckergusskrone, Kupferkessel, Kelle und Zuckerbombe"><div><h1>Die Karamellküche.</h1><p>Der Karies-Prinz kocht auf. Zuckerbomben legen klebrigen Boden. Karamellherzen fliegen im Fächer. Nach einem angekündigten Ansturm feuert er einen vollständigen Herzkranz rundherum. Drei Abläufe, drei verschiedene Antworten.</p></div></div>
+<video id="fight" controls muted loop playsinline aria-label="Native Aufnahme des echten Karamellprinzen: Bomben, Herzsalven, Zuckerrausch und Herzkranz"></video>
+<div class="controls" aria-label="Schwierigkeitsvergleich"><button data-difficulty="easy" aria-pressed="false">Easy</button><button data-difficulty="normal" aria-pressed="true">Normal</button><button data-difficulty="hard" aria-pressed="false">Hard</button><button data-difficulty="hell" aria-pressed="false">Hell</button></div><p id="difficulty-note">Normal · zweite Gesundheitsphase · drei Bomben, zwei Herzsalven, ein vollständiger Herzkranz.</p>
+<div class="controls"><button id="toggle" aria-pressed="false">Abspielen</button><button id="restart">Von vorn</button><button data-attack="0">Bomben</button><button data-attack="1">Herzfächer</button><button data-attack="2">Zuckerrausch + Herzkranz</button><button id="slow" aria-pressed="false">Halbe Geschwindigkeit</button></div>
+<div class="steps"><div><strong>1 · Zuckerbomben</strong><p>Markierte Einschläge bewusst ablegen. Easy / Normal / Hard / Hell: in der zweiten Phase zwei / drei / vier / fünf Bomben. Ab Normal bewegt er sich zwischen den Würfen. Karamell bremst fünf Sekunden lang; höchstens vier Felder.</p></div><div><strong>2 · Herzfächer</strong><p>Die Kelle hebt ein Karamellherz. Die tatsächlichen Flugrichtungen werden angekündigt. In der zweiten Phase eine / zwei / drei / vier Salven mit fünf / sieben / neun / elf Herzen. Gleichmäßige Abstände, keine ausgelassenen Geschosse.</p></div><div><strong>3 · Zuckerrausch</strong><p>Die Lichtbahn kündigt einen festen Ansturm an. Danach bereitet der Prinz einen Herzkranz vor. Vollständige Ringe ohne Sicherheitsgasse. Auf Hell folgen zwei versetzte Kränze. Distanz, Geschossabstände und der Wechsel zwischen den Ringen zählen.</p></div></div>
+<div class="shots variants"><img data-shot="heart-fan" src="heart-fan.png" alt="Echte Karamellherzen in einer gerichteten Salve"><img data-shot="sugar-rush" src="sugar-rush.png" alt="Vorgebeugte Ansturmhaltung und wachsende Lichtbahn"><img data-shot="heart-crown" src="heart-crown.png" alt="Vollständiger Herzkranz ohne ausgesparte Schüsse in Richtung Denti"></div>
+<p>Generierte Einzelteile mit Gelenkanimation; keine verzerrten Ganzkörperbilder. Bombermarkierung, Flug und Treffer folgen einer gemeinsamen Uhr. Keine zusätzlichen Boss-HP und keine alten generischen Phasensalven.</p>
+<details><summary>Normal: Desktop und Mobile</summary><img src="desktop.png" style="width:100%;border-radius:12px" alt="Prinz, fliegende Zuckerbombe und gemaltes Karamellfeld im tatsächlichen Kampf-HUD"><div class="shots"><img class="mobile" src="mobile.png" alt="Hochkantaufnahme bei 320 mal 568"><img class="landscape" src="landscape.png" alt="Querformataufnahme bei 568 mal 320"></div></details>
+<p class="note">Je 18 Sekunden native Godot-Aufnahme auf Easy, Normal, Hard und Hell, jeweils in der zweiten Gesundheitsphase, mit skriptgesteuertem Denti, ohne Waffen und normale Gegner zur besseren Beurteilung. Der Encounter ist im regulären Welle-10-Profil sowie Story und Endlos angeschlossen. Speichern/Fortsetzen auch mit vier Salven, langsame Eckrouten auf Hell, feste Ziele, Dash-Treffer und begrenzte Felder sind getestet. Menschliche Spieltests der vollen Welle und mobile Web-Performance stehen noch aus.</p>
+<p class="note">Das bereits generierte Karamellherz ist jetzt ein echtes Projektil. Alle drei Hauptangriffe kommen bereits in der ersten Gesundheitsphase vor. Schwierigkeit und Gesundheitsphasen erweitern Fächer und Salven. Hell hat 28 % schnellere Herzen, kürzere Erholung und deutlich mehr Bewegung. Die Warnzeiten bleiben erhalten.</p>
+<details><summary>Wie König und Imperator darauf aufbauen</summary><p><strong>König · jetzt umgesetzt:</strong> Säurerinnen, angekündigte Pegelwechsel, versetzte Splitterstampfer und das Zurückziehen des Vorrats. Freie Übergänge planen und die Öffnung nach dem Entleeren nutzen. <a href="../king-acid/fight.html">Zum Säuresammler</a>.</p><p><strong>Imperator · jetzt umgesetzt:</strong> gerichtete Kronenwache, wechselnde Hofurteile, echte Portal-Wurzellanzen und vollständige Nervensalven mit offenem Kern. <a href="../emperor-court/fight.html">Zum Kronengericht</a>.</p></details><p><a href="../king-acid/fight.html">Zum Säuresammler</a> · <a href="../count-bedbug/fight.html">Zum Umhang-Grafen</a> · <a href="../warning-effects/">Charge-Warnungen</a></p>
+</main><script>const chapters={
+  "easy": {
+    "0": 0.1,
+    "1": 4.76666666666667,
+    "2": 8.0
+  },
+  "normal": {
+    "0": 0.1,
+    "1": 5.76666666666667,
+    "2": 9.6
+  },
+  "hard": {
+    "0": 0.1,
+    "1": 6.9,
+    "2": 11.6666666666667
+  },
+  "hell": {
+    "0": 0.1,
+    "1": 8.03333333333333,
+    "2": 13.8
+  }
+};
+const v=document.getElementById('fight'),t=document.getElementById('toggle'),s=document.getElementById('slow'),note=document.getElementById('difficulty-note');
+let active='normal',mediaUrl=null,loadSerial=0;
+const attackButtons=[...document.querySelectorAll('[data-attack]')];
+async function loadPreview(level,autoplay=true){
+ const serial=++loadSerial;v.pause();document.querySelectorAll('[data-shot]').forEach(img=>img.src=img.dataset.shot+(level==='normal'?'':'-'+level)+'.png?v=full-rings-1');attackButtons.forEach(b=>b.disabled=true);
+ try{
+  const response=await fetch('fight'+(level==='normal'?'':'-'+level)+'.mp4?v=all-levels-full-rings-1');
+  if(!response.ok)throw new Error('Video konnte nicht geladen werden');
+  const blob=await response.blob();if(serial!==loadSerial)return;
+  const previous=mediaUrl;mediaUrl=URL.createObjectURL(blob);
+  const loaded=new Promise(resolve=>v.addEventListener('loadedmetadata',resolve,{once:true}));
+  v.src=mediaUrl;if(previous)URL.revokeObjectURL(previous);await loaded;
+  if(serial!==loadSerial)return;attackButtons.forEach(b=>b.disabled=false);
+  if(autoplay)await v.play().catch(sync);else sync();
+ }catch(error){if(serial===loadSerial)note.textContent='Vorschau konnte nicht geladen werden. Bitte erneut den Schwierigkeitsgrad wählen.';sync()}
+}
+function sync(){t.textContent=v.paused?'Abspielen':'Anhalten';t.setAttribute('aria-pressed',String(!v.paused))}
+document.querySelectorAll('[data-difficulty]').forEach(button=>button.onclick=()=>{active=button.dataset.difficulty;document.querySelectorAll('[data-difficulty]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));note.textContent=({easy:'Easy · zweite Gesundheitsphase · zwei Bomben, eine Herzsalve, ein vollständiger Herzkranz.',normal:'Normal · zweite Gesundheitsphase · drei Bomben, zwei Herzsalven, ein vollständiger Herzkranz.',hard:'Hard · zweite Gesundheitsphase · vier Bomben, drei Herzsalven, ein vollständiger Herzkranz.',hell:'Hell · zweite Gesundheitsphase · fünf Bomben, vier Herzsalven, zwei vollständige versetzte Herzkränze.'})[active];loadPreview(active)});
+document.querySelectorAll('[data-attack]').forEach(button=>button.onclick=()=>{v.currentTime=chapters[active][button.dataset.attack]||0;v.play().catch(sync)});
+t.onclick=()=>v.paused?v.play().catch(sync):v.pause();document.getElementById('restart').onclick=()=>{v.currentTime=0;v.play().catch(sync)};s.onclick=()=>{v.playbackRate=v.playbackRate===1?.5:1;s.setAttribute('aria-pressed',String(v.playbackRate===.5));s.textContent=v.playbackRate===.5?'Normale Geschwindigkeit':'Halbe Geschwindigkeit'};v.addEventListener('play',sync);v.addEventListener('pause',sync);loadPreview(active,!matchMedia('(prefers-reduced-motion: reduce)').matches);</script></html>

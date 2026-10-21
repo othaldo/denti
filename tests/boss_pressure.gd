@@ -85,7 +85,7 @@ func _run() -> void:
 		seconds += 0.1
 		if boss.dying:
 			break
-	if not boss.dying or seconds < 44.0 or seconds > 62.0 or boss.boss_phase != 2 or boss.boss_radial_volley_index != 9:
+	if not boss.dying or seconds < 44.0 or seconds > 62.0 or boss.boss_phase != 2 or boss.boss_radial_volley_index != 0 or boss.crown_court_encounter == null or boss.crown_court_encounter.pulses_fired <= 0 or boss.crown_court_encounter.portals_fired <= 0:
 		_fail("strong build skipped the final boss encounter: %.1fs, phase %d" % [seconds, boss.boss_phase])
 		return
 	session.clear_run()

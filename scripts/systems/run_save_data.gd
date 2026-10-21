@@ -122,6 +122,40 @@ static func _valid_structure(value: Dictionary) -> bool:
 		if not _containers(entry, ["motion"], []):
 			return false
 	for entry in value.get("enemies", []):
+		if not _containers(entry, ["caramel"], []): return false
+		if not _containers(entry, ["acid_king"], []): return false
+		if not AcidKingSnapshot.valid(entry.get("acid_king", {})): return false
+		if not _containers(entry, ["crown_court"], []): return false
+		if not CrownCourtSnapshot.valid(entry.get("crown_court", {})): return false
+		var caramel: Dictionary = entry.get("caramel", {})
+		if not _containers(caramel, [], ["origin", "destination", "splash_at", "pools", "aim", "rush_origin", "rush_end", "rays", "hearts"]): return false
+		for key in ["origin", "destination", "splash_at", "aim", "rush_origin", "rush_end"]:
+			if caramel.has(key):
+				if caramel[key].size() != 2: return false
+				for coordinate in caramel[key]:
+					if not (coordinate is float or coordinate is int): return false
+		for key in ["version", "state", "remaining", "elapsed", "throw_index", "count", "cycle", "splash_remaining", "attack_kind", "salvo_index", "salvo_count"]:
+			if caramel.has(key) and not (caramel[key] is float or caramel[key] is int): return false
+		if caramel.has("rush_hit") and not caramel.rush_hit is bool: return false
+		for ray in caramel.get("rays", []):
+			if not ray is Array or ray.size() != 2: return false
+			for coordinate in ray:
+				if not (coordinate is float or coordinate is int): return false
+		for heart in caramel.get("hearts", []):
+			if not heart is Dictionary or not _containers(heart, [], ["position", "velocity"]): return false
+			for key in ["position", "velocity"]:
+				if not heart.get(key) is Array or heart[key].size() != 2: return false
+				for coordinate in heart[key]:
+					if not (coordinate is float or coordinate is int): return false
+			for key in ["life", "damage"]:
+				if not (heart.get(key) is float or heart.get(key) is int): return false
+			if heart.has("source") and not heart.source is String: return false
+		for pool in caramel.get("pools", []):
+			if not pool is Dictionary or not _containers(pool, [], ["position"]): return false
+			if not pool.get("position") is Array or pool.position.size() != 2: return false
+			for coordinate in pool.position:
+				if not (coordinate is float or coordinate is int): return false
+			if not (pool.get("life") is float or pool.get("life") is int): return false
 		if not _containers(entry, ["cloak"], []): return false
 		var cloak: Dictionary = entry.get("cloak", {})
 		if not _containers(cloak, [], ["origin", "direction"]): return false
@@ -157,7 +191,7 @@ static func _valid_structure(value: Dictionary) -> bool:
 static func _valid_scalars(value: Variant, field: String = "") -> bool:
 	# These fields are numeric maps or arrays; other primitive fields may be bools/IDs.
 	const NUMBER_ARRAYS := ["position", "direction", "boss_dash_end", "boss_dash_origin", "horde_waves", "burst_times", "elite_times", "elite_counts", "hits", "orbit_hits", "kill_events"]
-	const NUMBER_FIELDS := ["wave", "xp", "xp_goal", "level", "coins", "duration", "remaining", "spawn_cooldown", "burst_index", "elite_index", "elite_time", "reroll_cost", "tier", "price", "invested_coins", "affix_slots", "x", "y", "dx", "dy", "damage", "health", "timer", "phase", "boss_move", "cooldown", "focus_target", "focus_hits", "focus_time", "pending_levels", "level_rerolls", "step", "scrap_coins", "charge_aim_distance"]
+	const NUMBER_FIELDS := ["wave", "xp", "xp_goal", "level", "coins", "duration", "remaining", "spawn_cooldown", "burst_index", "elite_index", "elite_time", "reroll_cost", "tier", "price", "invested_coins", "affix_slots", "x", "y", "dx", "dy", "damage", "health", "timer", "phase", "boss_move", "cooldown", "focus_target", "focus_hits", "focus_time", "pending_levels", "level_rerolls", "step", "scrap_coins", "charge_aim_distance", "contact_timer"]
 	if field in NUMBER_ARRAYS:
 		if not value is Array:
 			return false
