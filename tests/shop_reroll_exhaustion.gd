@@ -18,7 +18,8 @@ func _run() -> void:
 	for item in ShopController.CATALOG:
 		if item.weapon_data == null:
 			game.items.owned[str(item.id)] = maxi(item.max_stacks, item.family_limit) if item.family_limit > 0 else maxi(item.max_stacks, 1)
-	game.coins = 10000
+	# This exercises catalog exhaustion, independently of the reroll price curve.
+	game.coins = 1000000
 	game.wave.current_wave = 1
 	game._open_shop()
 	for draw in 40:

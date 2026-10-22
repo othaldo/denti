@@ -1,12 +1,12 @@
 # Gold, Shoppreise und vier Auswahlkarten
 
-Umgesetzt am 2026-10-01 auf Grundlage der [Untersuchung](ECONOMY_RESEARCH.md).
+Ursprünglich umgesetzt am 2026-10-01 auf Grundlage der [Untersuchung](ECONOMY_RESEARCH.md). Goldkurve und Rerolls wurden am 22.10.2026 zum [Goldzahn-Gauner](LOOT_GOBLIN.md) nachgeschärft. Die alten Kampfmessungen unten bleiben als historischer Vergleich erhalten.
 
 ## Gold
 
 Gold wird unabhängig von XP gewürfelt. Die bisherigen XP-Werte und deren Drop-Abschwächung bleiben bestehen. Plaque, Bakterien, Säurespucker und Zucker haben jetzt **100 % Basis-Münzchance**. Die ersten drei geben Wert 1, Zucker Wert 2. Eliten geben weiterhin garantiert 4 Münzen.
 
-Der Gold-Faktor beträgt in Welle 1–4 100 %. Danach gilt `max(1 - 0,015 * Welle, 0,50)`, unabhängig davon, ob es eine Bosswelle ist. Auf Normal entspricht die tatsächliche Münzchance damit der [Brotato-Materials-Kurve](https://brotato.wiki.spellsandguns.com/Materials): Welle 5: 92,5 %, Welle 10: 85 %, Welle 20: 70 %. Im Endlosmodus greift die Untergrenze von 50 % ab Welle 34. Easy/Hard/Hell wenden weiterhin ihre Belohnungsfaktoren 1,15/0,9/0,8 an; Eliten bleiben garantiert. Boss-Kills selbst geben weiterhin Relikt-Fortschritt und keinen neuen Gold-Bonus.
+Der Gold-Faktor beträgt in Welle 1–4 100 %. Danach gilt `max(1 - 0,015 * Welle - 0,009375 * (Welle - 4), 0,40)`, unabhängig davon, ob es eine Bosswelle ist. Auf Normal beträgt er in Welle 5 etwa 91,6 %, in Welle 10 etwa 79,4 % und in Welle 20 55 %. Im Endlosmodus greift die Untergrenze von 40 % ab Welle 27. Die frühere Brotato-nahe Kurve ohne zusätzlichen späten Abschlag ergab 92,5/85/70 % und mindestens 50 %. Easy/Hard/Hell wenden weiterhin ihre Belohnungsfaktoren 1,15/0,9/0,8 an; Eliten bleiben garantiert. Boss-Kills selbst geben weiterhin Relikt-Fortschritt und keinen neuen Gold-Bonus.
 
 Zuvor wurde die Wellenkurve zusätzlich mit Basiswerten von nur 40/45/50/65 % multipliziert. Bei Plaque blieben in Welle 20 so lediglich 28 % tatsächliche Münzchance. Der alte Startbonus entfällt: frühe Drops sind auf Normal bereits garantiert. Glück erhöht ohne Goldsonde weder die normale Drop-Chance noch den Münzwert.
 
@@ -31,7 +31,7 @@ Der transparente Atlas ergänzt die bestehenden gemalten Icons um Zellen 28/29. 
 
 Nach dem Loot-Sammeln hat jede Level-up-Auswahl einen kleinen Reload-Knopf mit Münzpreis. Links daneben stehen das gerade ausgewählte Level und der Münzbestand. Ein Reroll würfelt vier geeignete Stats neu und verbraucht weder XP noch eine ausstehende Auswahl. Es gilt weiter die Seltenheit des tatsächlich verdienten Levels, einschließlich der Meilensteine.
 
-Unsere Kostenformel ist `max(2, ceil(verdientes Level / 2)) + bisherige Rerolls dieser Auswahl`. Beispiele: Level 2: 2/3/4/... Münzen, Level 5: 3/4/5/..., Level 10: 5/6/7/... und Level 20: 10/11/12/.... Die eigene Preisfolge wächst mit dem Spielverlauf und setzt beim nächsten ausstehenden Level zurück. Unbezahlbare Rerolls sind deaktiviert. Kampf, Startwaffe, Upgrade-Kapsel, Relikt und Shop bieten keine Level-up-Rerolls.
+Die Kostenformel ist seit 22.10.2026 `max(2, ceil(verdientes Level / 2)) + n * (n + 1) / 2`, mit `n` als bereits bezahlten Rerolls dieser Auswahl. Beispiele: Level 2: 2/3/5/8/12/... Münzen, Level 5: 3/4/6/9/13/..., Level 10: 5/6/8/11/15/... und Level 20: 10/11/13/16/20/.... Die Preisfolge setzt beim nächsten ausstehenden Level zurück. Unbezahlbare Rerolls sind deaktiviert. Kampf, Startwaffe, Upgrade-Kapsel, Relikt und Shop bieten keine Level-up-Rerolls.
 
 Save/Resume bewahrt die vier konkreten Angebote, verbleibende Münzen und Rerollzahl; ältere Spielstände beginnen bei der ersten Rerollgebühr und behalten ihre gespeicherten Angebote. Die Telemetrie erfasst diese Ausgaben separat als `level_reroll`.
 
@@ -54,7 +54,7 @@ Die Welle ist die gerade abgeschlossene Welle, der erste Shop verwendet also 1. 
 
 Stufe IV wird hier nur als Preisvergleich gezeigt, nicht als Angebot früher Shops.
 
-Jeder Shop hat vier Angebote. „Merken“ reserviert ein Angebot kostenlos, auch wenn aktuell Münzen oder freie Wurzeln fehlen. Es bleibt beim Reroll und im nächsten Shop im selben Platz und behält seinen Preis. „Gemerkt“ gibt es wieder frei. Ein Kauf entfernt die Reservierung. Vier gemerkte Angebote sperren bezahlte Rerolls. Bis Welle 20 behalten Rerolls die Kostenfolge 2/3/4/... und beginnen pro Shop erneut bei 2. Danach erhöhen Endlosfaktor und Welle den Startpreis und die Schritte, siehe [Endlosmodus](ENDLESS_MODE.md).
+Jeder Shop hat vier Angebote. „Merken“ reserviert ein Angebot kostenlos, auch wenn aktuell Münzen oder freie Wurzeln fehlen. Es bleibt beim Reroll und im nächsten Shop im selben Platz und behält seinen Preis. „Gemerkt“ gibt es wieder frei. Ein Kauf entfernt die Reservierung. Vier gemerkte Angebote sperren bezahlte Rerolls. Bis Welle 20 gilt die Kostenfolge 2/3/5/8/12/17/... und jeder neue Shop beginnt bei 2. Zehn Versuche kosten 185 statt bisher 65 Münzen. Danach erhöhen Endlosfaktor und Welle den Startpreis und multiplizieren den Zuschlag mit dem bisherigen Kostenschritt, siehe [Endlosmodus](ENDLESS_MODE.md). Alte gespeicherte Shops behalten ihren angezeigten nächsten Preis und verwenden anschließend die neue Kurve.
 
 Save/Resume erhält alle vier Angebote, ihre exakten Preise, Reservierungen und Rerollkosten, auch während der folgenden Kampfwelle. Alte Shops mit drei Plätzen behalten ihre Angebote, ausverkauften Plätze und Preise; nur der vierte Platz wird ergänzt. Alte gespeicherte Level-ups mit drei Optionen bleiben erhalten, neue Level-ups bieten vier verschiedene geeignete Stats.
 
@@ -74,7 +74,13 @@ Der kleine Reload-Knopf sitzt rechts in der Angebotsüberschrift und zeigt den a
 
 Automatisch geprüft wurden 320×568, 360×640, 568×320, 640×360, 540×960, 720×1280, 800×600, 1024×600, 1280×670, 1280×720 und 1920×1080 sowie der anschließende Wechsel zurück ins Hochformat. Der Layout-Test verwendet sechs belegte Wurzeln, alle 32 Items (eins davon doppelt) und drei Relikte. Er prüft die sichtbare Item-Leiste, Hover-Titel/-Effekte und Stapelzahlen, das Erreichen des letzten Relikts per Scrollen sowie die kompakten Reload-/Startknöpfe. Gemischte Titel, lange/mehrzeilige Texte, Preise von 5/100/1000/9999 und wechselnde Reservierungen müssen identische Aktionsgrößen und Baselines behalten. Karten, Text/Icon-Grenzen und Knöpfe werden auf Überschneidungen und Überläufe geprüft, auf breiten Bildschirmen auch alle Katalogtexte in den schmalen Karten. Gerenderte Ansichten bei 320×568, 720×1280, 1024×600, 1280×670 und 1280×720 wurden zusätzlich visuell geprüft.
 
-## Messung und Grenzen
+## Aktuelle Prognose und historische Messungen
+
+Der [Vergleich vom 22.10.2026](LOOT_GOBLIN.md#allgemeine-economy-korrektur) verwendet zwölf identische Spawnpläne je Schwierigkeitsgrad für alte/neue erwartete Golddrops. Frühe Wellen bleiben gleich; Welle 19 liefert je nach Schwierigkeit etwa 17–18 % weniger erwartetes Gold. Dies berücksichtigt weder Gaunerverluste noch Rerollausgaben und ist keine Kampfmessung. Die [Rohdaten](loot_goblin_economy.json) halten die Annahmen fest.
+
+### Historischer Vergleich vom 01.10.2026
+
+Die folgenden Kampfmessungen verwenden die damalige Goldkurve von 70 % in Welle 20. Sie wurden für die Gauner-Änderung nicht überschrieben und sind kein Nachweis der neuen Kaufkraft.
 
 `tools/audit_economy.gd` erzeugt [Spawnplan-Erwartungswerte](economy_audit.json) für 30 Seeds. `tools/benchmark_economy.gd` erzeugt [Kampfmessungen](economy_combat_benchmark.json) für vier konfigurierte Builds mit je drei Seeds.
 
@@ -91,6 +97,6 @@ Die Messungen verwenden unsterbliches Denti, eine vorgegebene Ellipsenbewegung, 
 
 Die Telemetrie speichert pro Welle Einnahmequellen (Drops, Pickup-Items, Kill-Items, Zinsen, Upgrade-Kapseln, Waffenverkauf) und Shopausgaben getrennt nach Waffen, Items und Rerolls. So lässt sich ein realer Run anschließend auf Kaufkraft untersuchen.
 
-Die vollständige Testsuite mit 49 Skripten besteht. Neue Integrationstests prüfen bezahlte und unbezahlbare Rerolls, Reset pro ausstehendem Level, die separate Level-9-/Level-10-Seltenheit, alte und neue Save/Resume-Daten, Stapellimits, begrenzte Glücksboni, fertige Dropwerte und die Kombination mit Goldfüllung. Layoutprüfungen umfassen auch den sichtbaren Münzstand und Reload-Knopf bei allen oben genannten Auflösungen.
+Zum damaligen Stand bestand die vollständige Testsuite mit 49 Skripten. Die Integrationstests prüfen bezahlte und unbezahlbare Rerolls, Reset pro ausstehendem Level, die separate Level-9-/Level-10-Seltenheit, alte und neue Save/Resume-Daten, Stapellimits, begrenzte Glücksboni, fertige Dropwerte und die Kombination mit Goldfüllung. Layoutprüfungen umfassen auch den sichtbaren Münzstand und Reload-Knopf bei allen oben genannten Auflösungen. Die Gauner-/Economy-Erweiterung ergänzt Prüfungen für progressive Gebühren, neue und alte Shop-Spielstände sowie tatsächlichen Münzbesitz.
 
 Quellen für die übernommenen Kurven: [Brotato Materials](https://brotato.wiki.spellsandguns.com/Materials), [Brotato Shop](https://brotato.wiki.spellsandguns.com/Shop).

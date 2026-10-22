@@ -1,0 +1,182 @@
+{
+  "before": {
+    "baseline_health": true,
+    "method": "Actual fixed 60 Hz combat against a moving goblin. Baseline-speed Denti pursues from 240 units with five configured weapons, no items/affixes and no other enemies. Normal/Hell. Baseline mode uses the old health profile with current AI; no coins are present, so scoop changes do not affect the comparison. Synthetic builds, not a complete run; no promise about maximum-power builds.",
+    "samples": [
+      {
+        "difficulty": "normal",
+        "health": 645.0,
+        "killed": true,
+        "profile": {
+          "damage": 24.0,
+          "melee": 8.0,
+          "ranged": 4.0,
+          "speed": 25.0,
+          "tier": 2,
+          "wave": 11
+        },
+        "seconds": 3.65
+      },
+      {
+        "difficulty": "normal",
+        "health": 645.0,
+        "killed": true,
+        "profile": {
+          "damage": 50.0,
+          "melee": 14.0,
+          "ranged": 12.0,
+          "speed": 45.0,
+          "tier": 3,
+          "wave": 11
+        },
+        "seconds": 1.83333333333333
+      },
+      {
+        "difficulty": "normal",
+        "health": 1240.2,
+        "killed": true,
+        "profile": {
+          "damage": 80.0,
+          "melee": 24.0,
+          "ranged": 18.0,
+          "speed": 70.0,
+          "tier": 4,
+          "wave": 19
+        },
+        "seconds": 3.01666666666667
+      },
+      {
+        "difficulty": "hell",
+        "health": 903.536009142108,
+        "killed": true,
+        "profile": {
+          "damage": 24.0,
+          "melee": 8.0,
+          "ranged": 4.0,
+          "speed": 25.0,
+          "tier": 2,
+          "wave": 11
+        },
+        "seconds": 5.56666666666667
+      },
+      {
+        "difficulty": "hell",
+        "health": 903.536009142108,
+        "killed": true,
+        "profile": {
+          "damage": 50.0,
+          "melee": 14.0,
+          "ranged": 12.0,
+          "speed": 45.0,
+          "tier": 3,
+          "wave": 11
+        },
+        "seconds": 3.93333333333333
+      },
+      {
+        "difficulty": "hell",
+        "health": 2060.24358775708,
+        "killed": true,
+        "profile": {
+          "damage": 80.0,
+          "melee": 24.0,
+          "ranged": 18.0,
+          "speed": 70.0,
+          "tier": 4,
+          "wave": 19
+        },
+        "seconds": 4.96666666666667
+      }
+    ]
+  },
+  "after": {
+    "baseline_health": false,
+    "method": "Actual fixed 60 Hz combat against a moving goblin. Baseline-speed Denti pursues from 240 units with five configured weapons, no items/affixes and no other enemies. Normal/Hell. Baseline mode uses the old health profile with current AI; no coins are present, so scoop changes do not affect the comparison. Synthetic builds, not a complete run; no promise about maximum-power builds.",
+    "samples": [
+      {
+        "difficulty": "normal",
+        "health": 2070.0,
+        "killed": true,
+        "profile": {
+          "damage": 24.0,
+          "melee": 8.0,
+          "ranged": 4.0,
+          "speed": 25.0,
+          "tier": 2,
+          "wave": 11
+        },
+        "seconds": 7.36666666666667
+      },
+      {
+        "difficulty": "normal",
+        "health": 2070.0,
+        "killed": true,
+        "profile": {
+          "damage": 50.0,
+          "melee": 14.0,
+          "ranged": 12.0,
+          "speed": 45.0,
+          "tier": 3,
+          "wave": 11
+        },
+        "seconds": 4.75
+      },
+      {
+        "difficulty": "normal",
+        "health": 4134.0,
+        "killed": true,
+        "profile": {
+          "damage": 80.0,
+          "melee": 24.0,
+          "ranged": 18.0,
+          "speed": 70.0,
+          "tier": 4,
+          "wave": 19
+        },
+        "seconds": 5.53333333333333
+      },
+      {
+        "difficulty": "hell",
+        "health": 2899.7202153863,
+        "killed": true,
+        "profile": {
+          "damage": 24.0,
+          "melee": 8.0,
+          "ranged": 4.0,
+          "speed": 25.0,
+          "tier": 2,
+          "wave": 11
+        },
+        "seconds": 11.35
+      },
+      {
+        "difficulty": "hell",
+        "health": 2899.7202153863,
+        "killed": true,
+        "profile": {
+          "damage": 50.0,
+          "melee": 14.0,
+          "ranged": 12.0,
+          "speed": 45.0,
+          "tier": 3,
+          "wave": 11
+        },
+        "seconds": 7.26666666666667
+      },
+      {
+        "difficulty": "hell",
+        "health": 6867.47862585694,
+        "killed": true,
+        "profile": {
+          "damage": 80.0,
+          "melee": 24.0,
+          "ranged": 18.0,
+          "speed": 70.0,
+          "tier": 4,
+          "wave": 19
+        },
+        "seconds": 11.4833333333333
+      }
+    ]
+  }
+}

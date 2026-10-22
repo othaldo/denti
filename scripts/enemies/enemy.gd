@@ -87,6 +87,7 @@ var cloak_encounter: CloakEncounter
 var caramel_encounter: CaramelEncounter
 var acid_king_encounter: AcidKingEncounter
 var crown_court_encounter: CrownCourtEncounter
+var loot_goblin: LootGoblin
 var inflicted_statuses: Array[Dictionary] = []
 var spatial_index: EnemySpatialIndex
 var hit_flash_time: float = 0.0
@@ -150,6 +151,10 @@ func _ready() -> void:
 	sprite.scale = Vector2.ONE * (data.radius * 2.35 / side)
 	sprite_base_scale = sprite.scale
 	animation_time = randf_range(0.0, TAU)
+	if data.loot_goblin_profile != null:
+		loot_goblin = LootGoblin.new()
+		loot_goblin.enemy = self
+		add_child(loot_goblin)
 	if target != null:
 		_update_sprite_facing(global_position.direction_to(target.global_position))
 	if data.is_boss:
@@ -281,6 +286,9 @@ func _physics_process(delta: float) -> void:
 		return
 	if target == null or target.stats.health <= 0.0:
 		return
+	if loot_goblin != null:
+		loot_goblin.advance(delta)
+		return
 	if data.aura_radius > 0.0:
 		aura_timer -= delta
 		if aura_timer <= 0.0:
@@ -313,6 +321,7 @@ func _physics_process(delta: float) -> void:
 
 
 func try_contact_hit() -> void:
+	if loot_goblin != null: return
 	if contact_timer > 0.0 or health <= 0.0 or is_queued_for_deletion() or target == null:
 		return
 	var charging := special_phase == SpecialPhase.ACTIVE and (active_special_attack == EnemyData.SpecialAttack.DASH or active_special_attack == EnemyData.SpecialAttack.BOSS and boss_move == BossMove.CHARGE)

@@ -72,6 +72,12 @@ func _ready() -> void:
 	emperor.position = Vector2(4, 7)
 	add_child(emperor)
 	emperor.sample(0, 1, 2, Vector2.DOWN, true)
+	var goblin := LootGoblinRig.new()
+	goblin.name = &"GoblinRigWarmup"
+	goblin.scale = Vector2.ONE * 0.02
+	goblin.position = Vector2(4, 7)
+	add_child(goblin)
+	goblin.sample(0.25, true, true, false, 0.5, 1)
 	var numbers: Label = preload("res://scenes/ui/damage_number.tscn").instantiate()
 	numbers.name = "CombatFontWarmup"
 	numbers.text = "0123456789-+!"

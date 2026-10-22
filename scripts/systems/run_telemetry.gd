@@ -21,6 +21,8 @@ var wave_status_applications: Dictionary = {}
 var kills: int = 0
 var bosses_defeated: int = 0
 var coins_collected: int = 0
+var goblin_stats: Dictionary = {}
+var wave_goblin_stats: Dictionary = {}
 var xp_collected: int = 0
 var chests_found: int = 0
 var chests_kept: int = 0
@@ -78,6 +80,7 @@ func begin_wave(number: int, profile_id: StringName = &"") -> void:
 	wave_elites_spawned = 0
 	wave_elites_killed = 0
 	wave_coins = 0
+	wave_goblin_stats.clear()
 	wave_xp = 0
 	wave_gold_sources.clear()
 	wave_shop_spending.clear()
@@ -207,6 +210,11 @@ func record_taken(amount: float) -> void:
 	_append_amount(taken_events, amount)
 
 
+func record_goblin(event: StringName, amount: int = 1) -> void:
+	goblin_stats[str(event)] = int(goblin_stats.get(str(event), 0)) + maxi(amount, 0)
+	wave_goblin_stats[str(event)] = int(wave_goblin_stats.get(str(event), 0)) + maxi(amount, 0)
+
+
 func record_loot(kind: StringName, amount: int, source: StringName = &"drop") -> void:
 	if kind == &"coin":
 		coins_collected += amount
@@ -271,6 +279,7 @@ func current_wave_summary() -> Dictionary:
 		"enchantment_support": wave_enchantment_support.duplicate(),
 		"coins_collected": wave_coins, "xp_collected": wave_xp,
 		"gold_sources": wave_gold_sources.duplicate(), "shop_spending": wave_shop_spending.duplicate(),
+		"goblin": wave_goblin_stats.duplicate(),
 		"chests_found": wave_chests_found, "chests_kept": wave_chests_kept, "chests_scrapped": wave_chests_scrapped,
 		"boss_ttk": wave_boss_ttk,
 	}
@@ -293,6 +302,7 @@ func save_data() -> Dictionary:
 		"wave_status_damage": wave_status_damage.duplicate(), "wave_status_applications": wave_status_applications.duplicate(),
 		"kills": kills, "bosses_defeated": bosses_defeated,
 		"coins_collected": coins_collected, "xp_collected": xp_collected,
+		"goblin_stats": goblin_stats.duplicate(), "wave_goblin_stats": wave_goblin_stats.duplicate(),
 		"chests_found": chests_found, "chests_kept": chests_kept, "chests_scrapped": chests_scrapped,
 		"weapon_damage": weapon_damage.duplicate(), "proc_damage": proc_damage.duplicate(),
 		"enchantment_support": enchantment_support.duplicate(), "wave_enchantment_support": wave_enchantment_support.duplicate(),
@@ -335,6 +345,8 @@ func restore(saved: Dictionary, wave_number: int) -> void:
 	kills = maxi(int(saved.get("kills", 0)), 0)
 	bosses_defeated = maxi(int(saved.get("bosses_defeated", 0)), 0)
 	coins_collected = maxi(int(saved.get("coins_collected", 0)), 0)
+	goblin_stats = saved.get("goblin_stats", {}).duplicate()
+	wave_goblin_stats = saved.get("wave_goblin_stats", {}).duplicate()
 	xp_collected = maxi(int(saved.get("xp_collected", 0)), 0)
 	chests_found = maxi(int(saved.get("chests_found", 0)), 0)
 	chests_kept = maxi(int(saved.get("chests_kept", 0)), 0)

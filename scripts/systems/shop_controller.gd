@@ -35,6 +35,7 @@ var offers: Array[ShopOfferData] = []
 var reserved: Array[bool] = [false, false, false, false]
 var reroll_cost: int = 2
 var reroll_step: int = 1
+var rerolls: int = 0
 var rng := RandomNumberGenerator.new()
 
 
@@ -43,6 +44,7 @@ func _ready() -> void:
 
 
 func open_shop(wave_number: int, luck: float, loadout: WeaponLoadout, items: ItemInventory = null) -> void:
+	rerolls = 0
 	reroll_cost = EndlessRules.shop_reroll_start(wave_number)
 	reroll_step = EndlessRules.shop_reroll_step(wave_number)
 	_roll_offers(wave_number, luck, loadout, items)
@@ -50,7 +52,8 @@ func open_shop(wave_number: int, luck: float, loadout: WeaponLoadout, items: Ite
 
 func reroll(wave_number: int, luck: float, loadout: WeaponLoadout, items: ItemInventory = null) -> void:
 	_roll_offers(wave_number, luck, loadout, items)
-	reroll_cost += reroll_step
+	rerolls += 1
+	reroll_cost = maxi(reroll_cost + reroll_step, EconomyRules.shop_reroll_cost(wave_number, rerolls))
 
 
 func take_offer(index: int) -> ShopOfferData:
@@ -126,7 +129,8 @@ func _roll_offers(wave_number: int, luck: float, loadout: WeaponLoadout, items: 
 
 
 func _pick_item(tier: int, items: ItemInventory, loadout: WeaponLoadout) -> ShopOfferData:
-	var wanted_tags: Array[StringName] = items.preferred_tags(loadout) if items != null else []
+	var wanted_tags: Array[StringName] = []
+	if items != null: wanted_tags = items.preferred_tags(loadout)
 	for candidate_tier in range(tier, 0, -1):
 		var pool: Array[ShopOfferData] = []
 		var tagged: Array[ShopOfferData] = []
@@ -183,12 +187,14 @@ func save_state() -> Dictionary:
 	for index in offers.size():
 		var offer: ShopOfferData = offers[index]
 		offer_data.append({"id": str(offer.id), "tier": offer.weapon_tier, "rolls": offer.weapon_data.rolls.duplicate(true) if offer.weapon_data != null else {}, "price": offer.price, "reserved": reserved[index]} if offer != null else {})
-	return {"offers": offer_data, "reroll_cost": reroll_cost}
+	return {"offers": offer_data, "reroll_cost": reroll_cost, "shop_rerolls": rerolls}
 
 
 func restore_state(saved: Dictionary, wave_number: int) -> void:
 	reroll_cost = maxi(int(saved.get("reroll_cost", 2)), 2)
 	reroll_step = EndlessRules.shop_reroll_step(wave_number)
+	# Honor an already displayed legacy quote, then continue the new curve.
+	rerolls = clampi(int(saved.get("shop_rerolls", maxi((reroll_cost - EndlessRules.shop_reroll_start(wave_number)) / reroll_step, 0))), 0, 10000)
 	offers.clear()
 	reserved = [false, false, false, false]
 	for value in saved.get("offers", []):

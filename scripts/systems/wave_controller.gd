@@ -6,6 +6,7 @@ signal boss_requested(data: EnemyData)
 signal horde_requested(data: EnemyData, count: int)
 signal elite_requested(data: EnemyData)
 signal wave_finished(wave_number: int)
+signal loot_goblin_requested
 
 const DURATION := 45.0
 const MAX_WAVES := 20
@@ -79,6 +80,8 @@ var current_profile_id: StringName = &""
 var next_profile_id: StringName = &""
 var difficulty_id: StringName = &"normal"
 var endless_enabled: bool = false
+var goblin_profile: LootGoblinData = preload("res://data/encounters/loot_goblin.tres")
+var goblin_checked: bool = false
 
 
 func plan_hordes() -> void:
@@ -268,6 +271,7 @@ func start_next_wave() -> void:
 	remaining = duration
 	spawn_cooldown = 0.0
 	horde_spawned = false
+	goblin_checked = false
 	plan_bursts()
 	plan_elites()
 	active = true
@@ -285,6 +289,10 @@ func _process(delta: float) -> void:
 		active = false
 		wave_finished.emit(current_wave)
 		return
+	if not goblin_checked and remaining <= goblin_profile.arrival_remaining:
+		goblin_checked = true
+		if current_wave >= goblin_profile.first_wave and not is_boss_wave(current_wave) and randf() < goblin_profile.spawn_chance:
+			loot_goblin_requested.emit()
 	if not horde_spawned and horde_waves.has(current_wave) and remaining <= duration * (1.0 - HORDE_TIME_FRACTION):
 		horde_spawned = true
 		horde_requested.emit(_horde_data(current_wave), maxi(roundi(float(5 + current_wave) * MOB_BURST_SIZE_FACTOR * DifficultyCatalog.by_id(difficulty_id).horde_size_multiplier), 1))
@@ -400,6 +408,10 @@ func _roll_profile(wave_number: int, avoid_id: StringName = &"") -> StringName:
 	return WaveProfileCatalog.roll_for_wave(wave_number, avoid_id)
 
 
+func goblin_reserved_slots() -> int:
+	return 1 if not goblin_checked and current_wave >= goblin_profile.first_wave and not is_boss_wave(current_wave) else 0
+
+
 func save_state() -> Dictionary:
 	return {
 		"difficulty_id": str(difficulty_id),
@@ -410,6 +422,7 @@ func save_state() -> Dictionary:
 		"burst_times": burst_times, "burst_index": burst_index,
 		"elite_times": elite_times.duplicate(), "elite_counts": elite_counts.duplicate(), "elite_index": elite_index,
 		"current_profile_id": str(current_profile_id), "next_profile_id": str(next_profile_id),
+		"goblin_checked": goblin_checked,
 	}
 
 
@@ -421,6 +434,7 @@ func restore_state(saved: Dictionary, story_enabled: bool = false) -> void:
 		current_wave = 0
 	duration = clampf(float(saved.get("duration", WaveController.DURATION)), 1.0, 120.0)
 	remaining = clampf(float(saved.get("remaining", duration)), 0.0, duration)
+	goblin_checked = bool(saved.get("goblin_checked", remaining <= goblin_profile.arrival_remaining))
 	spawn_cooldown = maxf(float(saved.get("spawn_cooldown", 0.0)), 0.0)
 	active = bool(saved.get("active", true))
 	horde_waves.clear()

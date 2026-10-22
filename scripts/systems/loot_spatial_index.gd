@@ -79,6 +79,19 @@ func _remove(drop: Loot, cell: Vector2i) -> void:
 func _cell(at: Vector2) -> Vector2i:
 	return Vector2i(floori(at.x / CELL_SIZE), floori(at.y / CELL_SIZE))
 
+
+func in_circle(at: Vector2, radius: float) -> Array[Loot]:
+	var found: Array[Loot] = []
+	var bounds := global_transform.affine_inverse() * Rect2(at - Vector2.ONE * radius, Vector2.ONE * radius * 2)
+	var first := _cell(bounds.position)
+	var last := _cell(bounds.end)
+	for y in range(first.y, last.y + 1):
+		for x in range(first.x, last.x + 1):
+			for drop: Loot in cells.get(Vector2i(x, y), []):
+				if not drop.is_queued_for_deletion() and drop.global_position.distance_squared_to(at) <= radius * radius:
+					found.append(drop)
+	return found
+
 func _physics_process(delta: float) -> void:
 	if player == null:
 		return

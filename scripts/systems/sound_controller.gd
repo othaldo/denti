@@ -13,6 +13,9 @@ const BOSS_CHARGE: AudioStreamWAV = preload("res://assets/audio/sfx/boss_charge.
 const BOSS_PULSE: AudioStreamWAV = preload("res://assets/audio/sfx/boss_pulse.wav")
 const BOSS_BREAK: AudioStreamWAV = preload("res://assets/audio/sfx/boss_break.wav")
 const PICKUP: AudioStreamWAV = preload("res://assets/audio/sfx/pickup.wav")
+const GOBLIN_ARRIVAL: AudioStreamWAV = preload("res://assets/audio/sfx/goblin_arrival.wav")
+const GOBLIN_CAUGHT: AudioStreamWAV = preload("res://assets/audio/sfx/goblin_caught.wav")
+const GOBLIN_ESCAPE: AudioStreamWAV = preload("res://assets/audio/sfx/goblin_escape.wav")
 const VOICE_COUNT := 12
 
 var voices: Array[AudioStreamPlayer] = []
@@ -77,6 +80,9 @@ func _stream_for(cue: StringName) -> AudioStreamWAV:
 		&"boss_pulse": return BOSS_PULSE
 		&"boss_break": return BOSS_BREAK
 		&"pickup": return PICKUP
+		&"goblin_arrival": return GOBLIN_ARRIVAL
+		&"goblin_caught": return GOBLIN_CAUGHT
+		&"goblin_escape": return GOBLIN_ESCAPE
 	return null
 
 

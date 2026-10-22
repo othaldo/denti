@@ -56,6 +56,22 @@ func begin_wave_collection() -> void:
 		spatial_index.collecting[get_instance_id()] = self
 
 
+func stealable() -> bool:
+	if kind != &"coin" or amount <= 0 or wave_collecting or is_queued_for_deletion() or target == null:
+		return false
+	var reach := maxf(Loot.PICKUP_DISTANCE, target.items.cached_pickup_range)
+	return global_position.distance_squared_to(target.global_position) > reach * reach
+
+
+func take_for_goblin(capacity: int) -> int:
+	if not stealable(): return 0
+	var taken := mini(amount, maxi(capacity, 0))
+	amount -= taken
+	if amount == 0: queue_free()
+	# Ownership changes without a pickup signal: no XP, economy proc or queue.
+	return taken
+
+
 func _physics_process(delta: float) -> void:
 	if target == null:
 		return

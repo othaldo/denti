@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/enemies/loot_goblin/parts.png" id="2"]
+[ext_resource type="Resource" path="res://data/encounters/loot_goblin.tres" id="3"]
+
+[sub_resource type="AtlasTexture" id="Portrait"]
+atlas = ExtResource("2")
+region = Rect2(0, 0, 512, 512)
+
+[resource]
+script = ExtResource("1")
+display_name = "Goldzahn-Gauner"
+max_health = 420.0
+health_per_wave = 150.0
+late_health_acceleration = 6.0
+damage_reduction = 0.06
+move_speed = 195.0
+contact_damage = 0.0
+radius = 25.0
+xp_drop = 0
+coin_drop = 0
+sprite = SubResource("Portrait")
+allow_random_status_trait = false
+loot_goblin_profile = ExtResource("3")

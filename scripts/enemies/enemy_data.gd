@@ -30,6 +30,7 @@ enum SpriteFacing { FRONT, RIGHT, LEFT }
 @export_group("Role")
 @export var is_boss: bool = false
 @export var is_elite: bool = false
+@export var loot_goblin_profile: LootGoblinData
 @export var pillow_profile: PillowEncounterData
 @export var cloak_profile: CloakEncounterData
 @export var caramel_profile: CaramelEncounterData

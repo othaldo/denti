@@ -6,6 +6,8 @@ static func capture(game) -> Dictionary:
 	var enemies_data: Array[Dictionary] = []
 	var enemy_indices: Dictionary = {}
 	for enemy: Enemy in game.get_node("Enemies").get_children():
+		if enemy.is_queued_for_deletion() or enemy.death_resolved and not enemy.data.is_boss:
+			continue
 		enemy_indices[enemy.get_instance_id()] = enemies_data.size()
 		enemies_data.append(enemy.save_state())
 	var weapon_runtime: Array[Dictionary] = []

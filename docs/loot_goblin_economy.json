@@ -1,0 +1,565 @@
+{
+	"method": "12 seeded spawn plans per difficulty. Same requested enemies for old/new expected coin chance; assumes every requested non-boss dies during combat. Includes guaranteed elite coins and escorts. Excludes caps, player builds, economy items, capsules, spending and goblin theft. This is an income forecast, not a balance playtest.",
+	"rows": [
+		{
+			"after": 44.0,
+			"before": 44.0,
+			"difficulty": "easy",
+			"reduction_percent": 0.0,
+			"wave": 1
+		},
+		{
+			"after": 51.0,
+			"before": 51.0,
+			"difficulty": "easy",
+			"reduction_percent": 0.0,
+			"wave": 2
+		},
+		{
+			"after": 65.6666666666667,
+			"before": 65.6666666666667,
+			"difficulty": "easy",
+			"reduction_percent": 0.0,
+			"wave": 3
+		},
+		{
+			"after": 84.0,
+			"before": 84.0,
+			"difficulty": "easy",
+			"reduction_percent": 0.0,
+			"wave": 4
+		},
+		{
+			"after": 76.5,
+			"before": 76.5,
+			"difficulty": "easy",
+			"reduction_percent": 0.0,
+			"wave": 5
+		},
+		{
+			"after": 100.25,
+			"before": 100.25,
+			"difficulty": "easy",
+			"reduction_percent": 0.0,
+			"wave": 6
+		},
+		{
+			"after": 114.810369791668,
+			"before": 115.166666666667,
+			"difficulty": "easy",
+			"reduction_percent": 0.309374999999257,
+			"wave": 7
+		},
+		{
+			"after": 127.003364583336,
+			"before": 131.083333333333,
+			"difficulty": "easy",
+			"reduction_percent": 3.11249999999814,
+			"wave": 8
+		},
+		{
+			"after": 129.52282291667,
+			"before": 136.943916666667,
+			"difficulty": "easy",
+			"reduction_percent": 5.41907514450649,
+			"wave": 9
+		},
+		{
+			"after": 130.60825520833,
+			"before": 139.863958333331,
+			"difficulty": "easy",
+			"reduction_percent": 6.61764705882394,
+			"wave": 10
+		},
+		{
+			"after": 178.596833333334,
+			"before": 193.489333333338,
+			"difficulty": "easy",
+			"reduction_percent": 7.69680671458429,
+			"wave": 11
+		},
+		{
+			"after": 196.197583333328,
+			"before": 215.546333333337,
+			"difficulty": "easy",
+			"reduction_percent": 8.97660827757484,
+			"wave": 12
+		},
+		{
+			"after": 213.384130208335,
+			"before": 237.431708333336,
+			"difficulty": "easy",
+			"reduction_percent": 10.1282083567543,
+			"wave": 13
+		},
+		{
+			"after": 211.374625000009,
+			"before": 238.759000000001,
+			"difficulty": "easy",
+			"reduction_percent": 11.469462931237,
+			"wave": 14
+		},
+		{
+			"after": 148.929492187495,
+			"before": 171.788437499996,
+			"difficulty": "easy",
+			"reduction_percent": 13.3064516129038,
+			"wave": 15
+		},
+		{
+			"after": 237.187010416663,
+			"before": 276.312166666657,
+			"difficulty": "easy",
+			"reduction_percent": 14.1597660074066,
+			"wave": 16
+		},
+		{
+			"after": 237.727031249985,
+			"before": 281.876249999986,
+			"difficulty": "easy",
+			"reduction_percent": 15.6626245559898,
+			"wave": 17
+		},
+		{
+			"after": 239.397765624997,
+			"before": 289.244875000011,
+			"difficulty": "easy",
+			"reduction_percent": 17.2335324437511,
+			"wave": 18
+		},
+		{
+			"after": 239.057966145842,
+			"before": 291.710895833345,
+			"difficulty": "easy",
+			"reduction_percent": 18.0496959282534,
+			"wave": 19
+		},
+		{
+			"after": 130.9275,
+			"before": 166.635000000001,
+			"difficulty": "easy",
+			"reduction_percent": 21.4285714285718,
+			"wave": 20
+		},
+		{
+			"after": 53.0,
+			"before": 53.0,
+			"difficulty": "normal",
+			"reduction_percent": 0.0,
+			"wave": 1
+		},
+		{
+			"after": 62.0,
+			"before": 62.0,
+			"difficulty": "normal",
+			"reduction_percent": 0.0,
+			"wave": 2
+		},
+		{
+			"after": 79.4166666666667,
+			"before": 79.4166666666667,
+			"difficulty": "normal",
+			"reduction_percent": 0.0,
+			"wave": 3
+		},
+		{
+			"after": 100.416666666667,
+			"before": 100.416666666667,
+			"difficulty": "normal",
+			"reduction_percent": 0.0,
+			"wave": 4
+		},
+		{
+			"after": 84.3901041666653,
+			"before": 85.2541666666654,
+			"difficulty": "normal",
+			"reduction_percent": 1.0135135135136,
+			"wave": 5
+		},
+		{
+			"after": 113.931458333332,
+			"before": 116.328333333335,
+			"difficulty": "normal",
+			"reduction_percent": 2.06043956044151,
+			"wave": 6
+		},
+		{
+			"after": 123.096250000001,
+			"before": 127.089999999998,
+			"difficulty": "normal",
+			"reduction_percent": 3.14245810055683,
+			"wave": 7
+		},
+		{
+			"after": 134.306666666663,
+			"before": 140.106666666671,
+			"difficulty": "normal",
+			"reduction_percent": 4.13970308337008,
+			"wave": 8
+		},
+		{
+			"after": 136.945312500001,
+			"before": 144.562500000001,
+			"difficulty": "normal",
+			"reduction_percent": 5.26913099870293,
+			"wave": 9
+		},
+		{
+			"after": 138.443229166671,
+			"before": 148.254166666664,
+			"difficulty": "normal",
+			"reduction_percent": 6.61764705881928,
+			"wave": 10
+		},
+		{
+			"after": 187.136145833336,
+			"before": 202.415833333339,
+			"difficulty": "normal",
+			"reduction_percent": 7.548662201163,
+			"wave": 11
+		},
+		{
+			"after": 212.192083333321,
+			"before": 232.748333333339,
+			"difficulty": "normal",
+			"reduction_percent": 8.83196442510191,
+			"wave": 12
+		},
+		{
+			"after": 214.338958333326,
+			"before": 238.498333333327,
+			"difficulty": "normal",
+			"reduction_percent": 10.1297877693072,
+			"wave": 13
+		},
+		{
+			"after": 220.584895833326,
+			"before": 248.670833333326,
+			"difficulty": "normal",
+			"reduction_percent": 11.2944236859304,
+			"wave": 14
+		},
+		{
+			"after": 153.859375,
+			"before": 177.475000000005,
+			"difficulty": "normal",
+			"reduction_percent": 13.3064516129058,
+			"wave": 15
+		},
+		{
+			"after": 243.319375000009,
+			"before": 283.510000000016,
+			"difficulty": "normal",
+			"reduction_percent": 14.1760872632376,
+			"wave": 16
+		},
+		{
+			"after": 252.011822916679,
+			"before": 296.607916666643,
+			"difficulty": "normal",
+			"reduction_percent": 15.0353686614795,
+			"wave": 17
+		},
+		{
+			"after": 258.410625000023,
+			"before": 309.795000000006,
+			"difficulty": "normal",
+			"reduction_percent": 16.5865733791645,
+			"wave": 18
+		},
+		{
+			"after": 235.657187500002,
+			"before": 287.477500000005,
+			"difficulty": "normal",
+			"reduction_percent": 18.0258672417847,
+			"wave": 19
+		},
+		{
+			"after": 135.849999999994,
+			"before": 172.900000000006,
+			"difficulty": "normal",
+			"reduction_percent": 21.4285714285776,
+			"wave": 20
+		},
+		{
+			"after": 53.0999999999993,
+			"before": 53.0999999999993,
+			"difficulty": "hard",
+			"reduction_percent": 0.0,
+			"wave": 1
+		},
+		{
+			"after": 62.999999999999,
+			"before": 62.999999999999,
+			"difficulty": "hard",
+			"reduction_percent": 0.0,
+			"wave": 2
+		},
+		{
+			"after": 82.0499999999987,
+			"before": 82.0499999999987,
+			"difficulty": "hard",
+			"reduction_percent": 0.0,
+			"wave": 3
+		},
+		{
+			"after": 100.875,
+			"before": 100.875,
+			"difficulty": "hard",
+			"reduction_percent": 0.0,
+			"wave": 4
+		},
+		{
+			"after": 86.2518749999993,
+			"before": 87.1349999999988,
+			"difficulty": "hard",
+			"reduction_percent": 1.01351351351296,
+			"wave": 5
+		},
+		{
+			"after": 121.03278125,
+			"before": 123.410749999997,
+			"difficulty": "hard",
+			"reduction_percent": 1.92687326671094,
+			"wave": 6
+		},
+		{
+			"after": 132.830000000002,
+			"before": 136.88,
+			"difficulty": "hard",
+			"reduction_percent": 2.95879602571506,
+			"wave": 7
+		},
+		{
+			"after": 146.507000000002,
+			"before": 152.671999999997,
+			"difficulty": "hard",
+			"reduction_percent": 4.03806853908681,
+			"wave": 8
+		},
+		{
+			"after": 160.624046874999,
+			"before": 168.910374999994,
+			"difficulty": "hard",
+			"reduction_percent": 4.90575438305371,
+			"wave": 9
+		},
+		{
+			"after": 142.398750000003,
+			"before": 152.490000000004,
+			"difficulty": "hard",
+			"reduction_percent": 6.61764705882449,
+			"wave": 10
+		},
+		{
+			"after": 205.439359375003,
+			"before": 221.597874999999,
+			"difficulty": "hard",
+			"reduction_percent": 7.29181885205165,
+			"wave": 11
+		},
+		{
+			"after": 238.638875000002,
+			"before": 260.649499999997,
+			"difficulty": "hard",
+			"reduction_percent": 8.44452991469219,
+			"wave": 12
+		},
+		{
+			"after": 240.727437500008,
+			"before": 266.57149999999,
+			"difficulty": "hard",
+			"reduction_percent": 9.69498333467121,
+			"wave": 13
+		},
+		{
+			"after": 246.786031250001,
+			"before": 277.322749999983,
+			"difficulty": "hard",
+			"reduction_percent": 11.011256288921,
+			"wave": 14
+		},
+		{
+			"after": 160.091015624993,
+			"before": 184.663125000001,
+			"difficulty": "hard",
+			"reduction_percent": 13.3064516129074,
+			"wave": 15
+		},
+		{
+			"after": 287.01956250001,
+			"before": 330.63300000002,
+			"difficulty": "hard",
+			"reduction_percent": 13.1908906551998,
+			"wave": 16
+		},
+		{
+			"after": 293.459671875002,
+			"before": 343.815375000014,
+			"difficulty": "hard",
+			"reduction_percent": 14.6461463874354,
+			"wave": 17
+		},
+		{
+			"after": 291.471656250014,
+			"before": 347.472750000013,
+			"difficulty": "hard",
+			"reduction_percent": 16.1166864883639,
+			"wave": 18
+		},
+		{
+			"after": 270.991171875014,
+			"before": 328.524375000004,
+			"difficulty": "hard",
+			"reduction_percent": 17.5126132193354,
+			"wave": 19
+		},
+		{
+			"after": 143.054999999993,
+			"before": 182.070000000011,
+			"difficulty": "hard",
+			"reduction_percent": 21.4285714285802,
+			"wave": 20
+		},
+		{
+			"after": 54.3999999999998,
+			"before": 54.3999999999998,
+			"difficulty": "hell",
+			"reduction_percent": 0.0,
+			"wave": 1
+		},
+		{
+			"after": 63.1999999999993,
+			"before": 63.1999999999993,
+			"difficulty": "hell",
+			"reduction_percent": 0.0,
+			"wave": 2
+		},
+		{
+			"after": 82.3333333333321,
+			"before": 82.3333333333321,
+			"difficulty": "hell",
+			"reduction_percent": 0.0,
+			"wave": 3
+		},
+		{
+			"after": 114.73333333333,
+			"before": 114.73333333333,
+			"difficulty": "hell",
+			"reduction_percent": 0.0,
+			"wave": 4
+		},
+		{
+			"after": 90.3416666666653,
+			"before": 91.2666666666676,
+			"difficulty": "hell",
+			"reduction_percent": 1.01351351351604,
+			"wave": 5
+		},
+		{
+			"after": 127.327749999997,
+			"before": 129.754,
+			"difficulty": "hell",
+			"reduction_percent": 1.86988455076748,
+			"wave": 6
+		},
+		{
+			"after": 158.943541666669,
+			"before": 163.321666666661,
+			"difficulty": "hell",
+			"reduction_percent": 2.68067617074245,
+			"wave": 7
+		},
+		{
+			"after": 159.979499999996,
+			"before": 166.031999999994,
+			"difficulty": "hell",
+			"reduction_percent": 3.64538161318156,
+			"wave": 8
+		},
+		{
+			"after": 169.408083333339,
+			"before": 177.739333333335,
+			"difficulty": "hell",
+			"reduction_percent": 4.68734176265365,
+			"wave": 9
+		},
+		{
+			"after": 142.345833333332,
+			"before": 152.433333333335,
+			"difficulty": "hell",
+			"reduction_percent": 6.6176470588255,
+			"wave": 10
+		},
+		{
+			"after": 215.727500000005,
+			"before": 231.739999999997,
+			"difficulty": "hell",
+			"reduction_percent": 6.90968326572564,
+			"wave": 11
+		},
+		{
+			"after": 238.437666666668,
+			"before": 259.622666666653,
+			"difficulty": "hell",
+			"reduction_percent": 8.15991926744437,
+			"wave": 12
+		},
+		{
+			"after": 276.918541666666,
+			"before": 303.721666666643,
+			"difficulty": "hell",
+			"reduction_percent": 8.82489724692435,
+			"wave": 13
+		},
+		{
+			"after": 275.209583333317,
+			"before": 305.803333333346,
+			"difficulty": "hell",
+			"reduction_percent": 10.0043873513567,
+			"wave": 14
+		},
+		{
+			"after": 162.548958333328,
+			"before": 187.498333333321,
+			"difficulty": "hell",
+			"reduction_percent": 13.3064516129003,
+			"wave": 15
+		},
+		{
+			"after": 298.58250000001,
+			"before": 342.120000000017,
+			"difficulty": "hell",
+			"reduction_percent": 12.7257979656274,
+			"wave": 16
+		},
+		{
+			"after": 296.834583333346,
+			"before": 345.503333333333,
+			"difficulty": "hell",
+			"reduction_percent": 14.0863329827944,
+			"wave": 17
+		},
+		{
+			"after": 292.210166666653,
+			"before": 345.742666666645,
+			"difficulty": "hell",
+			"reduction_percent": 15.4833363542042,
+			"wave": 18
+		},
+		{
+			"after": 278.783874999985,
+			"before": 335.287000000001,
+			"difficulty": "hell",
+			"reduction_percent": 16.8521669495137,
+			"wave": 19
+		},
+		{
+			"after": 143.623333333344,
+			"before": 182.793333333321,
+			"difficulty": "hell",
+			"reduction_percent": 21.4285714285604,
+			"wave": 20
+		}
+	]
+}

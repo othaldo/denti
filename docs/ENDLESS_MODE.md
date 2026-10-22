@@ -48,9 +48,9 @@ Die Faktoren beziehen sich auf denselben Gegnertyp in Welle 20 und gelten vor Sc
 
 ### Economy und Fortsetzen
 
-Die Münzchance sinkt auf Normal bis zur Untergrenze von 50 % ab Welle 34; Eliten bleiben garantierte Drops. Goldsonde, Goldextraktor und die begrenzten Zinsen bleiben nutzbar. Treffer-Unverwundbarkeit und Angriffs-Warnzeiten behalten ihre bisherigen Regeln. Damit bleiben Economy-Builds und lesbare Ausweichfenster Teil des Runs.
+Seit der [Economy-Korrektur vom 22.10.2026](LOOT_GOBLIN.md) sinkt der Gold-Faktor auf Normal bis zur Untergrenze von 40 % ab Welle 27; Eliten bleiben garantierte Drops. In normalen Endloswellen kann außerdem der Goldzahn-Gauner erscheinen. Goldsonde, Goldextraktor und die begrenzten Zinsen bleiben nutzbar. Treffer-Unverwundbarkeit und Angriffs-Warnzeiten behalten ihre bisherigen Regeln.
 
-Shop-Rerolls starten bei `max(2, ceil(2 * (1 + E / 5)))` und steigen je Kauf um `max(1, round(sqrt(1 + E)))`. Beispiele: Welle 30: 3/4/5/..., Welle 40: 5/8/11/.... Das ist eine eigene, mildere Rerollkurve. Gemerkte Angebote behalten ihren exakten Preis. Level-up-Rerolls bleiben an das tatsächlich verdiente Level gebunden.
+Shop-Rerolls starten bei `max(2, ceil(2 * (1 + E / 5)))`. Zu diesem Startpreis kommt seit 22.10.2026 `max(1, round(sqrt(1 + E))) * n * (n + 1) / 2`, mit `n` als bereits bezahlten Versuchen dieses Shops. Beispiele: Welle 30: 3/4/6/9/..., Welle 40: 5/8/14/23/.... Gemerkte Angebote behalten ihren exakten Preis. Level-up-Rerolls bleiben an das tatsächlich verdiente Level gebunden und verwenden denselben progressiven Zuschlag ohne Endlosmultiplikator.
 
 Speichern und Fortsetzen erhält Endlosstatus, Wellen über 20, Build, Belohnungswarteschlange, Preise sowie beide Bosse einschließlich ihrer individuellen Entzündung. Alte Spielstände bleiben normale Runs. Beim Tod endet der Endloslauf; der Bericht enthält weiterhin den Sieg in Welle 20 und zusätzlich die erreichte Endloswelle sowie das Ende durch Tod.
 

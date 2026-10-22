@@ -104,7 +104,7 @@ static func _valid_structure(value: Dictionary) -> bool:
 		if not chest is Dictionary or not _containers(chest, [], ["choices"]):
 			return false
 	var telemetry: Dictionary = value.get("telemetry", {})
-	var metric_maps := ["status_damage", "status_applications", "wave_status_damage", "wave_status_applications", "weapon_damage", "proc_damage", "enchantment_support", "wave_enchantment_support", "wave_gold_sources", "wave_shop_spending"]
+	var metric_maps := ["status_damage", "status_applications", "wave_status_damage", "wave_status_applications", "weapon_damage", "proc_damage", "enchantment_support", "wave_enchantment_support", "wave_gold_sources", "wave_shop_spending", "goblin_stats", "wave_goblin_stats"]
 	if not _containers(telemetry, metric_maps, ["wave_history", "damage_events", "kill_events", "taken_events"]):
 		return false
 	for key in metric_maps:
@@ -122,6 +122,21 @@ static func _valid_structure(value: Dictionary) -> bool:
 		if not _containers(entry, ["motion"], []):
 			return false
 	for entry in value.get("enemies", []):
+		if not _containers(entry, ["loot_goblin"], []): return false
+		var goblin: Dictionary = entry.get("loot_goblin", {})
+		if not _containers(goblin, ["capsule"], ["destination"]): return false
+		var capsule: Dictionary = goblin.get("capsule", {})
+		if not _containers(capsule, [], ["options"]): return false
+		for option in capsule.get("options", []):
+			if not option is Dictionary: return false
+			for key in ["rarity", "damage"]:
+				if option.has(key) and not (option[key] is float or option[key] is int): return false
+		if goblin.has("destination"):
+			if goblin.destination.size() != 2: return false
+			for coordinate in goblin.destination:
+				if not (coordinate is float or coordinate is int): return false
+		for key in ["carried", "state", "state_time", "sprint_time", "plan_time", "motion_time", "facing", "grab_time", "grab_animation_time"]:
+			if goblin.has(key) and not (goblin[key] is float or goblin[key] is int): return false
 		if not _containers(entry, ["caramel"], []): return false
 		if not _containers(entry, ["acid_king"], []): return false
 		if not AcidKingSnapshot.valid(entry.get("acid_king", {})): return false
@@ -191,7 +206,7 @@ static func _valid_structure(value: Dictionary) -> bool:
 static func _valid_scalars(value: Variant, field: String = "") -> bool:
 	# These fields are numeric maps or arrays; other primitive fields may be bools/IDs.
 	const NUMBER_ARRAYS := ["position", "direction", "boss_dash_end", "boss_dash_origin", "horde_waves", "burst_times", "elite_times", "elite_counts", "hits", "orbit_hits", "kill_events"]
-	const NUMBER_FIELDS := ["wave", "xp", "xp_goal", "level", "coins", "duration", "remaining", "spawn_cooldown", "burst_index", "elite_index", "elite_time", "reroll_cost", "tier", "price", "invested_coins", "affix_slots", "x", "y", "dx", "dy", "damage", "health", "timer", "phase", "boss_move", "cooldown", "focus_target", "focus_hits", "focus_time", "pending_levels", "level_rerolls", "step", "scrap_coins", "charge_aim_distance", "contact_timer"]
+	const NUMBER_FIELDS := ["wave", "xp", "xp_goal", "level", "coins", "duration", "remaining", "spawn_cooldown", "burst_index", "elite_index", "elite_time", "reroll_cost", "tier", "price", "invested_coins", "affix_slots", "x", "y", "dx", "dy", "damage", "health", "timer", "phase", "boss_move", "cooldown", "focus_target", "focus_hits", "focus_time", "pending_levels", "level_rerolls", "shop_rerolls", "step", "scrap_coins", "charge_aim_distance", "contact_timer"]
 	if field in NUMBER_ARRAYS:
 		if not value is Array:
 			return false

@@ -34,6 +34,7 @@ static func capture(enemy: Enemy) -> Dictionary:
 		"caramel": enemy.caramel_encounter.save_data() if enemy.caramel_encounter != null else {},
 		"acid_king": enemy.acid_king_encounter.save_data() if enemy.acid_king_encounter != null else {},
 		"crown_court": enemy.crown_court_encounter.save_data() if enemy.crown_court_encounter != null else {},
+		"loot_goblin": enemy.loot_goblin.save_data() if enemy.loot_goblin != null else {},
 	}
 
 
@@ -97,4 +98,6 @@ static func restore(enemy: Enemy, entry: Dictionary, boss_pending: bool = false)
 		enemy.acid_king_encounter.restore(entry.get("acid_king", {}))
 	if enemy.crown_court_encounter != null:
 		enemy.crown_court_encounter.restore(entry.get("crown_court", {}))
+	if enemy.loot_goblin != null:
+		enemy.loot_goblin.restore(entry.get("loot_goblin", {}))
 	enemy.queue_redraw()

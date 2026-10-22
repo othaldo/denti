@@ -8,14 +8,14 @@ func _run() -> void:
 		if EconomyRules.shop_price(9, entry[0]) != entry[1]:
 			_fail("Brotato price curve differs from expected prices")
 			return
-	if not is_equal_approx(EconomyRules.gold_drop_factor(4), 1.0) or not is_equal_approx(EconomyRules.gold_drop_factor(10), 0.85) or not is_equal_approx(EconomyRules.gold_drop_factor(20), 0.70):
+	if not is_equal_approx(EconomyRules.gold_drop_factor(4), 1.0) or not is_equal_approx(EconomyRules.gold_drop_factor(10), 0.79375) or not is_equal_approx(EconomyRules.gold_drop_factor(20), 0.55):
 		_fail("gold decay curve is incorrect")
 		return
 	if EconomyRules.coin_chance(WaveController.ACID_CROWN, 19, 0.5) != 1.0:
 		_fail("elite gold is not guaranteed")
 		return
 	for enemy in [WaveController.PLAQUE, WaveController.BACTERIA, WaveController.ACID_SPITTER, WaveController.SUGAR]:
-		for entry in [[1, 1.0], [4, 1.0], [5, 0.925], [10, 0.85], [20, 0.70], [40, 0.50]]:
+		for entry in [[1, 1.0], [4, 1.0], [5, 0.915625], [10, 0.79375], [20, 0.55], [40, 0.40]]:
 			if not is_equal_approx(EconomyRules.coin_chance(enemy, entry[0]), entry[1]):
 				_fail("normal enemy gold chance does not follow the materials curve")
 				return
@@ -46,7 +46,7 @@ func _run() -> void:
 		gold_drops += int(gold)
 		xp_drops += int(experience)
 		gold_without_xp += int(gold and not experience)
-	if absi(gold_drops - 2860) > 120 or absi(xp_drops - 1520) > 120 or gold_without_xp < 1400:
+	if absi(gold_drops - 2298) > 120 or absi(xp_drops - 1520) > 120 or gold_without_xp < 1200:
 		_fail("gold is still gated by XP or the unchanged XP rate drifted: %d gold, %d XP, %d independent gold" % [gold_drops, xp_drops, gold_without_xp])
 		return
 	game.wave.active = false

@@ -108,6 +108,7 @@ func _ready() -> void:
 	wave.boss_requested.connect(_spawn_enemy)
 	wave.horde_requested.connect(_spawn_horde)
 	wave.elite_requested.connect(_spawn_elite)
+	wave.loot_goblin_requested.connect(_spawn_loot_goblin)
 	wave.wave_finished.connect(_on_wave_finished)
 	player.stats.died.connect(_on_player_died)
 	player.stats.root_capacity_changed.connect(_on_root_capacity_changed)
@@ -336,7 +337,7 @@ func _refresh_hud() -> void:
 
 
 func _spawn_enemy(data: EnemyData) -> void:
-	var limit := MAX_ACTIVE_ENEMIES if data.is_elite or data.is_boss else MAX_ACTIVE_ENEMIES - maxi(wave.elite_reserved_slots(), 1)
+	var limit := MAX_ACTIVE_ENEMIES if data.is_elite or data.is_boss else MAX_ACTIVE_ENEMIES - maxi(wave.elite_reserved_slots(), 1) - wave.goblin_reserved_slots()
 	if $Enemies.get_child_count() >= limit:
 		telemetry.record_spawn_blocked()
 		return
@@ -344,6 +345,19 @@ func _spawn_enemy(data: EnemyData) -> void:
 	if treasure:
 		rewards.treasure_spawned = true
 	_create_enemy(data, _spawn_position(_spawn_edge()), treasure)
+
+
+func _spawn_loot_goblin() -> void:
+	if not wave.active or ended or $Enemies.get_child_count() >= MAX_ACTIVE_ENEMIES:
+		return
+	for existing: Enemy in $Enemies.get_children():
+		if existing.loot_goblin != null: return
+	var at := _spawn_position(_spawn_edge())
+	_create_enemy(EnemyCatalog.LOOT_GOBLIN, at)
+	var enemy: Enemy = $Enemies.get_child(-1)
+	enemy.loot_goblin.capsule = WeaponAffixes.sanitize_chest(WeaponAffixes.roll_chest(wave.current_wave, player.stats.luck, player.loadout, true))
+	telemetry.record_goblin(&"spawned")
+	sound.play_cue(&"goblin_arrival")
 
 
 func _spawn_elite(data: EnemyData) -> void:
@@ -369,7 +383,7 @@ func _spawn_horde(data: EnemyData, count: int) -> void:
 	var center := _spawn_position(edge)
 	var lower := Vector2.ONE * (DentiArena.WALL_WIDTH + 8.0)
 	var upper := arena.arena_size - lower
-	var limit := MAX_ACTIVE_ENEMIES - maxi(wave.elite_reserved_slots(), 1)
+	var limit := MAX_ACTIVE_ENEMIES - maxi(wave.elite_reserved_slots(), 1) - wave.goblin_reserved_slots()
 	for index in count:
 		if $Enemies.get_child_count() >= limit:
 			telemetry.record_spawn_blocked(count - index)
@@ -435,6 +449,10 @@ func _create_enemy(data: EnemyData, at: Vector2, treasure: bool = false) -> void
 	if data.is_elite:
 		enemy.elite_guarded.connect(_on_elite_guarded)
 	$Enemies.add_child(enemy)
+	if enemy.loot_goblin != null:
+		enemy.loot_goblin.stolen.connect(_on_goblin_stole.bind(enemy))
+		enemy.loot_goblin.reward_ready.connect(_on_goblin_reward.bind(enemy))
+		enemy.loot_goblin.escaped.connect(_on_goblin_escape.bind(enemy))
 	telemetry.record_spawn(data.is_boss, data.is_elite)
 	if data.is_boss:
 		boss = enemy
@@ -448,6 +466,7 @@ func _on_enemy_defeated(at: Vector2, data: EnemyData, treasure: bool = false) ->
 	var bonus_coins := items.on_kill(at, data.is_boss)
 	coins += bonus_coins
 	telemetry.record_loot(&"coin", bonus_coins, &"kill_item")
+	if data.loot_goblin_profile != null: return
 	if data.is_boss:
 		boss = BossEncounter.primary($Enemies)
 		if boss_pending:
@@ -462,6 +481,38 @@ func _on_enemy_defeated(at: Vector2, data: EnemyData, treasure: bool = false) ->
 		_spawn_loot(at + Vector2(-11.0, 0.0), &"xp", data.xp_drop)
 	if wave.active and data.coin_drop > 0 and randf() < EconomyRules.coin_chance(data, wave.current_wave, DifficultyCatalog.by_id(wave.difficulty_id).reward_chance_multiplier):
 		_spawn_loot(at + Vector2(11.0, 0.0), &"coin", items.coin_drop_value(data.coin_drop))
+
+
+func _on_goblin_stole(amount: int, at: Vector2, enemy: Enemy) -> void:
+	telemetry.record_goblin(&"stolen", amount)
+	var coin := Sprite2D.new()
+	coin.texture = CombatSpriteTextures.loot(&"coin")
+	coin.scale = Vector2.ONE * 20.0 / coin.texture.get_width()
+	coin.position = at
+	coin.z_index = 5
+	add_child(coin)
+	var tween := coin.create_tween()
+	tween.tween_property(coin, "position", enemy.global_position + Vector2(12, -14), 0.22).set_trans(Tween.TRANS_QUAD)
+	tween.parallel().tween_property(coin, "scale", coin.scale * 0.4, 0.22)
+	tween.tween_callback(coin.queue_free)
+
+
+func _on_goblin_reward(amount: int, capsule: Dictionary, enemy: Enemy) -> void:
+	telemetry.record_goblin(&"killed")
+	telemetry.record_goblin(&"recovered", amount)
+	if amount > 0:
+		# Values were rolled on their original drop. Do not multiply them again.
+		_spawn_loot(enemy.global_position, &"coin", amount, &"", {"source": "goblin_return"})
+	if not capsule.is_empty():
+		_spawn_loot(enemy.global_position, &"chest", int(capsule.scrap_coins), WeaponAffixes.CHEST_ID, capsule)
+	sound.play_cue(&"goblin_caught")
+
+
+func _on_goblin_escape(amount: int, enemy: Enemy) -> void:
+	telemetry.record_goblin(&"escaped")
+	telemetry.record_goblin(&"lost", amount)
+	LootGoblinRig.departure(self, enemy.global_position, float(amount) / enemy.loot_goblin.profile.capacity, enemy.loot_goblin.facing)
+	sound.play_cue(&"goblin_escape")
 
 
 func _on_boss_death_started(_at: Vector2) -> void:
@@ -516,7 +567,7 @@ func _on_loot_collected(kind: StringName, amount: int, reward_id: StringName = &
 		hud.chests_label.text = str(telemetry.wave_chests_found)
 	else:
 		var bonus := items.on_pickup(kind, amount)
-		telemetry.record_loot(kind, amount)
+		telemetry.record_loot(kind, amount, StringName(str(drop.reward_data.get("source", "drop"))) if drop != null else &"drop")
 		telemetry.record_loot(kind, bonus, &"pickup_item")
 		if kind == &"coin":
 			coins += amount + bonus
@@ -690,6 +741,8 @@ func _on_relic_chosen(id: StringName) -> void:
 func _on_wave_finished(wave_number: int) -> void:
 	if ended:
 		return
+	for enemy: Enemy in $Enemies.get_children():
+		if enemy.loot_goblin != null: enemy.loot_goblin.escape()
 	if WaveController.is_boss_wave(wave_number):
 		var remaining_bosses := BossEncounter.remaining($Enemies)
 		if not remaining_bosses.is_empty():
@@ -819,7 +872,7 @@ func _clear_arena(collect_drops: bool, keep_boss: bool = false) -> void:
 				hud.chests_label.text = str(telemetry.wave_chests_found)
 			else:
 				var bonus := items.on_pickup(drop.kind, drop.amount)
-				telemetry.record_loot(drop.kind, drop.amount)
+				telemetry.record_loot(drop.kind, drop.amount, StringName(str(drop.reward_data.get("source", "drop"))))
 				telemetry.record_loot(drop.kind, bonus, &"pickup_item")
 				if drop.kind == &"coin":
 					coins += drop.amount + bonus

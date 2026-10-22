@@ -12,7 +12,7 @@ func _initialize() -> void:
 		if not is_equal_approx(WaveController.enemy_speed_multiplier(data, 1000) / WaveController.enemy_speed_multiplier(data, 20), 2.75) or WaveController.damage_reduction(data, 1000) != WaveController.damage_reduction(data, 20):
 			_fail("endless movement or defense grows beyond its bound")
 			return
-	if EconomyRules.shop_price(9, 20) != 47 or EconomyRules.shop_price(9, 30) != 80 or EconomyRules.shop_price(9, 40) != 192 or EconomyRules.gold_drop_factor(34) != 0.5:
+	if EconomyRules.shop_price(9, 20) != 47 or EconomyRules.shop_price(9, 30) != 80 or EconomyRules.shop_price(9, 40) != 192 or EconomyRules.gold_drop_factor(34) != 0.4:
 		_fail("endless shop inflation or gold floor differs")
 		return
 	if EndlessRules.shop_reroll_start(40) != 5 or EndlessRules.shop_reroll_step(40) != 3 or EndlessRules.density_factor(1000) != 2.0:

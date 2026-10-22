@@ -70,7 +70,7 @@ func step(index: EnemySpatialIndex, delta: float) -> void:
 			player = enemy.target
 			player_at = player.global_position
 		var data := enemy.data
-		if not ordinary_space or enemy.target != player or player == null or data.is_boss or data.is_elite or data.aura_radius > 0.0 or enemy.overtime_active or enemy.bleed_time > 0.0 or enemy.affix_effects.is_active() or enemy.special_phase != Enemy.SpecialPhase.COOLDOWN:
+		if not ordinary_space or enemy.target != player or player == null or enemy.loot_goblin != null or data.is_boss or data.is_elite or data.aura_radius > 0.0 or enemy.overtime_active or enemy.bleed_time > 0.0 or enemy.affix_effects.is_active() or enemy.special_phase != Enemy.SpecialPhase.COOLDOWN:
 			enemy._physics_process(delta)
 			if player != null:
 				player_at = player.global_position
