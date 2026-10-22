@@ -3,6 +3,11 @@
 Stand: **22.10.2026**. Zweites Umsetzungspaket aus der
 [UI-Bestandsaufnahme](UI_VIEW_AUDIT.md), auf Grundlage der [Menübühne](MENU_UI.md).
 
+**Nachkorrektur zur Seltenheit:** Karten, Zielwaffen und Ersatzoptionen verwenden
+jetzt sichtbare Farbkanten und getönte Flächen. Die älteren Bilder unten zeigen
+noch den ersten neutraleren Stand; aktuelle Aufnahmen und die Prüfung aller
+Seltenheitsanzeigen stehen unter [Seltenheit auf einen Blick](RARITY_UI.md).
+
 ## Im Spiel umgesetzt
 
 - **Aufstiege:** vier direkte Auswahlkarten mit gemaltem Attributmotiv,

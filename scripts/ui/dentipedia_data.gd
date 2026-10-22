@@ -46,10 +46,10 @@ static func entries(category: int, discovered: Array[String]) -> Array[Dictionar
 					result.append({"title": "Unbekannte Spezialwaffe", "icon": recipe.result.sprite, "locked": true, "body": "Noch nicht fusioniert."})
 		1:
 			for item in ItemCatalog.ALL:
-				result.append({"title": item.display_name, "icon": item.icon_texture if item.icon_texture != null else DentiUIIcons.item(item.icon_index), "body": item.effect_text() + "\n\n" + item.limit_text()})
+				result.append({"title": item.display_name, "icon": item.icon_texture if item.icon_texture != null else DentiUIIcons.item(item.icon_index), "body": item.effect_text() + "\n\n" + item.limit_text(), "rarity_tier": item.rarity_tier})
 		2:
 			for relic in RelicCatalog.CATALOG:
-				result.append({"title": relic.display_name, "icon": DentiUIIcons.relic(relic.icon_index), "body": DentiAttributes.resolve_text(relic.description)})
+				result.append({"title": relic.display_name, "icon": DentiUIIcons.relic(relic.icon_index), "body": DentiAttributes.resolve_text(relic.description), "rarity_tier": 4, "rarity_caption": "Göttliches Relikt"})
 		3:
 			for type in DentiAttributes.ACTIVE:
 				result.append({"title": DentiAttributes.name_for(type), "icon": DentiUIIcons.stat(DentiAttributes.ICONS[type]), "body": DentiAttributes.meaning_for(type)})

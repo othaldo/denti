@@ -111,6 +111,7 @@ func show_chest(chest: Dictionary, loadout: WeaponLoadout, player_stats: PlayerS
 	weapons = loadout.equipped()
 	stats = player_stats
 	title_label.text = "Goldene Kapsel" if bool(chest.get("golden", false)) else "Upgrade-Kapsel"
+	title_label.add_theme_color_override("font_color", DentiUIStyle.GOLD if bool(chest.get("golden", false)) else DentiUIStyle.INK)
 	for button in weapon_buttons:
 		button.free()
 	weapon_buttons.clear()
@@ -118,6 +119,8 @@ func show_chest(chest: Dictionary, loadout: WeaponLoadout, player_stats: PlayerS
 	for index in weapons.size():
 		var weapon := weapons[index]
 		var button := RunSetupChoice.new()
+		button.rarity_tier = weapon.tier
+		button.rarity_color = WeaponPresentation.special_color(weapon.data)
 		button.custom_minimum_size = Vector2(64, 64)
 		button.tooltip_text = WeaponPresentation.weapon_name(weapon) + "\n" + AffixPresentation.summary(weapon, stats, item_context) + "\n" + weapon.data.stats_text(weapon.tier)
 		weapon_grid.add_child(button)
@@ -169,6 +172,7 @@ func _select_weapon(index: int, reset_replace: bool = true) -> void:
 	target_art.show()
 	weapon_name.text = WeaponPresentation.weapon_name(weapon)
 	weapon_meta.text = "%s · %d/%d Plätze" % [WeaponPresentation.tier_text(weapon.data, weapon.tier), weapon.affixes.size(), weapon.affix_slots]
+	weapon_meta.add_theme_color_override("font_color", DentiUIStyle.rarity_text_color(mini(weapon.tier + int(weapon.data.chest_upgrades.get("mk", 0)), 5)))
 	target_summary.text = WeaponPresentation.enchantment_list(weapon) if not needs_replacement and not weapon.affixes.is_empty() else ""
 	target_summary.visible = not target_summary.text.is_empty()
 	for button in replacement_buttons:
@@ -202,7 +206,8 @@ func _select_weapon(index: int, reset_replace: bool = true) -> void:
 		var rarity := DentiUIComponents.label(text_rows, AffixPresentation.progress_text(affix), 14)
 		rarity.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		rarity.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		DentiUIStyle.style_affix_rarity_label(rarity, affix.rarity)
+		# The whole replacement card already conveys rarity; no nested badge.
+		DentiUIStyle.style_rarity_label(rarity, affix.rarity)
 		button.set_meta("rarity_label", rarity)
 		button.set_meta("effect_label", effect)
 		button.set_meta("text_rows", text_rows)
@@ -229,7 +234,9 @@ func _refresh_cards() -> void:
 		selector.keyboard_focus = _keyboard_focus
 		selector.refresh()
 	for index in replacement_buttons.size():
-		RunSetupStyle.choice(replacement_buttons[index], index == int(reward.get("replace", -1)), _keyboard_focus, 12)
+		DentiUIStyle.style_card(replacement_buttons[index], int(weapons[selected_weapon].affixes[index].rarity), Color.TRANSPARENT, 12)
+		DentiUIStyle.mark_card(replacement_buttons[index], DentiUIStyle.INK if index == int(reward.get("replace", -1)) else Color.TRANSPARENT)
+		RunSetupStyle.focus(replacement_buttons[index], _keyboard_focus)
 	var weapon := weapons[selected_weapon]
 	for index in buttons.size():
 		var option: Dictionary = reward.options[index]

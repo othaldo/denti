@@ -396,7 +396,7 @@ func show_weapon_values(data: WeaponData, tier: int, player: Player) -> void:
 		if not data.rolls.is_empty():
 			var quality := WeaponRolls.attribute_quality(data, entry[3])
 			var number := row.get_child(1) as Label
-			number.add_theme_color_override("font_color", DentiRarity.color_for(quality))
+			DentiUIStyle.style_quality_value(number, quality)
 			row.tooltip_text += "\nWertequalität: " + WeaponRolls.NAMES[quality - 1]
 
 	_sync_catalog_slots()

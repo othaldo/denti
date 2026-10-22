@@ -246,7 +246,7 @@ func _restore_standard_content() -> void:
 func _set_rarity(tier: int, caption: String = "") -> void:
 	upgrade_tier = tier
 	rarity_label.text = caption if not caption.is_empty() else DentiRarity.name_for(tier)
-	rarity_label.add_theme_color_override("font_color", DentiRarity.color_for(tier).lightened(0.55))
+	DentiUIStyle.style_rarity_label(rarity_label, tier)
 
 
 func _finish_content() -> void:
@@ -261,10 +261,7 @@ func _finish_content() -> void:
 
 
 func _style_surface() -> void:
-	for state in ["normal", "disabled"]:
-		add_theme_stylebox_override(state, MenuStyle.box(DentiUIStyle.PANEL, Color.TRANSPARENT, 18, 0))
-	add_theme_stylebox_override("hover", MenuStyle.box(DentiUIStyle.RAISED, DentiUIStyle.GOLD, 18, 1))
-	add_theme_stylebox_override("pressed", MenuStyle.box(DentiUIStyle.RAISED.darkened(0.08), DentiUIStyle.GOLD, 18, 1))
+	DentiUIStyle.style_card(self, upgrade_tier, Color.TRANSPARENT, 18)
 	var outline := MenuStyle.box(Color.TRANSPARENT, DentiUIStyle.INK, 14, 2)
 	outline.draw_center = false
 	outline.set_expand_margin_all(-4)

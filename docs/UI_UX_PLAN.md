@@ -14,6 +14,11 @@ Anleitungssätze auf jeder Seite, keine doppelt beschrifteten Informationen,
 keine Absatzsammlungen in der Standardansicht. Anordnung, Bilder und sichtbare
 Zustände übernehmen die Führung. Zusätzliche Erklärungen sind gezielt abrufbar.
 
+Seltenheit muss ohne Lesen des Wortes erkennbar bleiben: sichtbare Farbkante
+und leicht getönte Fläche am Objekt, mit eigener Markierung für Auswahl und
+Fokus. Bereits farbige Karten bekommen keinen zweiten Seltenheitskasten im
+Inneren. [Bestandsaufnahme und aktuelle native Ansichten](RARITY_UI.md).
+
 Ein UX-Plan darf ausführlich sein; diese Ausführlichkeit wandert nicht als
 Text in die Spieloberfläche.
 

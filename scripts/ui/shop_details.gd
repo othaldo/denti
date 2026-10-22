@@ -174,7 +174,7 @@ func _rolled_value(key: String, value: String, data: WeaponData, attribute: Stri
 	var label := _value(key, value)
 	if not data.rolls.is_empty():
 		var quality := WeaponRolls.attribute_quality(data, attribute)
-		label.add_theme_color_override("font_color", DentiRarity.color_for(quality))
+		DentiUIStyle.style_quality_value(label, quality)
 		label.tooltip_text += "\nWertequalität: " + WeaponRolls.NAMES[quality - 1]
 
 

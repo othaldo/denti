@@ -84,6 +84,9 @@ func _refresh() -> void:
 		button.clip_text = true
 		button.custom_minimum_size.y = 48
 		DentiUIStyle.style_button(button, false, true)
+		if entry.has("rarity_tier"):
+			DentiUIStyle.style_card(button, int(entry.rarity_tier))
+			button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		if entry.get("evolved", false):
 			DentiUIStyle.style_card(button, 4, WeaponPresentation.EVOLUTION_COLOR)
 			button.alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -140,6 +143,9 @@ func _show(entry: Dictionary) -> void:
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if entry.get("evolved", false):
 		title.add_theme_color_override("font_color", WeaponPresentation.EVOLUTION_COLOR)
+	if entry.has("rarity_tier"):
+		var rarity := DentiUIComponents.label(detail, str(entry.get("rarity_caption", DentiRarity.name_for(int(entry.rarity_tier)))), 13)
+		DentiUIStyle.style_affix_rarity_label(rarity, int(entry.rarity_tier))
 	DentiUIComponents.label(detail, entry.body, 16)
 	if entry.has("recipe"):
 		DentiUIComponents.label(detail, "Fusion", 20)

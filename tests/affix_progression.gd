@@ -61,13 +61,13 @@ func _run() -> void:
 		assert(rarity_label.text.to_lower().contains(DentiRarity.name_for(rarity).to_lower()) and not rarity_colors.has(color), "capsule choices lost their distinct named rarity")
 		rarity_colors.append(color)
 	var label: Label = panel.replacement_buttons[0].get_meta("rarity_label")
-	assert(label.get_theme_color("font_color") == DentiRarity.color_for(4) and label.text == "Legendär III+", "replacement rarity/progress missing")
+	assert(label.get_theme_color("font_color") == DentiUIStyle.rarity_text_color(4) and label.text == "Legendär III+", "replacement rarity/progress missing")
 	var equipment: Array[Dictionary] = []
 	game.shop_panel.details.show_weapon(weapon.data, weapon.tier, game.player, true, equipment)
 	game.shop_panel.details.show_affixes(weapon, game.player.stats)
 	var rows: VBoxContainer = game.shop_panel.details.affix_rows
 	var rarity_label := rows.get_child(-1) as Label
-	assert(rarity_label.text == "Legendär III+" and rarity_label.get_theme_color("font_color") == DentiRarity.color_for(4), "weapon details use wrong rarity color")
+	assert(rarity_label.text == "Legendär III+" and rarity_label.get_theme_color("font_color") == DentiUIStyle.rarity_text_color(4), "weapon details use wrong rarity color")
 	assert(AffixPresentation.comparison(weapon, chest.options[0], game.player.stats, -1).contains("Legendär III+"))
 	var offer := {"id": "ice", "rarity": 2, "damage": 7.0}
 	var original_offer := offer.duplicate(true)

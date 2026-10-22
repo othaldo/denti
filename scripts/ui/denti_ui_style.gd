@@ -107,7 +107,7 @@ static func style_check_button(button: CheckButton) -> void:
 
 
 static func style_rarity_label(label: Label, tier: int) -> void:
-	var rarity_color := DentiRarity.color_for(tier).lightened(0.65)
+	var rarity_color := rarity_text_color(tier)
 	var badge := _box(Color.TRANSPARENT, Color.TRANSPARENT, 4, 0)
 	badge.content_margin_left = 0.0
 	badge.content_margin_right = 0.0
@@ -120,26 +120,55 @@ static func style_rarity_label(label: Label, tier: int) -> void:
 
 static func style_affix_rarity_label(label: Label, tier: int) -> void:
 	style_rarity_label(label, tier)
-	label.add_theme_color_override("font_color", DentiRarity.color_for(tier))
+	var badge := _box(PANEL.lerp(DentiRarity.color_for(tier), 0.10), DentiRarity.color_for(tier).lightened(0.20), 3, 0)
+	badge.border_width_left = 3
+	badge.content_margin_left = 7
+	badge.content_margin_right = 4
+	badge.content_margin_top = 1
+	badge.content_margin_bottom = 1
+	label.add_theme_stylebox_override("normal", badge)
 
 
-static func style_card(button: Button, tier: int = 1, color: Color = Color.TRANSPARENT) -> void:
+static func rarity_text_color(tier: int) -> Color:
+	# Keep small type readable; the saturated edge carries the stronger color cue.
+	return DentiRarity.color_for(tier).lightened(0.65)
+
+
+static func style_quality_value(label: Label, quality: int) -> void:
+	label.add_theme_color_override("font_color", rarity_text_color(quality))
+	var underline := _box(Color.TRANSPARENT, DentiRarity.color_for(quality).lightened(0.20), 0, 0)
+	underline.border_width_bottom = 2
+	underline.content_margin_left = 0
+	underline.content_margin_right = 0
+	underline.content_margin_top = 0
+	underline.content_margin_bottom = 3
+	label.add_theme_stylebox_override("normal", underline)
+
+
+static func style_card(button: Button, tier: int = 1, color: Color = Color.TRANSPARENT, radius: int = 14) -> void:
 	style_button(button)
 	var accent := color if color.a > 0 else DentiRarity.color_for(tier)
 	var fill := PANEL.lerp(accent, 0.16)
-	var normal := rarity_surface(tier, color)
+	var normal := rarity_surface(tier, color, radius)
 	button.add_theme_stylebox_override("normal", normal)
-	var hover := _box(fill.lightened(0.035), accent.lightened(0.35), 14, 2)
+	var hover := normal.duplicate() as StyleBoxFlat
+	hover.bg_color = fill.lightened(0.035)
+	hover.border_color = accent.lightened(0.35)
 	button.add_theme_stylebox_override("hover", hover)
-	button.add_theme_stylebox_override("pressed", _box(fill.darkened(0.06), accent, 14, 2))
+	var pressed := normal.duplicate() as StyleBoxFlat
+	pressed.bg_color = fill.darkened(0.06)
+	button.add_theme_stylebox_override("pressed", pressed)
 	# Focus is an inset cream outline; the rarity border and fill stay visible.
 	button.add_theme_stylebox_override("focus", _rarity_marker(INK))
-	button.add_theme_stylebox_override("disabled", _box(fill.darkened(0.08), accent.darkened(0.15), 14, 2))
+	var disabled := normal.duplicate() as StyleBoxFlat
+	disabled.bg_color = fill.darkened(0.08)
+	button.add_theme_stylebox_override("disabled", disabled)
 
 
-static func rarity_surface(tier: int, color: Color = Color.TRANSPARENT) -> StyleBoxFlat:
+static func rarity_surface(tier: int, color: Color = Color.TRANSPARENT, radius: int = 14) -> StyleBoxFlat:
 	var accent := color if color.a > 0 else DentiRarity.color_for(tier)
-	var style := _box(PANEL.lerp(accent, 0.16), accent if color.a > 0 else accent.lightened(0.20), 14, 2)
+	var style := _box(PANEL.lerp(accent, 0.16), accent if color.a > 0 else accent.lightened(0.20), radius, 1)
+	style.border_width_top = 4
 	return style
 
 

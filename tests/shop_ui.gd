@@ -45,7 +45,7 @@ func _run() -> void:
 		return
 	var offer_card: OfferCard = game.shop_panel.offer_buttons[0]
 	var rarity_border := offer_card.get_theme_stylebox("normal") as StyleBoxFlat
-	if offer_card.rarity_label.visible or rarity_border.border_width_left != 2 or rarity_border.border_color != DentiRarity.color_for(game.shop.offers[0].rarity_tier).lightened(0.20) or not offer_card.tooltip_text.contains("Seltenheit:"):
+	if offer_card.rarity_label.visible or rarity_border.border_width_top != 4 or rarity_border.border_width_left != 1 or rarity_border.border_color != DentiRarity.color_for(game.shop.offers[0].rarity_tier).lightened(0.20) or not offer_card.tooltip_text.contains("Seltenheit:"):
 		_fail("shop rarity lacks a visible border or accessible name")
 		return
 	if not weapon_button.tooltip_text.contains("DPS") or not weapon_button.tooltip_text.contains("Basis-Schaden") or not offer_card.tooltip_text.contains("DPS") or not offer_card.tooltip_text.contains("Nahkampf"):
@@ -151,4 +151,4 @@ func _inside(rect: Rect2, viewport_size: Vector2) -> bool:
 
 func _rarity_matches(style: StyleBoxFlat, tier: int) -> bool:
 	var accent := DentiRarity.color_for(tier)
-	return style.border_width_left == 2 and style.border_color == accent.lightened(0.20) and style.bg_color == DentiUIStyle.PANEL.lerp(accent, 0.16)
+	return style.border_width_top == 4 and style.border_width_left == 1 and style.border_color == accent.lightened(0.20) and style.bg_color == DentiUIStyle.PANEL.lerp(accent, 0.16)

@@ -94,13 +94,13 @@ func _run() -> void:
 	card.show_weapon_values(mixed, 1, game.player)
 	assert(card.name_label.text.ends_with("Mk I"), "shop weapon name omits Mk")
 	assert(card.get_theme_stylebox("normal").border_color == DentiUIStyle.rarity_surface(1).border_color, "Mk I weapon inherits purple roll frame")
-	assert(card.summary_row.get_child(0).get_child(1).get_theme_color("font_color") == DentiRarity.color_for(4), "great damage roll has wrong color")
-	assert(card.summary_row.get_child(1).get_child(1).get_theme_color("font_color") == DentiRarity.color_for(1), "bad tempo roll inherits aggregate rarity")
+	assert(card.summary_row.get_child(0).get_child(1).get_theme_color("font_color") == DentiUIStyle.rarity_text_color(4), "great damage roll has wrong color")
+	assert(card.summary_row.get_child(1).get_child(1).get_theme_color("font_color") == DentiUIStyle.rarity_text_color(1), "bad tempo roll inherits aggregate rarity")
 	var equipment: Array[Dictionary] = []
 	game.shop_panel.details.show_weapon(mixed, 1, game.player, false, equipment)
 	assert(game.shop_panel.details.heading.text.ends_with("Mk I"))
-	assert(game.shop_panel.details.values_grid.get_child(1).get_theme_color("font_color") == DentiRarity.color_for(4))
-	assert(game.shop_panel.details.values_grid.get_child(3).get_theme_color("font_color") == DentiRarity.color_for(1))
+	assert(game.shop_panel.details.values_grid.get_child(1).get_theme_color("font_color") == DentiUIStyle.rarity_text_color(4))
+	assert(game.shop_panel.details.values_grid.get_child(3).get_theme_color("font_color") == DentiUIStyle.rarity_text_color(1))
 	game.shop_panel.hide()
 	var pool := game.get_node("Projectiles") as PlayerProjectilePool
 	var shot := pool.acquire(rolled, 1)

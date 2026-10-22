@@ -19,12 +19,15 @@ func _run() -> void:
 	shop.set_catalog_layout(true)
 	var reward := UpgradeCard.new()
 	root.add_child(reward)
+	var modern_reward := RewardCard.new()
+	root.add_child(modern_reward)
 	for tier in range(1, 6):
 		var item := ShopController.by_id(&"conductive_varnish").duplicate() as ShopOfferData
 		item.rarity_tier = tier
 		shop.show_offer(item, 0)
 		reward.show_item(item)
-		for card in [shop, reward]:
+		modern_reward.show_item(item)
+		for card in [shop, reward, modern_reward]:
 			for state in ["normal", "hover", "pressed", "disabled"]:
 				var background: Color = (card.get_theme_stylebox(state) as StyleBoxFlat).bg_color
 				for label in [card.name_label, card.effect_label]:
@@ -34,7 +37,7 @@ func _run() -> void:
 				if card == shop and _contrast(shop.category_label.get_theme_color("font_color"), background) < 7.0:
 					_fail("small weapon/item category lacks contrast at tier %d / %s" % [tier, state])
 					return
-				if card == reward and _contrast(reward.rarity_label.get_theme_color("font_color"), background) < 7.0:
+				if card != shop and _contrast(card.rarity_label.get_theme_color("font_color"), background) < 7.0:
 					_fail("small rarity label lacks contrast at tier %d / %s" % [tier, state])
 					return
 		var price_background := (shop.buy_button.get_theme_stylebox("disabled") as StyleBoxFlat).bg_color

@@ -5,6 +5,8 @@ var selected := false
 var keyboard_focus := false
 var mark: TextureRect
 var artwork: TextureRect
+var rarity_tier := 0
+var rarity_color := Color.TRANSPARENT
 
 func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
@@ -48,5 +50,10 @@ func _layout_artwork() -> void:
 	mark.offset_bottom = marker_size
 
 func refresh() -> void:
-	RunSetupStyle.choice(self, selected, keyboard_focus)
+	if rarity_tier > 0:
+		DentiUIStyle.style_card(self, rarity_tier, rarity_color)
+		DentiUIStyle.mark_card(self, DentiUIStyle.INK if selected else Color.TRANSPARENT)
+		RunSetupStyle.focus(self, keyboard_focus)
+	else:
+		RunSetupStyle.choice(self, selected, keyboard_focus)
 	if mark != null: mark.visible = selected
