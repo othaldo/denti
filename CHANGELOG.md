@@ -2,6 +2,14 @@
 
 Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü angezeigt. 0.1.0 wurde rückblickend anhand der Git-Historie dokumentiert; 0.2.0 bündelt die seitdem entstandenen Änderungen. Die Einträge beschreiben implementierte Funktionen. Weitere Pläne stehen in der [Roadmap](docs/ROADMAP.md).
 
+## Noch ohne neue Versionsnummer — 22.10.2026
+
+- **GitHub-Builds und Releases:** automatische Web-/Windows-Pakete, herunterladbare Testbuilds, versionierte Release-Entwürfe, Prüfsummen und Update-Manifeste. Stabile Webversion und `/dev/` sind ab dem ersten veröffentlichten Release getrennt. [Ablauf](docs/RELEASES.md).
+- **Gauner hält länger durch und sammelt im Laufen:** deutlich stärkere Gesundheitskurve; nahe Münzstapel werden alle 0,12 Sekunden gemeinsam eingesackt, auch beim Fliehen. Sammelpriorität für Denti und Beutellimit bleiben erhalten. Vergleich in Welle 11 auf Normal mit fünf Mk-III-Waffen: etwa 4,8 statt 1,8 Sekunden Lebensdauer.
+- **Seltenheit wieder sichtbar:** Aufstiege, Itemfunde, Relikte und Kapselangebote tragen Farbkanten und getönte Flächen. Shop, Ausrüstung, Besitz und Dentikon verwenden dieselbe Zuordnung. Auswahl erhält die Seltenheitsfarbe; Ersatzoptionen haben keine doppelten Farbrahmen. Waffenwerte zeigen ihre eigene Rollqualität unabhängig vom Mk-Rahmen. [Native Ansichten](docs/RARITY_UI.md).
+- **Goldzahn-Gauner:** seltener animierter Beutedieb ab Welle 8, höchstens einer pro normaler Welle. Sammelt lose Münzen, flieht und sucht Deckung hinter Gegnern. Beim Töten gibt es die Beute zurück und eine goldene Upgrade-Kapsel; bei Flucht am Wellenende gehen gestohlene Münzen verloren. Kampf bleibt ununterbrochen; Save/Resume erhält Beutel und Belohnung.
+- **Weniger endlose Rerolls:** Shopkosten beginnen bei 2/3/5/8/12 statt 2/3/4/5/6; derselbe progressive Zuschlag gilt für Level-Auswahlen. Die Goldkurve bleibt in Welle 1–4 erhalten und fällt bis Welle 20 auf 55 %, später mindestens 40 %. [Regeln, native Animation und Einkommensprognose](docs/LOOT_GOBLIN.md).
+
 ## 0.5.0 — 17.10.2026
 
 - **Gemalte Projektile:** eigene Formen für Wasser, Paste, Mundspülung, Metall, Licht, Raketen sowie gegnerische Säure- und Splittergeschosse. Spielerprojektile verwenden einen gemeinsamen Sprite statt mehrerer Ebenen. Flugrichtung, Rückflug und kreisende Geschosse richten sich korrekt aus, auch unter transformierten Eltern.

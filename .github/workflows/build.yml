@@ -1,0 +1,138 @@
+name: Build Denti
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+jobs:
+  build:
+    name: Test and export Web + Windows
+    runs-on: ubuntu-24.04
+    container:
+      image: barichello/godot-ci:4.7.2
+    outputs:
+      artifact: ${{ steps.metadata.outputs.artifact }}
+      version: ${{ steps.metadata.outputs.version }}
+      channel: ${{ steps.metadata.outputs.channel }}
+      tag: ${{ steps.metadata.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install test dependencies
+        run: |
+          apt-get update -qq
+          apt-get install -y -qq --no-install-recommends libfontconfig1 python3
+      - name: Prepare Godot export templates
+        run: |
+          mkdir -p "$HOME/.local/share/godot/export_templates"
+          cp -R /root/.local/share/godot/export_templates/4.7.2.stable \
+            "$HOME/.local/share/godot/export_templates/4.7.2.stable"
+      - name: Show Godot version
+        run: godot --version
+      - name: Stamp version and build identity
+        id: metadata
+        run: python3 tools/release_build.py stamp
+      - name: Import project assets
+        run: godot --headless --path . --editor --quit
+      - name: Run tests
+        run: |
+          python3 -m unittest discover -s tools/tests -v
+          python3 tools/run_tests.py --godot godot --jobs 4
+      - name: Upload test logs and timings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: godot-test-results
+          path: |
+            .godot/test_results.json
+            .godot/test_runs/**/*.log
+            .godot/test_runs/**/results.json
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Export release binaries
+        run: |
+          mkdir -p build/web build/windows
+          godot --headless --verbose --path . --export-release Web build/web/index.html
+          godot --headless --verbose --path . --export-release Windows build/windows/Denti.exe
+      - name: Package builds and update manifest
+        run: python3 tools/release_build.py package
+      - name: Upload downloadable builds
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.metadata.outputs.artifact }}
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 14
+
+  draft-release:
+    name: Create versioned release draft
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v') && github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.build.outputs.artifact }}
+          path: dist
+      - name: Create draft or refresh an unpublished draft
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ needs.build.outputs.tag }}
+          RELEASE_CHANNEL: ${{ needs.build.outputs.channel }}
+        run: |
+          if gh release view "$RELEASE_TAG" --json isDraft --jq '.isDraft' > draft.txt 2>/dev/null; then
+            test "$(cat draft.txt)" = true || { echo 'Published releases are immutable; create a new tag.'; exit 1; }
+            gh release upload "$RELEASE_TAG" dist/* --clobber
+          elif [ "$RELEASE_CHANNEL" = beta ]; then
+            gh release create "$RELEASE_TAG" dist/* --verify-tag --draft --prerelease --title "Denti $RELEASE_TAG" --generate-notes
+          else
+            gh release create "$RELEASE_TAG" dist/* --verify-tag --draft --title "Denti $RELEASE_TAG" --generate-notes
+          fi
+
+  deploy-dev:
+    name: Publish web test build
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      actions: read
+      pages: write
+      id-token: write
+    concurrency:
+      group: denti-pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}dev/
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.build.outputs.artifact }}
+          path: dist
+      - name: Compose stable site and current test build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tools/prepare_pages.py --dev-dist dist
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: build/site
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
