@@ -6,6 +6,7 @@ func _initialize() -> void:
 func _run() -> void:
 	var session: Node = root.get_node("GameSession")
 	session.save_path = "user://test_affix_layout_history.json"
+	session.reduced_ui_motion = true
 	var game: Node = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(game)
 	current_scene = game
@@ -31,16 +32,21 @@ func _run() -> void:
 				for frame in 8:
 					await process_frame
 				for selector in panel.weapon_buttons:
-					for label: Label in selector.get_meta("labels"):
-						if not selector.get_global_rect().grow(0.5).encloses(label.get_global_rect()):
-							push_error("Enchanted weapon name escapes selector at %s: %s" % [extent, label.text])
-							finish(1)
-							return
-						for line in label.text.split("\n"):
-							if label.get_theme_font("font").get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1, label.get_theme_font_size("font_size")).x > label.size.x + 1:
-								push_error("Enchanted weapon name is clipped at %s: %s" % [extent, label.text])
-								finish(1)
-								return
+					var art: TextureRect = selector.get_meta("art")
+					if art.texture == null or not selector.get_global_rect().grow(0.5).encloses(art.get_global_rect()):
+						push_error("Weapon selector artwork escapes its target at %s" % extent)
+						finish(1)
+						return
+				var weapon := panel.weapons[target]
+				if panel.weapon_name.text.replace("\n", " ") != WeaponPresentation.weapon_name(weapon) or not panel.weapon_meta.text.contains(WeaponPresentation.tier_text(weapon.data, weapon.tier)):
+					push_error("Active weapon preview lost the enchanted name or Mk tier at %s" % extent)
+					finish(1)
+					return
+				for label: Label in [panel.weapon_name, panel.weapon_meta]:
+					if not label.is_visible_in_tree() or label.size.y + 0.5 < label.get_minimum_size().y or not label.get_parent_control().get_global_rect().grow(0.5).encloses(label.get_global_rect()):
+						push_error("Active weapon preview is clipped at %s: %s" % [extent, label.text])
+						finish(1)
+						return
 				for card in panel.buttons:
 					for control in [card.icon_rect, card.name_label, card.keep_label, card.rarity_label, card.effect_label, card.progress_bar]:
 						if control.visible and not card.get_global_rect().grow(0.5).encloses(control.get_global_rect()):
@@ -67,7 +73,7 @@ func _run() -> void:
 	finish(0)
 
 func _snapshot(panel: WeaponChestPanel) -> Array:
-	var result: Array = []
+	var result: Array = [panel.weapon_name.text, panel.weapon_name.size.round(), panel.weapon_meta.text, panel.weapon_meta.size.round(), panel.target_summary.text]
 	for card in panel.buttons:
 		result.append(card.size.round())
 		for control in [card.name_label, card.rarity_label, card.keep_label, card.effect_label]:

@@ -9,6 +9,7 @@ func _run() -> void:
 	root.size = Vector2i(1280, 720)
 	await process_frame
 	root.get_node("GameSession").save_path = "user://test_ui_layout_run.json"
+	root.get_node("GameSession").reduced_ui_motion = true
 	var game: Node2D = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(game)
 	current_scene = game
@@ -37,7 +38,7 @@ func _run() -> void:
 	if not paused or not game.choice_panel.visible:
 		_fail("level-up overlay did not appear")
 		return
-	var choice_panel: PanelContainer = game.choice_panel.dialog_panel
+	var choice_panel: Control = game.choice_panel.dialog_panel
 	if not _inside(choice_panel.get_global_rect(), Vector2(1280, 720)):
 		_fail("level-up dialog exceeds 1280x720")
 		return
@@ -105,7 +106,7 @@ func _run() -> void:
 	root.size = Vector2i(1024, 600)
 	await process_frame
 	await process_frame
-	var layout_size: Vector2 = game.choice_panel.get_node("Root").size
+	var layout_size: Vector2 = root.get_visible_rect().size
 	if not _inside(game.choice_panel.dialog_panel.get_global_rect(), layout_size) or not _inside(game.choice_panel.buttons[0].get_global_rect(), layout_size) or not _inside(game.choice_panel.buttons[1].get_global_rect(), layout_size):
 		_fail("chest decision exceeds the scaled 1024x600 viewport")
 		return
@@ -121,18 +122,25 @@ func _run() -> void:
 	]
 	game.choice_panel.show_upgrades(upgrades)
 	await process_frame
-	if game.choice_panel.cards.columns != 1 or not _inside(game.choice_panel.dialog_panel.get_global_rect(), Vector2(720, 1280)):
+	if not _inside(game.choice_panel.dialog_panel.get_global_rect(), Vector2(720, 1280)):
 		_fail("portrait upgrade dialog exceeds the phone viewport: %s, root %s, columns %d" % [game.choice_panel.dialog_panel.get_global_rect(), game.choice_panel.get_node("Root").size, game.choice_panel.cards.columns])
 		return
-	var previous_bottom := -1.0
+	var reward_rectangles: Array[Rect2] = []
 	for button: Button in game.choice_panel.buttons:
 		if not button.visible:
 			continue
 		var rect := button.get_global_rect()
-		if not _inside(rect, Vector2(720, 1280)) or rect.position.y < previous_bottom:
-			_fail("portrait upgrade cards overlap or exceed the phone viewport")
+		for previous in reward_rectangles:
+			if rect.intersects(previous):
+				_fail("portrait upgrade cards overlap")
+				return
+		reward_rectangles.append(rect)
+		game.choice_panel.stage.body_scroll.ensure_control_visible(button)
+		for frame in 3:
+			await process_frame
+		if rect.size.y <= game.choice_panel.stage.body_scroll.size.y and not _inside(button.get_global_rect(), Vector2(720, 1280)):
+			_fail("portrait upgrade card is unreachable in the reward scroll area")
 			return
-		previous_bottom = rect.end.y
 	game.choice_panel.visible = false
 	game.shop_panel.visible = true
 	await process_frame

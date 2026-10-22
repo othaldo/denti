@@ -14,7 +14,7 @@ func _run() -> void:
 	var game: Node2D = current_scene
 	game.coins = 50
 	game._on_level_reroll()
-	if game.coins != 50 or game.choice_panel.level_actions.visible:
+	if game.coins != 50 or game.choice_panel.level_actions.is_visible_in_tree():
 		_fail("starter screen offered or charged a level reroll")
 		return
 	choose_panel(game.choice_panel, 0)
@@ -42,6 +42,9 @@ func _run() -> void:
 	if game.coins != 45 or game.rewards.pending_levels != 2 or game.rewards.level_rerolls != 1 or game.level != 10 or game.choice_panel.reroll_button.text != "6" or not paused:
 		_fail("first reroll did not charge level 9 cost and preserve its queue")
 		return
+	if game.rewards.choice_progress() != Vector2i(1, 3) or game.choice_panel.stage.progress_label.text != "1 / 3":
+		_fail("reroll advanced or reset the reward choice counter")
+		return
 	if not _check_tier(game, 1):
 		return
 	var saved: Dictionary = session.load_run()
@@ -52,8 +55,11 @@ func _run() -> void:
 	await process_frame
 	await process_frame
 	game = current_scene
-	if game.coins != 45 or game.rewards.level_rerolls != 1 or _choices(game) != rolled_choices or game.choice_panel.reroll_button.text != "6" or not game.choice_panel.level_actions.visible or not paused:
+	if game.coins != 45 or game.rewards.level_rerolls != 1 or _choices(game) != rolled_choices or game.choice_panel.reroll_button.text != "6" or not game.choice_panel.level_actions.is_visible_in_tree() or not paused:
 		_fail("resume lost reroll count, cost, choices, wallet or pause")
+		return
+	if not game.choice_panel.stage.progress_label.is_visible_in_tree() or game.choice_panel.stage.progress_label.text != "1 / 3":
+		_fail("resume lost the visible reward counter before a reroll")
 		return
 	# Negative luck is a test-only fixture; real saves clamp luck to zero.
 	game.player.stats.luck = -100.0
@@ -67,13 +73,26 @@ func _run() -> void:
 	if game.rewards.pending_levels != 1 or game.rewards.level_rerolls != 0 or game.choice_panel.reroll_button.text != "5":
 		_fail("next queued level inherited the preceding reroll cost")
 		return
+	if game.rewards.choice_progress() != Vector2i(2, 3) or game.choice_panel.stage.progress_label.text != "2 / 3":
+		_fail("resolving a rerolled level did not advance the choice counter once")
+		return
+	session.resume_requested = true
+	paused = false
+	change_scene_to_file("res://scenes/game/game.tscn")
+	await process_frame
+	await process_frame
+	game = current_scene
+	if not game.choice_panel.stage.progress_label.is_visible_in_tree() or game.choice_panel.stage.progress_label.text != "2 / 3":
+		_fail("resume reset the visible counter after a resolved reward")
+		return
+	game.player.stats.luck = -100.0
 	game.choice_panel.reroll_button.pressed.emit()
 	if game.coins != 34 or not _check_tier(game, 3):
 		_fail("reroll lost the level 10 epic milestone")
 		return
 	choose_panel(game.choice_panel, 0)
 	game._on_level_reroll()
-	if game.coins != 34 or game.choice_panel.mode != &"chest" or game.choice_panel.level_actions.visible:
+	if game.coins != 34 or game.choice_panel.mode != &"chest" or game.choice_panel.level_actions.is_visible_in_tree():
 		_fail("chest screen offered or charged a level reroll")
 		return
 	choose_panel(game.choice_panel, 1)

@@ -11,6 +11,11 @@ func _check(condition: bool, message: String) -> void:
 		push_error(message)
 
 func _button(menu: GameMenu, title: String) -> Button:
+	if title == "Zurück" and menu.actions.has(&"back"):
+		return menu.actions[&"back"]
+	for action: Button in menu.actions.values():
+		if action.text == title:
+			return action
 	for child in menu.rows.get_children():
 		if child is Button and child.text == title:
 			return child
@@ -71,7 +76,7 @@ func _run() -> void:
 		menu._show_home()
 		for frame in 10:
 			await process_frame
-		_check(_inside(menu.build_panel, size), "unlocked main menu overflows %s: %s" % [size, menu.build_panel.get_global_rect()])
+		_check(_inside(menu.stage.panel, size), "unlocked main menu overflows %s: %s" % [size, menu.stage.panel.get_global_rect()])
 		_button(menu, "Code eingeben").pressed.emit()
 		for frame in 10:
 			await process_frame

@@ -606,6 +606,8 @@ func _show_level_choice() -> void:
 		var choice := pool[index].with_tier(DentiRarity.upgrade_tier(earned_level, player.stats.luck))
 		choices.append(choice.with_stat_context(player.stats))
 	choice_panel.show_upgrades(choices)
+	var progress := rewards.choice_progress()
+	choice_panel.set_progress(progress.x, progress.y)
 	_update_level_reroll()
 	get_tree().paused = true
 	_save_run()
@@ -754,6 +756,7 @@ func _finish_loot_collection() -> void:
 
 
 func _advance_post_wave_rewards() -> void:
+	var progress := rewards.choice_progress()
 	if rewards.step in [PostWaveRewards.Step.LEVELS, PostWaveRewards.Step.CHESTS, PostWaveRewards.Step.RELICS]:
 		get_node("/root/SceneTransitions").present(&"rewards")
 		run_flow.enter(RunFlow.Phase.REWARDS)
@@ -765,6 +768,7 @@ func _advance_post_wave_rewards() -> void:
 			if chest.get("kind", "") == "affix":
 				choice_panel.hide()
 				weapon_chest_panel.show_chest(chest, player.loadout, player.stats, items.scrap_value(int(chest.scrap_coins)), items)
+				weapon_chest_panel.set_progress(progress.x, progress.y)
 				get_tree().paused = true
 				_save_run()
 				return
@@ -774,6 +778,7 @@ func _advance_post_wave_rewards() -> void:
 				_advance_post_wave_rewards()
 				return
 			choice_panel.show_chest(item, items.scrap_value(int(chest["scrap_coins"])))
+			choice_panel.set_progress(progress.x, progress.y)
 			get_tree().paused = true
 			_save_run()
 		PostWaveRewards.Step.RELICS:
@@ -787,6 +792,7 @@ func _advance_post_wave_rewards() -> void:
 				_advance_post_wave_rewards()
 				return
 			choice_panel.show_relics(options)
+			choice_panel.set_progress(progress.x, progress.y)
 			get_tree().paused = true
 			_save_run()
 		PostWaveRewards.Step.STORY:

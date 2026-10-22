@@ -103,16 +103,16 @@ func _run() -> void:
 		await process_frame
 	var first: UpgradeCard = resumed.choice_panel.buttons[0]
 	var normal := first.get_theme_stylebox("normal") as StyleBoxFlat
-	var focus := first.get_theme_stylebox("focus") as StyleBoxFlat
-	if normal.bg_color != DentiUIStyle.PANEL.lerp(DentiRarity.color_for(2), 0.16) or focus.draw_center or focus.border_color != DentiUIStyle.INK or focus.expand_margin_left >= 0:
-		_fail("rarity surface and keyboard selection use the same visual signal")
-		return
 	first.grab_focus()
-	var right := InputEventAction.new()
-	right.action = &"ui_right"
+	var right := InputEventKey.new()
+	right.keycode = KEY_RIGHT
 	right.pressed = true
 	root.push_input(right, true)
 	await process_frame
+	var focus := first.get_theme_stylebox("focus") as StyleBoxFlat
+	if normal == null or focus == null or focus.draw_center or focus.border_color == normal.border_color or first.rarity_label.text.to_lower() != DentiRarity.name_for(2).to_lower():
+		_fail("rarity surface and keyboard selection use the same visual signal")
+		return
 	if not resumed.choice_panel.buttons[1].has_focus() or first.get_theme_stylebox("normal") != normal:
 		_fail("keyboard focus does not move independently of the rarity surface")
 		return

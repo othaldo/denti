@@ -6,6 +6,7 @@ func _initialize() -> void:
 
 
 func _run() -> void:
+	root.get_node("GameSession").reduced_ui_motion = true
 	var panel: ChoicePanel = load("res://scenes/ui/choice_panel.tscn").instantiate()
 	root.add_child(panel)
 	var capture := "--capture" in OS.get_cmdline_user_args()
@@ -33,8 +34,11 @@ func _run() -> void:
 			if not bounds.encloses(panel.dialog_panel.get_global_rect()):
 				_fail("chest dialog exceeds %s for %s: %s" % [extent, item.id, panel.dialog_panel.get_global_rect()])
 				return
-			if panel.cards.columns != 1 or absf(reward.size.x - scrap.size.x) > 1.0 or scrap.size.y > 48.0 or scrap.size.y < 44.0:
-				_fail("reward is narrow or scrap occupies a full card at %s" % extent)
+			if panel.cards.columns != 1 or not panel.stage.footer.is_ancestor_of(scrap) or scrap.size.y < 48.0 or scrap.size.y > 72.0:
+				_fail("scrap action is not a compact reachable footer action at %s" % extent)
+				return
+			if not bounds.encloses(scrap.get_global_rect()):
+				_fail("scrap action scrolled outside the viewport at %s" % extent)
 				return
 			for control in [reward.icon_rect, reward.name_label, reward.rarity_label, reward.effect_label, reward.keep_label]:
 				if not control.is_visible_in_tree() or not reward.get_global_rect().encloses(control.get_global_rect()) or control.size.y < control.get_minimum_size().y:
@@ -43,8 +47,9 @@ func _run() -> void:
 			if _plain(reward.effect_label.text) != _plain(item.effect_text()) or _plain(reward.name_label.text) != _plain(item.display_name):
 				_fail("chest truncated a reward name or effect at %s for %s: %s / %s" % [extent, item.id, reward.effect_label.text, item.effect_text()])
 				return
-			if reward.get_global_rect().intersects(scrap.get_global_rect()) or reward.keep_label.text != "Behalten" or scrap.icon == null:
-				_fail("keep/scrap choice lost its action or overlaps")
+			var visible_reward := reward.get_global_rect().intersection(panel.stage.body_scroll.get_global_rect())
+			if visible_reward.intersects(scrap.get_global_rect()) or reward.keep_label.text != "Behalten" or not scrap.text.contains("5") or not scrap.text.contains("Münzen"):
+				_fail("keep/scrap choice lost its action or overlaps at %s: %s / %s / %s" % [extent, reward.keep_label.text, scrap.text, visible_reward])
 				return
 			if capture and item.id == &"dodge_2" and extent in [Vector2i(720, 1280), Vector2i(1040, 600), Vector2i(640, 360)]:
 				await RenderingServer.frame_post_draw

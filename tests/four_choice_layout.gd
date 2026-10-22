@@ -53,8 +53,9 @@ func _run() -> void:
 			var rectangles: Array[Rect2] = []
 			for card: UpgradeCard in game.choice_panel.buttons:
 				var rect := card.get_global_rect()
-				if not card.visible or not bounds.encloses(rect):
-					_fail("upgrade card is missing or outside %s" % extent)
+				var scroll_bounds: Rect2 = game.choice_panel.stage.body_scroll.get_global_rect()
+				if not card.visible or rect.position.x < scroll_bounds.position.x - 1.0 or rect.end.x > scroll_bounds.end.x + 1.0:
+					_fail("upgrade card is missing or exceeds the content width at %s" % extent)
 					return
 				for previous in rectangles:
 					if rect.intersects(previous):
@@ -69,6 +70,19 @@ func _run() -> void:
 				if icon == null or icon.atlas != DentiUIIcons.STAT_ATLAS or icon.get_size().x != icon.get_size().y or card.icon_rect.stretch_mode != TextureRect.STRETCH_KEEP_ASPECT_CENTERED:
 					_fail("upgrade icon does not preserve its own complete square stat motif")
 					return
+			# Compact screens may scroll the choices. Each decision and the last
+			# line must remain reachable without scrolling the reroll footer away.
+			for card: UpgradeCard in game.choice_panel.buttons:
+				game.choice_panel.stage.body_scroll.ensure_control_visible(card)
+				for frame in 3:
+					await process_frame
+				var scroll_bounds: Rect2 = game.choice_panel.stage.body_scroll.get_global_rect()
+				if card.size.y <= scroll_bounds.size.y and not scroll_bounds.grow(1.0).encloses(card.get_global_rect()):
+					_fail("upgrade card cannot be reached in the scroll area at %s" % extent)
+					return
+			game.choice_panel.stage.body_scroll.scroll_vertical = 0
+			for frame in 3:
+				await process_frame
 			if capture and extent in [Vector2i(320, 568), Vector2i(720, 1280), Vector2i(1280, 670), Vector2i(1280, 720)]:
 				await RenderingServer.frame_post_draw
 				root.get_texture().get_image().save_png(capture_path + "/levelup_%dx%d_group%d.png" % [extent.x, extent.y, start])
@@ -77,7 +91,7 @@ func _run() -> void:
 			card.mouse_entered.emit()
 		await create_timer(0.15).timeout
 		for card: UpgradeCard in game.choice_panel.buttons:
-			if not bounds.encloses(card.get_global_rect()) or not card.get_global_rect().encloses(card.icon_rect.get_global_rect()):
+			if not card.get_global_rect().encloses(card.icon_rect.get_global_rect()):
 				_fail("hover clips a level-up icon/card at %s" % extent)
 				return
 			card.mouse_exited.emit()

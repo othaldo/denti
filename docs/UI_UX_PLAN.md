@@ -265,6 +265,14 @@ Hauptmenü, Optionen/Pause und Belohnungen einzeln auf unnötige Texte, doppelte
 Beschriftung, unklare Aktionen und unnötige Scrollbereiche prüfen. Keine pauschale
 Großbaustelle mit gleichzeitigem Umbau aller Spielansichten.
 
+Die [Bestandsaufnahme der übrigen Ansichten](UI_VIEW_AUDIT.md) ist abgeschlossen:
+15 native Ansichtszustände auf Desktop und mit mobiler Projektbasis geprüft.
+Die gemeinsame Grundlage sowie Hauptmenü, Pause und Einstellungen sind nun
+[im ersten Paket umgesetzt und nativ geprüft](MENU_UI.md), einschließlich
+mobiler Größenkorrektur und klarer Aktions-/Fokuszustände. Auch die
+[Belohnungsbühne](REWARD_UI.md) ist umgesetzt. Anschließend folgen Run-Ende,
+Shop/Build und Leseseiten als eigenständige Pakete.
+
 ## 10. Abnahme: Gestaltung und Verhalten
 
 ### Visuelle Prüfung
@@ -325,5 +333,8 @@ die globale Kampfskalierung bleibt bestehen.
 Die visuelle Prüfung umfasst alle sechs vorgesehenen Größen, die tatsächliche
 Desktop-Projektskalierung bei 1920×1080 und die mobile Projektbasis im physischen
 320×568-Fenster. Geprüft wurden auch leere Auswahl, langer Waffenname, Sperre,
-Detaildialoge und native Maus-/Escape-Eingabe. Paket E (andere Menüs) und echte
-Balancevergleiche sind weiterhin eigenständige Folgearbeiten.
+Detaildialoge und native Maus-/Escape-Eingabe. Paket E ist als
+[Prüfung und Umsetzungsplan](UI_VIEW_AUDIT.md) ausgearbeitet. Sein erstes
+[Menüpaket](MENU_UI.md) und die [Belohnungsansichten](REWARD_UI.md) sind
+umgesetzt; Run-Ende, Shop/Build, Leseseiten und echte Balancevergleiche bleiben
+eigenständige Folgearbeiten.

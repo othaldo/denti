@@ -53,8 +53,13 @@ func _run() -> void:
 	var panel: WeaponChestPanel = game.weapon_chest_panel
 	var chest := {"kind": "affix", "options": [{"id": "fire", "rarity": 4, "damage": 25}, {"id": "ice", "rarity": 2, "damage": 7}, {"id": "poison", "rarity": 3, "damage": 14}], "scrap_coins": 5}
 	panel.show_chest(chest, loadout, game.player.stats, 5)
+	var rarity_colors: Array[Color] = []
 	for index in 3:
-		assert(panel.buttons[index].rarity_label.get_theme_color("font_color") == DentiRarity.color_for(int(chest.options[index].rarity)), "chest rarity differs from Mk color")
+		var rarity := int(chest.options[index].rarity)
+		var rarity_label: Label = panel.buttons[index].rarity_label
+		var color := rarity_label.get_theme_color("font_color")
+		assert(rarity_label.text.to_lower().contains(DentiRarity.name_for(rarity).to_lower()) and not rarity_colors.has(color), "capsule choices lost their distinct named rarity")
+		rarity_colors.append(color)
 	var label: Label = panel.replacement_buttons[0].get_meta("rarity_label")
 	assert(label.get_theme_color("font_color") == DentiRarity.color_for(4) and label.text == "Legendär III+", "replacement rarity/progress missing")
 	var equipment: Array[Dictionary] = []

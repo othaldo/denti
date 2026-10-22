@@ -149,8 +149,10 @@ func _run() -> void:
 			await process_frame
 		for button in panel.weapon_buttons:
 			assert(button.visible and button.get_global_rect().end.x <= extent.x, "weapon card outside viewport")
-			var labels: Array = button.get_meta("labels")
-			assert(labels[1].get_global_rect().end.y <= button.get_global_rect().end.y, "weapon metadata overflows card")
+			var art: TextureRect = button.get_meta("art")
+			assert(art.texture != null and button.get_global_rect().encloses(art.get_global_rect()), "weapon selector clips its artwork")
+		assert(panel.weapon_name.text.replace("\n", " ") == WeaponPresentation.weapon_name(panel.weapons[4]), "active target preview lost its selected weapon")
+		assert(panel.weapon_name.is_visible_in_tree() and panel.weapon_meta.is_visible_in_tree(), "active weapon metadata is hidden")
 	game.items.acquire(ShopController.by_id(&"xp_heal_1"))
 	game.player.stats.health = game.player.stats.max_health - 1
 	game.items.on_pickup(&"xp", 10)

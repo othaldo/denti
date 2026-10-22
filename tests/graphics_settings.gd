@@ -63,7 +63,7 @@ func _run() -> void:
 	_check(root.content_scale_size == Vector2i(1040, 600), "graphics mode changed the logical mobile layout")
 	var logical_size := menu.root_control.size
 	_check(is_equal_approx(logical_size.y, 600), "economy mode changed logical height")
-	var panel := menu.build_panel.get_global_rect()
+	var panel := menu.stage.panel.get_global_rect()
 	_check(panel.position.y >= 0 and panel.end.y <= 600, "landscape graphics options overflow the screen")
 	_check(menu.graphics_option.get_global_rect().end.x <= logical_size.x, "graphics selector overflowed the panel")
 	menu.graphics_option.select(2)

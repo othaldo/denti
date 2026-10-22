@@ -15,8 +15,8 @@ func _run() -> void:
 	game.game_menu.open_pause()
 	var menu: GameMenu = game.game_menu
 	menu._show_items()
-	if menu.rows.get_child_count() != 3 or not menu.rows.get_child(1).text.contains("Keine Items"):
-		_fail("empty inventory has explanatory filler or a decorative portrait")
+	if not _has_label(menu.rows, "Keine Items"):
+		_fail("empty inventory does not show its empty state")
 		return
 	game.items.acquire(ShopController.by_id(&"metal_crown"))
 	game.items.acquire(ShopController.by_id(&"metal_crown"))
@@ -29,7 +29,7 @@ func _run() -> void:
 		for frame in 4:
 			await process_frame
 		var bounds := Rect2(Vector2.ZERO, Vector2(extent))
-		if not bounds.encloses(menu.build_panel.get_global_rect()) or menu.rows.get_child(0).text != "Stats":
+		if not bounds.encloses(menu.build_panel.get_global_rect()) or menu.page != &"stats":
 			_fail("compact stats exceed viewport %s" % extent)
 			return
 		var weapons: HBoxContainer = menu.rows.get_node("WeaponScroll").get_child(0)
@@ -77,3 +77,12 @@ func _fail(message: String) -> void:
 	root.get_node("GameSession").clear_run()
 	push_error(message)
 	finish(1)
+
+
+func _has_label(node: Node, text: String) -> bool:
+	if node is Label and node.text.contains(text):
+		return true
+	for child in node.get_children():
+		if _has_label(child, text):
+			return true
+	return false

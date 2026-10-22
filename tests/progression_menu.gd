@@ -29,7 +29,7 @@ func _run() -> void:
 	if menu.menu_music.current_cue != &"main_menu" or menu.menu_music.fade_state != MusicController.FadeState.FADING_IN:
 		_fail("main menu theme did not restart with a fade")
 		return
-	if (menu.rows.get_child(3) as Button).text != "Neues Spiel" or not (menu.rows.get_child(3) as Button).has_focus():
+	if menu.home.primary_button != menu.actions[&"new_run"] or not menu.actions[&"new_run"].has_focus():
 		_fail("new game was not selected when no save exists")
 		return
 	menu._new_game()
@@ -107,14 +107,14 @@ func _run() -> void:
 	if menu == null or not session.has_run():
 		_fail("main menu lost the run")
 		return
-	if (menu.rows.get_child(3) as Button).text != "Fortsetzen" or not (menu.rows.get_child(3) as Button).has_focus():
+	if menu.home.primary_button != menu.actions[&"continue"] or not menu.actions[&"continue"].has_focus():
 		_fail("continue was not the default action with a save")
 		return
 	menu._new_game()
-	if menu.page != &"confirm_new_game" or not session.has_run() or (menu.rows.get_child(3) as Button).text != "Abbrechen" or not (menu.rows.get_child(3) as Button).has_focus():
+	if menu.page != &"confirm_new_game" or not session.has_run() or not menu.actions.has(&"cancel") or not (menu.actions[&"cancel"].has_focus() or menu.stage.back_button.has_focus()):
 		_fail("new game did not ask before deleting the save")
 		return
-	(menu.rows.get_child(3) as Button).pressed.emit()
+	(menu.actions[&"cancel"] as Button).pressed.emit()
 	if menu.page != &"home" or not session.has_run():
 		_fail("cancelling a new game did not preserve the save")
 		return
@@ -203,7 +203,7 @@ func _run() -> void:
 	await process_frame
 	menu = current_scene as GameMenu
 	menu._new_game()
-	(menu.rows.get_child(4) as Button).pressed.emit()
+	(menu.actions[&"confirm_new_run"] as Button).pressed.emit()
 	if menu.page != &"difficulty":
 		_fail("confirmed new game did not offer difficulty selection")
 		return

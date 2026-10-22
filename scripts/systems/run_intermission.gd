@@ -54,6 +54,8 @@ static func restore(game, saved: Dictionary) -> void:
 			game.get_node("/root/SceneTransitions").present(&"rewards")
 			game.run_flow.enter(RunFlow.Phase.REWARDS)
 			game.choice_panel.show_upgrades(options)
+			var progress: Vector2i = game.rewards.choice_progress()
+			game.choice_panel.set_progress(progress.x, progress.y)
 			game._update_level_reroll()
 			game.get_tree().paused = true
 		else:

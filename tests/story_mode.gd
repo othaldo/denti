@@ -178,10 +178,7 @@ func _run() -> void:
 	var menu: GameMenu = load("res://scenes/ui/game_menu.tscn").instantiate()
 	root.add_child(menu)
 	current_scene = menu
-	var story_button: Button
-	for child in menu.rows.get_children():
-		if child is Button and child.text == "Story-Modus":
-			story_button = child
+	var story_button: Button = menu.actions.get(&"story")
 	if not _check(story_button != null, "main menu lacks story entry"):
 		return
 	story_button.pressed.emit()

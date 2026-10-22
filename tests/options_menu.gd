@@ -22,7 +22,7 @@ func _run() -> void:
 	menu._show_options()
 	await process_frame
 	await process_frame
-	if menu.rows.get_child_count() != 10:
+	if _setting_control_count(menu.stage.content) != 8:
 		_fail("options page has duplicate controls")
 		return
 	var master_bus := AudioServer.get_bus_index("Master")
@@ -50,7 +50,7 @@ func _run() -> void:
 	music_slider.value = 62.0
 	sfx_slider.value = 15.0
 	await process_frame
-	if menu.rows.get_child_count() != 10 or menu.fps_toggle != fps_toggle or menu.master_slider != master_slider or menu.music_slider != music_slider or menu.sfx_slider != sfx_slider or menu.ui_sound_toggle != ui_sound_toggle or menu.motion_toggle != motion_toggle:
+	if _setting_control_count(menu.stage.content) != 8 or menu.fps_toggle != fps_toggle or menu.master_slider != master_slider or menu.music_slider != music_slider or menu.sfx_slider != sfx_slider or menu.ui_sound_toggle != ui_sound_toggle or menu.motion_toggle != motion_toggle:
 		_fail("moving sliders duplicated options")
 		return
 	if session.ui_sounds or not session.reduced_ui_motion:
@@ -65,33 +65,32 @@ func _run() -> void:
 	if not is_equal_approx(AudioServer.get_bus_volume_linear(master_bus), 0.37) or not is_equal_approx(AudioServer.get_bus_volume_linear(music_bus), 0.62) or not is_equal_approx(AudioServer.get_bus_volume_linear(sfx_bus), 0.15):
 		_fail("audio bus levels do not match the sliders")
 		return
-	if master_slider.get_parent().get_child(2).text != "37%" or music_slider.get_parent().get_child(2).text != "62%" or sfx_slider.get_parent().get_child(2).text != "15%":
+	if not _contains_text(master_slider.get_parent().get_parent(), "37%") or not _contains_text(music_slider.get_parent().get_parent(), "62%") or not _contains_text(sfx_slider.get_parent().get_parent(), "15%"):
 		_fail("slider percentages did not update")
 		return
 	var saved_settings := ConfigFile.new()
 	if saved_settings.load(session.settings_path) != OK or int(saved_settings.get_value("audio", "master", -1)) != 37 or int(saved_settings.get_value("audio", "music", -1)) != 62 or int(saved_settings.get_value("audio", "sfx", -1)) != 15 or bool(saved_settings.get_value("display", "show_fps", not selected_fps)) != selected_fps:
 		_fail("options settings were not saved")
 		return
-	var options_panel: PanelContainer = menu.rows.get_parent().get_parent()
-	if options_panel.get_global_rect().end.y > 720.0:
+	if not Rect2(0, 0, 1280, 720).encloses(menu.stage.panel.get_global_rect()):
 		_fail("options panel exceeds the viewport")
 		return
-	var fullscreen_button: Button = menu.fullscreen_button
-	fullscreen_button.pressed.emit()
+	var fullscreen_toggle: CheckButton = menu.fullscreen_toggle
+	fullscreen_toggle.button_pressed = not fullscreen_toggle.button_pressed
 	await process_frame
-	if menu.rows.get_child_count() != 10 or menu.fullscreen_button != fullscreen_button:
+	if _setting_control_count(menu.stage.content) != 8 or menu.fullscreen_toggle != fullscreen_toggle:
 		_fail("fullscreen option duplicated controls")
 		return
-	var back_button: Button = menu.rows.get_child(9)
+	var back_button: Button = menu.actions[&"back"]
 	back_button.pressed.emit()
 	await process_frame
-	if menu.page != &"home" or menu.rows.get_child_count() != 11 + int(session.code_entry_unlocked):
+	if menu.page != &"home" or not menu.home.visible or not menu.actions.has(&"settings"):
 		_fail("options back button failed")
 		return
-	var options_button: Button = menu.rows.get_child(6)
+	var options_button: Button = menu.actions[&"settings"]
 	options_button.pressed.emit()
 	await process_frame
-	if menu.page != &"options" or menu.rows.get_child_count() != 10 or menu.fps_toggle.button_pressed != selected_fps or int(menu.master_slider.value) != 37 or int(menu.music_slider.value) != 62 or int(menu.sfx_slider.value) != 15 or menu.ui_sound_toggle.button_pressed or not menu.motion_toggle.button_pressed:
+	if menu.page != &"options" or _setting_control_count(menu.stage.content) != 8 or menu.fps_toggle.button_pressed != selected_fps or int(menu.master_slider.value) != 37 or int(menu.music_slider.value) != 62 or int(menu.sfx_slider.value) != 15 or menu.ui_sound_toggle.button_pressed or not menu.motion_toggle.button_pressed:
 		_fail("opening options again duplicated controls")
 		return
 	session.master_volume_percent = 100
@@ -120,13 +119,13 @@ func _run() -> void:
 			return
 	game.wave.active = false
 	game.game_menu.open_pause()
-	if not paused or game.game_menu.rows.get_child_count() != 9:
+	if not paused or not game.game_menu.visible or not game.game_menu.actions.has(&"settings"):
 		_fail("pause menu did not open")
 		return
-	var pause_options_button: Button = game.game_menu.rows.get_child(7)
+	var pause_options_button: Button = game.game_menu.actions[&"settings"]
 	pause_options_button.pressed.emit()
 	await process_frame
-	if game.game_menu.page != &"options" or game.game_menu.rows.get_child_count() != 10:
+	if game.game_menu.page != &"options" or _setting_control_count(game.game_menu.stage.content) != 8:
 		_fail("pause options did not open cleanly")
 		return
 	var pause_music_slider: HSlider = game.game_menu.music_slider
@@ -145,12 +144,12 @@ func _run() -> void:
 		return
 	pause_music_slider.value = 23.0
 	await process_frame
-	if game.game_menu.rows.get_child_count() != 10 or game.game_menu.music_slider != pause_music_slider or session.music_volume_percent != 23:
+	if _setting_control_count(game.game_menu.stage.content) != 8 or game.game_menu.music_slider != pause_music_slider or session.music_volume_percent != 23:
 		_fail("pause options duplicated controls")
 		return
-	(game.game_menu.rows.get_child(9) as Button).pressed.emit()
+	(game.game_menu.actions[&"back"] as Button).pressed.emit()
 	await process_frame
-	if game.game_menu.page != &"home" or game.game_menu.rows.get_child_count() != 9:
+	if game.game_menu.page != &"home" or not game.game_menu.actions.has(&"continue") or not paused:
 		_fail("pause options back button failed")
 		return
 	game.game_menu.close_pause()
@@ -188,3 +187,19 @@ func _run() -> void:
 func _fail(message: String) -> void:
 	push_error(message)
 	finish(1)
+
+
+func _setting_control_count(node: Node) -> int:
+	var count := int(node is HSlider or node is CheckButton or node is OptionButton)
+	for child in node.get_children():
+		count += _setting_control_count(child)
+	return count
+
+
+func _contains_text(node: Node, value: String) -> bool:
+	if node is Label and node.text.replace(" ", "") == value:
+		return true
+	for child in node.get_children():
+		if _contains_text(child, value):
+			return true
+	return false

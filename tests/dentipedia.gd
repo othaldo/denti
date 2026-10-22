@@ -84,12 +84,10 @@ func _run() -> void:
 	check(revealed[WeaponCatalog.ALL.size()].body.contains("Mk IV:") and not revealed[WeaponCatalog.ALL.size()].body.contains("Mk V:"), "Dentipedia special weapon has wrong tier")
 	check(DentipediaData.ingredients(recipe).size() == 1 + recipe.families.size() + recipe.items.size(), "recipe ingredients incomplete")
 	game.game_menu.open_pause()
-	var found := false
-	for child in game.game_menu.rows.get_children():
-		if child is Button and child.text == "Dentipedia":
-			found = true
-			child.pressed.emit()
-			break
+	var entry: Button = game.game_menu.actions.get(&"dentipedia")
+	var found := entry != null
+	if found:
+		entry.pressed.emit()
 	check(found and game.game_menu.page == &"dentipedia", "pause menu entry missing")
 	for extent in [Vector2i(1280, 720), Vector2i(720, 1280), Vector2i(320, 568), Vector2i(568, 320)]:
 		root.content_scale_size = extent
@@ -179,12 +177,10 @@ func _run() -> void:
 	paused = false
 	var main_menu: GameMenu = load("res://scenes/ui/game_menu.tscn").instantiate()
 	root.add_child(main_menu)
-	var main_entry := false
-	for child in main_menu.rows.get_children():
-		if child is Button and child.text == "Dentipedia":
-			main_entry = true
-			child.pressed.emit()
-			break
+	var main_button: Button = main_menu.actions.get(&"dentipedia")
+	var main_entry := main_button != null
+	if main_entry:
+		main_button.pressed.emit()
 	check(main_entry and main_menu.page == &"dentipedia", "main menu Dentipedia entry missing")
 	if failures.is_empty():
 		print("Denti Dentipedia test passed")

@@ -7,6 +7,11 @@ var setup: RunSetup
 var setup_selector: RunSetupScreen
 var difficulty_buttons: Dictionary = {}
 var launching_run := false
+var stage: MenuStage
+var home: MenuHome
+var settings_view: MenuSettings
+var actions: Dictionary = {}
+var home_return_focus: StringName = &""
 
 var page: StringName = &"home"
 var root_control: Control
@@ -17,7 +22,7 @@ var build_scroll: ScrollContainer
 var build_grid: GridContainer
 var item_details: ShopDetails
 var menu_music: MusicController
-var fullscreen_button: Button
+var fullscreen_toggle: CheckButton
 var fps_toggle: CheckButton
 var graphics_option: OptionButton
 var master_slider: HSlider
@@ -26,9 +31,7 @@ var sfx_slider: HSlider
 var ui_sound_toggle: CheckButton
 var motion_toggle: CheckButton
 var menu_stage: HBoxContainer
-var hero: TextureRect
 var dentipedia: Dentipedia
-var title_logo: TextureRect
 var code_input: LineEdit
 var code_error: Label
 @onready var session: Node = get_node("/root/GameSession")
@@ -85,7 +88,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif overlay and page == &"home":
 		close_pause()
 	else:
-		_show_home()
+		_return_home()
 
 
 func _build_ui() -> void:
@@ -93,10 +96,7 @@ func _build_ui() -> void:
 	root_control.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root_control.theme = DentiUIStyle.make_theme()
 	add_child(root_control)
-	var background := ColorRect.new()
-	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	background.color = Color(DentiUIStyle.BACKGROUND, 0.88) if overlay else DentiUIStyle.BACKGROUND
-	root_control.add_child(background)
+	MenuStyle.backdrop(root_control, overlay)
 	var center := CenterContainer.new()
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root_control.add_child(center)
@@ -108,14 +108,6 @@ func _build_ui() -> void:
 	menu_stage.add_theme_constant_override("separation", 40)
 	center.add_child(menu_stage)
 	menu_stage.add_child(panel)
-	hero = TextureRect.new()
-	hero.texture = preload("res://assets/denti/denti_unarmed.png")
-	hero.custom_minimum_size = Vector2(300, 360)
-	hero.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	hero.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	hero.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	menu_stage.add_child(hero)
-	hero.visible = not overlay
 	var margin := MarginContainer.new()
 	margin.add_theme_constant_override("margin_left", 32)
 	margin.add_theme_constant_override("margin_right", 32)
@@ -126,9 +118,17 @@ func _build_ui() -> void:
 	rows.add_theme_constant_override("separation", 10)
 	margin.add_child(rows)
 	get_viewport().size_changed.connect(_update_build_layout)
+	stage = MenuStage.new()
+	root_control.add_child(stage)
+	stage.visible = false
+	stage.back_requested.connect(_return_home)
 
 
 func _clear_rows() -> void:
+	stage.visible = false
+	actions.clear()
+	home = null
+	settings_view = null
 	menu_stage.visible = true
 	for edge in ["left", "right"]:
 		rows.get_parent().add_theme_constant_override("margin_" + edge, 32)
@@ -144,12 +144,11 @@ func _clear_rows() -> void:
 	build_grid = null
 	item_details = null
 	dentipedia = null
-	title_logo = null
 	code_input = null
 	code_error = null
 	build_panel.custom_minimum_size = Vector2(520, 0)
 	rows.add_theme_constant_override("separation", 10)
-	fullscreen_button = null
+	fullscreen_toggle = null
 	fps_toggle = null
 	graphics_option = null
 	master_slider = null
@@ -157,32 +156,15 @@ func _clear_rows() -> void:
 	sfx_slider = null
 	ui_sound_toggle = null
 	motion_toggle = null
-	hero.visible = not overlay and page == &"home" and root_control.size.x >= 900
 	call_deferred("_update_build_layout")
 
 
 func _title(text_value: String) -> void:
-	var portrait := TextureRect.new()
-	portrait.texture = preload("res://assets/denti/denti_gameplay.png")
-	portrait.custom_minimum_size = Vector2(0, 80)
-	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	portrait.visible = overlay and page == &"home"
-	rows.add_child(portrait)
-	if not overlay and page == &"home":
-		title_logo = TextureRect.new()
-		title_logo.texture = preload("res://assets/story/title.png")
-		title_logo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		title_logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		title_logo.custom_minimum_size = Vector2(0, 120)
-		title_logo.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		rows.add_child(title_logo)
-		return
 	var label := Label.new()
-	label.text = "DENTI" if not overlay and page == &"home" else text_value
+	label.text = text_value
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.add_theme_color_override("font_color", DentiUIStyle.INK)
-	label.add_theme_font_size_override("font_size", 54 if not overlay and page == &"home" else 34)
+	label.add_theme_font_size_override("font_size", 34)
 	rows.add_child(label)
 
 
@@ -192,18 +174,6 @@ func _text(text_value: String) -> void:
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.add_theme_color_override("font_color", DentiUIStyle.MUTED)
-	rows.add_child(label)
-
-
-func _version_info() -> void:
-	var version := str(ProjectSettings.get_setting("application/config/version", "0.0.0"))
-	var build := str(ProjectSettings.get_setting("denti/build", "dev"))
-	var build_text := "dev" if build == "dev" else "build %s" % build
-	var label := Label.new()
-	label.text = "v%s · %s" % [version, build_text]
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.add_theme_color_override("font_color", DentiUIStyle.MUTED)
-	label.add_theme_font_size_override("font_size", 13)
 	rows.add_child(label)
 
 
@@ -220,99 +190,57 @@ func _button(text_value: String, callback: Callable, accent: bool = false, disab
 	return button
 
 
-func _volume_slider(title: String, value: int, setter: Callable) -> HSlider:
-	var panel := PanelContainer.new()
-	panel.custom_minimum_size.y = 50.0
-	DentiUIStyle.style_chip(panel, Color(0.96, 0.92, 0.83))
-	rows.add_child(panel)
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 12)
-	panel.add_child(row)
-	var label := Label.new()
-	label.text = title
-	label.custom_minimum_size.x = 85.0
-	label.add_theme_color_override("font_color", DentiUIStyle.INK)
-	row.add_child(label)
-	var slider := HSlider.new()
-	slider.min_value = 0.0
-	slider.max_value = 100.0
-	slider.step = 1.0
-	slider.value = value
-	slider.custom_minimum_size = Vector2(160, 32)
-	slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	slider.tooltip_text = "%s-Lautstärke" % title
-	DentiUIStyle.style_slider(slider)
-	row.add_child(slider)
-	var value_label := Label.new()
-	value_label.text = "%d%%" % value
-	value_label.custom_minimum_size.x = 54.0
-	value_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	value_label.add_theme_color_override("font_color", DentiUIStyle.INK)
-	row.add_child(value_label)
-	slider.value_changed.connect(func(new_value: float) -> void:
-		var percent := roundi(new_value)
-		value_label.text = "%d%%" % percent
-		setter.call(percent)
-	)
-	return slider
-
-
-func _fps_option() -> CheckButton:
-	var panel := PanelContainer.new()
-	panel.custom_minimum_size.y = 46.0
-	DentiUIStyle.style_chip(panel, Color(0.96, 0.92, 0.83))
-	rows.add_child(panel)
-	var row := HBoxContainer.new()
-	panel.add_child(row)
-	var toggle := CheckButton.new()
-	toggle.text = "FPS anzeigen"
-	toggle.button_pressed = session.show_fps
-	DentiUIStyle.style_check_button(toggle)
-	toggle.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(toggle)
-	toggle.toggled.connect(Callable(session, "set_show_fps"))
-	graphics_option = OptionButton.new()
-	graphics_option.add_item("Grafik: Automatisch", 0)
-	graphics_option.add_item("Grafik: Sparsam", 1)
-	graphics_option.add_item("Grafik: Voll", 2)
-	graphics_option.selected = session.graphics_mode
-	graphics_option.tooltip_text = "Automatisch startet mit voller Auflösung und wechselt im Kampf bei anhaltend unter 20 FPS für diesen Run auf Sparsam. Sparsam senkt die Renderauflösung und begrenzt Schadenszahlen. Voll nutzt die Bildschirmauflösung."
-	DentiUIStyle.style_button(graphics_option)
-	row.add_child(graphics_option)
-	graphics_option.item_selected.connect(Callable(session, "set_graphics_mode"))
-	return toggle
-
-
 func _show_home() -> void:
 	page = &"home"
 	_clear_rows()
-	_title("Denti: Divine Dentistry" if not overlay else "Zahnpause")
+	menu_stage.visible = false
+	home = MenuHome.new()
+	var version := "v%s · %s" % [ProjectSettings.get_setting("application/config/version", "0.0.0"), ProjectSettings.get_setting("denti/build", "dev")]
+	stage.present("", home, "" if overlay else version)
+	var can_continue: bool = overlay or session.has_run() or FileAccess.file_exists(_draft_path())
+	var context := ""
 	if overlay:
-		_text("Welle %d · Level %d · %s" % [game.wave.current_wave, game.level, DifficultyCatalog.by_id(game.wave.difficulty_id).display_name])
-		_button("Fortsetzen", close_pause, true)
-		if session.test_scenario_id != &"":
-			_button("Test neu starten", game._restart)
-		_button("Stats", _show_stats)
-		_button("Items", _show_items)
-		_button("Dentipedia", _show_dentipedia)
-		_button("Einstellungen", _show_options)
-		_button("Hauptmenü", _to_main_menu)
-	else:
-		_text("Divine Dentistry")
-		if session.has_run() or FileAccess.file_exists(_draft_path()):
-			_button("Fortsetzen", _continue_game, true)
-			_button("Neues Spiel", _new_game)
+		context = "Welle %d · Level %d · %s" % [game.wave.current_wave, game.level, DifficultyCatalog.by_id(game.wave.difficulty_id).display_name]
+	elif session.has_run():
+		var saved: Dictionary = session.load_run()
+		if bool(saved.get("starter_pending", false)):
+			context = "Run vorbereiten"
 		else:
-			_button("Neues Spiel", _new_game, true)
-			_button("Fortsetzen", _continue_game, false, true)
-		_button("Story-Modus", _new_story_game)
-		_button("Einstellungen", _show_options)
-		_button("Credits", _show_credits)
-		if session.code_entry_unlocked:
-			_button("Code eingeben", _show_code_entry)
-		_button("Dentipedia", _show_dentipedia)
-		_button("Beenden", func() -> void: get_tree().quit())
-		_version_info()
+			context = "Welle %d · Level %d · %s" % [int(saved.get("wave", 1)), int(saved.get("level", 1)), DifficultyCatalog.by_id(StringName(str(saved.get("difficulty_id", "normal")))).display_name]
+	elif can_continue:
+		context = "Run vorbereiten"
+	home.configure(overlay, can_continue, context, session.code_entry_unlocked, session.test_scenario_id != &"")
+	home.action_requested.connect(_home_action)
+	actions = home.actions
+	stage._layout_content()
+	stage._refresh_focus()
+	if actions.has(home_return_focus):
+		(actions[home_return_focus] as Button).grab_focus()
+	else:
+		home.primary_button.grab_focus()
+
+
+func _home_action(id: StringName) -> void:
+	home_return_focus = id
+	match id:
+		&"continue":
+			if overlay: close_pause()
+			else: _continue_game()
+		&"new_run": _new_game()
+		&"story": _new_story_game()
+		&"settings": _show_options()
+		&"build": _show_stats()
+		&"dentipedia": _show_dentipedia()
+		&"credits": _show_credits()
+		&"code": _show_code_entry()
+		&"quit": get_tree().quit()
+		&"main_menu": _to_main_menu()
+		&"test_restart": game._restart()
+
+
+func _return_home() -> void:
+	if page == &"options": home_return_focus = &"settings"
+	_show_home()
 
 
 func _compact_title(title: String) -> void:
@@ -337,15 +265,6 @@ func _update_build_layout() -> void:
 	menu_stage.reset_size()
 	(menu_stage.get_parent() as Container).queue_sort()
 	var extent := root_control.size
-	hero.visible = not overlay and page == &"home" and extent.x >= 900
-	if title_logo != null:
-		var compact := extent.y < 650
-		var short_screen := extent.y < 600
-		title_logo.custom_minimum_size.y = 64 if short_screen else (72 if compact else 120)
-		rows.add_theme_constant_override("separation", 6 if compact else 10)
-		for child in rows.get_children():
-			if child is Button:
-				child.custom_minimum_size.y = 40 if short_screen else (44 if compact else 48)
 	if page == &"dentipedia":
 		build_panel.custom_minimum_size.x = minf(960, extent.x - 24)
 		if dentipedia != null:
@@ -367,7 +286,7 @@ func _update_build_layout() -> void:
 func _show_stats() -> void:
 	page = &"stats"
 	_clear_rows()
-	_compact_title("Stats")
+	_build_navigation(&"stats")
 	var stats: PlayerStats = game.player.stats
 	var wave_text := "Endlos · Welle %d" % game.wave.current_wave if game.wave.endless_enabled else "Welle %d / %d" % [game.wave.current_wave, WaveController.MAX_WAVES]
 	DentiUIComponents.label(rows, "Leben %.0f / %.0f · Schild %d · Level %d\nXP %d / %d · %s\nOffene Aufstiege: %d" % [stats.health, stats.max_health, stats.shield_charges, game.level, game.xp, game.xp_goal, wave_text, game.rewards.pending_levels], 16)
@@ -464,7 +383,7 @@ func _show_weapon_details(data: WeaponData, tier: int, weapon: WeaponInstance = 
 func _show_items() -> void:
 	page = &"items"
 	_clear_rows()
-	_compact_title("Items & Relikte")
+	_build_navigation(&"items")
 	var owned := BuildPresentation.collected_entries(game.items, game.relics)
 	if owned.is_empty():
 		DentiUIComponents.label(rows, "Keine Items oder Relikte", 16)
@@ -518,17 +437,37 @@ func _show_options() -> void:
 		session.visit_settings_for_code_entry()
 	page = &"options"
 	_clear_rows()
-	_title("Einstellungen")
-	_text("")
+	menu_stage.visible = false
+	settings_view = MenuSettings.new()
+	stage.present("Einstellungen", settings_view, "", 1100)
+	settings_view.configure(session)
+	fullscreen_toggle = settings_view.fullscreen_toggle
+	fps_toggle = settings_view.fps_toggle
+	graphics_option = settings_view.graphics_option
+	master_slider = settings_view.master_slider
+	music_slider = settings_view.music_slider
+	sfx_slider = settings_view.sfx_slider
+	ui_sound_toggle = settings_view.ui_sound_toggle
+	motion_toggle = settings_view.motion_toggle
+	actions[&"back"] = stage.back_button
+	stage._refresh_focus()
+	stage.back_button.grab_focus()
+
+
+func _build_navigation(active: StringName) -> void:
 	rows.add_theme_constant_override("separation", 6)
-	fullscreen_button = _button("", _toggle_fullscreen)
-	fps_toggle = _fps_option()
-	master_slider = _volume_slider("Gesamt", session.master_volume_percent, Callable(session, "set_master_volume"))
-	music_slider = _volume_slider("Musik", session.music_volume_percent, Callable(session, "set_music_volume"))
-	sfx_slider = _volume_slider("SFX", session.sfx_volume_percent, Callable(session, "set_sfx_volume"))
-	_ui_options()
-	_refresh_option_buttons()
-	_button("Zurück", _show_home, true)
+	var tabs := HBoxContainer.new()
+	tabs.add_theme_constant_override("separation", 8)
+	rows.add_child(tabs)
+	for id in [&"stats", &"items"]:
+		var button := Button.new()
+		button.text = "Werte" if id == &"stats" else "Items & Relikte"
+		MenuStyle.action(button, false, true)
+		RunSetupStyle.choice(button, id == active, false)
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		tabs.add_child(button)
+		button.pressed.connect(_show_stats if id == &"stats" else _show_items)
+		actions[id] = button
 
 
 func _show_code_entry() -> void:
@@ -571,41 +510,12 @@ func _activate_test_code(code: String) -> void:
 	get_node("/root/SceneTransitions").change_scene("res://scenes/game/game.tscn")
 
 
-func _ui_options() -> void:
-	var panel := PanelContainer.new()
-	DentiUIStyle.style_chip(panel)
-	rows.add_child(panel)
-	var row := VBoxContainer.new()
-	panel.add_child(row)
-	ui_sound_toggle = CheckButton.new()
-	ui_sound_toggle.text = "UI-Klänge"
-	ui_sound_toggle.button_pressed = session.ui_sounds
-	DentiUIStyle.style_check_button(ui_sound_toggle)
-	row.add_child(ui_sound_toggle)
-	ui_sound_toggle.toggled.connect(Callable(session, "set_ui_sounds"))
-	motion_toggle = CheckButton.new()
-	motion_toggle.text = "Reduzierte Bewegung"
-	motion_toggle.button_pressed = session.reduced_ui_motion
-	DentiUIStyle.style_check_button(motion_toggle)
-	row.add_child(motion_toggle)
-	motion_toggle.toggled.connect(Callable(session, "set_reduced_ui_motion"))
-
-
-func _refresh_option_buttons() -> void:
-	fullscreen_button.text = "Vollbild: %s" % ("An" if session.is_fullscreen() else "Aus")
-
-
 func _show_credits() -> void:
 	page = &"credits"
 	_clear_rows()
 	_title("Credits")
 	_text("Denti basiert auf der Projektvorlage.\nGrafiken und Icons: OpenAI ImageGen\nMusik: othaldo · erstellt mit Suno\nSoundeffekte: eigens synthetisiert\nSchrift: Fredoka · SIL Open Font License 1.1\nUI: eigenes Godot-Design")
 	_button("Zurück", _show_home, true)
-
-
-func _toggle_fullscreen() -> void:
-	session.set_fullscreen(not session.is_fullscreen())
-	_refresh_option_buttons()
 
 
 func _new_game() -> void:
@@ -634,10 +544,28 @@ func _choose_new_run() -> void:
 func _show_new_game_confirmation() -> void:
 	page = &"confirm_new_game"
 	_clear_rows()
-	_title("Neues Spiel?")
-	_text("Dein aktueller Run wird erst ersetzt, wenn du den neuen Run startest.")
-	_button("Abbrechen", _show_home, true)
-	_button("Weiter zur Schwierigkeitswahl", _show_difficulty)
+	menu_stage.visible = false
+	var content := VBoxContainer.new()
+	content.alignment = BoxContainer.ALIGNMENT_CENTER
+	content.add_theme_constant_override("separation", 24)
+	stage.present("Neuer Run?", content, "", 640)
+	var consequence := Label.new()
+	consequence.text = "Dein aktueller Run wird erst ersetzt, wenn du den neuen Run startest."
+	consequence.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	consequence.add_theme_font_size_override("font_size", 18)
+	content.add_child(consequence)
+	var choices := VBoxContainer.new()
+	choices.add_theme_constant_override("separation", 12)
+	content.add_child(choices)
+	for id in [&"confirm_new_run", &"cancel"]:
+		var button := Button.new()
+		button.text = "Run vorbereiten" if id == &"confirm_new_run" else "Abbrechen"
+		MenuStyle.action(button, id == &"confirm_new_run", id == &"cancel")
+		choices.add_child(button)
+		button.pressed.connect(_show_difficulty if id == &"confirm_new_run" else _return_home)
+		actions[id] = button
+	stage._refresh_focus()
+	stage.back_button.grab_focus()
 
 
 func _draft_path() -> String:

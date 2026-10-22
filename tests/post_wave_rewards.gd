@@ -44,6 +44,12 @@ func _run() -> void:
 		_fail("loot sweep did not finish before level-up and chest choices")
 		return
 	for index in 3:
+		if game.rewards.choice_progress() != Vector2i(index + 1, 5):
+			_fail("reward progress lost choices collected during the loot sweep")
+			return
+		if game.choice_panel.stage.progress_label.text != "%d / 5" % (index + 1) or not game.choice_panel.stage.progress_label.is_visible_in_tree():
+			_fail("the displayed reward counter does not match the saved queue")
+			return
 		if game.choice_panel.mode != &"upgrade" or game.rewards.pending_levels != 3 - index or game.shop_panel.visible:
 			_fail("pending level-ups were skipped or shop opened early")
 			return
@@ -52,6 +58,12 @@ func _run() -> void:
 		_fail("chest choices did not follow all level-ups")
 		return
 	var armor_before: float = game.player.stats.armor
+	if game.rewards.choice_progress() != Vector2i(4, 5):
+		_fail("capsules restarted the overall reward progress")
+		return
+	if game.choice_panel.stage.progress_label.text != "4 / 5":
+		_fail("the item capsule counter restarted after level choices")
+		return
 	choose_panel(game.choice_panel, 0)
 	if game.items.count(&"metal_crown") != 1 or game.player.stats.armor != armor_before + 3.0 or game.choice_panel.chest_item.id != &"fluoride_gel" or game.rewards.pending_chests.size() != 1:
 		_fail("KEEP did not grant the item or advance to the next chest")
@@ -63,6 +75,12 @@ func _run() -> void:
 	await process_frame
 	await process_frame
 	game = current_scene
+	if game.rewards.choice_progress() != Vector2i(5, 5):
+		_fail("continue reset completed reward choices")
+		return
+	if game.choice_panel.stage.progress_label.text != "5 / 5":
+		_fail("continue restored the queue but lost the visible reward counter")
+		return
 	if not paused or game.rewards.step != PostWaveRewards.Step.CHESTS or game.choice_panel.mode != &"chest" or game.choice_panel.chest_item.id != &"fluoride_gel" or game.items.count(&"metal_crown") != 1:
 		_fail("continue lost the pending chest decision")
 		return

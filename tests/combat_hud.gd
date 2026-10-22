@@ -1,5 +1,14 @@
 extends "res://tests/support/test_runtime.gd"
 
+
+func _has_pause_label(node: Node, text: String) -> bool:
+	if node is Label and node.text.contains(text):
+		return true
+	for child in node.get_children():
+		if _has_pause_label(child, text):
+			return true
+	return false
+
 var failures: Array[String] = []
 
 
@@ -105,10 +114,14 @@ func _run() -> void:
 		root.content_scale_size = extent
 		root.size = extent
 		game.game_menu._show_stats()
-		_check((game.game_menu.rows.get_child(1) as Label).text.contains("Offene Aufstiege: 123"), "pause stats do not show the uncapped pending count")
-		var wallet: HBoxContainer = game.game_menu.rows.get_child(2)
-		var details_link := wallet.get_child(wallet.get_child_count() - 1) as LinkButton
+		_check(_has_pause_label(game.game_menu.rows, "Offene Aufstiege: 123"), "pause stats do not show the uncapped pending count")
+		var details_link: LinkButton
+		for link: LinkButton in game.game_menu.rows.find_children("*", "LinkButton", true, false):
+			if link.text == "Bossdetails":
+				details_link = link
 		_check(details_link != null, "pause stats lack the boss details action")
+		if details_link == null:
+			continue
 		details_link.pressed.emit()
 		await _settle()
 		var full_name_found := false

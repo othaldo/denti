@@ -106,7 +106,7 @@ func _run() -> void:
 	current_scene = menu
 	for extent in [Vector2i(320, 568), Vector2i(1280, 720)]:
 		await _resize(extent)
-		if not _check(menu.title_logo != null and menu.title_logo.texture == StoryTravel.TITLE and Rect2(Vector2.ZERO, Vector2(extent)).encloses(menu.build_panel.get_global_rect()), "gold title or main menu does not fit %s" % extent):
+		if not _check(menu.home.logo.texture == StoryTravel.TITLE and Rect2(Vector2.ZERO, Vector2(extent)).encloses(menu.stage.panel.get_global_rect()), "gold title or main menu does not fit %s" % extent):
 			return
 		await _capture("menu_%dx%d" % [extent.x, extent.y])
 	print("Denti animated chapter travel, reveal/fog, save/resume, reduced motion and menu logo test passed")

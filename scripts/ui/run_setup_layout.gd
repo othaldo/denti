@@ -4,16 +4,11 @@ extends RefCounted
 # Undo shrinking below the canvas design size locally, so a 48-unit menu
 # target remains usable on phones/small windows. Combat keeps its own scale.
 static func ui_scale(viewport: Viewport) -> float:
-	var scale := viewport.get_screen_transform().get_scale()
-	return 1.0 / clampf(minf(scale.x, scale.y), 0.1, 1.0)
+	return MenuLayout.ui_scale(viewport)
 
 # All measurements are in canvas coordinates, independent of window pixels.
 static func stage(safe: Rect2) -> Rect2:
-	var compact := safe.size.x < 600 or safe.size.y < 480
-	var margin := Vector2(12, 12) if compact else Vector2(48, 36)
-	var available := safe.size - margin * 2
-	var extent := Vector2(minf(1600, available.x), minf(950, available.y))
-	return Rect2(safe.position + (safe.size - extent) * 0.5, extent)
+	return MenuLayout.stage(safe)
 
 static func body(stage_size: Vector2) -> Rect2:
 	var compact := stage_size.x < 600 or stage_size.y < 480

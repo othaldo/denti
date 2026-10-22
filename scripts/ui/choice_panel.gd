@@ -12,282 +12,235 @@ signal main_menu_requested
 signal endless_requested
 const UPGRADE_COUNT := 4
 
-@onready var title_label: Label = $Root/Center/Panel/Margin/Rows/Title
-@onready var subtitle_label: Label = $Root/Center/Panel/Margin/Rows/Subtitle
-@onready var dialog_panel: PanelContainer = $Root/Center/Panel
-@onready var cards: GridContainer = $Root/Center/Panel/Margin/Rows/Cards
-@onready var level_actions: HBoxContainer = $Root/Center/Panel/Margin/Rows/LevelActions
-@onready var level_coins: Label = $Root/Center/Panel/Margin/Rows/LevelActions/Coins
-@onready var reroll_button: Button = $Root/Center/Panel/Margin/Rows/LevelActions/Reroll
-@onready var buttons: Array[UpgradeCard] = [
-	$Root/Center/Panel/Margin/Rows/Cards/Choice1,
-	$Root/Center/Panel/Margin/Rows/Cards/Choice2,
-	$Root/Center/Panel/Margin/Rows/Cards/Choice3,
-	$Root/Center/Panel/Margin/Rows/Cards/Choice4,
-]
-
+var title_label: Label
+var subtitle_label: Label
+var dialog_panel: Control
+var cards: GridContainer
+var level_actions: HBoxContainer
+var level_coins: Label
+var reroll_button: Button
+var buttons: Array[UpgradeCard] = []
+var stage: RewardStage
+var reward_view: RewardChoices
 var starter_selection: StarterSelection
-
 var current_upgrades: Array[UpgradeData] = []
 var starter_options: Array[WeaponData] = []
 var mode: StringName = &"upgrade"
-var end_won: bool = false
-var end_coins: int = 0
+var end_won := false
+var end_coins := 0
 var chest_item: ShopOfferData
 var relic_options: Array[RelicData] = []
 var end_recap: Dictionary = {}
 
+@onready var legacy_panel: PanelContainer = $Root/Center/Panel
+@onready var legacy_cards: GridContainer = $Root/Center/Panel/Margin/Rows/Cards
+@onready var legacy_title: Label = $Root/Center/Panel/Margin/Rows/Title
+@onready var legacy_subtitle: Label = $Root/Center/Panel/Margin/Rows/Subtitle
+var legacy_buttons: Array[UpgradeCard] = []
 
 func _ready() -> void:
 	visible = false
 	$Root.theme = DentiUIStyle.make_theme()
 	$Root/Dim.color = Color(0.12, 0.06, 0.13, 0.78)
-	DentiUIStyle.style_dialog(dialog_panel)
-	title_label.add_theme_color_override("font_color", DentiUIStyle.INK)
-	title_label.add_theme_font_size_override("font_size", 32)
-	subtitle_label.add_theme_color_override("font_color", DentiUIStyle.MUTED)
-	level_coins.add_theme_color_override("font_color", DentiUIStyle.INK)
-	DentiUIStyle.style_button(reroll_button)
+	DentiUIStyle.style_dialog(legacy_panel)
+	$Root/Center/Panel/Margin/Rows/LevelActions.hide()
+	for index in UPGRADE_COUNT:
+		legacy_buttons.append(legacy_cards.get_child(index))
+		legacy_buttons[index].pressed.connect(_on_choice_pressed.bind(index))
+	stage = RewardStage.new()
+	$Root.add_child(stage)
+	reward_view = RewardChoices.new()
+	stage.present("Aufstieg", reward_view)
+	for index in reward_view.buttons.size():
+		reward_view.buttons[index].pressed.connect(_on_choice_pressed.bind(index))
+	level_actions = HBoxContainer.new()
+	level_actions.add_theme_constant_override("separation", 8)
+	level_actions.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	stage.footer.add_child(level_actions)
+	level_coins = Label.new()
+	level_coins.add_theme_font_size_override("font_size", 16)
+	level_coins.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	level_actions.add_child(level_coins)
+	var coin := TextureRect.new()
+	coin.texture = DentiUIIcons.hud(2)
+	coin.custom_minimum_size = Vector2(24, 24)
+	coin.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	coin.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	coin.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	level_actions.add_child(coin)
+	var spacer := Control.new()
+	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	level_actions.add_child(spacer)
+	reroll_button = Button.new()
+	MenuStyle.action(reroll_button)
 	reroll_button.icon = preload("res://assets/ui/reload_light.svg")
-	reroll_button.add_theme_constant_override("icon_max_width", 18)
+	reroll_button.add_theme_constant_override("icon_max_width", 20)
+	reroll_button.custom_minimum_size = Vector2(96, 48)
+	level_actions.add_child(reroll_button)
 	reroll_button.pressed.connect(func() -> void: level_reroll_requested.emit())
-	for index in buttons.size():
-		buttons[index].pressed.connect(_on_choice_pressed.bind(index))
 	starter_selection = StarterSelection.new()
 	$Root.add_child(starter_selection)
+	starter_selection.hide()
 	starter_selection.chosen.connect(func(weapon: WeaponData) -> void:
 		visible = false
 		starter_chosen.emit(weapon))
 	starter_selection.selection_changed.connect(func() -> void: starter_preview_changed.emit())
+	_use_legacy(&"upgrade")
 	get_viewport().size_changed.connect(_update_layout)
-	_update_layout()
 
+func _use_rewards(next: StringName) -> void:
+	mode = next
+	$Root/Center.hide()
+	starter_selection.hide()
+	buttons = reward_view.buttons
+	cards = reward_view.cards
+	dialog_panel = stage.panel
+	title_label = stage.title_label
+	subtitle_label = stage.progress_label
+	reward_view.kind = mode
+	for index in buttons.size():
+		var button := buttons[index]
+		if button.get_parent() != cards: button.reparent(cards)
+		cards.move_child(button, index)
+		button.hide()
+	level_actions.visible = mode == &"upgrade"
+	stage.show()
+	stage.body_scroll.scroll_vertical = 0
+
+func _use_legacy(next: StringName) -> void:
+	mode = next
+	stage.hide()
+	level_actions.hide()
+	starter_selection.visible = mode == &"starter"
+	$Root/Center.visible = mode != &"starter"
+	buttons = legacy_buttons
+	cards = legacy_cards
+	dialog_panel = legacy_panel
+	title_label = legacy_title
+	subtitle_label = legacy_subtitle
 
 func _update_layout() -> void:
-	level_actions.visible = mode == &"upgrade"
-	dialog_panel.visible = mode != &"starter"
-	if starter_selection != null:
-		starter_selection.visible = mode == &"starter"
-	if mode == &"starter":
+	if mode in [&"upgrade", &"chest", &"relic"] and stage.visible:
+		stage.relayout()
+		stage.refresh_focus()
 		return
-	var viewport_size: Vector2 = $Root.size
-	var portrait := viewport_size.y > viewport_size.x and viewport_size.x < 800.0
-	if mode == &"end":
-		_layout_end(viewport_size)
-		return
-	if mode == &"chest":
-		_layout_chest(viewport_size)
-		return
-	if mode == &"upgrade":
-		var narrow := viewport_size.x < 600.0 or viewport_size.y < 480.0
-		reroll_button.custom_minimum_size = Vector2(80, 32 if narrow else 40)
-		reroll_button.add_theme_font_size_override("font_size", 14 if narrow else 17)
-		level_coins.add_theme_font_size_override("font_size", 14 if narrow else 17)
-		cards.columns = 1 if portrait and viewport_size.y >= 1000.0 else (4 if (viewport_size.x >= 1150.0 and viewport_size.y >= 650.0) or viewport_size.y < 480.0 else 2)
-		$Root/Center/Panel/Margin/Rows/Portrait.visible = viewport_size.y >= 480.0
-		subtitle_label.visible = viewport_size.y >= 600.0
-		dialog_panel.custom_minimum_size = Vector2(minf(viewport_size.x - 24.0, 1120.0), 0)
-		$Root/Center/Panel/Margin/Rows/Portrait.custom_minimum_size.y = 48.0 if viewport_size.y >= 650.0 else 24.0
-		title_label.add_theme_font_size_override("font_size", 24 if narrow else 30)
-		subtitle_label.add_theme_font_size_override("font_size", 14 if narrow else 17)
-		subtitle_label.custom_minimum_size.y = 32.0
-		for edge in ["left", "right", "top", "bottom"]:
-			$Root/Center/Panel/Margin.add_theme_constant_override("margin_" + edge, 8 if narrow else 14)
-		cards.add_theme_constant_override("h_separation", 8 if narrow else 12)
-		cards.add_theme_constant_override("v_separation", 8 if narrow else 12)
-		for button in buttons:
-			(button as UpgradeCard).set_upgrade_layout(narrow, cards.columns != 4 or narrow)
-		return
-	$Root/Center/Panel/Margin/Rows/Portrait.visible = true
-	subtitle_label.visible = true
-	$Root/Center/Panel/Margin/Rows/Portrait.custom_minimum_size.y = 80.0 if mode == &"end" else 108.0
-	title_label.add_theme_font_size_override("font_size", 32)
-	subtitle_label.add_theme_font_size_override("font_size", 17)
-	for edge in ["left", "right"]:
-		$Root/Center/Panel/Margin.add_theme_constant_override("margin_" + edge, 28)
-	$Root/Center/Panel/Margin.add_theme_constant_override("margin_top", 18)
-	$Root/Center/Panel/Margin.add_theme_constant_override("margin_bottom", 24)
-	cards.columns = 1 if portrait else 3
-	var desktop_width := 760.0 if mode == &"chest" else (800.0 if mode == &"credits" else 900.0)
-	dialog_panel.custom_minimum_size.x = 660.0 if portrait else desktop_width
-	for button in buttons:
-		(button as UpgradeCard).reset_card_layout()
-		(button as UpgradeCard).set_mobile_text(portrait or viewport_size.y <= 620.0)
-
-
-func _layout_chest(viewport_size: Vector2) -> void:
-	var compact := viewport_size.x < 600.0 or viewport_size.y < 480.0
-	var padding := 12 if compact else 16
-	var width := minf(viewport_size.x - 24.0, 600.0)
-	dialog_panel.custom_minimum_size = Vector2(width, 0)
-	# The reward itself carries the art. A second large mascot and an equally
-	# tall scrap card leave less room for the effect, especially in landscape.
-	$Root/Center/Panel/Margin/Rows/Portrait.visible = false
-	title_label.add_theme_font_size_override("font_size", 22 if compact else 26)
-	subtitle_label.visible = true
-	subtitle_label.custom_minimum_size = Vector2.ZERO
-	subtitle_label.add_theme_font_size_override("font_size", 13 if compact else 14)
-	for edge in ["left", "right", "top", "bottom"]:
-		$Root/Center/Panel/Margin.add_theme_constant_override("margin_" + edge, padding)
-	cards.columns = 1
-	cards.add_theme_constant_override("v_separation", 8)
-	var panel_style := dialog_panel.get_theme_stylebox("panel")
-	var card_width := width - panel_style.get_minimum_size().x - padding * 2
-	(buttons[0] as UpgradeCard).set_chest_layout(card_width, compact)
-	buttons[1].custom_minimum_size = Vector2(0, 44 if compact else 48)
-	buttons[1].add_theme_font_size_override("font_size", 14 if compact else 16)
-	buttons[1].icon = DentiUIIcons.hud(2)
-	buttons[1].add_theme_constant_override("icon_max_width", 18)
-	buttons[0].focus_neighbor_bottom = buttons[1].get_path()
-	buttons[1].focus_neighbor_top = buttons[0].get_path()
-
-
-func _layout_end(viewport_size: Vector2) -> void:
-	var compact := viewport_size.x < 600.0 or viewport_size.y < 600.0
-	dialog_panel.custom_minimum_size = Vector2(minf(viewport_size.x - 24.0, 900.0), 0)
-	$Root/Center/Panel/Margin/Rows/Portrait.visible = viewport_size.y >= 600.0
-	$Root/Center/Panel/Margin/Rows/Portrait.custom_minimum_size.y = 64.0
+	if mode == &"starter": return
+	var extent: Vector2 = $Root.size
+	var compact := extent.x < 600 or extent.y < 600
+	legacy_panel.custom_minimum_size = Vector2(minf(extent.x - 24, 900), 0)
+	var portrait := $Root/Center/Panel/Margin/Rows/Portrait
+	portrait.visible = extent.y >= 600
+	portrait.custom_minimum_size.y = 64
 	title_label.add_theme_font_size_override("font_size", 22 if compact else 30)
 	subtitle_label.visible = true
 	subtitle_label.custom_minimum_size.y = 0
 	subtitle_label.add_theme_font_size_override("font_size", 14 if compact else 17)
-	subtitle_label.text = _end_summary(end_won, end_coins, end_recap)
 	for edge in ["left", "right", "top", "bottom"]:
 		$Root/Center/Panel/Margin.add_theme_constant_override("margin_" + edge, 8 if compact else 14)
-	cards.columns = 2
+	cards.columns = 2 if mode == &"end" else 1
 	cards.add_theme_constant_override("h_separation", 8 if compact else 12)
 	cards.add_theme_constant_override("v_separation", 8 if compact else 12)
-	var labels := ["Neuer Run", "Credits", "Hauptmenü", "Endlos"] if compact else ["Noch einmal spielen", "Credits", "Hauptmenü", "Endlos weiterspielen"]
-	for index in buttons.size():
-		buttons[index].custom_minimum_size = Vector2(0, 40 if compact else 48)
-		buttons[index].add_theme_font_size_override("font_size", 14 if compact else 18)
-		buttons[index].text = labels[index]
+	if mode == &"end":
+		subtitle_label.text = _end_summary(end_won, end_coins, end_recap)
+		var labels := ["Neuer Run", "Credits", "Hauptmenü", "Endlos"] if compact else ["Noch einmal spielen", "Credits", "Hauptmenü", "Endlos weiterspielen"]
+		for index in buttons.size():
+			buttons[index].custom_minimum_size = Vector2(0, 40 if compact else 48)
+			buttons[index].add_theme_font_size_override("font_size", 14 if compact else 18)
+			buttons[index].text = labels[index]
 
+func set_progress(current: int, total: int) -> void:
+	stage.set_progress(current, total)
 
 func update_level_reroll(coins: int, cost: int, earned_level: int = 0) -> void:
-	level_coins.text = ("Level %d · " % earned_level if earned_level > 0 else "") + "%d Münzen" % coins
+	level_coins.text = ("Level %d · " % earned_level if earned_level > 0 else "") + str(coins)
 	reroll_button.text = str(cost)
 	reroll_button.disabled = coins < cost
-	reroll_button.tooltip_text = "Level-up neu würfeln · %d Münzen\nVier neue Angebote für dieses Level. Nächster Reroll: +1 Münze." % cost
-
+	reroll_button.tooltip_text = "Neu würfeln · %d Münzen" % cost
 
 func show_upgrades(options: Array[UpgradeData]) -> void:
-	mode = &"upgrade"
+	_use_rewards(&"upgrade")
 	current_upgrades = options
-	dialog_panel.custom_minimum_size = Vector2(900, 440)
-	_update_layout()
-	title_label.text = "Denti steigt auf!"
-	subtitle_label.text = "Wähle einen Bonus"
-	subtitle_label.custom_minimum_size.y = 40.0
+	title_label.text = "Aufstieg"
 	for index in buttons.size():
 		buttons[index].visible = index < options.size()
-		if index < options.size():
-			buttons[index].show_upgrade(options[index])
-	_update_layout()
-	visible = true
-	buttons[0].grab_focus()
-
+		if index < options.size(): buttons[index].show_upgrade(options[index])
+	_finish_reward()
 
 func show_starters(options: Array[WeaponData], selected_id: StringName = &"") -> void:
-	mode = &"starter"
+	_use_legacy(&"starter")
 	starter_options = options
-	for button in buttons:
-		button.visible = false
+	for button in buttons: button.hide()
 	starter_selection.show_options(options, selected_id)
-	_update_layout()
 	visible = true
-
 
 func show_chest(item: ShopOfferData, scrap_coins: int) -> void:
-	mode = &"chest"
+	_use_rewards(&"chest")
 	chest_item = item
-	title_label.text = "Upgrade-Kapsel!"
-	subtitle_label.text = item.limit_text()
+	title_label.text = "Fund"
 	buttons[0].show_item(item)
-	buttons[0].visible = true
-	buttons[1].show_action("Für %d Münzen zerlegen" % scrap_coins)
-	buttons[1].visible = true
-	buttons[2].visible = false
-	buttons[3].visible = false
-	_update_layout()
-	visible = true
-	buttons[0].grab_focus()
-
+	buttons[0].show()
+	buttons[1].show_action("Zerlegen · %d Münzen" % scrap_coins)
+	MenuStyle.action(buttons[1], false, true)
+	buttons[1].reparent(stage.footer)
+	buttons[1].show()
+	_finish_reward()
 
 func show_relics(options: Array[RelicData]) -> void:
-	mode = &"relic"
+	_use_rewards(&"relic")
 	relic_options = options
-	dialog_panel.custom_minimum_size = Vector2(900, 465)
-	_update_layout()
-	title_label.text = "Göttliche Zahnreliquie!"
-	subtitle_label.text = "Der Boss ist besiegt. Wähle ein Relikt für diesen Lauf."
-	subtitle_label.custom_minimum_size.y = 40.0
+	title_label.text = "Relikt"
 	for index in buttons.size():
 		buttons[index].visible = index < options.size()
-		if index < options.size():
-			buttons[index].show_relic(options[index])
-	visible = true
-	buttons[0].grab_focus()
+		if index < options.size(): buttons[index].show_relic(options[index])
+	_finish_reward()
 
+func _finish_reward() -> void:
+	visible = true
+	_update_layout()
+	if not buttons.is_empty() and buttons[0].visible: buttons[0].grab_focus()
+	DentiUIMotion.reveal(reward_view)
 
 func show_end(won: bool, coins: int, recap: Dictionary = {}) -> void:
-	mode = &"end"
+	_use_legacy(&"end")
 	end_won = won
 	end_coins = coins
 	end_recap = recap.duplicate(true)
 	current_upgrades.clear()
-	dialog_panel.custom_minimum_size = Vector2(900, 560)
-	_update_layout()
-	$Root/Center/Panel/Margin/Rows/Portrait.custom_minimum_size.y = 80.0
 	title_label.text = "Endlos beendet!" if not won and bool(recap.get("endless_enabled", false)) else ("Alle huldigen Denti!" if won else "Denti ist ausgefallen!")
-	subtitle_label.add_theme_font_size_override("font_size", 17)
-	subtitle_label.text = _end_summary(won, coins, end_recap)
-	subtitle_label.custom_minimum_size.y = 270.0
 	buttons[0].show_action("Noch einmal spielen", true)
-	buttons[0].visible = true
 	buttons[1].show_action("Credits")
-	buttons[1].visible = true
 	buttons[2].show_action("Hauptmenü")
-	buttons[2].visible = true
-	buttons[3].visible = won and not bool(recap.get("endless_enabled", false)) and int(recap.get("wave_reached", 0)) == WaveController.MAX_WAVES
 	buttons[3].show_action("Endlos weiterspielen", true)
+	for index in 3: buttons[index].show()
+	buttons[3].visible = won and not bool(recap.get("endless_enabled", false)) and int(recap.get("wave_reached", 0)) == WaveController.MAX_WAVES
 	buttons[3].tooltip_text = "Mit diesem Build in Welle 21 weiterspielen. Dein Sieg bleibt erhalten."
 	_update_layout()
 	visible = true
 	buttons[0].grab_focus()
 
-
 func _on_choice_pressed(index: int) -> void:
 	match mode:
-		&"starter":
-			starter_selection.select_weapon(index)
+		&"starter": starter_selection.select_weapon(index)
 		&"upgrade":
-			if index >= current_upgrades.size():
-				return
+			if index >= current_upgrades.size(): return
 			visible = false
 			upgrade_chosen.emit(current_upgrades[index])
 		&"chest":
-			if index > 1:
-				return
+			if index > 1: return
 			visible = false
 			chest_resolved.emit(index == 0)
 		&"relic":
-			if index >= relic_options.size():
-				return
+			if index >= relic_options.size(): return
 			visible = false
 			relic_chosen.emit(relic_options[index].id)
 		&"end":
 			if index == 0:
 				visible = false
 				restart_requested.emit()
-			elif index == 1:
-				_show_credits()
-			elif index == 2:
-				main_menu_requested.emit()
-			elif index == 3 and buttons[3].visible:
-				endless_requested.emit()
-		&"credits":
-			show_end(end_won, end_coins, end_recap)
+			elif index == 1: _show_credits()
+			elif index == 2: main_menu_requested.emit()
+			elif index == 3 and buttons[3].visible: endless_requested.emit()
+		&"credits": show_end(end_won, end_coins, end_recap)
 
 
 func _end_summary(won: bool, coins: int, recap: Dictionary) -> String:

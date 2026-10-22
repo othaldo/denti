@@ -129,23 +129,7 @@ func _schedule_layout() -> void:
 		get_tree().process_frame.connect(_layout, CONNECT_ONE_SHOT)
 
 func _build_background() -> void:
-	var background := ColorRect.new()
-	background.color = DentiUIStyle.BACKGROUND
-	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(background)
-	var glow := TextureRect.new()
-	var texture := GradientTexture2D.new()
-	texture.width = 128
-	texture.height = 128
-	texture.fill = GradientTexture2D.FILL_RADIAL
-	texture.fill_from = Vector2(0.5, 0.35)
-	texture.fill_to = Vector2(1, 0.7)
-	texture.gradient = Gradient.new()
-	texture.gradient.colors = PackedColorArray([Color("322435"), DentiUIStyle.BACKGROUND])
-	glow.texture = texture
-	glow.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	glow.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(glow)
+	MenuStyle.backdrop(self)
 
 func _action(text: String, primary: bool) -> Button:
 	var button := Button.new()

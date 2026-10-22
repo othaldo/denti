@@ -14,6 +14,8 @@ var random_chests_spawned: int = 0
 var treasure_spawned: bool = false
 var final_wave: bool = false
 var pending_story: StringName = &""
+var choices_resolved: int = 0
+var choices_total: int = 0
 
 
 func begin_wave() -> void:
@@ -27,6 +29,8 @@ func begin_wave() -> void:
 	treasure_spawned = false
 	final_wave = false
 	pending_story = &""
+	choices_resolved = 0
+	choices_total = 0
 
 
 func earn_level() -> void:
@@ -69,12 +73,15 @@ func begin_collection() -> void:
 
 func finish_collection(is_final: bool) -> void:
 	final_wave = is_final
+	_update_choice_total()
 	_advance()
 
 
 func resolve_level() -> void:
 	if step != Step.LEVELS or pending_levels <= 0:
 		return
+	_update_choice_total()
+	choices_resolved += 1
 	pending_levels -= 1
 	level_rerolls = 0
 	_advance()
@@ -83,6 +90,8 @@ func resolve_level() -> void:
 func resolve_chest() -> void:
 	if step != Step.CHESTS or pending_chests.is_empty():
 		return
+	_update_choice_total()
+	choices_resolved += 1
 	pending_chests.pop_front()
 	_advance()
 
@@ -90,12 +99,28 @@ func resolve_chest() -> void:
 func resolve_relic() -> void:
 	if step != Step.RELICS or pending_relics.is_empty():
 		return
+	_update_choice_total()
+	choices_resolved += 1
 	pending_relics.clear()
 	_advance()
 
 
 func current_chest() -> Dictionary:
 	return pending_chests[0] if not pending_chests.is_empty() else {}
+
+
+func choice_progress() -> Vector2i:
+	var remaining := _remaining_choices()
+	var total := maxi(choices_total, choices_resolved + remaining)
+	return Vector2i(choices_resolved + 1 if remaining > 0 else total, total)
+
+
+func _remaining_choices() -> int:
+	return pending_levels + pending_chests.size() + (0 if pending_relics.is_empty() else 1)
+
+
+func _update_choice_total() -> void:
+	choices_total = maxi(choices_total, choices_resolved + _remaining_choices())
 
 
 func queue_story(id: StringName) -> void:
@@ -112,7 +137,8 @@ func resolve_story() -> void:
 
 func save_data() -> Dictionary:
 	return {"step": step, "pending_levels": pending_levels, "level_rerolls": level_rerolls, "pending_chests": pending_chests.duplicate(true),
-		"pending_relics": pending_relics.duplicate(), "chest_spawned": chest_spawned, "random_chests_spawned": random_chests_spawned, "treasure_spawned": treasure_spawned, "final_wave": final_wave, "pending_story": str(pending_story)}
+		"pending_relics": pending_relics.duplicate(), "chest_spawned": chest_spawned, "random_chests_spawned": random_chests_spawned, "treasure_spawned": treasure_spawned, "final_wave": final_wave, "pending_story": str(pending_story),
+		"choices_resolved": choices_resolved, "choices_total": choices_total}
 
 
 func restore(saved: Dictionary) -> void:
@@ -141,6 +167,9 @@ func restore(saved: Dictionary) -> void:
 	random_chests_spawned = clampi(int(saved.get("random_chests_spawned", ChestRewards.MAX_RANDOM_CHESTS_PER_WAVE if chest_spawned else 0)), 0, ChestRewards.MAX_RANDOM_CHESTS_PER_WAVE)
 	treasure_spawned = bool(saved.get("treasure_spawned", false))
 	final_wave = bool(saved.get("final_wave", false))
+	choices_resolved = maxi(int(saved.get("choices_resolved", 0)), 0)
+	choices_total = maxi(int(saved.get("choices_total", 0)), 0)
+	_update_choice_total()
 	if step == Step.LEVELS and pending_levels == 0 or step == Step.CHESTS and pending_chests.is_empty() or step == Step.RELICS and pending_relics.is_empty() or step == Step.STORY and pending_story == &"":
 		_advance()
 

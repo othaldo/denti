@@ -21,6 +21,11 @@ Die Run-Vorbereitung ist nun als gemeinsame native Auswahlbühne umgesetzt:
 vier gemalte Schwierigkeitsmotive, 18 Waffen, kompakte Vorschau und Details auf Abruf.
 [Nutzerfeedback, Gestaltungsplan und native Prüfung](UI_UX_PLAN.md).
 Als Nächstes bleiben menschliche Build-/Druckvergleiche und frühe Starter-Balance.
+Für die übrigen Menüs liegt eine [native UI-Bestandsaufnahme mit Reihenfolge und
+Abnahmekriterien](UI_VIEW_AUDIT.md) vor. Der erste UI-Schritt ist
+[umgesetzt](MENU_UI.md): gemeinsame Bühne und mobile Größen für Hauptmenü,
+Pause und Einstellungen. Auch die [Belohnungsbühne](REWARD_UI.md) für Aufstiege,
+Relikte, Kapseln und Itemfunde ist umgesetzt. Als Nächstes folgt das Run-Ende.
 
 | Priorität | Vorhaben | Ergebnis |
 | --- | --- | --- |

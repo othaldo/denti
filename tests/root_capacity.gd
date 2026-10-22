@@ -68,7 +68,7 @@ func _run() -> void:
 			root.content_scale_size = extent
 			root.size = extent
 			for frame in 5: await process_frame
-			_check(Rect2(Vector2.ZERO, Vector2(extent)).encloses(game.game_menu.build_panel.get_global_rect()), "many weapons pushed pause stats outside the viewport")
+			_check(Rect2(Vector2.ZERO, Vector2(extent)).encloses(game.game_menu.build_panel.get_global_rect()), "many weapons pushed pause stats outside the viewport at %s: %s" % [extent, game.game_menu.build_panel.get_global_rect()])
 			var scroll: ScrollContainer = game.game_menu.rows.get_node("WeaponScroll")
 			_check(game.game_menu.build_panel.get_global_rect().encloses(scroll.get_global_rect()), "pause weapon scroller exceeds its panel")
 		game.game_menu.hide()
