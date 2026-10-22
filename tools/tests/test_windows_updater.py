@@ -1,6 +1,7 @@
 """Exercise the actual PowerShell 5.1 installer against disposable portable builds."""
 
 import hashlib
+import ctypes
 import json
 import os
 from pathlib import Path
@@ -137,6 +138,11 @@ File.WriteAllText(Path.Combine(Path.GetDirectoryName(args[2]), "status.json"), "
             job_path = self.work / 'job.json'
             job = json.loads(job_path.read_text())
             job['parent_pid'] = parent.pid
+            # A process reports its long image path even when TEMP/the job uses
+            # an 8.3 alias (common on GitHub-hosted Windows runners).
+            short_path = ctypes.create_unicode_buffer(32768)
+            if ctypes.windll.kernel32.GetShortPathNameW(str(self.install), short_path, len(short_path)):
+                job['install_dir'] = short_path.value
             job_path.write_text(json.dumps(job), encoding='utf-8')
             helper = subprocess.Popen([str(POWERSHELL), '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File', str(HELPER), '-JobPath', str(job_path)], stdout=helper_log, stderr=helper_log)
             deadline = time.monotonic() + 20

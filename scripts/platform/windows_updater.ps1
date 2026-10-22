@@ -3,7 +3,25 @@ param([string]$JobPath)
 # Runs with Windows PowerShell 5.1 / .NET Framework; no separate runtime needed.
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.IO.Compression.FileSystem
+Add-Type -TypeDefinition @'
+using System.Runtime.InteropServices;
+using System.Text;
+public static class DentiUpdatePaths {
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern uint GetLongPathNameW(string path, StringBuilder buffer, uint length);
+}
+'@
 $DentiFiles = @('Denti.exe', 'Denti.pck', 'build-info.json')
+
+function Get-CanonicalImagePath([string]$Path) {
+    $buffer = [Text.StringBuilder]::new(32768)
+    $length = [DentiUpdatePaths]::GetLongPathNameW([IO.Path]::GetFullPath($Path), $buffer, $buffer.Capacity)
+    if ($length -eq 0 -or $length -ge $buffer.Capacity) { throw 'Cannot resolve the running executable path.' }
+    $resolved = $buffer.ToString()
+    if ($resolved.StartsWith('\\?\UNC\')) { return '\\' + $resolved.Substring(8) }
+    if ($resolved.StartsWith('\\?\')) { return $resolved.Substring(4) }
+    return $resolved
+}
 
 function Assert-PlainDirectory([string]$Path) {
     $item = [IO.DirectoryInfo]::new([IO.Path]::GetFullPath($Path))
@@ -155,7 +173,9 @@ function Invoke-DentiUpdate([string]$Path) {
         # A file-share lock serializes helpers for the same portable installation.
         $lock = [IO.File]::Open((Join-Path $job.InstallDir '.denti-update.lock'), 'OpenOrCreate', 'ReadWrite', 'None')
         $parent = [Diagnostics.Process]::GetProcessById([int]$job.parent_pid)
-        if ($parent.MainModule.FileName -ine (Join-Path $job.InstallDir 'Denti.exe')) { throw 'The running game does not match this installation.' }
+        $runningImage = Get-CanonicalImagePath $parent.MainModule.FileName
+        $expectedImage = Get-CanonicalImagePath (Join-Path $job.InstallDir 'Denti.exe')
+        if ($runningImage -ine $expectedImage) { throw "The running game does not match this installation: $runningImage != $expectedImage" }
         $stage = Prepare-Update $job
         Write-UpdateStatus $job 'ready'
         if (-not $parent.WaitForExit(90000)) { throw 'The game did not close; nothing was replaced.' }
