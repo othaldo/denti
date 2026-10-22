@@ -124,7 +124,7 @@ File.WriteAllText(Path.Combine(Path.GetDirectoryName(args[2]), "status.json"), "
         result = subprocess.run([str(compiler), '/nologo', '/target:winexe', '/out:' + str(destination), str(source)], capture_output=True, text=True, timeout=30)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
-    def _full_process(self, acknowledge):
+    def _full_process(self, acknowledge, lock_second=False):
         self._stub_exe(self.install / 'Denti.exe', 'old', False)
         self.original['Denti.exe'] = (self.install / 'Denti.exe').read_bytes()
         new_exe = self.root / 'new.exe'
@@ -133,6 +133,7 @@ File.WriteAllText(Path.Combine(Path.GetDirectoryName(args[2]), "status.json"), "
         self.pack()
         parent = subprocess.Popen([str(self.install / 'Denti.exe')])
         helper = None
+        locked_handle = None
         helper_log = (self.work / 'helper.log').open('w')
         try:
             job_path = self.work / 'job.json'
@@ -159,18 +160,40 @@ File.WriteAllText(Path.Combine(Path.GetDirectoryName(args[2]), "status.json"), "
             else: self.fail('helper did not prepare the update')
             # No installation may happen while the original game is still running.
             self.assert_original()
+            if lock_second:
+                from ctypes import wintypes
+                create_file = ctypes.windll.kernel32.CreateFileW
+                create_file.argtypes = [wintypes.LPCWSTR, wintypes.DWORD, wintypes.DWORD, wintypes.LPVOID, wintypes.DWORD, wintypes.DWORD, wintypes.HANDLE]
+                create_file.restype = wintypes.HANDLE
+                locked_handle = create_file(str(self.install / 'Denti.pck'), 0x80000000, 0, None, 3, 0x80, None)
+                self.assertNotEqual(locked_handle, wintypes.HANDLE(-1).value)
             parent.terminate()
             parent.wait(timeout=5)
             helper.wait(timeout=20)
-            self.assertEqual(helper.returncode, 0 if acknowledge else 1, (self.work / 'helper.log').read_text())
+            successful = acknowledge and not lock_second
+            self.assertEqual(helper.returncode, 0 if successful else 1, (self.work / 'helper.log').read_text())
             status = json.loads((self.work / 'status.json').read_text(encoding='utf-8-sig'))
-            self.assertEqual(status['state'], 'complete' if acknowledge else 'failed')
-            if acknowledge:
+            self.assertEqual(status['state'], 'complete' if successful else 'failed')
+            if locked_handle is not None:
+                ctypes.windll.kernel32.CloseHandle(ctypes.c_void_p(locked_handle))
+                locked_handle = None
+            if successful:
                 for name, data in self.payload.items(): self.assertEqual((self.install / name).read_bytes(), data)
                 self.assertFalse((self.work / 'package.zip').exists())
                 self.assertEqual(len(list(self.install.glob('.denti-update-*/backup/Denti.exe'))), 1)
-            else: self.assert_original()
+            else:
+                self.assert_original()
+                deadline = time.monotonic() + 5
+                restored_pid = None
+                while time.monotonic() < deadline:
+                    try: restored_pid = int((self.install / 'old.started').read_text())
+                    except (OSError, ValueError): restored_pid = None
+                    if restored_pid is not None and restored_pid != parent.pid: break
+                    time.sleep(.05)
+                self.assertIsNotNone(restored_pid, 'old game did not write a startup receipt')
+                self.assertNotEqual(restored_pid, parent.pid, 'old game was not restarted after rollback')
         finally:
+            if locked_handle is not None: ctypes.windll.kernel32.CloseHandle(ctypes.c_void_p(locked_handle))
             if parent.poll() is None: parent.terminate(); parent.wait(timeout=5)
             if helper is not None and helper.poll() is None: helper.terminate(); helper.wait(timeout=5)
             helper_log.close()
@@ -185,6 +208,9 @@ File.WriteAllText(Path.Combine(Path.GetDirectoryName(args[2]), "status.json"), "
 
     def test_missing_startup_ack_restores_previous_game_and_restarts_it(self):
         self._full_process(False)
+
+    def test_replacement_failure_after_exit_restarts_restored_game(self):
+        self._full_process(True, lock_second=True)
 
 
 if __name__ == "__main__":

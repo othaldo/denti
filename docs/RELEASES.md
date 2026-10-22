@@ -136,8 +136,9 @@ Dateien einzeln atomar, mit vollständigen Rückfallkopien.
 
 Die neue Version muss den erfolgreichen Aufbau ihres Hauptmenüs bestätigen.
 Schlägt ein Austausch fehl oder kommt keine Startbestätigung, werden die alten
-Dateien wiederhergestellt. Nach einem fehlgeschlagenen Neustart wird die alte
-Version erneut gestartet. Ein Sperrgriff verhindert parallele Installationen.
+Dateien wiederhergestellt. Nach erfolgreicher Wiederherstellung wird die alte
+Version erneut gestartet, auch wenn bereits der Dateiaustausch fehlgeschlagen ist.
+Ein Sperrgriff verhindert parallele Installationen.
 Die wiederhergestellte Version zeigt den fehlgeschlagenen Versuch im Updatebereich;
 ein Hintergrundcheck überschreibt diese Rückmeldung nicht.
 Andere Dateien im Spielordner und sämtliche `user://`-Spielstände, Einstellungen

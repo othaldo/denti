@@ -167,6 +167,7 @@ function Invoke-DentiUpdate([string]$Path) {
     $stage = $null
     $lock = $null
     $installed = $false
+    $parentExited = $false
     $child = $null
     try {
         $job = Read-UpdateJob $Path
@@ -179,6 +180,7 @@ function Invoke-DentiUpdate([string]$Path) {
         $stage = Prepare-Update $job
         Write-UpdateStatus $job 'ready'
         if (-not $parent.WaitForExit(90000)) { throw 'The game did not close; nothing was replaced.' }
+        $parentExited = $true
         Install-UpdateFiles $job $stage
         $installed = $true
         Write-UpdateStatus $job 'restarting'
@@ -212,13 +214,17 @@ function Invoke-DentiUpdate([string]$Path) {
                 if ($installed) {
                     if ($null -ne $child -and -not $child.HasExited) { $child.Kill(); $child.WaitForExit() }
                     Restore-UpdateFiles $job $stage
-                    Write-UpdateStatus $job 'failed' $detail
-                    [void](Start-Denti $job $false)
                 }
                 if ($null -ne $stage) {
                     # Never discard the last good files if rollback itself failed.
                     $remaining = @([IO.Directory]::GetFiles((Join-Path $stage 'backup')))
-                    if ($remaining.Count -eq 0) { Remove-KnownStage $stage }
+                    if ($remaining.Count -eq 0) {
+                        Remove-KnownStage $stage
+                        if ($parentExited) {
+                            Write-UpdateStatus $job 'failed' $detail
+                            [void](Start-Denti $job $false)
+                        }
+                    }
                 }
             } catch { $detail += ' Recovery: ' + $_.Exception.Message }
             Write-UpdateStatus $job 'failed' $detail
