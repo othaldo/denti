@@ -7,7 +7,9 @@ Ein kleiner 2D-Arena-Survivor über einen göttlichen Backenzahn, der Plaque, Zu
 GitHub Actions testet und baut **Web und Windows**. Testpakete stehen bei den
 [Actions-Läufen](https://github.com/othaldo/denti/actions) zum Download bereit;
 Versionstags erzeugen Release-Entwürfe. Veröffentlichte Versionen stehen unter
-[Releases](https://github.com/othaldo/denti/releases). [Ablauf und Update-Grundlage](docs/RELEASES.md).
+[Releases](https://github.com/othaldo/denti/releases). Portable Windows-Builds
+prüfen veröffentlichte Stable-/Beta-Updates im Hauptmenü und installieren sie
+auf Wunsch mit Neustart und Rückfallkopie. [Builds, Releases und Updater](docs/RELEASES.md).
 
 ![Denti kämpft in Welle 4 gegen Plaque, Bakterien, Zucker und Säurespucker](docs/screenshots/kampf.png)
 

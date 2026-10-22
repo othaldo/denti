@@ -25,6 +25,8 @@ func _run() -> void:
 	game.wave.spawn_cooldown = 100.0
 	game.wave.burst_index = game.wave.burst_times.size()
 	game.wave.horde_spawned = true
+	# This fixture counts scheduled elites, independently of the random loot thief.
+	game.wave.goblin_checked = true
 	game.wave.remaining = game.wave.duration - game.wave.elite_times[0] + 0.01
 	game.wave._process(0.02)
 	if game.get_node("Enemies").get_child_count() != 1 or game.wave.elite_index != 1 or game.telemetry.wave_elites_spawned != 1:

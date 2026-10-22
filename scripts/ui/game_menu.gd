@@ -10,6 +10,7 @@ var launching_run := false
 var stage: MenuStage
 var home: MenuHome
 var settings_view: MenuSettings
+var updates_view: MenuUpdates
 var actions: Dictionary = {}
 var home_return_focus: StringName = &""
 
@@ -60,6 +61,8 @@ func _ready() -> void:
 		setup_selector.next_requested.connect(_advance_setup)
 		setup_selector.step_requested.connect(_visit_setup_step)
 		_show_home()
+		get_node("/root/GameUpdates").confirm_startup()
+		get_node("/root/GameUpdates").check_for_updates.call_deferred()
 		if session.setup_requested:
 			session.setup_requested = false
 			_choose_new_run()
@@ -83,6 +86,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not visible or not event.is_action_pressed("ui_cancel"):
 		return
 	get_viewport().set_input_as_handled()
+	if page == &"updates" and get_node("/root/GameUpdates").state == GameUpdateService.State.INSTALLING: return
 	if not overlay and page in RunSetup.STEPS:
 		_setup_back()
 	elif overlay and page == &"home":
@@ -129,6 +133,7 @@ func _clear_rows() -> void:
 	actions.clear()
 	home = null
 	settings_view = null
+	updates_view = null
 	menu_stage.visible = true
 	for edge in ["left", "right"]:
 		rows.get_parent().add_theme_constant_override("margin_" + edge, 32)
@@ -212,6 +217,11 @@ func _show_home() -> void:
 	home.configure(overlay, can_continue, context, session.code_entry_unlocked, session.test_scenario_id != &"")
 	home.action_requested.connect(_home_action)
 	actions = home.actions
+	var updates: GameUpdateService = get_node("/root/GameUpdates")
+	if not overlay and updates.can_update():
+		home._action(&"updates", "Updates", home.utilities, false, true)
+		if not updates.changed.is_connected(_update_home_update): updates.changed.connect(_update_home_update)
+		_update_home_update()
 	stage._layout_content()
 	stage._refresh_focus()
 	if actions.has(home_return_focus):
@@ -232,6 +242,7 @@ func _home_action(id: StringName) -> void:
 		&"build": _show_stats()
 		&"dentipedia": _show_dentipedia()
 		&"credits": _show_credits()
+		&"updates": _show_updates()
 		&"code": _show_code_entry()
 		&"quit": get_tree().quit()
 		&"main_menu": _to_main_menu()
@@ -239,8 +250,39 @@ func _home_action(id: StringName) -> void:
 
 
 func _return_home() -> void:
+	if page == &"updates":
+		var updates: GameUpdateService = get_node("/root/GameUpdates")
+		if updates.state == GameUpdateService.State.INSTALLING: return
+		if updates.state in [GameUpdateService.State.DOWNLOADING, GameUpdateService.State.VERIFYING]: updates.cancel_download()
+		home_return_focus = &"updates"
 	if page == &"options": home_return_focus = &"settings"
 	_show_home()
+
+
+func _update_home_update() -> void:
+	if home == null or not is_instance_valid(home) or not home.actions.has(&"updates"): return
+	var updates: GameUpdateService = get_node("/root/GameUpdates")
+	var ready: bool = updates.state in [GameUpdateService.State.AVAILABLE, GameUpdateService.State.READY]
+	(home.actions[&"updates"] as Button).text = "Update zurückgesetzt" if updates.restored_update else ("Update verfügbar" if ready else "Updates")
+
+
+func _show_updates() -> void:
+	var updates: GameUpdateService = get_node("/root/GameUpdates")
+	if overlay or not updates.can_update(): return
+	page = &"updates"
+	_clear_rows()
+	menu_stage.visible = false
+	updates_view = MenuUpdates.new()
+	stage.present("Updates", updates_view, "", 680)
+	updates_view.configure(updates)
+	if not updates.changed.is_connected(_update_install_navigation): updates.changed.connect(_update_install_navigation)
+	_update_install_navigation()
+	updates.check_for_updates()
+
+
+func _update_install_navigation() -> void:
+	if page != &"updates": return
+	stage.back_button.disabled = get_node("/root/GameUpdates").state == GameUpdateService.State.INSTALLING
 
 
 func _compact_title(title: String) -> void:

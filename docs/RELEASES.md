@@ -1,10 +1,9 @@
 # Builds und Releases auf GitHub
 
 GitHub Actions baut die spielbaren Pakete. Lokal ist keine Exportumgebung nötig.
-Die erste Stufe umfasst Builds, Downloads, Release-Entwürfe und die Trennung von
-Test- und stabiler Webversion. `release.json` bildet die Grundlage für eine
-spätere Updateprüfung. Ein Updatebutton oder automatischer Installer im Spiel
-ist in dieser Stufe noch nicht enthalten.
+Die Pipeline umfasst Builds, Downloads, Release-Entwürfe und die Trennung von
+Test- und stabiler Webversion. Portable Windows-Builds können veröffentlichte
+Updates direkt im Hauptmenü laden und nach einem bewussten Neustart installieren.
 
 ## Ablauf
 
@@ -95,16 +94,81 @@ GitHub Pages wird wie bisher über Actions bereitgestellt. Die Workflows nutzen
 den eingebauten `GITHUB_TOKEN`; zusätzliche Zugangsschlüssel oder ein eigener
 Downloadserver sind nicht nötig. Das Paket ist derzeit nicht codesigniert.
 
-## Prüfung und nächste Stufe
+## Updater im Windows-Spiel
+
+Im Hauptmenü führt **Updates** zur installierten Version, Kanalwahl und einer
+einzigen Aktion. Eine verfügbare Version hebt den Menüeintrag dezent hervor.
+Der automatische Check läuft beim ersten Menübesuch, danach höchstens alle sechs
+Stunden innerhalb derselben Sitzung. **Erneut prüfen** übergeht dieses Intervall.
+Ohne Netzwerk oder bei GitHub-Limits bleibt das Spiel vollständig nutzbar.
+
+- **Stable** berücksichtigt nur veröffentlichte stabile Releases.
+- **Beta** berücksichtigt auch Vorabversionen; die höchste semantische Version
+  gewinnt, unabhängig von Veröffentlichungsreihenfolge oder alphabetischer Sortierung.
+- Es gibt keine automatischen Downgrades. Ein Entwicklungsbuild kann zur stabilen
+  Veröffentlichung derselben Basisversion wechseln. GitHub-Actions-Artefakte sind
+  keine Updatequelle; bis zur ersten Veröffentlichung gibt es keine Updates.
+- Editor, Browser, Linux und umbenannte Windows-EXEs aktivieren den Windows-Updater
+  nicht. Im Browser aktualisiert weiterhin das Webdeployment die Spielversion.
+
+**Herunterladen** zeigt Fortschritt und lässt sich abbrechen. Verlassen der
+Updateseite bricht einen laufenden Download ebenfalls ab. Das geprüfte Paket kann
+vor der Installation liegenbleiben, während man weiterspielt. **Installieren & neu
+starten** ist ausschließlich aus dem Hauptmenü erreichbar. Kämpfe und Pausenmenüs
+werden nie für Updates unterbrochen.
+
+### Prüfung, Austausch und Rückfall
+
+Die Prüfung verbindet GitHub-Release, Versions-Tag, Repository, Kanal,
+Speicherformat, Paketname, Downloadadresse, Dateigröße und SHA-256. Downloads
+kommen ausschließlich aus `othaldo/denti` auf GitHub. Der Dateihash wird in
+kleinen Abschnitten geprüft, damit das Menü weiter reagieren kann. Das ZIP darf
+genau `Denti.exe`, `Denti.pck` und `build-info.json` enthalten; die Buildkennung
+im Archiv muss zum Manifest passen.
+
+Der eingebaute Helfer nutzt Windows PowerShell 5.1 und .NET Framework; Python,
+ein zusätzlicher Installer und Administratorrechte sind nicht erforderlich.
+Der Spielordner muss beschreibbar sein. Verknüpfte Installations-/Cacheordner
+werden nicht automatisch verändert. Der Helfer prüft das Paket erneut, entpackt
+in einen eigenen Ordner auf demselben Laufwerk und meldet erst dann Bereitschaft.
+Er wartet auf das Ende des zugehörigen Denti-Prozesses und ersetzt die drei
+Dateien einzeln atomar, mit vollständigen Rückfallkopien.
+
+Die neue Version muss den erfolgreichen Aufbau ihres Hauptmenüs bestätigen.
+Schlägt ein Austausch fehl oder kommt keine Startbestätigung, werden die alten
+Dateien wiederhergestellt. Nach einem fehlgeschlagenen Neustart wird die alte
+Version erneut gestartet. Ein Sperrgriff verhindert parallele Installationen.
+Die wiederhergestellte Version zeigt den fehlgeschlagenen Versuch im Updatebereich;
+ein Hintergrundcheck überschreibt diese Rückmeldung nicht.
+Andere Dateien im Spielordner und sämtliche `user://`-Spielstände, Einstellungen
+und Freischaltungen werden vom Helfer nicht verändert.
+
+Nach Erfolg wird das Download-ZIP entfernt und genau eine vorherige Spielversion
+als Rückfallkopie behalten. `.denti-updater.json` verweist auf deren Ordner
+`.denti-update-…/backup`. Bei einem Stromausfall während des Austauschs bleiben
+bereits gesicherte Dateien dort erhalten; man kann sie bei beendetem Spiel
+zurückkopieren oder das komplette veröffentlichte ZIP erneut entpacken.
+Ein fehlgeschlagener Rückfall löscht seine Sicherungen nicht.
+
+Ändert eine zukünftige Version `RunStore.VERSION`, wird die automatische
+Installation vorerst mit einem Hinweis auf das andere Speicherformat gesperrt.
+Explizite Migrationen müssen implementiert und geprüft werden, bevor diese
+Sperre für ein neues Speicherformat geöffnet wird.
+
+Die erste Version mit diesem Updater muss einmal als vollständiges Windows-ZIP
+installiert werden. Ältere Pakete erhalten die neue Funktion nicht nachträglich.
+
+## Prüfung
 
 `python -m unittest discover -s tools/tests -v` prüft unter anderem Versions-Tags,
 Windows-Versionsdaten, lauffähige Archivstruktur, fehlende Exporte, Prüfsummen,
 beschädigte Pakete, erste Veröffentlichung, getrennte Webkanäle und abgelaufene
-Testartefakte. Die vorhandene Godot-Suite bleibt Teil jedes Builds.
+Testartefakte. Ein separater Windows-CI-Job führt den tatsächlichen PowerShell-
+Helfer gegen Wegwerf-Installationen aus: Austausch, gesperrte Datei, Rückfall,
+Prüfsummenfehler, Pfadmanipulation und vollständige Prozessübergabe mit und ohne
+Startbestätigung. Die vorhandene Godot-Suite prüft zusätzlich Kanalwahl,
+Versionsordnung, Manifestprüfung, Archive und responsive Updateansichten.
+Beide Testjobs müssen vor einem Release-Entwurf oder Webdeployment bestehen.
 
-Die nächste Stufe liest das veröffentlichte `release.json` im Spiel: verfügbare
-Version erkennen, stabile und Beta-Kanäle unterscheiden und einen passenden
-Download anbieten. Anschließend kann ein separater Updater Downloads prüfen
-und nach dem Beenden installieren. Spielstände, Migrationen und Wiederherstellung
-gehören zu dieser Installationsstufe; während eines Runs wird kein Austausch
-erzwungen.
+Native Ansichten: [Installation am Desktop](screenshots/updater/ready_1280x720.png)
+und [Download in schmaler Ansicht](screenshots/updater/downloading_360x640.png).

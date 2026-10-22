@@ -27,6 +27,7 @@ buses/default_bus_layout="res://assets/audio/audio_buses.tres"
 
 GameSession="*res://scripts/systems/game_session.gd"
 SceneTransitions="*res://scripts/ui/scene_transition.gd"
+GameUpdates="*res://scripts/systems/game_updates.gd"
 
 [denti]
 

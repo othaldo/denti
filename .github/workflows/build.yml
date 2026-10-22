@@ -16,6 +16,14 @@ concurrency:
   cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
 
 jobs:
+  windows-updater-tests:
+    name: Test Windows updater and rollback
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v6
+      - name: Exercise the native PowerShell installer
+        run: python -m unittest discover -s tools/tests -p test_windows_updater.py -v
+
   build:
     name: Test and export Web + Windows
     runs-on: ubuntu-24.04
@@ -77,7 +85,7 @@ jobs:
 
   draft-release:
     name: Create versioned release draft
-    needs: build
+    needs: [build, windows-updater-tests]
     if: startsWith(github.ref, 'refs/tags/v') && github.event_name == 'push'
     runs-on: ubuntu-24.04
     permissions:
@@ -105,7 +113,7 @@ jobs:
 
   deploy-dev:
     name: Publish web test build
-    needs: build
+    needs: [build, windows-updater-tests]
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-24.04
     permissions:

@@ -4,6 +4,7 @@ Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü an
 
 ## Noch ohne neue Versionsnummer — 22.10.2026
 
+- **Windows-Updater:** Stable/Beta-Prüfung im Hauptmenü, abbrechbarer Download, Paketprüfung und „Installieren & neu starten“. Austausch erst nach Spielende; fehlgeschlagene Dateiersetzung oder fehlende Startbestätigung stellen die bisherige Version wieder her. Spielstände bleiben außerhalb des Austauschs. Native Windows-Tests prüfen den Helfer samt Prozessübergabe und Rückfall. [Ablauf](docs/RELEASES.md#updater-im-windows-spiel).
 - **GitHub-Builds und Releases:** automatische Web-/Windows-Pakete, herunterladbare Testbuilds, versionierte Release-Entwürfe, Prüfsummen und Update-Manifeste. Stabile Webversion und `/dev/` sind ab dem ersten veröffentlichten Release getrennt. [Ablauf](docs/RELEASES.md).
 - **Gauner hält länger durch und sammelt im Laufen:** deutlich stärkere Gesundheitskurve; nahe Münzstapel werden alle 0,12 Sekunden gemeinsam eingesackt, auch beim Fliehen. Sammelpriorität für Denti und Beutellimit bleiben erhalten. Vergleich in Welle 11 auf Normal mit fünf Mk-III-Waffen: etwa 4,8 statt 1,8 Sekunden Lebensdauer.
 - **Seltenheit wieder sichtbar:** Aufstiege, Itemfunde, Relikte und Kapselangebote tragen Farbkanten und getönte Flächen. Shop, Ausrüstung, Besitz und Dentikon verwenden dieselbe Zuordnung. Auswahl erhält die Seltenheitsfarbe; Ersatzoptionen haben keine doppelten Farbrahmen. Waffenwerte zeigen ihre eigene Rollqualität unabhängig vom Mk-Rahmen. [Native Ansichten](docs/RARITY_UI.md).
