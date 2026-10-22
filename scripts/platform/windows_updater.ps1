@@ -186,6 +186,7 @@ function Invoke-DentiUpdate([string]$Path) {
         Write-UpdateStatus $job 'complete'
     } catch {
         $detail = $_.Exception.Message
+        [Console]::Error.WriteLine($detail)
         if ($null -ne $job) {
             try {
                 if ($installed) {

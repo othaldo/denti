@@ -145,7 +145,10 @@ File.WriteAllText(Path.Combine(Path.GetDirectoryName(args[2]), "status.json"), "
                     status = json.loads((self.work / 'status.json').read_text(encoding='utf-8-sig'))
                     if status['state'] == 'ready': break
                 except (OSError, ValueError): pass
-                if helper.poll() is not None: self.fail('helper exited before ready: ' + (self.work / 'helper.log').read_text())
+                if helper.poll() is not None:
+                    status_path = self.work / 'status.json'
+                    diagnostic = status_path.read_text(encoding='utf-8-sig') if status_path.exists() else 'no status written'
+                    self.fail('helper exited before ready: ' + diagnostic + '\n' + (self.work / 'helper.log').read_text())
                 time.sleep(.05)
             else: self.fail('helper did not prepare the update')
             # No installation may happen while the original game is still running.
