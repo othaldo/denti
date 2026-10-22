@@ -49,6 +49,9 @@ und werden 14 Tage aufbewahrt. Dafür ist eine GitHub-Anmeldung erforderlich.
 Veröffentlichte Release-Dateien sind die dauerhaften Downloadadressen.
 Testlogs bleiben sieben Tage erhalten.
 
+Entwicklungsscreenshots, Dokumentation, Tests und Vorschauwerkzeuge bleiben aus
+beiden Spielepaketen ausgeschlossen.
+
 ## Ein Release erstellen
 
 1. Gewünschten Stand auf `main` prüfen. Basisversion in
