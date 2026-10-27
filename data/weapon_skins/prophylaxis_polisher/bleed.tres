@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="WeaponSkinData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_skin_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/weapons/element_forms/prophylaxis_polisher/bleed.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/weapons/element_forms/prophylaxis_polisher/bleed_body.png" id="3"]
+[ext_resource type="Texture2D" path="res://assets/weapons/element_forms/prophylaxis_polisher/bleed_head.png" id="4"]
+
+[sub_resource type="AtlasTexture" id="Icon_skin"]
+atlas = ExtResource("2")
+region = Rect2(57, 22, 398, 470)
+filter_clip = true
+
+[resource]
+script = ExtResource("1")
+grip_anchor = Vector2(0.237599, 0.775426)
+tip_anchor = Vector2(0.810849, 0.146182)
+working_head_radius = 0.076282
+working_head_aspect = 0.617021
+working_head_angle_degrees = -15
+sprite = SubResource("Icon_skin")
+held_sprite = ExtResource("3")
+working_head_texture = ExtResource("4")

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="WeaponSkinData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_skin_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/weapons/element_forms/floss_whip/fire.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/weapons/element_forms/floss_whip/fire_left_grip.png" id="3"]
+
+[sub_resource type="AtlasTexture" id="Icon_skin"]
+atlas = ExtResource("2")
+region = Rect2(36, 31, 445, 452)
+filter_clip = true
+
+[resource]
+script = ExtResource("1")
+grip_anchor = Vector2(0.188497, 0.780586)
+tip_anchor = Vector2(0.802327, 0.285367)
+floss_left_tip = Vector2(0.322266, 0.271484)
+sprite = SubResource("Icon_skin")
+held_sprite = ExtResource("2")
+floss_left_texture = ExtResource("3")

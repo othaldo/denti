@@ -8,6 +8,7 @@ var listing: VBoxContainer
 var detail: VBoxContainer
 var split: BoxContainer
 var list_scroll: ScrollContainer
+var detail_scroll: ScrollContainer
 var toolbar: BoxContainer
 var entries: Array[Dictionary] = []
 var selected: Dictionary = {}
@@ -35,7 +36,7 @@ func _ready() -> void:
 	listing.mouse_filter = Control.MOUSE_FILTER_PASS
 	listing.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	list_scroll.add_child(listing)
-	var detail_scroll := _scroll(split)
+	detail_scroll = _scroll(split)
 	detail = VBoxContainer.new()
 	detail.mouse_filter = Control.MOUSE_FILTER_PASS
 	detail.add_theme_constant_override("separation", 10)
@@ -58,7 +59,10 @@ func _scroll(parent: Node) -> ScrollContainer:
 func _layout() -> void:
 	toolbar.vertical = size.x < 400
 	split.vertical = size.x < 620 and get_viewport_rect().size.y >= 420
-	list_scroll.custom_minimum_size = Vector2(0 if split.vertical else (160 if size.x < 620 else 210), 115 if split.vertical else 0)
+	var short_list := split.vertical and listing.get_child_count() <= 2
+	var list_height := minf(115, maxf(48, listing.get_child_count() * 52)) if split.vertical else 0.0
+	list_scroll.custom_minimum_size = Vector2(0 if split.vertical else (160 if size.x < 620 else 210), list_height)
+	list_scroll.size_flags_vertical = Control.SIZE_SHRINK_BEGIN if short_list else Control.SIZE_EXPAND_FILL
 	list_scroll.size_flags_stretch_ratio = 0.55 if split.vertical else 0.65
 
 func _clear(parent: Node) -> void:
@@ -80,6 +84,7 @@ func _refresh() -> void:
 		var button := Button.new()
 		button.mouse_filter = Control.MOUSE_FILTER_PASS
 		button.text = entry.title
+		button.tooltip_text = entry.title
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.clip_text = true
 		button.custom_minimum_size.y = 48
@@ -108,6 +113,7 @@ func _refresh() -> void:
 				silhouette.position = Vector2(8, 6)
 		button.pressed.connect(_show.bind(entry))
 	_show(first)
+	_layout()
 
 func _image(parent: Node, texture: Texture2D, locked: bool, extent: int) -> TextureRect:
 	var icon := TextureRect.new()
@@ -128,6 +134,7 @@ func _image(parent: Node, texture: Texture2D, locked: bool, extent: int) -> Text
 
 func _show(entry: Dictionary) -> void:
 	_clear(detail)
+	detail_scroll.scroll_vertical = 0
 	selected = entry
 	for button in listing.get_children():
 		button.set_pressed_no_signal(button.get_meta("entry") == entry)
@@ -137,12 +144,15 @@ func _show(entry: Dictionary) -> void:
 	var header := HBoxContainer.new()
 	detail.add_child(header)
 	var compact := get_viewport_rect().size.y < 420
+	var art: TextureRect
 	if entry.has("icon"):
-		_image(header, entry.icon, entry.get("locked", false), 40 if compact else 80)
+		art = _image(header, entry.icon, entry.get("locked", false), 40 if compact else 80)
 	var title := DentiUIComponents.label(header, entry.title, 18 if compact else 22)
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if entry.get("evolved", false):
 		title.add_theme_color_override("font_color", WeaponPresentation.EVOLUTION_COLOR)
+	if entry.has("weapon_data"):
+		_forms(entry.weapon_data, art, title)
 	if entry.has("rarity_tier"):
 		var rarity := DentiUIComponents.label(detail, str(entry.get("rarity_caption", DentiRarity.name_for(int(entry.rarity_tier)))), 13)
 		DentiUIStyle.style_affix_rarity_label(rarity, int(entry.rarity_tier))
@@ -161,3 +171,35 @@ func _show(entry: Dictionary) -> void:
 			_image(cell, ingredient.icon, false, 52)
 			DentiUIComponents.label(cell, ingredient.title, 14).custom_minimum_size.x = 115
 		DentiUIComponents.label(detail, "→ " + str(entry.title) + "\nItems bleiben erhalten; die beteiligten Waffen werden ersetzt.", 16)
+
+
+func _forms(data: WeaponData, art: TextureRect, title: Label) -> void:
+	if data.element_skins.is_empty(): return
+	var forms := HFlowContainer.new()
+	forms.add_theme_constant_override("h_separation", 4)
+	forms.add_theme_constant_override("v_separation", 4)
+	detail.add_child(forms)
+	var group := ButtonGroup.new()
+	var elements: Array[StringName] = [&""]
+	elements.append_array(WeaponElementVisuals.ELEMENTS)
+	for element in elements:
+		var button := Button.new()
+		DentiUIStyle.style_button(button)
+		button.add_theme_font_size_override("font_size", 14)
+		button.custom_minimum_size = Vector2(40, 36)
+		button.mouse_filter = Control.MOUSE_FILTER_PASS
+		button.toggle_mode = true
+		button.button_group = group
+		button.set_meta("element", element)
+		button.set_pressed_no_signal(element == &"")
+		var name := "Normal" if element == &"" else WeaponAffixes.by_id(element).display_name
+		button.text = "Normal" if element == &"" else ""
+		button.icon = data.sprite if element == &"" else DentiUIIcons.item(WeaponAffixes.by_id(element).icon_index)
+		button.expand_icon = true
+		button.add_theme_constant_override("icon_max_width", 20)
+		button.tooltip_text = name + "form ansehen · Basiswerte bleiben gleich"
+		forms.add_child(button)
+		button.pressed.connect(func() -> void:
+			art.texture = WeaponSkins.with_element(data, element).sprite
+			title.text = data.display_name + ("" if element == &"" else " · " + name)
+		)

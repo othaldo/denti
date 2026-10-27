@@ -12,4 +12,4 @@ late_health_acceleration = 0.36
 move_speed = 82.0
 coin_drop_chance = 1.0
 sprite = ExtResource("2")
-affix_resistances = {"fire": 0.25}
+affix_resistances = {"fire": 0.25, "wet": -0.25}

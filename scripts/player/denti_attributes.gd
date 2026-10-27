@@ -20,7 +20,7 @@ const MEANINGS: Array[String] = [
 	"Regenerationspunkte und Heilung pro Sekunde", "Bewegungstempo", "Glück bei Beute und Seltenheiten",
 	"Zusätzlicher Nahschaden nach Waffenskalierung", "Zusätzlicher Fernschaden nach Waffenskalierung",
 	"Chance, einem Treffer auszuweichen; maximal 60 %. Bewahrt Schildladungen.",
-	"Maximale Ausdauer. Ein Dash kostet 100 Wurzelkraft. Der gesamte Vorrat lädt in 4 Sekunden nach; mehr Wurzelkraft erhöht auch die Nachladerate. Maximal 500. Zwischen Dashes gilt ein Cooldown. Keine zusätzlichen Schutzframes.",
+	"Maximale Ausdauer, bis 500. Ein Dash kostet 100 Wurzelkraft. Ein größerer Vorrat speichert mehr Dashes; die Regeneration pro Sekunde bleibt gleich. Zwischen Dashes gilt ein kurzer Cooldown. Keine zusätzlichen Schutzframes.",
 ]
 const ICONS: Array[int] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 const ACTIVE: Array[Type] = [Type.DAMAGE, Type.ARMOR, Type.MAX_HEALTH, Type.ATTACK_SPEED,

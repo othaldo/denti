@@ -33,6 +33,7 @@ var focus_target_id: int = 0
 var focus_hits: int = 0
 var focus_time: float = 0.0
 var evolution: WeaponEvolutionEffects
+var floss_cut: WeaponFlossCut
 
 
 func configure(weapon: WeaponData, weapon_tier: int = 1) -> void:
@@ -46,7 +47,9 @@ func _ready() -> void:
 	player = get_parent().get_parent() as Player
 	if data.attack_mode == &"cone":
 		AttackEffects.prepare_spray(data.arc_degrees)
+		WeaponElementVisuals.prepare_spray(data.element_skin, data.arc_degrees)
 	sprite = Sprite2D.new()
+	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	sprite.texture = data.held_texture()
 	sprite.offset = (Vector2(0.5, 0.5) - data.grip_anchor) * data.held_texture().get_size()
 	add_child(sprite)
@@ -55,7 +58,6 @@ func _ready() -> void:
 		CombatDiagnostics.instrument(evolution, "evolution", self)
 		evolution.weapon = self
 		add_child(evolution)
-		sprite.modulate = Color(1.12, 1.04, 1.18)
 	if data.working_head_texture != null:
 		working_head = WeaponWorkingHead.new()
 		working_head.configure(data)
@@ -64,6 +66,7 @@ func _ready() -> void:
 		elastic = WeaponElastic.new()
 		elastic.configure(data)
 		sprite.add_child(elastic)
+	_refresh_floss_cut()
 	z_index = 1
 	update_visual()
 
@@ -108,6 +111,8 @@ func update_visual() -> void:
 	sprite.scale = pose_data.scale
 	if elastic != null:
 		elastic.set_progress(progress())
+	if floss_cut != null:
+		floss_cut.set_pose(pose_data, progress(), idle_time, visual_density)
 	# Denti's face stays readable even when a rear hand thrusts across the body.
 	z_index = -1 if WeaponMotion.is_contact(data) or sprite.position.y < -12.0 else 1
 
@@ -183,7 +188,7 @@ func _begin_attack(targets: Array[Enemy]) -> void:
 	elif not evolution_attack:
 		_fire(targets, damage, critical)
 	var sound_kind: StringName = &"brush"
-	if data.attack_mode in [&"area", &"sweep"]:
+	if data.attack_animation == "floss_cut" or data.attack_mode in [&"area", &"sweep"]:
 		sound_kind = &"floss"
 	elif data.attack_mode in [&"melee", &"thrust"]:
 		sound_kind = &"drill"
@@ -264,9 +269,11 @@ func restore_motion(saved: Dictionary, enemies: Array[Node]) -> void:
 
 
 func _draw() -> void:
+	if data != null and data.attack_animation == "floss_cut": return
+	var element := data.element_skin if data != null else &""
 	if data != null and data.evolution_kind != &"" and sprite != null:
 		var center := to_local(muzzle_position())
-		draw_arc(center, 10, idle_time * 2, idle_time * 2 + TAU * 0.8, 24, Color(data.projectile_color, 0.6), 2)
+		draw_arc(center, 10, idle_time * 2, idle_time * 2 + TAU * 0.8, 24, Color(WeaponElementVisuals.color(element, data.projectile_color), 0.6), 2)
 	if attack_time <= 0.0 or sprite == null:
 		return
 	if data.evolution_kind == &"revelation":
@@ -279,28 +286,64 @@ func _draw() -> void:
 		if fraction < WeaponMotion.ACTIVE_START:
 			return
 		var blade := WeaponMotion.segment(data, WeaponMotion.pose(data, tier, home_position, aim, fraction, idle_time, aim_distance, visual_density))
-		AttackEffects.strip(self, AttackEffects.Shape.THREAD, blade[0], blade[1], 9.0, Color(color, fade * 0.35), idle_time)
+		WeaponElementVisuals.strip(self, element, AttackEffects.Shape.THREAD, blade[0], blade[1], 9.0, Color(color, fade * 0.35), idle_time)
 		if data.attack_animation in ["drill", "polish"]:
-			AttackEffects.flash(self, muzzle, 10.0, Color(color, fade * 0.65), idle_time)
+			WeaponElementVisuals.flash(self, element, muzzle, 10.0, Color(color, fade * 0.65), idle_time)
 		else:
 			var previous := WeaponMotion.segment(data, WeaponMotion.pose(data, tier, home_position, aim, maxf(fraction - 0.06, WeaponMotion.ACTIVE_START), idle_time, aim_distance, visual_density))
-			AttackEffects.strip(self, AttackEffects.Shape.SLASH, previous[1], blade[1], 16.0, Color(color, fade * 0.65), idle_time)
+			WeaponElementVisuals.strip(self, element, AttackEffects.Shape.SLASH, previous[1], blade[1], 16.0, Color(color, fade * 0.65), idle_time)
 		return
 	match data.attack_mode:
 		&"projectile":
 			if fraction < 0.25:
-				AttackEffects.flash(self, muzzle, (1.0 - fraction / 0.25) * 15.0, color, idle_time)
+				WeaponElementVisuals.flash(self, element, muzzle, (1.0 - fraction / 0.25) * 15.0, color, idle_time)
 		&"beam":
 			var end := to_local(beam_segment()[1])
-			AttackEffects.strip(self, AttackEffects.Shape.BEAM, muzzle, end, 40.0, Color(1, 1, 1, fade), idle_time)
-			AttackEffects.flash(self, end, 15.0, Color(1, 0.98, 0.83, fade), idle_time)
+			WeaponElementVisuals.strip(self, element, AttackEffects.Shape.BEAM, muzzle, end, 40.0, Color(1, 1, 1, fade), idle_time)
+			WeaponElementVisuals.flash(self, element, end, 15.0, Color(1, 0.98, 0.83, fade), idle_time)
 		&"beam_line":
 			var end := to_local(beam_segment()[1])
-			AttackEffects.strip(self, AttackEffects.Shape.UV, muzzle, end, data.attack_width * 1.5, Color(1, 1, 1, fade), idle_time)
-			AttackEffects.flash(self, muzzle, data.attack_width * 0.7, color, idle_time)
+			WeaponElementVisuals.strip(self, element, AttackEffects.Shape.UV, muzzle, end, data.attack_width * 1.5, Color(1, 1, 1, fade), idle_time)
+			WeaponElementVisuals.flash(self, element, muzzle, data.attack_width * 0.7, color, idle_time)
 		&"cone":
-			AttackEffects.spray(self, muzzle, aim, data.range_at_tier(tier), data.arc_degrees, Color(1, 1, 1, fade * 0.85), idle_time)
+			WeaponElementVisuals.spray(self, element, muzzle, aim, data.range_at_tier(tier), data.arc_degrees, Color(1, 1, 1, fade * 0.85), idle_time)
 
 
 func refresh_affix_stats() -> void:
+	WeaponUpgrades.refresh(affixes, data, tier)
 	data = WeaponRolls.with_affixes(data, affixes)
+	refresh_skin()
+
+
+func refresh_skin() -> void:
+	if data.attack_mode == &"cone":
+		WeaponElementVisuals.prepare_spray(data.element_skin, data.arc_degrees)
+	if sprite == null:
+		return
+	sprite.texture = data.held_texture()
+	sprite.offset = (Vector2(0.5, 0.5) - data.grip_anchor) * sprite.texture.get_size()
+	if working_head != null:
+		var angle := working_head.spin_angle
+		working_head.free()
+		working_head = WeaponWorkingHead.new()
+		working_head.configure(data)
+		sprite.add_child(working_head)
+		working_head.advance(angle)
+	if elastic != null:
+		elastic.free()
+		elastic = WeaponElastic.new()
+		elastic.configure(data)
+		sprite.add_child(elastic)
+	_refresh_floss_cut()
+	update_visual()
+
+
+func _refresh_floss_cut() -> void:
+	if floss_cut != null:
+		floss_cut.free()
+		floss_cut = null
+	sprite.visible = data.attack_animation != "floss_cut"
+	if data.attack_animation == "floss_cut":
+		floss_cut = WeaponFlossCut.new()
+		floss_cut.configure(data)
+		add_child(floss_cut)

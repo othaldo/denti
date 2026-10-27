@@ -18,28 +18,32 @@ static func circle_fraction(start: Vector2, travel: Vector2, centre: Vector2, ra
 static func move(player: Player, travel: Vector2, seconds: float) -> bool:
 	var start := player.global_position
 	var destination := (start + travel).clamp(Vector2.ONE * DentiArena.PLAYER_MARGIN, player.arena.arena_size - Vector2.ONE * DentiArena.PLAYER_MARGIN)
-	var movement := destination - start
-	var first := INF
-	var obstacle: Enemy
-	var candidates := player.enemies_on_segment(start, destination, CONTACT_RADIUS)
+	var wall := player.move_and_collide(destination - start)
+	var movement := player.global_position - start
+	var used := seconds * minf(movement.length() / travel.length(), 1.0) if not travel.is_zero_approx() else 0.0
+	var candidates := player.enemies_on_segment(start, player.global_position, CONTACT_RADIUS)
 	# A locked enemy charge can enter the path from outside the spatial query.
 	# Sweep relative motion as well, rather than treating that body as static.
 	if is_instance_valid(player.enemy_index):
 		for enemy in player.enemy_index.shadow_batch.enemies:
-			if enemy.health > 0 and not enemy.is_queued_for_deletion() and not _charge_movement(enemy, seconds).is_zero_approx() and not candidates.has(enemy):
+			if enemy.health > 0 and not enemy.is_queued_for_deletion() and not _charge_movement(enemy, used).is_zero_approx() and not candidates.has(enemy):
 				candidates.append(enemy)
+	var contacts: Array[Dictionary] = []
 	for enemy in candidates:
-		var relative := movement - _charge_movement(enemy, seconds)
+		if enemy.health <= 0 or enemy.is_queued_for_deletion(): continue
+		var relative := movement - _charge_movement(enemy, used)
 		var fraction := circle_fraction(start, relative, enemy.global_position, enemy.data.radius + CONTACT_RADIUS)
-		if fraction < first:
-			first = fraction
-			obstacle = enemy
-	if obstacle != null:
-		destination = start + movement * maxf(first - 0.0001, 0.0)
-	var wall := player.move_and_collide(destination - start)
-	if wall == null and is_instance_valid(obstacle):
-		obstacle.try_contact_hit()
-	return wall != null or obstacle != null or not destination.is_equal_approx(start + travel)
+		if fraction != INF:
+			contacts.append({"enemy": enemy, "fraction": fraction})
+	# Touch every crossed body in travel order, without letting bodies shorten
+	# the dash. Existing per-enemy cooldowns, shields and player i-frames still apply.
+	contacts.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return a.enemy.spatial_order < b.enemy.spatial_order if is_equal_approx(a.fraction, b.fraction) else a.fraction < b.fraction)
+	for contact in contacts:
+		if player.stats.health <= 0: break
+		var enemy: Enemy = contact.enemy
+		if is_instance_valid(enemy): enemy.try_contact_hit(true)
+	return wall != null or not destination.is_equal_approx(start + travel)
 
 static func _charge_movement(enemy: Enemy, seconds: float) -> Vector2:
 	if enemy.caramel_encounter != null:

@@ -1,0 +1,271 @@
+{
+  "schema_version": 1,
+  "weapon_id": "turbo_drill",
+  "display_name": "Turbo-Bohrer",
+  "canvas": {
+    "width": 1024,
+    "height": 1536,
+    "format": "PNG",
+    "mode": "RGBA",
+    "background": "transparent"
+  },
+  "reference": "assets/weapons/turbo_drill.png",
+  "prompts": "prompts.json",
+  "normal_provenance": "generated portrait-format interpretation of the original; not a pixel-identical copy",
+  "preview_region": [
+    0,
+    80,
+    1024,
+    1400
+  ],
+  "preview_size_px": 60,
+  "approximate_grip_anchor": [
+    0.19,
+    0.71
+  ],
+  "approximate_tip_anchor": [
+    0.96,
+    0.32
+  ],
+  "status": "complete_for_review",
+  "integrated_into_game": true,
+  "variants": [
+    {
+      "id": "normal",
+      "label": "Normal",
+      "description": "Normalform",
+      "file": "normal.png",
+      "sha256": "d0b13205096ae31d044cd9b503af5e65120b72c9245514b0449d93ab17e560bd",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        21,
+        260,
+        1007,
+        1305
+      ],
+      "solid_bounds_alpha128": [
+        22,
+        261,
+        1007,
+        1304
+      ],
+      "button_centroid_px": [
+        382.8,
+        693.3
+      ],
+      "source": "imagegen:exec-bcddc72f-b9dc-4323-89bb-670b7273f3ef.png",
+      "origin": "built_in_imagegen_edit",
+      "button_shift_px": 0.0
+    },
+    {
+      "id": "fire",
+      "label": "Feuer",
+      "description": "Glutgehäuse",
+      "file": "fire.png",
+      "sha256": "cf4f279a8eba0a342dba56c696f2530b6b25a88cdc3b9152effe73ce0195c6a9",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        21,
+        180,
+        1007,
+        1306
+      ],
+      "solid_bounds_alpha128": [
+        22,
+        181,
+        1006,
+        1305
+      ],
+      "button_centroid_px": [
+        382.3,
+        690.5
+      ],
+      "source": "imagegen:exec-a1fc36ce-5fea-47ea-9d5d-19266a1746d0.png",
+      "origin": "built_in_imagegen_edit",
+      "button_shift_px": 2.84
+    },
+    {
+      "id": "ice",
+      "label": "Eis",
+      "description": "Kristallkopf",
+      "file": "ice.png",
+      "sha256": "bf9089cd924b163be99fc730bc7036a97bfe67d32dcc5e2b2c58e8d5cb5e5eb9",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        22,
+        156,
+        1007,
+        1305
+      ],
+      "solid_bounds_alpha128": [
+        22,
+        156,
+        1006,
+        1304
+      ],
+      "button_centroid_px": [
+        383.0,
+        694.4
+      ],
+      "source": "imagegen:exec-616e0a10-0ce5-4e47-a743-2ecfa29b5a33.png",
+      "origin": "built_in_imagegen_edit",
+      "button_shift_px": 1.12
+    },
+    {
+      "id": "poison",
+      "label": "Gift",
+      "description": "Gifttank",
+      "file": "poison.png",
+      "sha256": "0a630ffbd451ed4fc3ddaceed0e782cae774ef4f756096c3e36b3b30be574c0a",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        22,
+        216,
+        1009,
+        1305
+      ],
+      "solid_bounds_alpha128": [
+        22,
+        216,
+        1009,
+        1305
+      ],
+      "button_centroid_px": [
+        381.3,
+        688.3
+      ],
+      "source": "imagegen:exec-1b12bdd8-27b9-4f47-99bf-73b2edee1356.png",
+      "origin": "built_in_imagegen_edit",
+      "button_shift_px": 5.22
+    },
+    {
+      "id": "electric",
+      "label": "Elektro",
+      "description": "Blitzspule",
+      "file": "electric.png",
+      "sha256": "f760f583c0e6cfc08665f5ba9ea76eaf03f41c06d3443523f57b149a9cd7b7a1",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        23,
+        211,
+        1007,
+        1306
+      ],
+      "solid_bounds_alpha128": [
+        23,
+        211,
+        1006,
+        1305
+      ],
+      "button_centroid_px": [
+        384.4,
+        692.7
+      ],
+      "source": "imagegen:exec-935babe3-2199-489f-8fd4-fa5b1ad82e43.png",
+      "origin": "built_in_imagegen_edit",
+      "button_shift_px": 1.71
+    },
+    {
+      "id": "bleed",
+      "label": "Blut",
+      "description": "Rubin & Dornen",
+      "file": "bleed.png",
+      "sha256": "1cd0b0075ed3902ca1cfe7068ffe0c8f7d2fbdc91a147c40ac7fa8dd25f9f0b6",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        22,
+        229,
+        1006,
+        1304
+      ],
+      "solid_bounds_alpha128": [
+        22,
+        230,
+        1006,
+        1303
+      ],
+      "button_centroid_px": [
+        381.6,
+        690.8
+      ],
+      "source": "imagegen:exec-b24c68a5-4be8-4ea3-8d3d-be4a08c7cf91.png",
+      "origin": "built_in_imagegen_edit",
+      "button_shift_px": 2.77
+    },
+    {
+      "id": "wet",
+      "label": "Wasser",
+      "description": "Wasserkammer",
+      "file": "wet.png",
+      "sha256": "1dad75656403d33bcbae7ad7e8f4874a47cbaecbbfefa30dbb505f4aeb137a6c",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        22,
+        199,
+        1007,
+        1305
+      ],
+      "solid_bounds_alpha128": [
+        22,
+        199,
+        1006,
+        1305
+      ],
+      "button_centroid_px": [
+        382.5,
+        693.0
+      ],
+      "source": "imagegen:exec-f6ca4641-97d3-4831-929e-06951fe5eb9e.png",
+      "origin": "built_in_imagegen_edit",
+      "button_shift_px": 0.42
+    }
+  ],
+  "visual_review": {
+    "method": "Godot comparison sheet at shared crop and native sprite scale",
+    "screenshot": "docs/screenshots/weapon_elements/turbo_drill_complete_pack.png"
+  },
+  "runtime": {
+    "weapon_resource": "data/weapons/turbo_drill.tres",
+    "skin_resources": "data/weapon_skins/turbo_drill/",
+    "textures": "assets/weapons/element_forms/turbo_drill/",
+    "canvas": [
+      512,
+      512
+    ],
+    "source_paintings_preserved": true,
+    "documentation": "docs/WEAPON_SKINS.md"
+  },
+  "integration_notes": [
+    "Runtime sprites share the source crop and rig per weapon; UI icons use centered per-form regions.",
+    "Element forms follow each instance through upgrades, fusion, evolution and resume.",
+    "Existing projectile art and evolution effects are retained."
+  ]
+}

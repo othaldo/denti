@@ -13,6 +13,7 @@ const ALL: Array[WeaponAffixData] = [
 	preload("res://data/affixes/electric.tres"),
 	preload("res://data/affixes/range.tres"), preload("res://data/affixes/tempo.tres"),
 	preload("res://data/affixes/wet.tres"), preload("res://data/affixes/holy.tres"), preload("res://data/affixes/leech.tres"),
+	preload("res://data/affixes/crit.tres"), preload("res://data/affixes/crit_damage.tres"), preload("res://data/affixes/knockback.tres"),
 ]
 
 
@@ -21,6 +22,17 @@ static func by_id(id: StringName) -> WeaponAffixData:
 		if affix.id == id:
 			return affix
 	return null
+
+
+static func element(values: Array[Dictionary]) -> StringName:
+	# Old mixed-element saves retain all their investments. Their strongest
+	# element supplies the identity; new choices cannot add another element.
+	var strongest: Dictionary = {}
+	for entry in values:
+		var definition := by_id(StringName(entry.id))
+		if definition == null or not definition.elemental: continue
+		if strongest.is_empty() or nominal(entry) > nominal(strongest): strongest = entry
+	return StringName(strongest.id) if not strongest.is_empty() else &""
 
 
 static func sanitize(values: Array) -> Array[Dictionary]:
@@ -32,6 +44,10 @@ static func sanitize(values: Array) -> Array[Dictionary]:
 		if not is_finite(damage) or damage <= 0.0:
 			continue
 		var entry := {"id": str(value.id), "damage": damage, "rarity": clampi(int(value.get("rarity", 1)), 1, 4), "stacks": maxi(int(value.get("stacks", 1)), 1), "rank": clampi(int(value.get("rank", 1)), 1, MAX_RANK), "bonus": maxf(float(value.get("bonus", 0)), 0), "progress": clampf(float(value.get("progress", 0)), 0, 0.999999)}
+		if value.has("level"):
+			entry["level"] = clampi(int(value.level), 1, WeaponUpgrades.MAX_LEVEL)
+			var floor_value := float(value.get("legacy_floor", 0))
+			entry["legacy_floor"] = maxf(floor_value, 0) if is_finite(floor_value) else 0.0
 		var index := find(result, StringName(entry.id))
 		if index >= 0:
 			result[index] = merge_entries(result[index], entry)
@@ -56,7 +72,9 @@ static func progress_weight(current: Dictionary, option: Dictionary) -> float:
 
 
 static func nominal(value: Dictionary) -> float:
-	var rarity := int(value.rarity)
+	if value.has("level"):
+		return by_id(StringName(value.id)).upgrade_steps[WeaponUpgrades.level(value) - 1]
+	var rarity := int(value.get("rarity", 1))
 	var rank := int(value.get("rank", 1))
 	var base := rank_damage(StringName(value.id), rarity, rank) + float(value.get("bonus", 0))
 	var next := rank_damage(StringName(value.id), rarity, rank + 1) if rank < MAX_RANK else (rank_damage(StringName(value.id), rarity + 1) if rarity < 4 else base + LEGENDARY_BONUS)
@@ -87,6 +105,11 @@ static func upgraded(current: Dictionary, option: Dictionary) -> Dictionary:
 
 
 static func merge_entries(first: Dictionary, second: Dictionary) -> Dictionary:
+	if first.has("level") or second.has("level"):
+		return {"id": str(first.id), "level": mini(WeaponUpgrades.level(first) + WeaponUpgrades.level(second), WeaponUpgrades.MAX_LEVEL),
+			"damage": maxf(float(first.damage), float(second.damage)), "rarity": 1, "rank": 1, "progress": 0.0, "bonus": 0.0,
+			"stacks": int(first.get("stacks", 1)) + int(second.get("stacks", 1)),
+			"legacy_floor": maxf(float(first.get("legacy_floor", 0)) if first.has("level") else float(first.damage), float(second.get("legacy_floor", 0)) if second.has("level") else float(second.damage))}
 	var primary := first if int(first.rarity) >= int(second.rarity) else second
 	var other := second if primary == first else first
 	var result := primary.duplicate(true)
@@ -138,6 +161,8 @@ static func roll_chest(wave: int, luck: float, loadout: WeaponLoadout, golden: b
 
 
 static func sanitize_chest(value: Dictionary) -> Dictionary:
+	if value.get("kind", "") == WeaponUpgrades.KIND:
+		return {"kind": WeaponUpgrades.KIND, "points": 1, "golden": bool(value.get("golden", false)), "scrap_coins": maxi(int(value.get("scrap_coins", 1)), 1)}
 	if value.get("kind", "") != "affix":
 		return {}
 	var options: Array[Dictionary] = []
@@ -180,6 +205,7 @@ static func apply(weapon: WeaponInstance, option: Dictionary, replace: int = -1)
 		var upgrades := weapon.data.chest_upgrades.duplicate(true)
 		upgrades["mk"] = int(upgrades.get("mk", 0)) + 1
 		weapon.data = WeaponRolls.resolve(weapon.data, weapon.data.rolls, upgrades)
+		weapon.refresh_affix_stats()
 		return true
 	var index := find(weapon.affixes, StringName(option.id))
 	if index >= 0:

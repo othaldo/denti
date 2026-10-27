@@ -29,4 +29,4 @@ attack_speed = 600.0
 attack_duration = 0.85
 attack_damage = 13.0
 dash_impact_radius = 76.0
-affix_resistances = {"bleed": 0.35}
+affix_resistances = {"bleed": 0.35, "wet": -0.5}

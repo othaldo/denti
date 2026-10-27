@@ -1,0 +1,270 @@
+{
+  "schema_version": 1,
+  "weapon_id": "uv_lamp",
+  "display_name": "UV-Lampe",
+  "canvas": {
+    "width": 1024,
+    "height": 1536,
+    "format": "PNG",
+    "mode": "RGBA",
+    "background": "transparent"
+  },
+  "reference": "assets/weapons/weapon_icons_expansion.png",
+  "reference_resource": "data/weapons/uv_lamp.tres",
+  "reference_atlas_region": [
+    0,
+    397,
+    397,
+    396
+  ],
+  "normal_provenance": "generated portrait-format interpretation of the original atlas image; not a pixel-identical copy",
+  "prompts": "prompts.json",
+  "preview_region": [
+    0,
+    230,
+    1024,
+    1050
+  ],
+  "preview_size_px": 65,
+  "status": "complete_for_review",
+  "integrated_into_game": true,
+  "variants": [
+    {
+      "id": "normal",
+      "label": "Normal",
+      "description": "Violette UV-Kammer",
+      "file": "normal.png",
+      "sha256": "9aec011137bd6f928bcea7628abcce736f6695f5d3807cee29cb8da8c62da9a9",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        88,
+        408,
+        1003,
+        1209
+      ],
+      "solid_bounds_alpha128": [
+        89,
+        409,
+        1003,
+        1208
+      ],
+      "medallion_centroid_px": [
+        281.4,
+        878.8
+      ],
+      "source": "imagegen:exec-179a38e0-66e4-4266-b2c0-74e7bee61da7.png",
+      "origin": "built_in_imagegen_edit",
+      "medallion_shift_px": 0.0
+    },
+    {
+      "id": "fire",
+      "label": "Feuer",
+      "description": "Glutkammer",
+      "file": "fire.png",
+      "sha256": "e40963a5020e16b3358e0ff08bd39961bf4d4bc415010a3c1fb3c2db6e57456f",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        83,
+        309,
+        1001,
+        1214
+      ],
+      "solid_bounds_alpha128": [
+        84,
+        310,
+        1001,
+        1214
+      ],
+      "medallion_centroid_px": [
+        279.6,
+        878.3
+      ],
+      "source": "imagegen:exec-45e74574-412d-4c73-bad6-64a682b0e76c.png",
+      "origin": "built_in_imagegen_edit",
+      "medallion_shift_px": 1.87
+    },
+    {
+      "id": "ice",
+      "label": "Eis",
+      "description": "Kristallfassung",
+      "file": "ice.png",
+      "sha256": "b141c08e8d4542524f8ee3392d6d09fbbd4424026d4c0dfdbd0343eb3876c639",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        53,
+        278,
+        1017,
+        1222
+      ],
+      "solid_bounds_alpha128": [
+        54,
+        278,
+        1017,
+        1221
+      ],
+      "medallion_centroid_px": [
+        256.4,
+        873.4
+      ],
+      "source": "imagegen:exec-04aab912-65e5-4fa0-83dc-f575339b942e.png",
+      "origin": "built_in_imagegen_edit",
+      "medallion_shift_px": 25.58
+    },
+    {
+      "id": "poison",
+      "label": "Gift",
+      "description": "Giftkammer",
+      "file": "poison.png",
+      "sha256": "c15af7d79af8d0b4c388b6442a9fc4bfc73a14c4eec2d997d9a3a1367692b8aa",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        56,
+        378,
+        1014,
+        1234
+      ],
+      "solid_bounds_alpha128": [
+        56,
+        379,
+        1013,
+        1234
+      ],
+      "medallion_centroid_px": [
+        259.4,
+        883.8
+      ],
+      "source": "imagegen:exec-54af4e5b-f873-46a8-b7eb-39b5b0c30460.png",
+      "origin": "built_in_imagegen_edit",
+      "medallion_shift_px": 22.56
+    },
+    {
+      "id": "electric",
+      "label": "Elektro",
+      "description": "Blitzspulen",
+      "file": "electric.png",
+      "sha256": "7e431c9e137dd77b07cd36e94286c574a75a3cf0a2101eead99058e02a9256b2",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        53,
+        388,
+        1014,
+        1221
+      ],
+      "solid_bounds_alpha128": [
+        53,
+        388,
+        1013,
+        1221
+      ],
+      "medallion_centroid_px": [
+        258.2,
+        879.0
+      ],
+      "source": "imagegen:exec-02153047-03b2-4e61-9e95-2cc09d7e2f45.png",
+      "origin": "built_in_imagegen_edit",
+      "medallion_shift_px": 23.2
+    },
+    {
+      "id": "bleed",
+      "label": "Blut",
+      "description": "Rubin & Dornen",
+      "file": "bleed.png",
+      "sha256": "e672bb71a2724b4b858a0bc9963b2154449b08b54387748d79912f9a7fa710fe",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        88,
+        352,
+        1018,
+        1210
+      ],
+      "solid_bounds_alpha128": [
+        88,
+        352,
+        1017,
+        1210
+      ],
+      "medallion_centroid_px": [
+        280.8,
+        879.5
+      ],
+      "source": "imagegen:exec-94e9ed68-54c3-442d-ac08-ba92e48f3d97.png",
+      "origin": "built_in_imagegen_edit",
+      "medallion_shift_px": 0.92
+    },
+    {
+      "id": "wet",
+      "label": "Wasser",
+      "description": "Wasserkammer",
+      "file": "wet.png",
+      "sha256": "c26e67a706c67de20771af2f74f18fbb881c2083d02fdcb2957b12388c301aa5",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        89,
+        406,
+        1003,
+        1209
+      ],
+      "solid_bounds_alpha128": [
+        89,
+        406,
+        1003,
+        1209
+      ],
+      "medallion_centroid_px": [
+        281.4,
+        878.8
+      ],
+      "source": "imagegen:exec-494bb30c-6044-4c2e-8935-6b89e9a5cff8.png",
+      "origin": "built_in_imagegen_edit",
+      "medallion_shift_px": 0.0
+    }
+  ],
+  "visual_review": {
+    "method": "Godot comparison sheet at shared crop and native sprite scale",
+    "screenshot": "docs/screenshots/weapon_elements/uv_lamp_complete_pack.png"
+  },
+  "runtime": {
+    "weapon_resource": "data/weapons/uv_lamp.tres",
+    "skin_resources": "data/weapon_skins/uv_lamp/",
+    "textures": "assets/weapons/element_forms/uv_lamp/",
+    "canvas": [
+      512,
+      512
+    ],
+    "source_paintings_preserved": true,
+    "documentation": "docs/WEAPON_SKINS.md"
+  },
+  "integration_notes": [
+    "Runtime sprites share the source crop and rig per weapon; UI icons use centered per-form regions.",
+    "Element forms follow each instance through upgrades, fusion, evolution and resume.",
+    "Existing projectile art and evolution effects are retained."
+  ]
+}

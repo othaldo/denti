@@ -5,21 +5,31 @@ const EVOLUTION_COLOR := Color("ff3038")
 
 
 static func weapon_name(weapon: WeaponInstance) -> String:
-	if weapon.affixes.is_empty():
-		return weapon.data.display_name
+	return name_for(weapon.data, weapon.affixes)
+
+
+static func name_for(data: WeaponData, affixes: Array[Dictionary]) -> String:
+	if affixes.is_empty():
+		return data.display_name
+	var element := WeaponAffixes.element(affixes)
+	if element != &"" and affixes.any(func(entry: Dictionary) -> bool: return entry.has("level")):
+		return data.display_name + " " + WeaponAffixes.by_id(element).name_suffix
 	# Compare development, not incomparable damage and percentage values.
 	# Equal effects keep their slot order, so names are stable across save/resume.
-	var strongest: Dictionary = weapon.affixes[0]
-	for affix in weapon.affixes:
+	var strongest: Dictionary = affixes[0]
+	for affix in affixes:
 		if WeaponAffixes.nominal(affix) > WeaponAffixes.nominal(strongest):
 			strongest = affix
 	var suffix := WeaponAffixes.by_id(StringName(strongest.id)).name_suffix
-	return weapon.data.display_name + (" " + suffix if not suffix.is_empty() else "")
+	return data.display_name + (" " + suffix if not suffix.is_empty() else "")
 
 
 static func enchantment_list(weapon: WeaponInstance) -> String:
 	var parts: PackedStringArray = []
 	for affix in weapon.affixes:
+		if affix.has("level"):
+			parts.append("%s %d/10" % [WeaponAffixes.by_id(StringName(affix.id)).display_name, WeaponUpgrades.level(affix)])
+			continue
 		parts.append("%s %s" % [WeaponAffixes.by_id(StringName(affix.id)).display_name,
 			["I", "II", "III"][clampi(int(affix.get("rank", 1)), 1, WeaponAffixes.MAX_RANK) - 1] + ("+" if float(affix.get("bonus", 0)) > 0 else "")])
 	return " · ".join(parts) if not parts.is_empty() else "Noch keine Verzauberung"

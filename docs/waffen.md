@@ -16,7 +16,7 @@ Der aktuelle [DPS-Balancepass vom 4. Oktober 2026](WEAPON_DPS_BALANCE.md) vergle
 | --- | ---: | --- | --- |
 | Zauberbürste | 2 | Schmelz-Projektil | Verlässliche Reichweite; ab Stufe III zwei, ab IV drei Pastegeschosse mit leichtem Streuwinkel. |
 | Turbo-Bohrer | 1 | Bohrung im Nahkampf | Kompakte, schnelle Bohrstöße; Bossbonus wächst von 25 % auf 40 %. |
-| Zahnseidenpeitsche | 1 | Rundumschnitt | Trifft alle nahen Gegner und verursacht Blutung; der Radius wächst mit der Stufe. |
+| Zahnseidenpeitsche | 1 | Einzelner Zahnseidenhieb nach vorn | Fester Griff, ausfahrender Faden; trifft Gegner auf seinem Weg. 180–210 Reichweite und Blutung. |
 | Wasserflosser | 1 | Schnelles Wasserprojektil | Macht Ziele nass und verlangsamt sie, hat niedrigen Rohschaden und wachsenden Rückstoß. |
 | Kronenwerfer | 2 | Schweres Metallprojektil | Durchdringt auf Stufe I einen weiteren Gegner, auf Stufe IV drei. |
 | Schmelzspiegel | 1 | Sofortiger Lichtstrahl | Präziser Treffer ohne Flugzeit. |
@@ -29,13 +29,15 @@ Der aktuelle [DPS-Balancepass vom 4. Oktober 2026](WEAPON_DPS_BALANCE.md) vergle
 | Mundduschen-Turbine | 2 | 48°-Wasserkegel | Macht Gruppen 3 s nass, verlangsamt sie und stößt sie kräftig zurück; geringer Rohschaden. |
 | UV-Lampe | 2 | Breite Lichtlinie | Sofortstrahl trifft alle Gegner entlang einer 36 Pixel breiten Linie; +10 Prozentpunkte Waffen-Crit und ×2 Crit-Schaden. |
 | Amalgam-Schleuder | 1 | Schweres Metallprojektil | Langsame Kugel, kleiner Splash und hoher Rückstoß, auch bei Explosionen. |
-| Zahnseiden-Garotte | 2 | 150°-Frontschnitt | Langsamer schwerer Hieb mit 3,2 Blutungsschaden/s für 3,5 s; kein Treffer hinter Denti. |
+| Zahnseiden-Schneide | 2 | Doppelter Zahnseidenhieb nach vorn | Zwei feste Griffe, zwei ausfahrende Fäden; 220–270 Reichweite, kurzer Rückstoß und 3,2 Blutungsschaden/s für 3,5 s. |
 | Prophylaxe-Polierer | 1 | Schneller Licht-Nahkampf | +10 Prozentpunkte Waffen-Crit; jeder dritte fortlaufende Treffer auf dasselbe Ziel ist garantiert kritisch. |
 | Fluorid-Rakete | 2 | Schmelz-Rakete | Hoher Flächenschaden, große Explosion und lange Pause; explodiert auch am Reichweitenende. |
 
-Die Waffen haben eigene Sprites unter `assets/weapons/` und werden getrennt von Dentis Körper geschwenkt beziehungsweise beim Schuss zurückgestoßen. Die zehn neuen Waffen verwenden zugeschnittene Regionen des transparenten `weapon_icons_expansion.png`-Atlas; derselbe Ausschnitt dient als Shopbild. Projektilfarbe, Tempo, Reichweite und Trefferform liegen in den jeweiligen `WeaponData`-Ressourcen unter `data/weapons/`.
+Die Waffen haben eigene Sprites unter `assets/weapons/` und werden getrennt von Dentis Körper animiert. Alle Standardwaffen und Evolutionen verwenden ihre [Normal- und Elementformen](WEAPON_SKINS.md). Projektilfarbe, Tempo, Reichweite und Trefferform liegen in den jeweiligen `WeaponData`-Ressourcen unter `data/weapons/`.
 
 Eine [Vergleichsansicht mit Denti und allen 18 Waffen](WEAPON_SIZE_BALANCE.md) zeigt Ruhehaltung und Angriff bei gleicher Vergrößerung. Der Bohrer ist auf Stufe I 60 Pixel groß, trifft jetzt für 28 Basisschaden alle 0,64 Sekunden und skaliert mit 100 % Nahschaden. Kratzer, Peitsche, Garotte und Speer wurden ebenfalls in ihren Proportionen angepasst; Reichweiten bleiben erhalten.
+
+Die frühere Garotte heißt inzwischen **Zahnseiden-Schneide**. Ihre Griffe bleiben bei Denti; zwei Fäden schnellen nach vorn und treffen Gegner auf ihrem Weg. Die Peitsche arbeitet genauso mit einem Faden. Das gewählte Element bestimmt die Fadenanimation. [Native Animationen, Werte und Messung](FLOSS_CUT.md).
 
 Die [optische Prüfung aller Waffen](WEAPON_ART_REVIEW.md) bewertet Perspektive, Werkzeugform, Haltung und Animation und nennt konkrete Prioritäten für die nächste Überarbeitung.
 
@@ -55,14 +57,14 @@ pro Treffer und Ziel, nicht der Gesamtschaden eines Kegels oder einer Explosion.
 | Mundduschen-Turbine | 7 | 0,36 s | 195 | 14 |
 | UV-Lampe | 42 | 1,50 s | 600 | 17 |
 | Amalgam-Schleuder | 28 | 1,15 s | 370 | 10 |
-| Zahnseiden-Garotte | 44 | 1,20 s | 145 | 15 |
+| Zahnseiden-Schneide | 44 | 1,20 s | 220 | 15 |
 | Prophylaxe-Polierer | 10 | 0,28 s | 85 | 10 |
 | Fluorid-Rakete | 70 | 2,40 s | 550 | 18 |
 
 Alle zehn Waffen sind im normalen Shop erhältlich und unterstützen vier Stufen,
 Fusion, Verkauf und Fortsetzen. Alle Standardwaffen stehen auch als Mk-I-Start zur Wahl.
 Die Erweiterung nutzt individuelle Schadenskurven; Speer, Bürste, Sprüher,
-Turbine, UV-Lampe und Garotte gewinnen Reichweite. Schleuder und Rakete
+Turbine, UV-Lampe und Zahnseiden-Schneide gewinnen Reichweite. Schleuder und Rakete
 gewinnen Explosionsradius, Turbine Rückstoß, Fräse Bossbonus.
 
 Blutung, Nass, Licht-Crits und Projektiltreffer verwenden dieselben Item- und
@@ -77,7 +79,8 @@ Die Ausrüstung fasst sechs Wurzelplätze. Waffen mit einer Wurzel belegen einen
 Bohrung verursacht je nach Stufe 25–40 % mehr Schaden gegen Bosse. Schnitt verursacht 15 % mehr Schaden gegen nahezu unverletzte Gegner und baut Blutung auf. Wasserflosser-Treffer machen Gegner nass. Nass senkt das Lauftempo um 20 %, bei Eliten um 10 % und bei Bossen um 5 %; angekündigte Anstürme bleiben unverändert. Erneute Treffer frischen die Dauer auf, ohne den Slow zu stapeln. [Nassregeln und Tests](WET_STATUS.md). Die anderen Schadensarten unterscheiden sich über Reichweite, Projektiltempo, Durchschlag, Rückstoß, Strahl oder Flächentreffer. Einige Gegner haben Affix-Resistenzen, sichtbar als farbige Schilde; Grundtreffer bleiben davon unberührt. Die Waffen haben individuelle Schadensmultiplikatoren und ausgewählte Eigenschaften, die mit ihrer Stufe wachsen.
 
 Weiterentwickelte Spezialwaffen sind eigenständige Waffenformen. Ihre Mk-Stufe
-bleibt erhalten; **Mk V und höher** werden ausschließlich durch Upgrade-Kapseln freigeschaltet. Ein grüner Aufwärtspfeil direkt auf der ausgerüsteten
+bleibt erhalten. Neue Waffenpunkte öffnen keine Mk-Stufen über IV; ältere gespeicherte
+Mk-Funde und höhere Stufen bleiben erhalten. Ein grüner Aufwärtspfeil direkt auf der ausgerüsteten
 Waffe im Shop zeigt eine verfügbare Fusion oder Evolution an. Er erscheint nur,
 wenn der passende Fusionspartner beziehungsweise alle Evolutionszutaten vorliegen.
 
@@ -108,8 +111,10 @@ in einem linearen Durchlauf statt alle Gegner nach Entfernung zu sortieren.
 | Waffen | Bewegung |
 | --- | --- |
 | Zahnstocher-Speer | Ausholen, gerader Stich, Zurückziehen |
-| Zahnsteinkratzer, Zahnseiden-Garotte | Ausholen, Frontschwung, Rückkehr |
-| Zahnseidenpeitsche, Interdentalbürste | Rundumschwung |
+| Zahnsteinkratzer | Ausholen, Frontschwung, Rückkehr |
+| Zahnseiden-Schneide | Feste Griffe, zwei Fäden fahren nach vorn aus und ziehen sich zurück |
+| Zahnseidenpeitsche | Fester Griff, ein Faden fährt nach vorn aus und zieht sich zurück |
+| Interdentalbürste | Rundumschwung |
 | Turbo-Bohrer, Karies-Fräse | Vorstoß und vibrierender Arbeitskontakt; Fräskopf rotiert |
 | Prophylaxe-Polierer | Kurzer Arbeitskontakt mit rotierendem Polierkopf |
 | Zauberbürste, Wasserflosser, Kronenwerfer, Fluorid-Rakete | Zielen, Abschuss, Rückstoß |

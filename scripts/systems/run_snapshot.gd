@@ -58,6 +58,11 @@ static func restore(game, saved: Dictionary) -> void:
 	saved = RunSaveData.normalize(saved)
 	if saved.is_empty():
 		return
+	game.element_impacts.clear()
+	# An unconfirmed fusion is only a preview; resume uses the saved ingredients.
+	game.weapon_fusion_panel.hide()
+	game.weapon_fusion_panel.plan = null
+	game.weapon_enchantment_panel.hide()
 	game.run_flow.enter(RunFlow.Phase.COMBAT)
 	var wave: WaveController = game.wave
 	var player: Player = game.player
@@ -98,6 +103,7 @@ static func restore(game, saved: Dictionary) -> void:
 	game.items.restore(saved.get("items", {}))
 	game.relics.restore(saved.get("relics", {}))
 	game.rewards.restore(saved.get("rewards", {}))
+	game.rewards.weapon_upgrades.validate(player.loadout)
 	for entry in saved.get("enemies", []):
 		var enemy_data := _enemy_from_path(str(entry.get("type", "")))
 		if enemy_data == null:

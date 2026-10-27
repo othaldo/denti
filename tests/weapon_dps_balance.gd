@@ -21,7 +21,11 @@ func _run() -> void:
 			var result := _measure(data, tier, "single")
 			var dps := float(result.dps_per_root)
 			# Focused contact damage must compensate for lost range/uptime.
-			if data.attack_mode in [&"melee", &"thrust"]:
+			if data.attack_animation == "floss_cut":
+				# Anchored floss is a piercing line, paid for by hitting successive targets.
+				var lane := _measure(data, tier, "lane")
+				_check(float(lane.dps_per_root) >= reference * 2.0, "%s tier %d lacks piercing-line payoff" % [data.id, tier])
+			elif data.attack_mode in [&"melee", &"thrust"]:
 				_check(dps >= reference * 1.25, "%s tier %d lacks melee risk premium" % [data.id, tier])
 			else:
 				var pack := _measure(data, tier, "pack")

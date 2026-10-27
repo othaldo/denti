@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "weapon_id": "fluoride_rocket",
+  "display_name": "Fluorid-Rakete",
+  "canvas": {
+    "width": 1024,
+    "height": 1536,
+    "format": "PNG",
+    "mode": "RGBA",
+    "background": "transparent"
+  },
+  "reference": "assets/weapons/weapon_icons_expansion.png",
+  "reference_resource": "data/weapons/fluoride_rocket.tres",
+  "normal_provenance": "generated portrait-format interpretation of the original weapon image; not a pixel-identical copy",
+  "prompts": "prompts.json",
+  "preview_region": [
+    29,
+    342,
+    987,
+    874
+  ],
+  "preview_size_px": 75,
+  "status": "complete_for_review",
+  "integrated_into_game": true,
+  "variants": [
+    {
+      "id": "normal",
+      "label": "Normal",
+      "description": "Normalform",
+      "file": "normal.png",
+      "sha256": "c1bb4ac2962e613ea8c0b1ed51bfb0d6847a612eaa2e72dd97734989035fff6f",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        54,
+        368,
+        979,
+        1193
+      ],
+      "solid_bounds_alpha128": [
+        54,
+        368,
+        979,
+        1192
+      ],
+      "source": "imagegen:exec-b7660507-412b-48b4-a0b2-cc4b97d831a2.png",
+      "origin": "built_in_imagegen_reference"
+    },
+    {
+      "id": "fire",
+      "label": "Feuer",
+      "description": "Feuerform",
+      "file": "fire.png",
+      "sha256": "77ceeb784d2fe4fd138ceb7fd70a6646ce1f4299692cd14644319c1598d048f3",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        55,
+        365,
+        980,
+        1193
+      ],
+      "solid_bounds_alpha128": [
+        55,
+        366,
+        980,
+        1192
+      ],
+      "source": "imagegen:exec-4fe0c8b9-a7d4-4a76-8704-b260037aa042.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "ice",
+      "label": "Eis",
+      "description": "Eisform",
+      "file": "ice.png",
+      "sha256": "99562ea8cea767ee9ca7bdd7cb00bbf66160494d54740fff72e97efebe3f87df",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        55,
+        368,
+        979,
+        1193
+      ],
+      "solid_bounds_alpha128": [
+        56,
+        368,
+        978,
+        1192
+      ],
+      "source": "imagegen:exec-db3ca2ab-30a3-478d-81b0-ceac1825e153.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "poison",
+      "label": "Gift",
+      "description": "Giftform",
+      "file": "poison.png",
+      "sha256": "3722afb4c098f3c69ebf690c5de453f6105357cb576b29a421d8b4b7f51645dd",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        54,
+        369,
+        981,
+        1191
+      ],
+      "solid_bounds_alpha128": [
+        55,
+        369,
+        980,
+        1190
+      ],
+      "source": "imagegen:exec-613715b5-5d90-4593-839d-e9d595e11a9b.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "electric",
+      "label": "Elektro",
+      "description": "Elektroform",
+      "file": "electric.png",
+      "sha256": "7d6e6174a1de5ded3da919f2a75cbc2273c6b50f7d722c4bd2541be49844903b",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        52,
+        368,
+        992,
+        1192
+      ],
+      "solid_bounds_alpha128": [
+        53,
+        369,
+        992,
+        1192
+      ],
+      "source": "imagegen:exec-6c06a4dd-1134-4223-8418-67168ad6a26a.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "bleed",
+      "label": "Blut",
+      "description": "Blutform",
+      "file": "bleed.png",
+      "sha256": "4886a89d8483e7d5a1982824c45f5929b96a6a08711f420304dee1dc9fb84e3d",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        56,
+        367,
+        982,
+        1192
+      ],
+      "solid_bounds_alpha128": [
+        56,
+        368,
+        982,
+        1192
+      ],
+      "source": "imagegen:exec-f3cb5a87-2d38-4544-beb7-9bedd1ab45be.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "wet",
+      "label": "Wasser",
+      "description": "Wasserform",
+      "file": "wet.png",
+      "sha256": "abedfd505bb7ba5a8c3114bc816ef235cafc247b0ec21fc0391186c9dcabbe88",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        55,
+        366,
+        980,
+        1193
+      ],
+      "solid_bounds_alpha128": [
+        56,
+        367,
+        980,
+        1192
+      ],
+      "source": "imagegen:exec-942a8d85-7ea3-4d8b-b54d-00998ef61414.png",
+      "origin": "built_in_imagegen_edit"
+    }
+  ],
+  "integration_notes": [
+    "Runtime sprites share the source crop and rig per weapon; UI icons use centered per-form regions.",
+    "Element forms follow each instance through upgrades, fusion, evolution and resume.",
+    "Existing projectile art and evolution effects are retained."
+  ],
+  "reference_atlas_region": [
+    1586.0,
+    397.0,
+    397.0,
+    396.0
+  ],
+  "visual_review": {
+    "method": "Godot comparison sheet at shared crop and native sprite scale",
+    "screenshot": "docs/screenshots/weapon_elements/fluoride_rocket_complete_pack.png"
+  },
+  "runtime": {
+    "weapon_resource": "data/weapons/fluoride_rocket.tres",
+    "skin_resources": "data/weapon_skins/fluoride_rocket/",
+    "textures": "assets/weapons/element_forms/fluoride_rocket/",
+    "canvas": [
+      512,
+      512
+    ],
+    "source_paintings_preserved": true,
+    "documentation": "docs/WEAPON_SKINS.md"
+  }
+}

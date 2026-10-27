@@ -1,0 +1,237 @@
+{
+  "schema_version": 1,
+  "weapon_id": "halo",
+  "display_name": "Heiligenschein",
+  "weapon_group": "evolution",
+  "evolution_kind": "halo",
+  "canvas": {
+    "width": 1024,
+    "height": 1536,
+    "format": "PNG",
+    "mode": "RGBA",
+    "background": "transparent"
+  },
+  "reference": "assets/weapons/weapon_evolutions.png",
+  "reference_resource": "data/weapons/halo.tres",
+  "normal_provenance": "generated portrait-format interpretation of the original weapon image; not a pixel-identical copy",
+  "prompts": "prompts.json",
+  "preview_region": [
+    0,
+    113,
+    1024,
+    1260
+  ],
+  "preview_size_px": 65,
+  "status": "complete_for_review",
+  "integrated_into_game": true,
+  "variants": [
+    {
+      "id": "normal",
+      "label": "Normal",
+      "description": "Normalform",
+      "file": "normal.png",
+      "sha256": "fe227e7058279db67a5527364ae8baea6e0d87e1139bcf4a29579c09ed948086",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        19,
+        207,
+        1015,
+        1348
+      ],
+      "solid_bounds_alpha128": [
+        20,
+        208,
+        1015,
+        1348
+      ],
+      "source": "imagegen:exec-458f5728-cde4-4d5d-b5bb-af608318dbe8.png",
+      "origin": "built_in_imagegen_reference"
+    },
+    {
+      "id": "fire",
+      "label": "Feuer",
+      "description": "Feuerform",
+      "file": "fire.png",
+      "sha256": "35debefb37515e8b76ff1eb21932fb5d351c6ca7f592acca6b1514aa4abefadc",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        19,
+        136,
+        1015,
+        1350
+      ],
+      "solid_bounds_alpha128": [
+        20,
+        137,
+        1015,
+        1349
+      ],
+      "source": "imagegen:exec-c95f3443-2866-4779-b427-afff10970893.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "ice",
+      "label": "Eis",
+      "description": "Eisform",
+      "file": "ice.png",
+      "sha256": "f5ffdf6d59cf7a914d593c8d66e4b8459e9c68c42fd46a0bfee00dc9205ce587",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        20,
+        201,
+        1015,
+        1349
+      ],
+      "solid_bounds_alpha128": [
+        20,
+        202,
+        1014,
+        1348
+      ],
+      "source": "imagegen:exec-e75b8d2a-4223-40d0-843d-23c65fe3acf4.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "poison",
+      "label": "Gift",
+      "description": "Giftform",
+      "file": "poison.png",
+      "sha256": "50378a985f48674e3812fe7c3e16306829e6ae364b9b0aa685588d5e37c410b9",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        19,
+        164,
+        1016,
+        1349
+      ],
+      "solid_bounds_alpha128": [
+        20,
+        165,
+        1015,
+        1349
+      ],
+      "source": "imagegen:exec-21ac4ca6-63b6-4d54-9ca2-3cbb4a197ba3.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "electric",
+      "label": "Elektro",
+      "description": "Elektroform",
+      "file": "electric.png",
+      "sha256": "f8fc5478a6c8c16893411c5b3fbb754de98dfca87fac0a632cddcdc36429f018",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        20,
+        191,
+        1015,
+        1349
+      ],
+      "solid_bounds_alpha128": [
+        20,
+        191,
+        1014,
+        1349
+      ],
+      "source": "imagegen:exec-ba04ccc1-9aa9-4e21-a690-399ad6e10af7.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "bleed",
+      "label": "Blut",
+      "description": "Blutform",
+      "file": "bleed.png",
+      "sha256": "79ee90f0acc0b8f93a170bb74ded70de2734e6d4a546fc30042428e72398a9c5",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        20,
+        173,
+        1015,
+        1350
+      ],
+      "solid_bounds_alpha128": [
+        21,
+        173,
+        1014,
+        1349
+      ],
+      "source": "imagegen:exec-0955a781-8537-413b-b401-bfda1e63f96e.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "wet",
+      "label": "Wasser",
+      "description": "Wasserform",
+      "file": "wet.png",
+      "sha256": "8fd2eebb879e42bf6428196a077bd01f218037966064519d9ed01db0be298a4c",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        21,
+        161,
+        1016,
+        1350
+      ],
+      "solid_bounds_alpha128": [
+        21,
+        162,
+        1015,
+        1349
+      ],
+      "source": "imagegen:exec-8800fb09-8f72-4094-ae77-de903ba6e60a.png",
+      "origin": "built_in_imagegen_edit"
+    }
+  ],
+  "integration_notes": [
+    "Runtime sprites share the source crop and rig per weapon; UI icons use centered per-form regions.",
+    "Element forms follow each instance through upgrades, fusion, evolution and resume.",
+    "Existing projectile art and evolution effects are retained."
+  ],
+  "reference_atlas_region": [
+    48.0,
+    512.0,
+    480.0,
+    496.0
+  ],
+  "visual_review": {
+    "method": "Godot comparison sheet at shared crop and native sprite scale",
+    "screenshot": "docs/screenshots/weapon_elements/halo_complete_pack.png"
+  },
+  "runtime": {
+    "weapon_resource": "data/weapons/halo.tres",
+    "skin_resources": "data/weapon_skins/halo/",
+    "textures": "assets/weapons/element_forms/halo/",
+    "canvas": [
+      512,
+      512
+    ],
+    "source_paintings_preserved": true,
+    "documentation": "docs/WEAPON_SKINS.md"
+  }
+}

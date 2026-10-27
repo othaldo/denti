@@ -3,6 +3,7 @@ extends RefCounted
 
 
 static func progress_text(value: Dictionary) -> String:
+	if value.has("level"): return "%d/10" % WeaponUpgrades.level(value)
 	var text := "%s %s%s" % [DentiRarity.name_for(value.rarity), ["I", "II", "III"][clampi(int(value.get("rank", 1)), 1, WeaponAffixes.MAX_RANK) - 1], "+" if float(value.get("bonus", 0)) > 0 else ""]
 	return text + (" · %.1f %%" % (float(value.get("progress", 0)) * 100.0) if float(value.get("progress", 0)) > 0 else "")
 
@@ -25,7 +26,7 @@ static func summary(weapon: WeaponInstance, stats: PlayerStats = null, items: It
 	for affix in weapon.affixes:
 		var data := WeaponAffixes.by_id(StringName(affix.id))
 		lines.append("%s +%s %s · %s" % [data.display_name, value_text(float(affix.damage), data.id, weapon.data, stats, items), damage_unit(data.id, items), progress_text(affix)])
-	return "Verzauberungen · %d/%d Plätze" % [weapon.affixes.size(), weapon.affix_slots] + ("\n" + "\n".join(lines) if not lines.is_empty() else "")
+	return "Verzauberungen · %d/%d Plätze" % [weapon.affixes.size(), maxi(WeaponUpgrades.slots(weapon.tier), weapon.affixes.size())] + ("\n" + "\n".join(lines) if not lines.is_empty() else "")
 
 
 static func dot_duration(kind: StringName, items: ItemInventory = null) -> float:
@@ -41,7 +42,7 @@ static func damage_unit(kind: StringName, items: ItemInventory = null) -> String
 	if data.effect_kind == "holy":
 		return "Schaden / Lichtstoß"
 	if data.stat_key != &"":
-		return "% " + data.display_name
+		return (data.stat_unit + " " if not data.stat_unit.is_empty() else "") + ("Rückstoß" if data.id == &"knockback" else data.display_name)
 	return "Gesamtschaden über %.0f s" % dot_duration(kind, items) if data.dot_duration > 0 else "Schaden/Treffer"
 
 
@@ -119,7 +120,7 @@ static func mechanics_text(kind: StringName) -> String:
 		&"electric":
 			return "Ein Sprung, +1 bei nassem Startziel, +1 mit Kettenitem; maximal %d. Sprungschaden %.0f %% des Elektrotreffers, Kettenitems verstärken ihn. Intervall %.2f s. Leitlack verstärkt Elektro auf nassen Zielen." % [data.proc_target_cap, data.proc_factor * 100, data.proc_cooldown]
 		&"wet":
-			return "Kein Zusatzschaden. Nassdauer maximal %.1f s; aktiviert Elektro, Leitlack und Spülpfützen. Nass verlangsamt nach den normalen Gegnerregeln." % data.utility_cap
+			return "Direkter Wasserschaden: +50 %% gegen Zucker, +25 %% gegen Plaque. Nassdauer maximal %.1f s; bereitet Elektro anderer Waffen, Leitlack und Spülpfützen vor. Nässe verlangsamt nach den normalen Gegnerregeln." % data.utility_cap
 		&"holy":
 			return "%d Krits; Markierungen halten jeweils %.0f s. Weitere Waffen können markierte Ziele auslösen. Lichtstoß trifft bis zu %d Ziele, Intervall %.1f s." % [data.mark_threshold, data.mark_duration, data.proc_targets, data.proc_cooldown]
 		&"leech":

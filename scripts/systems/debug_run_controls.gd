@@ -34,6 +34,7 @@ func set_weapon_tier(index: int, tier: int) -> void:
 	var weapons: Array[WeaponInstance] = game.player.loadout.equipped()
 	if index >= 0 and index < weapons.size():
 		weapons[index].tier = clampi(tier, 1, WeaponLoadout.MAX_TIER)
+		weapons[index].refresh_affix_stats()
 		changed()
 
 
@@ -75,6 +76,9 @@ func start_wave(number: int) -> bool:
 
 
 func changed() -> void:
+	if game.weapon_enchantment_panel.visible:
+		game.rewards.weapon_upgrades.validate(game.player.loadout)
+		game.weapon_enchantment_panel.refresh()
 	if game.in_shop:
 		game._update_shop_panel()
 	game._refresh_hud()

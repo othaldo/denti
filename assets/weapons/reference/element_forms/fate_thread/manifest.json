@@ -1,0 +1,237 @@
+{
+  "schema_version": 1,
+  "weapon_id": "fate_thread",
+  "display_name": "Schicksalsfaden",
+  "weapon_group": "evolution",
+  "evolution_kind": "thread",
+  "canvas": {
+    "width": 1024,
+    "height": 1536,
+    "format": "PNG",
+    "mode": "RGBA",
+    "background": "transparent"
+  },
+  "reference": "assets/weapons/weapon_evolutions.png",
+  "reference_resource": "data/weapons/fate_thread.tres",
+  "normal_provenance": "generated portrait-format interpretation of the original weapon image; not a pixel-identical copy",
+  "prompts": "prompts.json",
+  "preview_region": [
+    20,
+    169,
+    1004,
+    1134
+  ],
+  "preview_size_px": 78,
+  "status": "complete_for_review",
+  "integrated_into_game": true,
+  "variants": [
+    {
+      "id": "normal",
+      "label": "Normal",
+      "description": "Normalform",
+      "file": "normal.png",
+      "sha256": "eb1ee803829cb8999734fafaa45ef4cdfee803420b4b4c9732e372994d352524",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        45,
+        244,
+        1010,
+        1278
+      ],
+      "solid_bounds_alpha128": [
+        45,
+        245,
+        1010,
+        1278
+      ],
+      "source": "imagegen:exec-250158c1-8ea4-47d6-97d1-8d697242b79e.png",
+      "origin": "built_in_imagegen_reference"
+    },
+    {
+      "id": "fire",
+      "label": "Feuer",
+      "description": "Feuerform",
+      "file": "fire.png",
+      "sha256": "85067c4598629a27c6d58be9be357d4e0a427355df662772675dcaef2376e350",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        43,
+        193,
+        1021,
+        1258
+      ],
+      "solid_bounds_alpha128": [
+        44,
+        193,
+        1020,
+        1258
+      ],
+      "source": "imagegen:exec-c37c69f4-062f-4ad6-896a-a427cc2b7b5c.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "ice",
+      "label": "Eis",
+      "description": "Eisform",
+      "file": "ice.png",
+      "sha256": "85ec397d418914240540761e75cb93231fad120382a8dae7f0dc48b05da152f8",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        46,
+        204,
+        1018,
+        1248
+      ],
+      "solid_bounds_alpha128": [
+        46,
+        205,
+        1018,
+        1248
+      ],
+      "source": "imagegen:exec-24bcf36c-75eb-476f-9dcb-d0b3114c0051.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "poison",
+      "label": "Gift",
+      "description": "Giftform",
+      "file": "poison.png",
+      "sha256": "4f978d61ce4d8e560f061e6f29a2d04eeb59f94029769637fe4407eeb9086dff",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        46,
+        210,
+        1016,
+        1246
+      ],
+      "solid_bounds_alpha128": [
+        47,
+        211,
+        1015,
+        1246
+      ],
+      "source": "imagegen:exec-19df00f1-154a-4614-87b2-51e82b152662.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "electric",
+      "label": "Elektro",
+      "description": "Elektroform",
+      "file": "electric.png",
+      "sha256": "97e52c56c75fde41662832b0a966c32854ebf2004bcb4a27776d621b2dbcc650",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        45,
+        239,
+        1014,
+        1278
+      ],
+      "solid_bounds_alpha128": [
+        46,
+        240,
+        1013,
+        1278
+      ],
+      "source": "imagegen:exec-29d1dc46-1c45-4e61-967c-f604e956cfda.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "bleed",
+      "label": "Blut",
+      "description": "Blutform",
+      "file": "bleed.png",
+      "sha256": "d68af10d3c9a6bf79302980d66227829ed1feec3749b41ae6199c76d166a3f9f",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        46,
+        218,
+        1010,
+        1278
+      ],
+      "solid_bounds_alpha128": [
+        46,
+        218,
+        1010,
+        1277
+      ],
+      "source": "imagegen:exec-75505776-09cc-4342-bec3-7e3512a053a2.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "wet",
+      "label": "Wasser",
+      "description": "Wasserform",
+      "file": "wet.png",
+      "sha256": "b8663b79baa9c3f11a78f54314c016baae5cff2382722763fa5baa7ea665bbac",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        46,
+        233,
+        1013,
+        1279
+      ],
+      "solid_bounds_alpha128": [
+        46,
+        234,
+        1013,
+        1279
+      ],
+      "source": "imagegen:exec-7ff2660d-1baa-4962-959d-3adf795af33c.png",
+      "origin": "built_in_imagegen_edit"
+    }
+  ],
+  "integration_notes": [
+    "Runtime sprites share the source crop and rig per weapon; UI icons use centered per-form regions.",
+    "Element forms follow each instance through upgrades, fusion, evolution and resume.",
+    "Existing projectile art and evolution effects are retained."
+  ],
+  "reference_atlas_region": [
+    528.0,
+    20.0,
+    504.0,
+    474.0
+  ],
+  "visual_review": {
+    "method": "Godot comparison sheet at shared crop and native sprite scale",
+    "screenshot": "docs/screenshots/weapon_elements/fate_thread_complete_pack.png"
+  },
+  "runtime": {
+    "weapon_resource": "data/weapons/fate_thread.tres",
+    "skin_resources": "data/weapon_skins/fate_thread/",
+    "textures": "assets/weapons/element_forms/fate_thread/",
+    "canvas": [
+      512,
+      512
+    ],
+    "source_paintings_preserved": true,
+    "documentation": "docs/WEAPON_SKINS.md"
+  }
+}

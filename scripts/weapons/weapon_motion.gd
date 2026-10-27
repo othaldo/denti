@@ -10,7 +10,7 @@ static func is_contact(data: WeaponData) -> bool:
 
 
 static func base_scale(data: WeaponData, density: float = 1.0) -> float:
-	return WeaponLayout.visual_size(data, density) / maxf(data.held_texture().get_size().x, data.held_texture().get_size().y)
+	return WeaponLayout.visual_size(data, density) * data.held_scale / maxf(data.held_texture().get_size().x, data.held_texture().get_size().y)
 
 
 static func tip_local(data: WeaponData) -> Vector2:
@@ -27,6 +27,12 @@ static func pose(data: WeaponData, tier: int, home: Vector2, aim: Vector2, progr
 	var active := progress >= 0.0
 	var side := -1.0 if aim.x < -0.02 else 1.0
 	var factor := base_scale(data, density)
+	if data.attack_animation == "floss_cut":
+		var floss := WeaponFlossMotion.pose(data, tier, home, aim, progress, density)
+		# The hidden sprite supplies the tip marker; the anchored rig draws itself.
+		floss.merge({"position": floss.curve[-1] - tip_local(data) * factor,
+			"rotation": 0.0, "scale": Vector2.ONE * factor})
+		return floss
 	var rotation := 0.0
 	var scale := Vector2.ONE * factor
 	var grip := home + Vector2(0, sin(idle_time * 3.4) * 1.0)
@@ -101,6 +107,9 @@ static func pose(data: WeaponData, tier: int, home: Vector2, aim: Vector2, progr
 
 
 static func segment(data: WeaponData, pose_data: Dictionary) -> PackedVector2Array:
+	if pose_data.has("curve"):
+		var curve: PackedVector2Array = pose_data.curve
+		return PackedVector2Array([curve[0], curve[-1]])
 	var grip: Vector2 = pose_data.position
 	var tip := grip + (tip_local(data) * Vector2(pose_data.scale)).rotated(float(pose_data.rotation))
 	return PackedVector2Array([grip, tip])

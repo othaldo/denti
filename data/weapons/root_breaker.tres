@@ -1,9 +1,11 @@
 [gd_resource type="Resource" script_class="WeaponData" load_steps=4 format=3]
+
 [ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/weapons/weapon_evolutions.png" id="2"]
-[sub_resource type="AtlasTexture" id="Atlas_weapon"]
+[ext_resource type="Texture2D" path="res://assets/weapons/element_forms/root_breaker/normal.png" id="2"]
+
+[sub_resource type="AtlasTexture" id="Icon_skin"]
 atlas = ExtResource("2")
-region = Rect2(1032, 24, 480, 488)
+region = Rect2(46, 40, 416, 452)
 filter_clip = true
 
 [resource]
@@ -22,13 +24,10 @@ interval = 0.64
 attack_range = 160.0
 damage_tiers = PackedFloat32Array(1.00, 1.40, 1.95, 2.65)
 boss_bonus_tiers = PackedFloat32Array(0.25, 0.3, 0.35, 0.4)
-sprite = SubResource("Atlas_weapon")
-grip_anchor = Vector2(0.19, 0.84)
 visual_angle_degrees = 40
 price = 9
 held_style = "staff"
 attack_animation = "drill"
-tip_anchor = Vector2(0.96, 0.02)
 visual_size = 60.0
 animation_duration = 0.22
 
@@ -36,3 +35,17 @@ evolution_kind = &"drill"
 evolution_radius = 360.0
 evolution_damage_factor = 1.5
 evolution_threshold = 4
+
+grip_anchor = Vector2(0.268211, 0.810558)
+tip_anchor = Vector2(0.886579, 0.099166)
+sprite = SubResource("Icon_skin")
+held_sprite = ExtResource("2")
+held_scale = 1.124458
+element_skins = {
+"fire": "res://data/weapon_skins/root_breaker/fire.tres",
+"ice": "res://data/weapon_skins/root_breaker/ice.tres",
+"poison": "res://data/weapon_skins/root_breaker/poison.tres",
+"electric": "res://data/weapon_skins/root_breaker/electric.tres",
+"bleed": "res://data/weapon_skins/root_breaker/bleed.tres",
+"wet": "res://data/weapon_skins/root_breaker/wet.tres"
+}

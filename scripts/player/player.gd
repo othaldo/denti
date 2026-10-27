@@ -144,7 +144,7 @@ func damage_circle_at(centre: Vector2, radius: float, seconds_into_frame: float 
 func projectile_crosses(start: Vector2, end: Vector2, radius: float, delta: float, launch_serial: int) -> bool:
 	if not swept_dash_this_frame() or launch_serial == motion_serial:
 		return Geometry2D.get_closest_point_to_segment(global_position, start, end).distance_squared_to(global_position) <= radius * radius
-	# Split at dash end/contact: the player can stop early in a long frame.
+	# Split at dash end/wall: the player can stop early in a long frame.
 	var middle := start.lerp(end, clampf(dash_motion_seconds / maxf(delta, 0.000001), 0, 1))
 	var relative := Geometry2D.get_closest_point_to_segment(Vector2.ZERO, start - motion_start, middle - motion_end)
 	var after := Geometry2D.get_closest_point_to_segment(motion_end, middle, end)
@@ -168,6 +168,13 @@ func play_attack_animation(aim: Vector2, kind: StringName = &"brush") -> void:
 	attack_time = ATTACK_ANIMATION_DURATION
 	attack_direction = aim
 	attack_performed.emit(kind)
+
+
+func take_contact_hit(amount: float, inflicted_statuses: Array[Dictionary] = [], during_dash: bool = false) -> float:
+	if during_dash or dash.active:
+		dash.contacted.emit()
+		amount *= dash.config.contact_damage_multiplier
+	return take_hit(amount, inflicted_statuses)
 
 
 func take_hit(amount: float, inflicted_statuses: Array[Dictionary] = []) -> float:

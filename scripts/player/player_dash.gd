@@ -2,7 +2,7 @@ class_name PlayerDash
 extends RefCounted
 
 signal started
-signal contact_stopped
+signal contacted
 
 const DEFAULT: DashData = preload("res://data/player/dash.tres")
 var config: DashData = DEFAULT
@@ -62,13 +62,12 @@ func advance(player: Player, delta: float) -> void:
 		time -= used
 		if stopped:
 			finish()
-			contact_stopped.emit()
 		if active:
 			return
 	var delay := minf(recovery, time)
 	recovery -= delay
 	time -= delay
-	charge = minf(capacity, charge + time * config.recharge_per_second(capacity))
+	charge = minf(capacity, charge + time * config.recharge_rate)
 
 func clamp_charge() -> void:
 	# Capacity upgrades never grant free charge; reductions cannot overfill it.

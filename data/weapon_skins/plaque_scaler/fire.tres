@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="WeaponSkinData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_skin_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/weapons/element_forms/plaque_scaler/fire.png" id="2"]
+
+[sub_resource type="AtlasTexture" id="Icon_skin"]
+atlas = ExtResource("2")
+region = Rect2(99, 26, 310, 467)
+filter_clip = true
+
+[resource]
+script = ExtResource("1")
+grip_anchor = Vector2(0.278003, 0.829802)
+tip_anchor = Vector2(0.706382, 0.148988)
+sprite = SubResource("Icon_skin")
+held_sprite = ExtResource("2")

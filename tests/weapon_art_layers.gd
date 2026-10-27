@@ -44,7 +44,12 @@ func _run() -> void:
 		for side in [-1.0, 1.0]:
 			var home := Vector2(side * 50.0, 16.0)
 			var idle := WeaponMotion.pose(data, 1, home, Vector2(side, 0), -1, 0)
-			if Vector2(idle.position).distance_to(home) > 0.001:
+			if idle.has("curve"):
+				for point: Vector2 in idle.grips:
+					if point.distance_to(home) > WeaponFlossMotion.GRIP_SPACING * 0.5 + 0.001:
+						_fail("idle floss grip floated away from its root: " + str(data.id))
+						return
+			elif Vector2(idle.position).distance_to(home) > 0.001:
 				_fail("idle grip floated away from its hand: " + str(data.id))
 				return
 		if data.sprite is AtlasTexture and (data.sprite as AtlasTexture).atlas.resource_path == "res://assets/weapons/weapon_icons_refined.png":

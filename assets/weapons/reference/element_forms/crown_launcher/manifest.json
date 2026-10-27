@@ -1,0 +1,368 @@
+{
+  "schema_version": 1,
+  "weapon_id": "crown_launcher",
+  "display_name": "Kronenwerfer",
+  "canvas": {
+    "width": 1024,
+    "height": 1536,
+    "format": "PNG",
+    "mode": "RGBA",
+    "background": "transparent"
+  },
+  "reference": "assets/weapons/weapon_icons_refined.png",
+  "reference_resource": "data/weapons/crown_launcher.tres",
+  "reference_atlas_region": [
+    0,
+    0,
+    512,
+    512
+  ],
+  "normal_provenance": "generated portrait-format interpretation of the original atlas image; not a pixel-identical copy",
+  "prompts": "prompts.json",
+  "preview_region": [
+    0,
+    150,
+    1024,
+    1320
+  ],
+  "preview_size_px": 65,
+  "status": "complete_for_review",
+  "integrated_into_game": true,
+  "variants": [
+    {
+      "id": "normal",
+      "label": "Normal",
+      "description": "Goldene Krone",
+      "file": "normal.png",
+      "sha256": "712397b3f7b42bd12d8135fcba09fadb6b949637303558850e3e9e955c8c9878",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        50,
+        408,
+        1013,
+        1308
+      ],
+      "solid_bounds_alpha128": [
+        50,
+        409,
+        1013,
+        1308
+      ],
+      "feature_centers_px": {
+        "medallion": [
+          391.7,
+          884.4
+        ],
+        "rear_grip": [
+          257.3,
+          1107.1
+        ],
+        "front_grip": [
+          771.8,
+          1036.5
+        ]
+      },
+      "source": "imagegen:exec-bb5bc133-5e09-43bd-b5f1-5d14b890f0b9.png",
+      "origin": "built_in_imagegen_edit",
+      "feature_shift_px": {
+        "medallion": 0.0,
+        "rear_grip": 0.0,
+        "front_grip": 0.0
+      }
+    },
+    {
+      "id": "fire",
+      "label": "Feuer",
+      "description": "Glutkrone",
+      "file": "fire.png",
+      "sha256": "12f6a027438980d303332e96b737187af18763ef131642367c1ab9665f98d839",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        50,
+        227,
+        1013,
+        1276
+      ],
+      "solid_bounds_alpha128": [
+        50,
+        228,
+        1013,
+        1276
+      ],
+      "feature_centers_px": {
+        "medallion": [
+          390.7,
+          853.7
+        ],
+        "rear_grip": [
+          252.5,
+          1084.3
+        ],
+        "front_grip": [
+          770.2,
+          1017.5
+        ]
+      },
+      "source": "imagegen:exec-4408786b-76e1-407f-b889-32a26b721a52.png",
+      "origin": "built_in_imagegen_edit",
+      "feature_shift_px": {
+        "medallion": 30.72,
+        "rear_grip": 23.3,
+        "front_grip": 19.07
+      }
+    },
+    {
+      "id": "ice",
+      "label": "Eis",
+      "description": "Frostkrone",
+      "file": "ice.png",
+      "sha256": "3ed974220becd23c38d17c5ebbe7aeaffee936e0f8a7bb434750e84debbd87f2",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        43,
+        240,
+        1016,
+        1277
+      ],
+      "solid_bounds_alpha128": [
+        44,
+        240,
+        1015,
+        1277
+      ],
+      "feature_centers_px": {
+        "medallion": [
+          390.6,
+          849.5
+        ],
+        "rear_grip": [
+          250.4,
+          1084.4
+        ],
+        "front_grip": [
+          777.2,
+          1018.8
+        ]
+      },
+      "source": "imagegen:exec-57f14bb9-899d-4e72-a1de-8210f1313da7.png",
+      "origin": "built_in_imagegen_edit",
+      "feature_shift_px": {
+        "medallion": 34.92,
+        "rear_grip": 23.73,
+        "front_grip": 18.51
+      }
+    },
+    {
+      "id": "poison",
+      "label": "Gift",
+      "description": "Giftkrone",
+      "file": "poison.png",
+      "sha256": "0b8767b47eac25bd71f4ed9db8e0eff45eb6150e57ad626abfbe058f3fbe8679",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        14,
+        284,
+        1014,
+        1299
+      ],
+      "solid_bounds_alpha128": [
+        14,
+        285,
+        1013,
+        1299
+      ],
+      "feature_centers_px": {
+        "medallion": [
+          367.4,
+          858.1
+        ],
+        "rear_grip": [
+          229.0,
+          1088.1
+        ],
+        "front_grip": [
+          764.0,
+          1024.6
+        ]
+      },
+      "source": "imagegen:exec-328ea7bd-e314-4543-a250-83842a6e73f5.png",
+      "origin": "built_in_imagegen_edit",
+      "feature_shift_px": {
+        "medallion": 35.81,
+        "rear_grip": 34.09,
+        "front_grip": 14.23
+      }
+    },
+    {
+      "id": "electric",
+      "label": "Elektro",
+      "description": "Blitzkrone",
+      "file": "electric.png",
+      "sha256": "5b1b4fe9d9e94b75de345d5e0b6f0d8e144c482ef4bee9e1c29e15bd0d898ff4",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        51,
+        243,
+        1010,
+        1276
+      ],
+      "solid_bounds_alpha128": [
+        52,
+        243,
+        1010,
+        1276
+      ],
+      "feature_centers_px": {
+        "medallion": [
+          391.6,
+          853.0
+        ],
+        "rear_grip": [
+          253.9,
+          1084.5
+        ],
+        "front_grip": [
+          773.0,
+          1019.7
+        ]
+      },
+      "source": "imagegen:exec-9e475b6a-3149-4133-ade6-441c5cf0cdec.png",
+      "origin": "built_in_imagegen_edit",
+      "feature_shift_px": {
+        "medallion": 31.4,
+        "rear_grip": 22.85,
+        "front_grip": 16.84
+      }
+    },
+    {
+      "id": "bleed",
+      "label": "Blut",
+      "description": "Rubinkrone",
+      "file": "bleed.png",
+      "sha256": "5538b56649608353adcbd4d85f69128b7c040356552038f4f5c678705c1acbfb",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        50,
+        270,
+        1012,
+        1276
+      ],
+      "solid_bounds_alpha128": [
+        51,
+        271,
+        1011,
+        1276
+      ],
+      "feature_centers_px": {
+        "medallion": [
+          391.3,
+          852.9
+        ],
+        "rear_grip": [
+          253.9,
+          1084.3
+        ],
+        "front_grip": [
+          772.4,
+          1019.0
+        ]
+      },
+      "source": "imagegen:exec-e9e063ec-9cd6-476d-85c7-744e8ca583a3.png",
+      "origin": "built_in_imagegen_edit",
+      "feature_shift_px": {
+        "medallion": 31.5,
+        "rear_grip": 23.05,
+        "front_grip": 17.51
+      }
+    },
+    {
+      "id": "wet",
+      "label": "Wasser",
+      "description": "Flutkrone",
+      "file": "wet.png",
+      "sha256": "01a2d130f010798f475000dd796eca4a3d34268bcde4808a38c7dc463c9f0e63",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        51,
+        260,
+        1013,
+        1275
+      ],
+      "solid_bounds_alpha128": [
+        51,
+        261,
+        1013,
+        1275
+      ],
+      "feature_centers_px": {
+        "medallion": [
+          393.1,
+          853.2
+        ],
+        "rear_grip": [
+          254.9,
+          1084.9
+        ],
+        "front_grip": [
+          774.4,
+          1020.1
+        ]
+      },
+      "source": "imagegen:exec-8514c9db-b1ec-4957-a4ad-ca19d30b2120.png",
+      "origin": "built_in_imagegen_edit",
+      "feature_shift_px": {
+        "medallion": 31.23,
+        "rear_grip": 22.33,
+        "front_grip": 16.6
+      }
+    }
+  ],
+  "visual_review": {
+    "method": "Godot comparison sheet at shared crop and native sprite scale",
+    "screenshot": "docs/screenshots/weapon_elements/crown_launcher_complete_pack.png"
+  },
+  "runtime": {
+    "weapon_resource": "data/weapons/crown_launcher.tres",
+    "skin_resources": "data/weapon_skins/crown_launcher/",
+    "textures": "assets/weapons/element_forms/crown_launcher/",
+    "canvas": [
+      512,
+      512
+    ],
+    "source_paintings_preserved": true,
+    "documentation": "docs/WEAPON_SKINS.md"
+  },
+  "integration_notes": [
+    "Runtime sprites share the source crop and rig per weapon; UI icons use centered per-form regions.",
+    "Element forms follow each instance through upgrades, fusion, evolution and resume.",
+    "Existing projectile art and evolution effects are retained."
+  ]
+}

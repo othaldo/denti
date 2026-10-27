@@ -3,6 +3,8 @@
 [resource]
 script = ExtResource("1")
 id = &"holy"
+elemental = true
+selectable = false
 projectile_effect_index = 8
 display_name = "Weihe"
 name_suffix = "des Segens"

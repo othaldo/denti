@@ -7,5 +7,5 @@ projectile_effect_index = 5
 display_name = "Reichweite"
 name_suffix = "der Weitsicht"
 color = Color(0.35, 0.8, 1, 1)
-icon_index = 10
+icon_index = 97
 stat_key = &"range"

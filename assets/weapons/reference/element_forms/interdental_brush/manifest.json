@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "weapon_id": "interdental_brush",
+  "display_name": "Interdental-Bürste",
+  "canvas": {
+    "width": 1024,
+    "height": 1536,
+    "format": "PNG",
+    "mode": "RGBA",
+    "background": "transparent"
+  },
+  "reference": "assets/weapons/weapon_icons_expansion.png",
+  "reference_resource": "data/weapons/interdental_brush.tres",
+  "normal_provenance": "generated portrait-format interpretation of the original weapon image; not a pixel-identical copy",
+  "prompts": "prompts.json",
+  "preview_region": [
+    79,
+    196,
+    937,
+    1124
+  ],
+  "preview_size_px": 58,
+  "status": "complete_for_review",
+  "integrated_into_game": true,
+  "variants": [
+    {
+      "id": "normal",
+      "label": "Normal",
+      "description": "Normalform",
+      "file": "normal.png",
+      "sha256": "d0d7cfb6ee409ca21083eeb9281bb7a180280302637b4133b6848a5fff613cae",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        104,
+        261,
+        974,
+        1296
+      ],
+      "solid_bounds_alpha128": [
+        104,
+        261,
+        974,
+        1295
+      ],
+      "source": "imagegen:exec-dd6fe2c8-cf8d-4a05-95a0-17024014ce63.png",
+      "origin": "built_in_imagegen_reference"
+    },
+    {
+      "id": "fire",
+      "label": "Feuer",
+      "description": "Feuerform",
+      "file": "fire.png",
+      "sha256": "2f456b5792830a4968606a7085459214be2cf20f2a4f3ed3cebdc1d6c92bfe50",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        104,
+        239,
+        988,
+        1295
+      ],
+      "solid_bounds_alpha128": [
+        104,
+        239,
+        988,
+        1295
+      ],
+      "source": "imagegen:exec-c69bcc5a-0ef6-4b06-a2cf-16eadfa1f3b7.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "ice",
+      "label": "Eis",
+      "description": "Eisform",
+      "file": "ice.png",
+      "sha256": "ddf68f011007ffb56e901e1482a694d3bf34eeff98cdba8f9ab7ac8402b679cf",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        103,
+        226,
+        992,
+        1273
+      ],
+      "solid_bounds_alpha128": [
+        103,
+        227,
+        992,
+        1272
+      ],
+      "source": "imagegen:exec-ea7e8ca6-5549-4857-96db-3cf86c6e777c.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "poison",
+      "label": "Gift",
+      "description": "Giftform",
+      "file": "poison.png",
+      "sha256": "1cd0946e20200d3550b60b6a8af751822c44059398712bd81bbc526f4d4e3870",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        104,
+        219,
+        987,
+        1296
+      ],
+      "solid_bounds_alpha128": [
+        105,
+        220,
+        987,
+        1295
+      ],
+      "source": "imagegen:exec-f750e7e9-fac4-4cc6-bc69-1e4e082e7db1.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "electric",
+      "label": "Elektro",
+      "description": "Elektroform",
+      "file": "electric.png",
+      "sha256": "9be2b1d82ebf9f1cee5ec45be199bfce5cbb61d5f9db373664de17775a51ffcf",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        104,
+        236,
+        969,
+        1264
+      ],
+      "solid_bounds_alpha128": [
+        105,
+        236,
+        968,
+        1264
+      ],
+      "source": "imagegen:exec-13f18fcc-c149-41f6-993b-f0ebe8b24433.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "bleed",
+      "label": "Blut",
+      "description": "Blutform",
+      "file": "bleed.png",
+      "sha256": "fb019f6572c9e6dea93bb46e10bd18527ec2db85244de1b7c8e6303f698c18b4",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        104,
+        240,
+        981,
+        1296
+      ],
+      "solid_bounds_alpha128": [
+        104,
+        241,
+        981,
+        1295
+      ],
+      "source": "imagegen:exec-3248f339-0842-487b-85f2-52421458e023.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "wet",
+      "label": "Wasser",
+      "description": "Wasserform",
+      "file": "wet.png",
+      "sha256": "9b534e73bc67f292c8cd0856f123cdff0562479f414ac14ace0acef587830e21",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        104,
+        238,
+        980,
+        1297
+      ],
+      "solid_bounds_alpha128": [
+        105,
+        239,
+        980,
+        1296
+      ],
+      "source": "imagegen:exec-8f59a927-9ccb-4c65-9e1d-29a72ebcafaa.png",
+      "origin": "built_in_imagegen_edit"
+    }
+  ],
+  "integration_notes": [
+    "Runtime sprites share the source crop and rig per weapon; UI icons use centered per-form regions.",
+    "Element forms follow each instance through upgrades, fusion, evolution and resume.",
+    "Existing projectile art and evolution effects are retained."
+  ],
+  "reference_atlas_region": [
+    793.0,
+    0.0,
+    397.0,
+    397.0
+  ],
+  "visual_review": {
+    "method": "Godot comparison sheet at shared crop and native sprite scale",
+    "screenshot": "docs/screenshots/weapon_elements/interdental_brush_complete_pack.png"
+  },
+  "runtime": {
+    "weapon_resource": "data/weapons/interdental_brush.tres",
+    "skin_resources": "data/weapon_skins/interdental_brush/",
+    "textures": "assets/weapons/element_forms/interdental_brush/",
+    "canvas": [
+      512,
+      512
+    ],
+    "source_paintings_preserved": true,
+    "documentation": "docs/WEAPON_SKINS.md"
+  }
+}

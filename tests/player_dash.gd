@@ -70,7 +70,8 @@ func _run() -> void:
 		_check(player.global_position.distance_to(Vector2(500, 300) + direction.normalized() * 150) < 0.02, "dash distance depends on diagonal or move speed")
 		_check(not player.dash.active and player.dash.charge == 0 and player.hurt_time == 0 and player.dodge_time == 0, "dash gives protection or skips its recovery")
 	player.stats.speed_bonus = 0
-	for sample in [[0.0, 4.51], [100.0, 2.51], [400.0, 1.5]]:
+	# Growing the maximum does not accelerate recovery from an empty pool.
+	for sample in [[0.0, 4.51], [100.0, 4.51], [400.0, 4.51]]:
 		_reset()
 		player.stats.dash_recovery_bonus = sample[0]
 		player.dash.request(Vector2.RIGHT, true)
@@ -78,25 +79,26 @@ func _run() -> void:
 		_check(not player.dash.ready_to_dash(), "dash became ready before cost and cooldown were available")
 		player._physics_process(0.01001)
 		_check(player.dash.ready_to_dash(), "dash did not recharge at its expected time")
-	# A larger pool stores multiple fixed-cost dashes and refills in four seconds.
+	# A larger pool stores multiple dashes; regeneration stays fixed at 25/s.
 	_reset()
 	player.stats.apply_upgrade(&"dash_recovery_bonus", 100)
 	_check(player.dash.capacity == 200 and player.dash.charge == 100, "capacity upgrade granted free charge or failed to expand the pool")
 	player.dash.reset_wave()
 	_check(player.dash.request(Vector2.RIGHT, true) and player.dash.charge == 100, "dash did not spend exactly 100 from a 200-point pool")
 	_check(not player.try_dash() and player.dash.charge == 100, "stored second dash bypassed cooldown")
-	player._physics_process(1.5)
+	player._physics_process(0.5)
 	_check(player.dash.charge < 200 and player.try_dash(), "second dash required a full pool instead of 100 points")
 	player._physics_process(0.51)
 	player.dash.charge = 0
-	player._physics_process(4.0)
-	_check(is_equal_approx(player.dash.charge, 200), "larger pool did not completely refill in four seconds")
+	player._physics_process(8.0)
+	_check(is_equal_approx(player.dash.charge, 200), "200 stamina did not refill in eight seconds at the fixed rate")
 	player.dash.charge = 0
 	player._physics_process(1.0)
-	_check(is_equal_approx(player.dash.charge, 50), "200 stamina did not regenerate 50 points per second")
+	_check(is_equal_approx(player.dash.charge, 25), "capacity changed the fixed 25/s regeneration")
 	game.hud.dash_indicator.refresh()
-	_check(game.hud.dash_indicator.vessel.label.text == "50" and game.hud.dash_indicator.caption.text == "/ 200", "HUD does not use the current stamina capacity")
-	_check(is_equal_approx(game.hud.dash_indicator.vessel.displayed_ratio, 0.25), "stamina fill still uses the old fixed maximum")
+	_check(game.hud.dash_indicator.vessel.label.text == "25" and game.hud.dash_indicator.caption.text == "/ 200", "HUD does not use the current stamina capacity")
+	_check(is_equal_approx(game.hud.dash_indicator.vessel.displayed_ratio, 0.125), "stamina fill still uses the old fixed maximum")
+	_check(game.hud.dash_indicator.tooltip_text.contains("8.0 s") and game.hud.dash_indicator.tooltip_text.contains("0.5 s Cooldown"), "dash tooltip misstates recharge or cooldown")
 	player.stats.apply_upgrade(&"dash_recovery_bonus", -100)
 	player.dash.charge = 100
 	player.stats.apply_upgrade(&"dash_recovery_bonus", 100)
@@ -105,9 +107,24 @@ func _run() -> void:
 	_check(player.dash.charge == 100, "capacity loss left the pool overfilled")
 	_reset()
 	player.stats.dash_recovery_bonus = 400
+	player.dash.reset_wave()
 	player.dash.request(Vector2.RIGHT, true)
-	player._physics_process(1.31)
+	player._physics_process(0.49)
 	_check(player.dash.charge > 99.99 and player.dash.cooldown > 0 and not player.try_dash(), "full charge bypassed cooldown")
+	# The reported 300-stamina case: spend the entire bank in three quick dashes.
+	_reset()
+	player.stats.dash_recovery_bonus = 200
+	player.dash.reset_wave()
+	for index in 3:
+		_check(player.dash.request(Vector2.RIGHT, true), "300 stamina could not fund three consecutive dashes")
+		_check(is_equal_approx(player.dash.charge, 200 - index * 100), "regeneration replenished the bank between rapid dashes")
+		player._physics_process(0.5)
+	_check(not player.try_dash() and player.dash.charge == 0, "empty bank permitted a fourth consecutive dash")
+	player._physics_process(0.01)
+	player._physics_process(3.99)
+	_check(not player.dash.ready_to_dash() and is_equal_approx(player.dash.charge, 99.75), "spent stamina regenerated faster with a 300-point maximum")
+	player._physics_process(0.01001)
+	_check(player.dash.ready_to_dash() and player.dash.charge < 101, "one fixed-cost dash did not return after four seconds of regeneration")
 	_reset()
 	player.dash.charge = 99
 	_check(not player.try_dash() and player.dash.charge == 99, "partial charge is usable or invalid input spends it")
@@ -155,16 +172,54 @@ func _run() -> void:
 		var before := player.stats.health
 		player.dash.request(Vector2.RIGHT, true)
 		player._physics_process(0.16)
-		_check(player.global_position.x < obstacle.global_position.x and not player.dash.active and player.dash.charge < 1, "protection allowed crossing an enemy: " + protection)
+		_check(player.global_position.distance_to(Vector2(650, 300)) < 0.02 and not player.dash.active and player.dash.charge < 1, "enemy contact shortened dash: " + protection)
 		obstacle.try_contact_hit()
-		_check(player.stats.health == before - (10 if protection == "none" else 0), "contact damage was duplicated or ignored")
+		_check(player.stats.health == before - (15 if protection == "none" else 0), "dash contact bonus was duplicated, blocked incorrectly or missing")
 		if protection == "shield": _check(player.stats.shield_charges == 1, "same contact consumed two shields")
 		if protection == "roll": _check(player.stats.shield_charges == 1, "passive dodge consumed a shield during dash")
 	_reset()
 	_enemy(player.global_position)
 	player.dash.request(Vector2.RIGHT, true)
 	player._physics_process(1.0)
-	_check(player.global_position == Vector2(500, 300), "dash escaped an overlapping horde")
+	_check(player.global_position.distance_to(Vector2(650, 300)) < 0.02 and player.stats.health == 9985, "starting inside an enemy blocked dash or skipped enhanced damage")
+	_reset()
+	var middle := _enemy(player.global_position + Vector2(75, 0))
+	var contacts_before: int = game.telemetry.dash_contacts
+	player.dash.request(Vector2.RIGHT, true)
+	player._physics_process(0.08)
+	_check(player.dash.active and player.dash.remaining > 0 and player.stats.health == 9985, "mid-dash contact cancelled remaining motion or skipped bonus damage")
+	player._physics_process(0.08)
+	_check(player.global_position.distance_to(Vector2(650, 300)) < 0.02 and player.stats.health == 9985, "a continued dash lost distance or double-hit the same enemy")
+	_check(game.telemetry.dash_contacts == contacts_before + 1, "dash contact telemetry counts duplicate body hits")
+	_reset()
+	var far := _enemy(player.global_position + Vector2(120, 0))
+	far.contact_damage = 40
+	_enemy(player.global_position + Vector2(60, 0))
+	player.dash.request(Vector2.RIGHT, true)
+	player._physics_process(0.16)
+	_check(player.global_position.distance_to(Vector2(650, 300)) < 0.02 and player.stats.health == 9985, "horde contacts were not resolved in travel order with normal i-frames")
+	_reset()
+	middle = _enemy(player.global_position)
+	middle.try_contact_hit()
+	_check(player.stats.health == 9990, "ordinary enemy contact inherited dash penalty")
+	_reset()
+	middle = _enemy(player.global_position)
+	player.dash.request(Vector2.RIGHT, true)
+	middle.try_contact_hit()
+	_check(player.stats.health == 9985 and player.dash.active, "enemy-initiated contact during dash missed its bonus or stopped motion")
+	player._physics_process(0.16)
+	_check(player.global_position.distance_to(Vector2(650, 300)) < 0.02 and player.stats.health == 9985, "enemy and dash sweeps charged the same body contact twice")
+	_reset()
+	player.dash.request(Vector2.RIGHT, true)
+	player._physics_process(0.04)
+	player.take_hit(20)
+	_check(player.dash.active and player.stats.health == 9980, "dash penalty leaked into non-contact damage")
+	_reset()
+	player.stats.armor = 15 # Half damage, applied after the contact multiplier.
+	_enemy(player.global_position + Vector2(75, 0))
+	player.dash.request(Vector2.RIGHT, true)
+	player._physics_process(0.16)
+	_check(is_equal_approx(player.stats.health, 9992.5), "dash contact bypassed armor or multiplied damage twice")
 	_reset()
 	var charger := _enemy(player.global_position + Vector2(75, 100))
 	charger.data = charger.data.duplicate()
@@ -175,7 +230,7 @@ func _run() -> void:
 	charger.special_direction = Vector2.UP
 	player.dash.request(Vector2.RIGHT, true)
 	player._physics_process(0.16)
-	_check(not player.dash.active and player.global_position.x < 600 and player.stats.health < 10000, "crossing enemy charge tunneled through dash")
+	_check(not player.dash.active and player.global_position.distance_to(Vector2(650, 300)) < 0.02 and player.stats.health == 9985, "crossing charge blocked dash or missed its enhanced contact")
 	_reset()
 	player.global_position.x = player.arena.arena_size.x - DentiArena.PLAYER_MARGIN - 10
 	player.dash.request(Vector2.RIGHT, true)
@@ -192,9 +247,12 @@ func _run() -> void:
 	game.add_child(wall)
 	await physics_frame
 	await physics_frame
+	_enemy(Vector2(700, 300))
+	contacts_before = game.telemetry.dash_contacts
 	player.dash.request(Vector2.RIGHT, true)
 	player._physics_process(0.16)
-	_check(player.global_position.x < 570 and not player.dash.active, "dash crossed a physical wall")
+	_check(player.global_position.x < 570 and not player.dash.active and player.stats.health == 10000, "dash crossed a wall or hit an enemy beyond the stopped path")
+	_check(game.telemetry.dash_contacts == contacts_before, "wall collision was counted as enemy contact")
 	wall.free()
 	for long_frame in [0.16, 1.0]:
 		_reset()
@@ -247,7 +305,7 @@ func _run() -> void:
 	player.set_physics_process(false)
 	_enemy(player.global_position + Vector2(50, 0))
 	player._physics_process(remainder)
-	_check(not player.dash.active and player.global_position.x < 620, "resumed movement skipped new collision checks")
+	_check(not player.dash.active and player.global_position.distance_to(Vector2(650, 300)) < 0.02 and player.stats.health == 9985, "resumed dash did not cross a newly encountered enemy with bonus damage")
 	saved.player.erase("dash")
 	saved.player.stats.erase("dash_recovery_bonus")
 	_check(not RunSaveData.normalize(saved).is_empty(), "legacy dash-less save was rejected")

@@ -11,6 +11,7 @@ signal buy_requested(index: int)
 signal sell_requested(index: int)
 signal merge_requested(index: int)
 signal evolution_requested(index: int, recipe_id: StringName)
+signal enchant_requested
 signal reroll_requested
 signal reservation_requested(index: int)
 signal continue_requested
@@ -23,6 +24,7 @@ var luck_label: Label
 var offer_buttons: Array[OfferCard] = []
 var reroll_button: Button
 var continue_button: Button
+var enchant_button: Button
 var inventory_label: Label
 var inventory_row: EquipmentSlots
 var inventory_scroll: ScrollContainer
@@ -281,6 +283,9 @@ func present(model: ShopViewData) -> void:
 	continue_button.text = "Welle %d starten" % (wave_number + 1)
 	continue_button.tooltip_text = continue_button.text
 	continue_button.disabled = equipment.is_empty()
+	var points := model.upgrade_points
+	enchant_button.visible = points > 0
+	enchant_button.text = "Verzaubern · %d" % points
 	if selected_kind == "equipment":
 		var found := -1
 		for index in equipment.size():
@@ -399,16 +404,16 @@ func _render_selection() -> void:
 		details.merge_button.visible = true
 		details.merge_button.disabled = not bool(entry.mergeable)
 		details.merge_button.mouse_default_cursor_shape = Control.CURSOR_ARROW if details.merge_button.disabled else Control.CURSOR_POINTING_HAND
-		details.merge_button.text = "Weitere Mk-Stufen aus Upgrade-Kapseln" if tier == 4 else "Fusionieren · Stufe %s" % ["I", "II", "III", "IV"][tier]
+		details.merge_button.text = "Mk IV erreicht" if tier == 4 else "Fusionieren · Stufe %s" % ["I", "II", "III", "IV"][tier]
 		if data.evolution_kind != &"":
-			details.merge_button.text = "Weitere Mk-Stufen aus Upgrade-Kapseln"
+			details.merge_button.text = "Waffe entwickelt"
 		if bool(entry.mergeable):
 			var primary := player.loadout.equipped()[selected_index]
-			var partner := player.loadout.merge_partner(selected_index)
+			var partner := player.loadout.fusion_partner(selected_index)
 			var result := player.loadout.fusion_data(primary, partner.data, partner)
-			details.action_hint.text = "%s frei · beste Werte\n%s" % [data.roots_text(), _fusion_comparison(result, tier + 1, data, tier)]
+			details.action_hint.text = "Verzauberungen auswählen" if player.loadout.merge_affix_conflict(selected_index) else "%s frei · beste Werte\n%s" % [data.roots_text(), _fusion_comparison(result, tier + 1, data, tier)]
 		else:
-			details.action_hint.text = "Zu viele Verzauberungen für die vorhandenen Plätze" if player != null and player.loadout.merge_affix_conflict(selected_index) else ("Kein Fusionspartner" if tier < 4 else "Verzauberungen wachsen mit weiteren Upgrade-Kapseln.")
+			details.action_hint.text = player.loadout.merge_conflict_reason(selected_index) if player != null and player.loadout.merge_affix_conflict(selected_index) else ("Kein Fusionspartner" if tier < 4 else "")
 		details.action_hint.visible = not details.action_hint.text.is_empty()
 		_highlight_equipment()
 		return

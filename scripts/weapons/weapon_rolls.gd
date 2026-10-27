@@ -46,6 +46,8 @@ static func resolve(data: WeaponData, value: Dictionary, upgrades: Dictionary = 
 	var result := template.duplicate() as WeaponData
 	result.rolls = values
 	result.chest_upgrades = {"mk": maxi(int(upgrades.get("mk", 0)), 0), "range": maxf(float(upgrades.get("range", 0)), 0), "tempo": maxf(float(upgrades.get("tempo", 0)), 0)}
+	for key in ["crit", "crit_damage", "knockback"]:
+		result.chest_upgrades[key] = maxf(float(upgrades.get(key, 0)), 0)
 	var levels := int(result.chest_upgrades.mk)
 	var reach := (float(values.get("range", 1)) * (1.0 + float(result.chest_upgrades.range) / 100.0 + levels * 0.03))
 	result.base_damage *= float(values.get("damage", 1)) * (1.0 + levels * 0.10)
@@ -54,7 +56,12 @@ static func resolve(data: WeaponData, value: Dictionary, upgrades: Dictionary = 
 	result.range_tiers = template.range_tiers.duplicate()
 	for index in result.range_tiers.size():
 		result.range_tiers[index] *= reach
-	result.crit_bonus += float(values.get("crit", 0))
+	result.crit_bonus += float(values.get("crit", 0)) + float(result.chest_upgrades.crit) / 100.0
+	result.crit_multiplier += float(result.chest_upgrades.crit_damage) / 100.0
+	var push := float(result.chest_upgrades.knockback)
+	result.knockback += push
+	result.knockback_tiers = template.knockback_tiers.duplicate()
+	for index in result.knockback_tiers.size(): result.knockback_tiers[index] += push
 	return result
 
 
@@ -77,14 +84,14 @@ static func fuse(primary: WeaponData, partner: WeaponData) -> WeaponData:
 
 
 static func with_affixes(data: WeaponData, affixes: Array[Dictionary]) -> WeaponData:
-	var upgrades := {"mk": int(data.chest_upgrades.get("mk", 0)), "range": 0.0, "tempo": 0.0}
+	var upgrades := {"mk": int(data.chest_upgrades.get("mk", 0)), "range": 0.0, "tempo": 0.0, "crit": 0.0, "crit_damage": 0.0, "knockback": 0.0}
 	for affix in affixes:
 		var definition := WeaponAffixes.by_id(StringName(affix.id))
 		if definition.stat_key != &"":
 			upgrades[str(definition.stat_key)] += float(affix.damage)
-	if float(upgrades.range) == 0 and float(upgrades.tempo) == 0 and int(upgrades.mk) == 0:
+	if upgrades.values().all(func(value) -> bool: return float(value) == 0):
 		upgrades = {}
-	return resolve(data, data.rolls, upgrades)
+	return WeaponSkins.with_element(resolve(data, data.rolls, upgrades), WeaponAffixes.element(affixes))
 
 
 static func title(data: WeaponData) -> String:

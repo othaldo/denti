@@ -1,0 +1,409 @@
+{
+  "magic_toothbrush": {
+    "texture": "assets/weapons/magic_toothbrush.png",
+    "region": null,
+    "visible_size": 68.997396,
+    "grip_anchor": [
+      0.5,
+      0.93
+    ],
+    "tip_anchor": [
+      0.5,
+      0.1
+    ]
+  },
+  "turbo_drill": {
+    "texture": "assets/weapons/turbo_drill.png",
+    "region": null,
+    "visible_size": 58.262911,
+    "grip_anchor": [
+      0.19,
+      0.82
+    ],
+    "tip_anchor": [
+      0.97,
+      0.225
+    ]
+  },
+  "floss_whip": {
+    "texture": "assets/weapons/floss_whip.png",
+    "region": null,
+    "visible_size": 72.384977,
+    "grip_anchor": [
+      0.13,
+      0.88
+    ],
+    "tip_anchor": [
+      0.89,
+      0.71
+    ]
+  },
+  "water_jet": {
+    "texture": "assets/weapons/weapon_icons_refined.png",
+    "region": [
+      1024,
+      0,
+      512,
+      512
+    ],
+    "visible_size": 49.730469,
+    "grip_anchor": [
+      0.44377,
+      0.7873
+    ],
+    "tip_anchor": [
+      0.89915,
+      0.09588
+    ]
+  },
+  "crown_launcher": {
+    "texture": "assets/weapons/weapon_icons_refined.png",
+    "region": [
+      0,
+      0,
+      512,
+      512
+    ],
+    "visible_size": 55.605469,
+    "grip_anchor": [
+      0.30355,
+      0.77246
+    ],
+    "tip_anchor": [
+      0.82421,
+      0.29278
+    ]
+  },
+  "enamel_mirror": {
+    "texture": "assets/weapons/enamel_mirror.png",
+    "region": null,
+    "visible_size": 61.826172,
+    "grip_anchor": [
+      0.16,
+      0.9
+    ],
+    "tip_anchor": [
+      0.78,
+      0.14
+    ]
+  },
+  "plaque_scaler": {
+    "texture": "assets/weapons/plaque_scaler.png",
+    "region": null,
+    "visible_size": 66.140625,
+    "grip_anchor": [
+      0.14,
+      0.89
+    ],
+    "tip_anchor": [
+      0.88,
+      0.12
+    ]
+  },
+  "mouthwash_mortar": {
+    "texture": "assets/weapons/weapon_icons_refined.png",
+    "region": [
+      512,
+      0,
+      512,
+      512
+    ],
+    "visible_size": 64.306641,
+    "grip_anchor": [
+      0.22368,
+      0.78063
+    ],
+    "tip_anchor": [
+      0.83849,
+      0.33623
+    ]
+  },
+  "toothpick_spear": {
+    "texture": "assets/weapons/weapon_icons_expansion.png",
+    "region": [
+      0,
+      0,
+      397,
+      397
+    ],
+    "visible_size": 71.335013,
+    "grip_anchor": [
+      0.24,
+      0.73
+    ],
+    "tip_anchor": [
+      0.86,
+      0.17
+    ]
+  },
+  "cavity_grinder": {
+    "texture": "assets/weapons/weapon_animation_parts.png",
+    "region": [
+      0,
+      0,
+      512,
+      512
+    ],
+    "visible_size": 50.585938,
+    "grip_anchor": [
+      0.17,
+      0.72
+    ],
+    "tip_anchor": [
+      0.73,
+      0.205
+    ]
+  },
+  "interdental_brush": {
+    "texture": "assets/weapons/weapon_icons_expansion.png",
+    "region": [
+      793,
+      0,
+      397,
+      397
+    ],
+    "visible_size": 45.289673,
+    "grip_anchor": [
+      0.26,
+      0.76
+    ],
+    "tip_anchor": [
+      0.83,
+      0.16
+    ]
+  },
+  "fluoride_sprayer": {
+    "texture": "assets/weapons/weapon_icons_refined.png",
+    "region": [
+      0,
+      512,
+      512,
+      512
+    ],
+    "visible_size": 51.328125,
+    "grip_anchor": [
+      0.33805,
+      0.76445
+    ],
+    "tip_anchor": [
+      0.78895,
+      0.27455
+    ]
+  },
+  "water_turbine": {
+    "texture": "assets/weapons/weapon_icons_refined.png",
+    "region": [
+      512,
+      512,
+      512,
+      512
+    ],
+    "visible_size": 60.15625,
+    "grip_anchor": [
+      0.21096,
+      0.74985
+    ],
+    "tip_anchor": [
+      0.83628,
+      0.25499
+    ]
+  },
+  "uv_lamp": {
+    "texture": "assets/weapons/weapon_icons_expansion.png",
+    "region": [
+      0,
+      397,
+      397,
+      396
+    ],
+    "visible_size": 55.176322,
+    "grip_anchor": [
+      0.37,
+      0.73
+    ],
+    "tip_anchor": [
+      0.83,
+      0.32
+    ]
+  },
+  "amalgam_slingshot": {
+    "texture": "assets/weapons/weapon_animation_parts.png",
+    "region": [
+      1024,
+      0,
+      512,
+      512
+    ],
+    "visible_size": 51.796875,
+    "grip_anchor": [
+      0.59,
+      0.69
+    ],
+    "tip_anchor": [
+      0.56,
+      0.34
+    ]
+  },
+  "floss_garrote": {
+    "texture": "assets/weapons/weapon_icons_expansion.png",
+    "region": [
+      793,
+      397,
+      397,
+      396
+    ],
+    "visible_size": 69.753149,
+    "grip_anchor": [
+      0.5,
+      0.7
+    ],
+    "tip_anchor": [
+      0.5,
+      0.24
+    ]
+  },
+  "prophylaxis_polisher": {
+    "texture": "assets/weapons/weapon_animation_parts.png",
+    "region": [
+      512,
+      0,
+      512,
+      512
+    ],
+    "visible_size": 47.734375,
+    "grip_anchor": [
+      0.2,
+      0.81
+    ],
+    "tip_anchor": [
+      0.73,
+      0.201
+    ]
+  },
+  "fluoride_rocket": {
+    "texture": "assets/weapons/weapon_icons_expansion.png",
+    "region": [
+      1586,
+      397,
+      397,
+      396
+    ],
+    "visible_size": 63.098237,
+    "grip_anchor": [
+      0.47,
+      0.7
+    ],
+    "tip_anchor": [
+      0.84,
+      0.28
+    ]
+  },
+  "storm_shower": {
+    "texture": "assets/weapons/weapon_evolutions.png",
+    "region": [
+      48,
+      32,
+      480,
+      476
+    ],
+    "visible_size": 55.341667,
+    "grip_anchor": [
+      0.22,
+      0.85
+    ],
+    "tip_anchor": [
+      0.88,
+      0.09
+    ]
+  },
+  "fate_thread": {
+    "texture": "assets/weapons/weapon_evolutions.png",
+    "region": [
+      528,
+      20,
+      504,
+      474
+    ],
+    "visible_size": 75.678571,
+    "grip_anchor": [
+      0.1,
+      0.9
+    ],
+    "tip_anchor": [
+      0.88,
+      0.15
+    ]
+  },
+  "root_breaker": {
+    "texture": "assets/weapons/weapon_evolutions.png",
+    "region": [
+      1032,
+      24,
+      480,
+      488
+    ],
+    "visible_size": 58.770492,
+    "grip_anchor": [
+      0.19,
+      0.84
+    ],
+    "tip_anchor": [
+      0.96,
+      0.02
+    ]
+  },
+  "halo": {
+    "texture": "assets/weapons/weapon_evolutions.png",
+    "region": [
+      48,
+      512,
+      480,
+      496
+    ],
+    "visible_size": 63.951613,
+    "grip_anchor": [
+      0.15,
+      0.85
+    ],
+    "tip_anchor": [
+      0.94,
+      0.28
+    ]
+  },
+  "trinity_brush": {
+    "texture": "assets/weapons/weapon_evolutions.png",
+    "region": [
+      548,
+      495,
+      500,
+      513
+    ],
+    "visible_size": 67.953216,
+    "grip_anchor": [
+      0.13,
+      0.85
+    ],
+    "tip_anchor": [
+      0.72,
+      0.08
+    ]
+  },
+  "revelation": {
+    "texture": "assets/weapons/weapon_evolutions.png",
+    "region": [
+      1048,
+      520,
+      464,
+      488
+    ],
+    "visible_size": 62.336066,
+    "grip_anchor": [
+      0.12,
+      0.86
+    ],
+    "tip_anchor": [
+      0.91,
+      0.17
+    ]
+  }
+}

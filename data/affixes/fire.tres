@@ -3,6 +3,12 @@
 [resource]
 script = ExtResource("1")
 id = &"fire"
+elemental = true
+projectile_art_kind = 0
+attack_stream_art = 0
+attack_trail_art = 0
+attack_spray_art = 0
+visual_animation_rate = 1.35
 projectile_effect_index = 0
 display_name = "Feuer"
 name_suffix = "der Glut"
@@ -14,5 +20,5 @@ proc_radius = 115.0
 proc_cooldown = 0.35
 proc_targets = 3
 color = Color(1, 0.48, 0.19, 1)
-icon_index = 14
+icon_index = 91
 dot_duration = 2.0

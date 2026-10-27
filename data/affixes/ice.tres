@@ -3,6 +3,12 @@
 [resource]
 script = ExtResource("1")
 id = &"ice"
+elemental = true
+projectile_art_kind = 5
+attack_stream_art = 8
+attack_trail_art = 2
+attack_spray_art = 8
+visual_animation_rate = 0.75
 projectile_effect_index = 1
 display_name = "Eis"
 name_suffix = "des Frosts"
@@ -14,6 +20,6 @@ proc_radius = 95.0
 proc_cooldown = 0.8
 proc_targets = 6
 color = Color(0.35, 0.8, 1, 1)
-icon_index = 8
+icon_index = 92
 slow_fraction = 0.15
 slow_duration = 1.5

@@ -3,13 +3,20 @@
 [resource]
 script = ExtResource("1")
 id = &"wet"
+elemental = true
+projectile_art_kind = 0
+attack_stream_art = 6
+attack_trail_art = 6
+attack_spray_art = 6
+visual_animation_rate = 1.0
 projectile_effect_index = 7
-display_name = "Nässe"
+display_name = "Wasser"
 name_suffix = "der Flut"
-description = "Durchnässt Gegner. Bereitet Elektro, Leitlack und Spülpfützen vor."
-effect_kind = "wet"
+description = "Wasserschaden und Nässe. Besonders wirksam gegen Zucker und Plaque."
+effect_kind = "damage"
+damage_factor = 0.65
 color = Color(0.25, 0.85, 1, 1)
-icon_index = 21
+icon_index = 96
 build_tags = Array[StringName]([&"ranged", &"area"])
 utility_base = 1.2
 utility_scale = 0.06

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="WeaponSkinData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_skin_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/weapons/element_forms/cavity_grinder/normal.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/weapons/element_forms/cavity_grinder/normal_body.png" id="3"]
+[ext_resource type="Texture2D" path="res://assets/weapons/element_forms/cavity_grinder/normal_head.png" id="4"]
+
+[sub_resource type="AtlasTexture" id="Icon_skin"]
+atlas = ExtResource("2")
+region = Rect2(20, 40, 468, 443)
+filter_clip = true
+
+[resource]
+script = ExtResource("1")
+grip_anchor = Vector2(0.153648, 0.766120)
+tip_anchor = Vector2(0.852592, 0.205149)
+working_head_radius = 0.106478
+working_head_aspect = 0.631579
+working_head_angle_degrees = -25
+sprite = SubResource("Icon_skin")
+held_sprite = ExtResource("3")
+working_head_texture = ExtResource("4")

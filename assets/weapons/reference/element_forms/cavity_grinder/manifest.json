@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "weapon_id": "cavity_grinder",
+  "display_name": "Karies-Fräse",
+  "canvas": {
+    "width": 1024,
+    "height": 1536,
+    "format": "PNG",
+    "mode": "RGBA",
+    "background": "transparent"
+  },
+  "reference": "assets/weapons/weapon_icons_refined.png",
+  "reference_resource": "data/weapons/cavity_grinder.tres",
+  "normal_provenance": "generated portrait-format interpretation of the original weapon image; not a pixel-identical copy",
+  "prompts": "prompts.json",
+  "preview_region": [
+    4,
+    311,
+    1020,
+    985
+  ],
+  "preview_size_px": 70,
+  "status": "complete_for_review",
+  "integrated_into_game": true,
+  "variants": [
+    {
+      "id": "normal",
+      "label": "Normal",
+      "description": "Normalform",
+      "file": "normal.png",
+      "sha256": "7661d13f9f13e082fb9dd887afdbd8ce134268efb41783ca00a640a8ae4aa0bd",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        27,
+        358,
+        993,
+        1272
+      ],
+      "solid_bounds_alpha128": [
+        28,
+        359,
+        992,
+        1271
+      ],
+      "source": "imagegen:exec-835b8e00-c6aa-49eb-ba9c-f50386401853.png",
+      "origin": "built_in_imagegen_reference"
+    },
+    {
+      "id": "fire",
+      "label": "Feuer",
+      "description": "Feuerform",
+      "file": "fire.png",
+      "sha256": "7d7f49af9c1d73d33dcce438115c7b307b5bc9aa98a0c14923bfae80e36857f8",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        27,
+        341,
+        1002,
+        1240
+      ],
+      "solid_bounds_alpha128": [
+        28,
+        342,
+        1001,
+        1239
+      ],
+      "source": "imagegen:exec-905dad06-c7c0-4445-aa4e-e62125cc7ff4.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "ice",
+      "label": "Eis",
+      "description": "Eisform",
+      "file": "ice.png",
+      "sha256": "5a8b733d91a36fb833e551920e2c67add67a2caf59110a95b76e48a270cb3aaf",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        29,
+        354,
+        998,
+        1272
+      ],
+      "solid_bounds_alpha128": [
+        30,
+        355,
+        998,
+        1272
+      ],
+      "source": "imagegen:exec-cb6d9f34-7e7a-41f8-9d35-95d484a1d41c.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "poison",
+      "label": "Gift",
+      "description": "Giftform",
+      "file": "poison.png",
+      "sha256": "7b9acc76d4d3e85bfb9e4da8e4c80be27079dfba90ab0e8245627a0e759199f2",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        28,
+        358,
+        993,
+        1272
+      ],
+      "solid_bounds_alpha128": [
+        28,
+        358,
+        992,
+        1272
+      ],
+      "source": "imagegen:exec-ecf8772c-7a7b-42bd-9baf-b3ab5df46117.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "electric",
+      "label": "Elektro",
+      "description": "Elektroform",
+      "file": "electric.png",
+      "sha256": "04364c961dc67774f4ac0e7ca31a9c94748b6a558741361c0f9b161122d9ac91",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        28,
+        358,
+        995,
+        1272
+      ],
+      "solid_bounds_alpha128": [
+        28,
+        358,
+        994,
+        1272
+      ],
+      "source": "imagegen:exec-19392a7e-3199-4ab3-af98-7c1126a167e8.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "bleed",
+      "label": "Blut",
+      "description": "Blutform",
+      "file": "bleed.png",
+      "sha256": "5dc70aa77c1cda9707a689af4a0b43acf2cd3fdce2d985c13d99b3966ae0dbeb",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        28,
+        335,
+        1000,
+        1273
+      ],
+      "solid_bounds_alpha128": [
+        28,
+        335,
+        1000,
+        1272
+      ],
+      "source": "imagegen:exec-d455a136-8020-4fc4-b70a-a9e293ee49dd.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "wet",
+      "label": "Wasser",
+      "description": "Wasserform",
+      "file": "wet.png",
+      "sha256": "296eb48a528a32aa3c7b32237a1c43d1878ddb9f19e2234f1300650e9ab00831",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        27,
+        354,
+        997,
+        1272
+      ],
+      "solid_bounds_alpha128": [
+        28,
+        355,
+        997,
+        1271
+      ],
+      "source": "imagegen:exec-8e0301b0-d6c3-4d69-8f51-72e212b5c81f.png",
+      "origin": "built_in_imagegen_edit"
+    }
+  ],
+  "integration_notes": [
+    "Runtime sprites share the source crop and rig per weapon; UI icons use centered per-form regions.",
+    "Element forms follow each instance through upgrades, fusion, evolution and resume.",
+    "Existing projectile art and evolution effects are retained."
+  ],
+  "reference_atlas_region": [
+    0.0,
+    1024.0,
+    512.0,
+    512.0
+  ],
+  "visual_review": {
+    "method": "Godot comparison sheet at shared crop and native sprite scale",
+    "screenshot": "docs/screenshots/weapon_elements/cavity_grinder_complete_pack.png"
+  },
+  "runtime": {
+    "weapon_resource": "data/weapons/cavity_grinder.tres",
+    "skin_resources": "data/weapon_skins/cavity_grinder/",
+    "textures": "assets/weapons/element_forms/cavity_grinder/",
+    "canvas": [
+      512,
+      512
+    ],
+    "source_paintings_preserved": true,
+    "documentation": "docs/WEAPON_SKINS.md"
+  }
+}

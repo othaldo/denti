@@ -1,6 +1,13 @@
-[gd_resource type="Resource" script_class="WeaponData" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="WeaponData" load_steps=4 format=3]
+
 [ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/weapons/turbo_drill.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/weapons/element_forms/turbo_drill/normal.png" id="2"]
+
+[sub_resource type="AtlasTexture" id="Icon_skin"]
+atlas = ExtResource("2")
+region = Rect2(51, 61, 408, 431)
+filter_clip = true
+
 [resource]
 script = ExtResource("1")
 role = "Boss-Fokus im Nahkampf"
@@ -17,12 +24,23 @@ interval = 0.64
 attack_range = 160.0
 damage_tiers = PackedFloat32Array(1.00, 1.40, 1.95, 2.65)
 boss_bonus_tiers = PackedFloat32Array(0.25, 0.3, 0.35, 0.4)
-sprite = ExtResource("2")
-grip_anchor = Vector2(0.19, 0.82)
 visual_angle_degrees = 40
 price = 9
 held_style = "staff"
 attack_animation = "drill"
-tip_anchor = Vector2(0.97, 0.225)
 visual_size = 60.0
 animation_duration = 0.22
+
+grip_anchor = Vector2(0.247777, 0.789097)
+tip_anchor = Vector2(0.872939, 0.292618)
+sprite = SubResource("Icon_skin")
+held_sprite = ExtResource("2")
+held_scale = 1.169828
+element_skins = {
+"fire": "res://data/weapon_skins/turbo_drill/fire.tres",
+"ice": "res://data/weapon_skins/turbo_drill/ice.tres",
+"poison": "res://data/weapon_skins/turbo_drill/poison.tres",
+"electric": "res://data/weapon_skins/turbo_drill/electric.tres",
+"bleed": "res://data/weapon_skins/turbo_drill/bleed.tres",
+"wet": "res://data/weapon_skins/turbo_drill/wet.tres"
+}

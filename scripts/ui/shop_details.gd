@@ -112,14 +112,17 @@ func show_weapon(data: WeaponData, tier: int, player: Player, equipped: bool, eq
 
 func show_affixes(weapon: WeaponInstance, stats: PlayerStats, items: ItemInventory = null) -> void:
 	heading.text = WeaponPresentation.weapon_name(weapon) + " · " + WeaponPresentation.tier_text(weapon.data, weapon.tier)
-	DentiUIComponents.label(affix_rows, "Verzauberungen · %d/%d Plätze" % [weapon.affixes.size(), weapon.affix_slots], 14)
+	DentiUIComponents.label(affix_rows, "Verzauberungen · %d/%d Plätze" % [weapon.affixes.size(), maxi(WeaponUpgrades.slots(weapon.tier), weapon.affixes.size())], 14)
 	for affix in weapon.affixes:
 		var data := WeaponAffixes.by_id(StringName(affix.id))
 		var label := DentiUIComponents.label(affix_rows, "%s +%s %s" % [data.display_name, AffixPresentation.value_text(float(affix.damage), data.id, weapon.data, stats, items), AffixPresentation.damage_unit(data.id, items)], 14)
 		label.tooltip_text = AffixPresentation.effect_description(data.id) + "\n" + AffixPresentation.mechanics_text(data.id)
 		label.add_theme_color_override("font_color", data.color)
 		var rarity := DentiUIComponents.label(affix_rows, AffixPresentation.progress_text(affix), 12)
-		DentiUIStyle.style_affix_rarity_label(rarity, affix.rarity)
+		if affix.has("level"):
+			rarity.add_theme_color_override("font_color", DentiUIStyle.MUTED)
+		else:
+			DentiUIStyle.style_affix_rarity_label(rarity, affix.rarity)
 
 
 func show_item(entry: Dictionary, owned: bool) -> void:

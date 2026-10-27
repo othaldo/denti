@@ -10,8 +10,8 @@ seine Richtung nicht.
 
 - 150 Welteinheiten in 0,16 s, unabhängig von Bewegungstempo und Diagonale.
 - Anfangsvorrat: 100 Wurzelkraft, durch Punkte bis auf 500 ausbaubar. Jeder Start kostet genau 100; ein teilgefüllter Vorrat genügt, solange mindestens 100 übrig sind.
-- Nach dem Ende 0,35 s Erholungspause, danach maximaler Vorrat / 4 pro Sekunde. Der gesamte Vorrat lädt immer in 4 s auf: 100 → 25/s, 200 → 50/s.
-- Separater Cooldown von 1,5 s ab Start. Mindestens 100 Wurzelkraft **und** freier Cooldown
+- Nach dem Ende 0,35 s Erholungspause, danach feste **25 Wurzelkraft pro Sekunde**, unabhängig vom maximalen Vorrat.
+- Separater Cooldown von **0,5 s** ab Start. Mindestens 100 Wurzelkraft **und** freier Cooldown
   sind erforderlich. Ungültige Eingaben werden nicht vorgemerkt.
 - Neue Wellen starten voll. Pause, Shop und Fortsetzen schenken keine Ladung;
   Pausen- und Offlinezeit regenerieren nichts.
@@ -23,17 +23,21 @@ Run-Koordinator bestimmt weiterhin Kampf und Pause.
 
 ## Kontakt und Gefahr
 
-Der erste lebende Gegner, eine Wand oder der Arenarand beendet den Dash ohne
-Erstattung. Auch ein Start innerhalb einer Horde kann Gegner nicht durchqueren.
-Schild, Zahnflutsch und bestehende Trefferpausen ändern diesen Stopp nicht.
+Gegnerkörper beenden den Dash nicht. Denti legt auch beim Start innerhalb einer
+Horde seine Strecke zurück. Nur Wände und der Arenarand stoppen die Bewegung ohne
+Erstattung. Körperkontakt während des Dashs verursacht **50 % mehr Schaden**, vor
+Härte. Schild, Zahnflutsch und bestehende Trefferpausen gelten weiterhin.
 Der Dash verursacht keinen Schaden und verleiht keine zusätzlichen Schutzframes.
 
 Gegnerkörper werden entlang der Bewegung geprüft; bereits laufende gegnerische
 Charges werden relativ zur eigenen Bewegung geprüft. Kontakt läuft über
 denselben Trefferweg wie normale Berührung und erhält dessen Kontaktcooldown,
 damit derselbe Kontakt nicht nochmals Schaden oder eine zweite Schildladung kostet.
+Mehrere gekreuzte Gegner werden in Bewegungsreihenfolge geprüft. Gegner hinter
+einer Wand zählen nur, wenn sie die tatsächlich zurückgelegte Strecke berühren.
+Projektile, Flächen und laufender Statusschaden erhalten keinen Dash-Schadensbonus.
 Projektile prüfen die relative Bewegung; bei langen Frames wird am tatsächlichen
-Dashende beziehungsweise Kontaktstopp geteilt. Neu danach erzeugte Geschosse
+Dashende beziehungsweise Wandstopp geteilt. Neu danach erzeugte Geschosse
 treffen keine vergangenen Spielerpositionen.
 
 Die vorhandenen Flächenangriffe sind zeitlich ausgelöste Pulse. Ihr Treffer
@@ -50,16 +54,20 @@ Levelaufstieg zeigt etwa **+25 Wurzelkraft**. Die bisherigen Zahlen-IDs und der
 interne Ressourcen-/Save-Key `dash_recovery_bonus` bleiben kompatibel: bisherige
 Bonuswerte werden als zusätzliche Punkte über dem Basisvorrat 100 übernommen.
 
-| Maximaler Vorrat | Nachladerate | Dashes aus vollem Vorrat ohne Nachladen |
-| --- | --- | --- |
-| 100 | 25/s | 1 |
-| 200 | 50/s | 2 |
-| 500 | 125/s | 5 |
+| Maximaler Vorrat | Nachladerate | Leer → voll, ohne Erholungspause | Gespeicherte Dashes |
+| --- | --- | --- | --- |
+| 100 | 25/s | 4 s | 1 |
+| 200 | 25/s | 8 s | 2 |
+| 300 | 25/s | 12 s | 3 |
+| 500 | 25/s | 20 s | 5 |
 
-Die reine Auffüllzeit von leer auf voll bleibt immer 4 s, zusätzlich zu Dashdauer
-und Erholungspause. Der separate Cooldown von 1,5 s begrenzt auch gespeicherte
-Dashes. Nach einem Dash aus 200 bleiben 100 übrig; nach dem Cooldown darf ein
-weiterer Dash starten, ohne auf 200 warten zu müssen.
+Mehr Wurzelkraft vergrößert nur den Vorrat. Sie beschleunigt die Regeneration nicht.
+Mit 300 Punkten lassen sich drei Dashes im Abstand von jeweils 0,5 s ausführen,
+bevor Ausdauer nachgeladen werden muss. Der leere Vorrat regeneriert in vier
+Sekunden die Kosten eines weiteren Dashs. Dauer und Erholungspause ergeben nach
+dem letzten Dash insgesamt etwa 4,51 s bis zum nächsten aus leerem Vorrat.
+Nach einem Dash aus 200 bleiben dagegen 100 übrig: Der zweite Dash darf bereits
+nach dem kurzen Cooldown starten, ohne auf einen vollen Vorrat zu warten.
 
 Level-Boni bieten +25/40/60/90 Punkte je Seltenheit und geben kurz vor dem
 Limit nur den noch nutzbaren Rest. Am Limit 500 wird der Bonus nicht mehr
@@ -92,7 +100,8 @@ Richtungen. Ein fortgesetzter Dash prüft seine verbleibende Strecke erneut.
 Alte Saves ohne Dash-Daten erhalten 100 Wurzelkraft ohne Bonus. Bestehende Saves bewahren auch Restvorräte über 100 und während eines aktiven Dashs.
 Gespeicherte Aufstiegsangebote begrenzen ihre angebotenen Punkte erneut anhand der
 wiederhergestellten Stats. F3-Telemetrie und Run-Daten erfassen Dashanzahl,
-Kontaktabbrüche und tatsächlich erlittenen Schaden während Dash-Bewegungsframes.
+Gegnerkontakte und tatsächlich erlittenen Schaden während Dash-Bewegungsframes.
+Die bisherigen JSON-Felder `dash_contacts` bleiben für gespeicherte Berichte erhalten.
 
 Die automatischen Prüfungen decken Zeitgrenzen, lange Frames, Richtungen,
 gehaltenes Shift, Gegner/Wände/Ränder, Schilde/Dodge/Trefferpausen, Geschosse,
@@ -102,6 +111,8 @@ vereinfachte Icon bestand der vollständige Testlauf mit **118/118 Tests**
 (`.godot/test_runs/20261019-203516-f31b1f29`, 110,88 s). Neue Fälle prüfen
 feste Kosten aus größerem Vorrat, Nachladerate, Teilfüllung, Kapazitätswechsel,
 HUD-Maximum und Save/Resume mit gespeichertem Restvorrat während eines Dashs.
+Der aktuelle Regressionstest prüft insbesondere die drei schnellen Dashes aus
+300 Ausdauer, den gesperrten vierten Dash und dieselbe 25/s-Rate bei jedem Maximum.
 Native Aufnahmen: [Mobile](screenshots/dash/mobile.png),
 [Desktop](screenshots/dash/desktop.png), [Animation](screenshots/dash/flow.gif).
 Die Aufnahmen oben zeigen den ursprünglichen Basisvorrat. Die vereinfachte

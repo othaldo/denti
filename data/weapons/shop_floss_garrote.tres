@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("1")
 id = &"floss_garrote"
-display_name = "Zahnseiden-Garotte"
-description = "2 Wurzeln · Schwerer 150°-Frontbogen verursacht starke Blutung. Gegner hinter Denti bleiben ungetroffen."
+display_name = "Zahnseiden-Schneide"
+description = "2 Wurzeln · Zwei Fäden schnellen nach vorn, treffen Gegner auf ihrem Weg und stoßen sie zurück. Blutung."
 price = 15
 weapon_data = ExtResource("2")

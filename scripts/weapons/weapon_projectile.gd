@@ -31,6 +31,8 @@ var visual_frames: Array[Texture2D] = []
 var visual_frame_index: int = -1
 var visual_generation: int = -1
 var visual_radius: float = 7.0
+var visual_element: StringName = &""
+var visual_rate: float = 1.0
 var flight_range: float = 0.0
 var splash_radius: float = 0.0
 var pool: PlayerProjectilePool
@@ -59,6 +61,8 @@ func launch(start: Vector2, aim: Vector2, attack_damage: float, weapon: WeaponDa
 	damage = attack_damage
 	data = weapon
 	affixes = weapon_affixes.duplicate(true)
+	visual_element = WeaponElementVisuals.element(data, affixes)
+	visual_rate = WeaponElementVisuals.animation_rate(visual_element)
 	affix_factor = additions_factor
 	tier = weapon_tier
 	critical = is_critical
@@ -86,7 +90,7 @@ func retire() -> void:
 
 
 func _create_visuals() -> void:
-	var base := ProjectileEnchantmentSkins.base_texture(data, tier)
+	var base := ProjectileEnchantmentSkins.base_texture(data, tier, affixes)
 	var radius := ProjectileEnchantmentSkins.visual_radius(data, tier)
 	if is_instance_valid(pool):
 		visual_frames = pool.skins.frames(base, ProjectileEnchantmentSkins.mask(affixes), radius)
@@ -112,7 +116,7 @@ func _sync_visuals(heading: Vector2 = Vector2.ZERO) -> void:
 		return
 	body_sprite.visible = impact_time <= 0.0
 	if not visual_frames.is_empty():
-		var frame := (floori(animation_time * ProjectileParticleFrames.FPS) + get_instance_id() % ProjectileParticleFrames.COUNT) % visual_frames.size()
+		var frame := (floori(animation_time * ProjectileParticleFrames.FPS * visual_rate) + get_instance_id() % ProjectileParticleFrames.COUNT) % visual_frames.size()
 		if frame != visual_frame_index or body_sprite.texture != visual_frames[frame]:
 			body_sprite.texture = visual_frames[frame]
 			visual_frame_index = frame
@@ -132,7 +136,9 @@ func _physics_process(delta: float) -> void:
 		for enemy in EnemySpatialIndex.circle(get_tree(), enemy_index, orbit_center, data.evolution_radius):
 			if enemy.health > 0 and not orbit_hits.has(enemy.get_instance_id()):
 				orbit_hits.append(enemy.get_instance_id())
-				enemy.take_damage(damage * data.evolution_damage_factor, null, false, &"evolution")
+				var dealt := enemy.take_damage(damage * data.evolution_damage_factor, null, false, &"evolution")
+				if dealt > 0:
+					ElementImpactBatch.emit_from(self, visual_element, enemy.global_position, Vector2.from_angle(animation_time * 9).orthogonal(), 27)
 		_sync_visuals(Vector2.from_angle(animation_time * 9.0).orthogonal())
 		if orbit_time <= 0:
 			_start_return()
@@ -220,7 +226,8 @@ func _explode() -> void:
 	for enemy in EnemySpatialIndex.circle(get_tree(), enemy_index, global_position, splash_radius):
 		if enemy.health > 0:
 			var push_direction := global_position.direction_to(enemy.global_position)
-			WeaponAttackShapes.hit(enemy, data, tier, damage, critical, items, direction if push_direction.is_zero_approx() else push_direction, affixes, affix_factor)
+			WeaponAttackShapes.hit(enemy, data, tier, damage, critical, items, direction if push_direction.is_zero_approx() else push_direction, affixes, affix_factor, false)
+	ElementImpactBatch.emit_from(self, visual_element, global_position, direction, splash_radius, true)
 	impact_time = IMPACT_DURATION
 	_sync_visuals()
 	queue_redraw()
@@ -277,5 +284,9 @@ func _draw() -> void:
 	if impact_time > 0.0:
 		var progress := 1.0 - impact_time / IMPACT_DURATION
 		var radius := data.splash_at_tier(tier) if data.splash_at_tier(tier) > 0.0 else 20.0
+		if WeaponElementVisuals.ELEMENTS.has(visual_element):
+			if ElementImpactBatch.find(self) != null: return
+			WeaponElementVisuals.flash(self, visual_element, Vector2.ZERO, radius * progress, Color(1, 1, 1, (1.0 - progress) * 0.75), animation_time + progress * IMPACT_DURATION)
+			return
 		GroundEffects.draw(self, GroundEffects.Shape.RIPPLE, Vector2.ZERO, radius * progress, Color(data.projectile_color, 1.0 - progress))
 		return

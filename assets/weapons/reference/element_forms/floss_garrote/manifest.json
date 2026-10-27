@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "weapon_id": "floss_garrote",
+  "display_name": "Zahnseiden-Garotte",
+  "canvas": {
+    "width": 1024,
+    "height": 1536,
+    "format": "PNG",
+    "mode": "RGBA",
+    "background": "transparent"
+  },
+  "reference": "assets/weapons/weapon_icons_expansion.png",
+  "reference_resource": "data/weapons/floss_garrote.tres",
+  "normal_provenance": "generated portrait-format interpretation of the original weapon image; not a pixel-identical copy",
+  "prompts": "prompts.json",
+  "preview_region": [
+    17,
+    360,
+    990,
+    777
+  ],
+  "preview_size_px": 86,
+  "status": "complete_for_review",
+  "integrated_into_game": true,
+  "variants": [
+    {
+      "id": "normal",
+      "label": "Normal",
+      "description": "Normalform",
+      "file": "normal.png",
+      "sha256": "80297b655a5dc8741b58f3fbe3e6f0b16f2035b1e761db366e9b0f0fb2d9ac5d",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        95,
+        425,
+        931,
+        1102
+      ],
+      "solid_bounds_alpha128": [
+        96,
+        426,
+        931,
+        1101
+      ],
+      "source": "imagegen:exec-d326853f-8552-4e3c-ac73-a8baf087cce2.png",
+      "origin": "built_in_imagegen_reference"
+    },
+    {
+      "id": "fire",
+      "label": "Feuer",
+      "description": "Feuerform",
+      "file": "fire.png",
+      "sha256": "27356c7c1990856585f478f927e6775f08a67f02f1d55eb206f02d07aa4d4ec1",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        86,
+        402,
+        942,
+        1105
+      ],
+      "solid_bounds_alpha128": [
+        87,
+        403,
+        942,
+        1104
+      ],
+      "source": "imagegen:exec-46a1d6fd-6aca-4d7a-8bef-baa721d1895d.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "ice",
+      "label": "Eis",
+      "description": "Eisform",
+      "file": "ice.png",
+      "sha256": "c450c71009fdbf76c765163e013fd2fdd54e8f4fb8209d88722e0fbf1a7542e2",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        91,
+        399,
+        934,
+        1072
+      ],
+      "solid_bounds_alpha128": [
+        92,
+        399,
+        933,
+        1072
+      ],
+      "source": "imagegen:exec-6364da5d-15a5-4823-8543-60b9f4ffa9a0.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "poison",
+      "label": "Gift",
+      "description": "Giftform",
+      "file": "poison.png",
+      "sha256": "40b756c1ecedc7cb4e45236f0bd0c07513064519b86a2454d80674c4bdf21583",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        90,
+        418,
+        934,
+        1102
+      ],
+      "solid_bounds_alpha128": [
+        91,
+        419,
+        934,
+        1102
+      ],
+      "source": "imagegen:exec-20606eed-5199-45f8-a015-d4fa45c26008.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "electric",
+      "label": "Elektro",
+      "description": "Elektroform",
+      "file": "electric.png",
+      "sha256": "959a23c9f773bd04b0585eb175e5c66bc5610663a5e8439e74e8fcfa501753b2",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        40,
+        384,
+        984,
+        1113
+      ],
+      "solid_bounds_alpha128": [
+        41,
+        384,
+        983,
+        1113
+      ],
+      "source": "imagegen:exec-5505ba3d-e141-4a63-986c-19de08d2ed1d.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "bleed",
+      "label": "Blut",
+      "description": "Blutform",
+      "file": "bleed.png",
+      "sha256": "e59a9d1c7fd483aaaf826afa670ce024400c6d9365dba4a2f5727af951fd3b93",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        78,
+        420,
+        952,
+        1102
+      ],
+      "solid_bounds_alpha128": [
+        78,
+        421,
+        951,
+        1102
+      ],
+      "source": "imagegen:exec-9a727235-8f81-4046-b95e-3523137b4976.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "wet",
+      "label": "Wasser",
+      "description": "Wasserform",
+      "file": "wet.png",
+      "sha256": "19347eb627a70bf577d6a4eacfd7118b3015b315545a1638842957afb593c8a6",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        80,
+        415,
+        951,
+        1109
+      ],
+      "solid_bounds_alpha128": [
+        81,
+        416,
+        950,
+        1109
+      ],
+      "source": "imagegen:exec-adc0fc86-8cb7-4968-b29f-efdc06f69dd3.png",
+      "origin": "built_in_imagegen_edit"
+    }
+  ],
+  "integration_notes": [
+    "Runtime sprites share the source crop and rig per weapon; UI icons use centered per-form regions.",
+    "Element forms follow each instance through upgrades, fusion, evolution and resume.",
+    "Existing projectile art and evolution effects are retained."
+  ],
+  "reference_atlas_region": [
+    793.0,
+    397.0,
+    397.0,
+    396.0
+  ],
+  "visual_review": {
+    "method": "Godot comparison sheet at shared crop and native sprite scale",
+    "screenshot": "docs/screenshots/weapon_elements/floss_garrote_complete_pack.png"
+  },
+  "runtime": {
+    "weapon_resource": "data/weapons/floss_garrote.tres",
+    "skin_resources": "data/weapon_skins/floss_garrote/",
+    "textures": "assets/weapons/element_forms/floss_garrote/",
+    "canvas": [
+      512,
+      512
+    ],
+    "source_paintings_preserved": true,
+    "documentation": "docs/WEAPON_SKINS.md"
+  }
+}

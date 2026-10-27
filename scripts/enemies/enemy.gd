@@ -320,14 +320,14 @@ func _physics_process(delta: float) -> void:
 				try_contact_hit()
 
 
-func try_contact_hit() -> void:
+func try_contact_hit(during_dash: bool = false) -> void:
 	if loot_goblin != null: return
 	if contact_timer > 0.0 or health <= 0.0 or is_queued_for_deletion() or target == null:
 		return
 	var charging := special_phase == SpecialPhase.ACTIVE and (active_special_attack == EnemyData.SpecialAttack.DASH or active_special_attack == EnemyData.SpecialAttack.BOSS and boss_move == BossMove.CHARGE)
 	charging = charging or caramel_encounter != null and caramel_encounter.state == CaramelEncounter.State.RUSH_ACTIVE
 	contact_timer = 0.8 / overtime_attack_factor()
-	target.take_hit(attack_damage if charging else contact_damage, inflicted_statuses)
+	target.take_contact_hit(attack_damage if charging else contact_damage, inflicted_statuses, during_dash)
 
 
 func _update_sprite_facing(direction: Vector2) -> void:

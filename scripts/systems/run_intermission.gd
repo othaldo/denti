@@ -60,7 +60,7 @@ static func restore(game, saved: Dictionary) -> void:
 			game.get_tree().paused = true
 		else:
 			game._advance_post_wave_rewards()
-	elif game.rewards.step == PostWaveRewards.Step.CHESTS or game.rewards.step == PostWaveRewards.Step.RELICS or game.rewards.step == PostWaveRewards.Step.STORY:
+	elif game.rewards.step in [PostWaveRewards.Step.CHESTS, PostWaveRewards.Step.RELICS, PostWaveRewards.Step.STORY, PostWaveRewards.Step.WEAPONS]:
 		game._advance_post_wave_rewards()
 	elif game.rewards.step == PostWaveRewards.Step.LEVELS:
 		game._advance_post_wave_rewards()
@@ -71,6 +71,7 @@ static func restore(game, saved: Dictionary) -> void:
 		game.in_shop = true
 		game._update_shop_panel()
 		game.get_tree().paused = true
+		if not game.rewards.weapon_upgrades.actions.is_empty(): game._on_shop_enchant()
 	game._refresh_hud()
 
 

@@ -1,0 +1,237 @@
+{
+  "schema_version": 1,
+  "weapon_id": "revelation",
+  "display_name": "Zahn der Offenbarung",
+  "weapon_group": "evolution",
+  "evolution_kind": "revelation",
+  "canvas": {
+    "width": 1024,
+    "height": 1536,
+    "format": "PNG",
+    "mode": "RGBA",
+    "background": "transparent"
+  },
+  "reference": "assets/weapons/weapon_evolutions.png",
+  "reference_resource": "data/weapons/revelation.tres",
+  "normal_provenance": "generated portrait-format interpretation of the original weapon image; not a pixel-identical copy",
+  "prompts": "prompts.json",
+  "preview_region": [
+    11,
+    87,
+    1013,
+    1326
+  ],
+  "preview_size_px": 65,
+  "status": "complete_for_review",
+  "integrated_into_game": true,
+  "variants": [
+    {
+      "id": "normal",
+      "label": "Normal",
+      "description": "Normalform",
+      "file": "normal.png",
+      "sha256": "d11a84ad727131f8b735976fcd911e74903dba954bfcd93e14cdda8d835eeae8",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        36,
+        128,
+        1009,
+        1387
+      ],
+      "solid_bounds_alpha128": [
+        37,
+        128,
+        1009,
+        1387
+      ],
+      "source": "imagegen:exec-f2991179-89cf-4ac0-acaf-c309cf933485.png",
+      "origin": "built_in_imagegen_reference"
+    },
+    {
+      "id": "fire",
+      "label": "Feuer",
+      "description": "Feuerform",
+      "file": "fire.png",
+      "sha256": "3da1c589a4e1c088d68c79d9fe77c4852eaaf0ce87606f5671ebf73e23928b5d",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        37,
+        126,
+        1009,
+        1387
+      ],
+      "solid_bounds_alpha128": [
+        38,
+        127,
+        1009,
+        1387
+      ],
+      "source": "imagegen:exec-14f27c33-88d7-41b4-a1d4-e8f7819a9efa.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "ice",
+      "label": "Eis",
+      "description": "Eisform",
+      "file": "ice.png",
+      "sha256": "ce138cfb898a1b29dca5ac96e1acde47e454201114935905c21d6c663467f196",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        36,
+        124,
+        1013,
+        1390
+      ],
+      "solid_bounds_alpha128": [
+        37,
+        125,
+        1013,
+        1389
+      ],
+      "source": "imagegen:exec-66366948-0d15-4e6d-9543-f83fce18de8d.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "poison",
+      "label": "Gift",
+      "description": "Giftform",
+      "file": "poison.png",
+      "sha256": "6397b5eaadbaffb024678c977ac8b473e4b30f9718eeac59827c5ab981544cc3",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        37,
+        128,
+        1010,
+        1388
+      ],
+      "solid_bounds_alpha128": [
+        37,
+        128,
+        1009,
+        1388
+      ],
+      "source": "imagegen:exec-8d865186-696e-4521-afc8-3419a5f46319.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "electric",
+      "label": "Elektro",
+      "description": "Elektroform",
+      "file": "electric.png",
+      "sha256": "1aeb808d94cda3e1c45ef63d9cbadf33c4925e7d260b4d6776d134e86c5b2ff6",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        35,
+        114,
+        1016,
+        1389
+      ],
+      "solid_bounds_alpha128": [
+        35,
+        115,
+        1016,
+        1389
+      ],
+      "source": "imagegen:exec-cd964e9f-9ba1-4610-9368-dee48d6462bd.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "bleed",
+      "label": "Blut",
+      "description": "Blutform",
+      "file": "bleed.png",
+      "sha256": "23eb47c6fff4d42f43f2a1003fd68c70f39e9f1b04ea6473c58429b86d39b74a",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        37,
+        128,
+        1010,
+        1388
+      ],
+      "solid_bounds_alpha128": [
+        37,
+        128,
+        1010,
+        1387
+      ],
+      "source": "imagegen:exec-ada97e6c-1776-430c-ad62-080d11fc180c.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "wet",
+      "label": "Wasser",
+      "description": "Wasserform",
+      "file": "wet.png",
+      "sha256": "38adb93407db13f35587541c26a9a561794635082cabd7e0a4f801ee03e10202",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        37,
+        111,
+        1011,
+        1388
+      ],
+      "solid_bounds_alpha128": [
+        37,
+        111,
+        1011,
+        1387
+      ],
+      "source": "imagegen:exec-9e6b3776-cdd0-48dd-b51f-6906073e7610.png",
+      "origin": "built_in_imagegen_edit"
+    }
+  ],
+  "integration_notes": [
+    "Runtime sprites share the source crop and rig per weapon; UI icons use centered per-form regions.",
+    "Element forms follow each instance through upgrades, fusion, evolution and resume.",
+    "Existing projectile art and evolution effects are retained."
+  ],
+  "reference_atlas_region": [
+    1048.0,
+    520.0,
+    464.0,
+    488.0
+  ],
+  "visual_review": {
+    "method": "Godot comparison sheet at shared crop and native sprite scale",
+    "screenshot": "docs/screenshots/weapon_elements/revelation_complete_pack.png"
+  },
+  "runtime": {
+    "weapon_resource": "data/weapons/revelation.tres",
+    "skin_resources": "data/weapon_skins/revelation/",
+    "textures": "assets/weapons/element_forms/revelation/",
+    "canvas": [
+      512,
+      512
+    ],
+    "source_paintings_preserved": true,
+    "documentation": "docs/WEAPON_SKINS.md"
+  }
+}

@@ -1,0 +1,229 @@
+{
+  "schema_version": 1,
+  "weapon_id": "floss_whip",
+  "display_name": "Zahnseidenpeitsche",
+  "canvas": {
+    "width": 1024,
+    "height": 1536,
+    "format": "PNG",
+    "mode": "RGBA",
+    "background": "transparent"
+  },
+  "reference": "assets/weapons/floss_whip.png",
+  "reference_resource": "data/weapons/floss_whip.tres",
+  "normal_provenance": "generated portrait-format interpretation of the original weapon image; not a pixel-identical copy",
+  "prompts": "prompts.json",
+  "preview_region": [
+    0,
+    0,
+    1024,
+    1536
+  ],
+  "preview_size_px": 78,
+  "status": "complete_for_review",
+  "integrated_into_game": true,
+  "variants": [
+    {
+      "id": "normal",
+      "label": "Normal",
+      "description": "Normalform",
+      "file": "normal.png",
+      "sha256": "972929d619e10a9b491c7c8a399aad1e4d5c38c5ad9ba120cfe1056b999606d9",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        19,
+        279,
+        1017,
+        1294
+      ],
+      "solid_bounds_alpha128": [
+        20,
+        279,
+        1016,
+        1294
+      ],
+      "source": "imagegen:exec-6d46f3a3-8a1c-436c-abbc-accd9a7e0f23.png",
+      "origin": "built_in_imagegen_reference"
+    },
+    {
+      "id": "fire",
+      "label": "Feuer",
+      "description": "Feuerform",
+      "file": "fire.png",
+      "sha256": "c8226af04ecac099d07dc79f6cf95401192d0af9729ec9b8f787c6d85cd0595d",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        19,
+        278,
+        1018,
+        1295
+      ],
+      "solid_bounds_alpha128": [
+        19,
+        278,
+        1017,
+        1294
+      ],
+      "source": "imagegen:exec-41034adb-ddf8-41be-a591-70f512e806d8.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "ice",
+      "label": "Eis",
+      "description": "Eisform",
+      "file": "ice.png",
+      "sha256": "0864b3587bc3055a764c1de838dd3e81debf863af9988def4729106b49f92bea",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        18,
+        259,
+        1023,
+        1295
+      ],
+      "solid_bounds_alpha128": [
+        19,
+        261,
+        1021,
+        1294
+      ],
+      "source": "imagegen:exec-8db0cb7c-f047-4eec-8ce4-e11bc9801168.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "poison",
+      "label": "Gift",
+      "description": "Giftform",
+      "file": "poison.png",
+      "sha256": "fb96148ee9202a271396644566402fa6a50a71a8d8d3837a9b3dc255b5a277d3",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        19,
+        276,
+        1019,
+        1294
+      ],
+      "solid_bounds_alpha128": [
+        20,
+        276,
+        1018,
+        1294
+      ],
+      "source": "imagegen:exec-714e4891-1284-4984-a044-97bb59d82d8d.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "electric",
+      "label": "Elektro",
+      "description": "Elektroform",
+      "file": "electric.png",
+      "sha256": "5b2c1820640668938f187d5ae223f5eb5b689d6b5e240c30da8ecd52bb94dac2",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        19,
+        279,
+        1018,
+        1294
+      ],
+      "solid_bounds_alpha128": [
+        20,
+        279,
+        1018,
+        1294
+      ],
+      "source": "imagegen:exec-057cd2df-e00a-47b8-be69-2cc9c30e9a48.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "bleed",
+      "label": "Blut",
+      "description": "Blutform",
+      "file": "bleed.png",
+      "sha256": "a01586f71e9a46978130623f02db00e6ca9ebc2c77460729f71a0f97a0e3f1bc",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        20,
+        270,
+        1019,
+        1295
+      ],
+      "solid_bounds_alpha128": [
+        20,
+        271,
+        1018,
+        1295
+      ],
+      "source": "imagegen:exec-87631907-f6f1-4f1c-b943-9b1148b87e49.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "wet",
+      "label": "Wasser",
+      "description": "Wasserform",
+      "file": "wet.png",
+      "sha256": "88973db6bbb0c8d852668e91bfabc9b36afdfe773f7d953a86cce729175c20b2",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        19,
+        263,
+        1023,
+        1294
+      ],
+      "solid_bounds_alpha128": [
+        19,
+        264,
+        1022,
+        1294
+      ],
+      "source": "imagegen:exec-884b5097-51ac-46d8-8c42-775938c0ca45.png",
+      "origin": "built_in_imagegen_edit"
+    }
+  ],
+  "integration_notes": [
+    "Runtime sprites share the source crop and rig per weapon; UI icons use centered per-form regions.",
+    "Element forms follow each instance through upgrades, fusion, evolution and resume.",
+    "Existing projectile art and evolution effects are retained."
+  ],
+  "visual_review": {
+    "method": "Godot comparison sheet at shared crop and native sprite scale",
+    "screenshot": "docs/screenshots/weapon_elements/floss_whip_complete_pack.png"
+  },
+  "runtime": {
+    "weapon_resource": "data/weapons/floss_whip.tres",
+    "skin_resources": "data/weapon_skins/floss_whip/",
+    "textures": "assets/weapons/element_forms/floss_whip/",
+    "canvas": [
+      512,
+      512
+    ],
+    "source_paintings_preserved": true,
+    "documentation": "docs/WEAPON_SKINS.md"
+  }
+}

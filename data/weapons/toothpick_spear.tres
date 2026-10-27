@@ -1,11 +1,11 @@
 [gd_resource type="Resource" script_class="WeaponData" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/weapons/weapon_icons_expansion.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/weapons/element_forms/toothpick_spear/normal.png" id="2"]
 
-[sub_resource type="AtlasTexture" id="Atlas_weapon"]
+[sub_resource type="AtlasTexture" id="Icon_skin"]
 atlas = ExtResource("2")
-region = Rect2(0, 0, 397, 397)
+region = Rect2(47, 50, 415, 442)
 filter_clip = true
 
 [resource]
@@ -14,7 +14,6 @@ role = "Gegnerlinien im Nahkampf durchstoßen"
 id = &"toothpick_spear"
 display_name = "Zahnstocher-Speer"
 description = "1 Wurzel · Langer Stich trifft Gegner auf einer schmalen Linie."
-sprite = SubResource("Atlas_weapon")
 hands = 1
 attack_mode = &"thrust"
 damage_type = "Schnitt"
@@ -28,10 +27,22 @@ visual_angle_degrees = 45
 attack_width = 14
 damage_tiers = PackedFloat32Array(1.00, 1.40, 1.90, 2.50)
 range_tiers = PackedFloat32Array(205, 215, 225, 240)
-grip_anchor = Vector2(0.24, 0.73)
 projectile_color = Color(1.0, 0.81, 0.40, 1)
 held_style = "staff"
 attack_animation = "thrust"
-tip_anchor = Vector2(0.86, 0.17)
 visual_size = 96.0
 animation_duration = 0.38
+
+grip_anchor = Vector2(0.233581, 0.809348)
+tip_anchor = Vector2(0.887463, 0.112457)
+sprite = SubResource("Icon_skin")
+held_sprite = ExtResource("2")
+held_scale = 0.872600
+element_skins = {
+"fire": "res://data/weapon_skins/toothpick_spear/fire.tres",
+"ice": "res://data/weapon_skins/toothpick_spear/ice.tres",
+"poison": "res://data/weapon_skins/toothpick_spear/poison.tres",
+"electric": "res://data/weapon_skins/toothpick_spear/electric.tres",
+"bleed": "res://data/weapon_skins/toothpick_spear/bleed.tres",
+"wet": "res://data/weapon_skins/toothpick_spear/wet.tres"
+}

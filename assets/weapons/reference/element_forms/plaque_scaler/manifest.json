@@ -1,0 +1,229 @@
+{
+  "schema_version": 1,
+  "weapon_id": "plaque_scaler",
+  "display_name": "Zahnsteinkratzer",
+  "canvas": {
+    "width": 1024,
+    "height": 1536,
+    "format": "PNG",
+    "mode": "RGBA",
+    "background": "transparent"
+  },
+  "reference": "assets/weapons/plaque_scaler.png",
+  "reference_resource": "data/weapons/plaque_scaler.tres",
+  "normal_provenance": "pixel-identical copy of the original image",
+  "prompts": "prompts.json",
+  "preview_region": [
+    55,
+    16,
+    969,
+    1485
+  ],
+  "preview_size_px": 72,
+  "status": "complete_for_review",
+  "integrated_into_game": true,
+  "variants": [
+    {
+      "id": "normal",
+      "label": "Normal",
+      "description": "Normalform",
+      "file": "normal.png",
+      "sha256": "87f9d34f6442043f41768a1e10e38e95145492f7cc687a70982c66ceed045865",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        80,
+        64,
+        1004,
+        1475
+      ],
+      "solid_bounds_alpha128": [
+        80,
+        65,
+        1003,
+        1474
+      ],
+      "source": "original:plaque_scaler.png",
+      "origin": "unchanged_original_copy"
+    },
+    {
+      "id": "fire",
+      "label": "Feuer",
+      "description": "Feuerform",
+      "file": "fire.png",
+      "sha256": "b19dc8df3fb8b1534b0d9e696e7e1f01aa919a2e558f27feb1d625fc0b3ead0f",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        79,
+        61,
+        1006,
+        1476
+      ],
+      "solid_bounds_alpha128": [
+        79,
+        62,
+        1006,
+        1476
+      ],
+      "source": "imagegen:exec-a312a62b-fffc-42ec-a59f-392e614b422b.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "ice",
+      "label": "Eis",
+      "description": "Eisform",
+      "file": "ice.png",
+      "sha256": "b46d4e39e4debb75b2696c718210c9a8721400b5930c7706ec13bdcf0b0685ac",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        79,
+        59,
+        1009,
+        1477
+      ],
+      "solid_bounds_alpha128": [
+        80,
+        60,
+        1009,
+        1476
+      ],
+      "source": "imagegen:exec-f2d66322-bc67-4d20-8d7c-d2985d7fb7ba.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "poison",
+      "label": "Gift",
+      "description": "Giftform",
+      "file": "poison.png",
+      "sha256": "370ff2691a9fb2e0b92136fc94a26b2bb8faac3230e9088968e47e8731f2ef8d",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        80,
+        39,
+        1008,
+        1476
+      ],
+      "solid_bounds_alpha128": [
+        80,
+        40,
+        1007,
+        1476
+      ],
+      "source": "imagegen:exec-125398c2-c017-43f5-a10d-ac98fefd9387.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "electric",
+      "label": "Elektro",
+      "description": "Elektroform",
+      "file": "electric.png",
+      "sha256": "7fc4c722dd5e27b9d492a6d990887f0ef2d1b286641ed13ab14081a63de7574f",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        79,
+        48,
+        1018,
+        1477
+      ],
+      "solid_bounds_alpha128": [
+        80,
+        49,
+        1018,
+        1477
+      ],
+      "source": "imagegen:exec-20fec6cb-3e75-4177-8241-3bdb212b6da4.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "bleed",
+      "label": "Blut",
+      "description": "Blutform",
+      "file": "bleed.png",
+      "sha256": "0a480d820f106280900fa05659bd41108ebc29c93b295bfdae4466394b58bfb3",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        80,
+        59,
+        1007,
+        1476
+      ],
+      "solid_bounds_alpha128": [
+        81,
+        60,
+        1007,
+        1475
+      ],
+      "source": "imagegen:exec-08ffd1ab-5dcf-4604-a468-47578bc4ff9f.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "wet",
+      "label": "Wasser",
+      "description": "Wasserform",
+      "file": "wet.png",
+      "sha256": "82495b9cd1083f2c84452da13704477a036eead74c03fa875483e186de117598",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        79,
+        64,
+        1007,
+        1476
+      ],
+      "solid_bounds_alpha128": [
+        79,
+        64,
+        1007,
+        1476
+      ],
+      "source": "imagegen:exec-dc37f6cb-f1b9-4e35-992d-99d411ef3037.png",
+      "origin": "built_in_imagegen_edit"
+    }
+  ],
+  "integration_notes": [
+    "Runtime sprites share the source crop and rig per weapon; UI icons use centered per-form regions.",
+    "Element forms follow each instance through upgrades, fusion, evolution and resume.",
+    "Existing projectile art and evolution effects are retained."
+  ],
+  "visual_review": {
+    "method": "Godot comparison sheet at shared crop and native sprite scale",
+    "screenshot": "docs/screenshots/weapon_elements/plaque_scaler_complete_pack.png"
+  },
+  "runtime": {
+    "weapon_resource": "data/weapons/plaque_scaler.tres",
+    "skin_resources": "data/weapon_skins/plaque_scaler/",
+    "textures": "assets/weapons/element_forms/plaque_scaler/",
+    "canvas": [
+      512,
+      512
+    ],
+    "source_paintings_preserved": true,
+    "documentation": "docs/WEAPON_SKINS.md"
+  }
+}

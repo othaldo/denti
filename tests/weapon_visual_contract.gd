@@ -4,6 +4,8 @@ var game: Node2D
 var failures: Array[String] = []
 var audit_sheet: Image
 var audit_index: int = 0
+var audit_element: StringName = &""
+var audit_directory := "res://.godot/weapon-audit"
 
 func _initialize() -> void:
 	call_deferred("_run")
@@ -21,6 +23,10 @@ func target(at: Vector2) -> Enemy:
 	return enemy
 
 func _run() -> void:
+	for argument in OS.get_cmdline_user_args():
+		if argument.begins_with("--element="):
+			audit_element = StringName(argument.trim_prefix("--element="))
+			audit_directory += "/" + str(audit_element)
 	var session: Node = root.get_node("GameSession")
 	session.save_path = "user://test_weapon_visual_contract.json"
 	session.progression_path = "user://test_weapon_visual_contract.cfg"
@@ -51,7 +57,10 @@ func _run() -> void:
 					number.queue_free()
 				await process_frame
 				game.player.global_position = Vector2(600, 400)
-				game.player.loadout.restore([{"id": str(data.id), "tier": 4}])
+				var affixes: Array[Dictionary] = []
+				if audit_element != &"":
+					affixes = WeaponUpgrades.advance([], audit_element, data, 4)
+				game.player.loadout.restore([{"id": str(data.id), "tier": 4, "affixes": affixes}])
 				var weapon: WeaponInstance = game.player.loadout.equipped()[0]
 				weapon.set_physics_process(false)
 				weapon.visual_density = density
@@ -129,10 +138,10 @@ func _run() -> void:
 					caption.text = data.display_name
 					await process_frame
 					await RenderingServer.frame_post_draw
-					DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://.godot/weapon-audit"))
+					DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(audit_directory))
 					var image := root.get_texture().get_image().get_region(Rect2i(400, 200, 480, 320))
 					image.convert(Image.FORMAT_RGBA8)
-					image.save_png("res://.godot/weapon-audit/%s.png" % data.id)
+					image.save_png(audit_directory + "/%s.png" % data.id)
 					audit_sheet.blit_rect(image, Rect2i(0, 0, 480, 320), Vector2i(audit_index % 4 * 480, audit_index / 4 * 320))
 					audit_index += 1
 	# Orbit begins at the first physical collision, even across a large frame step.
@@ -148,7 +157,7 @@ func _run() -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(session.progression_path))
 	paused = false
 	if "--capture" in OS.get_cmdline_user_args():
-		audit_sheet.save_png("res://.godot/weapon-audit/all-weapons.png")
+		audit_sheet.save_png(audit_directory + "/all-weapons.png")
 	if failures.is_empty():
 		print("PASS weapon_visual_contract: 24 weapons, 5 directions, 2 densities; tracking, resume and impact")
 	finish(0 if failures.is_empty() else 1)

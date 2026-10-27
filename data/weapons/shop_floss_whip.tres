@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = &"floss_whip"
 display_name = "Zahnseidenpeitsche"
-description = "1 Wurzel · Rundumschnitt · erster Treffer stärker"
+description = "1 Wurzel · Ein Faden schnellt nach vorn und trifft Gegner auf seinem Weg. Blutung."
 price = 7
 weapon_data = ExtResource("2")
 icon_texture = ExtResource("3")

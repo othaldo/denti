@@ -6,9 +6,10 @@ extends Resource
 @export var distance: float = 150.0
 @export var duration: float = 0.16
 @export var recovery_delay: float = 0.35
-@export var refill_duration: float = 4.0
-@export var cooldown: float = 1.5
+@export_range(1.0, 100.0, 0.5) var recharge_rate: float = 25.0
+@export var cooldown: float = 0.5
+@export var contact_damage_multiplier: float = 1.5
 @export var max_stamina_bonus: float = 400.0
 
-func recharge_per_second(maximum: float) -> float:
-	return maximum / refill_duration
+func refill_time(maximum: float) -> float:
+	return maximum / recharge_rate

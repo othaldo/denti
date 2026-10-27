@@ -4,6 +4,7 @@ extends RefCounted
 # Display-only data is assembled once, independent of the shop scene tree.
 var wave_number: int = 0
 var coins: int = 0
+var upgrade_points: int = 0
 var reroll_cost: int = 0
 var offers: Array[ShopOfferData] = []
 var equipment: Array[Dictionary] = []

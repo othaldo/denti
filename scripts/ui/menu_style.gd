@@ -48,14 +48,23 @@ static func action(button: Button, primary: bool = false, quiet_action: bool = f
 	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	if quiet_action: quiet(button)
 	elif not primary:
-		button.add_theme_stylebox_override("normal", box(DentiUIStyle.PANEL, Color.TRANSPARENT, 12, 0))
+		button.add_theme_stylebox_override("normal", _button_surface(button, DentiUIStyle.PANEL, 12))
 	focus(button, false)
 
 static func quiet(button: Button) -> void:
 	DentiUIStyle.style_button(button)
-	button.add_theme_stylebox_override("normal", box(Color.TRANSPARENT, Color.TRANSPARENT, 10, 0))
-	button.add_theme_stylebox_override("disabled", StyleBoxEmpty.new())
+	button.add_theme_stylebox_override("normal", _button_surface(button, Color.TRANSPARENT, 10))
+	button.add_theme_stylebox_override("disabled", button.get_theme_stylebox("normal").duplicate())
 	button.add_theme_color_override("font_disabled_color", Color(DentiUIStyle.MUTED, 0.35))
+
+static func _button_surface(button: Button, fill: Color, radius: int) -> StyleBoxFlat:
+	# Preserve the shared content margins when replacing only the painted surface.
+	var style := button.get_theme_stylebox("normal").duplicate() as StyleBoxFlat
+	style.bg_color = fill
+	style.border_color = Color.TRANSPARENT
+	style.set_border_width_all(0)
+	style.set_corner_radius_all(radius)
+	return style
 
 static func box(fill: Color, edge: Color, radius: int, width: int) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()

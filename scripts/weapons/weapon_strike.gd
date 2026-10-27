@@ -19,8 +19,6 @@ func tick(weapon: WeaponInstance, from_progress: float, to_progress: float) -> v
 	var end := minf(to_progress, WeaponMotion.ACTIVE_END)
 	if end < start:
 		return
-	# Sample the swept weapon path, including skipped physics frames/high attack speed.
-	var steps := maxi(ceili((end - start) / 0.025), 1)
 	var enemies: Array[Enemy] = []
 	var candidates: Array[Enemy] = []
 	if weapon.data.attack_mode == &"melee":
@@ -34,10 +32,34 @@ func tick(weapon: WeaponInstance, from_progress: float, to_progress: float) -> v
 			continue
 		if weapon.data.attack_mode == &"melee" and enemy.get_instance_id() != target_id:
 			continue
-		if WeaponAttackShapes.contains(weapon.data, weapon.tier, weapon.player.global_position, weapon.aim, enemy.global_position, enemy.data.radius):
+		if weapon.data.attack_animation == "floss_cut":
+			if weapon.aim.dot(enemy.global_position - weapon.player.global_position) >= 0:
+				enemies.append(enemy)
+		elif WeaponAttackShapes.contains(weapon.data, weapon.tier, weapon.player.global_position, weapon.aim, enemy.global_position, enemy.data.radius):
 			enemies.append(enemy)
 	if enemies.is_empty():
 		return
+	if weapon.data.attack_animation == "floss_cut":
+		var paths := WeaponFlossMotion.swept_curves(weapon.data, weapon.tier, weapon.home_position, weapon.aim, start, end, weapon.visual_density)
+		for enemy in enemies:
+			if not is_instance_valid(enemy) or enemy.health <= 0: continue
+			var offset := enemy.global_position - weapon.player.global_position
+			var hit_radius := enemy.data.radius + weapon.data.attack_width * 0.5
+			var touching := false
+			for path in paths:
+				if WeaponFlossMotion.touches(path, offset, hit_radius):
+					touching = true
+					break
+			if touching:
+				hit_ids[enemy.get_instance_id()] = true
+				var at := enemy.global_position
+				var outward := offset.normalized() if not offset.is_zero_approx() else weapon.aim
+				var dealt := WeaponAttackShapes.hit(enemy, weapon.data, weapon.tier, damage, critical, weapon.player.items, outward, weapon.affixes)
+				if dealt > 0 and weapon.data.element_skin == &"":
+					ElementImpactBatch.emit_from(enemy, &"bleed", at, outward, 30)
+		return
+	# Sample the rigid blade; the floss arc above uses its exact swept sector.
+	var steps := maxi(ceili((end - start) / 0.025), 1)
 	for index in range(steps + 1):
 		var progress := lerpf(start, end, float(index) / float(steps))
 		var pose_data := WeaponMotion.pose(weapon.data, weapon.tier, weapon.home_position, weapon.aim, progress, weapon.idle_time, weapon.aim_distance, weapon.visual_density)

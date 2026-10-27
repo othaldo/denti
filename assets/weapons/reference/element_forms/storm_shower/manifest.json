@@ -1,0 +1,237 @@
+{
+  "schema_version": 1,
+  "weapon_id": "storm_shower",
+  "display_name": "Gewitterdusche",
+  "weapon_group": "evolution",
+  "evolution_kind": "storm",
+  "canvas": {
+    "width": 1024,
+    "height": 1536,
+    "format": "PNG",
+    "mode": "RGBA",
+    "background": "transparent"
+  },
+  "reference": "assets/weapons/weapon_evolutions.png",
+  "reference_resource": "data/weapons/storm_shower.tres",
+  "normal_provenance": "generated portrait-format interpretation of the original weapon image; not a pixel-identical copy",
+  "prompts": "prompts.json",
+  "preview_region": [
+    0,
+    159,
+    1024,
+    1192
+  ],
+  "preview_size_px": 58,
+  "status": "complete_for_review",
+  "integrated_into_game": true,
+  "variants": [
+    {
+      "id": "normal",
+      "label": "Normal",
+      "description": "Normalform",
+      "file": "normal.png",
+      "sha256": "49dd188d2b9d030fd570b4cd6695e70f09919be6704d87aad11a974713288d10",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        41,
+        242,
+        1010,
+        1327
+      ],
+      "solid_bounds_alpha128": [
+        41,
+        243,
+        1010,
+        1327
+      ],
+      "source": "imagegen:exec-9a02f93c-d7b3-4b1c-b3ce-bafcf8c57268.png",
+      "origin": "built_in_imagegen_reference"
+    },
+    {
+      "id": "fire",
+      "label": "Feuer",
+      "description": "Feuerform",
+      "file": "fire.png",
+      "sha256": "d17626b2584050022029ca02efd641a6e758dc3fcb48fc4d78af142a0abdb11d",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        42,
+        210,
+        1011,
+        1296
+      ],
+      "solid_bounds_alpha128": [
+        42,
+        211,
+        1011,
+        1295
+      ],
+      "source": "imagegen:exec-d634ee89-70f8-4848-9df0-0b41220c9612.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "ice",
+      "label": "Eis",
+      "description": "Eisform",
+      "file": "ice.png",
+      "sha256": "17c52a9aae2bbd1f220a5d9ac1109714bb344d0a8d5d829667d96ba4ce3ee577",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        38,
+        182,
+        1021,
+        1296
+      ],
+      "solid_bounds_alpha128": [
+        39,
+        183,
+        1020,
+        1295
+      ],
+      "source": "imagegen:exec-9e3be0fe-8fcd-4f9f-a9b9-578325c984f2.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "poison",
+      "label": "Gift",
+      "description": "Giftform",
+      "file": "poison.png",
+      "sha256": "06ce12fa93ebeebed7dcdf46eb3dbf9af806b00084811be1e07d477aaae7b46b",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        22,
+        242,
+        1010,
+        1327
+      ],
+      "solid_bounds_alpha128": [
+        22,
+        242,
+        1009,
+        1327
+      ],
+      "source": "imagegen:exec-4877177e-b173-4cc1-884b-a62c30839e28.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "electric",
+      "label": "Elektro",
+      "description": "Elektroform",
+      "file": "electric.png",
+      "sha256": "8328e891a9918587603edfd2d289b09914741f12ec16c017ab9c0f7ee324a23e",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        41,
+        241,
+        1010,
+        1327
+      ],
+      "solid_bounds_alpha128": [
+        42,
+        241,
+        1009,
+        1326
+      ],
+      "source": "imagegen:exec-0de8822b-81ee-4870-91b5-a4c5741ef46b.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "bleed",
+      "label": "Blut",
+      "description": "Blutform",
+      "file": "bleed.png",
+      "sha256": "6425380c2ef562c72183ed56b69e3ec36446eb4bf32687209fd03f104d6efa33",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        20,
+        223,
+        1010,
+        1296
+      ],
+      "solid_bounds_alpha128": [
+        21,
+        224,
+        1010,
+        1296
+      ],
+      "source": "imagegen:exec-3214fe85-d855-4041-8f2f-45e45e5d4ca1.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "wet",
+      "label": "Wasser",
+      "description": "Wasserform",
+      "file": "wet.png",
+      "sha256": "752355009c8c7277715c09b17878bb38e31a33e1a2bc461b65cf4b49b13aaafb",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        42,
+        227,
+        1016,
+        1328
+      ],
+      "solid_bounds_alpha128": [
+        43,
+        228,
+        1016,
+        1327
+      ],
+      "source": "imagegen:exec-257a6bce-75e4-4ddc-ad22-7bd064c09058.png",
+      "origin": "built_in_imagegen_edit"
+    }
+  ],
+  "integration_notes": [
+    "Runtime sprites share the source crop and rig per weapon; UI icons use centered per-form regions.",
+    "Element forms follow each instance through upgrades, fusion, evolution and resume.",
+    "Existing projectile art and evolution effects are retained."
+  ],
+  "reference_atlas_region": [
+    48.0,
+    32.0,
+    480.0,
+    476.0
+  ],
+  "visual_review": {
+    "method": "Godot comparison sheet at shared crop and native sprite scale",
+    "screenshot": "docs/screenshots/weapon_elements/storm_shower_complete_pack.png"
+  },
+  "runtime": {
+    "weapon_resource": "data/weapons/storm_shower.tres",
+    "skin_resources": "data/weapon_skins/storm_shower/",
+    "textures": "assets/weapons/element_forms/storm_shower/",
+    "canvas": [
+      512,
+      512
+    ],
+    "source_paintings_preserved": true,
+    "documentation": "docs/WEAPON_SKINS.md"
+  }
+}

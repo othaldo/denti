@@ -1,0 +1,237 @@
+{
+  "schema_version": 1,
+  "weapon_id": "trinity_brush",
+  "display_name": "Dreifaltigkeitsbürste",
+  "weapon_group": "evolution",
+  "evolution_kind": "trinity",
+  "canvas": {
+    "width": 1024,
+    "height": 1536,
+    "format": "PNG",
+    "mode": "RGBA",
+    "background": "transparent"
+  },
+  "reference": "assets/weapons/weapon_evolutions.png",
+  "reference_resource": "data/weapons/trinity_brush.tres",
+  "normal_provenance": "generated portrait-format interpretation of the original weapon image; not a pixel-identical copy",
+  "prompts": "prompts.json",
+  "preview_region": [
+    15,
+    77,
+    1009,
+    1357
+  ],
+  "preview_size_px": 70,
+  "status": "complete_for_review",
+  "integrated_into_game": true,
+  "variants": [
+    {
+      "id": "normal",
+      "label": "Normal",
+      "description": "Normalform",
+      "file": "normal.png",
+      "sha256": "04ae245cd07d7307e8d953ccfd5da744f935c7bc4329a4efeddb40cb690f591a",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        81,
+        192,
+        992,
+        1380
+      ],
+      "solid_bounds_alpha128": [
+        81,
+        193,
+        991,
+        1380
+      ],
+      "source": "imagegen:exec-6ee1e497-a2b1-4755-a770-f5b277201d49.png",
+      "origin": "built_in_imagegen_reference"
+    },
+    {
+      "id": "fire",
+      "label": "Feuer",
+      "description": "Feuerform",
+      "file": "fire.png",
+      "sha256": "58e4c9772c0d0f9984b99eb8f2bac47c5e34945fcb0f54cb81fc21a616ad4b89",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        38,
+        101,
+        1005,
+        1410
+      ],
+      "solid_bounds_alpha128": [
+        39,
+        101,
+        1004,
+        1410
+      ],
+      "source": "imagegen:exec-1e76dfb1-9fae-429e-bfa8-3eb18c590fb2.png",
+      "origin": "built_in_imagegen_edit_transparency_repair"
+    },
+    {
+      "id": "ice",
+      "label": "Eis",
+      "description": "Eisform",
+      "file": "ice.png",
+      "sha256": "f0812eb06ded1a9270e183e3261412305c7142e914b9461d0b3a857fe0e128f0",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        81,
+        162,
+        998,
+        1380
+      ],
+      "solid_bounds_alpha128": [
+        81,
+        163,
+        998,
+        1380
+      ],
+      "source": "imagegen:exec-268d3f09-6c64-4477-ac4f-9f666e3d6f99.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "poison",
+      "label": "Gift",
+      "description": "Giftform",
+      "file": "poison.png",
+      "sha256": "6f8637f7180a597e10c0bcd57360c22565e419a713d216596a70b94d71b2d33b",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        81,
+        178,
+        1011,
+        1380
+      ],
+      "solid_bounds_alpha128": [
+        82,
+        179,
+        1010,
+        1380
+      ],
+      "source": "imagegen:exec-91fdbe89-ed98-477f-9c9a-75a5084abb28.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "electric",
+      "label": "Elektro",
+      "description": "Elektroform",
+      "file": "electric.png",
+      "sha256": "864c701bee75f0cd7c2105aa60d41c9f66fb8c2086628668b3b1ca05ea3099dd",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        81,
+        159,
+        994,
+        1348
+      ],
+      "solid_bounds_alpha128": [
+        81,
+        159,
+        993,
+        1347
+      ],
+      "source": "imagegen:exec-cc8e4236-3588-4d5f-b0a0-856631b5486c.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "bleed",
+      "label": "Blut",
+      "description": "Blutform",
+      "file": "bleed.png",
+      "sha256": "3493486bedd7eda5665b572cc23dbc9c8d72d969c95d1911fec41c3beae2b23b",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        46,
+        116,
+        1014,
+        1395
+      ],
+      "solid_bounds_alpha128": [
+        46,
+        117,
+        1013,
+        1394
+      ],
+      "source": "imagegen:exec-9315d22e-8fa5-4286-b00c-55cd0fdd2305.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "wet",
+      "label": "Wasser",
+      "description": "Wasserform",
+      "file": "wet.png",
+      "sha256": "9c85008721440669fccc21bfdc08a0d091e028c19c5e05775595c02515f6d16c",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        81,
+        133,
+        1020,
+        1349
+      ],
+      "solid_bounds_alpha128": [
+        81,
+        133,
+        1019,
+        1348
+      ],
+      "source": "imagegen:exec-9ec14187-cbe9-470e-8d8b-999628e47f8f.png",
+      "origin": "built_in_imagegen_edit"
+    }
+  ],
+  "integration_notes": [
+    "Runtime sprites share the source crop and rig per weapon; UI icons use centered per-form regions.",
+    "Element forms follow each instance through upgrades, fusion, evolution and resume.",
+    "Existing projectile art and evolution effects are retained."
+  ],
+  "reference_atlas_region": [
+    548.0,
+    495.0,
+    500.0,
+    513.0
+  ],
+  "visual_review": {
+    "method": "Godot comparison sheet at shared crop and native sprite scale",
+    "screenshot": "docs/screenshots/weapon_elements/trinity_brush_complete_pack.png"
+  },
+  "runtime": {
+    "weapon_resource": "data/weapons/trinity_brush.tres",
+    "skin_resources": "data/weapon_skins/trinity_brush/",
+    "textures": "assets/weapons/element_forms/trinity_brush/",
+    "canvas": [
+      512,
+      512
+    ],
+    "source_paintings_preserved": true,
+    "documentation": "docs/WEAPON_SKINS.md"
+  }
+}

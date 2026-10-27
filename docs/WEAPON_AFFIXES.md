@@ -1,5 +1,9 @@
 # Verzauberungen aus Upgrade-Kapseln
 
+**Aktuell seit 26.10.2026:** Neue Funde verwenden [gezielte Waffenupgrades](WEAPON_UPGRADES.md)
+mit Punkten, Rängen bis 10/10 und einem Effektplatz je Mk-Stufe. Die folgenden
+Zufallsfund-/Seltenheitsregeln dokumentieren das weiterhin ladbare Altsystem.
+
 Im Spiel heißen Affixe **Verzauberungen**. Die am weitesten entwickelte
 Verzauberung bestimmt einen Namenszusatz, etwa „Zauberbürste der Glut“ oder
 „Turbo-Bohrer der Eile“. Bei Gleichstand bleibt die Reihenfolge der belegten
@@ -101,7 +105,7 @@ Weihe speichert höchstens drei Krit-Markierungen für 4 s; Krits anderer Waffen
 können ein markiertes Ziel auslösen. Der Lichtstoß trifft höchstens acht Ziele
 in 105 Reichweite, Intervall 0,8 s. Sein Schaden beträgt Stärke × Waffen-/Bisskraft-
 Skalierung × 0,9 × 1,3. Lebensraub heilt höchstens 5 % des tatsächlich gezählten
-Trefferschadens und `min(0,25 + Stärke × 0,04; 2)` HP je Impuls, alle 0,75 s.
+Trefferschadens und `min(0,25 + Stärke × 0,04; 2)` HP je Impuls, alle 0,6 s.
 Alle Waffen teilen diese Intervalle. DoTs und Folgeeffekte lösen keine neuen
 Waffentreffer oder Lebensraub aus. Gegnerverteidigung und Boss-/Elitebudgets
 gelten auch für alle Folgeeffekte.
@@ -188,8 +192,8 @@ Gleiche Fusionsaffixe behalten die höhere Seltenheit und ihren Ausbau. Bei glei
 Seltenheit wird der Ausbau des zweiten Affixes als passende Beiträge angerechnet;
 Niedrigere Beiträge liefern anteiligen Fortschritt. Legendäre Zusatzbeiträge
 werden übernommen. Der höhere bereits vorhandene Schadenswert bleibt mindestens erhalten. Unterschiedliche Effekte werden übernommen, sofern ihre
-Anzahl in die größere Slotkapazität beider Waffen passt. Andernfalls bleibt die
-Fusion gesperrt. Es wird kein wertvoller Effekt still verworfen. Dieselben
+Anzahl in die Ergebnisstufe passt. Bei Konflikten öffnet sich die manuelle
+[Fusionsauswahl mit Punkt-Erstattung](WEAPON_UPGRADES.md#stärke-fusion-und-alte-spielstände). Es wird kein wertvoller Effekt still verworfen. Dieselben
 Regeln gelten für Zwei-Waffen-Evolutionen. Die Primär-ID bleibt bei Fusion und
 Evolution erhalten. Verkauf erstattet weiterhin nur investierte Münzen.
 
@@ -245,8 +249,8 @@ Exemplare: Maximum für Schaden, Reichweite und Crit, Minimum für Angriffspause
 Legendäre Einzelwerte können dadurch beim direkten Kartenkauf nicht verloren gehen.
 Bei mehreren passenden Partnern gewinnt das Ergebnis mit der höchsten erwarteten
 Grund-DPS unter den aktuellen Spieler- und Itemwerten; bei Gleichstand entscheidet
-die Reichweite, danach die Ausrüstungsreihenfolge. Verzauberungs-Konflikte bleiben
-bei manueller Fusion gesperrt. Affixe verbinden sich nach den Ausbau-Regeln; beim
+die Reichweite, danach die Ausrüstungsreihenfolge. Verzauberungs-Konflikte öffnen
+bei manueller Fusion die Effektauswahl mit Erstattung übriger Upgradepunkte. Affixe verbinden sich nach den Ausbau-Regeln; beim
 Kauf bleiben alle Affixe des ausgerüsteten Exemplars erhalten. Zusätzliche Mk-Aufstiege
 aus Kapseln übernehmen den höheren Stand beider Waffen, ohne ihn zu addieren. Tempo-
 und Reichweiten-Verzauberungen werden aus den übernommenen Affixen neu berechnet.

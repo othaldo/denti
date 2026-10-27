@@ -1,0 +1,789 @@
+{
+  "magic_toothbrush": {
+    "source_crop": [
+      351,
+      0,
+      763,
+      1531
+    ],
+    "runtime_canvas": [
+      512,
+      512
+    ],
+    "content_size": [
+      127,
+      472
+    ],
+    "source_sha256": {
+      "normal": "5eb16ba37a9a74c89efd3ee65e0ba3ee65465957b6c6e7225620cc230b3d6b3f",
+      "fire": "5ee8879267a555fe82344453250d67a8a7354c0a51517d27ab82aab3d73bce6a",
+      "ice": "8f875cfcd7e77f825d0dabafd51674333746271b7b3e59fbe19672c3a0ee915b",
+      "poison": "5bea9dba1aef877d90469c4f74a1e52ce11572e37081e375aaa1134c4aebf763",
+      "electric": "ce4891f379f4fefde27309ee77bdae68b9a401a09c440a8115333779c3565c28",
+      "bleed": "9fd2828f72404cc31f182dc2c612bbd3ce56af1740e115f58313607659a67113",
+      "wet": "8d1f47653fdd3c3af1a0b5b480960d562f09e28ec37fe7624ab16b5d339ba677"
+    },
+    "normal_rig": {
+      "grip_anchor": "Vector2(0.490310, 0.883888)",
+      "tip_anchor": "Vector2(0.508181, 0.132779)",
+      "sprite": "texture:normal.png",
+      "held_sprite": "texture:normal.png",
+      "held_scale": "1.080657"
+    }
+  },
+  "turbo_drill": {
+    "source_crop": [
+      15,
+      150,
+      1016,
+      1312
+    ],
+    "runtime_canvas": [
+      512,
+      512
+    ],
+    "content_size": [
+      407,
+      472
+    ],
+    "source_sha256": {
+      "normal": "d0b13205096ae31d044cd9b503af5e65120b72c9245514b0449d93ab17e560bd",
+      "fire": "cf4f279a8eba0a342dba56c696f2530b6b25a88cdc3b9152effe73ce0195c6a9",
+      "ice": "bf9089cd924b163be99fc730bc7036a97bfe67d32dcc5e2b2c58e8d5cb5e5eb9",
+      "poison": "0a630ffbd451ed4fc3ddaceed0e782cae774ef4f756096c3e36b3b30be574c0a",
+      "electric": "f760f583c0e6cfc08665f5ba9ea76eaf03f41c06d3443523f57b149a9cd7b7a1",
+      "bleed": "1cd0b0075ed3902ca1cfe7068ffe0c8f7d2fbdc91a147c40ac7fa8dd25f9f0b6",
+      "wet": "1dad75656403d33bcbae7ad7e8f4874a47cbaecbbfefa30dbb505f4aeb137a6c"
+    },
+    "normal_rig": {
+      "grip_anchor": "Vector2(0.247777, 0.789097)",
+      "tip_anchor": "Vector2(0.872939, 0.292618)",
+      "sprite": "texture:normal.png",
+      "held_sprite": "texture:normal.png",
+      "held_scale": "1.169828"
+    }
+  },
+  "floss_whip": {
+    "source_crop": [
+      0,
+      245,
+      1024,
+      1322
+    ],
+    "runtime_canvas": [
+      512,
+      512
+    ],
+    "content_size": [
+      449,
+      472
+    ],
+    "source_sha256": {
+      "normal": "972929d619e10a9b491c7c8a399aad1e4d5c38c5ad9ba120cfe1056b999606d9",
+      "fire": "c8226af04ecac099d07dc79f6cf95401192d0af9729ec9b8f787c6d85cd0595d",
+      "ice": "0864b3587bc3055a764c1de838dd3e81debf863af9988def4729106b49f92bea",
+      "poison": "fb96148ee9202a271396644566402fa6a50a71a8d8d3837a9b3dc255b5a277d3",
+      "electric": "5b2c1820640668938f187d5ae223f5eb5b689d6b5e240c30da8ecd52bb94dac2",
+      "bleed": "a01586f71e9a46978130623f02db00e6ca9ebc2c77460729f71a0f97a0e3f1bc",
+      "wet": "88973db6bbb0c8d852668e91bfabc9b36afdfe773f7d953a86cce729175c20b2"
+    },
+    "normal_rig": {
+      "grip_anchor": "Vector2(0.188497, 0.780586)",
+      "tip_anchor": "Vector2(0.802327, 0.285367)",
+      "floss_left_tip": "Vector2(0.322266, 0.271484)",
+      "sprite": "texture:normal.png",
+      "held_sprite": "texture:normal.png",
+      "floss_left_texture": "texture:normal_left_grip.png",
+      "held_scale": "1.062958"
+    }
+  },
+  "water_jet": {
+    "source_crop": [
+      52,
+      217,
+      992,
+      1188
+    ],
+    "runtime_canvas": [
+      512,
+      512
+    ],
+    "content_size": [
+      457,
+      472
+    ],
+    "source_sha256": {
+      "normal": "dbbd7b71f21251b6cde690458043e63d34ad3fe8d0c5239927b9dc6f62105048",
+      "fire": "e03b26d0c5b1b0d760a6583bfeadc8075033f716339faeb60ee7766fb80a21e0",
+      "ice": "e2d44745acbe34a890a993e66b83bf85a04d90617b7e01aabf1c62b8b82c615f",
+      "poison": "2027f824bae4394a9aec0d6e1c7b00a50b111d17f69e553e8a112b2b7e8b953a",
+      "electric": "1239d53e13b0a8e8aeccc3ac4243c965c69925d05a1dad77fcc6b7c2beefced8",
+      "bleed": "2fbf56d95a91c2e4f6b16a1604424bb06fba473996043357e5b18a7f8c563734",
+      "wet": "77093081171757e3cc63484f89156ef30a66aff3c4ac1db8cbae431e066e4c7f"
+    },
+    "normal_rig": {
+      "grip_anchor": "Vector2(0.366020, 0.765929)",
+      "tip_anchor": "Vector2(0.902540, 0.087672)",
+      "sprite": "texture:normal.png",
+      "held_sprite": "texture:normal.png",
+      "held_scale": "0.958515"
+    }
+  },
+  "crown_launcher": {
+    "source_crop": [
+      8,
+      221,
+      1022,
+      1314
+    ],
+    "runtime_canvas": [
+      512,
+      512
+    ],
+    "content_size": [
+      438,
+      472
+    ],
+    "source_sha256": {
+      "normal": "712397b3f7b42bd12d8135fcba09fadb6b949637303558850e3e9e955c8c9878",
+      "fire": "12f6a027438980d303332e96b737187af18763ef131642367c1ab9665f98d839",
+      "ice": "3ed974220becd23c38d17c5ebbe7aeaffee936e0f8a7bb434750e84debbd87f2",
+      "poison": "0b8767b47eac25bd71f4ed9db8e0eff45eb6150e57ad626abfbe058f3fbe8679",
+      "electric": "5b1b4fe9d9e94b75de345d5e0b6f0d8e144c482ef4bee9e1c29e15bd0d898ff4",
+      "bleed": "5538b56649608353adcbd4d85f69128b7c040356552038f4f5c678705c1acbfb",
+      "wet": "01a2d130f010798f475000dd796eca4a3d34268bcde4808a38c7dc463c9f0e63"
+    },
+    "normal_rig": {
+      "grip_anchor": "Vector2(0.310747, 0.826975)",
+      "tip_anchor": "Vector2(0.773717, 0.349278)",
+      "sprite": "texture:normal.png",
+      "held_sprite": "texture:normal.png",
+      "held_scale": "1.050360"
+    }
+  },
+  "enamel_mirror": {
+    "source_crop": [
+      89,
+      1,
+      1024,
+      1515
+    ],
+    "runtime_canvas": [
+      512,
+      512
+    ],
+    "content_size": [
+      291,
+      472
+    ],
+    "source_sha256": {
+      "normal": "b797d5370f534527eb66d4882c6a28527bf686d84b669700fa8ec42d3bbb7928",
+      "fire": "0aa5e7268c9550dce84221f3c88a7c42d40f55050778c39e3745289be04ead42",
+      "ice": "0ac51e8e21e885f01d797864029a318669c07fb0268030d61f26095399e36767",
+      "poison": "160a8e12ac3df3959538810339a08cccb22a964f5d0fa6f31fc72a4636d43115",
+      "electric": "b9fd774d8e6186df0cf8750f2ba324c1923e0ff24befc9b7b04915aa9bbe5376",
+      "bleed": "05295ac872d68d3edebbfb58744ee3c2b43999918628400b547ac50a08c6e723",
+      "wet": "0680a5ec0b1fe29c5c0cd75f54edd24daeeb93f4bf84d29f350f786b4a66f187"
+    },
+    "normal_rig": {
+      "grip_anchor": "Vector2(0.312633, 0.816628)",
+      "tip_anchor": "Vector2(0.657514, 0.167662)",
+      "sprite": "texture:normal.png",
+      "held_sprite": "texture:normal.png",
+      "held_scale": "1.067982"
+    }
+  },
+  "plaque_scaler": {
+    "source_crop": [
+      73,
+      33,
+      1024,
+      1483
+    ],
+    "runtime_canvas": [
+      512,
+      512
+    ],
+    "content_size": [
+      310,
+      472
+    ],
+    "source_sha256": {
+      "normal": "87f9d34f6442043f41768a1e10e38e95145492f7cc687a70982c66ceed045865",
+      "fire": "b19dc8df3fb8b1534b0d9e696e7e1f01aa919a2e558f27feb1d625fc0b3ead0f",
+      "ice": "b46d4e39e4debb75b2696c718210c9a8721400b5930c7706ec13bdcf0b0685ac",
+      "poison": "370ff2691a9fb2e0b92136fc94a26b2bb8faac3230e9088968e47e8731f2ef8d",
+      "electric": "7fc4c722dd5e27b9d492a6d990887f0ef2d1b286641ed13ab14081a63de7574f",
+      "bleed": "0a480d820f106280900fa05659bd41108ebc29c93b295bfdae4466394b58bfb3",
+      "wet": "82495b9cd1083f2c84452da13704477a036eead74c03fa875483e186de117598"
+    },
+    "normal_rig": {
+      "grip_anchor": "Vector2(0.278003, 0.829802)",
+      "tip_anchor": "Vector2(0.706382, 0.148988)",
+      "sprite": "texture:normal.png",
+      "held_sprite": "texture:normal.png",
+      "held_scale": "1.022464"
+    }
+  },
+  "mouthwash_mortar": {
+    "source_crop": [
+      49,
+      236,
+      1015,
+      1247
+    ],
+    "runtime_canvas": [
+      512,
+      512
+    ],
+    "content_size": [
+      451,
+      472
+    ],
+    "source_sha256": {
+      "normal": "3686bca1a56f85772822d9e143c1d0918cf887df5e47ad75968520aa1c4b879d",
+      "fire": "41012a9bcaa4711bed711eca48be9dce37b200b8fef8d207989c1fd05c8bc727",
+      "ice": "d15f452f03586d2be8c402517cf4953d14701fa300e1d96a9d58e4305d8531c6",
+      "poison": "0055b77486aee84d0c301f42363181a571a6db9ddf0f88a8b16f570701684952",
+      "electric": "45d80079793d4baf082f7176cda0774e7b64601605daf911a510e644a3ab6f54",
+      "bleed": "cc81fa5d2ec8ff9ebf044f1e7797649a2e9507507decf2f8b3e52edffb196a9b",
+      "wet": "8b98a49094ccdba09d2650046d3ad7ad8c46557e9c85267e6a689d973bd89887"
+    },
+    "normal_rig": {
+      "grip_anchor": "Vector2(0.187902, 0.778021)",
+      "tip_anchor": "Vector2(0.811613, 0.352737)",
+      "sprite": "texture:normal.png",
+      "held_sprite": "texture:normal.png",
+      "held_scale": "1.000000"
+    }
+  },
+  "toothpick_spear": {
+    "source_crop": [
+      79,
+      229,
+      997,
+      1266
+    ],
+    "runtime_canvas": [
+      512,
+      512
+    ],
+    "content_size": [
+      418,
+      472
+    ],
+    "source_sha256": {
+      "normal": "c3a11ebd8036e402a8f8f30f59ec7ef2c58c28e04d8af8665a1d6a279836fdef",
+      "fire": "faf5c37253065aa172f847aff2ef36b45fc58e92e0ff41d8d189347b755cad6d",
+      "ice": "f7c8dbe73ba4605013a539d6fee24eaef979bd8d59dc709579ed8228ecbd1f73",
+      "poison": "650ae06ae0e2d90c9f56b769371e576e06bda17bdc54d45b723428fb4ce1eb44",
+      "electric": "c063abd54ea0e168ecea04de037074e4a541dc56fb7d29ca1206150f18836556",
+      "bleed": "b93a173fe949ecfa6c5db3326573c9e0d9bf8e41c6ed1b0d976ec53977c66d2d",
+      "wet": "3b0917ea1c24975572432acf1c7e81646756539f3ff8e1afed67d962fd9c9557"
+    },
+    "normal_rig": {
+      "grip_anchor": "Vector2(0.233581, 0.809348)",
+      "tip_anchor": "Vector2(0.887463, 0.112457)",
+      "sprite": "texture:normal.png",
+      "held_sprite": "texture:normal.png",
+      "held_scale": "0.872600"
+    }
+  },
+  "cavity_grinder": {
+    "source_crop": [
+      21,
+      329,
+      1008,
+      1279
+    ],
+    "runtime_canvas": [
+      512,
+      512
+    ],
+    "content_size": [
+      472,
+      454
+    ],
+    "source_sha256": {
+      "normal": "7661d13f9f13e082fb9dd887afdbd8ce134268efb41783ca00a640a8ae4aa0bd",
+      "fire": "7d7f49af9c1d73d33dcce438115c7b307b5bc9aa98a0c14923bfae80e36857f8",
+      "ice": "5a8b733d91a36fb833e551920e2c67add67a2caf59110a95b76e48a270cb3aaf",
+      "poison": "7b9acc76d4d3e85bfb9e4da8e4c80be27079dfba90ab0e8245627a0e759199f2",
+      "electric": "04364c961dc67774f4ac0e7ca31a9c94748b6a558741361c0f9b161122d9ac91",
+      "bleed": "5dc70aa77c1cda9707a689af4a0b43acf2cd3fdce2d985c13d99b3966ae0dbeb",
+      "wet": "296eb48a528a32aa3c7b32237a1c43d1878ddb9f19e2234f1300650e9ab00831"
+    },
+    "normal_rig": {
+      "grip_anchor": "Vector2(0.153648, 0.766120)",
+      "tip_anchor": "Vector2(0.852592, 0.205149)",
+      "working_head_radius": "0.106478",
+      "working_head_aspect": "0.631579",
+      "working_head_angle_degrees": "-25",
+      "sprite": "texture:normal.png",
+      "held_sprite": "texture:normal_body.png",
+      "working_head_texture": "texture:normal_head.png",
+      "held_scale": "0.800866"
+    }
+  },
+  "interdental_brush": {
+    "source_crop": [
+      97,
+      213,
+      998,
+      1303
+    ],
+    "runtime_canvas": [
+      512,
+      512
+    ],
+    "content_size": [
+      390,
+      472
+    ],
+    "source_sha256": {
+      "normal": "d0d7cfb6ee409ca21083eeb9281bb7a180280302637b4133b6848a5fff613cae",
+      "fire": "2f456b5792830a4968606a7085459214be2cf20f2a4f3ed3cebdc1d6c92bfe50",
+      "ice": "ddf68f011007ffb56e901e1482a694d3bf34eeff98cdba8f9ab7ac8402b679cf",
+      "poison": "1cd0946e20200d3550b60b6a8af751822c44059398712bd81bbc526f4d4e3870",
+      "electric": "9be2b1d82ebf9f1cee5ec45be199bfce5cbb61d5f9db373664de17775a51ffcf",
+      "bleed": "fb019f6572c9e6dea93bb46e10bd18527ec2db85244de1b7c8e6303f698c18b4",
+      "wet": "9b534e73bc67f292c8cd0856f123cdff0562479f414ac14ace0acef587830e21"
+    },
+    "normal_rig": {
+      "grip_anchor": "Vector2(0.242790, 0.796759)",
+      "tip_anchor": "Vector2(0.772572, 0.140875)",
+      "sprite": "texture:normal.png",
+      "held_sprite": "texture:normal.png",
+      "held_scale": "0.890420"
+    }
+  },
+  "fluoride_sprayer": {
+    "source_crop": [
+      67,
+      148,
+      1018,
+      1347
+    ],
+    "runtime_canvas": [
+      512,
+      512
+    ],
+    "content_size": [
+      374,
+      472
+    ],
+    "source_sha256": {
+      "normal": "c9731ad02169055936b73b74984e7870b3b80b483cc41930727b76469615437f",
+      "fire": "d4b0188d1e4bab9f62863c553f256af2ccc9e05284d034e83e377d047d4ef14c",
+      "ice": "4f457ec289f6a81035108bcd92d1dd8bba40687e4e1719da62a7e74c19064f21",
+      "poison": "421c1990d052ccbc45cdff3235badb3b213b455b58015e1be8b1d615a4ffc616",
+      "electric": "6f13499f5948c9a5d009069ec6cfa8cfe0b910151781dbcad13e1dbe3f9bc852",
+      "bleed": "0cf4bd265dc6a413f5dd8ab9838a82e0248eecb4c83ef1204ecd43725add67e1",
+      "wet": "5732119d98ef068a8cc8da3d0d40e48bf7bdc9a56119af47d26fe307247cdce3"
+    },
+    "normal_rig": {
+      "grip_anchor": "Vector2(0.340884, 0.775794)",
+      "tip_anchor": "Vector2(0.794271, 0.283563)",
+      "sprite": "texture:normal.png",
+      "held_sprite": "texture:normal.png",
+      "held_scale": "0.952174"
+    }
+  },
+  "water_turbine": {
+    "source_crop": [
+      24,
+      325,
+      1011,
+      1194
+    ],
+    "runtime_canvas": [
+      512,
+      512
+    ],
+    "content_size": [
+      472,
+      416
+    ],
+    "source_sha256": {
+      "normal": "d55ef2bb658597b670bca297b69cb76671438387455b34d177a739099521f5ab",
+      "fire": "fdb435cef7991785ae79fd2ed771b2c6e9bf3536e19d477ab5d569c1af15a143",
+      "ice": "f1582199a203224dfd81add27495b497d3fbc284cc59900fc9e6703b4c35e2d1",
+      "poison": "11d3a9e767231d49e081f9627e5ee3fdb867c0fb5dc5ad9c147a115945163513",
+      "electric": "5503bb1771cd36ea76c529c38d6afc5105a0df1e8e0a570018a53e9bee7d6fda",
+      "bleed": "80bb5d44fa8f1aa1792b6b3db5a392777f53150b11a47894aab190856f0d4742",
+      "wet": "88f193af9f4e52fe4b9ce338278e35ac3465c4f777ce06da5fc04fd19800ce4f"
+    },
+    "normal_rig": {
+      "grip_anchor": "Vector2(0.163744, 0.762338)",
+      "tip_anchor": "Vector2(0.863520, 0.203983)",
+      "sprite": "texture:normal.png",
+      "held_sprite": "texture:normal.png",
+      "held_scale": "0.944206"
+    }
+  },
+  "uv_lamp": {
+    "source_crop": [
+      47,
+      272,
+      1024,
+      1240
+    ],
+    "runtime_canvas": [
+      512,
+      512
+    ],
+    "content_size": [
+      472,
+      468
+    ],
+    "source_sha256": {
+      "normal": "9aec011137bd6f928bcea7628abcce736f6695f5d3807cee29cb8da8c62da9a9",
+      "fire": "e40963a5020e16b3358e0ff08bd39961bf4d4bc415010a3c1fb3c2db6e57456f",
+      "ice": "b141c08e8d4542524f8ee3392d6d09fbbd4424026d4c0dfdbd0343eb3876c639",
+      "poison": "c15af7d79af8d0b4c388b6442a9fc4bfc73a14c4eec2d997d9a3a1367692b8aa",
+      "electric": "7e431c9e137dd77b07cd36e94286c574a75a3cf0a2101eead99058e02a9256b2",
+      "bleed": "e672bb71a2724b4b858a0bc9963b2154449b08b54387748d79912f9a7fa710fe",
+      "wet": "c26e67a706c67de20771af2f74f18fbb881c2083d02fdcb2957b12388c301aa5"
+    },
+    "normal_rig": {
+      "grip_anchor": "Vector2(0.311549, 0.782913)",
+      "tip_anchor": "Vector2(0.872128, 0.307944)",
+      "sprite": "texture:normal.png",
+      "held_sprite": "texture:normal.png",
+      "held_scale": "0.983302"
+    }
+  },
+  "amalgam_slingshot": {
+    "source_crop": [
+      16,
+      213,
+      1007,
+      1294
+    ],
+    "runtime_canvas": [
+      512,
+      512
+    ],
+    "content_size": [
+      433,
+      472
+    ],
+    "source_sha256": {
+      "normal": "e060347b6c58ec14ea06cb753229ddcb72df377d3010c44b63c20561c704493a",
+      "fire": "06c9f63147c93b791e9937a7ab058fbd39bba9c2d57e40ec2945742bc6dc11d0",
+      "ice": "bd154c2bd086149b70e529e95ca49bfe2f4e4f6ea8cc469621bc1bebdd232c97",
+      "poison": "ab4d86e8dd4c9335282b1f062d59176b660c6ef0cd34a09ba8ddb7f5a804b218",
+      "electric": "bd0a04ce2fd2593c89faa1f7d4d8766e65eb66c5e4272cfa828c7cded28b9ea1",
+      "bleed": "66257f15eb3f77f755804f8ed45ef292c975e25e351a8c55b60e182ec4150834",
+      "wet": "3b7c1255eb25a586025360044a0c3da457c23f0cd50d7e43cbcbad74c0c21dce"
+    },
+    "normal_rig": {
+      "grip_anchor": "Vector2(0.498307, 0.796313)",
+      "tip_anchor": "Vector2(0.514084, 0.273979)",
+      "pouch_anchor": "Vector2(0.514084, 0.273979)",
+      "fork_left_anchor": "Vector2(0.237351, 0.220709)",
+      "fork_right_anchor": "Vector2(0.763527, 0.202800)",
+      "pouch_width": "0.316406",
+      "sprite": "texture:normal.png",
+      "held_sprite": "texture:normal_body.png",
+      "pull_texture": "texture:normal_pouch.png",
+      "held_scale": "0.906667"
+    }
+  },
+  "floss_garrote": {
+    "source_crop": [
+      34,
+      378,
+      990,
+      1119
+    ],
+    "runtime_canvas": [
+      512,
+      512
+    ],
+    "content_size": [
+      472,
+      366
+    ],
+    "source_sha256": {
+      "normal": "80297b655a5dc8741b58f3fbe3e6f0b16f2035b1e761db366e9b0f0fb2d9ac5d",
+      "fire": "27356c7c1990856585f478f927e6775f08a67f02f1d55eb206f02d07aa4d4ec1",
+      "ice": "c450c71009fdbf76c765163e013fd2fdd54e8f4fb8209d88722e0fbf1a7542e2",
+      "poison": "40b756c1ecedc7cb4e45236f0bd0c07513064519b86a2454d80674c4bdf21583",
+      "electric": "959a23c9f773bd04b0585eb175e5c66bc5610663a5e8439e74e8fcfa501753b2",
+      "bleed": "e59a9d1c7fd483aaaf826afa670ce024400c6d9365dba4a2f5727af951fd3b93",
+      "wet": "19347eb627a70bf577d6a4eacfd7118b3015b315545a1638842957afb593c8a6"
+    },
+    "normal_rig": {
+      "grip_anchor": "Vector2(0.243784, 0.683553)",
+      "tip_anchor": "Vector2(0.517550, 0.221410)",
+      "floss_left_tip": "Vector2(0.203125, 0.417969)",
+      "floss_right_tip": "Vector2(0.798828, 0.417969)",
+      "sprite": "texture:normal.png",
+      "held_sprite": "texture:normal.png",
+      "floss_left_texture": "texture:normal_left_grip.png",
+      "floss_right_texture": "texture:normal_right_grip.png",
+      "held_scale": "1.005507"
+    }
+  },
+  "prophylaxis_polisher": {
+    "source_crop": [
+      36,
+      197,
+      994,
+      1333
+    ],
+    "runtime_canvas": [
+      512,
+      512
+    ],
+    "content_size": [
+      398,
+      472
+    ],
+    "source_sha256": {
+      "normal": "225899a2644a6d873b5bef97122bbb4bd51958eaf3a04589b7c644e2f65a68d9",
+      "fire": "35f9d5d1a5b952c91e283d95e2733a471b44b21d9b07d720a2cebfbd69ea3c10",
+      "ice": "f95fba576d7641f7e7b14c9af6dc566a1b6b123a6ff74fe6910c7f8121dd65a6",
+      "poison": "e71c13369e9ad23a4a2cd5544b1daa7d2e3501e8c45ed9312efaf5a6cde9f04e",
+      "electric": "eaf4cae2350789533faf09252c8e94532a85fe6ebee681a311956cb6ab3f9bb2",
+      "bleed": "5d91ec1f7c64d13050d64eabcbc9b18357f0fb5ca21d27f001d6305a984fcd07",
+      "wet": "45f9ba7131f3f57b6b0d8cffec3754f9bba4f3ebdca92f0e77b64a6341e1ef54"
+    },
+    "normal_rig": {
+      "grip_anchor": "Vector2(0.237599, 0.775426)",
+      "tip_anchor": "Vector2(0.810849, 0.146182)",
+      "working_head_radius": "0.076282",
+      "working_head_aspect": "0.617021",
+      "working_head_angle_degrees": "-15",
+      "sprite": "texture:normal.png",
+      "held_sprite": "texture:normal_body.png",
+      "working_head_texture": "texture:normal_head.png",
+      "held_scale": "0.813853"
+    }
+  },
+  "fluoride_rocket": {
+    "source_crop": [
+      46,
+      359,
+      998,
+      1199
+    ],
+    "runtime_canvas": [
+      512,
+      512
+    ],
+    "content_size": [
+      472,
+      416
+    ],
+    "source_sha256": {
+      "normal": "c1bb4ac2962e613ea8c0b1ed51bfb0d6847a612eaa2e72dd97734989035fff6f",
+      "fire": "77ceeb784d2fe4fd138ceb7fd70a6646ce1f4299692cd14644319c1598d048f3",
+      "ice": "99562ea8cea767ee9ca7bdd7cb00bbf66160494d54740fff72e97efebe3f87df",
+      "poison": "3722afb4c098f3c69ebf690c5de453f6105357cb576b29a421d8b4b7f51645dd",
+      "electric": "7d6e6174a1de5ded3da919f2a75cbc2273c6b50f7d722c4bd2541be49844903b",
+      "bleed": "4886a89d8483e7d5a1982824c45f5929b96a6a08711f420304dee1dc9fb84e3d",
+      "wet": "abedfd505bb7ba5a8c3114bc816ef235cafc247b0ec21fc0391186c9dcabbe88"
+    },
+    "normal_rig": {
+      "grip_anchor": "Vector2(0.333443, 0.748785)",
+      "tip_anchor": "Vector2(0.852966, 0.182258)",
+      "sprite": "texture:normal.png",
+      "held_sprite": "texture:normal.png",
+      "held_scale": "0.938455"
+    }
+  },
+  "storm_shower": {
+    "source_crop": [
+      14,
+      176,
+      1024,
+      1334
+    ],
+    "runtime_canvas": [
+      512,
+      512
+    ],
+    "content_size": [
+      412,
+      472
+    ],
+    "source_sha256": {
+      "normal": "49dd188d2b9d030fd570b4cd6695e70f09919be6704d87aad11a974713288d10",
+      "fire": "d17626b2584050022029ca02efd641a6e758dc3fcb48fc4d78af142a0abdb11d",
+      "ice": "17c52a9aae2bbd1f220a5d9ac1109714bb344d0a8d5d829667d96ba4ce3ee577",
+      "poison": "06ce12fa93ebeebed7dcdf46eb3dbf9af806b00084811be1e07d477aaae7b46b",
+      "electric": "8328e891a9918587603edfd2d289b09914741f12ec16c017ab9c0f7ee324a23e",
+      "bleed": "6425380c2ef562c72183ed56b69e3ec36446eb4bf32687209fd03f104d6efa33",
+      "wet": "752355009c8c7277715c09b17878bb38e31a33e1a2bc461b65cf4b49b13aaafb"
+    },
+    "normal_rig": {
+      "grip_anchor": "Vector2(0.258005, 0.817291)",
+      "tip_anchor": "Vector2(0.828851, 0.161438)",
+      "sprite": "texture:normal.png",
+      "held_sprite": "texture:normal.png",
+      "held_scale": "1.102784"
+    }
+  },
+  "fate_thread": {
+    "source_crop": [
+      37,
+      187,
+      1024,
+      1286
+    ],
+    "runtime_canvas": [
+      512,
+      512
+    ],
+    "content_size": [
+      424,
+      472
+    ],
+    "source_sha256": {
+      "normal": "eb1ee803829cb8999734fafaa45ef4cdfee803420b4b4c9732e372994d352524",
+      "fire": "85067c4598629a27c6d58be9be357d4e0a427355df662772675dcaef2376e350",
+      "ice": "85ec397d418914240540761e75cb93231fad120382a8dae7f0dc48b05da152f8",
+      "poison": "4f978d61ce4d8e560f061e6f29a2d04eeb59f94029769637fe4407eeb9086dff",
+      "electric": "97e52c56c75fde41662832b0a966c32854ebf2004bcb4a27776d621b2dbcc650",
+      "bleed": "d68af10d3c9a6bf79302980d66227829ed1feec3749b41ae6199c76d166a3f9f",
+      "wet": "b8663b79baa9c3f11a78f54314c016baae5cff2382722763fa5baa7ea665bbac"
+    },
+    "normal_rig": {
+      "grip_anchor": "Vector2(0.222164, 0.832915)",
+      "tip_anchor": "Vector2(0.780699, 0.226357)",
+      "sprite": "texture:normal.png",
+      "held_sprite": "texture:normal.png",
+      "held_scale": "1.116319"
+    }
+  },
+  "root_breaker": {
+    "source_crop": [
+      34,
+      208,
+      1019,
+      1322
+    ],
+    "runtime_canvas": [
+      512,
+      512
+    ],
+    "content_size": [
+      417,
+      472
+    ],
+    "source_sha256": {
+      "normal": "c784816ae11ef037b019b2cd42643824194fe1f314265a7ceec060f64f3b683f",
+      "fire": "af54bfb5ce98292ec77b542685df0872c8c1b1b0d2c4bece94aa7e6cf6fd86cd",
+      "ice": "8aa5da6cc5741e03e1767c9a299e4ac85dc91b2267f56240271ad8dd31514f35",
+      "poison": "0b5c3137614ea77c4d4a70ce0ecbba86c0f609854bb4faab70a4cd1665553ee7",
+      "electric": "c6c01fbb98480ee100a774e9f08d634e844877a306ae0a687d046d67b202bdcd",
+      "bleed": "2a1c4f4af966e416a6cb89ce09f934d9f19c75cdc36974ac509461039636e1e3",
+      "wet": "2a3559ed6dca955f91c10fdd8da12cfc6e2a5c80c898e4ce8d2b6c0ba0285071"
+    },
+    "normal_rig": {
+      "grip_anchor": "Vector2(0.268211, 0.810558)",
+      "tip_anchor": "Vector2(0.886579, 0.099166)",
+      "sprite": "texture:normal.png",
+      "held_sprite": "texture:normal.png",
+      "held_scale": "1.124458"
+    }
+  },
+  "halo": {
+    "source_crop": [
+      13,
+      130,
+      1022,
+      1356
+    ],
+    "runtime_canvas": [
+      512,
+      512
+    ],
+    "content_size": [
+      388,
+      472
+    ],
+    "source_sha256": {
+      "normal": "fe227e7058279db67a5527364ae8baea6e0d87e1139bcf4a29579c09ed948086",
+      "fire": "35debefb37515e8b76ff1eb21932fb5d351c6ca7f592acca6b1514aa4abefadc",
+      "ice": "f5ffdf6d59cf7a914d593c8d66e4b8459e9c68c42fd46a0bfee00dc9205ce587",
+      "poison": "50378a985f48674e3812fe7c3e16306829e6ae364b9b0aa685588d5e37c410b9",
+      "electric": "f8fc5478a6c8c16893411c5b3fbb754de98dfca87fac0a632cddcdc36429f018",
+      "bleed": "79ee90f0acc0b8f93a170bb74ded70de2734e6d4a546fc30042428e72398a9c5",
+      "wet": "8fd2eebb879e42bf6428196a077bd01f218037966064519d9ed01db0be298a4c"
+    },
+    "normal_rig": {
+      "grip_anchor": "Vector2(0.231102, 0.809197)",
+      "tip_anchor": "Vector2(0.799717, 0.346304)",
+      "sprite": "texture:normal.png",
+      "held_sprite": "texture:normal.png",
+      "held_scale": "1.144868"
+    }
+  },
+  "trinity_brush": {
+    "source_crop": [
+      32,
+      95,
+      1024,
+      1417
+    ],
+    "runtime_canvas": [
+      512,
+      512
+    ],
+    "content_size": [
+      354,
+      472
+    ],
+    "source_sha256": {
+      "normal": "04ae245cd07d7307e8d953ccfd5da744f935c7bc4329a4efeddb40cb690f591a",
+      "fire": "58e4c9772c0d0f9984b99eb8f2bac47c5e34945fcb0f54cb81fc21a616ad4b89",
+      "ice": "f0812eb06ded1a9270e183e3261412305c7142e914b9461d0b3a857fe0e128f0",
+      "poison": "6f8637f7180a597e10c0bcd57360c22565e419a713d216596a70b94d71b2d33b",
+      "electric": "864c701bee75f0cd7c2105aa60d41c9f66fb8c2086628668b3b1ca05ea3099dd",
+      "bleed": "3493486bedd7eda5665b572cc23dbc9c8d72d969c95d1911fec41c3beae2b23b",
+      "wet": "9c85008721440669fccc21bfdc08a0d091e028c19c5e05775595c02515f6d16c"
+    },
+    "normal_rig": {
+      "grip_anchor": "Vector2(0.289998, 0.802699)",
+      "tip_anchor": "Vector2(0.607285, 0.223284)",
+      "sprite": "texture:normal.png",
+      "held_sprite": "texture:normal.png",
+      "held_scale": "1.169481"
+    }
+  },
+  "revelation": {
+    "source_crop": [
+      29,
+      105,
+      1022,
+      1396
+    ],
+    "runtime_canvas": [
+      512,
+      512
+    ],
+    "content_size": [
+      363,
+      472
+    ],
+    "source_sha256": {
+      "normal": "d11a84ad727131f8b735976fcd911e74903dba954bfcd93e14cdda8d835eeae8",
+      "fire": "3da1c589a4e1c088d68c79d9fe77c4852eaaf0ce87606f5671ebf73e23928b5d",
+      "ice": "ce138cfb898a1b29dca5ac96e1acde47e454201114935905c21d6c663467f196",
+      "poison": "6397b5eaadbaffb024678c977ac8b473e4b30f9718eeac59827c5ab981544cc3",
+      "electric": "1aeb808d94cda3e1c45ef63d9cbadf33c4925e7d260b4d6776d134e86c5b2ff6",
+      "bleed": "23eb47c6fff4d42f43f2a1003fd68c70f39e9f1b04ea6473c58429b86d39b74a",
+      "wet": "38adb93407db13f35587541c26a9a561794635082cabd7e0a4f801ee03e10202"
+    },
+    "normal_rig": {
+      "grip_anchor": "Vector2(0.268238, 0.819657)",
+      "tip_anchor": "Vector2(0.705511, 0.217311)",
+      "sprite": "texture:normal.png",
+      "held_sprite": "texture:normal.png",
+      "held_scale": "1.065111"
+    }
+  }
+}

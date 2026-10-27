@@ -1,0 +1,368 @@
+{
+  "schema_version": 1,
+  "weapon_id": "mouthwash_mortar",
+  "display_name": "Mundspülungs-Mörser",
+  "canvas": {
+    "width": 1024,
+    "height": 1536,
+    "format": "PNG",
+    "mode": "RGBA",
+    "background": "transparent"
+  },
+  "reference": "assets/weapons/weapon_icons_refined.png",
+  "reference_resource": "data/weapons/mouthwash_mortar.tres",
+  "reference_atlas_region": [
+    512,
+    0,
+    512,
+    512
+  ],
+  "normal_provenance": "generated portrait-format interpretation of the original atlas image; not a pixel-identical copy",
+  "prompts": "prompts.json",
+  "preview_region": [
+    0,
+    100,
+    1024,
+    1380
+  ],
+  "preview_size_px": 75,
+  "status": "complete_for_review",
+  "integrated_into_game": true,
+  "variants": [
+    {
+      "id": "normal",
+      "label": "Normal",
+      "description": "Minzbehälter",
+      "file": "normal.png",
+      "sha256": "3686bca1a56f85772822d9e143c1d0918cf887df5e47ad75968520aa1c4b879d",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        68,
+        359,
+        1007,
+        1240
+      ],
+      "solid_bounds_alpha128": [
+        69,
+        360,
+        1006,
+        1240
+      ],
+      "feature_centers_px": {
+        "medallion": [
+          368.7,
+          848.4
+        ],
+        "rear_grip": [
+          173.9,
+          1065.3
+        ],
+        "front_grip": [
+          658.7,
+          1007.1
+        ]
+      },
+      "source": "imagegen:exec-cadacd0d-9dd1-4148-8420-f5e38b6abacf.png",
+      "origin": "built_in_imagegen_edit",
+      "feature_shift_px": {
+        "medallion": 0.0,
+        "rear_grip": 0.0,
+        "front_grip": 0.0
+      }
+    },
+    {
+      "id": "fire",
+      "label": "Feuer",
+      "description": "Glutbehälter",
+      "file": "fire.png",
+      "sha256": "41012a9bcaa4711bed711eca48be9dce37b200b8fef8d207989c1fd05c8bc727",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        67,
+        255,
+        1006,
+        1209
+      ],
+      "solid_bounds_alpha128": [
+        68,
+        255,
+        1006,
+        1208
+      ],
+      "feature_centers_px": {
+        "medallion": [
+          369.0,
+          821.3
+        ],
+        "rear_grip": [
+          172.7,
+          1034.8
+        ],
+        "front_grip": [
+          662.1,
+          995.6
+        ]
+      },
+      "source": "imagegen:exec-320e508a-ae8f-47c4-95c0-37561d586e7a.png",
+      "origin": "built_in_imagegen_edit",
+      "feature_shift_px": {
+        "medallion": 27.1,
+        "rear_grip": 30.52,
+        "front_grip": 11.99
+      }
+    },
+    {
+      "id": "ice",
+      "label": "Eis",
+      "description": "Frostbehälter",
+      "file": "ice.png",
+      "sha256": "d15f452f03586d2be8c402517cf4953d14701fa300e1d96a9d58e4305d8531c6",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        56,
+        298,
+        1008,
+        1241
+      ],
+      "solid_bounds_alpha128": [
+        56,
+        299,
+        1007,
+        1240
+      ],
+      "feature_centers_px": {
+        "medallion": [
+          368.7,
+          848.3
+        ],
+        "rear_grip": [
+          174.3,
+          1065.3
+        ],
+        "front_grip": [
+          659.2,
+          1008.1
+        ]
+      },
+      "source": "imagegen:exec-bbb543fd-8e6f-46cc-bc29-36027f93c97d.png",
+      "origin": "built_in_imagegen_edit",
+      "feature_shift_px": {
+        "medallion": 0.1,
+        "rear_grip": 0.4,
+        "front_grip": 1.12
+      }
+    },
+    {
+      "id": "poison",
+      "label": "Gift",
+      "description": "Gifttank & Fänge",
+      "file": "poison.png",
+      "sha256": "0055b77486aee84d0c301f42363181a571a6db9ddf0f88a8b16f570701684952",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        68,
+        322,
+        1009,
+        1241
+      ],
+      "solid_bounds_alpha128": [
+        68,
+        323,
+        1009,
+        1240
+      ],
+      "feature_centers_px": {
+        "medallion": [
+          368.4,
+          848.6
+        ],
+        "rear_grip": [
+          173.7,
+          1065.2
+        ],
+        "front_grip": [
+          659.6,
+          1007.8
+        ]
+      },
+      "source": "imagegen:exec-22e23efc-92fa-413e-901c-cc5dac595c90.png",
+      "origin": "built_in_imagegen_edit",
+      "feature_shift_px": {
+        "medallion": 0.36,
+        "rear_grip": 0.22,
+        "front_grip": 1.14
+      }
+    },
+    {
+      "id": "electric",
+      "label": "Elektro",
+      "description": "Blitzbehälter",
+      "file": "electric.png",
+      "sha256": "45d80079793d4baf082f7176cda0774e7b64601605daf911a510e644a3ab6f54",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        68,
+        242,
+        1007,
+        1241
+      ],
+      "solid_bounds_alpha128": [
+        69,
+        242,
+        1007,
+        1240
+      ],
+      "feature_centers_px": {
+        "medallion": [
+          368.7,
+          848.0
+        ],
+        "rear_grip": [
+          174.3,
+          1065.1
+        ],
+        "front_grip": [
+          659.4,
+          1010.0
+        ]
+      },
+      "source": "imagegen:exec-d5a882c4-1108-41b9-94e7-f6a5814b0103.png",
+      "origin": "built_in_imagegen_edit",
+      "feature_shift_px": {
+        "medallion": 0.4,
+        "rear_grip": 0.45,
+        "front_grip": 2.98
+      }
+    },
+    {
+      "id": "bleed",
+      "label": "Blut",
+      "description": "Rubin & Dornen",
+      "file": "bleed.png",
+      "sha256": "cc81fa5d2ec8ff9ebf044f1e7797649a2e9507507decf2f8b3e52edffb196a9b",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        69,
+        261,
+        1007,
+        1240
+      ],
+      "solid_bounds_alpha128": [
+        69,
+        261,
+        1007,
+        1239
+      ],
+      "feature_centers_px": {
+        "medallion": [
+          368.6,
+          848.2
+        ],
+        "rear_grip": [
+          174.5,
+          1064.7
+        ],
+        "front_grip": [
+          659.3,
+          1008.9
+        ]
+      },
+      "source": "imagegen:exec-de919a58-8221-4ff5-84f9-0a383e8d85f7.png",
+      "origin": "built_in_imagegen_edit",
+      "feature_shift_px": {
+        "medallion": 0.22,
+        "rear_grip": 0.85,
+        "front_grip": 1.9
+      }
+    },
+    {
+      "id": "wet",
+      "label": "Wasser",
+      "description": "Wellenbehälter",
+      "file": "wet.png",
+      "sha256": "8b98a49094ccdba09d2650046d3ad7ad8c46557e9c85267e6a689d973bd89887",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        68,
+        360,
+        1007,
+        1241
+      ],
+      "solid_bounds_alpha128": [
+        69,
+        360,
+        1006,
+        1240
+      ],
+      "feature_centers_px": {
+        "medallion": [
+          368.6,
+          848.6
+        ],
+        "rear_grip": [
+          174.4,
+          1065.9
+        ],
+        "front_grip": [
+          659.0,
+          1009.5
+        ]
+      },
+      "source": "imagegen:exec-7bf2763d-62f2-465b-9f45-16cfb6398ef4.png",
+      "origin": "built_in_imagegen_edit",
+      "feature_shift_px": {
+        "medallion": 0.22,
+        "rear_grip": 0.78,
+        "front_grip": 2.42
+      }
+    }
+  ],
+  "visual_review": {
+    "method": "Godot comparison sheet at shared crop and native sprite scale",
+    "screenshot": "docs/screenshots/weapon_elements/mouthwash_mortar_complete_pack.png"
+  },
+  "runtime": {
+    "weapon_resource": "data/weapons/mouthwash_mortar.tres",
+    "skin_resources": "data/weapon_skins/mouthwash_mortar/",
+    "textures": "assets/weapons/element_forms/mouthwash_mortar/",
+    "canvas": [
+      512,
+      512
+    ],
+    "source_paintings_preserved": true,
+    "documentation": "docs/WEAPON_SKINS.md"
+  },
+  "integration_notes": [
+    "Runtime sprites share the source crop and rig per weapon; UI icons use centered per-form regions.",
+    "Element forms follow each instance through upgrades, fusion, evolution and resume.",
+    "Existing projectile art and evolution effects are retained."
+  ]
+}

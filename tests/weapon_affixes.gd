@@ -42,8 +42,13 @@ func _run() -> void:
 	loadout.acquire(first.data, first.tier)
 	second = loadout.equipped()[1]
 	WeaponAffixes.apply(second, poison)
-	if not _expect(not loadout.can_merge(0) and not loadout.merge(0), "fusion silently consumed a third distinct effect"):
+	var before_mk_upgrade := loadout.save_data()
+	if not _expect(loadout.can_merge(0) and loadout.merge(0) and first.tier == 3 and first.affixes.size() == 3 and first.affix_slots == 3, "Mk III fusion did not unlock room for its third effect"):
 		return
+	# The remaining assertions exercise compatibility with the original two copies.
+	loadout.restore(before_mk_upgrade)
+	first = loadout.equipped()[0]
+	second = loadout.equipped()[1]
 	var saved_weapons := loadout.save_data()
 	loadout.restore(saved_weapons)
 	first = loadout.equipped()[0]
@@ -154,8 +159,12 @@ func _run() -> void:
 	for drop: Loot in drops:
 		if drop.reward_id == WeaponAffixes.CHEST_ID:
 			found += 1
-			if not _expect(drop.reward_data.golden and drop.reward_data.options.size() == 3, "ground chest lost its pre-rolled choices"):
+			if not _expect(drop.reward_data.golden and not WeaponAffixes.sanitize_chest(drop.reward_data).is_empty(), "ground chest lost its saved reward"):
 				return
+			# Existing saved three-choice capsules still resolve through their legacy
+			# path; the new point-capsule flow is exercised by weapon_upgrades.gd.
+			if drop.reward_data.kind == WeaponUpgrades.KIND:
+				drop.reward_data = WeaponAffixes.roll_chest(8, 40, loadout, true, rng)
 	if not _expect(found == 2, "golden kill did not guarantee a chest beyond the normal wave limit"):
 		return
 	var drop: Loot = drops[0]
@@ -224,7 +233,7 @@ func _run() -> void:
 	if not _expect(game.player.loadout.evolve(0, WeaponEvolutions.by_id(&"root_breaker"), game.items), "affixed weapon could not evolve"):
 		return
 	evolving = game.player.loadout.equipped()[0]
-	if not _expect(evolving.instance_uid == evolving_uid and evolving.affix_slots == 2 and evolving.affixes[0].damage == 20, "evolution lost affixes or identity"):
+	if not _expect(evolving.instance_uid == evolving_uid and evolving.affix_slots == 4 and evolving.affixes[0].damage == 20, "evolution lost affixes, Mk-IV slots or identity"):
 		return
 	session.clear_run()
 	paused = false

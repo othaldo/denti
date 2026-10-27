@@ -141,7 +141,9 @@ func _line_damage(start: Vector2, end: Vector2, amount: float, width: float, ble
 	for enemy in weapon.player.enemies_on_segment(start, end, width * 0.5):
 		var closest := Geometry2D.get_closest_point_to_segment(enemy.global_position, start, end)
 		if closest.distance_to(enemy.global_position) <= width * 0.5 + enemy.data.radius:
-			enemy.take_damage(amount, null, false, &"evolution")
+			var dealt := enemy.take_damage(amount, null, false, &"evolution")
+			if dealt > 0:
+				ElementImpactBatch.emit_from(enemy, weapon.data.element_skin, enemy.global_position, start.direction_to(end), 27)
 			if bleed and enemy.health > 0:
 				enemy.apply_bleed(weapon.data.bleed_dps * weapon.player.stats.damage_factor(), weapon.data.bleed_duration, 3)
 
@@ -157,14 +159,15 @@ func _flash(start: Vector2, end: Vector2, mounted: bool = false, direction: Vect
 func _draw() -> void:
 	if weapon == null:
 		return
-	var color := weapon.data.projectile_color
+	var element := weapon.data.element_skin
+	var color := WeaponElementVisuals.color(element, weapon.data.projectile_color)
 	for pool in pools:
-		GroundEffects.draw(self, GroundEffects.Shape.POOL, to_local(pool.at), weapon.data.evolution_radius, Color(color, 0.8))
+		WeaponElementVisuals.pool(self, element, to_local(pool.at), weapon.data.evolution_radius, Color(color, 0.8), weapon.idle_time)
 	for thread in threads:
 		var a := instance_from_id(thread.a) as Enemy
 		var b := instance_from_id(thread.b) as Enemy
 		if is_instance_valid(a) and is_instance_valid(b):
-			AttackEffects.strip(self, AttackEffects.Shape.THREAD, to_local(a.global_position), to_local(b.global_position), 12.0, Color(color, 0.6), weapon.idle_time)
+			WeaponElementVisuals.strip(self, element, AttackEffects.Shape.THREAD, to_local(a.global_position), to_local(b.global_position), 12.0, Color(color, 0.6), weapon.idle_time)
 	for id in marks:
 		var enemy := instance_from_id(id) as Enemy
 		if is_instance_valid(enemy):
@@ -172,12 +175,12 @@ func _draw() -> void:
 	for flash in flashes:
 		var line := flash_segment(flash)
 		var width := weapon.data.attack_width if weapon.data.evolution_kind == &"revelation" and flash.get("mounted", false) else 3.0
-		AttackEffects.strip(self, AttackEffects.Shape.BEAM, to_local(line[0]), to_local(line[1]), maxf(width, 18.0), Color(color, float(flash.life) / 0.22), weapon.idle_time)
+		WeaponElementVisuals.strip(self, element, AttackEffects.Shape.BEAM, to_local(line[0]), to_local(line[1]), maxf(width, 18.0), Color(color, float(flash.life) / 0.22), weapon.idle_time)
 	if charge_time > 0:
 		var start := weapon.muzzle_position()
-		AttackEffects.aim(self, to_local(start), to_local(start + weapon.aim * weapon.data.range_at_tier(weapon.tier)), Color(color, 0.6), 1.0 - charge_time / weapon.data.evolution_duration)
+		WeaponElementVisuals.aim(self, element, to_local(start), to_local(start + weapon.aim * weapon.data.range_at_tier(weapon.tier)), Color(color, 0.6), 1.0 - charge_time / weapon.data.evolution_duration)
 		var pulse := 6.0 + (1.0 - charge_time / weapon.data.evolution_duration) * 7.0
-		AttackEffects.flash(self, to_local(weapon.muzzle_position()), pulse, Color(color, 0.8), weapon.idle_time)
+		WeaponElementVisuals.flash(self, element, to_local(weapon.muzzle_position()), pulse, Color(color, 0.8), weapon.idle_time)
 
 func flash_segment(flash: Dictionary) -> PackedVector2Array:
 	if not flash.get("mounted", false):

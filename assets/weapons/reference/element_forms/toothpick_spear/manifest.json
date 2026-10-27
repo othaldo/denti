@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "weapon_id": "toothpick_spear",
+  "display_name": "Zahnstocher-Speer",
+  "canvas": {
+    "width": 1024,
+    "height": 1536,
+    "format": "PNG",
+    "mode": "RGBA",
+    "background": "transparent"
+  },
+  "reference": "assets/weapons/weapon_icons_expansion.png",
+  "reference_resource": "data/weapons/toothpick_spear.tres",
+  "normal_provenance": "generated portrait-format interpretation of the original weapon image; not a pixel-identical copy",
+  "prompts": "prompts.json",
+  "preview_region": [
+    62,
+    212,
+    952,
+    1071
+  ],
+  "preview_size_px": 96,
+  "status": "complete_for_review",
+  "integrated_into_game": true,
+  "variants": [
+    {
+      "id": "normal",
+      "label": "Normal",
+      "description": "Normalform",
+      "file": "normal.png",
+      "sha256": "c3a11ebd8036e402a8f8f30f59ec7ef2c58c28e04d8af8665a1d6a279836fdef",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        85,
+        301,
+        983,
+        1259
+      ],
+      "solid_bounds_alpha128": [
+        86,
+        302,
+        983,
+        1258
+      ],
+      "source": "imagegen:exec-ec965cfd-9e95-4981-bd04-e61d0bc11573.png",
+      "origin": "built_in_imagegen_reference"
+    },
+    {
+      "id": "fire",
+      "label": "Feuer",
+      "description": "Feuerform",
+      "file": "fire.png",
+      "sha256": "faf5c37253065aa172f847aff2ef36b45fc58e92e0ff41d8d189347b755cad6d",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        86,
+        257,
+        990,
+        1260
+      ],
+      "solid_bounds_alpha128": [
+        87,
+        257,
+        990,
+        1259
+      ],
+      "source": "imagegen:exec-cd20a159-ff66-4c54-b5f4-6f156f0ad8ab.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "ice",
+      "label": "Eis",
+      "description": "Eisform",
+      "file": "ice.png",
+      "sha256": "f7c8dbe73ba4605013a539d6fee24eaef979bd8d59dc709579ed8228ecbd1f73",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        86,
+        280,
+        988,
+        1258
+      ],
+      "solid_bounds_alpha128": [
+        86,
+        280,
+        987,
+        1258
+      ],
+      "source": "imagegen:exec-0013b7a8-275a-4c55-ae2c-b139cb3bdeff.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "poison",
+      "label": "Gift",
+      "description": "Giftform",
+      "file": "poison.png",
+      "sha256": "650ae06ae0e2d90c9f56b769371e576e06bda17bdc54d45b723428fb4ce1eb44",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        87,
+        235,
+        985,
+        1227
+      ],
+      "solid_bounds_alpha128": [
+        87,
+        236,
+        984,
+        1227
+      ],
+      "source": "imagegen:exec-3c9cb0dc-86fd-440a-ac29-d2f178efaa69.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "electric",
+      "label": "Elektro",
+      "description": "Elektroform",
+      "file": "electric.png",
+      "sha256": "c063abd54ea0e168ecea04de037074e4a541dc56fb7d29ca1206150f18836556",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        85,
+        299,
+        985,
+        1259
+      ],
+      "solid_bounds_alpha128": [
+        86,
+        299,
+        984,
+        1259
+      ],
+      "source": "imagegen:exec-1f05c795-b22a-4325-897e-49c93ce7d83b.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "bleed",
+      "label": "Blut",
+      "description": "Blutform",
+      "file": "bleed.png",
+      "sha256": "b93a173fe949ecfa6c5db3326573c9e0d9bf8e41c6ed1b0d976ec53977c66d2d",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        87,
+        299,
+        984,
+        1257
+      ],
+      "solid_bounds_alpha128": [
+        88,
+        299,
+        984,
+        1257
+      ],
+      "source": "imagegen:exec-417ad38b-6ae2-4e23-9297-7ea6dccd3062.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "wet",
+      "label": "Wasser",
+      "description": "Wasserform",
+      "file": "wet.png",
+      "sha256": "3b0917ea1c24975572432acf1c7e81646756539f3ff8e1afed67d962fd9c9557",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        86,
+        292,
+        988,
+        1259
+      ],
+      "solid_bounds_alpha128": [
+        86,
+        293,
+        987,
+        1259
+      ],
+      "source": "imagegen:exec-a3f3d280-f140-4d34-be10-a3fac32c11a9.png",
+      "origin": "built_in_imagegen_edit"
+    }
+  ],
+  "integration_notes": [
+    "Runtime sprites share the source crop and rig per weapon; UI icons use centered per-form regions.",
+    "Element forms follow each instance through upgrades, fusion, evolution and resume.",
+    "Existing projectile art and evolution effects are retained."
+  ],
+  "reference_atlas_region": [
+    0.0,
+    0.0,
+    397.0,
+    397.0
+  ],
+  "visual_review": {
+    "method": "Godot comparison sheet at shared crop and native sprite scale",
+    "screenshot": "docs/screenshots/weapon_elements/toothpick_spear_complete_pack.png"
+  },
+  "runtime": {
+    "weapon_resource": "data/weapons/toothpick_spear.tres",
+    "skin_resources": "data/weapon_skins/toothpick_spear/",
+    "textures": "assets/weapons/element_forms/toothpick_spear/",
+    "canvas": [
+      512,
+      512
+    ],
+    "source_paintings_preserved": true,
+    "documentation": "docs/WEAPON_SKINS.md"
+  }
+}

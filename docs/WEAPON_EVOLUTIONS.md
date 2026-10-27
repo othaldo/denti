@@ -1,5 +1,10 @@
 # Waffen-Evolutionen
 
+Seit 27.10.2026 öffnet die Evolutionsaktion eine Fusionsvorschau mit vier Effektplätzen
+und höchstens einem Element. Gleiche Effekte addieren ihre Ränge bis 10/10; verworfene
+und überschüssige Ränge werden als Upgradepunkte erstattet. Erst „Fusionieren“
+verbraucht die Zutaten. [Auswahl und Regeln](WEAPON_UPGRADES.md#stärke-fusion-und-alte-spielstände).
+
 Sechs Spezialwaffen ergänzen die 18 normalen Waffen. Sie entstehen ausschließlich durch freiwilliges Fusionieren in der Zahnklinik. Die Rezepte sind zunächst geheim: Erst mit allen erforderlichen Mk-IV-Waffen und Items erscheint beim Anklicken einer beteiligten Waffe die Fusionsoption samt Ergebnis und Effekt. Es gibt keine Hinweise auf fehlende Zutaten, keine Vorschau bei niedrigerer Stufe und keinen Eintrag im normalen Shopangebot.
 
 Unter **Esc → Dentipedia → Waffen** stehen die Spezialwaffen am Ende der Liste. Vor der ersten erfolgreichen Fusion erscheint nur eine schwarze Silhouette ohne Namen, Werte oder Rezept. Danach ist der Eintrag mit Erklärung und Zutaten dauerhaft freigeschaltet. Die Entdeckung steht in `progression.cfg`, unabhängig vom aktuellen Run und von einem späteren Verkauf. Bereits gespeicherte Spezialwaffen werden beim Fortsetzen ebenfalls als entdeckt eingetragen. Suche und Tooltips verraten keine gesperrten Inhalte.

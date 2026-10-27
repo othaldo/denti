@@ -1,39 +1,58 @@
-[gd_resource type="Resource" script_class="WeaponData" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="WeaponData" load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/weapons/weapon_icons_expansion.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/weapons/element_forms/floss_garrote/normal.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/weapons/element_forms/floss_garrote/normal_left_grip.png" id="3"]
+[ext_resource type="Texture2D" path="res://assets/weapons/element_forms/floss_garrote/normal_right_grip.png" id="4"]
 
-[sub_resource type="AtlasTexture" id="Atlas_weapon"]
+[sub_resource type="AtlasTexture" id="Icon_skin"]
 atlas = ExtResource("2")
-region = Rect2(793, 397, 397, 396)
+region = Rect2(47, 93, 419, 341)
 filter_clip = true
 
 [resource]
 script = ExtResource("1")
-role = "Blutung gegen ein festes Ziel"
+role = "Doppelfaden zum Abstandhalten"
 id = &"floss_garrote"
-display_name = "Zahnseiden-Garotte"
-description = "2 Wurzeln · Schwerer 150°-Frontbogen verursacht starke Blutung. Gegner hinter Denti bleiben ungetroffen."
-sprite = SubResource("Atlas_weapon")
+display_name = "Zahnseiden-Schneide"
+description = "2 Wurzeln · Zwei Fäden schnellen nach vorn, treffen Gegner auf ihrem Weg und stoßen sie zurück. Blutung."
 hands = 2
-attack_mode = &"sweep"
+attack_mode = &"thrust"
 damage_type = "Schnitt"
 base_damage = 44.0
 damage_stat = "melee"
 stat_scaling = 1.5
 interval = 1.20
-attack_range = 145
+attack_range = 220
 price = 15
 visual_angle_degrees = 90
-arc_degrees = 150
+attack_width = 14.0
+floss_wave_amplitude = 10.0
+knockback = 24.0
 bleed_dps = 3.2
 bleed_duration = 3.5
-range_tiers = PackedFloat32Array(145, 150, 160, 170)
+range_tiers = PackedFloat32Array(220, 235, 250, 270)
 damage_tiers = PackedFloat32Array(1.00, 1.40, 1.95, 2.65)
-grip_anchor = Vector2(0.50, 0.70)
 projectile_color = Color(1.0, 0.65, 0.80, 1)
 held_style = "staff"
-attack_animation = "slash"
-tip_anchor = Vector2(0.5, 0.24)
+attack_animation = "floss_cut"
 visual_size = 86.0
 animation_duration = 0.4
+
+grip_anchor = Vector2(0.243784, 0.683553)
+tip_anchor = Vector2(0.517550, 0.221410)
+floss_left_tip = Vector2(0.203125, 0.417969)
+floss_right_tip = Vector2(0.798828, 0.417969)
+sprite = SubResource("Icon_skin")
+held_sprite = ExtResource("2")
+floss_left_texture = ExtResource("3")
+floss_right_texture = ExtResource("4")
+held_scale = 1.005507
+element_skins = {
+"fire": "res://data/weapon_skins/floss_garrote/fire.tres",
+"ice": "res://data/weapon_skins/floss_garrote/ice.tres",
+"poison": "res://data/weapon_skins/floss_garrote/poison.tres",
+"electric": "res://data/weapon_skins/floss_garrote/electric.tres",
+"bleed": "res://data/weapon_skins/floss_garrote/bleed.tres",
+"wet": "res://data/weapon_skins/floss_garrote/wet.tres"
+}

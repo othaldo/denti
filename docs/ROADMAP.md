@@ -55,7 +55,7 @@ Jede Stufe wird einzeln umgesetzt, getestet und gespielt. Bossumsetzung erfolgt 
 
 ## 2. Wurzelkraft und Dash
 
-**Prototyp umgesetzt:** Shift, Touchbutton, Kontaktstopp, zeitlich geprüfte Treffer,
+**Prototyp umgesetzt:** Shift, Touchbutton, Durchdashen mit Kontaktrisiko, zeitlich geprüfte Treffer,
 Save/Resume, Wurzelkraft-Attribut, zwei passende Item-Ergänzungen und Telemetrie.
 [Details, Prüfungen und native Animation](DASH.md). Der menschliche Vergleich
 des Gegnerdrucks mit/ohne Dash und Wurzelkraft-Investition steht noch aus.
@@ -76,9 +76,9 @@ Lebensregeneration; Zahnflutsch bleibt passive Ausweichchance.
 3. Richtung: aktuelle Bewegung, sonst letzte Bewegung, anfangs nach unten. Maus und Waffen ändern sie nicht.
 4. **150 Welteinheiten in 0,16 Sekunden**, unabhängig von Bewegungstempo und Diagonale.
 5. Jeder Dash zieht genau **100 Punkte** ab. Restvorrat bleibt verfügbar; vollständige Füllung ist nicht erforderlich.
-6. Nach Dashende und **0,35 s Erholungspause** lädt der gesamte Vorrat in **4 s** nach. Nachladerate = maximale Wurzelkraft / 4. Bewegung und Schaden setzen den Fortschritt nicht zurück.
-7. **1,5 s Cooldown ab Dashstart** gilt auch bei gespeichertem Vorrat. Genug Ausdauer bei noch laufendem Cooldown zeigt dessen Restzeit im Zahn.
-8. Ein Kontaktstopp erstattet die Kosten nicht. Tatsächlich neue Wellen starten voll; Pause, Shop und Fortsetzen gewähren keine Gratisladung.
+6. Nach Dashende und **0,35 s Erholungspause** lädt der Vorrat mit festen **25 Punkten/s** nach, unabhängig von der maximalen Wurzelkraft. Bewegung und Schaden setzen den Fortschritt nicht zurück.
+7. **0,5 s Cooldown ab Dashstart** gilt auch bei gespeichertem Vorrat. Genug Ausdauer bei noch laufendem Cooldown zeigt dessen Restzeit im Zahn.
+8. Ein Wand-/Randstopp erstattet die Kosten nicht. Tatsächlich neue Wellen starten voll; Pause, Shop und Fortsetzen gewähren keine Gratisladung.
 
 ### Startwerte und Begrenzung
 
@@ -88,28 +88,29 @@ Lebensregeneration; Zahnflutsch bleibt passive Ausweichchance.
 | Maximal ausgebauter Vorrat | 500 |
 | Dashdauer / Strecke | 0,16 s / 150 Welteinheiten |
 | Erholungspause nach Dashende | 0,35 s |
-| Auffüllzeit leer auf voll | immer 4 s |
-| Nachladerate bei 100 / 200 / 500 Vorrat | 25 / 50 / 125 pro Sekunde |
-| Cooldown ab Dashstart | 1,5 s |
+| Auffüllzeit leer auf voll bei 100 / 300 / 500 Vorrat | 4 / 12 / 20 s |
+| Nachladerate bei jedem Maximalvorrat | 25 pro Sekunde |
+| Cooldown ab Dashstart | 0,5 s |
 
 Levelaufstiege geben +25/40/60/90 Punkte je Seltenheit, begrenzt auf den
 verbleibenden Platz bis 500. Am Limit wird das Attribut nicht mehr angeboten.
-Mehr Vorrat speichert mehrere Dashes und lädt zugleich mehr Punkte pro Sekunde
-nach. Ein größerer Vorrat muss vor einem Dash nicht vollständig gefüllt sein.
+Mehr Vorrat speichert mehrere Dashes; die Regeneration bleibt gleich. Ein größerer
+Vorrat muss vor einem Dash nicht vollständig gefüllt sein. 300 Punkte erlauben
+drei schnelle Dashes, bevor neue Ausdauer nötig ist.
 **Cooldown-Reduktion bleibt eine spätere Erweiterung.**
 
 ### Dash durch Gegner bleibt gefährlich
 
-Der Dash dient dazu, einen noch freien Weg rechtzeitig zu nutzen. Er räumt keine Horde weg und verleiht **keine zusätzlichen Unverwundbarkeitsframes**, keine Unberührbarkeit, keinen Rückstoß und keinen eigenen Schaden.
+Der Dash kann Gegner durchqueren, räumt aber keine Horde weg. Er verleiht **keine zusätzlichen Unverwundbarkeitsframes**, keinen Rückstoß und keinen eigenen Schaden.
 
-- **Körperkontakt mit einem lebenden Gegner stoppt den Dash am ersten Kontakt.** Denti landet vor dessen Körper, niemals auf der anderen Seite. Wände und Arenagrenzen begrenzen ihn ebenfalls.
-- Beginnt Denti bereits überlappend in einer Horde, schafft der Dash keinen Fluchtweg durch diese Gegner. Vorhandene Schilde, passive Ausweichchance und laufende Trefferpausen heben die Bewegungsblockierung nicht auf.
+- **Körperkontakt mit einem lebenden Gegner beendet den Dash nicht.** Wände und Arenagrenzen stoppen die Bewegung weiterhin.
+- Auch ein Start überlappend in einer Horde erlaubt das Durchqueren. Vorhandene Schilde, passive Ausweichchance und laufende Trefferpausen bleiben wirksam.
 - Kontakt wird entlang der gesamten bewegten Strecke geprüft. Ein hoher Dashspeed oder ein langsamer Frame darf weder Gegner noch Projektile oder aktive Schadensflächen überspringen.
 - Bei Kontakt greift die normale Schadensverarbeitung einschließlich Härte, Schild, Zahnflutsch und bereits bestehender Trefferpausen. Der Dash setzt diese Schutzmechanismen weder neu noch verlängert er sie. Laufendes Gift und Blutung ticken weiter.
 - Der Kontakt erzeugt höchstens einen unmittelbaren Treffer über den vorhandenen Schadensweg; die normale Gegnerberührung darf denselben Kontakt nicht noch einmal abrechnen.
-- **Zusätzlicher Kontaktschaden ist eine gezielte Playtest-Variante:** Ausgangswert +25 % auf den beim Dash-Kontakt ausgelösten Treffer, vor Härte. Die erste Variante testet zunächst Stopp plus normalen Schaden. Nur falls Horden dadurch noch zu leicht umgangen werden, wird der Aufschlag aktiviert. Er erhöht weder sämtliche Projektile noch laufenden Statusschaden.
+- **Dash-Kontakte verursachen 50 % mehr Schaden**, vor Härte. Der Zuschlag gilt auch bei einer kreuzenden gegnerischen Charge, aber nicht für Projektile, Flächen oder laufenden Statusschaden.
 
-Ein Kontaktstopp mit verlorener Ladung bestraft schlechte Planung bereits deutlich. Ein zusätzlicher Schadensaufschlag braucht deshalb einen erkennbaren Nutzen im Spieltest und verständliches Feedback.
+Der Schadensaufschlag hält das Durchqueren von Horden riskant; die Bewegung bleibt dabei verlässlich. Das Dash-Tooltip nennt den Zuschlag.
 
 ### Mobile Steuerung
 
@@ -125,7 +126,7 @@ Die Dash-Logik erhält eine kleine eigene Bewegungskomponente. `PlayerStats` ble
 
 Speichern/Fortsetzen erhält Ladung, Cooldown, Erholungspause und bei aktivem Dash Richtung sowie Restdauer. Alte Saves starten mit 100 Wurzelkraft ohne Bonus; bestehende Zahlen-IDs der Attribute bleiben kompatibel. Pausierte Spielzeit und Offlinezeit laden den Dash nicht nach. Beim Laden einer Bewegung wird die verbleibende Strecke wieder regulär auf Kontakt geprüft.
 
-**Abnahme:** Tests für 100-Punkte-Kosten, ausbaubaren Vorrat, feste Auffüllzeit, gespeicherte Dashes, gleichzeitige Sperren, gehaltenes Shift, Diagonalen, Randkontakt, Start innerhalb einer Horde und Kontakt trotz Schild/Dodge/Trefferpause. Streckenprüfungen decken auch Projektile und Schadensflächen bei längeren Frames ab. Dazu Pause/Fortsetzen mitten im Dash und Cooldown, alte Saves, Mehrfingereingabe und Drehung des Displays. Telemetrie erfasst Dashanzahl, Kontaktabbrüche und Schaden während des Dashs; normale Spielanzeigen bleiben kompakt.
+**Abnahme:** Tests für 100-Punkte-Kosten, ausbaubaren Vorrat, feste Auffüllzeit, gespeicherte Dashes, gleichzeitige Sperren, gehaltenes Shift, Diagonalen, Randkontakt, Start innerhalb einer Horde und Kontakt trotz Schild/Dodge/Trefferpause. Streckenprüfungen decken auch Projektile und Schadensflächen bei längeren Frames ab. Dazu Pause/Fortsetzen mitten im Dash und Cooldown, alte Saves, Mehrfingereingabe und Drehung des Displays. Telemetrie erfasst Dashanzahl, Gegnerkontakte und Schaden während des Dashs; normale Spielanzeigen bleiben kompakt.
 
 ## 3. Vier Story-Areas, vier unterschiedliche Bosskämpfe
 
@@ -264,7 +265,7 @@ ersetzen. Die Schrittreihenfolge erlaubt später eine Klassenauswahl dazwischen.
 | Schritt | Lieferumfang | Prüfung vor dem nächsten Schritt |
 | --- | --- | --- |
 | 1 · umgesetzt | Animiertes Zahngefäß, XP-Randlinie, kompakter Timer, getrennte Bossanzeigen | Größen, Textgrenzen, Statusanzeigen, sechs Auflösungen und native Bilder; [Nachweis](COMBAT_HUD.md) |
-| 2 · umgesetzt | Dash-Basis inklusive Touchbutton, Kontaktstopp und Save/Resume | Eine Ladung, beide Sperren, keine neuen Schutzframes, Streckenprüfung und native Darstellung geprüft |
+| 2 · umgesetzt | Dash-Basis inklusive Touchbutton, Durchdashen und Save/Resume | Kontaktschaden +50 %, beide Sperren, keine neuen Schutzframes, Streckenprüfung und native Darstellung geprüft |
 | 3 · Prototyp umgesetzt | Wurzelkraft-Attribut, wenige passende Angebote und Telemetrie | Wartezeiten, Stat-/Save-Kompatibilität und Limit geprüft; Druck-/Balance-Playtest noch offen |
 | 4 · Prototyp umgesetzt | Karies-Graf als erster eigener Encounter | Umhang-Rig, Warnsektoren, Nachschläge, Dash-Streckenprüfung, Fortsetzen und nativer Nah-/Fernvergleich; menschliche Abnahme offen |
 | 5 | Vier Boss-Encounter als Prototyp umgesetzt; Build-Abnahme folgt | Eigene Abläufe samt Grenzen und Tests vorhanden; Nah-/Fernkampf, Kernfenster, vollständige Wellen und mobile Performance vergleichen |

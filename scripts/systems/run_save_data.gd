@@ -98,8 +98,13 @@ static func _valid_structure(value: Dictionary) -> bool:
 		if not puddle is Dictionary or not _numeric_values(puddle):
 			return false
 	var rewards: Dictionary = value.get("rewards", {})
-	if not _containers(rewards, [], ["pending_chests", "pending_relics"]) or not _containers(value.get("relics", {}), [], ["owned"]):
+	if not _containers(rewards, ["weapon_upgrades"], ["pending_chests", "pending_relics"]) or not _containers(value.get("relics", {}), [], ["owned"]):
 		return false
+	var weapon_upgrades: Dictionary = rewards.get("weapon_upgrades", {})
+	if not _containers(weapon_upgrades, ["cursor"], ["actions"]): return false
+	if weapon_upgrades.has("points") and not (weapon_upgrades.points is int or weapon_upgrades.points is float): return false
+	for action in weapon_upgrades.get("actions", []):
+		if not action is Dictionary: return false
 	for chest in rewards.get("pending_chests", []):
 		if not chest is Dictionary or not _containers(chest, [], ["choices"]):
 			return false

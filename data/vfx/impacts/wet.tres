@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ElementImpactProfile" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/weapons/element_impact_profile.gd" id="1"]
+[resource]
+script = ExtResource("1")
+element = &"wet"
+atlas_region = Rect2(1024, 512, 512, 512)
+motion = 4
+burst_duration = 0.5
+ground_duration = 0.85
+ground_opacity = 0.48
+lift = 26.0
+fragments = 6

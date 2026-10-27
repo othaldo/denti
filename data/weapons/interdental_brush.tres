@@ -1,11 +1,11 @@
 [gd_resource type="Resource" script_class="WeaponData" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/weapons/weapon_icons_expansion.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/weapons/element_forms/interdental_brush/normal.png" id="2"]
 
-[sub_resource type="AtlasTexture" id="Atlas_weapon"]
+[sub_resource type="AtlasTexture" id="Icon_skin"]
 atlas = ExtResource("2")
-region = Rect2(793, 0, 397, 397)
+region = Rect2(61, 37, 383, 455)
 filter_clip = true
 
 [resource]
@@ -14,7 +14,6 @@ role = "Breiter Schwung gegen Gruppen"
 id = &"interdental_brush"
 display_name = "Interdental-Bürste"
 description = "1 Wurzel · Winziger Rundumschnitt: schnelle kleine Treffer bauen Blutung auf."
-sprite = SubResource("Atlas_weapon")
 hands = 1
 attack_mode = &"area"
 damage_type = "Schnitt"
@@ -29,10 +28,22 @@ bleed_dps = 1.2
 bleed_duration = 2.5
 range_tiers = PackedFloat32Array(62, 65, 70, 75)
 damage_tiers = PackedFloat32Array(1.00, 1.35, 1.80, 2.40)
-grip_anchor = Vector2(0.26, 0.76)
 projectile_color = Color(1.0, 0.57, 0.30, 1)
 held_style = "staff"
 attack_animation = "spin"
-tip_anchor = Vector2(0.83, 0.16)
 visual_size = 58.0
 animation_duration = 0.28
+
+grip_anchor = Vector2(0.242790, 0.796759)
+tip_anchor = Vector2(0.772572, 0.140875)
+sprite = SubResource("Icon_skin")
+held_sprite = ExtResource("2")
+held_scale = 0.890420
+element_skins = {
+"fire": "res://data/weapon_skins/interdental_brush/fire.tres",
+"ice": "res://data/weapon_skins/interdental_brush/ice.tres",
+"poison": "res://data/weapon_skins/interdental_brush/poison.tres",
+"electric": "res://data/weapon_skins/interdental_brush/electric.tres",
+"bleed": "res://data/weapon_skins/interdental_brush/bleed.tres",
+"wet": "res://data/weapon_skins/interdental_brush/wet.tres"
+}

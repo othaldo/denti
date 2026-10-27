@@ -25,6 +25,7 @@ const UPGRADES: Array[UpgradeData] = [
 
 @onready var player: Player = $Player
 @onready var arena: DentiArena = $Arena
+@onready var element_impacts: ElementImpactBatch = $ElementImpacts
 @onready var wave: WaveController = $WaveController
 @onready var shop: ShopController = $ShopController
 @onready var items: ItemInventory = $Items
@@ -73,6 +74,8 @@ var hud_refresh_time: float = 0.0
 var telemetry := RunTelemetry.new()
 var rewards := PostWaveRewards.new()
 var weapon_chest_panel: WeaponChestPanel
+var weapon_enchantment_panel: WeaponEnchantmentPanel
+var weapon_fusion_panel: WeaponFusionPanel
 var story := StoryProgress.new()
 var story_controller := StoryRunController.new()
 var story_dialogue: StoryDialogue
@@ -88,6 +91,7 @@ func _enter_tree() -> void:
 
 
 func _ready() -> void:
+	element_impacts.attach_burst_layer($EnemyProjectiles)
 	hud.bind_mobile_controls(mobile_controls)
 	randomize()
 	session.begin_graphics_run()
@@ -114,7 +118,7 @@ func _ready() -> void:
 	player.stats.root_capacity_changed.connect(_on_root_capacity_changed)
 	player.stats.damage_taken.connect(_record_player_damage)
 	player.dash.started.connect(telemetry.record_dash)
-	player.dash.contact_stopped.connect(telemetry.record_dash_contact)
+	player.dash.contacted.connect(telemetry.record_dash_contact)
 	player.stats.shield_blocked.connect(items.on_shield_blocked)
 	player.stats.shield_blocked.connect(relics.on_shield_blocked)
 	player.stats.healed.connect(items.on_healed)
@@ -137,6 +141,15 @@ func _ready() -> void:
 	weapon_chest_panel.chosen.connect(_on_affix_chosen)
 	weapon_chest_panel.scrapped.connect(_on_affix_scrapped)
 	weapon_chest_panel.selection_changed.connect(_save_run)
+	weapon_enchantment_panel = WeaponEnchantmentPanel.new()
+	add_child(weapon_enchantment_panel)
+	weapon_enchantment_panel.upgrade_requested.connect(_on_weapon_upgrade_requested)
+	weapon_enchantment_panel.undo_requested.connect(_on_weapon_upgrade_undo)
+	weapon_enchantment_panel.completed.connect(_on_weapon_upgrades_completed)
+	weapon_fusion_panel = WeaponFusionPanel.new()
+	add_child(weapon_fusion_panel)
+	weapon_fusion_panel.confirmed.connect(_on_fusion_confirmed)
+	weapon_enchantment_panel.selection_changed.connect(_save_run)
 	choice_panel.relic_chosen.connect(_on_relic_chosen)
 	choice_panel.starter_chosen.connect(_on_starter_chosen)
 	choice_panel.starter_preview_changed.connect(_save_run)
@@ -147,6 +160,7 @@ func _ready() -> void:
 	shop_panel.sell_requested.connect(_on_shop_sell)
 	shop_panel.merge_requested.connect(_on_shop_merge)
 	shop_panel.evolution_requested.connect(_on_shop_evolve)
+	shop_panel.enchant_requested.connect(_on_shop_enchant)
 	shop_panel.reroll_requested.connect(_on_shop_reroll)
 	shop_panel.reservation_requested.connect(_on_shop_reserve)
 	shop_panel.continue_requested.connect(_on_shop_continue)
@@ -355,7 +369,7 @@ func _spawn_loot_goblin() -> void:
 	var at := _spawn_position(_spawn_edge())
 	_create_enemy(EnemyCatalog.LOOT_GOBLIN, at)
 	var enemy: Enemy = $Enemies.get_child(-1)
-	enemy.loot_goblin.capsule = WeaponAffixes.sanitize_chest(WeaponAffixes.roll_chest(wave.current_wave, player.stats.luck, player.loadout, true))
+	enemy.loot_goblin.capsule = WeaponUpgrades.capsule(wave.current_wave, true)
 	telemetry.record_goblin(&"spawned")
 	sound.play_cue(&"goblin_arrival")
 
@@ -473,7 +487,7 @@ func _on_enemy_defeated(at: Vector2, data: EnemyData, treasure: bool = false) ->
 			call_deferred("_resolve_boss_wave")
 		return
 	if wave.active and (treasure or rewards.can_drop_chest() and randf() < ChestRewards.drop_chance(player.stats.luck, data.is_elite)):
-		var chest := WeaponAffixes.roll_chest(wave.current_wave, player.stats.luck, player.loadout, treasure)
+		var chest := WeaponUpgrades.capsule(wave.current_wave, treasure)
 		if not treasure:
 			rewards.mark_chest_spawned()
 		_spawn_loot(at, &"chest", int(chest["scrap_coins"]), WeaponAffixes.CHEST_ID, chest)
@@ -561,6 +575,7 @@ func _on_loot_collected(kind: StringName, amount: int, reward_id: StringName = &
 	if kind == &"chest":
 		if reward_id == WeaponAffixes.CHEST_ID and drop != null:
 			rewards.queue_affix_chest(drop.reward_data)
+			if drop.reward_data.get("kind", "") == WeaponUpgrades.KIND: telemetry.record_chest_kept()
 		else:
 			rewards.queue_chest(reward_id, amount)
 		telemetry.record_chest_found()
@@ -704,6 +719,32 @@ func _on_chest_resolved(keep: bool) -> void:
 	_advance_post_wave_rewards()
 
 
+func _on_weapon_upgrade_requested(uid: String, id: StringName) -> void:
+	if rewards.step != PostWaveRewards.Step.WEAPONS and not (in_shop and weapon_enchantment_panel.visible): return
+	if rewards.weapon_upgrades.plan(player.loadout, uid, id):
+		weapon_enchantment_panel.refresh()
+		_save_run()
+
+
+func _on_weapon_upgrade_undo() -> void:
+	if rewards.step != PostWaveRewards.Step.WEAPONS and not (in_shop and weapon_enchantment_panel.visible): return
+	rewards.weapon_upgrades.undo()
+	weapon_enchantment_panel.refresh()
+	_save_run()
+
+
+func _on_weapon_upgrades_completed() -> void:
+	if in_shop and weapon_enchantment_panel.visible:
+		if not rewards.weapon_upgrades.commit(player.loadout): return
+		weapon_enchantment_panel.hide()
+		_update_shop_panel()
+		_save_run()
+		return
+	if not rewards.resolve_weapons(player.loadout): return
+	weapon_enchantment_panel.hide()
+	_advance_post_wave_rewards()
+
+
 func _on_affix_chosen(uid: String, option_index: int, replace: int) -> void:
 	var chest := rewards.current_chest()
 	if rewards.step != PostWaveRewards.Step.CHESTS or chest.get("kind", "") != "affix" or option_index < 0 or option_index >= 3:
@@ -810,12 +851,18 @@ func _finish_loot_collection() -> void:
 
 func _advance_post_wave_rewards() -> void:
 	var progress := rewards.choice_progress()
-	if rewards.step in [PostWaveRewards.Step.LEVELS, PostWaveRewards.Step.CHESTS, PostWaveRewards.Step.RELICS]:
+	if rewards.step in [PostWaveRewards.Step.LEVELS, PostWaveRewards.Step.CHESTS, PostWaveRewards.Step.RELICS, PostWaveRewards.Step.WEAPONS]:
 		get_node("/root/SceneTransitions").present(&"rewards")
 		run_flow.enter(RunFlow.Phase.REWARDS)
 	match rewards.step:
 		PostWaveRewards.Step.LEVELS:
 			_show_level_choice()
+		PostWaveRewards.Step.WEAPONS:
+			choice_panel.hide()
+			weapon_chest_panel.hide()
+			weapon_enchantment_panel.show_upgrades(rewards.weapon_upgrades, player.loadout, player.stats, items)
+			get_tree().paused = true
+			_save_run()
 		PostWaveRewards.Step.CHESTS:
 			var chest := rewards.current_chest()
 			if chest.get("kind", "") == "affix":
@@ -866,6 +913,7 @@ func _clear_arena(collect_drops: bool, keep_boss: bool = false) -> void:
 			if drop.kind == &"chest":
 				if drop.reward_id == WeaponAffixes.CHEST_ID:
 					rewards.queue_affix_chest(drop.reward_data)
+					if drop.reward_data.get("kind", "") == WeaponUpgrades.KIND: telemetry.record_chest_kept()
 				else:
 					rewards.queue_chest(drop.reward_id, drop.amount)
 				telemetry.record_chest_found()
@@ -883,6 +931,7 @@ func _clear_arena(collect_drops: bool, keep_boss: bool = false) -> void:
 
 
 func _clear_combat(keep_boss: bool = false) -> void:
+	element_impacts.clear()
 	for enemy in $Enemies.get_children():
 		if keep_boss and enemy.data.is_boss:
 			continue
@@ -943,7 +992,9 @@ func _open_shop() -> void:
 func _update_shop_panel() -> void:
 	shop_panel.story_timeline.show_progress(story, wave.current_wave)
 	shop_panel.set_build_context(player)
-	shop_panel.present(BuildPresentation.shop_view(player, shop, items, relics, wave.current_wave, coins))
+	var model := BuildPresentation.shop_view(player, shop, items, relics, wave.current_wave, coins)
+	model.upgrade_points = rewards.weapon_upgrades.remaining()
+	shop_panel.present(model)
 	_refresh_hud()
 
 func _on_shop_buy(index: int) -> void:
@@ -979,21 +1030,44 @@ func _on_shop_sell(index: int) -> void:
 
 
 func _on_shop_merge(index: int) -> void:
-	if not in_shop or not player.loadout.merge(index):
+	if not in_shop: return
+	if player.loadout.merge_affix_conflict(index):
+		var plan := player.loadout.fusion_plan(index)
+		if plan != null: weapon_fusion_panel.show_plan(plan)
 		return
+	if not player.loadout.merge(index): return
 	_update_shop_panel()
 	shop_panel.animate_equipment(index)
 	_save_run()
 
 
 func _on_shop_evolve(index: int, recipe_id: StringName) -> void:
-	if not in_shop or not player.loadout.evolve(index, WeaponEvolutions.by_id(recipe_id), items):
+	if not in_shop: return
+	var plan := player.loadout.fusion_plan(index, WeaponEvolutions.by_id(recipe_id), items)
+	if plan != null and plan.recipe_id == recipe_id: weapon_fusion_panel.show_plan(plan)
+
+
+func _on_fusion_confirmed(plan: WeaponFusionPlan) -> void:
+	if not in_shop or not weapon_fusion_panel.visible or weapon_fusion_panel.plan != plan: return
+	if not player.loadout.commit_fusion(plan, items, rewards.weapon_upgrades):
+		weapon_fusion_panel.confirm_button.disabled = true
+		weapon_fusion_panel.refund_label.text = "Ausgangswaffen verändert"
 		return
-	get_node("/root/GameSession").discover_fusion(recipe_id)
+	weapon_fusion_panel.hide()
+	weapon_fusion_panel.plan = null
+	if plan.recipe_id != &"": get_node("/root/GameSession").discover_fusion(plan.recipe_id)
 	shop_panel.close_details()
 	_update_shop_panel()
 	shop_panel.animate_equipment(player.loadout.equipped().size() - 1)
 	_save_run()
+	if plan.refund() > 0: _on_shop_enchant()
+
+
+func _on_shop_enchant() -> void:
+	if not in_shop or weapon_fusion_panel.visible or rewards.weapon_upgrades.points <= 0: return
+	shop_panel.close_details()
+	shop_panel.hide()
+	weapon_enchantment_panel.show_upgrades(rewards.weapon_upgrades, player.loadout, player.stats, items)
 
 
 func _on_shop_reroll() -> void:
@@ -1014,7 +1088,7 @@ func _on_shop_reserve(index: int) -> void:
 
 
 func _on_shop_continue() -> void:
-	if not in_shop:
+	if not in_shop or weapon_fusion_panel.visible or weapon_enchantment_panel.visible:
 		return
 	if player.loadout.equipped().is_empty():
 		return
@@ -1077,6 +1151,7 @@ func _run_recap_data() -> Dictionary:
 func debug_start_wave(number: int) -> void:
 	if not DebugRunControls.allowed() or player.loadout.equipped().is_empty():
 		return
+	element_impacts.clear()
 	wave.active = false
 	# Remove immediately while paused so old loot callbacks and attacks cannot
 	# leak into the freshly started wave.
@@ -1092,6 +1167,9 @@ func debug_start_wave(number: int) -> void:
 	starter_pending = false
 	choice_panel.visible = false
 	weapon_chest_panel.hide()
+	weapon_enchantment_panel.hide()
+	weapon_fusion_panel.hide()
+	weapon_fusion_panel.plan = null
 	shop_panel.visible = false
 	game_menu.visible = false
 	player.set_physics_process(true)

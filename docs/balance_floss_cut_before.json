@@ -1,0 +1,478 @@
+{
+	"hz": 60,
+	"measurements": [
+		{
+			"bleed_dps": 8.96,
+			"direct_dps": 37.4,
+			"distance": 45.0,
+			"dps_per_root": 23.18,
+			"hits": 25,
+			"scenario": "close",
+			"tier": 1,
+			"total_dps": 46.36,
+			"weapon": "floss_garrote"
+		},
+		{
+			"bleed_dps": 8.96,
+			"direct_dps": 37.4,
+			"distance": 94.25,
+			"dps_per_root": 23.18,
+			"hits": 25,
+			"scenario": "single",
+			"tier": 1,
+			"total_dps": 46.36,
+			"weapon": "floss_garrote"
+		},
+		{
+			"bleed_dps": 44.8,
+			"direct_dps": 183.333333333333,
+			"distance": 94.25,
+			"dps_per_root": 114.066666666667,
+			"hits": 125,
+			"scenario": "pack",
+			"tier": 1,
+			"total_dps": 228.133333333333,
+			"weapon": "floss_garrote"
+		},
+		{
+			"bleed_dps": 35.84,
+			"direct_dps": 152.533333333333,
+			"distance": 94.25,
+			"dps_per_root": 94.1866666666667,
+			"hits": 100,
+			"scenario": "lane",
+			"tier": 1,
+			"total_dps": 188.373333333333,
+			"weapon": "floss_garrote"
+		},
+		{
+			"bleed_dps": 8.96,
+			"direct_dps": 38.1333333333333,
+			"distance": 145.0,
+			"dps_per_root": 23.5466666666667,
+			"hits": 25,
+			"scenario": "edge",
+			"tier": 1,
+			"total_dps": 47.0933333333333,
+			"weapon": "floss_garrote"
+		},
+		{
+			"bleed_dps": 8.96,
+			"direct_dps": 57.4933323542277,
+			"distance": 45.0,
+			"dps_per_root": 33.2266661771138,
+			"hits": 27,
+			"scenario": "close",
+			"tier": 2,
+			"total_dps": 66.4533323542277,
+			"weapon": "floss_garrote"
+		},
+		{
+			"bleed_dps": 8.96,
+			"direct_dps": 57.4933323542277,
+			"distance": 97.5,
+			"dps_per_root": 33.2266661771138,
+			"hits": 27,
+			"scenario": "single",
+			"tier": 2,
+			"total_dps": 66.4533323542277,
+			"weapon": "floss_garrote"
+		},
+		{
+			"bleed_dps": 44.8,
+			"direct_dps": 287.466661771138,
+			"distance": 97.5,
+			"dps_per_root": 166.133330885569,
+			"hits": 135,
+			"scenario": "pack",
+			"tier": 2,
+			"total_dps": 332.266661771138,
+			"weapon": "floss_garrote"
+		},
+		{
+			"bleed_dps": 35.84,
+			"direct_dps": 229.973329416911,
+			"distance": 97.5,
+			"dps_per_root": 132.906664708455,
+			"hits": 108,
+			"scenario": "lane",
+			"tier": 2,
+			"total_dps": 265.813329416911,
+			"weapon": "floss_garrote"
+		},
+		{
+			"bleed_dps": 8.96,
+			"direct_dps": 57.4933323542277,
+			"distance": 150.0,
+			"dps_per_root": 33.2266661771138,
+			"hits": 27,
+			"scenario": "edge",
+			"tier": 2,
+			"total_dps": 66.4533323542277,
+			"weapon": "floss_garrote"
+		},
+		{
+			"bleed_dps": 8.96,
+			"direct_dps": 82.9400020281474,
+			"distance": 45.0,
+			"dps_per_root": 45.9500010140737,
+			"hits": 28,
+			"scenario": "close",
+			"tier": 3,
+			"total_dps": 91.9000020281474,
+			"weapon": "floss_garrote"
+		},
+		{
+			"bleed_dps": 8.96,
+			"direct_dps": 82.9400020281474,
+			"distance": 104.0,
+			"dps_per_root": 45.9500010140737,
+			"hits": 28,
+			"scenario": "single",
+			"tier": 3,
+			"total_dps": 91.9000020281474,
+			"weapon": "floss_garrote"
+		},
+		{
+			"bleed_dps": 44.8,
+			"direct_dps": 414.700010140737,
+			"distance": 104.0,
+			"dps_per_root": 229.750005070368,
+			"hits": 140,
+			"scenario": "pack",
+			"tier": 3,
+			"total_dps": 459.500010140737,
+			"weapon": "floss_garrote"
+		},
+		{
+			"bleed_dps": 26.88,
+			"direct_dps": 248.820006084442,
+			"distance": 104.0,
+			"dps_per_root": 137.850003042221,
+			"hits": 84,
+			"scenario": "lane",
+			"tier": 3,
+			"total_dps": 275.700006084442,
+			"weapon": "floss_garrote"
+		},
+		{
+			"bleed_dps": 8.96,
+			"direct_dps": 82.9400020281474,
+			"distance": 160.0,
+			"dps_per_root": 45.9500010140737,
+			"hits": 28,
+			"scenario": "edge",
+			"tier": 3,
+			"total_dps": 91.9000020281474,
+			"weapon": "floss_garrote"
+		},
+		{
+			"bleed_dps": 8.96,
+			"direct_dps": 120.486671002706,
+			"distance": 45.0,
+			"dps_per_root": 64.7233355013529,
+			"hits": 30,
+			"scenario": "close",
+			"tier": 4,
+			"total_dps": 129.446671002706,
+			"weapon": "floss_garrote"
+		},
+		{
+			"bleed_dps": 8.96,
+			"direct_dps": 120.486671002706,
+			"distance": 110.5,
+			"dps_per_root": 64.7233355013529,
+			"hits": 30,
+			"scenario": "single",
+			"tier": 4,
+			"total_dps": 129.446671002706,
+			"weapon": "floss_garrote"
+		},
+		{
+			"bleed_dps": 44.8,
+			"direct_dps": 602.433355013529,
+			"distance": 110.5,
+			"dps_per_root": 323.616677506765,
+			"hits": 150,
+			"scenario": "pack",
+			"tier": 4,
+			"total_dps": 647.233355013529,
+			"weapon": "floss_garrote"
+		},
+		{
+			"bleed_dps": 26.88,
+			"direct_dps": 361.460013008118,
+			"distance": 110.5,
+			"dps_per_root": 194.170006504059,
+			"hits": 90,
+			"scenario": "lane",
+			"tier": 4,
+			"total_dps": 388.340013008118,
+			"weapon": "floss_garrote"
+		},
+		{
+			"bleed_dps": 8.96,
+			"direct_dps": 120.486671002706,
+			"distance": 170.0,
+			"dps_per_root": 64.7233355013529,
+			"hits": 30,
+			"scenario": "edge",
+			"tier": 4,
+			"total_dps": 129.446671002706,
+			"weapon": "floss_garrote"
+		},
+		{
+			"bleed_dps": 5.16,
+			"direct_dps": 19.8,
+			"distance": 45.0,
+			"dps_per_root": 24.96,
+			"hits": 32,
+			"scenario": "close",
+			"tier": 1,
+			"total_dps": 24.96,
+			"weapon": "floss_whip"
+		},
+		{
+			"bleed_dps": 5.16,
+			"direct_dps": 19.8,
+			"distance": 74.75,
+			"dps_per_root": 24.96,
+			"hits": 32,
+			"scenario": "single",
+			"tier": 1,
+			"total_dps": 24.96,
+			"weapon": "floss_whip"
+		},
+		{
+			"bleed_dps": 25.7999999999999,
+			"direct_dps": 99.0,
+			"distance": 74.75,
+			"dps_per_root": 124.8,
+			"hits": 160,
+			"scenario": "pack",
+			"tier": 1,
+			"total_dps": 124.8,
+			"weapon": "floss_whip"
+		},
+		{
+			"bleed_dps": 25.7999999999999,
+			"direct_dps": 99.0,
+			"distance": 74.75,
+			"dps_per_root": 124.8,
+			"hits": 160,
+			"scenario": "lane",
+			"tier": 1,
+			"total_dps": 124.8,
+			"weapon": "floss_whip"
+		},
+		{
+			"bleed_dps": 5.16,
+			"direct_dps": 19.8,
+			"distance": 115.0,
+			"dps_per_root": 24.96,
+			"hits": 32,
+			"scenario": "edge",
+			"tier": 1,
+			"total_dps": 24.96,
+			"weapon": "floss_whip"
+		},
+		{
+			"bleed_dps": 5.16,
+			"direct_dps": 29.399999499321,
+			"distance": 45.0,
+			"dps_per_root": 34.559999499321,
+			"hits": 34,
+			"scenario": "close",
+			"tier": 2,
+			"total_dps": 34.559999499321,
+			"weapon": "floss_whip"
+		},
+		{
+			"bleed_dps": 5.16,
+			"direct_dps": 29.399999499321,
+			"distance": 78.0,
+			"dps_per_root": 34.559999499321,
+			"hits": 34,
+			"scenario": "single",
+			"tier": 2,
+			"total_dps": 34.559999499321,
+			"weapon": "floss_whip"
+		},
+		{
+			"bleed_dps": 25.7999999999999,
+			"direct_dps": 146.999997496605,
+			"distance": 78.0,
+			"dps_per_root": 172.799997496605,
+			"hits": 170,
+			"scenario": "pack",
+			"tier": 2,
+			"total_dps": 172.799997496605,
+			"weapon": "floss_whip"
+		},
+		{
+			"bleed_dps": 25.7999999999999,
+			"direct_dps": 146.999997496605,
+			"distance": 78.0,
+			"dps_per_root": 172.799997496605,
+			"hits": 170,
+			"scenario": "lane",
+			"tier": 2,
+			"total_dps": 172.799997496605,
+			"weapon": "floss_whip"
+		},
+		{
+			"bleed_dps": 5.16,
+			"direct_dps": 29.399999499321,
+			"distance": 120.0,
+			"dps_per_root": 34.559999499321,
+			"hits": 34,
+			"scenario": "edge",
+			"tier": 2,
+			"total_dps": 34.559999499321,
+			"weapon": "floss_whip"
+		},
+		{
+			"bleed_dps": 5.16,
+			"direct_dps": 42.1799994707108,
+			"distance": 45.0,
+			"dps_per_root": 47.3399994707108,
+			"hits": 36,
+			"scenario": "close",
+			"tier": 3,
+			"total_dps": 47.3399994707108,
+			"weapon": "floss_whip"
+		},
+		{
+			"bleed_dps": 5.16,
+			"direct_dps": 42.1799994707108,
+			"distance": 84.5,
+			"dps_per_root": 47.3399994707108,
+			"hits": 36,
+			"scenario": "single",
+			"tier": 3,
+			"total_dps": 47.3399994707108,
+			"weapon": "floss_whip"
+		},
+		{
+			"bleed_dps": 25.7999999999999,
+			"direct_dps": 210.899997353554,
+			"distance": 84.5,
+			"dps_per_root": 236.699997353554,
+			"hits": 180,
+			"scenario": "pack",
+			"tier": 3,
+			"total_dps": 236.699997353554,
+			"weapon": "floss_whip"
+		},
+		{
+			"bleed_dps": 25.7999999999999,
+			"direct_dps": 210.899997353554,
+			"distance": 84.5,
+			"dps_per_root": 236.699997353554,
+			"hits": 180,
+			"scenario": "lane",
+			"tier": 3,
+			"total_dps": 236.699997353554,
+			"weapon": "floss_whip"
+		},
+		{
+			"bleed_dps": 5.16,
+			"direct_dps": 42.1799994707108,
+			"distance": 130.0,
+			"dps_per_root": 47.3399994707108,
+			"hits": 36,
+			"scenario": "edge",
+			"tier": 3,
+			"total_dps": 47.3399994707108,
+			"weapon": "floss_whip"
+		},
+		{
+			"bleed_dps": 5.16,
+			"direct_dps": 58.5,
+			"distance": 45.0,
+			"dps_per_root": 63.66,
+			"hits": 38,
+			"scenario": "close",
+			"tier": 4,
+			"total_dps": 63.66,
+			"weapon": "floss_whip"
+		},
+		{
+			"bleed_dps": 5.16,
+			"direct_dps": 58.5,
+			"distance": 91.0,
+			"dps_per_root": 63.66,
+			"hits": 38,
+			"scenario": "single",
+			"tier": 4,
+			"total_dps": 63.66,
+			"weapon": "floss_whip"
+		},
+		{
+			"bleed_dps": 25.7999999999999,
+			"direct_dps": 292.5,
+			"distance": 91.0,
+			"dps_per_root": 318.3,
+			"hits": 190,
+			"scenario": "pack",
+			"tier": 4,
+			"total_dps": 318.3,
+			"weapon": "floss_whip"
+		},
+		{
+			"bleed_dps": 25.7999999999999,
+			"direct_dps": 292.5,
+			"distance": 91.0,
+			"dps_per_root": 318.3,
+			"hits": 190,
+			"scenario": "lane",
+			"tier": 4,
+			"total_dps": 318.3,
+			"weapon": "floss_whip"
+		},
+		{
+			"bleed_dps": 5.16,
+			"direct_dps": 58.5,
+			"distance": 140.0,
+			"dps_per_root": 63.66,
+			"hits": 38,
+			"scenario": "edge",
+			"tier": 4,
+			"total_dps": 63.66,
+			"weapon": "floss_whip"
+		}
+	],
+	"method": "Real attacks and bleeding; immortal anchored targets, no AI, armor, guard or knockback displacement. Distances scale with each weapon's range; close=45px, single/pack=65%, lane=25–85%, edge=100%. Not a win-rate test.",
+	"seconds": 30.0,
+	"seed": 13579,
+	"weapons": [
+		{
+			"damage": 44.0,
+			"id": "floss_garrote",
+			"interval": 1.2,
+			"knockback": 0.0,
+			"name": "Zahnseiden-Garotte",
+			"range": [
+				145.0,
+				150.0,
+				160.0,
+				170.0
+			],
+			"roots": 2
+		},
+		{
+			"damage": 18.0,
+			"id": "floss_whip",
+			"interval": 0.95,
+			"knockback": 0.0,
+			"name": "Zahnseidenpeitsche",
+			"range": [
+				115.0,
+				120.0,
+				130.0,
+				140.0
+			],
+			"roots": 1
+		}
+	]
+}

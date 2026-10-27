@@ -71,12 +71,12 @@ func _run() -> void:
 		return
 	_clear()
 	front = _enemy(Vector2(80, 0))
-	side = _enemy(Vector2(55, 65))
+	side = _enemy(Vector2(150, 10))
 	behind = _enemy(Vector2(-80, 0))
 	var garrote := _equip(&"floss_garrote")
 	_attack(garrote)
 	if front.bleed_stacks != 1 or side.bleed_stacks != 1 or behind.health != 10000.0:
-		_fail("garrote front arc or bleed failed")
+		_fail("garrote forward strands or bleed failed")
 		return
 	_clear()
 	front = _enemy(Vector2(80, 0))

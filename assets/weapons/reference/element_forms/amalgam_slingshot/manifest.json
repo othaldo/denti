@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "weapon_id": "amalgam_slingshot",
+  "display_name": "Amalgam-Schleuder",
+  "canvas": {
+    "width": 1024,
+    "height": 1536,
+    "format": "PNG",
+    "mode": "RGBA",
+    "background": "transparent"
+  },
+  "reference": "assets/weapons/weapon_icons_refined.png",
+  "reference_resource": "data/weapons/amalgam_slingshot.tres",
+  "normal_provenance": "generated portrait-format interpretation of the original weapon image; not a pixel-identical copy",
+  "prompts": "prompts.json",
+  "preview_region": [
+    0,
+    195,
+    1024,
+    1116
+  ],
+  "preview_size_px": 65,
+  "status": "complete_for_review",
+  "integrated_into_game": true,
+  "variants": [
+    {
+      "id": "normal",
+      "label": "Normal",
+      "description": "Normalform",
+      "file": "normal.png",
+      "sha256": "e060347b6c58ec14ea06cb753229ddcb72df377d3010c44b63c20561c704493a",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        51,
+        257,
+        971,
+        1286
+      ],
+      "solid_bounds_alpha128": [
+        52,
+        258,
+        970,
+        1286
+      ],
+      "source": "imagegen:exec-b635d44a-2aa4-46e7-8fe9-75c4d59bbef5.png",
+      "origin": "built_in_imagegen_reference"
+    },
+    {
+      "id": "fire",
+      "label": "Feuer",
+      "description": "Feuerform",
+      "file": "fire.png",
+      "sha256": "06c9f63147c93b791e9937a7ab058fbd39bba9c2d57e40ec2945742bc6dc11d0",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        32,
+        219,
+        990,
+        1286
+      ],
+      "solid_bounds_alpha128": [
+        32,
+        219,
+        990,
+        1286
+      ],
+      "source": "imagegen:exec-da633f4d-bf17-4cea-8b44-11982d2b37d1.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "ice",
+      "label": "Eis",
+      "description": "Eisform",
+      "file": "ice.png",
+      "sha256": "bd154c2bd086149b70e529e95ca49bfe2f4e4f6ea8cc469621bc1bebdd232c97",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        24,
+        236,
+        1000,
+        1287
+      ],
+      "solid_bounds_alpha128": [
+        25,
+        237,
+        999,
+        1286
+      ],
+      "source": "imagegen:exec-54dce788-9178-4a77-a831-c7f28175f112.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "poison",
+      "label": "Gift",
+      "description": "Giftform",
+      "file": "poison.png",
+      "sha256": "ab4d86e8dd4c9335282b1f062d59176b660c6ef0cd34a09ba8ddb7f5a804b218",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        23,
+        232,
+        1000,
+        1256
+      ],
+      "solid_bounds_alpha128": [
+        23,
+        232,
+        1000,
+        1256
+      ],
+      "source": "imagegen:exec-4229837b-e438-4a73-a0ea-625e0df3029e.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "electric",
+      "label": "Elektro",
+      "description": "Elektroform",
+      "file": "electric.png",
+      "sha256": "bd0a04ce2fd2593c89faa1f7d4d8766e65eb66c5e4272cfa828c7cded28b9ea1",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        30,
+        238,
+        993,
+        1286
+      ],
+      "solid_bounds_alpha128": [
+        31,
+        239,
+        993,
+        1286
+      ],
+      "source": "imagegen:exec-24de9acb-68df-4567-b1ca-e892d7542b8c.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "bleed",
+      "label": "Blut",
+      "description": "Blutform",
+      "file": "bleed.png",
+      "sha256": "66257f15eb3f77f755804f8ed45ef292c975e25e351a8c55b60e182ec4150834",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        35,
+        232,
+        989,
+        1286
+      ],
+      "solid_bounds_alpha128": [
+        35,
+        233,
+        989,
+        1285
+      ],
+      "source": "imagegen:exec-f26f8a4d-ef97-4ddd-bb35-bb7bb3fc4370.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "wet",
+      "label": "Wasser",
+      "description": "Wasserform",
+      "file": "wet.png",
+      "sha256": "3b7c1255eb25a586025360044a0c3da457c23f0cd50d7e43cbcbad74c0c21dce",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        24,
+        237,
+        1001,
+        1288
+      ],
+      "solid_bounds_alpha128": [
+        24,
+        238,
+        1000,
+        1287
+      ],
+      "source": "imagegen:exec-82eb839a-f1d3-486f-a08e-ca379a6e18b5.png",
+      "origin": "built_in_imagegen_edit"
+    }
+  ],
+  "integration_notes": [
+    "Runtime sprites share the source crop and rig per weapon; UI icons use centered per-form regions.",
+    "Element forms follow each instance through upgrades, fusion, evolution and resume.",
+    "Existing projectile art and evolution effects are retained."
+  ],
+  "reference_atlas_region": [
+    1024.0,
+    512.0,
+    512.0,
+    512.0
+  ],
+  "visual_review": {
+    "method": "Godot comparison sheet at shared crop and native sprite scale",
+    "screenshot": "docs/screenshots/weapon_elements/amalgam_slingshot_complete_pack.png"
+  },
+  "runtime": {
+    "weapon_resource": "data/weapons/amalgam_slingshot.tres",
+    "skin_resources": "data/weapon_skins/amalgam_slingshot/",
+    "textures": "assets/weapons/element_forms/amalgam_slingshot/",
+    "canvas": [
+      512,
+      512
+    ],
+    "source_paintings_preserved": true,
+    "documentation": "docs/WEAPON_SKINS.md"
+  }
+}

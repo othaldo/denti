@@ -25,7 +25,10 @@ static func mask(values: Array[Dictionary]) -> int:
 			result |= 1 << definition.projectile_effect_index
 	return result
 
-static func base_texture(data: WeaponData, tier: int) -> Texture2D:
+static func base_texture(data: WeaponData, tier: int, affixes: Array[Dictionary] = []) -> Texture2D:
+	var elemental := WeaponElementVisuals.projectile(data, tier, affixes)
+	if elemental != null:
+		return elemental
 	if data.projectile_shape == &"rocket":
 		return CombatSpriteTextures.rocket(data.projectile_color)
 	var radius := 11.0 if data.splash_at_tier(tier) > 0 or data.pierce_at_tier(tier) > 0 else 7.0
@@ -55,7 +58,7 @@ func prepare(weapons: Array[WeaponInstance]) -> void:
 			continue
 		var bits := mask(weapon.affixes)
 		has_enchantment = has_enchantment or bits != 0
-		var base := base_texture(weapon.data, weapon.tier)
+		var base := base_texture(weapon.data, weapon.tier, weapon.affixes)
 		var radius := visual_radius(weapon.data, weapon.tier)
 		wanted[_key(base, bits, radius)] = {"base": base, "bits": bits, "radius": radius}
 	if not has_enchantment:

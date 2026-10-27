@@ -1,10 +1,11 @@
 [gd_resource type="Resource" script_class="WeaponData" load_steps=4 format=3]
-[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/weapons/weapon_icons_refined.png" id="2"]
 
-[sub_resource type="AtlasTexture" id="Atlas_weapon"]
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/weapons/element_forms/mouthwash_mortar/normal.png" id="2"]
+
+[sub_resource type="AtlasTexture" id="Icon_skin"]
 atlas = ExtResource("2")
-region = Rect2(512, 0, 512, 512)
+region = Rect2(36, 74, 445, 418)
 filter_clip = true
 
 [resource]
@@ -25,13 +26,24 @@ projectile_speed = 400.0
 splash_radius = 85.0
 damage_tiers = PackedFloat32Array(1.00, 1.35, 1.90, 2.70)
 splash_tiers = PackedFloat32Array(85.0, 95.0, 105.0, 115.0)
-sprite = SubResource("Atlas_weapon")
-grip_anchor = Vector2(0.22368, 0.78063)
 projectile_color = Color(0.27, 0.9, 0.67, 1)
 visual_angle_degrees = 35
 price = 14
 held_style = "aimed"
 attack_animation = "lob"
-tip_anchor = Vector2(0.83849, 0.33623)
 visual_size = 75.0
 animation_duration = 0.42
+
+grip_anchor = Vector2(0.187902, 0.778021)
+tip_anchor = Vector2(0.811613, 0.352737)
+sprite = SubResource("Icon_skin")
+held_sprite = ExtResource("2")
+held_scale = 1.000000
+element_skins = {
+"fire": "res://data/weapon_skins/mouthwash_mortar/fire.tres",
+"ice": "res://data/weapon_skins/mouthwash_mortar/ice.tres",
+"poison": "res://data/weapon_skins/mouthwash_mortar/poison.tres",
+"electric": "res://data/weapon_skins/mouthwash_mortar/electric.tres",
+"bleed": "res://data/weapon_skins/mouthwash_mortar/bleed.tres",
+"wet": "res://data/weapon_skins/mouthwash_mortar/wet.tres"
+}

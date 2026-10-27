@@ -25,8 +25,6 @@ func evolution_ready(index: int, recipe: WeaponEvolutionRecipe, items: ItemInven
 	for id in recipe.items:
 		if items.count(id) < 1:
 			return false
-	if partner != null and not _affixes_fit(selected, partner):
-		return false
 	return used_slots() - selected.data.hands - (partner.data.hands if partner != null else 0) + recipe.result.hands <= capacity
 
 
@@ -41,25 +39,88 @@ func ready_evolutions(index: int, items: ItemInventory) -> Array[WeaponEvolution
 func evolve(index: int, recipe: WeaponEvolutionRecipe, items: ItemInventory) -> bool:
 	if not evolution_ready(index, recipe, items):
 		return false
-	var selected := equipped()[index]
-	var other_id := recipe.partner_weapon if selected.data.id == recipe.base_weapon else recipe.base_weapon
-	var partner := _find_tier(other_id, MAX_TIER, selected) if other_id != &"" else null
+	# Direct callers may inherit compatible effects; conflicts require a draft.
+	var plan := fusion_plan(index, recipe, items)
+	if plan.refund() > 0 or not plan.valid(): return false
+	return commit_fusion(plan, items, WeaponUpgradeState.new())
+
+
+func fusion_partner(index: int) -> WeaponInstance:
+	var weapons := equipped()
+	if index < 0 or index >= weapons.size() or weapons[index].tier >= MAX_TIER: return null
+	var primary := weapons[index]
+	var compatible := _merge_partner(primary)
+	return compatible if compatible != null else _find_tier(primary.data.id, primary.tier, primary)
+
+
+func fusion_plan(index: int, recipe: WeaponEvolutionRecipe = null, items: ItemInventory = null) -> WeaponFusionPlan:
+	var weapons := equipped()
+	if index < 0 or index >= weapons.size(): return null
+	var primary := weapons[index]
+	var partner: WeaponInstance
+	var result: WeaponData
+	var result_tier := MAX_TIER
+	if recipe != null:
+		if items == null or not evolution_ready(index, recipe, items): return null
+		var other_id := recipe.partner_weapon if primary.data.id == recipe.base_weapon else recipe.base_weapon
+		partner = _find_tier(other_id, MAX_TIER, primary) if other_id != &"" else null
+		var upgrades := primary.data.chest_upgrades.duplicate(true)
+		if partner != null: upgrades["mk"] = int(upgrades.get("mk", 0)) + int(partner.data.chest_upgrades.get("mk", 0))
+		result = WeaponRolls.resolve(recipe.result, primary.data.rolls, upgrades)
+	else:
+		partner = fusion_partner(index)
+		if partner == null: return null
+		result = WeaponRolls.fuse(primary.data, partner.data)
+		result_tier = primary.tier + 1
+	var plan := WeaponFusionPlan.new()
+	plan.configure(primary, partner, result, result_tier, recipe.id if recipe != null else &"")
+	return plan
+
+
+func commit_fusion(plan: WeaponFusionPlan, items: ItemInventory, points: WeaponUpgradeState) -> bool:
+	if plan == null or not plan.valid() or points == null or not points.actions.is_empty(): return false
+	var weapons := equipped()
+	var selected: WeaponInstance
+	var partner: WeaponInstance
+	for weapon in weapons:
+		if weapon.instance_uid == plan.primary_uid: selected = weapon
+		if weapon.instance_uid == plan.partner_uid: partner = weapon
+	if selected == null or (not plan.partner_uid.is_empty() and partner == null): return false
+	if WeaponFusionPlan.snapshot(selected) != plan.ingredients[0]: return false
+	if partner != null and WeaponFusionPlan.snapshot(partner) != plan.ingredients[1]: return false
+	var index := weapons.find(selected)
+	var recipe := WeaponEvolutions.by_id(plan.recipe_id) if plan.recipe_id != &"" else null
+	if plan.recipe_id != &"":
+		if recipe == null or items == null or not evolution_ready(index, recipe, items): return false
+	elif partner == null or selected.tier >= MAX_TIER or partner.tier != selected.tier or partner.data.id != selected.data.id:
+		return false
+	# Rebuild from live sources so a stale or altered preview cannot mint points.
+	var fresh := WeaponFusionPlan.new()
+	var fresh_data := WeaponRolls.fuse(selected.data, partner.data) if recipe == null else fusion_plan(index, recipe, items).result_data
+	fresh.configure(selected, partner, fresh_data, selected.tier + 1 if recipe == null else MAX_TIER, plan.recipe_id)
+	fresh.selected.assign(plan.selected)
+	if not fresh.valid(): return false
+	var inherited := fresh.effects()
+	var refund := fresh.refund()
 	var invested := selected.invested_coins + (partner.invested_coins if partner != null else 0)
-	var inherited := _combined_affixes(selected, partner) if partner != null else selected.affixes.duplicate(true)
-	var slots := maxi(selected.affix_slots, partner.affix_slots if partner != null else 1)
 	var uid := selected.instance_uid
-	var rolls := selected.data.rolls.duplicate(true)
-	var upgrades := selected.data.chest_upgrades.duplicate(true)
-	if partner != null:
-		upgrades["mk"] = int(upgrades.get("mk", 0)) + int(partner.data.chest_upgrades.get("mk", 0))
-	if partner != null:
+	if recipe == null:
+		selected.data = fresh.result_data
+		selected.affixes.assign(inherited)
+		selected.tier = fresh.tier
+		selected.affix_slots = WeaponUpgrades.slots(fresh.tier)
+		selected.invested_coins = invested
 		partner.free()
-	selected.free()
-	var evolved := _add(WeaponRolls.resolve(recipe.result, rolls, upgrades), MAX_TIER, invested)
-	evolved.affixes.assign(inherited)
-	evolved.affix_slots = slots
-	evolved.instance_uid = uid
-	evolved.refresh_affix_stats()
+		selected.refresh_affix_stats()
+	else:
+		if partner != null: partner.free()
+		selected.free()
+		var evolved := _add(fresh.result_data, MAX_TIER, invested)
+		evolved.affixes.assign(inherited)
+		evolved.affix_slots = WeaponUpgrades.slots(MAX_TIER)
+		evolved.instance_uid = uid
+		evolved.refresh_affix_stats()
+	points.points += refund
 	_refresh_positions()
 	return true
 
@@ -146,6 +207,14 @@ func merge_affix_conflict(index: int) -> bool:
 	return weapon.tier < MAX_TIER and _find_tier(weapon.data.id, weapon.tier, weapon) != null and _merge_partner(weapon) == null
 
 
+func merge_conflict_reason(index: int) -> String:
+	if not merge_affix_conflict(index): return ""
+	var weapon := equipped()[index]
+	var partner := _find_tier(weapon.data.id, weapon.tier, weapon)
+	var reason := WeaponUpgrades.fusion_block_reason(weapon.affixes, partner.affixes)
+	return reason if not reason.is_empty() else "Nicht genug Verzauberungsplätze"
+
+
 func merge(index: int) -> bool:
 	if not can_merge(index):
 		return false
@@ -153,9 +222,9 @@ func merge(index: int) -> bool:
 	var partner := _merge_partner(weapon)
 	weapon.data = WeaponRolls.fuse(weapon.data, partner.data)
 	weapon.affixes = _combined_affixes(weapon, partner)
-	weapon.affix_slots = maxi(weapon.affix_slots, partner.affix_slots)
-	weapon.refresh_affix_stats()
 	weapon.tier += 1
+	weapon.affix_slots = maxi(WeaponUpgrades.slots(weapon.tier), maxi(weapon.affix_slots, partner.affix_slots))
+	weapon.refresh_affix_stats()
 	weapon.invested_coins += partner.invested_coins
 	partner.free()
 	_refresh_positions()
@@ -219,7 +288,8 @@ func _affixes_fit(primary: WeaponInstance, partner: WeaponInstance) -> bool:
 	for affix in primary.affixes + partner.affixes:
 		if not kinds.has(str(affix.id)):
 			kinds.append(str(affix.id))
-	return kinds.size() <= maxi(primary.affix_slots, partner.affix_slots)
+	var capacity_after := maxi(WeaponUpgrades.slots(primary.tier + 1), maxi(primary.affix_slots, partner.affix_slots))
+	return kinds.size() <= capacity_after and WeaponUpgrades.fusion_fits(primary.affixes, partner.affixes)
 
 
 func _combined_affixes(primary: WeaponInstance, partner: WeaponInstance) -> Array[Dictionary]:

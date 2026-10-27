@@ -11,6 +11,7 @@ enum SpriteFacing { FRONT, RIGHT, LEFT }
 @export var late_health_acceleration: float = 0.0
 @export_range(0.0, 0.6, 0.01) var damage_reduction: float = 0.0
 @export_range(0.0, 1.0, 0.01) var knockback_resistance: float = 0.0
+# Negative values are weaknesses (up to +50% damage); positive values resist.
 @export var affix_resistances: Dictionary = {}
 @export var move_speed: float = 90.0
 @export var contact_damage: float = 9.0
@@ -89,4 +90,4 @@ enum SpriteFacing { FRONT, RIGHT, LEFT }
 
 
 func affix_resistance(kind: StringName) -> float:
-	return clampf(float(affix_resistances.get(str(kind), 0.0)), 0.0, 0.60)
+	return clampf(float(affix_resistances.get(str(kind), 0.0)), -0.50, 0.60)

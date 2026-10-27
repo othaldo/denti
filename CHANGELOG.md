@@ -2,7 +2,31 @@
 
 Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü angezeigt. 0.1.0 wurde rückblickend anhand der Git-Historie dokumentiert; 0.2.0 bündelt die seitdem entstandenen Änderungen. Die Einträge beschreiben implementierte Funktionen. Weitere Pläne stehen in der [Roadmap](docs/ROADMAP.md).
 
-## Noch ohne neue Versionsnummer — 22.10.2026
+## 0.6.0 — 27.10.2026
+
+- **Dentipedia aktualisiert:** 25 Mechanikthemen erklären Waffenpunkte, Mk-Plätze, ein Element pro Waffe, manuelle Fusion mit Punkteerstattung, Dash und Ausdauer, Elementtreffer und die neuen Zahnseidenangriffe. Shop, Belohnungsfolge, Gauner, Endlos und Fortsetzen sind auf dem aktuellen Stand; alte Zufallskapseln stehen ausdrücklich unter Altbestand. Waffeneinträge zeigen ihre Normal- und sechs Elementformen als Ansicht. Suche nach „Garotte“ findet die Schneide; geheime Evolutionen bleiben geschützt. [Inhalte und native Ansichten](docs/DENTIPEDIA.md).
+
+- **Zahnseide mit festen Griffen:** Garotte und Zahnseidenpeitsche halten ihre Griffe bei Denti. Zwei beziehungsweise ein Faden schnellen nach vorn und treffen Gegner entlang des sichtbaren Wegs, höchstens einmal pro Angriff. Alle sechs Elemente animieren den Faden selbst. Die Garotte heißt Zahnseiden-Schneide, behält Rückstoß und 220–270 Reichweite; die Peitsche erhält 180–210 Reichweite für ihren Vorwärtsschlag. [Native Animationen und Messung](docs/FLOSS_CUT.md).
+
+- **Sichtbare elementare Einschläge:** Geschosse, Nahkampf, Strahlen und Explosionen erzeugen ausbrechende Partikel und kurze Bodenspuren: Glut, Eissplitter, Giftschleim, elektrische Entladung, Blutlache oder Wasserspritzer. Größe und Richtung folgen dem Treffer; die Effekte bleiben unabhängig vom Projektil sichtbar und fügen keinen zusätzlichen Schaden hinzu. [Native Animation und Regeln](docs/WEAPON_ELEMENT_EFFECTS.md#einschläge-und-bodenspuren).
+
+- **Eigene Verstärkungssymbole:** Reichweitenpfeil, Tempospuren, Lebensraubherz, Krit-Zielscheibe, kritischer Einschlag und Wuchtfaust ersetzen die bisherigen Item-Platzhalter. Einheitlich in Auswahl, Effektplätzen, Fusion und Dentipedia. [Ansicht und Asset](docs/art/support_icons.md).
+
+- **Eigene Elementsymbole:** Flamme, Eiskristall, Giftschädel, Blutstropfen, Blitz und Wassertropfen ersetzen die Item-Platzhalter. Einheitlich in Verzauberung, Effektplätzen, Fusion und Dentipedia. [Native Ansicht und Asset](docs/art/element_icons.md).
+
+- **Waffengrößen korrigiert:** Die neuen Texturen berücksichtigen wieder die sichtbaren Größen der bisherigen Normalformen. Gemeinsamer Maßstab je Waffe für alle Elemente; transparente Ränder verändern die Proportionen zu Denti nicht mehr. [Vergleich und Regeln](docs/WEAPON_SKINS.md#sichtbare-größe-neben-denti).
+
+- **Manuelle Verzauberungsfusion:** Evolutionen und Mk-Fusionen mit Konflikten bieten eine reversible Effektauswahl. Maximal vier Plätze und ein Element, gleiche Effekte bis 10/10 zusammenführen, alle übrigen Ränge als Upgradepunkte zurück. Direktes Wiederverzaubern im Shop, gespeicherte Restpunkte und Verzauberungsentwürfe. [Regeln und Ansichten](docs/WEAPON_UPGRADES.md).
+
+- **Angriffe passend zum Element:** eigene Geschosskerne für Feuer, Eis, Gift, Elektro, Blutung und Wasser; dazu passende Mündungsblitze, Nahkampfspuren, Strahlen, Sprühkegel, Treffer und Explosionen. Evolutionen übernehmen Farben und Effekte ebenfalls. Bereits fliegende Geschosse behalten ihr ursprüngliches Element, auch beim Fortsetzen. Vorbereitete Atlanten erhalten einen Sprite je Geschoss; Kampfwerte und Trefferflächen bleiben erhalten. [Animation und Prüfung](docs/WEAPON_ELEMENT_EFFECTS.md).
+
+- **Alle Waffenformen im Spiel:** 18 Standardwaffen und sechs Evolutionen tragen ihre neuen Normal- und sechs Elementformen, insgesamt 168 Bilder. Die Auswahl zeigt die passende Form schon vor dem Verzaubern. Shop, Inventar, Kampf, Fusion und Fortsetzen übernehmen sie je Waffenexemplar. Fräse, Polierer und Schleuder behalten passende Animationsteile; kompakte Spieltexturen mit Mipmaps ersetzen die großen Vorlagen im Laufzeitimport. [Umsetzung und native Ansichten](docs/WEAPON_SKINS.md).
+
+- **Ein Element pro Waffe:** Feuer, Eis, Gift, Blutung, Elektro oder Wasser; andere Plätze tragen Verstärkungen. Neu: Krit-Chance, Krit-Schaden und Wucht. Wasser verursacht eigenen Schaden mit Schwächen gegen Zucker (+50 %) und Plaque (+25 %). Weihe entfällt aus der neuen Auswahl; alte Investitionen bleiben erhalten. Elementkonflikte lassen sich in der Fusionsvorschau auflösen; übrige Ränge werden als Upgradepunkte erstattet. [Regeln und Waffenformen](docs/WEAPON_UPGRADES.md).
+
+- **Dash geht durch Gegner:** Körperkontakt beendet den Wurzelsprung nicht mehr und verursacht währenddessen 50 % mehr Schaden. Wände und Arenarand stoppen weiter; Härte, Schild, Zahnflutsch und Trefferpausen gelten weiterhin. Dash-Cooldown 1,5 → 0,5 s; Regeneration feste 25 Ausdauer/s unabhängig vom Maximum. 300 Ausdauer erlauben drei schnelle Dashes, bevor nachgeladen werden muss. Lebensraub durch Waffenverzauberungen heilt nun gemeinsam alle 0,6 statt 0,75 s.
+
+- **Gezielte Waffenverzauberung:** Upgrade-Kapseln geben frei verteilbare Punkte. Eine Waffe besitzt je nach Mk einen bis vier Effektplätze; Aktivieren startet bei 1/10, weitere Ränge kosten je einen Punkt bis 10/10. Neue Waffenansicht mit großer Vorschau, sichtbaren Mk-Sperren, tatsächlichen Vorher-/Nachher-Werten und Rückgängig. Unverbrauchte Punkte und offene Verteilungen werden gespeichert. [Regeln und native Ansichten](docs/WEAPON_UPGRADES.md).
 
 - **Windows-Updater:** Stable/Beta-Prüfung im Hauptmenü, abbrechbarer Download, Paketprüfung und „Installieren & neu starten“. Austausch erst nach Spielende; fehlgeschlagene Dateiersetzung oder fehlende Startbestätigung stellen die bisherige Version wieder her. Spielstände bleiben außerhalb des Austauschs. Native Windows-Tests prüfen den Helfer samt Prozessübergabe und Rückfall. [Ablauf](docs/RELEASES.md#updater-im-windows-spiel).
 - **GitHub-Builds und Releases:** automatische Web-/Windows-Pakete, herunterladbare Testbuilds, versionierte Release-Entwürfe, Prüfsummen und Update-Manifeste. Stabile Webversion und `/dev/` sind ab dem ersten veröffentlichten Release getrennt. [Ablauf](docs/RELEASES.md).

@@ -17,6 +17,22 @@ const HUD_ATLAS: Texture2D = preload("res://assets/ui/hud_icons_atlas.png")
 const STAT_ATLAS: Texture2D = preload("res://assets/ui/stat_icons_atlas.png")
 const RANGE: Texture2D = preload("res://assets/ui/range.svg")
 const STAMINA: Texture2D = preload("res://assets/ui/stamina_icon.png")
+const ELEMENT_ATLAS: Texture2D = preload("res://assets/ui/element_icons_atlas.png")
+const ELEMENT_ICON_START := 91
+# Each painted motif is centered within the same frame; no neighboring pixels.
+const ELEMENT_REGIONS: Array[Rect2] = [
+	Rect2(86, 42, 406, 452), Rect2(577, 46, 387, 436),
+	Rect2(1062, 103, 416, 369), Rect2(109, 535, 383, 420),
+	Rect2(618, 525, 310, 429), Rect2(1100, 535, 332, 426),
+]
+const ELEMENT_FRAME_SIZE := Vector2(512, 512)
+const SUPPORT_ATLAS: Texture2D = preload("res://assets/ui/weapon_support_icons_atlas.png")
+const SUPPORT_ICON_START := 97
+const SUPPORT_REGIONS: Array[Rect2] = [
+	Rect2(14, 151, 515, 231), Rect2(556, 85, 440, 366),
+	Rect2(1038, 94, 477, 359), Rect2(62, 498, 445, 435),
+	Rect2(530, 503, 488, 445), Rect2(1023, 584, 502, 309),
+]
 # Generated motifs are not exactly aligned to a uniform grid. Select each full
 # motif, then center it in the same transparent frame instead of cutting a cell.
 const STAT_REGIONS: Array[Rect2] = [
@@ -54,6 +70,13 @@ const HUD_ROWS := 2
 
 
 static func item(index: int) -> Texture2D:
+	if index >= SUPPORT_ICON_START and index < SUPPORT_ICON_START + SUPPORT_REGIONS.size():
+		var region := SUPPORT_REGIONS[index - SUPPORT_ICON_START]
+		# Equal visible length for wide arrows, round targets and diagonal slashes.
+		var frame := Vector2.ONE * maxf(region.size.x, region.size.y) / 0.86
+		return _framed_region(SUPPORT_ATLAS, region, frame)
+	if index >= ELEMENT_ICON_START and index < ELEMENT_ICON_START + ELEMENT_REGIONS.size():
+		return _framed_region(ELEMENT_ATLAS, ELEMENT_REGIONS[index - ELEMENT_ICON_START], ELEMENT_FRAME_SIZE)
 	if index >= 86:
 		return _region(DODGE_ATLAS, clampi(index - 86, 0, 4), 3, 2)
 	if index >= 78:

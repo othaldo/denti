@@ -1,0 +1,506 @@
+{
+  "magic_toothbrush": {
+    "grip": [
+      0.5,
+      0.92
+    ],
+    "tip": [
+      0.58,
+      0.095
+    ],
+    "combat_visible_size": 68.997396
+  },
+  "turbo_drill": {
+    "grip": [
+      0.18,
+      0.8
+    ],
+    "tip": [
+      0.98,
+      0.2
+    ],
+    "combat_visible_size": 58.262911
+  },
+  "floss_whip": {
+    "grip": [
+      0.13,
+      0.82
+    ],
+    "tip": [
+      0.85,
+      0.25
+    ],
+    "combat_visible_size": 72.384977,
+    "floss_cut": {
+      "canvas": 512,
+      "left_polygon": [
+        [
+          70,
+          110
+        ],
+        [
+          176,
+          110
+        ],
+        [
+          176,
+          140
+        ],
+        [
+          238,
+          138
+        ],
+        [
+          283,
+          164
+        ],
+        [
+          285,
+          286
+        ],
+        [
+          195,
+          316
+        ],
+        [
+          173,
+          350
+        ],
+        [
+          140,
+          484
+        ],
+        [
+          30,
+          484
+        ],
+        [
+          25,
+          410
+        ],
+        [
+          57,
+          307
+        ],
+        [
+          69,
+          269
+        ],
+        [
+          62,
+          211
+        ]
+      ],
+      "left_tip": [
+        165,
+        139
+      ]
+    }
+  },
+  "water_jet": {
+    "grip": [
+      0.34,
+      0.79
+    ],
+    "tip": [
+      0.97,
+      0.03
+    ],
+    "combat_visible_size": 49.730469
+  },
+  "crown_launcher": {
+    "grip": [
+      0.25,
+      0.83
+    ],
+    "tip": [
+      0.82,
+      0.2
+    ],
+    "combat_visible_size": 55.605469
+  },
+  "enamel_mirror": {
+    "grip": [
+      0.16,
+      0.85
+    ],
+    "tip": [
+      0.8,
+      0.12
+    ],
+    "combat_visible_size": 61.826172
+  },
+  "plaque_scaler": {
+    "grip": [
+      0.13,
+      0.86
+    ],
+    "tip": [
+      0.86,
+      0.1
+    ],
+    "combat_visible_size": 66.140625
+  },
+  "mouthwash_mortar": {
+    "grip": [
+      0.13,
+      0.78
+    ],
+    "tip": [
+      0.86,
+      0.25
+    ],
+    "combat_visible_size": 64.306641
+  },
+  "toothpick_spear": {
+    "grip": [
+      0.17,
+      0.83
+    ],
+    "tip": [
+      0.99,
+      0.01
+    ],
+    "combat_visible_size": 71.335013
+  },
+  "cavity_grinder": {
+    "grip": [
+      0.12,
+      0.8
+    ],
+    "tip": [
+      0.9,
+      0.14
+    ],
+    "rotor": {
+      "center": [
+        892,
+        488
+      ],
+      "radii": [
+        72,
+        114
+      ],
+      "angle": -25
+    },
+    "combat_visible_size": 50.585938
+  },
+  "interdental_brush": {
+    "grip": [
+      0.16,
+      0.82
+    ],
+    "tip": [
+      0.88,
+      0.07
+    ],
+    "combat_visible_size": 45.289673
+  },
+  "fluoride_sprayer": {
+    "grip": [
+      0.28,
+      0.8
+    ],
+    "tip": [
+      0.91,
+      0.25
+    ],
+    "combat_visible_size": 51.328125
+  },
+  "water_turbine": {
+    "grip": [
+      0.13,
+      0.83
+    ],
+    "tip": [
+      0.9,
+      0.13
+    ],
+    "combat_visible_size": 60.15625
+  },
+  "uv_lamp": {
+    "grip": [
+      0.27,
+      0.81
+    ],
+    "tip": [
+      0.92,
+      0.18
+    ],
+    "combat_visible_size": 55.176322
+  },
+  "amalgam_slingshot": {
+    "grip": [
+      0.5,
+      0.82
+    ],
+    "tip": [
+      0.5,
+      0.33
+    ],
+    "sling": {
+      "left": [
+        205,
+        426
+      ],
+      "right": [
+        822,
+        405
+      ],
+      "pouch_polygon": [
+        [
+          350,
+          540
+        ],
+        [
+          450,
+          435
+        ],
+        [
+          600,
+          435
+        ],
+        [
+          714,
+          545
+        ],
+        [
+          693,
+          676
+        ],
+        [
+          611,
+          750
+        ],
+        [
+          435,
+          752
+        ],
+        [
+          344,
+          642
+        ]
+      ],
+      "interior_polygon": [
+        [
+          230,
+          356
+        ],
+        [
+          511,
+          456
+        ],
+        [
+          786,
+          346
+        ],
+        [
+          751,
+          512
+        ],
+        [
+          698,
+          650
+        ],
+        [
+          616,
+          748
+        ],
+        [
+          430,
+          750
+        ],
+        [
+          341,
+          650
+        ],
+        [
+          280,
+          504
+        ]
+      ]
+    },
+    "combat_visible_size": 51.796875
+  },
+  "floss_garrote": {
+    "grip": [
+      0.18,
+      0.76
+    ],
+    "tip": [
+      0.52,
+      0.05
+    ],
+    "combat_visible_size": 69.753149,
+    "floss_cut": {
+      "canvas": 512,
+      "left_polygon": [
+        [
+          65,
+          210
+        ],
+        [
+          133,
+          210
+        ],
+        [
+          153,
+          290
+        ],
+        [
+          207,
+          363
+        ],
+        [
+          222,
+          445
+        ],
+        [
+          27,
+          454
+        ],
+        [
+          19,
+          250
+        ]
+      ],
+      "right_polygon": [
+        [
+          447,
+          210
+        ],
+        [
+          379,
+          210
+        ],
+        [
+          359,
+          290
+        ],
+        [
+          305,
+          363
+        ],
+        [
+          290,
+          445
+        ],
+        [
+          485,
+          454
+        ],
+        [
+          493,
+          250
+        ]
+      ],
+      "left_tip": [
+        104,
+        214
+      ],
+      "right_tip": [
+        409,
+        214
+      ]
+    }
+  },
+  "prophylaxis_polisher": {
+    "grip": [
+      0.16,
+      0.8
+    ],
+    "tip": [
+      0.87,
+      0.1
+    ],
+    "rotor": {
+      "center": [
+        898,
+        329
+      ],
+      "radii": [
+        58,
+        94
+      ],
+      "angle": -15
+    },
+    "combat_visible_size": 47.734375
+  },
+  "fluoride_rocket": {
+    "grip": [
+      0.32,
+      0.81
+    ],
+    "tip": [
+      0.9,
+      0.1
+    ],
+    "combat_visible_size": 63.098237
+  },
+  "storm_shower": {
+    "grip": [
+      0.18,
+      0.84
+    ],
+    "tip": [
+      0.92,
+      0.08
+    ],
+    "combat_visible_size": 55.341667
+  },
+  "fate_thread": {
+    "grip": [
+      0.16,
+      0.86
+    ],
+    "tip": [
+      0.85,
+      0.16
+    ],
+    "combat_visible_size": 75.678571
+  },
+  "root_breaker": {
+    "grip": [
+      0.21,
+      0.84
+    ],
+    "tip": [
+      0.99,
+      0.015
+    ],
+    "combat_visible_size": 58.770492
+  },
+  "halo": {
+    "grip": [
+      0.14,
+      0.83
+    ],
+    "tip": [
+      0.9,
+      0.29
+    ],
+    "combat_visible_size": 63.951613
+  },
+  "trinity_brush": {
+    "grip": [
+      0.16,
+      0.84
+    ],
+    "tip": [
+      0.66,
+      0.14
+    ],
+    "combat_visible_size": 67.953216
+  },
+  "revelation": {
+    "grip": [
+      0.17,
+      0.85
+    ],
+    "tip": [
+      0.8,
+      0.18
+    ],
+    "combat_visible_size": 62.336066
+  }
+}

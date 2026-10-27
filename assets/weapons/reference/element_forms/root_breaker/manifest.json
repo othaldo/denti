@@ -1,0 +1,237 @@
+{
+  "schema_version": 1,
+  "weapon_id": "root_breaker",
+  "display_name": "Wurzelkanalbrecher",
+  "weapon_group": "evolution",
+  "evolution_kind": "drill",
+  "canvas": {
+    "width": 1024,
+    "height": 1536,
+    "format": "PNG",
+    "mode": "RGBA",
+    "background": "transparent"
+  },
+  "reference": "assets/weapons/weapon_evolutions.png",
+  "reference_resource": "data/weapons/root_breaker.tres",
+  "normal_provenance": "generated portrait-format interpretation of the original weapon image; not a pixel-identical copy",
+  "prompts": "prompts.json",
+  "preview_region": [
+    22,
+    191,
+    1002,
+    1141
+  ],
+  "preview_size_px": 60,
+  "status": "complete_for_review",
+  "integrated_into_game": true,
+  "variants": [
+    {
+      "id": "normal",
+      "label": "Normal",
+      "description": "Normalform",
+      "file": "normal.png",
+      "sha256": "c784816ae11ef037b019b2cd42643824194fe1f314265a7ceec060f64f3b683f",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        45,
+        264,
+        1005,
+        1307
+      ],
+      "solid_bounds_alpha128": [
+        46,
+        265,
+        1004,
+        1307
+      ],
+      "source": "imagegen:exec-49309d0e-83ee-4efe-b8c8-20838921c663.png",
+      "origin": "built_in_imagegen_reference"
+    },
+    {
+      "id": "fire",
+      "label": "Feuer",
+      "description": "Feuerform",
+      "file": "fire.png",
+      "sha256": "af54bfb5ce98292ec77b542685df0872c8c1b1b0d2c4bece94aa7e6cf6fd86cd",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        46,
+        262,
+        1005,
+        1308
+      ],
+      "solid_bounds_alpha128": [
+        46,
+        262,
+        1005,
+        1308
+      ],
+      "source": "imagegen:exec-798c0612-395c-4a63-8cde-cb0fc6e72e4a.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "ice",
+      "label": "Eis",
+      "description": "Eisform",
+      "file": "ice.png",
+      "sha256": "8aa5da6cc5741e03e1767c9a299e4ac85dc91b2267f56240271ad8dd31514f35",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        49,
+        264,
+        1008,
+        1306
+      ],
+      "solid_bounds_alpha128": [
+        50,
+        264,
+        1007,
+        1306
+      ],
+      "source": "imagegen:exec-7c3356b5-7da5-4aa9-9e23-23e93bf30a68.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "poison",
+      "label": "Gift",
+      "description": "Giftform",
+      "file": "poison.png",
+      "sha256": "0b5c3137614ea77c4d4a70ce0ecbba86c0f609854bb4faab70a4cd1665553ee7",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        47,
+        214,
+        1013,
+        1275
+      ],
+      "solid_bounds_alpha128": [
+        48,
+        215,
+        1012,
+        1275
+      ],
+      "source": "imagegen:exec-7eac0c3c-2826-45a3-af83-84c57b1325ee.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "electric",
+      "label": "Elektro",
+      "description": "Elektroform",
+      "file": "electric.png",
+      "sha256": "c6c01fbb98480ee100a774e9f08d634e844877a306ae0a687d046d67b202bdcd",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        46,
+        262,
+        1005,
+        1308
+      ],
+      "solid_bounds_alpha128": [
+        46,
+        263,
+        1004,
+        1308
+      ],
+      "source": "imagegen:exec-e795f853-32ba-44e9-b2ad-f86ddc3b3295.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "bleed",
+      "label": "Blut",
+      "description": "Blutform",
+      "file": "bleed.png",
+      "sha256": "2a1c4f4af966e416a6cb89ce09f934d9f19c75cdc36974ac509461039636e1e3",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        47,
+        248,
+        1010,
+        1307
+      ],
+      "solid_bounds_alpha128": [
+        47,
+        249,
+        1010,
+        1307
+      ],
+      "source": "imagegen:exec-5061eafb-1a4c-47fe-ba53-2a38bc9738cd.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "wet",
+      "label": "Wasser",
+      "description": "Wasserform",
+      "file": "wet.png",
+      "sha256": "2a3559ed6dca955f91c10fdd8da12cfc6e2a5c80c898e4ce8d2b6c0ba0285071",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        45,
+        263,
+        1006,
+        1309
+      ],
+      "solid_bounds_alpha128": [
+        46,
+        263,
+        1005,
+        1308
+      ],
+      "source": "imagegen:exec-0f81ca5a-4109-4485-86cb-2659b8139ae3.png",
+      "origin": "built_in_imagegen_edit"
+    }
+  ],
+  "integration_notes": [
+    "Runtime sprites share the source crop and rig per weapon; UI icons use centered per-form regions.",
+    "Element forms follow each instance through upgrades, fusion, evolution and resume.",
+    "Existing projectile art and evolution effects are retained."
+  ],
+  "reference_atlas_region": [
+    1032.0,
+    24.0,
+    480.0,
+    488.0
+  ],
+  "visual_review": {
+    "method": "Godot comparison sheet at shared crop and native sprite scale",
+    "screenshot": "docs/screenshots/weapon_elements/root_breaker_complete_pack.png"
+  },
+  "runtime": {
+    "weapon_resource": "data/weapons/root_breaker.tres",
+    "skin_resources": "data/weapon_skins/root_breaker/",
+    "textures": "assets/weapons/element_forms/root_breaker/",
+    "canvas": [
+      512,
+      512
+    ],
+    "source_paintings_preserved": true,
+    "documentation": "docs/WEAPON_SKINS.md"
+  }
+}

@@ -120,7 +120,7 @@ func max_stamina() -> float:
 
 
 func stamina_text() -> String:
-	return "%.0f Wurzelkraft · %.2f/s · %.0f s Auffüllzeit%s" % [max_stamina(), DASH_CONFIG.recharge_per_second(max_stamina()), DASH_CONFIG.refill_duration, " (max.)" if dash_recovery_bonus >= DASH_CONFIG.max_stamina_bonus else ""]
+	return "%.0f Wurzelkraft · %.2f/s · %.1f s Auffüllzeit%s" % [max_stamina(), DASH_CONFIG.recharge_rate, DASH_CONFIG.refill_time(max_stamina()), " (max.)" if dash_recovery_bonus >= DASH_CONFIG.max_stamina_bonus else ""]
 
 
 func _process(delta: float) -> void:

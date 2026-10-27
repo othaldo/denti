@@ -3,6 +3,12 @@
 [resource]
 script = ExtResource("1")
 id = &"electric"
+elemental = true
+projectile_art_kind = 1
+attack_stream_art = 1
+attack_trail_art = 1
+attack_spray_art = 1
+visual_animation_rate = 1.8
 projectile_effect_index = 4
 display_name = "Elektro"
 name_suffix = "des Gewitters"
@@ -15,4 +21,4 @@ proc_cooldown = 0.45
 proc_targets = 1
 proc_target_cap = 3
 color = Color(1, 0.92, 0.23, 1)
-icon_index = 5
+icon_index = 95

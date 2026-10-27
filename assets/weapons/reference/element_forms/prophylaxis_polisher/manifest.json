@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "weapon_id": "prophylaxis_polisher",
+  "display_name": "Prophylaxe-Polierer",
+  "canvas": {
+    "width": 1024,
+    "height": 1536,
+    "format": "PNG",
+    "mode": "RGBA",
+    "background": "transparent"
+  },
+  "reference": "assets/weapons/weapon_icons_refined.png",
+  "reference_resource": "data/weapons/prophylaxis_polisher.tres",
+  "normal_provenance": "generated portrait-format interpretation of the original weapon image; not a pixel-identical copy",
+  "prompts": "prompts.json",
+  "preview_region": [
+    18,
+    180,
+    994,
+    1170
+  ],
+  "preview_size_px": 65,
+  "status": "complete_for_review",
+  "integrated_into_game": true,
+  "variants": [
+    {
+      "id": "normal",
+      "label": "Normal",
+      "description": "Normalform",
+      "file": "normal.png",
+      "sha256": "225899a2644a6d873b5bef97122bbb4bd51958eaf3a04589b7c644e2f65a68d9",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        42,
+        217,
+        978,
+        1326
+      ],
+      "solid_bounds_alpha128": [
+        42,
+        218,
+        977,
+        1326
+      ],
+      "source": "imagegen:exec-0e2b8f08-c046-482d-b327-a7c1311a7645.png",
+      "origin": "built_in_imagegen_reference"
+    },
+    {
+      "id": "fire",
+      "label": "Feuer",
+      "description": "Feuerform",
+      "file": "fire.png",
+      "sha256": "35f9d5d1a5b952c91e283d95e2733a471b44b21d9b07d720a2cebfbd69ea3c10",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        44,
+        210,
+        980,
+        1326
+      ],
+      "solid_bounds_alpha128": [
+        45,
+        210,
+        980,
+        1325
+      ],
+      "source": "imagegen:exec-882cd6a4-5c04-46a8-b430-1c02fc5b0cfd.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "ice",
+      "label": "Eis",
+      "description": "Eisform",
+      "file": "ice.png",
+      "sha256": "f95fba576d7641f7e7b14c9af6dc566a1b6b123a6ff74fe6910c7f8121dd65a6",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        46,
+        204,
+        988,
+        1323
+      ],
+      "solid_bounds_alpha128": [
+        46,
+        204,
+        988,
+        1322
+      ],
+      "source": "imagegen:exec-03b05a5a-f724-4841-9afb-826edc81843a.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "poison",
+      "label": "Gift",
+      "description": "Giftform",
+      "file": "poison.png",
+      "sha256": "e71c13369e9ad23a4a2cd5544b1daa7d2e3501e8c45ed9312efaf5a6cde9f04e",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        43,
+        215,
+        985,
+        1325
+      ],
+      "solid_bounds_alpha128": [
+        44,
+        215,
+        984,
+        1325
+      ],
+      "source": "imagegen:exec-fb41e556-5da8-4ab8-af5e-b59ad56e3ffe.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "electric",
+      "label": "Elektro",
+      "description": "Elektroform",
+      "file": "electric.png",
+      "sha256": "eaf4cae2350789533faf09252c8e94532a85fe6ebee681a311956cb6ab3f9bb2",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        43,
+        214,
+        983,
+        1327
+      ],
+      "solid_bounds_alpha128": [
+        43,
+        214,
+        982,
+        1326
+      ],
+      "source": "imagegen:exec-6aacca85-401b-4b2b-acf3-bc640f9eea72.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "bleed",
+      "label": "Blut",
+      "description": "Blutform",
+      "file": "bleed.png",
+      "sha256": "5d91ec1f7c64d13050d64eabcbc9b18357f0fb5ca21d27f001d6305a984fcd07",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        45,
+        211,
+        986,
+        1325
+      ],
+      "solid_bounds_alpha128": [
+        46,
+        211,
+        985,
+        1325
+      ],
+      "source": "imagegen:exec-d263d2bd-e637-4cde-ba6b-7bc3370924fd.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "wet",
+      "label": "Wasser",
+      "description": "Wasserform",
+      "file": "wet.png",
+      "sha256": "45f9ba7131f3f57b6b0d8cffec3754f9bba4f3ebdca92f0e77b64a6341e1ef54",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        43,
+        210,
+        984,
+        1325
+      ],
+      "solid_bounds_alpha128": [
+        44,
+        210,
+        983,
+        1325
+      ],
+      "source": "imagegen:exec-25410aa3-5209-4cfe-abc2-a23fd4f0bce4.png",
+      "origin": "built_in_imagegen_edit"
+    }
+  ],
+  "integration_notes": [
+    "Runtime sprites share the source crop and rig per weapon; UI icons use centered per-form regions.",
+    "Element forms follow each instance through upgrades, fusion, evolution and resume.",
+    "Existing projectile art and evolution effects are retained."
+  ],
+  "reference_atlas_region": [
+    512.0,
+    1024.0,
+    512.0,
+    512.0
+  ],
+  "visual_review": {
+    "method": "Godot comparison sheet at shared crop and native sprite scale",
+    "screenshot": "docs/screenshots/weapon_elements/prophylaxis_polisher_complete_pack.png"
+  },
+  "runtime": {
+    "weapon_resource": "data/weapons/prophylaxis_polisher.tres",
+    "skin_resources": "data/weapon_skins/prophylaxis_polisher/",
+    "textures": "assets/weapons/element_forms/prophylaxis_polisher/",
+    "canvas": [
+      512,
+      512
+    ],
+    "source_paintings_preserved": true,
+    "documentation": "docs/WEAPON_SKINS.md"
+  }
+}

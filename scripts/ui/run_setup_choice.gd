@@ -2,6 +2,7 @@ class_name RunSetupChoice
 extends Button
 
 var selected := false
+var selected_color := DentiUIStyle.INK
 var keyboard_focus := false
 var mark: TextureRect
 var artwork: TextureRect
@@ -52,7 +53,7 @@ func _layout_artwork() -> void:
 func refresh() -> void:
 	if rarity_tier > 0:
 		DentiUIStyle.style_card(self, rarity_tier, rarity_color)
-		DentiUIStyle.mark_card(self, DentiUIStyle.INK if selected else Color.TRANSPARENT)
+		DentiUIStyle.mark_card(self, selected_color if selected else Color.TRANSPARENT)
 		RunSetupStyle.focus(self, keyboard_focus)
 	else:
 		RunSetupStyle.choice(self, selected, keyboard_focus)

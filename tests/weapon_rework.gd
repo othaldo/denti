@@ -31,7 +31,7 @@ func _run() -> void:
 	if not brush.stats_text(4).contains("3 Geschosse") or _base_dps(brush, 4) <= brush.damage_at_tier(4) / brush.interval_at_tier(4):
 		_fail("brush tier traits were missing from shop information")
 		return
-	if whip.range_at_tier(4) != 140.0 or crown.pierce_at_tier(1) != 1 or crown.pierce_at_tier(4) != 3 or mortar.splash_at_tier(4) != 115.0:
+	if whip.range_at_tier(4) != 210.0 or crown.pierce_at_tier(1) != 1 or crown.pierce_at_tier(4) != 3 or mortar.splash_at_tier(4) != 115.0:
 		_fail("crowd-clear weapon tiers were not loaded")
 		return
 	if water.base_damage != 11.0 or water.knockback_at_tier(4) != 30.0 or scaler.base_damage != 16.0 or mirror.base_damage != 26.0:

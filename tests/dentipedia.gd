@@ -23,7 +23,7 @@ func _run() -> void:
 	check(hidden.size() == WeaponCatalog.ALL.size() + WeaponEvolutions.ALL.size(), "weapon list incomplete")
 	for index in WeaponEvolutions.ALL.size():
 		var entry: Dictionary = hidden[WeaponCatalog.ALL.size() + index]
-		check(entry.get("locked", false) and not entry.has("recipe"), "undiscovered recipe exposed")
+		check(entry.get("locked", false) and not entry.has("recipe") and not entry.has("weapon_data"), "undiscovered recipe or form selector exposed")
 		check(not str(entry).contains(WeaponEvolutions.ALL[index].result.display_name), "secret weapon name exposed")
 	for category in DentipediaData.CATEGORIES.size():
 		check(not DentipediaData.entries(category, []).is_empty(), "empty category")
@@ -53,6 +53,13 @@ func _run() -> void:
 	check(str(enchantment_entries["wet"].body).contains("Leitlack") and str(enchantment_entries["electric"].body).contains("Ein Sprung") and str(enchantment_entries["electric"].body).contains("Kettenitems"), "wet/electric synergy documentation missing")
 	check(str(enchantment_entries["leech"].body).contains("DoTs und Folgeeffekte heilen nicht"), "leech limitations missing")
 	check(str(DentipediaData.TOPICS["Strom & Nass"]).contains("auch ohne dieses Item"), "legacy electricity topic contradicts intrinsic chains")
+	var mechanics := DentipediaData.entries(4, [])
+	for title in ["Waffenpunkte & Effektplätze", "Manuelle Verzauberungsfusion", "Elemente & Waffenformen", "Wurzelsprung & Ausdauer", "Zahnseidenpeitsche & Schneide", "Goldzahn-Gauner", "Speichern & Fortsetzen", "Alte Spielstände"]:
+		check(mechanics.any(func(entry: Dictionary) -> bool: return entry.title == title and not str(entry.body).is_empty()), "current feature lacks a mechanics entry: " + title)
+	for entry in mechanics:
+		for index in str(entry.body).length():
+			var code := str(entry.body).unicode_at(index)
+			check(code <= 32 or DentiUIStyle.FONT.has_char(code), "mechanics entry has an unsupported glyph: U+%04X" % code)
 	var game: Node2D = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(game)
 	current_scene = game
@@ -70,6 +77,8 @@ func _run() -> void:
 	for id in recipe.items:
 		game.items.acquire(ShopController.by_id(id))
 	game._on_shop_evolve(0, recipe.id)
+	check(game.weapon_fusion_panel.visible and not session.discovered_fusions.has(str(recipe.id)), "unconfirmed fusion revealed the discovery")
+	game.weapon_fusion_panel.confirm_button.pressed.emit()
 	check(session.discovered_fusions.has(str(recipe.id)), "successful fusion did not unlock entry")
 	session.unlock_hell()
 	session.discovered_fusions.clear()
@@ -102,6 +111,7 @@ func _run() -> void:
 		pedia.search.text = ""
 		pedia._refresh()
 		pedia._show(revealed[-1])
+		check(pedia.detail.find_children("*", "HFlowContainer", false, false).is_empty(), "locked entry offers elemental forms")
 		var image: TextureRect = pedia.detail.get_child(0).get_child(0)
 		check(image.material is ShaderMaterial, "locked artwork is not a silhouette")
 		if "--capture" in OS.get_cmdline_user_args() and extent.x == 1280:
@@ -140,6 +150,35 @@ func _run() -> void:
 		if "--capture" in OS.get_cmdline_user_args():
 			await RenderingServer.frame_post_draw
 			root.get_texture().get_image().save_png("res://.godot/dentipedia-holy-%dx%d.png" % [extent.x, extent.y])
+		# Former names remain searchable, and a form preview must never enchant the build.
+		pedia.category.selected = 0
+		pedia.search.text = "Garotte"
+		pedia._refresh()
+		check(pedia.listing.get_child_count() == 1, "former Garotte name is not searchable")
+		var form_rows := pedia.detail.find_children("*", "HFlowContainer", false, false)
+		check(form_rows.size() == 1 and form_rows[0].get_child_count() == 7, "weapon is missing normal or elemental previews")
+		var art: TextureRect = pedia.detail.get_child(0).get_child(0)
+		var template := WeaponCatalog.by_id(&"floss_garrote")
+		var original_art := template.sprite
+		for button: Button in form_rows[0].get_children():
+			button.button_pressed = true
+			button.pressed.emit()
+			var kind := str(button.get_meta("element"))
+			var texture := art.texture as AtlasTexture
+			check(texture != null and texture.atlas.resource_path.ends_with("/%s.png" % ("normal" if kind.is_empty() else kind)), "form button displays another element")
+			check(button.button_group.get_pressed_button() == button, "form preview selection is ambiguous")
+		check(template.sprite == original_art and template.element_skin == &"", "encyclopedia preview changed the weapon catalog")
+		for frame in 5: await process_frame
+		check(form_rows[0].size.x <= pedia.detail_scroll.size.x + 1, "form choices overflow horizontally at %s" % extent)
+		pedia.detail_scroll.scroll_vertical = 500
+		for frame in 2: await process_frame
+		pedia.category.selected = 4
+		pedia.search.text = "Wurzelsprung"
+		pedia._refresh()
+		check(pedia.selected.get("title") == "Wurzelsprung & Ausdauer", "new dash topic cannot be found")
+		for frame in 3: await process_frame
+		check(pedia.detail_scroll.scroll_vertical == 0, "opening another topic retains the previous scroll offset")
+		pedia.search.text = ""
 		pedia.category.selected = 1
 		pedia._refresh()
 		for frame in 5:

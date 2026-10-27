@@ -28,6 +28,8 @@ static var _icons: Dictionary = {}
 
 static func weapon_icon(weapon: WeaponData) -> Texture2D:
 	var source := weapon.sprite
+	# Runtime skins are already framed by the packer, including their margins.
+	if not weapon.element_skins.is_empty(): return source
 	if source == null or not ICON_BOUNDS.has(weapon.id): return source
 	if _icons.has(source): return _icons[source]
 	var frame := AtlasTexture.new()

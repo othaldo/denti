@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "weapon_id": "water_jet",
+  "display_name": "Wasserflosser",
+  "canvas": {
+    "width": 1024,
+    "height": 1536,
+    "format": "PNG",
+    "mode": "RGBA",
+    "background": "transparent"
+  },
+  "reference": "assets/weapons/weapon_icons_refined.png",
+  "reference_resource": "data/weapons/water_jet.tres",
+  "normal_provenance": "generated portrait-format interpretation of the original weapon image; not a pixel-identical copy",
+  "prompts": "prompts.json",
+  "preview_region": [
+    34,
+    199,
+    976,
+    1006
+  ],
+  "preview_size_px": 58,
+  "status": "complete_for_review",
+  "integrated_into_game": true,
+  "variants": [
+    {
+      "id": "normal",
+      "label": "Normal",
+      "description": "Normalform",
+      "file": "normal.png",
+      "sha256": "dbbd7b71f21251b6cde690458043e63d34ad3fe8d0c5239927b9dc6f62105048",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        77,
+        240,
+        974,
+        1181
+      ],
+      "solid_bounds_alpha128": [
+        77,
+        240,
+        974,
+        1180
+      ],
+      "source": "imagegen:exec-e7bbe73f-464f-4941-b9eb-d14f1ac7df7b.png",
+      "origin": "built_in_imagegen_reference"
+    },
+    {
+      "id": "fire",
+      "label": "Feuer",
+      "description": "Feuerform",
+      "file": "fire.png",
+      "sha256": "e03b26d0c5b1b0d760a6583bfeadc8075033f716339faeb60ee7766fb80a21e0",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        58,
+        239,
+        974,
+        1180
+      ],
+      "solid_bounds_alpha128": [
+        58,
+        240,
+        974,
+        1180
+      ],
+      "source": "imagegen:exec-7d7eaa70-6c0d-4ccd-8bf5-8046681d389c.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "ice",
+      "label": "Eis",
+      "description": "Eisform",
+      "file": "ice.png",
+      "sha256": "e2d44745acbe34a890a993e66b83bf85a04d90617b7e01aabf1c62b8b82c615f",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        62,
+        223,
+        986,
+        1182
+      ],
+      "solid_bounds_alpha128": [
+        63,
+        223,
+        986,
+        1181
+      ],
+      "source": "imagegen:exec-00f2ed82-b36e-4680-a425-91a4e7527d6f.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "poison",
+      "label": "Gift",
+      "description": "Giftform",
+      "file": "poison.png",
+      "sha256": "2027f824bae4394a9aec0d6e1c7b00a50b111d17f69e553e8a112b2b7e8b953a",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        75,
+        238,
+        975,
+        1181
+      ],
+      "solid_bounds_alpha128": [
+        75,
+        239,
+        974,
+        1180
+      ],
+      "source": "imagegen:exec-965ee0e8-fec8-4711-9eb5-9bd5c5ee8c2c.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "electric",
+      "label": "Elektro",
+      "description": "Elektroform",
+      "file": "electric.png",
+      "sha256": "1239d53e13b0a8e8aeccc3ac4243c965c69925d05a1dad77fcc6b7c2beefced8",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        77,
+        239,
+        974,
+        1181
+      ],
+      "solid_bounds_alpha128": [
+        77,
+        240,
+        974,
+        1181
+      ],
+      "source": "imagegen:exec-090a0cab-501f-4818-9158-67591a37d420.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "bleed",
+      "label": "Blut",
+      "description": "Blutform",
+      "file": "bleed.png",
+      "sha256": "2fbf56d95a91c2e4f6b16a1604424bb06fba473996043357e5b18a7f8c563734",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        81,
+        240,
+        973,
+        1179
+      ],
+      "solid_bounds_alpha128": [
+        81,
+        240,
+        973,
+        1179
+      ],
+      "source": "imagegen:exec-2bd730f9-593e-43d5-bb49-b992f8b9f122.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "wet",
+      "label": "Wasser",
+      "description": "Wasserform",
+      "file": "wet.png",
+      "sha256": "77093081171757e3cc63484f89156ef30a66aff3c4ac1db8cbae431e066e4c7f",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        75,
+        231,
+        984,
+        1181
+      ],
+      "solid_bounds_alpha128": [
+        76,
+        231,
+        984,
+        1180
+      ],
+      "source": "imagegen:exec-a347e062-2483-4086-8546-8c15966b9a96.png",
+      "origin": "built_in_imagegen_edit"
+    }
+  ],
+  "integration_notes": [
+    "Runtime sprites share the source crop and rig per weapon; UI icons use centered per-form regions.",
+    "Element forms follow each instance through upgrades, fusion, evolution and resume.",
+    "Existing projectile art and evolution effects are retained."
+  ],
+  "reference_atlas_region": [
+    1024.0,
+    0.0,
+    512.0,
+    512.0
+  ],
+  "visual_review": {
+    "method": "Godot comparison sheet at shared crop and native sprite scale",
+    "screenshot": "docs/screenshots/weapon_elements/water_jet_complete_pack.png"
+  },
+  "runtime": {
+    "weapon_resource": "data/weapons/water_jet.tres",
+    "skin_resources": "data/weapon_skins/water_jet/",
+    "textures": "assets/weapons/element_forms/water_jet/",
+    "canvas": [
+      512,
+      512
+    ],
+    "source_paintings_preserved": true,
+    "documentation": "docs/WEAPON_SKINS.md"
+  }
+}

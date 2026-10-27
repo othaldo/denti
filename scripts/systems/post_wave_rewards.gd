@@ -2,7 +2,7 @@ class_name PostWaveRewards
 extends RefCounted
 
 # Keep old numeric values stable because saved runs store this enum as an integer.
-enum Step { COMBAT, COLLECTING, LEVELS, CHESTS, SHOP, END, RELICS, STORY }
+enum Step { COMBAT, COLLECTING, LEVELS, CHESTS, SHOP, END, RELICS, STORY, WEAPONS }
 
 var step: Step = Step.COMBAT
 var pending_levels: int = 0
@@ -16,6 +16,8 @@ var final_wave: bool = false
 var pending_story: StringName = &""
 var choices_resolved: int = 0
 var choices_total: int = 0
+var weapon_upgrades := WeaponUpgradeState.new()
+var weapons_resolved := false
 
 
 func begin_wave() -> void:
@@ -31,6 +33,9 @@ func begin_wave() -> void:
 	pending_story = &""
 	choices_resolved = 0
 	choices_total = 0
+	weapons_resolved = false
+	weapon_upgrades.actions.clear()
+	weapon_upgrades.cursor.clear()
 
 
 func earn_level() -> void:
@@ -57,7 +62,19 @@ func queue_chest(item_id: StringName, scrap_coins: int) -> void:
 func queue_affix_chest(value: Dictionary) -> void:
 	var chest := WeaponAffixes.sanitize_chest(value)
 	if not chest.is_empty():
-		pending_chests.append(chest)
+		if chest.kind == WeaponUpgrades.KIND:
+			weapon_upgrades.points += 1
+		else:
+			pending_chests.append(chest)
+
+
+func resolve_weapons(loadout: WeaponLoadout) -> bool:
+	if step != Step.WEAPONS or not weapon_upgrades.commit(loadout): return false
+	_update_choice_total()
+	choices_resolved += 1
+	weapons_resolved = true
+	_advance()
+	return true
 
 
 func queue_relics(options: Array[String]) -> void:
@@ -116,7 +133,7 @@ func choice_progress() -> Vector2i:
 
 
 func _remaining_choices() -> int:
-	return pending_levels + pending_chests.size() + (0 if pending_relics.is_empty() else 1)
+	return pending_levels + pending_chests.size() + (0 if pending_relics.is_empty() else 1) + (1 if not weapons_resolved and weapon_upgrades.points > 0 else 0)
 
 
 func _update_choice_total() -> void:
@@ -138,11 +155,14 @@ func resolve_story() -> void:
 func save_data() -> Dictionary:
 	return {"step": step, "pending_levels": pending_levels, "level_rerolls": level_rerolls, "pending_chests": pending_chests.duplicate(true),
 		"pending_relics": pending_relics.duplicate(), "chest_spawned": chest_spawned, "random_chests_spawned": random_chests_spawned, "treasure_spawned": treasure_spawned, "final_wave": final_wave, "pending_story": str(pending_story),
-		"choices_resolved": choices_resolved, "choices_total": choices_total}
+		"choices_resolved": choices_resolved, "choices_total": choices_total,
+		"weapon_upgrades": weapon_upgrades.save_data(), "weapons_resolved": weapons_resolved}
 
 
 func restore(saved: Dictionary) -> void:
-	step = clampi(int(saved.get("step", Step.COMBAT)), Step.COMBAT, Step.STORY) as Step
+	step = clampi(int(saved.get("step", Step.COMBAT)), Step.COMBAT, Step.WEAPONS) as Step
+	weapon_upgrades.restore(saved.get("weapon_upgrades", {}))
+	weapons_resolved = bool(saved.get("weapons_resolved", false))
 	pending_story = StringName(str(saved.get("pending_story", "")))
 	if StoryCatalog.dialogue(pending_story).is_empty():
 		pending_story = &""
@@ -170,7 +190,7 @@ func restore(saved: Dictionary) -> void:
 	choices_resolved = maxi(int(saved.get("choices_resolved", 0)), 0)
 	choices_total = maxi(int(saved.get("choices_total", 0)), 0)
 	_update_choice_total()
-	if step == Step.LEVELS and pending_levels == 0 or step == Step.CHESTS and pending_chests.is_empty() or step == Step.RELICS and pending_relics.is_empty() or step == Step.STORY and pending_story == &"":
+	if step == Step.LEVELS and pending_levels == 0 or step == Step.CHESTS and pending_chests.is_empty() or step == Step.RELICS and pending_relics.is_empty() or step == Step.STORY and pending_story == &"" or step == Step.WEAPONS and (weapons_resolved or weapon_upgrades.points == 0):
 		_advance()
 
 
@@ -179,6 +199,8 @@ func _advance() -> void:
 		step = Step.LEVELS
 	elif not pending_chests.is_empty():
 		step = Step.CHESTS
+	elif not weapons_resolved and weapon_upgrades.points > 0:
+		step = Step.WEAPONS
 	elif not pending_relics.is_empty():
 		step = Step.RELICS
 	elif pending_story != &"":

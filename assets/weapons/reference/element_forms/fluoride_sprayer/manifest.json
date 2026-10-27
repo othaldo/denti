@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "weapon_id": "fluoride_sprayer",
+  "display_name": "Fluorid-Sprüher",
+  "canvas": {
+    "width": 1024,
+    "height": 1536,
+    "format": "PNG",
+    "mode": "RGBA",
+    "background": "transparent"
+  },
+  "reference": "assets/weapons/weapon_icons_refined.png",
+  "reference_resource": "data/weapons/fluoride_sprayer.tres",
+  "normal_provenance": "generated portrait-format interpretation of the original weapon image; not a pixel-identical copy",
+  "prompts": "prompts.json",
+  "preview_region": [
+    49,
+    131,
+    975,
+    1233
+  ],
+  "preview_size_px": 60,
+  "status": "complete_for_review",
+  "integrated_into_game": true,
+  "variants": [
+    {
+      "id": "normal",
+      "label": "Normal",
+      "description": "Normalform",
+      "file": "normal.png",
+      "sha256": "c9731ad02169055936b73b74984e7870b3b80b483cc41930727b76469615437f",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        73,
+        174,
+        1009,
+        1340
+      ],
+      "solid_bounds_alpha128": [
+        73,
+        175,
+        1009,
+        1339
+      ],
+      "source": "imagegen:exec-34c100a0-2c5e-4c71-91ed-8eeefd11c33c.png",
+      "origin": "built_in_imagegen_reference"
+    },
+    {
+      "id": "fire",
+      "label": "Feuer",
+      "description": "Feuerform",
+      "file": "fire.png",
+      "sha256": "d4b0188d1e4bab9f62863c553f256af2ccc9e05284d034e83e377d047d4ef14c",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        73,
+        174,
+        1011,
+        1340
+      ],
+      "solid_bounds_alpha128": [
+        74,
+        174,
+        1011,
+        1340
+      ],
+      "source": "imagegen:exec-bb9b4b52-e3d0-411d-8946-c62a8aa308d1.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "ice",
+      "label": "Eis",
+      "description": "Eisform",
+      "file": "ice.png",
+      "sha256": "4f457ec289f6a81035108bcd92d1dd8bba40687e4e1719da62a7e74c19064f21",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        74,
+        166,
+        1006,
+        1340
+      ],
+      "solid_bounds_alpha128": [
+        75,
+        166,
+        1005,
+        1339
+      ],
+      "source": "imagegen:exec-9070cb03-c16e-41fc-9c7d-08d269c5bf87.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "poison",
+      "label": "Gift",
+      "description": "Giftform",
+      "file": "poison.png",
+      "sha256": "421c1990d052ccbc45cdff3235badb3b213b455b58015e1be8b1d615a4ffc616",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        74,
+        154,
+        1012,
+        1340
+      ],
+      "solid_bounds_alpha128": [
+        74,
+        155,
+        1011,
+        1339
+      ],
+      "source": "imagegen:exec-ce64bc8f-65f2-4c31-bd5d-815037c24b53.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "electric",
+      "label": "Elektro",
+      "description": "Elektroform",
+      "file": "electric.png",
+      "sha256": "6f13499f5948c9a5d009069ec6cfa8cfe0b910151781dbcad13e1dbe3f9bc852",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        74,
+        173,
+        1009,
+        1340
+      ],
+      "solid_bounds_alpha128": [
+        74,
+        174,
+        1008,
+        1340
+      ],
+      "source": "imagegen:exec-b482270b-7ecf-4ec3-babd-e0a5574fbe2f.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "bleed",
+      "label": "Blut",
+      "description": "Blutform",
+      "file": "bleed.png",
+      "sha256": "0cf4bd265dc6a413f5dd8ab9838a82e0248eecb4c83ef1204ecd43725add67e1",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        74,
+        174,
+        1009,
+        1340
+      ],
+      "solid_bounds_alpha128": [
+        74,
+        174,
+        1009,
+        1339
+      ],
+      "source": "imagegen:exec-f60f8fa5-be2b-48f4-8c15-7e39934a50c3.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "wet",
+      "label": "Wasser",
+      "description": "Wasserform",
+      "file": "wet.png",
+      "sha256": "5732119d98ef068a8cc8da3d0d40e48bf7bdc9a56119af47d26fe307247cdce3",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        73,
+        173,
+        1009,
+        1340
+      ],
+      "solid_bounds_alpha128": [
+        74,
+        173,
+        1008,
+        1340
+      ],
+      "source": "imagegen:exec-182edd02-5593-4a86-a851-5584fcdf3190.png",
+      "origin": "built_in_imagegen_edit"
+    }
+  ],
+  "integration_notes": [
+    "Runtime sprites share the source crop and rig per weapon; UI icons use centered per-form regions.",
+    "Element forms follow each instance through upgrades, fusion, evolution and resume.",
+    "Existing projectile art and evolution effects are retained."
+  ],
+  "reference_atlas_region": [
+    0.0,
+    512.0,
+    512.0,
+    512.0
+  ],
+  "visual_review": {
+    "method": "Godot comparison sheet at shared crop and native sprite scale",
+    "screenshot": "docs/screenshots/weapon_elements/fluoride_sprayer_complete_pack.png"
+  },
+  "runtime": {
+    "weapon_resource": "data/weapons/fluoride_sprayer.tres",
+    "skin_resources": "data/weapon_skins/fluoride_sprayer/",
+    "textures": "assets/weapons/element_forms/fluoride_sprayer/",
+    "canvas": [
+      512,
+      512
+    ],
+    "source_paintings_preserved": true,
+    "documentation": "docs/WEAPON_SKINS.md"
+  }
+}

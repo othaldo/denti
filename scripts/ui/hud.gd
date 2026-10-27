@@ -236,7 +236,7 @@ func update_telemetry(stats: RunTelemetry, enemies_alive: int, projectiles_alive
 		stats.last_boss_ttk, stats.wave_coins, stats.wave_xp, stats.total_damage,
 	]
 	telemetry_label.text += "\nZahnflutsch: %d Welle · %d Run" % [stats.wave_dodges, stats.dodges]
-	telemetry_label.text += "\nDash: %d · Kontaktstopps: %d · HP: %.1f" % [stats.dashes, stats.dash_contacts, stats.dash_damage]
+	telemetry_label.text += "\nDash: %d · Kontakte: %d · HP: %.1f" % [stats.dashes, stats.dash_contacts, stats.dash_damage]
 	telemetry_label.text += "\nGift/Blutung HP: %.1f / %.1f" % [stats.status_damage.get("poison", 0.0), stats.status_damage.get("bleed", 0.0)]
 	telemetry_label.text += "\nKette %.0f · Eis %.0f · Weihe %.0f" % [stats.proc_damage.get("affix_electric_chain", 0.0), stats.proc_damage.get("affix_ice_shatter", 0.0), stats.proc_damage.get("affix_holy", 0.0)]
 	telemetry_label.text += "\nLebensraub %.1f HP · Nässe %.0f" % [stats.enchantment_support.get("leech_healing", 0.0), stats.enchantment_support.get("wet_hits", 0.0)]

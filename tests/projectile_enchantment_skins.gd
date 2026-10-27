@@ -32,6 +32,10 @@ func _check_images_and_bounds() -> void:
 	var indices: Array[int] = []
 	for definition in WeaponAffixes.ALL:
 		var index := definition.projectile_effect_index
+		if index < 0:
+			_check(definition.stat_key != &"", "damage effect is missing its projectile visuals")
+			_check(ProjectileEnchantmentSkins.mask(_values([str(definition.id)])) == 0, "support without VFX created an element mask")
+			continue
 		_check(index >= 0 and not indices.has(index), "enchantment has no unique particle effect")
 		indices.append(index)
 		var changed := false
@@ -60,10 +64,10 @@ func _check_images_and_bounds() -> void:
 		weapons.append(weapon)
 	cache.prepare(weapons)
 	_check(cache.entries.size() == 6 and cache.pages.size() == 1 and cache.uploads_total == 1, "six largest equipped styles were not packed/uploaded together")
-	var old_frames := cache.frames(ProjectileEnchantmentSkins.base_texture(ROCKET, 4), ProjectileEnchantmentSkins.mask(weapons[0].affixes), 13)
+	var old_frames := cache.frames(ProjectileEnchantmentSkins.base_texture(ROCKET, 4, weapons[0].affixes), ProjectileEnchantmentSkins.mask(weapons[0].affixes), 13)
 	var old_atlas := (old_frames[0] as AtlasTexture).atlas
 	for weapon in weapons:
-		var frames := cache.frames(ProjectileEnchantmentSkins.base_texture(ROCKET, 4), ProjectileEnchantmentSkins.mask(weapon.affixes), 13)
+		var frames := cache.frames(ProjectileEnchantmentSkins.base_texture(ROCKET, 4, weapon.affixes), ProjectileEnchantmentSkins.mask(weapon.affixes), 13)
 		_check(frames.size() == ProjectileParticleFrames.COUNT, "equipped style lost animation frames")
 		for texture in frames:
 			_check((texture as AtlasTexture).atlas == old_atlas, "animation changes texture page and breaks batching")
@@ -71,6 +75,7 @@ func _check_images_and_bounds() -> void:
 	cache.prepare(weapons)
 	_check(cache.composed_total == count and cache.uploads_total == 1, "unchanged equipment regenerated/reuploaded particle frames")
 	for definition in WeaponAffixes.ALL:
+		if definition.projectile_effect_index < 0: continue
 		cache.frames(base, 1 << definition.projectile_effect_index, 7)
 		_check(cache.entries.size() <= cache.MAX_STYLES and cache.pages.size() <= cache.MAX_PAGES, "skin cache exceeds its memory bound")
 	_check((old_frames[0] as AtlasTexture).atlas == old_atlas and old_atlas.get_size() == Vector2(cache.PAGE_SIZE), "eviction overwrote an old in-flight atlas")

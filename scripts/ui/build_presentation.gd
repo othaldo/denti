@@ -35,7 +35,7 @@ static func shop_view(player: Player, shop: ShopController, items: ItemInventory
 	var weapons := player.loadout.equipped()
 	for index in weapons.size():
 		var weapon := weapons[index]
-		equipment.append({"data": weapon.data, "hands": weapon.data.hands, "icon": weapon.data.sprite, "uid": weapon.get_instance_id(), "name": WeaponPresentation.weapon_name(weapon), "tier": weapon.tier, "refund": player.loadout.refund_for(index), "stats": weapon.data.stats_text(weapon.tier), "combat": weapon.data.combat_text() + "\n" + AffixPresentation.summary(weapon, player.stats, items), "description": weapon.data.description, "dps": _dps(weapon.data, weapon.tier, player), "mergeable": player.loadout.can_merge(index)})
+		equipment.append({"data": weapon.data, "hands": weapon.data.hands, "icon": weapon.data.sprite, "uid": weapon.get_instance_id(), "name": WeaponPresentation.weapon_name(weapon), "tier": weapon.tier, "refund": player.loadout.refund_for(index), "stats": weapon.data.stats_text(weapon.tier), "combat": weapon.data.combat_text() + "\n" + AffixPresentation.summary(weapon, player.stats, items), "description": weapon.data.description, "dps": _dps(weapon.data, weapon.tier, player), "mergeable": player.loadout.fusion_partner(index) != null})
 	var buyable: Array[bool] = []
 	var offer_dps: Array[float] = []
 	for offer in shop.offers:

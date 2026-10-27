@@ -14,6 +14,9 @@ __pycache__/
 
 # Keep the small stat icon's mipmap import settings in fresh checkouts/exports.
 !assets/ui/stamina_icon.png.import
+!assets/ui/element_icons_atlas.png.import
+!assets/ui/weapon_support_icons_atlas.png.import
+!assets/vfx/element_hit_splats.png.import
 
 # The modular Count artwork uses mipmaps at combat sprite sizes.
 !assets/enemies/count_rig/parts.png.import
@@ -27,3 +30,6 @@ __pycache__/
 
 # Painted run-preparation motifs stay smooth at small card sizes.
 !assets/ui/run_setup/*.png.import
+
+# Approved weapon skins retain mipmaps in fresh checkouts and exports.
+!assets/weapons/element_forms/*/*.png.import

@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "weapon_id": "water_turbine",
+  "display_name": "Mundduschen-Turbine",
+  "canvas": {
+    "width": 1024,
+    "height": 1536,
+    "format": "PNG",
+    "mode": "RGBA",
+    "background": "transparent"
+  },
+  "reference": "assets/weapons/weapon_icons_refined.png",
+  "reference_resource": "data/weapons/water_turbine.tres",
+  "normal_provenance": "generated portrait-format interpretation of the original weapon image; not a pixel-identical copy",
+  "prompts": "prompts.json",
+  "preview_region": [
+    6,
+    307,
+    1018,
+    904
+  ],
+  "preview_size_px": 70,
+  "status": "complete_for_review",
+  "integrated_into_game": true,
+  "variants": [
+    {
+      "id": "normal",
+      "label": "Normal",
+      "description": "Normalform",
+      "file": "normal.png",
+      "sha256": "d55ef2bb658597b670bca297b69cb76671438387455b34d177a739099521f5ab",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        30,
+        332,
+        1005,
+        1187
+      ],
+      "solid_bounds_alpha128": [
+        31,
+        332,
+        1004,
+        1186
+      ],
+      "source": "imagegen:exec-6d6eb6ef-f00c-48eb-9ec5-882cdabb96fa.png",
+      "origin": "built_in_imagegen_reference"
+    },
+    {
+      "id": "fire",
+      "label": "Feuer",
+      "description": "Feuerform",
+      "file": "fire.png",
+      "sha256": "fdb435cef7991785ae79fd2ed771b2c6e9bf3536e19d477ab5d569c1af15a143",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        31,
+        332,
+        1005,
+        1187
+      ],
+      "solid_bounds_alpha128": [
+        31,
+        333,
+        1004,
+        1187
+      ],
+      "source": "imagegen:exec-9c917c8f-d20a-4c66-a7c4-c377d2e1c31b.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "ice",
+      "label": "Eis",
+      "description": "Eisform",
+      "file": "ice.png",
+      "sha256": "f1582199a203224dfd81add27495b497d3fbc284cc59900fc9e6703b4c35e2d1",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        30,
+        331,
+        1005,
+        1188
+      ],
+      "solid_bounds_alpha128": [
+        31,
+        331,
+        1004,
+        1187
+      ],
+      "source": "imagegen:exec-1a2f3919-14a0-425e-b223-4e7292b7397a.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "poison",
+      "label": "Gift",
+      "description": "Giftform",
+      "file": "poison.png",
+      "sha256": "11d3a9e767231d49e081f9627e5ee3fdb867c0fb5dc5ad9c147a115945163513",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        33,
+        331,
+        1005,
+        1187
+      ],
+      "solid_bounds_alpha128": [
+        33,
+        332,
+        1004,
+        1186
+      ],
+      "source": "imagegen:exec-abcf08dc-fb57-45a1-ae66-190781ba0b96.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "electric",
+      "label": "Elektro",
+      "description": "Elektroform",
+      "file": "electric.png",
+      "sha256": "5503bb1771cd36ea76c529c38d6afc5105a0df1e8e0a570018a53e9bee7d6fda",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        30,
+        331,
+        1005,
+        1188
+      ],
+      "solid_bounds_alpha128": [
+        30,
+        332,
+        1004,
+        1187
+      ],
+      "source": "imagegen:exec-cdf73d76-a31f-4efd-afa5-15b3e39da7c6.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "bleed",
+      "label": "Blut",
+      "description": "Blutform",
+      "file": "bleed.png",
+      "sha256": "80bb5d44fa8f1aa1792b6b3db5a392777f53150b11a47894aab190856f0d4742",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        30,
+        332,
+        1004,
+        1187
+      ],
+      "solid_bounds_alpha128": [
+        31,
+        332,
+        1004,
+        1187
+      ],
+      "source": "imagegen:exec-71bcaaa8-206a-4a77-bb14-f6b2567e9f50.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "wet",
+      "label": "Wasser",
+      "description": "Wasserform",
+      "file": "wet.png",
+      "sha256": "88f193af9f4e52fe4b9ce338278e35ac3465c4f777ce06da5fc04fd19800ce4f",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        30,
+        331,
+        1004,
+        1188
+      ],
+      "solid_bounds_alpha128": [
+        31,
+        331,
+        1004,
+        1187
+      ],
+      "source": "imagegen:exec-fa6df1d6-a1be-44f5-be2f-82dc5bb51158.png",
+      "origin": "built_in_imagegen_edit"
+    }
+  ],
+  "integration_notes": [
+    "Runtime sprites share the source crop and rig per weapon; UI icons use centered per-form regions.",
+    "Element forms follow each instance through upgrades, fusion, evolution and resume.",
+    "Existing projectile art and evolution effects are retained."
+  ],
+  "reference_atlas_region": [
+    512.0,
+    512.0,
+    512.0,
+    512.0
+  ],
+  "visual_review": {
+    "method": "Godot comparison sheet at shared crop and native sprite scale",
+    "screenshot": "docs/screenshots/weapon_elements/water_turbine_complete_pack.png"
+  },
+  "runtime": {
+    "weapon_resource": "data/weapons/water_turbine.tres",
+    "skin_resources": "data/weapon_skins/water_turbine/",
+    "textures": "assets/weapons/element_forms/water_turbine/",
+    "canvas": [
+      512,
+      512
+    ],
+    "source_paintings_preserved": true,
+    "documentation": "docs/WEAPON_SKINS.md"
+  }
+}

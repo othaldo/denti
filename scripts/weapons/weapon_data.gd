@@ -27,6 +27,8 @@ const WET_STATUS = preload("res://data/statuses/wet.tres")
 @export var bleed_duration: float = 0.0
 @export var wet_duration: float = 0.0
 @export var sprite: Texture2D
+@export var element_skins: Dictionary = {}
+var element_skin: StringName = &""
 @export var grip_anchor: Vector2 = Vector2(0.25, 0.85)
 @export var projectile_color: Color = Color(0.75, 0.96, 1.0)
 @export var visual_angle_degrees: float = 45.0
@@ -61,9 +63,11 @@ const WET_STATUS = preload("res://data/statuses/wet.tres")
 
 @export_group("Held animation")
 @export_enum("aimed", "upright", "staff") var held_style: String = "aimed"
-@export_enum("shoot", "lob", "pull", "thrust", "slash", "spin", "drill", "polish", "spray", "beam") var attack_animation: String = "shoot"
+@export_enum("shoot", "lob", "pull", "thrust", "slash", "spin", "drill", "polish", "spray", "beam", "floss_cut") var attack_animation: String = "shoot"
 @export var tip_anchor: Vector2 = Vector2(0.85, 0.15)
 @export var visual_size: float = 58.0
+## Compensates painted canvas padding; shared by every element of this weapon.
+@export_range(0.1, 2.0) var held_scale: float = 1.0
 @export var held_sprite: Texture2D
 @export var upright_at_rest: bool = false
 @export_range(0.08, 0.8) var animation_duration: float = 0.32
@@ -77,6 +81,12 @@ const WET_STATUS = preload("res://data/statuses/wet.tres")
 @export var fork_right_anchor: Vector2 = Vector2(0.77, 0.20)
 @export var pouch_anchor: Vector2 = Vector2(0.5, 0.38)
 @export var pouch_width: float = 0.24
+@export var floss_left_texture: Texture2D
+@export var floss_right_texture: Texture2D
+@export var floss_left_tip: Vector2
+@export var floss_right_tip: Vector2
+@export var floss_wave_amplitude: float = 12.0
+@export var floss_strand_spacing: float = 20.0
 
 
 func held_texture() -> Texture2D:

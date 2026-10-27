@@ -69,6 +69,7 @@ static func _chain(effects: ItemEffectContext, source: Enemy, power: float) -> v
 		var from := previous.global_position
 		_damage(next, power * (data.proc_factor + minf(chain_power, 0.6)), &"electric", &"affix_electric_chain")
 		effects.line(from, next.global_position, data.color)
+		ElementImpactBatch.emit_from(next, &"electric", next.global_position, from.direction_to(next.global_position), 24)
 		previous = next
 		candidates = _nearby(effects, next.global_position, radius, visited)
 
@@ -116,6 +117,7 @@ static func _area(effects: ItemEffectContext, source: Enemy, amount: float, data
 	for other in candidates.slice(0, data.proc_targets):
 		_damage(other, amount, data.id, proc_id)
 	effects.ring(source.global_position, data.proc_radius, data.color)
+	ElementImpactBatch.emit_from(source, data.id, source.global_position, Vector2.UP, data.proc_radius, true)
 
 
 static func _damage(enemy: Enemy, amount: float, kind: StringName, proc_id: StringName) -> void:

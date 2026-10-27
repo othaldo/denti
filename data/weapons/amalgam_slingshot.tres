@@ -1,24 +1,13 @@
-[gd_resource type="Resource" script_class="WeaponData" load_steps=7 format=3]
+[gd_resource type="Resource" script_class="WeaponData" load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/weapons/element_forms/amalgam_slingshot/normal.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/weapons/element_forms/amalgam_slingshot/normal_body.png" id="3"]
+[ext_resource type="Texture2D" path="res://assets/weapons/element_forms/amalgam_slingshot/normal_pouch.png" id="4"]
 
-[ext_resource type="Texture2D" path="res://assets/weapons/weapon_icons_refined.png" id="2"]
-
-[ext_resource type="Texture2D" path="res://assets/weapons/weapon_animation_parts.png" id="3"]
-
-[sub_resource type="AtlasTexture" id="Atlas_weapon"]
+[sub_resource type="AtlasTexture" id="Icon_skin"]
 atlas = ExtResource("2")
-region = Rect2(1024, 512, 512, 512)
-filter_clip = true
-
-[sub_resource type="AtlasTexture" id="Atlas_body"]
-atlas = ExtResource("3")
-region = Rect2(1024, 0, 512, 512)
-filter_clip = true
-
-[sub_resource type="AtlasTexture" id="Atlas_part"]
-atlas = ExtResource("3")
-region = Rect2(1024, 512, 512, 512)
+region = Rect2(51, 36, 409, 456)
 filter_clip = true
 
 [resource]
@@ -27,7 +16,6 @@ role = "Schwere Geschosse mit Durchschlag"
 id = &"amalgam_slingshot"
 display_name = "Amalgam-Schleuder"
 description = "1 Wurzel · Langsame Metallkugel mit Rückstoß und kleinem Flächenschaden."
-sprite = SubResource("Atlas_weapon")
 hands = 1
 attack_mode = &"projectile"
 damage_type = "Metall"
@@ -43,17 +31,27 @@ splash_radius = 38
 splash_tiers = PackedFloat32Array(38, 43, 48, 55)
 knockback = 32
 damage_tiers = PackedFloat32Array(1.00, 1.40, 1.95, 2.70)
-grip_anchor = Vector2(0.59, 0.69)
 projectile_color = Color(0.69, 0.72, 0.80, 1)
 held_style = "upright"
 attack_animation = "pull"
-tip_anchor = Vector2(0.56, 0.34)
 visual_size = 65.0
 animation_duration = 0.34
 
-held_sprite = SubResource("Atlas_body")
-pull_texture = SubResource("Atlas_part")
-fork_left_anchor = Vector2(0.27, 0.14)
-fork_right_anchor = Vector2(0.85, 0.14)
-pouch_anchor = Vector2(0.56, 0.34)
-pouch_width = 0.32
+grip_anchor = Vector2(0.498307, 0.796313)
+tip_anchor = Vector2(0.514084, 0.273979)
+pouch_anchor = Vector2(0.514084, 0.273979)
+fork_left_anchor = Vector2(0.237351, 0.220709)
+fork_right_anchor = Vector2(0.763527, 0.202800)
+pouch_width = 0.316406
+sprite = SubResource("Icon_skin")
+held_sprite = ExtResource("3")
+pull_texture = ExtResource("4")
+held_scale = 0.906667
+element_skins = {
+"fire": "res://data/weapon_skins/amalgam_slingshot/fire.tres",
+"ice": "res://data/weapon_skins/amalgam_slingshot/ice.tres",
+"poison": "res://data/weapon_skins/amalgam_slingshot/poison.tres",
+"electric": "res://data/weapon_skins/amalgam_slingshot/electric.tres",
+"bleed": "res://data/weapon_skins/amalgam_slingshot/bleed.tres",
+"wet": "res://data/weapon_skins/amalgam_slingshot/wet.tres"
+}
