@@ -95,11 +95,18 @@ func _run() -> void:
 	# Names belong to individual weapons, and use development rather than raw
 	# values (a legacy damage roll must not beat a higher-tier tempo effect).
 	var base_name := WeaponCatalog.by_id(&"magic_toothbrush").display_name
+	var capsule_rarity: Label = panel.replacement_buttons[0].get_meta("rarity_label")
+	panel.hide()
 	loadout.restore([
 		{"id": "magic_toothbrush", "tier": 2, "affix_slots": 4, "affixes": [
 			{"id": "fire", "rarity": 1, "damage": 999}, {"id": "ice", "rarity": 2, "damage": 7},
 			{"id": "tempo", "rarity": 3, "damage": 14}, {"id": "poison", "rarity": 1, "damage": 3}]},
 		{"id": "magic_toothbrush", "tier": 2}])
+	# Deferred layout can still run after a closed capsule's weapons are freed.
+	assert(not is_instance_valid(panel.weapons[0]))
+	for extent in [Vector2(480, 800), Vector2(1200, 800)]:
+		panel._on_stage_layout(extent)
+		assert(capsule_rarity.text == "Legendär III+", "capsule reflow lost its displayed rarity")
 	weapon = loadout.equipped()[0]
 	assert(WeaponPresentation.weapon_name(weapon) == base_name + " der Eile")
 	assert(WeaponPresentation.weapon_name(loadout.equipped()[1]) == base_name and weapon.data.display_name == base_name, "instance name contaminated shared weapon data")

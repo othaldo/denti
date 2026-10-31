@@ -219,6 +219,7 @@ func _select_weapon(index: int, reset_replace: bool = true) -> void:
 		button.set_meta("effect_label", effect)
 		button.set_meta("text_rows", text_rows)
 		button.set_meta("effect_source", effect.text)
+		button.set_meta("rarity_source", rarity.text)
 		button.pressed.connect(func() -> void:
 			reward["replace"] = affix_index
 			_refresh_cards()
@@ -308,7 +309,7 @@ func _on_stage_layout(extent: Vector2) -> void:
 		var effect: Label = button.get_meta("effect_label")
 		var rarity: Label = button.get_meta("rarity_label")
 		buttons[0]._wrap_chest_text(effect, str(button.get_meta("effect_source")), maxf(100, replacement_width - 24))
-		buttons[0]._wrap_chest_text(rarity, AffixPresentation.progress_text(weapons[selected_weapon].affixes[index]), maxf(100, replacement_width - 24))
+		buttons[0]._wrap_chest_text(rarity, str(button.get_meta("rarity_source")), maxf(100, replacement_width - 24))
 		button.custom_minimum_size = Vector2(0, maxf(68, _label_height(effect) + _label_height(rarity) + 19))
 	cards.columns = 1 if compact else 3
 	var card_width := (extent.x - (cards.columns - 1) * 16) / cards.columns
