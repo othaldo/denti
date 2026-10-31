@@ -35,6 +35,6 @@ Godot_v4.7.2-stable_win64_console.exe --path . --script res://tools/benchmark_wa
 Godot_v4.7.2-stable_win64_console.exe --path . --script res://tools/benchmark_warning_lanes.gd -- --verify
 ```
 
-Der zweite Aufruf vergleicht gerenderte Bilder gegen den alten Polygonpfad: 60 Richtungen, drei Fortschrittsstände, Drehung, nicht einheitliche Skalierung, Scherung, Spiegelung und Farbmodulation. Die neun nativen Bildvergleiche waren pixelgleich. `tests/prepared_combat_textures.gd` prüft zusätzlich die Wiederverwendung der Atlasregion und ihre vollständig weißen, opaken Pixel. Die vorhandenen Kampf-/Warnungstests prüfen weiterhin Angriffe, Kollisionsbahnen und Speicherzustände.
+Der zweite Aufruf vergleicht gerenderte Bilder gegen den alten Polygonpfad: 60 Richtungen, drei Fortschrittsstände, Drehung, nicht einheitliche Skalierung, Scherung, Spiegelung und Farbmodulation. Die neun nativen Bildvergleiche waren pixelgleich. `tests/extended/prepared_combat_textures.gd` prüft zusätzlich die Wiederverwendung der Atlasregion und ihre vollständig weißen, opaken Pixel. Die vorhandenen Kampf-/Warnungstests prüfen weiterhin Angriffe, Kollisionsbahnen und Speicherzustände.
 
 Für den nächsten Handyvergleich die Seite neu laden, Build-ID prüfen, `debug profile` frisch starten und mit derselben Grafikoption/Ausrichtung rund 30 Sekunden stehen bleiben. Der kopierte Bericht ermöglicht den Vergleich mit den obigen Werten.

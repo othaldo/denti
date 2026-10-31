@@ -1,0 +1,761 @@
+{
+  "date": "2026-10-31",
+  "platform": "Windows, Godot 4.7.2, headless, fixed delta 1/60 s",
+  "suite": "core",
+  "jobs": 4,
+  "seconds": 220.929,
+  "count": 150,
+  "failed": 0,
+  "results": [
+    {
+      "test": "acid_king_difficulty",
+      "seconds": 6.709,
+      "passed": true
+    },
+    {
+      "test": "acid_king_encounter",
+      "seconds": 5.007,
+      "passed": true
+    },
+    {
+      "test": "acid_king_pressure",
+      "seconds": 45.733,
+      "passed": true
+    },
+    {
+      "test": "affix_damage_over_time",
+      "seconds": 4.916,
+      "passed": true
+    },
+    {
+      "test": "affix_layout_history",
+      "seconds": 8.908,
+      "passed": true
+    },
+    {
+      "test": "affix_pressure_balance",
+      "seconds": 4.176,
+      "passed": true
+    },
+    {
+      "test": "affix_progression",
+      "seconds": 4.816,
+      "passed": true
+    },
+    {
+      "test": "amalgam_visibility",
+      "seconds": 5.004,
+      "passed": true
+    },
+    {
+      "test": "arena_background",
+      "seconds": 4.552,
+      "passed": true
+    },
+    {
+      "test": "atlas_item_batch",
+      "seconds": 4.905,
+      "passed": true
+    },
+    {
+      "test": "attribute_presentation",
+      "seconds": 5.284,
+      "passed": true
+    },
+    {
+      "test": "boss_aggression",
+      "seconds": 4.91,
+      "passed": true
+    },
+    {
+      "test": "boss_difficulty_pressure",
+      "seconds": 6.788,
+      "passed": true
+    },
+    {
+      "test": "boss_encounter",
+      "seconds": 5.009,
+      "passed": true
+    },
+    {
+      "test": "boss_inflammation",
+      "seconds": 4.734,
+      "passed": true
+    },
+    {
+      "test": "boss_overtime",
+      "seconds": 5.005,
+      "passed": true
+    },
+    {
+      "test": "boss_pressure",
+      "seconds": 5.009,
+      "passed": true
+    },
+    {
+      "test": "boss_projectile_warmup",
+      "seconds": 4.353,
+      "passed": true
+    },
+    {
+      "test": "boss_relics",
+      "seconds": 5.105,
+      "passed": true
+    },
+    {
+      "test": "build_overview",
+      "seconds": 4.726,
+      "passed": true
+    },
+    {
+      "test": "caramel_encounter",
+      "seconds": 4.634,
+      "passed": true
+    },
+    {
+      "test": "catalogs",
+      "seconds": 4.08,
+      "passed": true
+    },
+    {
+      "test": "central_enemy_motion",
+      "seconds": 6.045,
+      "passed": true
+    },
+    {
+      "test": "charge_warning",
+      "seconds": 4.715,
+      "passed": true
+    },
+    {
+      "test": "chest_layout",
+      "seconds": 10.561,
+      "passed": true
+    },
+    {
+      "test": "cloak_encounter",
+      "seconds": 4.911,
+      "passed": true
+    },
+    {
+      "test": "combat_feedback",
+      "seconds": 4.822,
+      "passed": true
+    },
+    {
+      "test": "combat_hud",
+      "seconds": 5.235,
+      "passed": true
+    },
+    {
+      "test": "combat_performance",
+      "seconds": 4.918,
+      "passed": true
+    },
+    {
+      "test": "crown_court_encounter",
+      "seconds": 6.121,
+      "passed": true
+    },
+    {
+      "test": "crown_court_positioning",
+      "seconds": 5.196,
+      "passed": true
+    },
+    {
+      "test": "crown_court_routes",
+      "seconds": 6.038,
+      "passed": true
+    },
+    {
+      "test": "damage_defense_balance",
+      "seconds": 5.665,
+      "passed": true
+    },
+    {
+      "test": "damage_number_batch",
+      "seconds": 4.355,
+      "passed": true
+    },
+    {
+      "test": "dentipedia",
+      "seconds": 7.885,
+      "passed": true
+    },
+    {
+      "test": "difficulty_levels",
+      "seconds": 4.933,
+      "passed": true
+    },
+    {
+      "test": "dodge",
+      "seconds": 5.947,
+      "passed": true
+    },
+    {
+      "test": "economy_items",
+      "seconds": 4.743,
+      "passed": true
+    },
+    {
+      "test": "economy_pressure",
+      "seconds": 4.262,
+      "passed": true
+    },
+    {
+      "test": "economy_shop",
+      "seconds": 5.474,
+      "passed": true
+    },
+    {
+      "test": "element_impacts",
+      "seconds": 5.002,
+      "passed": true
+    },
+    {
+      "test": "elite_aura",
+      "seconds": 4.917,
+      "passed": true
+    },
+    {
+      "test": "elite_pressure",
+      "seconds": 4.911,
+      "passed": true
+    },
+    {
+      "test": "emperor_final",
+      "seconds": 5.005,
+      "passed": true
+    },
+    {
+      "test": "enchantment_synergies",
+      "seconds": 5.296,
+      "passed": true
+    },
+    {
+      "test": "endless_flow",
+      "seconds": 4.999,
+      "passed": true
+    },
+    {
+      "test": "endless_rules",
+      "seconds": 4.076,
+      "passed": true
+    },
+    {
+      "test": "endless_ui",
+      "seconds": 4.365,
+      "passed": true
+    },
+    {
+      "test": "enemy_attack_batch",
+      "seconds": 4.741,
+      "passed": true
+    },
+    {
+      "test": "enemy_behaviors",
+      "seconds": 4.636,
+      "passed": true
+    },
+    {
+      "test": "enemy_death_once",
+      "seconds": 4.727,
+      "passed": true
+    },
+    {
+      "test": "enemy_facing",
+      "seconds": 4.736,
+      "passed": true
+    },
+    {
+      "test": "enemy_projectile_pool",
+      "seconds": 4.919,
+      "passed": true
+    },
+    {
+      "test": "enemy_render_updates",
+      "seconds": 4.162,
+      "passed": true
+    },
+    {
+      "test": "enemy_shadow_batch",
+      "seconds": 4.264,
+      "passed": true
+    },
+    {
+      "test": "four_choice_layout",
+      "seconds": 9.67,
+      "passed": true
+    },
+    {
+      "test": "graphics_settings",
+      "seconds": 4.354,
+      "passed": true
+    },
+    {
+      "test": "hud_pending_levels",
+      "seconds": 4.174,
+      "passed": true
+    },
+    {
+      "test": "item_families",
+      "seconds": 5.195,
+      "passed": true
+    },
+    {
+      "test": "item_stacking",
+      "seconds": 4.441,
+      "passed": true
+    },
+    {
+      "test": "item_synergies",
+      "seconds": 5.007,
+      "passed": true
+    },
+    {
+      "test": "item_system",
+      "seconds": 4.906,
+      "passed": true
+    },
+    {
+      "test": "king_assault",
+      "seconds": 4.447,
+      "passed": true
+    },
+    {
+      "test": "lane_warning_endpoints",
+      "seconds": 4.768,
+      "passed": true
+    },
+    {
+      "test": "level_rerolls",
+      "seconds": 5.562,
+      "passed": true
+    },
+    {
+      "test": "loot_goblin",
+      "seconds": 4.908,
+      "passed": true
+    },
+    {
+      "test": "loot_goblin_motion",
+      "seconds": 4.812,
+      "passed": true
+    },
+    {
+      "test": "loot_goblin_pressure",
+      "seconds": 4.722,
+      "passed": true
+    },
+    {
+      "test": "loot_pressure",
+      "seconds": 4.728,
+      "passed": true
+    },
+    {
+      "test": "loot_spatial_index",
+      "seconds": 4.914,
+      "passed": true
+    },
+    {
+      "test": "menu_stage",
+      "seconds": 4.926,
+      "passed": true
+    },
+    {
+      "test": "mob_curve",
+      "seconds": 4.448,
+      "passed": true
+    },
+    {
+      "test": "mobile_controls",
+      "seconds": 4.929,
+      "passed": true
+    },
+    {
+      "test": "mobile_shop_spacing",
+      "seconds": 5.466,
+      "passed": true
+    },
+    {
+      "test": "music_flow",
+      "seconds": 5.107,
+      "passed": true
+    },
+    {
+      "test": "nightclinic_ui",
+      "seconds": 8.633,
+      "passed": true
+    },
+    {
+      "test": "options_menu",
+      "seconds": 4.821,
+      "passed": true
+    },
+    {
+      "test": "painted_projectiles",
+      "seconds": 4.269,
+      "passed": true
+    },
+    {
+      "test": "pillow_encounter",
+      "seconds": 4.821,
+      "passed": true
+    },
+    {
+      "test": "player_damage_iframes",
+      "seconds": 4.637,
+      "passed": true
+    },
+    {
+      "test": "player_dash",
+      "seconds": 4.732,
+      "passed": true
+    },
+    {
+      "test": "player_death_cleanup",
+      "seconds": 4.452,
+      "passed": true
+    },
+    {
+      "test": "player_projectile_pool",
+      "seconds": 5.1,
+      "passed": true
+    },
+    {
+      "test": "player_status_effects",
+      "seconds": 5.189,
+      "passed": true
+    },
+    {
+      "test": "post_wave_rewards",
+      "seconds": 5.187,
+      "passed": true
+    },
+    {
+      "test": "prince_attack_variants",
+      "seconds": 5.856,
+      "passed": true
+    },
+    {
+      "test": "prince_bomb_frequency",
+      "seconds": 5.4,
+      "passed": true
+    },
+    {
+      "test": "prince_bomb_routes",
+      "seconds": 5.372,
+      "passed": true
+    },
+    {
+      "test": "progression_menu",
+      "seconds": 6.124,
+      "passed": true
+    },
+    {
+      "test": "projectile_enchantment_skins",
+      "seconds": 4.746,
+      "passed": true
+    },
+    {
+      "test": "projectile_rendering",
+      "seconds": 4.903,
+      "passed": true
+    },
+    {
+      "test": "queued_level_rarity",
+      "seconds": 9.753,
+      "passed": true
+    },
+    {
+      "test": "rarity_progression",
+      "seconds": 5.196,
+      "passed": true
+    },
+    {
+      "test": "reward_choice_progress",
+      "seconds": 4.263,
+      "passed": true
+    },
+    {
+      "test": "reward_stage",
+      "seconds": 5.287,
+      "passed": true
+    },
+    {
+      "test": "root_capacity",
+      "seconds": 6.029,
+      "passed": true
+    },
+    {
+      "test": "royal_boss_pressure",
+      "seconds": 32.222,
+      "passed": true
+    },
+    {
+      "test": "run_setup",
+      "seconds": 5.749,
+      "passed": true
+    },
+    {
+      "test": "run_setup_ui",
+      "seconds": 4.636,
+      "passed": true
+    },
+    {
+      "test": "run_storage",
+      "seconds": 4.357,
+      "passed": true
+    },
+    {
+      "test": "scene_transitions",
+      "seconds": 4.367,
+      "passed": true
+    },
+    {
+      "test": "shop_grid_layout",
+      "seconds": 5.194,
+      "passed": true
+    },
+    {
+      "test": "shop_interaction",
+      "seconds": 4.829,
+      "passed": true
+    },
+    {
+      "test": "shop_layout_stability",
+      "seconds": 7.697,
+      "passed": true
+    },
+    {
+      "test": "shop_reroll_exhaustion",
+      "seconds": 10.236,
+      "passed": true
+    },
+    {
+      "test": "shop_ui",
+      "seconds": 4.92,
+      "passed": true
+    },
+    {
+      "test": "shop_workbench",
+      "seconds": 5.281,
+      "passed": true
+    },
+    {
+      "test": "smoke",
+      "seconds": 5.664,
+      "passed": true
+    },
+    {
+      "test": "starter_selection",
+      "seconds": 7.781,
+      "passed": true
+    },
+    {
+      "test": "stat_balance",
+      "seconds": 5.006,
+      "passed": true
+    },
+    {
+      "test": "status_enemy_distribution",
+      "seconds": 5.004,
+      "passed": true
+    },
+    {
+      "test": "story_boss_dialogue",
+      "seconds": 6.783,
+      "passed": true
+    },
+    {
+      "test": "story_dialogue_effects",
+      "seconds": 5.006,
+      "passed": true
+    },
+    {
+      "test": "story_mode",
+      "seconds": 6.896,
+      "passed": true
+    },
+    {
+      "test": "story_travel",
+      "seconds": 6.776,
+      "passed": true
+    },
+    {
+      "test": "sustain_balance",
+      "seconds": 4.629,
+      "passed": true
+    },
+    {
+      "test": "tooth_vessel",
+      "seconds": 4.45,
+      "passed": true
+    },
+    {
+      "test": "ui_layout",
+      "seconds": 5.373,
+      "passed": true
+    },
+    {
+      "test": "ui_text_contrast",
+      "seconds": 4.273,
+      "passed": true
+    },
+    {
+      "test": "updater",
+      "seconds": 4.177,
+      "passed": true
+    },
+    {
+      "test": "updater_launcher",
+      "seconds": 4.347,
+      "passed": true
+    },
+    {
+      "test": "updater_ui",
+      "seconds": 4.535,
+      "passed": true
+    },
+    {
+      "test": "upgrade_resume",
+      "seconds": 16.6,
+      "passed": true
+    },
+    {
+      "test": "warning_effects",
+      "seconds": 4.263,
+      "passed": true
+    },
+    {
+      "test": "warning_visual_density",
+      "seconds": 4.26,
+      "passed": true
+    },
+    {
+      "test": "wave_balance",
+      "seconds": 5.948,
+      "passed": true
+    },
+    {
+      "test": "wave_loot_collection",
+      "seconds": 5.379,
+      "passed": true
+    },
+    {
+      "test": "wave_pressure",
+      "seconds": 5.297,
+      "passed": true
+    },
+    {
+      "test": "weapon_affixes",
+      "seconds": 5.567,
+      "passed": true
+    },
+    {
+      "test": "weapon_chest_expansion",
+      "seconds": 4.829,
+      "passed": true
+    },
+    {
+      "test": "weapon_dps_balance",
+      "seconds": 9.944,
+      "passed": true
+    },
+    {
+      "test": "weapon_element_visuals",
+      "seconds": 4.359,
+      "passed": true
+    },
+    {
+      "test": "weapon_elements",
+      "seconds": 4.939,
+      "passed": true
+    },
+    {
+      "test": "weapon_evolutions",
+      "seconds": 6.31,
+      "passed": true
+    },
+    {
+      "test": "weapon_expansion",
+      "seconds": 5.115,
+      "passed": true
+    },
+    {
+      "test": "weapon_floss_cut",
+      "seconds": 5.009,
+      "passed": true
+    },
+    {
+      "test": "weapon_fusion",
+      "seconds": 5.559,
+      "passed": true
+    },
+    {
+      "test": "weapon_layout",
+      "seconds": 4.819,
+      "passed": true
+    },
+    {
+      "test": "weapon_masteries",
+      "seconds": 5.844,
+      "passed": true
+    },
+    {
+      "test": "weapon_mastery_ui",
+      "seconds": 5.193,
+      "passed": true
+    },
+    {
+      "test": "weapon_motion",
+      "seconds": 4.825,
+      "passed": true
+    },
+    {
+      "test": "weapon_rework",
+      "seconds": 4.928,
+      "passed": true
+    },
+    {
+      "test": "weapon_rolls",
+      "seconds": 5.947,
+      "passed": true
+    },
+    {
+      "test": "weapon_skins",
+      "seconds": 6.488,
+      "passed": true
+    },
+    {
+      "test": "weapon_upgrade_economy",
+      "seconds": 4.914,
+      "passed": true
+    },
+    {
+      "test": "weapon_upgrade_layout",
+      "seconds": 6.494,
+      "passed": true
+    },
+    {
+      "test": "weapon_upgrades",
+      "seconds": 5.601,
+      "passed": true
+    },
+    {
+      "test": "weapon_visual_contract",
+      "seconds": 5.108,
+      "passed": true
+    },
+    {
+      "test": "weapons",
+      "seconds": 5.096,
+      "passed": true
+    },
+    {
+      "test": "wet_slow",
+      "seconds": 4.821,
+      "passed": true
+    }
+  ]
+}

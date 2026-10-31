@@ -2,6 +2,7 @@
 
 import concurrent.futures
 import importlib.util
+import io
 import json
 import os
 from pathlib import Path
@@ -43,6 +44,7 @@ else:
         self.command_patch = patch.object(runner, "godot_command",
                                           side_effect=lambda executable, test, log: [sys.executable, str(self.stub), test.stem])
         self.root_patch.start()
+        self.original_command = runner.godot_command
         self.command_patch.start()
 
     def tearDown(self):
@@ -101,6 +103,52 @@ else:
         self.assertEqual(len(runner.select_tests(self.root, [])), 3)
         with self.assertRaises(ValueError):
             runner.select_tests(self.root, ["missing_test"])
+
+    def test_suites_partition_tests_without_discovering_support_scripts(self):
+        directory = self.root / "tests"
+        (directory / "extended").mkdir(parents=True)
+        (directory / "support").mkdir()
+        (directory / "smoke.gd").touch()
+        (directory / "extended" / "boss_routes.gd").touch()
+        (directory / "support" / "test_runtime.gd").touch()
+        self.assertEqual([t.stem for t in runner.select_tests(self.root, [])], ["smoke"])
+        self.assertEqual([t.stem for t in runner.select_tests(self.root, [], "extended")], ["boss_routes"])
+        self.assertEqual({t.stem for t in runner.select_tests(self.root, [], "all")}, {"smoke", "boss_routes"})
+        self.assertEqual(len(runner.select_tests(self.root, ["boss_*"], "all")), 1)
+        with self.assertRaisesRegex(ValueError, "--suite all"):
+            runner.select_tests(self.root, ["boss_routes"])
+        with self.assertRaises(ValueError):
+            runner.select_tests(self.root, [], "typo")
+
+    def test_duplicate_suite_names_cannot_share_logs_or_user_data(self):
+        directory = self.root / "tests"
+        (directory / "extended").mkdir(parents=True)
+        (directory / "same.gd").touch()
+        (directory / "extended" / "same.gd").touch()
+        with self.assertRaisesRegex(ValueError, "unique"):
+            runner.select_tests(self.root, [], "all")
+
+    def test_godot_receives_the_nested_resource_path(self):
+        test = self.root / "tests" / "extended" / "boss_routes.gd"
+        command = self.original_command("godot", test, self.run_dir / "engine.log")
+        self.assertEqual(command[command.index("--script") + 1], "res://tests/extended/boss_routes.gd")
+
+    def test_extended_cli_runs_and_reports_only_the_requested_suite(self):
+        directory = self.root / "tests"
+        (directory / "extended").mkdir(parents=True)
+        (directory / "smoke.gd").touch()
+        (directory / "extended" / "art_check.gd").touch()
+        (self.root / ".godot").mkdir()
+        (self.root / ".godot" / "global_script_class_cache.cfg").touch()
+        with patch.object(sys, "argv", ["run_tests.py", "--suite", "extended"]), \
+                patch.object(runner.shutil, "which", return_value="fake"), \
+                patch.object(sys, "stdout", io.StringIO()), \
+                patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": str(self.root / "summary.md")}):
+            self.assertEqual(runner.main(), 0)
+        report = json.loads((self.root / ".godot" / "test_results.json").read_text())
+        self.assertEqual(report["suite"], "extended")
+        self.assertEqual([r["test"] for r in report["results"]], ["art_check"])
+        self.assertIn("(extended)", (self.root / "summary.md").read_text())
 
 
 if __name__ == "__main__":

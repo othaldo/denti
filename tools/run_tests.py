@@ -18,15 +18,25 @@ import uuid
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def select_tests(root: Path, patterns: list[str]) -> list[Path]:
-    tests = sorted((root / "tests").glob("*.gd"))
+def select_tests(root: Path, patterns: list[str], suite: str = "core") -> list[Path]:
+    if suite not in {"core", "extended", "all"}:
+        raise ValueError(f"Unknown test suite: {suite}")
+    directory = root / "tests"
+    tests = list(directory.glob("*.gd")) if suite != "extended" else []
+    if suite != "core":
+        tests.extend((directory / "extended").glob("*.gd"))
+    tests.sort()
     if patterns:
         tests = [test for test in tests if any(
             fnmatch.fnmatchcase(test.stem, pattern) or fnmatch.fnmatchcase(test.name, pattern)
             for pattern in patterns
         )]
     if not tests:
-        raise ValueError("No tests matched; refusing to report an empty suite as passing.")
+        raise ValueError(f"No tests matched in suite '{suite}'; use --suite all to include "
+                         "debug/art/exhaustive checks. Refusing to pass an empty suite.")
+    # Logs and user-data directories are keyed by stem across both suites.
+    if len({test.stem for test in tests}) != len(tests):
+        raise ValueError("Test names must be unique across suites.")
     return tests
 
 
@@ -44,7 +54,7 @@ def isolated_environment(directory: Path) -> dict[str, str]:
 
 def godot_command(godot: str, test: Path, engine_log: Path) -> list[str]:
     return [godot, "--headless", "--fixed-fps", "60", "--path", str(ROOT),
-            "--log-file", str(engine_log), "--script", "res://tests/" + test.name]
+            "--log-file", str(engine_log), "--script", "res://" + test.relative_to(ROOT).as_posix()]
 
 
 def stop_process(process: subprocess.Popen) -> None:
@@ -117,13 +127,15 @@ def main() -> int:
     parser.add_argument("--godot", default=os.environ.get("GODOT_BIN", "godot"))
     parser.add_argument("--jobs", type=positive_int, default=min(4, os.cpu_count() or 1))
     parser.add_argument("--timeout", type=positive_float, default=180.0, help="seconds per test")
+    parser.add_argument("--suite", choices=["core", "extended", "all"], default="core",
+                        help="core gameplay/UI (default), extended checks only, or all tests")
     parser.add_argument("--filter", action="append", default=[], help="test name/glob, repeatable")
     args = parser.parse_args()
     godot = shutil.which(args.godot)
     if godot is None:
         parser.error("Godot executable not found; set --godot or GODOT_BIN.")
     try:
-        tests = select_tests(ROOT, args.filter)
+        tests = select_tests(ROOT, args.filter, args.suite)
         isolated_environment(ROOT / ".godot" / "test_runs")
     except ValueError as error:
         parser.error(str(error))
@@ -132,7 +144,8 @@ def main() -> int:
     report_path = ROOT / ".godot" / "test_results.json"
     durations = {}
     # Fresh CI jobs use the recorded baseline; local timings override it.
-    for timing_path in [ROOT / "docs" / "test_runtime_serial.json", report_path]:
+    for timing_path in [ROOT / "docs" / "test_runtime_serial.json",
+                        ROOT / "docs" / "test_runtime_core.json", report_path]:
         try:
             previous = json.loads(timing_path.read_text(encoding="utf-8"))
             durations.update({result["test"]: result["seconds"] for result in previous["results"]})
@@ -144,7 +157,8 @@ def main() -> int:
     run_dir.mkdir(parents=True)
     started = time.perf_counter()
     results = []
-    print(f"Running {len(tests)} tests with {args.jobs} workers (fixed delta 1/60 s).", flush=True)
+    print(f"Running {len(tests)} {args.suite} tests with {args.jobs} workers "
+          "(fixed delta 1/60 s).", flush=True)
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.jobs) as executor:
         futures = {executor.submit(run_one, godot, test, run_dir, args.timeout): test for test in tests}
         for future in concurrent.futures.as_completed(futures):
@@ -159,7 +173,8 @@ def main() -> int:
     elapsed = round(time.perf_counter() - started, 3)
     results.sort(key=lambda result: result["test"])
     failed = sum(not result["passed"] for result in results)
-    report = {"seconds": elapsed, "jobs": args.jobs, "count": len(results), "failed": failed,
+    report = {"seconds": elapsed, "jobs": args.jobs, "suite": args.suite,
+              "count": len(results), "failed": failed,
               "godot": godot, "results": results}
     encoded = json.dumps(report, indent=2) + "\n"
     (run_dir / "results.json").write_text(encoded, encoding="utf-8")
@@ -171,7 +186,7 @@ def main() -> int:
     summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
     if summary_path:
         with open(summary_path, "a", encoding="utf-8") as summary:
-            summary.write(f"### Godot tests\n\n{len(results) - failed}/{len(results)} passed "
+            summary.write(f"### Godot tests ({args.suite})\n\n{len(results) - failed}/{len(results)} passed "
                           f"in {elapsed:.2f}s with {args.jobs} workers.\n\n"
                           "| Test | Seconds |\n| --- | ---: |\n")
             for result in sorted(results, key=lambda result: result["seconds"], reverse=True)[:10]:

@@ -1,10 +1,12 @@
 extends "res://tests/support/test_runtime.gd"
 const BATCH := preload("res://scripts/vfx/telegraph_batch.gd")
+const AA := preload("res://scripts/vfx/warning_antialias.gd")
 var failures := 0
 func _initialize() -> void: call_deferred("_run")
 func _check(value: bool, message: String) -> void:
 	if not value: failures += 1; push_error(message)
 func _run() -> void:
+	_check_antialias()
 	var owner := Node2D.new()
 	root.add_child(owner)
 	var base := Transform2D(0.37, Vector2(80, 95))
@@ -46,3 +48,25 @@ func _run() -> void:
 	other.free()
 	if failures == 0: print("PASS warning_effects: shared batches, exact geometry/transforms, safe core, dynamic sectors, density, growth, reuse and cleanup")
 	finish(0 if failures == 0 else 1)
+
+func _check_antialias() -> void:
+	var first := Node2D.new()
+	var second := Node2D.new()
+	root.add_child(first)
+	root.add_child(second)
+	AA.apply_to(first)
+	AA.apply_to(second)
+	_check(first.material == second.material and first.material is ShaderMaterial, "effects must share one antialias material")
+	var original := first.material
+	for tick in 100: AA.apply_to(first)
+	_check(first.material == original, "effect frames allocate antialias materials")
+	var custom := CanvasItemMaterial.new()
+	second.material = custom
+	AA.apply_to(second)
+	_check(second.material == custom, "existing caller material was overwritten")
+	second.material = null
+	second.use_parent_material = true
+	AA.apply_to(second)
+	_check(second.material == null, "inherited caller material was overwritten")
+	first.free()
+	second.free()

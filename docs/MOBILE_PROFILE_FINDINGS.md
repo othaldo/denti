@@ -31,7 +31,7 @@ Isolierter nativer Test mit 100 gleichzeitig neu gezeichneten Markierungsringen 
 
 In einer einzelnen vollen Desktop-Diagnosemessung sank die Momentaufnahme der Zeichenaufrufe von 271 auf 221. Der FPS-Schnitt verbesserte sich dort nicht (238 gegenüber 232 FPS); diese kurze Messung ist kein Beleg für eine Verbesserung der gesamten Arena. Der größere Atlas erhöhte den gemeldeten Desktop-Texturspeicher um etwa 4,5 MiB. Der isolierte Gewinn muss auf dem Handy anhand derselben Diagnosecodes erneut geprüft werden. Es gibt keine Zusage konstanter 60 FPS.
 
-Die Ringdarstellung wurde mit nativen Grafikframes visuell geprüft. `tests/prepared_combat_textures.gd` prüft die gemeinsamen Atlasregionen, Radien und freien Ringmitten aller aktuellen Gegner; vorhandene Tests prüfen Evolutionen, Item-Synergien, Relikte und Hit-Flash-Verhalten.
+Die Ringdarstellung wurde mit nativen Grafikframes visuell geprüft. `tests/extended/prepared_combat_textures.gd` prüft die gemeinsamen Atlasregionen, Radien und freien Ringmitten aller aktuellen Gegner; vorhandene Tests prüfen Evolutionen, Item-Synergien, Relikte und Hit-Flash-Verhalten.
 
 ## Beuteabfragen nach dem Handybericht zu fb65b09
 

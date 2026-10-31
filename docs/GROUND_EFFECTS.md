@@ -26,7 +26,7 @@ noch eine Prognose für Browser-FPS. Andere Texturen, Ebenen und Zeichenreihenfo
 können die Bündelung im vollständigen Kampf unterbrechen. Durch die transparenten
 Rechtecke bleibt Pixelarbeit bestehen.
 
-`tests/ground_effects.gd` prüft die Gefahrenkontur am tatsächlichen Radius, freie
+`tests/extended/attack_effects.gd` prüft die Gefahrenkontur am tatsächlichen Radius, freie
 Impulsmitte und transparente Zellränder. Der Warmup-Test prüft das tatsächliche
 Einplanen des neuen Atlasses zum Zeichnen. Bestehende Kampf-/Item-/Relikttests
 prüfen die unveränderten Effekte auf den Spielzustand.
