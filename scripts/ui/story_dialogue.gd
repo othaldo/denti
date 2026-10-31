@@ -82,6 +82,7 @@ func _ready() -> void:
 	actions.add_child(next_button)
 	next_button.pressed.connect(request_advance)
 	get_viewport().size_changed.connect(_layout)
+	get_node("/root/GameInput").changed.connect(_layout.call_deferred)
 
 func show_line(line: Dictionary, chapter: StoryChapter, index: int, total: int) -> void:
 	location_label.text = chapter.title
@@ -105,6 +106,10 @@ func show_line(line: Dictionary, chapter: StoryChapter, index: int, total: int) 
 	_layout()
 	call_deferred("_layout")
 	next_button.grab_focus()
+	if not root_control.has_meta("controller_registered"):
+		root_control.set_meta("controller_registered", true)
+		ControllerFocus.register(root_control, func() -> Control: return next_button)
+		ControllerPrompt.bind(next_button, &"ui_accept", false)
 
 func _process(delta: float) -> void:
 	if not visible:
@@ -153,6 +158,7 @@ func _layout() -> void:
 	if panel == null or not is_inside_tree():
 		return
 	var extent := get_viewport().get_visible_rect().size
+	extent.y -= ControllerActionBar.reserve(root_control)
 	var small := extent.x < 700 or extent.y < 420
 	portrait.custom_minimum_size = Vector2.ONE * (44 if extent.y < 420 else (56 if small else 72))
 	body_label.add_theme_font_size_override("font_size", 17 if small else 21)

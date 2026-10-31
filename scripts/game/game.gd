@@ -97,6 +97,7 @@ func _ready() -> void:
 	hud.bind_mobile_controls(mobile_controls)
 	randomize()
 	session.begin_graphics_run()
+	get_node("/root/GameInput").controller_disconnected.connect(_on_controller_disconnected)
 	story_dialogue = StoryDialogue.new()
 	add_child(story_dialogue)
 	story_dialogue.advance_requested.connect(_on_story_advance)
@@ -331,8 +332,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		hud.toggle_telemetry()
 		get_viewport().set_input_as_handled()
 		return
-	if event.is_action_pressed("ui_cancel") and run_flow.is_combat() and not game_menu.visible:
+	if event.is_action_pressed("pause") and run_flow.is_combat() and not game_menu.visible:
 		get_viewport().set_input_as_handled()
+		game_menu.open_pause()
+
+
+func _on_controller_disconnected() -> void:
+	if run_flow.is_combat() and not game_menu.visible and not ended:
 		game_menu.open_pause()
 
 

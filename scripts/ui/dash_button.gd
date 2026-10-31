@@ -30,6 +30,9 @@ func _init() -> void:
 	pressed.connect(func() -> void:
 		if is_instance_valid(player): player.try_dash())
 
+func _ready() -> void:
+	ControllerPrompt.bind(self, &"dash", false)
+
 func _layout() -> void:
 	var side := minf(size.x, size.y)
 	vessel.position = Vector2((size.x - side) * 0.5, 0)

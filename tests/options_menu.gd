@@ -22,7 +22,7 @@ func _run() -> void:
 	menu._show_options()
 	await process_frame
 	await process_frame
-	if _setting_control_count(menu.stage.content) != 8:
+	if _setting_control_count(menu.stage.content) != 9:
 		_fail("options page has duplicate controls")
 		return
 	var master_bus := AudioServer.get_bus_index("Master")
@@ -50,7 +50,7 @@ func _run() -> void:
 	music_slider.value = 62.0
 	sfx_slider.value = 15.0
 	await process_frame
-	if _setting_control_count(menu.stage.content) != 8 or menu.fps_toggle != fps_toggle or menu.master_slider != master_slider or menu.music_slider != music_slider or menu.sfx_slider != sfx_slider or menu.ui_sound_toggle != ui_sound_toggle or menu.motion_toggle != motion_toggle:
+	if _setting_control_count(menu.stage.content) != 9 or menu.fps_toggle != fps_toggle or menu.master_slider != master_slider or menu.music_slider != music_slider or menu.sfx_slider != sfx_slider or menu.ui_sound_toggle != ui_sound_toggle or menu.motion_toggle != motion_toggle:
 		_fail("moving sliders duplicated options")
 		return
 	if session.ui_sounds or not session.reduced_ui_motion:
@@ -78,7 +78,7 @@ func _run() -> void:
 	var fullscreen_toggle: CheckButton = menu.fullscreen_toggle
 	fullscreen_toggle.button_pressed = not fullscreen_toggle.button_pressed
 	await process_frame
-	if _setting_control_count(menu.stage.content) != 8 or menu.fullscreen_toggle != fullscreen_toggle:
+	if _setting_control_count(menu.stage.content) != 9 or menu.fullscreen_toggle != fullscreen_toggle:
 		_fail("fullscreen option duplicated controls")
 		return
 	var back_button: Button = menu.actions[&"back"]
@@ -90,7 +90,7 @@ func _run() -> void:
 	var options_button: Button = menu.actions[&"settings"]
 	options_button.pressed.emit()
 	await process_frame
-	if menu.page != &"options" or _setting_control_count(menu.stage.content) != 8 or menu.fps_toggle.button_pressed != selected_fps or int(menu.master_slider.value) != 37 or int(menu.music_slider.value) != 62 or int(menu.sfx_slider.value) != 15 or menu.ui_sound_toggle.button_pressed or not menu.motion_toggle.button_pressed:
+	if menu.page != &"options" or _setting_control_count(menu.stage.content) != 9 or menu.fps_toggle.button_pressed != selected_fps or int(menu.master_slider.value) != 37 or int(menu.music_slider.value) != 62 or int(menu.sfx_slider.value) != 15 or menu.ui_sound_toggle.button_pressed or not menu.motion_toggle.button_pressed:
 		_fail("opening options again duplicated controls")
 		return
 	session.master_volume_percent = 100
@@ -125,7 +125,7 @@ func _run() -> void:
 	var pause_options_button: Button = game.game_menu.actions[&"settings"]
 	pause_options_button.pressed.emit()
 	await process_frame
-	if game.game_menu.page != &"options" or _setting_control_count(game.game_menu.stage.content) != 8:
+	if game.game_menu.page != &"options" or _setting_control_count(game.game_menu.stage.content) != 9:
 		_fail("pause options did not open cleanly")
 		return
 	var pause_music_slider: HSlider = game.game_menu.music_slider
@@ -144,7 +144,7 @@ func _run() -> void:
 		return
 	pause_music_slider.value = 23.0
 	await process_frame
-	if _setting_control_count(game.game_menu.stage.content) != 8 or game.game_menu.music_slider != pause_music_slider or session.music_volume_percent != 23:
+	if _setting_control_count(game.game_menu.stage.content) != 9 or game.game_menu.music_slider != pause_music_slider or session.music_volume_percent != 23:
 		_fail("pause options duplicated controls")
 		return
 	(game.game_menu.actions[&"back"] as Button).pressed.emit()

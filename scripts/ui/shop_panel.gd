@@ -73,10 +73,22 @@ var detail_popup: PanelContainer
 var popup_layout_queued := false
 var story_timeline: StoryTimeline
 var displayed_wave: int = 0
+var details_first_layout := false
 
 func _ready() -> void:
 	ShopLayout.build(self)
+	ControllerFocus.register($Root, _default_focus)
+	ControllerFocus.register(detail_popup, func() -> Control: return details.close_button, 100)
+	ControllerPrompt.bind(reroll_button, &"ui_reroll", false)
+	ControllerPrompt.bind(details.close_button, &"ui_cancel", false)
+	$Root.set_meta("controller_back", "Pause")
+	get_node("/root/GameInput").changed.connect(_queue_layout)
 	_update_layout()
+
+func _default_focus() -> Control:
+	for button in offer_buttons:
+		if ControllerFocus.available(button): return button
+	return continue_button
 
 
 func set_build_context(context: Player) -> void:
@@ -116,9 +128,10 @@ func _queue_layout() -> void:
 
 func _update_layout() -> void:
 	layout_queued = false
-	if offer_scroll == null:
+	if offer_scroll == null or not is_inside_tree() or is_queued_for_deletion():
 		return
-	var extent: Vector2 = $Root.size
+	var extent := ControllerActionBar.content_rect($Root, Rect2(Vector2.ZERO, $Root.size)).size
+	$Root/Center.offset_bottom = -ControllerActionBar.reserve($Root)
 	var narrow := extent.x < 600
 	var short := extent.y < 700
 	rows.add_theme_constant_override("separation", 8 if short else 12)
@@ -189,7 +202,7 @@ func _refresh_header() -> void:
 
 
 func _size_offer_grid() -> void:
-	if offers_grid != null:
+	if offers_grid != null and is_inside_tree() and not is_queued_for_deletion():
 		offers_grid.custom_minimum_size.y = 0.0 if compact else minf(MAX_OFFER_HEIGHT, _available_body_height())
 
 
@@ -206,7 +219,7 @@ func _available_body_height() -> float:
 			if child != main_scroll:
 				required += child.get_combined_minimum_size().y
 	required += rows.get_theme_constant("separation") * maxi(visible_rows - 1, 0)
-	return maxf($Root.size.y - 24 - required, 0)
+	return maxf($Root.size.y - ControllerActionBar.reserve($Root) - 24 - required, 0)
 
 
 func _layout_inventory() -> void:
@@ -309,8 +322,11 @@ func present(model: ShopViewData) -> void:
 		DentiUIMotion.reveal($Root/Center/Panel)
 	visible = true
 	_queue_layout()
+	if get_node("/root/GameInput").navigation_active:
+		get_node("/root/GameInput").navigation.ensure_focus.call_deferred()
 
 func _select(kind: String, index: int) -> void:
+	details_first_layout = true
 	expanded = true
 	details_scroll.scroll_vertical = 0
 	detail_column.visible = true
@@ -346,6 +362,7 @@ func _size_detail_popup() -> void:
 		return
 	var extent: Vector2 = $Root.size
 	var width := minf(520, extent.x - 32)
+	extent.y -= ControllerActionBar.reserve($Root)
 	var icon_values := true
 	for index in range(0, details.values_grid.get_child_count(), 2):
 		if not details.values_grid.get_child(index) is TextureRect:
@@ -358,6 +375,9 @@ func _size_detail_popup() -> void:
 	detail_popup.custom_minimum_size = Vector2(width, 0)
 	detail_popup.size = Vector2(width, minf(height, extent.y - 32))
 	detail_popup.position = (extent - detail_popup.size) * 0.5
+	if details_first_layout:
+		details_scroll.scroll_vertical = 0
+		details_first_layout = false
 
 func _render_selection() -> void:
 	details.clear_actions()
@@ -517,6 +537,15 @@ func close_details() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if not ControllerFocus.active($Root): return
+	if visible and not expanded and event.is_action_pressed("ui_reroll") and not reroll_button.disabled:
+		reroll_requested.emit()
+		get_viewport().set_input_as_handled()
+		return
+	if visible and not expanded and event.is_action_pressed("pause") and event is InputEventJoypadButton:
+		pause_requested.emit()
+		get_viewport().set_input_as_handled()
+		return
 	if visible and event.is_action_pressed("ui_cancel"):
 		if expanded:
 			close_details()

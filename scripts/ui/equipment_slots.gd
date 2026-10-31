@@ -78,6 +78,7 @@ func show_entries(entries: Array[Dictionary], player: Player, used_slots: int, c
 			indicator.add_child(arrow)
 			button.tooltip_text += "\n" + ("Waffen-Evolution möglich" if evolution_ready else "Fusion zur nächsten Stufe möglich")
 		button.pressed.connect(func() -> void: selected.emit(index))
+		ControllerFocus.tag(button, "equipment:%s" % entry.get("uid", index))
 		button.gui_input.connect(_on_input.bind(index))
 	for index in maxi(capacity - used_slots, 0):
 		var slot := HBoxContainer.new()

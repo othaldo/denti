@@ -67,6 +67,9 @@ func _ready() -> void:
 	next_button.pressed.connect(advance)
 	root_control.add_child(next_button)
 	get_viewport().size_changed.connect(_layout)
+	ControllerFocus.register(root_control, func() -> Control: return next_button)
+	ControllerPrompt.bind(next_button, &"ui_accept", false)
+	get_node("/root/GameInput").changed.connect(_layout.call_deferred)
 
 func present(state: StoryProgress) -> void:
 	progress = state
@@ -138,6 +141,7 @@ func _layout() -> void:
 	if not is_inside_tree() or progress == null:
 		return
 	var extent := get_viewport().get_visible_rect().size
+	extent.y -= ControllerActionBar.reserve(root_control)
 	var short := extent.y < 480
 	var narrow := extent.x < 700
 	var margin := 16.0 if narrow else 28.0

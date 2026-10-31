@@ -20,6 +20,7 @@ func show_entries(entries: Array[Dictionary]) -> Vector2i:
 		var chip := PanelContainer.new()
 		chip.custom_minimum_size = Vector2(48, 44)
 		chip.focus_mode = Control.FOCUS_ALL
+		ControllerFocus.tag(chip, "item:%s" % entry.get("id", entry.name))
 		chip.tooltip_text = "%s ×%d\n%s" % [entry.name, copies, entry.description]
 		var tier := int(entry.get("tier", 4 if bool(entry.get("relic", false)) else 1))
 		chip.tooltip_text += "\nSeltenheit: " + DentiRarity.name_for(tier)

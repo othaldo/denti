@@ -200,6 +200,13 @@ dabei erhalten; es wird keine neue Textschicht ins Kampfbild eingebaut.
 
 ## 7. Zustände, Navigation und Rückmeldung
 
+Controller-Prompts (31.10.2026): Tastenzeichen und kurze Aktionsnamen stehen als
+gemeinsame Paare in einer festen unteren Aktionsleiste. Sie haben eine gemeinsame
+Mittellinie, konsistente Größen und Abstände und eigenen reservierten Platz.
+Keine schwebenden Tastensymbole an Karten- oder Button-Ecken. Fokus und Auswahl
+bleiben eigenständige visuelle Zustände; die Leiste nennt ausschließlich im
+aktuellen Kontext nutzbare Aktionen. Siehe [Recherche und Umsetzung](CONTROLLER_SUPPORT.md#tastensymbole).
+
 - Vor/Zurück und bereits besuchte Schritte behalten die Wahl. Der Schrittverlauf
   zeigt keine noch nicht existierende Klasse. Später wird der Klassenschritt
   zwischen Schwierigkeit und Waffe eingefügt, mit derselben Bühne und Navigation.

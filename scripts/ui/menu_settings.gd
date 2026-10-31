@@ -16,6 +16,7 @@ var fps_toggle: CheckButton
 var graphics_option: OptionButton
 var ui_sound_toggle: CheckButton
 var motion_toggle: CheckButton
+var controller_option: OptionButton
 
 var session: Node
 var columns: GridContainer
@@ -78,6 +79,7 @@ func _build() -> void:
 	var controls := _section("Bedienung", other_sections)
 	ui_sound_toggle = _toggle(controls, "UI-Klänge", "set_ui_sounds")
 	motion_toggle = _toggle(controls, "Reduzierte Bewegung", "set_reduced_ui_motion")
+	_controller_row(controls)
 	_update_columns()
 
 
@@ -190,6 +192,27 @@ func _graphics_row(parent: VBoxContainer) -> void:
 	)
 
 
+func _controller_row(parent: VBoxContainer) -> void:
+	var row := HBoxContainer.new()
+	row.custom_minimum_size.y = ROW_HEIGHT
+	row.add_theme_constant_override("separation", 12)
+	parent.add_child(row)
+	var label := _label("Tastensymbole")
+	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(label)
+	controller_option = OptionButton.new()
+	controller_option.name = "ControllerSymbols"
+	controller_option.custom_minimum_size.y = ROW_HEIGHT
+	for title in ["Automatisch", "Xbox", "PlayStation"]: controller_option.add_item(title)
+	DentiUIStyle.style_button(controller_option)
+	controller_option.add_theme_font_size_override("font_size", LABEL_SIZE)
+	controller_option.add_theme_stylebox_override("focus", _focus_box())
+	controller_option.get_popup().add_theme_font_size_override("font_size", LABEL_SIZE)
+	controller_option.get_popup().add_theme_constant_override("v_separation", 28)
+	row.add_child(controller_option)
+	controller_option.item_selected.connect(func(index: int) -> void: session.set_controller_symbols(index))
+
+
 func _label(value: String) -> Label:
 	var label := Label.new()
 	label.text = value
@@ -222,6 +245,7 @@ func _sync_values() -> void:
 	ui_sound_toggle.set_pressed_no_signal(bool(session.get("ui_sounds")))
 	motion_toggle.set_pressed_no_signal(bool(session.get("reduced_ui_motion")))
 	graphics_option.select(clampi(int(session.get("graphics_mode")), 0, 2))
+	controller_option.select(clampi(int(session.get("controller_symbols")), 0, 2))
 	for toggle: CheckButton in [fullscreen_toggle, fps_toggle, ui_sound_toggle, motion_toggle]:
 		toggle.queue_redraw()
 

@@ -44,6 +44,8 @@ func _ready() -> void:
 	body = Control.new()
 	stage.layout_changed.connect(_layout)
 	stage.present("Waffen fusionieren", body)
+	ControllerPrompt.bind(cancel_button, &"ui_cancel", false)
+	ControllerPrompt.bind(confirm_button)
 
 
 func show_plan(value: WeaponFusionPlan) -> void:
@@ -79,6 +81,14 @@ func _layout(extent: Vector2) -> void:
 	slot_buttons.clear()
 	var narrow := extent.x < 680
 	var compact := extent.x < 420
+	var refund_parent: Node = stage.header if compact else stage.footer
+	if refund_label.get_parent() != refund_parent:
+		refund_label.reparent(refund_parent)
+		if not compact: stage.footer.move_child(refund_label, 1)
+	refund_label.size_flags_horizontal = Control.SIZE_SHRINK_END if compact else Control.SIZE_EXPAND_FILL
+	confirm_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL if compact else Control.SIZE_FILL
+	for button in [cancel_button, confirm_button]: button.add_theme_font_size_override("font_size", 16 if compact else 20)
+	stage.title_label.text = "Evolution" if plan.recipe_id != &"" else ("Fusion" if compact else "Waffen fusionieren")
 	var short_layout := extent.y < 280 and not compact
 	var source_width := (extent.x - 16) / plan.ingredients.size() - (8 if plan.ingredients.size() == 2 else 0)
 	var source_height := 152.0 if not compact else 180.0
@@ -140,6 +150,7 @@ func _layout(extent: Vector2) -> void:
 		_text(button, "%d/10" % WeaponUpgrades.level(entry), Rect2(cell - 52, 2, 48, 46), 15, DentiUIStyle.GOLD if chosen else DentiUIStyle.MUTED)
 		button.tooltip_text = ("Alle %d Plätze belegt\n" % WeaponUpgrades.slots(plan.tier) if button.disabled else "") + AffixPresentation.effect_description(id)
 		button.pressed.connect(toggle.bind(id))
+		ControllerFocus.tag(button, "fusion:%s" % id)
 		effect_buttons.append(button)
 	var bottom := y + ceili(float(plan.candidates.size()) / columns) * 58
 	body.custom_minimum_size.y = maxf(212 if short_layout else top + hero_height + 24, bottom + 8)

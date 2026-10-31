@@ -57,7 +57,10 @@ Das Projekt mit **Godot 4.4 oder neuer** öffnen und mit **F5** starten. Unter L
 | F3 (Debug-Build) | Kampf-Telemetrie ein- und ausblenden |
 | F4 (lokaler Debug-Build) | Testmenü: Waffen, Items, Münzen, Stats und Wellen |
 | Maus | Waffen, Boni und Shopangebote wählen |
+| Controller | Linker Stick bewegt Denti; Steuerkreuz oder linker Stick navigieren Menüs. A / Kreuz bestätigt, B / Kreis geht zurück. RB / R1 löst den Dash aus, Menu / Options pausiert. X / Quadrat würfelt Angebote oder Level-Boni neu; Y / Dreieck öffnet Details in der Startauswahl. Rechter Stick scrollt Listen und Details. |
 | Touchscreen | Auf der freien Spielfläche ziehen und halten zum Bewegen. Nachziehen ändert die Richtung, Loslassen stoppt. Zweiter Finger auf Dash unten rechts für Wurzelsprung. Pause, Menüs und Shop per Tippen bedienen. |
+
+Xbox- und PlayStation-Tastensymbole wechseln mit dem zuletzt verwendeten Eingabegerät. Unter **Einstellungen → Tastensymbole** lässt sich **Automatisch, Xbox oder PlayStation** speichern. Verliert der aktive Controller während des Kampfes die Verbindung, öffnet sich die Pause; erneutes Verbinden setzt den Kampf nicht automatisch fort. [Controller-Steuerung und Prüfungen](docs/CONTROLLER_SUPPORT.md).
 
 Vor einem neuen Run wählst du **Easy, Normal oder Hard**; **Hell** wird nach einem Sieg auf Hard freigeschaltet. Der Grad bleibt beim Fortsetzen erhalten. Normal entspricht der bisherigen Balance, während die anderen Grade vor allem Gegnerdichte, Horden, Eliten und Projektilmuster verändern.
 
@@ -133,7 +136,7 @@ Unter Windows können die Tests mit dem Godot-Konsolenprogramm ausgeführt werde
 python tools/run_tests.py --godot Godot_v4.7.2-stable_win64_console.exe
 ```
 
-Der Runner benötigt Python 3.10+ (keine Zusatzpakete). Standardmäßig laufen 151 Tests für Spielfluss, Spielstände, Kampf, Balance, Shop und bedienbare UI. 15 zusätzliche Grafik-, Debug- und umfassende Boss-Routenprüfungen sind mit `--suite extended` gezielt aufrufbar; `--suite all --timeout 300` führt beide Gruppen aus. Normale CI-Builds verwenden die Kernprüfung, Release-Tags die vollständige Suite. Bis zu vier Tests laufen parallel, mit getrennten Godot-Benutzerdaten und unverändertem Simulationsschritt von 1/60 Sekunde. `--jobs 1` läuft seriell; `--filter 'weapon_*'` wählt innerhalb der Suite eine Teilmenge. Fehlercodes, `SCRIPT ERROR:`, Engine-`ERROR:`, Ressourcen-/Objektlecks und Zeitüberschreitungen lassen den Lauf fehlschlagen. Laufzeiten und Logs stehen unter `.godot/test_results.json` und `.godot/test_runs/`. [Auswahl, Befehle und Laufzeitvergleich](docs/TEST_RUNTIME.md).
+Der Runner benötigt Python 3.10+ (keine Zusatzpakete). Standardmäßig laufen 155 Tests für Spielfluss, Spielstände, Kampf, Balance, Shop und bedienbare UI. 15 zusätzliche Grafik-, Debug- und umfassende Boss-Routenprüfungen sind mit `--suite extended` gezielt aufrufbar; `--suite all --timeout 300` führt beide Gruppen aus. Normale CI-Builds verwenden die Kernprüfung, Release-Tags die vollständige Suite. Bis zu vier Tests laufen parallel, mit getrennten Godot-Benutzerdaten und unverändertem Simulationsschritt von 1/60 Sekunde. `--jobs 1` läuft seriell; `--filter 'weapon_*'` wählt innerhalb der Suite eine Teilmenge. Fehlercodes, `SCRIPT ERROR:`, Engine-`ERROR:`, Ressourcen-/Objektlecks und Zeitüberschreitungen lassen den Lauf fehlschlagen. Laufzeiten und Logs stehen unter `.godot/test_results.json` und `.godot/test_runs/`. [Auswahl, Befehle und Laufzeitvergleich](docs/TEST_RUNTIME.md).
 
 Eine Vorschau aller neuen Waffen im Shop und ihrer Effekte im Kampf erstellt
 `Godot_v4.7.2-stable_win64_console.exe --path . --script res://tools/preview_weapon_expansion.gd`

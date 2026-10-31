@@ -47,6 +47,9 @@ var reduced_ui_motion: bool:
 var graphics_mode: GraphicsMode:
 	get: return settings_data.graphics_mode
 	set(value): settings_data.graphics_mode = value
+var controller_symbols: int:
+	get: return settings_data.controller_symbols
+	set(value): settings_data.controller_symbols = clampi(value, 0, 2)
 var adaptive_graphics: AdaptiveGraphics = ADAPTIVE_GRAPHICS.new()
 var graphics_sample_us: int = -1
 var application_focused: bool = true
@@ -136,6 +139,12 @@ func set_graphics_mode(mode: int) -> void:
 	graphics_mode = clampi(mode, 0, 2) as GraphicsMode
 	begin_graphics_run()
 	_save_settings()
+
+
+func set_controller_symbols(mode: int) -> void:
+	controller_symbols = mode
+	_save_settings()
+	get_node("/root/GameInput").changed.emit()
 
 
 func apply_graphics() -> void:

@@ -42,6 +42,9 @@ func _ready() -> void:
 	resized.connect(_layout)
 	get_viewport().size_changed.connect(_layout.call_deferred)
 	visible = false
+	ControllerFocus.register(self, func() -> Control: return close_button, 100)
+	ControllerPrompt.bind(close_button, &"ui_cancel", false)
+	get_node("/root/GameInput").changed.connect(_layout.call_deferred)
 
 func present(title: String, text: String, source: Control) -> void:
 	return_focus = source
@@ -69,9 +72,9 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 func _layout() -> void:
-	if panel == null: return
+	if panel == null or not is_inside_tree() or get_viewport() == null: return
 	var factor := RunSetupLayout.ui_scale(get_viewport())
-	var bounds := HUDLayout.safe_rect(size)
+	var bounds := ControllerActionBar.content_rect(self, HUDLayout.safe_rect(size))
 	var safe := Rect2(bounds.position / factor, bounds.size / factor)
 	panel.scale = Vector2.ONE * factor
 	var width := minf(560, safe.size.x - 24)

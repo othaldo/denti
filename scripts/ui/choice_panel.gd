@@ -87,6 +87,14 @@ func _ready() -> void:
 	starter_selection.selection_changed.connect(func() -> void: starter_preview_changed.emit())
 	_use_legacy(&"upgrade")
 	get_viewport().size_changed.connect(_update_layout)
+	ControllerFocus.register($Root)
+	ControllerPrompt.bind(reroll_button, &"ui_reroll", false)
+	get_node("/root/GameInput").changed.connect(_update_layout.call_deferred)
+
+func _unhandled_input(event: InputEvent) -> void:
+	if visible and ControllerFocus.active($Root) and mode == &"upgrade" and event.is_action_pressed("ui_reroll") and not reroll_button.disabled:
+		level_reroll_requested.emit()
+		get_viewport().set_input_as_handled()
 
 func _use_rewards(next: StringName) -> void:
 	mode = next
@@ -120,6 +128,7 @@ func _use_legacy(next: StringName) -> void:
 	subtitle_label = legacy_subtitle
 
 func _update_layout() -> void:
+	$Root/Center.offset_bottom = -ControllerActionBar.reserve($Root)
 	if mode in [&"upgrade", &"chest", &"relic"] and stage.visible:
 		stage.relayout()
 		stage.refresh_focus()

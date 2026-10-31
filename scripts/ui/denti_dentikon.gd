@@ -62,6 +62,9 @@ static func open(source: Control, title: String, explanation: String, icon: Text
 	DentiUIStyle.style_button(close)
 	header.add_child(close)
 	close.pressed.connect(popup.hide)
+	ControllerPrompt.bind(close, &"ui_cancel", false)
+	for direction in ["focus_next", "focus_previous", "focus_neighbor_left", "focus_neighbor_right", "focus_neighbor_top", "focus_neighbor_bottom"]:
+		close.set(direction, NodePath("."))
 	var width := minf(440, source.get_viewport_rect().size.x - 32)
 	var body := _label(rows, explanation, 17)
 	body.autowrap_mode = TextServer.AUTOWRAP_OFF

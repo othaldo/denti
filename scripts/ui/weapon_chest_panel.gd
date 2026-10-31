@@ -127,6 +127,7 @@ func show_chest(chest: Dictionary, loadout: WeaponLoadout, player_stats: PlayerS
 		button.show_artwork(RunSetupPresentation.weapon_icon(weapon.data))
 		button.set_meta("art", button.artwork)
 		button.pressed.connect(_select_weapon.bind(index))
+		ControllerFocus.tag(button, "weapon:%s" % weapon.instance_uid)
 		weapon_buttons.append(button)
 		if weapon.instance_uid == str(chest.get("target_uid", "")):
 			selected = index
@@ -149,6 +150,12 @@ func show_chest(chest: Dictionary, loadout: WeaponLoadout, player_stats: PlayerS
 	scroll.scroll_vertical = 0
 	_layout()
 	DentiUIMotion.reveal(rows)
+	_focus_weapon.call_deferred()
+
+func _focus_weapon() -> void:
+	if not is_inside_tree() or is_queued_for_deletion() or not visible: return
+	if selected_weapon < weapon_buttons.size() and ControllerFocus.available(weapon_buttons[selected_weapon]):
+		weapon_buttons[selected_weapon].grab_focus()
 
 
 func set_progress(current: int, total: int) -> void:
@@ -316,6 +323,7 @@ func _label_height(label: Label) -> float:
 
 
 func _input(event: InputEvent) -> void:
+	if event is InputEventJoypadMotion and absf(event.axis_value) < 0.5: return
 	if not visible:
 		return
 	if event is InputEventKey or event is InputEventJoypadButton or event is InputEventJoypadMotion:

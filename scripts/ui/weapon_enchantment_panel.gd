@@ -35,6 +35,7 @@ var selection_preview: Control
 var ascension_button: Button
 var coins := 0
 var wave_number := 1
+var focus_after_layout := ""
 
 
 func _ready() -> void:
@@ -78,6 +79,7 @@ func _ready() -> void:
 	stage.present("Waffen verzaubern", body)
 	details = RunSetupDetails.new()
 	root_control.add_child(details)
+	ControllerPrompt.bind(finish_button)
 
 
 func show_upgrades(upgrades: WeaponUpgradeState, equipment: WeaponLoadout, player_stats: PlayerStats, items: ItemInventory, upgrade_income: WeaponUpgradeIncome = null, available_coins: int = 0, wave: int = 1) -> void:
@@ -93,6 +95,8 @@ func show_upgrades(upgrades: WeaponUpgradeState, equipment: WeaponLoadout, playe
 	stage.body_scroll.scroll_vertical = 0
 	refresh()
 	DentiUIMotion.reveal(body)
+	if get_node("/root/GameInput").navigation_active:
+		get_node("/root/GameInput").navigation.ensure_focus.call_deferred()
 
 
 func refresh() -> void:
@@ -117,6 +121,14 @@ func _refresh() -> void:
 	back_button.visible = not back_button.disabled
 	finish_button.text = "Verzaubern · %d" % _cost() if picking_slot >= 0 else "Fertig"
 	finish_button.disabled = picking_slot >= 0 and (selected_effect == &"" or remaining < _cost() or not _selection_allowed())
+	var back_prompt := ControllerPrompt.bind(back_button)
+	back_prompt.action = &"ui_cancel" if picking_slot >= 0 else &"ui_accept"
+	back_prompt.focused_only = picking_slot < 0
+	back_prompt.refresh()
+	var finish_prompt := ControllerPrompt.bind(finish_button)
+	finish_prompt.action = &"ui_accept" if picking_slot >= 0 else &"ui_cancel"
+	finish_prompt.focused_only = picking_slot >= 0
+	finish_prompt.refresh()
 	_layout(stage.last_extent)
 	if picking_slot >= 0 and selected_effect != &"": _reveal_selection.call_deferred()
 
@@ -211,6 +223,7 @@ func _weapon_card(index: int, rect: Rect2, compact: bool) -> void:
 	DentiUIStyle.mark_card(button, DentiUIStyle.GOLD if selected_weapon == index else Color.TRANSPARENT)
 	button.tooltip_text = str(models[index].name) + "\n" + str(models[index].meta)
 	button.pressed.connect(select_weapon.bind(index))
+	ControllerFocus.tag(button, "weapon:%s" % models[index].uid)
 	weapon_buttons.append(button)
 	if compact:
 		button.show_artwork(RunSetupPresentation.weapon_icon(data))
@@ -278,6 +291,7 @@ func _slots(rect: Rect2, compact: bool) -> float:
 				empty.alignment = HORIZONTAL_ALIGNMENT_CENTER
 			empty.disabled = remaining < _cost() or locked
 			empty.pressed.connect(open_picker.bind(index))
+			ControllerFocus.tag(empty, "slot:%d" % index)
 			upgrade_buttons.append(empty)
 			continue
 		var effect: Dictionary = effects[index]
@@ -289,6 +303,7 @@ func _slots(rect: Rect2, compact: bool) -> float:
 		_art(icon, DentiUIIcons.item(data.icon_index), Rect2(2, 3, 46, 46))
 		icon.tooltip_text = data.display_name + " · Details"
 		icon.pressed.connect(func() -> void: details.present(data.display_name, effect.details, icon))
+		ControllerFocus.tag(icon, "details:%d" % index)
 		var action_width := 72.0 if compact else 106.0
 		var text_width := row.size.x - 90 - action_width
 		_text(panel, data.display_name, Rect2(72, 3 if compact else 9, text_width if compact else text_width - 48, 25), 16 if compact else 19)
@@ -310,6 +325,7 @@ func _slots(rect: Rect2, compact: bool) -> float:
 		action.tooltip_text = "Maximalstufe erreicht" if level == MAX_LEVEL else "%s: %d/10 -> %d/10 · kostet %d Punkte" % [data.display_name, level, level + 1, _cost()]
 		action.disabled = level == MAX_LEVEL or remaining < _cost()
 		action.pressed.connect(upgrade.bind(index))
+		ControllerFocus.tag(action, "upgrade:%d" % index)
 		upgrade_buttons.append(action)
 	return SLOT_COUNT * (row_height + gap) - gap
 
@@ -332,6 +348,7 @@ func _picker(rect: Rect2) -> float:
 			var row := Rect2(rect.position + Vector2(index % columns * (width + gap), bottom + (index / columns) * 66), Vector2(width, 58))
 			var button := _button(body, "", row)
 			button.set_meta("effect_id", data.id)
+			ControllerFocus.tag(button, "effect:%s" % data.id)
 			RunSetupStyle.choice(button, selected_effect == data.id, stage.keyboard_focus)
 			_art(button, DentiUIIcons.item(data.icon_index), Rect2(8, 12, 34, 36))
 			_text(button, data.display_name, Rect2(47, 6, width - 52, 46), 15, DentiUIStyle.INK, true)
@@ -400,8 +417,10 @@ func open_picker(slot: int) -> void:
 	if remaining < _cost() or slot < models[selected_weapon].effects.size() or slot >= int(models[selected_weapon].slot_count): return
 	picking_slot = slot
 	selected_effect = &""
+	focus_after_layout = "picker"
 	_save_cursor()
 	_refresh.call_deferred()
+	_focus_after_refresh.call_deferred()
 
 
 func upgrade(slot: int) -> void:
@@ -420,12 +439,31 @@ func _confirm() -> void:
 
 func _back() -> void:
 	if picking_slot >= 0:
+		focus_after_layout = "slot:%d" % picking_slot
 		picking_slot = -1
 		selected_effect = &""
 		_save_cursor()
 	else:
 		undo_requested.emit()
 	_refresh.call_deferred()
+	_focus_after_refresh.call_deferred()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not visible or details.visible or not ControllerFocus.active(stage) or not event.is_action_pressed("ui_cancel"): return
+	if picking_slot >= 0: _back()
+	else: _confirm()
+	get_viewport().set_input_as_handled()
+
+
+func _focus_after_refresh() -> void:
+	if not get_node("/root/GameInput").navigation_active: return
+	for control in effect_buttons if focus_after_layout == "picker" else upgrade_buttons:
+		if ControllerFocus.available(control) and (focus_after_layout == "picker" or str(control.get_meta("controller_focus_key", "")) == focus_after_layout):
+			control.grab_focus()
+			ControllerFocus.reveal(control)
+			break
+	focus_after_layout = ""
 
 
 func _save_cursor() -> void:
@@ -454,6 +492,7 @@ func _ascension(rect: Rect2, short: bool = false) -> void:
 	ascension_button.tooltip_text = (str(offer.blocked) + "\n" if ascension_button.disabled else "") + "%s · %d Punkte · %d Gold\n+10 %% Basisschaden · +3 %% Tempo und Reichweite\nFertig übernimmt den Aufstieg; Rückgängig nimmt ihn zurück." % [offer.next, offer.cost, offer.coins]
 	ascension_button.pressed.connect(func() -> void:
 		ascension_requested.emit(str(models[selected_weapon].uid)))
+	ControllerFocus.tag(ascension_button, "ascension")
 
 
 func _selection_allowed() -> bool:

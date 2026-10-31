@@ -10,6 +10,7 @@ var reduced_ui_motion: bool = false
 var graphics_mode: int = 0
 var code_entry_unlocked: bool = false
 var fullscreen: bool = false
+var controller_symbols: int = 0
 
 
 func load_from(path: String) -> void:
@@ -24,6 +25,7 @@ func load_from(path: String) -> void:
 		graphics_mode = clampi(int(config.get_value("display", "graphics_mode", 0)), 0, 2)
 		code_entry_unlocked = bool(config.get_value("debug", "code_entry_unlocked", false))
 		fullscreen = bool(config.get_value("display", "fullscreen", false))
+		controller_symbols = clampi(int(config.get_value("input", "controller_symbols", 0)), 0, 2)
 
 
 func save_to(path: String, fullscreen: bool) -> Error:
@@ -37,4 +39,5 @@ func save_to(path: String, fullscreen: bool) -> Error:
 	config.set_value("ui", "sounds", ui_sounds)
 	config.set_value("ui", "reduced_motion", reduced_ui_motion)
 	config.set_value("debug", "code_entry_unlocked", code_entry_unlocked)
+	config.set_value("input", "controller_symbols", controller_symbols)
 	return config.save(path)

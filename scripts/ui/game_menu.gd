@@ -43,6 +43,8 @@ var code_error: Label
 func _ready() -> void:
 	game = get_parent() as Node2D if overlay else null
 	_build_ui()
+	ControllerFocus.register(root_control, func() -> Control: return home.primary_button if is_instance_valid(home) else stage.back_button)
+	get_node("/root/GameInput").changed.connect(_update_build_layout.call_deferred)
 	visible = not overlay
 	if not overlay:
 		get_node("/root/SceneTransitions").present(&"menu")
@@ -85,11 +87,14 @@ func close_pause() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not visible or not event.is_action_pressed("ui_cancel"):
+	if not visible or not (event.is_action_pressed("ui_cancel") or overlay and event.is_action_pressed("pause")):
 		return
+	if not ControllerFocus.active(root_control): return
 	get_viewport().set_input_as_handled()
 	if page == &"updates" and get_node("/root/GameUpdates").state == GameUpdateService.State.INSTALLING: return
-	if not overlay and page in RunSetup.STEPS:
+	if overlay and event.is_action_pressed("pause") and event is InputEventJoypadButton:
+		close_pause()
+	elif not overlay and page in RunSetup.STEPS:
 		_setup_back()
 	elif overlay and page == &"home":
 		close_pause()
@@ -220,6 +225,7 @@ func _show_home() -> void:
 	elif can_continue:
 		context = "Run vorbereiten"
 	home.configure(overlay, can_continue, context, session.code_entry_unlocked, session.test_scenario_id != &"")
+	if overlay: ControllerPrompt.bind(home.primary_button, &"pause", false)
 	home.action_requested.connect(_home_action)
 	actions = home.actions
 	var updates: GameUpdateService = get_node("/root/GameUpdates")
@@ -309,12 +315,15 @@ func _show_dentipedia() -> void:
 
 
 func _update_build_layout() -> void:
-	if build_panel == null:
+	if build_panel == null or not is_inside_tree():
 		return
 	# Shrink back after a taller page; the centered HBox can retain its old size.
 	menu_stage.reset_size()
 	(menu_stage.get_parent() as Container).queue_sort()
-	var extent := root_control.size
+	var reserve := ControllerActionBar.reserve(root_control)
+	menu_stage.get_parent().offset_bottom = -reserve
+	root_control.set_meta("controller_back", "Zurück" if page != &"home" else "")
+	var extent := root_control.size - Vector2(0, reserve)
 	if page == &"dentipedia":
 		return
 	if page == &"boss_details" and build_scroll != null:

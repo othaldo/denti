@@ -122,6 +122,12 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_schedule_layout)
 	visibility_changed.connect(func() -> void:
 		if not visible: details.visible = false)
+	ControllerFocus.register(self, Callable(), 20)
+	ControllerPrompt.bind(back_button, &"ui_cancel", false)
+	ControllerPrompt.bind(confirm_button)
+	ControllerPrompt.bind(details_button, &"ui_details", false)
+	get_node("/root/GameInput").changed.connect(_sync_input_mode)
+	_sync_input_mode()
 	_layout()
 
 func _schedule_layout() -> void:
@@ -241,10 +247,28 @@ func _input(event: InputEvent) -> void:
 	for button in [back_button, confirm_button, details_button, details.close_button] + step_buttons.values():
 		RunSetupStyle.focus(button, keyboard_focus)
 
+func _sync_input_mode() -> void:
+	var input := get_node_or_null("/root/GameInput")
+	if input == null or input.is_queued_for_deletion(): return
+	keyboard_focus = input.navigation_active
+	details.keyboard_focus = keyboard_focus
+	difficulty_view.keyboard_focus = keyboard_focus
+	difficulty_view.refresh()
+	weapon_view.keyboard_focus = keyboard_focus
+	weapon_view.refresh()
+	for button in [back_button, confirm_button, details_button, details.close_button] + step_buttons.values():
+		RunSetupStyle.focus(button, keyboard_focus)
+	_layout.call_deferred()
+
+func _unhandled_input(event: InputEvent) -> void:
+	if is_visible_in_tree() and ControllerFocus.active(self) and not details.visible and event.is_action_pressed("ui_details") and not details_button.disabled:
+		show_details()
+		get_viewport().set_input_as_handled()
+
 func _layout() -> void:
-	if panel == null: return
+	if panel == null or not is_inside_tree() or get_viewport() == null: return
 	var factor := RunSetupLayout.ui_scale(get_viewport())
-	var safe := HUDLayout.safe_rect(size)
+	var safe := ControllerActionBar.content_rect(self, HUDLayout.safe_rect(size))
 	var rect := RunSetupLayout.stage(Rect2(safe.position / factor, safe.size / factor))
 	panel.scale = Vector2.ONE * factor
 	panel.position = rect.position * factor

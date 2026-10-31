@@ -46,6 +46,9 @@ func _ready() -> void:
 	panel.add_child(footer)
 	resized.connect(_layout)
 	get_viewport().size_changed.connect(_schedule_layout)
+	ControllerFocus.register(self, Callable(), 10)
+	get_node("/root/GameInput").changed.connect(_sync_input_mode)
+	_sync_input_mode()
 	set_progress(0, 0)
 	_layout()
 
@@ -81,7 +84,7 @@ func _schedule_layout() -> void:
 func _layout() -> void:
 	if panel == null or not is_inside_tree() or get_viewport() == null: return
 	var factor := MenuLayout.ui_scale(get_viewport())
-	var safe := HUDLayout.safe_rect(size)
+	var safe := ControllerActionBar.content_rect(self, HUDLayout.safe_rect(size))
 	var bounds := MenuLayout.stage(Rect2(safe.position / factor, safe.size / factor), Vector2(1400, 950))
 	panel.position = bounds.position * factor
 	panel.scale = Vector2.ONE * factor
@@ -109,6 +112,7 @@ func _layout_content() -> void:
 
 func _input(event: InputEvent) -> void:
 	if not is_visible_in_tree(): return
+	if event is InputEventJoypadMotion and absf(event.axis_value) < 0.5: return
 	var using_keyboard := event is InputEventKey or event is InputEventJoypadButton or event is InputEventJoypadMotion
 	if event is InputEventMouse or event is InputEventScreenTouch or event is InputEventScreenDrag:
 		using_keyboard = false
@@ -120,6 +124,13 @@ func _input(event: InputEvent) -> void:
 
 func refresh_focus() -> void:
 	_style_focus(panel)
+
+func _sync_input_mode() -> void:
+	var input := get_node_or_null("/root/GameInput")
+	if input == null or input.is_queued_for_deletion(): return
+	keyboard_focus = input.navigation_active
+	refresh_focus()
+	_layout.call_deferred()
 
 func _style_focus(node: Node) -> void:
 	if node is Button:
