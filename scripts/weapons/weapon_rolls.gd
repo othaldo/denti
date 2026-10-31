@@ -46,6 +46,9 @@ static func resolve(data: WeaponData, value: Dictionary, upgrades: Dictionary = 
 	var result := template.duplicate() as WeaponData
 	result.rolls = values
 	result.chest_upgrades = {"mk": maxi(int(upgrades.get("mk", 0)), 0), "range": maxf(float(upgrades.get("range", 0)), 0), "tempo": maxf(float(upgrades.get("tempo", 0)), 0)}
+	if upgrades.has("mk_points"):
+		result.chest_upgrades["mk_points"] = maxi(int(upgrades.mk_points), 0)
+		result.chest_upgrades["mk_legacy"] = clampi(int(upgrades.get("mk_legacy", 0)), 0, int(result.chest_upgrades.mk))
 	for key in ["crit", "crit_damage", "knockback"]:
 		result.chest_upgrades[key] = maxf(float(upgrades.get(key, 0)), 0)
 	var levels := int(result.chest_upgrades.mk)
@@ -84,7 +87,8 @@ static func fuse(primary: WeaponData, partner: WeaponData) -> WeaponData:
 
 
 static func with_affixes(data: WeaponData, affixes: Array[Dictionary]) -> WeaponData:
-	var upgrades := {"mk": int(data.chest_upgrades.get("mk", 0)), "range": 0.0, "tempo": 0.0, "crit": 0.0, "crit_damage": 0.0, "knockback": 0.0}
+	var upgrades := data.chest_upgrades.duplicate(true)
+	upgrades.merge({"mk": int(data.chest_upgrades.get("mk", 0)), "range": 0.0, "tempo": 0.0, "crit": 0.0, "crit_damage": 0.0, "knockback": 0.0}, true)
 	for affix in affixes:
 		var definition := WeaponAffixes.by_id(StringName(affix.id))
 		if definition.stat_key != &"":

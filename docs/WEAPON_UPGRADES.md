@@ -1,6 +1,6 @@
 # Waffen gezielt verzaubern
 
-Stand: 27.10.2026. Im echten Belohnungsablauf einschließlich aller Waffenformen umgesetzt.
+Stand: 31.10.2026. Im echten Belohnungsablauf einschließlich aller Waffenformen umgesetzt.
 
 ![Waffenverzauberung mit Mk-Sperre](screenshots/weapon_upgrades/overview_1280x720.png)
 
@@ -37,6 +37,11 @@ Stand: 27.10.2026. Im echten Belohnungsablauf einschließlich aller Waffenformen
   ausgebauter oder fehlender Ausrüstung kann die Ansicht ebenfalls beendet werden.
 - Neue Kapseln würfeln keine Effekt-Seltenheiten, Slotfunde oder zusätzlichen Mk-Stufen.
   Mk-Fusion und individuell gewürfelte Shop-Grundwerte bleiben eigene Systeme.
+- **Gezielter Mk-V+-Aufstieg ab Mk IV:** je Wurzel 3/5/8/12 Punkte und
+  60/100/160/240 Gold für V/VI/VII/VIII. Zwei-Wurzel-Waffen bezahlen das Doppelte;
+  im Endlosmodus wächst der Goldanteil mit dem Endlosfaktor. Jeder Aufstieg gibt
+  additiv +10 % Basisschaden und +3 % Tempo/Reichweite. Er nutzt dieselbe Vorschau,
+  Rückgängig und Bestätigung wie Effektränge. [Regeln und Nachschubmessung](WEAPON_ASCENSION.md).
 
 ## Oberfläche
 

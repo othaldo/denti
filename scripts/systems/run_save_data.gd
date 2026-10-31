@@ -245,5 +245,7 @@ static func _valid_scalars(value: Variant, field: String = "") -> bool:
 static func _invalid_upgrade_metadata(value: Dictionary) -> bool:
 	if value.has("economy_version") and not (value.economy_version is int or value.economy_version is float): return true
 	for action in value.get("actions", []):
-		if action is Dictionary and action.has("cost") and not (action.cost is int or action.cost is float): return true
+		if action is Dictionary:
+			for key in ["cost", "coins", "from_mk"]:
+				if action.has(key) and not (action[key] is int or action[key] is float): return true
 	return false

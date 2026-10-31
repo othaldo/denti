@@ -3,6 +3,7 @@ extends CanvasLayer
 
 signal completed
 signal upgrade_requested(uid: String, id: StringName)
+signal ascension_requested(uid: String)
 signal undo_requested
 signal selection_changed
 
@@ -31,6 +32,9 @@ var remaining := 0
 var picking_slot := -1
 var selected_effect: StringName = &""
 var selection_preview: Control
+var ascension_button: Button
+var coins := 0
+var wave_number := 1
 
 
 func _ready() -> void:
@@ -76,7 +80,9 @@ func _ready() -> void:
 	root_control.add_child(details)
 
 
-func show_upgrades(upgrades: WeaponUpgradeState, equipment: WeaponLoadout, player_stats: PlayerStats, items: ItemInventory, upgrade_income: WeaponUpgradeIncome = null) -> void:
+func show_upgrades(upgrades: WeaponUpgradeState, equipment: WeaponLoadout, player_stats: PlayerStats, items: ItemInventory, upgrade_income: WeaponUpgradeIncome = null, available_coins: int = 0, wave: int = 1) -> void:
+	coins = available_coins
+	wave_number = wave
 	income = upgrade_income
 	state = upgrades
 	loadout = equipment
@@ -90,7 +96,7 @@ func show_upgrades(upgrades: WeaponUpgradeState, equipment: WeaponLoadout, playe
 
 
 func refresh() -> void:
-	models = WeaponUpgradePresentation.equipment(state, loadout, stats, item_context)
+	models = WeaponUpgradePresentation.equipment(state, loadout, stats, item_context, coins, wave_number)
 	remaining = state.remaining()
 	selected_weapon = 0
 	for index in models.size():
@@ -105,7 +111,7 @@ func refresh() -> void:
 
 func _refresh() -> void:
 	if stage == null: return
-	count_label.text = "%d Punkt%s" % [remaining, "" if remaining == 1 else "e"]
+	count_label.text = _balance_text()
 	back_button.text = "Zurück" if picking_slot >= 0 else "Rückgängig"
 	back_button.disabled = picking_slot < 0 and state.actions.is_empty()
 	back_button.visible = not back_button.disabled
@@ -119,17 +125,21 @@ func _layout(extent: Vector2) -> void:
 	if body == null or extent.x < 1: return
 	for child in body.get_children(): child.free()
 	selection_preview = null
+	ascension_button = null
 	weapon_buttons.clear()
 	upgrade_buttons.clear()
 	effect_buttons.clear()
 	var narrow := extent.x < 720
 	var compact := extent.x < 420
+	finish_button.custom_minimum_size.x = 110 if compact else 180
+	finish_button.add_theme_font_size_override("font_size", 16 if compact else 20)
+	back_button.add_theme_font_size_override("font_size", 14 if compact else 20)
 	stage.title_label.text = "Verzaubern" if compact else "Waffen verzaubern"
-	count_label.text = "%d Punkt%s" % [remaining, "" if remaining == 1 else "e"]
+	count_label.text = _balance_text()
 	count_label.tooltip_text = "%d Punkte · 2 je Kapsel" % remaining
 	if income != null: count_label.tooltip_text += "\n" + income.details()
 	stage.title_label.add_theme_font_size_override("font_size", 22 if compact else 32)
-	count_label.add_theme_font_size_override("font_size", 16 if compact else 20)
+	count_label.add_theme_font_size_override("font_size", 14 if compact else 18)
 	var top := 0.0
 	if models.is_empty():
 		_text(body, "Keine Waffe ausgerüstet", Rect2(0, 12, extent.x, 40), 22)
@@ -143,7 +153,11 @@ func _layout(extent: Vector2) -> void:
 		_text(body, current_data().display_name, Rect2(0, 136, 122, 48), 17, DentiUIStyle.INK, true)
 		_text(body, current_data().roots_text(), Rect2(0, 188, 122, 24), 14, DentiUIStyle.MUTED)
 		var right := Rect2(144, 0, extent.x - 144, 0)
-		var height := _picker(right) if picking_slot >= 0 else _slots(right, true)
+		var height := 0.0
+		if picking_slot >= 0: height = _picker(right)
+		else:
+			_ascension(Rect2(right.position, Vector2(right.size.x, 72)))
+			height = 84 + _slots(Rect2(right.position + Vector2(0, 84), right.size), true)
 		body.custom_minimum_size.y = maxf(212, height) + 8
 	elif narrow:
 		var columns := models.size()
@@ -154,6 +168,8 @@ func _layout(extent: Vector2) -> void:
 		top = ceili(float(models.size()) / columns) * (cell + 8) + 4
 		_hero(Rect2(0, top, extent.x, 64), true)
 		top += 72 if compact else 98
+		_ascension(Rect2(0, top, extent.x, 72))
+		top += 84
 		var height := _picker(Rect2(0, top, extent.x, 0)) if picking_slot >= 0 else _slots(Rect2(0, top, extent.x, 0), true)
 		body.custom_minimum_size.y = top + height + 8
 	else:
@@ -221,12 +237,13 @@ func _hero(rect: Rect2, compact: bool) -> void:
 		_text(body, data.display_name, Rect2(rect.position + Vector2(64, 0), Vector2(rect.size.x - 64, 30)), 22)
 		_root_info(Rect2(rect.position + Vector2(64, 29), Vector2(rect.size.x - 64, 36)))
 		return
-	var art_height := minf(280, rect.size.y - 140)
-	var y := rect.position.y + (rect.size.y - art_height - 100) / 2
+	var art_height := minf(260, rect.size.y - 200)
+	var y := rect.position.y + (rect.size.y - art_height - 182) / 2
 	_art(body, RunSetupPresentation.weapon_icon(data), Rect2(rect.position.x + 28, y, rect.size.x - 56, art_height))
-	var title := _text(body, data.display_name, Rect2(rect.position.x, y + art_height + 24, rect.size.x, 38), 28)
+	var title := _text(body, data.display_name, Rect2(rect.position.x, y + art_height + 16, rect.size.x, 38), 28)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_root_info(Rect2(rect.position.x, y + art_height + 67, rect.size.x, 40))
+	_root_info(Rect2(rect.position.x, y + art_height + 58, rect.size.x, 40))
+	_ascension(Rect2(rect.position.x, y + art_height + 110, rect.size.x, 72))
 
 
 func _root_info(rect: Rect2) -> void:
@@ -236,7 +253,7 @@ func _root_info(rect: Rect2) -> void:
 	MenuStyle.quiet(button)
 	button.add_theme_font_size_override("font_size", 16)
 	var text_width := button.get_theme_font("font").get_string_size(meta, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
-	_art(button, preload("res://assets/ui/info.svg"), Rect2((rect.size.x + text_width) / 2 + 8, (rect.size.y - 14) / 2, 14, 14))
+	_art(button, preload("res://assets/ui/info.svg"), Rect2(minf((rect.size.x + text_width) / 2 + 8, rect.size.x - 18), (rect.size.y - 14) / 2, 14, 14))
 	button.tooltip_text = "Effektstärke nach Wurzeln. Details öffnen."
 	button.pressed.connect(func() -> void:
 		details.present(data.display_name, models[selected_weapon].root_info, button))
@@ -419,6 +436,24 @@ func _save_cursor() -> void:
 
 func _cost() -> int:
 	return int(models[selected_weapon].cost) if not models.is_empty() else 1
+
+
+func _balance_text() -> String:
+	var gold := state.remaining_gold(coins) if state != null else coins
+	return "%d Punkt%s\n%d Gold" % [remaining, "" if remaining == 1 else "e", gold]
+
+
+func _ascension(rect: Rect2, short: bool = false) -> void:
+	var offer: Dictionary = models[selected_weapon].ascension
+	var locked := int(models[selected_weapon].tier) < WeaponLoadout.MAX_TIER
+	var title := "Ab Mk IV" if locked else ("Aufstieg · " if short else "Aufsteigen · ") + str(offer.next)
+	var price := "%d P · %d G" % [offer.cost, offer.coins] if short else "%d Punkte · %d Gold" % [offer.cost, offer.coins]
+	ascension_button = _button(body, title if locked else title + "\n" + price, rect)
+	ascension_button.add_theme_font_size_override("font_size", 13 if short else (14 if rect.size.x < 220 else 16))
+	ascension_button.disabled = not str(offer.blocked).is_empty()
+	ascension_button.tooltip_text = (str(offer.blocked) + "\n" if ascension_button.disabled else "") + "%s · %d Punkte · %d Gold\n+10 %% Basisschaden · +3 %% Tempo und Reichweite\nFertig übernimmt den Aufstieg; Rückgängig nimmt ihn zurück." % [offer.next, offer.cost, offer.coins]
+	ascension_button.pressed.connect(func() -> void:
+		ascension_requested.emit(str(models[selected_weapon].uid)))
 
 
 func _selection_allowed() -> bool:

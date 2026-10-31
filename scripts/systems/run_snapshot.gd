@@ -106,7 +106,7 @@ static func restore(game, saved: Dictionary) -> void:
 	game.items.restore(saved.get("items", {}))
 	game.relics.restore(saved.get("relics", {}))
 	game.rewards.restore(saved.get("rewards", {}))
-	game.rewards.weapon_upgrades.validate(player.loadout)
+	game.rewards.weapon_upgrades.validate(player.loadout, game.coins, wave.current_wave)
 	for entry in saved.get("enemies", []):
 		var enemy_data := _enemy_from_path(str(entry.get("type", "")))
 		if enemy_data == null:

@@ -146,6 +146,7 @@ func _ready() -> void:
 	weapon_enchantment_panel = WeaponEnchantmentPanel.new()
 	add_child(weapon_enchantment_panel)
 	weapon_enchantment_panel.upgrade_requested.connect(_on_weapon_upgrade_requested)
+	weapon_enchantment_panel.ascension_requested.connect(_on_weapon_ascension_requested)
 	weapon_enchantment_panel.undo_requested.connect(_on_weapon_upgrade_undo)
 	weapon_enchantment_panel.completed.connect(_on_weapon_upgrades_completed)
 	weapon_fusion_panel = WeaponFusionPanel.new()
@@ -742,14 +743,26 @@ func _on_weapon_upgrade_undo() -> void:
 	_save_run()
 
 
+func _on_weapon_ascension_requested(uid: String) -> void:
+	if rewards.step != PostWaveRewards.Step.WEAPONS and not (in_shop and weapon_enchantment_panel.visible): return
+	if rewards.weapon_upgrades.plan_ascension(player.loadout, uid, coins, wave.current_wave):
+		weapon_enchantment_panel.refresh()
+		_save_run()
+
+
 func _on_weapon_upgrades_completed() -> void:
+	var gold := rewards.weapon_upgrades.gold_spent()
 	if in_shop and weapon_enchantment_panel.visible:
-		if not rewards.weapon_upgrades.commit(player.loadout): return
+		if not rewards.weapon_upgrades.commit(player.loadout, coins, wave.current_wave): return
+		coins -= gold
+		telemetry.record_shop_spending(&"mk_upgrade", gold)
 		weapon_enchantment_panel.hide()
 		_update_shop_panel()
 		_save_run()
 		return
-	if not rewards.resolve_weapons(player.loadout): return
+	if not rewards.resolve_weapons(player.loadout, coins, wave.current_wave): return
+	coins -= gold
+	telemetry.record_shop_spending(&"mk_upgrade", gold)
 	weapon_enchantment_panel.hide()
 	_advance_post_wave_rewards()
 
@@ -872,7 +885,7 @@ func _advance_post_wave_rewards() -> void:
 		PostWaveRewards.Step.WEAPONS:
 			choice_panel.hide()
 			weapon_chest_panel.hide()
-			weapon_enchantment_panel.show_upgrades(rewards.weapon_upgrades, player.loadout, player.stats, items, rewards.upgrade_income)
+			weapon_enchantment_panel.show_upgrades(rewards.weapon_upgrades, player.loadout, player.stats, items, rewards.upgrade_income, coins, wave.current_wave)
 			get_tree().paused = true
 			_save_run()
 		PostWaveRewards.Step.CHESTS:
@@ -1079,10 +1092,11 @@ func _on_fusion_confirmed(plan: WeaponFusionPlan) -> void:
 
 
 func _on_shop_enchant() -> void:
-	if not in_shop or weapon_fusion_panel.visible or rewards.weapon_upgrades.points <= 0: return
+	if not in_shop or weapon_fusion_panel.visible: return
+	if rewards.weapon_upgrades.points <= 0 and not player.loadout.equipped().any(func(weapon: WeaponInstance) -> bool: return weapon.tier >= WeaponLoadout.MAX_TIER): return
 	shop_panel.close_details()
 	shop_panel.hide()
-	weapon_enchantment_panel.show_upgrades(rewards.weapon_upgrades, player.loadout, player.stats, items, rewards.upgrade_income)
+	weapon_enchantment_panel.show_upgrades(rewards.weapon_upgrades, player.loadout, player.stats, items, rewards.upgrade_income, coins, wave.current_wave)
 
 
 func _on_shop_reroll() -> void:

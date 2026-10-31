@@ -84,6 +84,8 @@ func _run() -> void:
 		sprite_enemy.free()
 	game.wave.active = true
 	game.wave.spawn_cooldown = 999.0
+	# This assertion isolates XP/coin drops; capsule/reward flow has its own tests.
+	game.rewards.chest_spawned = true
 
 	var guaranteed_coin_enemy: EnemyData = load("res://data/enemies/plaque.tres").duplicate()
 	guaranteed_coin_enemy.coin_drop_chance = 1.0
@@ -244,9 +246,9 @@ func _run() -> void:
 			game.boss.boss_phase_timer = 0.0
 			game.boss.boss_damage_budget = game.boss.health
 			game.boss.take_damage(99999.0)
-			if not await _complete_intermission(game):
-				_fail("boss rewards did not finish")
-				return
+		if expected_wave < WaveController.MAX_WAVES and not await _complete_intermission(game):
+			_fail("wave %d rewards did not finish (step %d)" % [expected_wave, game.rewards.step])
+			return
 		if expected_wave < WaveController.MAX_WAVES and not game.get_node("ShopPanel").visible:
 			_fail("shop missing between waves")
 			return
@@ -280,6 +282,8 @@ func _run() -> void:
 
 func _complete_intermission(game: Node2D) -> bool:
 	for frame in 180:
+		if game.weapon_enchantment_panel.visible:
+			game._on_weapon_upgrades_completed()
 		if game.weapon_chest_panel.visible:
 			game._on_affix_scrapped()
 		if game.choice_panel.visible and (game.choice_panel.mode == &"upgrade" or game.choice_panel.mode == &"chest" or game.choice_panel.mode == &"relic"):

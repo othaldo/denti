@@ -31,6 +31,7 @@ func configure(primary: WeaponInstance, partner: WeaponInstance, result: WeaponD
 		if weapon == null: continue
 		ingredients.append(snapshot(weapon))
 		source_data.append(weapon.data)
+		total_points += WeaponAscension.invested_points(weapon.data)
 		for entry: Dictionary in weapon.affixes:
 			var invested := WeaponUpgrades.level(entry) * WeaponUpgrades.cost(weapon.data)
 			total_points += invested
@@ -104,7 +105,7 @@ func effects() -> Array[Dictionary]:
 
 
 func refund() -> int:
-	var kept := 0
+	var kept := WeaponAscension.invested_points(result_data)
 	for entry in effects(): kept += WeaponUpgrades.level(entry) * WeaponUpgrades.cost(result_data)
 	return maxi(total_points - kept, 0)
 

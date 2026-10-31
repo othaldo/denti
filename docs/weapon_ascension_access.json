@@ -1,0 +1,139 @@
+{
+	"limits": "Spawn-plan forecast, not measured play. 25/50/75% sampled kills. No luck, items, gold carriers, goblin or overtime. Ordinary capsules only. All points saved. Shop focuses only the two-root starting brush, buys matching copies and fuses, at most one paid reroll/wave; no other purchases. Affordability includes current gold and real shop prices. Successful-run medians exclude runs that never reach the target.",
+	"rows": [
+		{
+			"difficulty": "easy",
+			"kill_fraction": 0.25,
+			"mk_iv_by_20": 30,
+			"mk_iv_median_wave": 8,
+			"mk_v_affordable_by_20": 30,
+			"mk_v_median_wave": 11,
+			"runs": 30,
+			"unspent_points_at_10": 7.46666666666667,
+			"unspent_points_at_20": 24.6
+		},
+		{
+			"difficulty": "easy",
+			"kill_fraction": 0.5,
+			"mk_iv_by_20": 30,
+			"mk_iv_median_wave": 5,
+			"mk_v_affordable_by_20": 30,
+			"mk_v_median_wave": 8,
+			"runs": 30,
+			"unspent_points_at_10": 11.5333333333333,
+			"unspent_points_at_20": 43.2
+		},
+		{
+			"difficulty": "easy",
+			"kill_fraction": 0.75,
+			"mk_iv_by_20": 30,
+			"mk_iv_median_wave": 5,
+			"mk_v_affordable_by_20": 30,
+			"mk_v_median_wave": 6,
+			"runs": 30,
+			"unspent_points_at_10": 19.8666666666667,
+			"unspent_points_at_20": 62.9333333333333
+		},
+		{
+			"difficulty": "normal",
+			"kill_fraction": 0.25,
+			"mk_iv_by_20": 30,
+			"mk_iv_median_wave": 7,
+			"mk_v_affordable_by_20": 30,
+			"mk_v_median_wave": 10,
+			"runs": 30,
+			"unspent_points_at_10": 8.73333333333333,
+			"unspent_points_at_20": 29.4666666666667
+		},
+		{
+			"difficulty": "normal",
+			"kill_fraction": 0.5,
+			"mk_iv_by_20": 30,
+			"mk_iv_median_wave": 5,
+			"mk_v_affordable_by_20": 30,
+			"mk_v_median_wave": 7,
+			"runs": 30,
+			"unspent_points_at_10": 13.6666666666667,
+			"unspent_points_at_20": 51.7333333333333
+		},
+		{
+			"difficulty": "normal",
+			"kill_fraction": 0.75,
+			"mk_iv_by_20": 30,
+			"mk_iv_median_wave": 5,
+			"mk_v_affordable_by_20": 30,
+			"mk_v_median_wave": 6,
+			"runs": 30,
+			"unspent_points_at_10": 23.6,
+			"unspent_points_at_20": 71.4666666666667
+		},
+		{
+			"difficulty": "hard",
+			"kill_fraction": 0.25,
+			"mk_iv_by_20": 30,
+			"mk_iv_median_wave": 6,
+			"mk_v_affordable_by_20": 30,
+			"mk_v_median_wave": 10,
+			"runs": 30,
+			"unspent_points_at_10": 10.8,
+			"unspent_points_at_20": 36.9333333333333
+		},
+		{
+			"difficulty": "hard",
+			"kill_fraction": 0.5,
+			"mk_iv_by_20": 30,
+			"mk_iv_median_wave": 5,
+			"mk_v_affordable_by_20": 30,
+			"mk_v_median_wave": 7,
+			"runs": 30,
+			"unspent_points_at_10": 16.5333333333333,
+			"unspent_points_at_20": 60.6666666666667
+		},
+		{
+			"difficulty": "hard",
+			"kill_fraction": 0.75,
+			"mk_iv_by_20": 30,
+			"mk_iv_median_wave": 5,
+			"mk_v_affordable_by_20": 30,
+			"mk_v_median_wave": 5,
+			"runs": 30,
+			"unspent_points_at_10": 28.0666666666667,
+			"unspent_points_at_20": 80.7333333333333
+		},
+		{
+			"difficulty": "hell",
+			"kill_fraction": 0.25,
+			"mk_iv_by_20": 30,
+			"mk_iv_median_wave": 6,
+			"mk_v_affordable_by_20": 30,
+			"mk_v_median_wave": 9,
+			"runs": 30,
+			"unspent_points_at_10": 13.4,
+			"unspent_points_at_20": 44.5333333333333
+		},
+		{
+			"difficulty": "hell",
+			"kill_fraction": 0.5,
+			"mk_iv_by_20": 30,
+			"mk_iv_median_wave": 5,
+			"mk_v_affordable_by_20": 30,
+			"mk_v_median_wave": 6,
+			"runs": 30,
+			"unspent_points_at_10": 21.3333333333333,
+			"unspent_points_at_20": 69.6
+		},
+		{
+			"difficulty": "hell",
+			"kill_fraction": 0.75,
+			"mk_iv_by_20": 30,
+			"mk_iv_median_wave": 5,
+			"mk_v_affordable_by_20": 30,
+			"mk_v_median_wave": 5,
+			"runs": 30,
+			"unspent_points_at_10": 32.5333333333333,
+			"unspent_points_at_20": 88.2666666666667
+		}
+	],
+	"seed": 20261031,
+	"trials_per_scenario": 30
+}

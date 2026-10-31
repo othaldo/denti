@@ -2,11 +2,14 @@ class_name WeaponUpgradePresentation
 extends RefCounted
 
 
-static func equipment(state: WeaponUpgradeState, loadout: WeaponLoadout, stats: PlayerStats, items: ItemInventory) -> Array[Dictionary]:
+static func equipment(state: WeaponUpgradeState, loadout: WeaponLoadout, stats: PlayerStats, items: ItemInventory, coins: int = 0, wave: int = 1) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for weapon in loadout.equipped():
 		var values := state.preview(weapon)
-		var preview_data := WeaponRolls.with_affixes(weapon.data, values)
+		var preview_data := state.preview_data(weapon)
+		var ascension := WeaponAscension.quote(preview_data, wave)
+		ascension["next"] = WeaponPresentation.tier_text(WeaponAscension.advance(preview_data), WeaponLoadout.MAX_TIER)
+		ascension["blocked"] = state.ascension_blocked(weapon, coins, wave)
 		var effects: Array[Dictionary] = []
 		var options: Array[Dictionary] = []
 		for entry in values:
@@ -27,8 +30,8 @@ static func equipment(state: WeaponUpgradeState, loadout: WeaponLoadout, stats: 
 				"blocked": "Bereits auf dieser Waffe" if existing else WeaponUpgrades.blocked_reason(values, definition.id, weapon.tier)})
 		var roots_info := "%s · %d/%d Plätze\n\nMk I: 1 Platz\nMk II: 2 Plätze\nMk III: 3 Plätze\nMk IV: 4 Plätze\n\nAktivieren startet bei 1/10. Jeder Schritt kostet %d Punkt(e) nach den Wurzelkosten. Eine Kapsel gibt 2 Punkte.\nSchadenseffekte teilen ihr Wurzelbudget auf die Basis-Angriffspause und die anfänglichen Projektile auf. Kontroll- und Heileffekte behalten ihre eigenen Obergrenzen." % [weapon.data.roots_text(), values.size(), WeaponUpgrades.slots(weapon.tier), WeaponUpgrades.cost(weapon.data)]
 		result.append({"id": weapon.data.id, "uid": weapon.instance_uid, "data": preview_data, "tier": weapon.tier,
-			"name": WeaponPresentation.name_for(weapon.data, values), "meta": WeaponPresentation.tier_text(weapon.data, weapon.tier) + " · " + weapon.data.roots_text(),
-			"cost": WeaponUpgrades.cost(weapon.data), "slot_count": WeaponUpgrades.slots(weapon.tier), "root_info": roots_info + "\n\nEine Waffe trägt höchstens ein Element. Blutung und Wasser zählen als Elemente. Weitere Plätze können Verstärkungen tragen.", "element": WeaponAffixes.element(values), "effects": effects, "options": options})
+			"name": WeaponPresentation.name_for(preview_data, values), "meta": WeaponPresentation.tier_text(preview_data, weapon.tier) + " · " + weapon.data.roots_text(), "ascension": ascension,
+			"cost": WeaponUpgrades.cost(weapon.data), "slot_count": WeaponUpgrades.slots(weapon.tier), "root_info": roots_info + "\n\nAb Mk IV ist Aufsteigen mit Punkten und Gold möglich. Die vier Effektplätze bleiben erhalten.\n\nEine Waffe trägt höchstens ein Element. Blutung und Wasser zählen als Elemente. Weitere Plätze können Verstärkungen tragen.", "element": WeaponAffixes.element(values), "effects": effects, "options": options})
 	return result
 
 

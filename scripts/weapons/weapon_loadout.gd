@@ -64,9 +64,7 @@ func fusion_plan(index: int, recipe: WeaponEvolutionRecipe = null, items: ItemIn
 		if items == null or not evolution_ready(index, recipe, items): return null
 		var other_id := recipe.partner_weapon if primary.data.id == recipe.base_weapon else recipe.base_weapon
 		partner = _find_tier(other_id, MAX_TIER, primary) if other_id != &"" else null
-		var upgrades := primary.data.chest_upgrades.duplicate(true)
-		if partner != null: upgrades["mk"] = int(upgrades.get("mk", 0)) + int(partner.data.chest_upgrades.get("mk", 0))
-		result = WeaponRolls.resolve(recipe.result, primary.data.rolls, upgrades)
+		result = WeaponAscension.inherit(recipe.result, primary.data, partner.data if partner != null else null)
 	else:
 		partner = fusion_partner(index)
 		if partner == null: return null

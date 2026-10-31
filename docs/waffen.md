@@ -79,8 +79,8 @@ Die Ausrüstung fasst sechs Wurzelplätze. Waffen mit einer Wurzel belegen einen
 Bohrung verursacht je nach Stufe 25–40 % mehr Schaden gegen Bosse. Schnitt verursacht 15 % mehr Schaden gegen nahezu unverletzte Gegner und baut Blutung auf. Wasserflosser-Treffer machen Gegner nass. Nass senkt das Lauftempo um 20 %, bei Eliten um 10 % und bei Bossen um 5 %; angekündigte Anstürme bleiben unverändert. Erneute Treffer frischen die Dauer auf, ohne den Slow zu stapeln. [Nassregeln und Tests](WET_STATUS.md). Die anderen Schadensarten unterscheiden sich über Reichweite, Projektiltempo, Durchschlag, Rückstoß, Strahl oder Flächentreffer. Einige Gegner haben Affix-Resistenzen, sichtbar als farbige Schilde; Grundtreffer bleiben davon unberührt. Die Waffen haben individuelle Schadensmultiplikatoren und ausgewählte Eigenschaften, die mit ihrer Stufe wachsen.
 
 Weiterentwickelte Spezialwaffen sind eigenständige Waffenformen. Ihre Mk-Stufe
-bleibt erhalten. Neue Waffenpunkte öffnen keine Mk-Stufen über IV; ältere gespeicherte
-Mk-Funde und höhere Stufen bleiben erhalten. Ein grüner Aufwärtspfeil direkt auf der ausgerüsteten
+kann ab IV mit Waffenpunkten und Gold gezielt auf V und höher steigen; alte
+Mk-Funde bleiben erhalten. [Preise, Vorschau und Vererbung](WEAPON_ASCENSION.md). Ein grüner Aufwärtspfeil direkt auf der ausgerüsteten
 Waffe im Shop zeigt eine verfügbare Fusion oder Evolution an. Er erscheint nur,
 wenn der passende Fusionspartner beziehungsweise alle Evolutionszutaten vorliegen.
 
@@ -142,25 +142,17 @@ die [Loadout-Vorschau](screenshots/weapon_loadouts.gif) zeigt diese Anordnung.
 
 ## Individuelle Verzauberungen
 
-Upgrade-Kapseln verbessern eine gewählte Waffeninstanz nach dem Wellenende.
-Feuer (2 s), Gift (5 s) und Affix-Blutung (3 s) verursachen zusätzlichen Schaden
-über Zeit. Eis und Elektro treffen direkt; Eis verlangsamt außerdem kurz.
-Treffer und DoTs zeigen Zahlen in Elementfarbe. Passende Gegnerresistenzen
-sind durch kleine farbige Schilde erkennbar. Weitere Funde desselben Affixes
-erhöhen bei gleicher Seltenheit die Ausbaustufe I–III und danach die Seltenheit.
-Höhere Funde überspringen Stufen, niedrigere geben 50/25/12,5 % Fortschritt.
-Nach Legendär III wachsen passende legendäre Beiträge mit jeweils +2 weiter.
-Waffen beginnen mit einem Platz für Verzauberungen; Slotfunde öffnen bis zu vier Slots.
-Auch Reichweite und Angriffstempo können als Waffen-Affixe gefunden werden.
-Ein neuer Effekt bei vollen Slots benötigt eine ausdrückliche Ersatzwahl.
+Upgrade-Kapseln geben je zwei Waffenpunkte. Nach dem Loot-Sweep verteilst du sie
+gezielt auf Effekte von 1/10 bis 10/10: ein Punkt je belegter Wurzel und Rang.
+Mk I–IV öffnen einen bis vier Plätze. Pro Waffe ist ein Element wählbar; weitere
+Plätze tragen Verstärkungen. Punkte bleiben über Wellen und Fortsetzen erhalten.
+Ab Mk IV steht zusätzlich der gezielte Mk-V+-Aufstieg gegen Punkte und Gold bereit.
 
-Fusion verbindet gleiche Effekte nach den Ausbau-Regeln; unterschiedliche werden
-übernommen, sofern sie in die höhere Slotkapazität beider Waffen passen. Bei zu vielen
-verschiedenen Effekten bleibt die Fusion gesperrt und verbraucht keine Waffe.
-Evolutionen erhalten die Affixe ebenfalls. Ein Kauf mit automatischer Fusion erhält
-alle Affixe der vorhandenen Waffe. Details und Pause-Menü zeigen Affixe separat.
-
-Feuer, Eis, Gift, Blutung und Elektro haben eigene Build-Rollen. Nässe bereitet Elektro und Wasseritems vor, Weihe belohnt kritische Treffer und Lebensraub heilt begrenzt. [Alle zehn Verzauberungen, Synergien, Grenzen und Tests](WEAPON_AFFIXES.md).
+Bei einer Fusion entscheidet die Vorschau über übernommene Effekte; ungenutzte
+Punkte werden erstattet. Bezahlte Mk-Stufen werden aus ihrem Punktebudget zu den
+Wurzelkosten des Ergebnisses übernommen. Alte Effekte und offene alte Kapseln
+bleiben kompatibel. [Verzauberungsregeln](WEAPON_UPGRADES.md) und
+[Mk-Aufstieg](WEAPON_ASCENSION.md) beschreiben aktuelle Kosten und Grenzen.
 
 Shopwaffen haben zusätzlich individuelle Rolls für Grundschaden (60–170 %),
 Angriffspause (72–135 %), Reichweite (80–125 %) und Crit (+0–10 Prozentpunkte).

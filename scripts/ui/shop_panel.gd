@@ -286,8 +286,8 @@ func present(model: ShopViewData) -> void:
 	continue_button.tooltip_text = continue_button.text
 	continue_button.disabled = equipment.is_empty()
 	var points := model.upgrade_points
-	enchant_button.visible = points > 0
-	enchant_button.text = "Verzaubern · %d" % points
+	enchant_button.visible = points > 0 or equipment.any(func(entry: Dictionary) -> bool: return int(entry.get("tier", 1)) >= WeaponLoadout.MAX_TIER)
+	enchant_button.text = "Verzaubern · %d" % points if points > 0 else "Verzaubern"
 	if selected_kind == "equipment":
 		var found := -1
 		for index in equipment.size():

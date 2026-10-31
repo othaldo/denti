@@ -203,6 +203,8 @@ static func apply(weapon: WeaponInstance, option: Dictionary, replace: int = -1)
 		return true
 	if option.id == "mk":
 		var upgrades := weapon.data.chest_upgrades.duplicate(true)
+		if upgrades.has("mk_points"):
+			upgrades["mk_legacy"] = int(upgrades.get("mk_legacy", 0)) + 1
 		upgrades["mk"] = int(upgrades.get("mk", 0)) + 1
 		weapon.data = WeaponRolls.resolve(weapon.data, weapon.data.rolls, upgrades)
 		weapon.refresh_affix_stats()

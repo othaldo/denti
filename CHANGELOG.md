@@ -4,6 +4,8 @@ Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü an
 
 ## Noch ohne neue Versionsnummer — 27.10.2026
 
+- **Mk V und höher gezielt kaufen:** Ab Mk IV bietet Verzaubern den Waffenaufstieg gegen Punkte und Gold. Kosten steigen je Stufe und Wurzel; Endlos skaliert den Goldanteil. Gemeinsame Vorschau, Rückgängig, kompatibles Fortsetzen und budgettreue Vererbung bei Evolutionen. [Preise, native Ansichten und Nachschub-Prognose](docs/WEAPON_ASCENSION.md).
+
 - **Rahmenlose Dentipedia:** sechs direkt sichtbare Kategorien statt Dropdown, ruhigere Eintragsliste und größere Waffenvorschau mit kompakter Mk-Tabelle. Im schmalen Hochformat wechseln Liste und Details; Zurück/Escape bewahren Suche, Listenposition und Spielpause. [Native Ansichten](docs/DENTIPEDIA.md).
 
 - **Imperator als aktiverer Finalboss:** Schnellere, weitreichend angekündigte Urteilsfächer, neu gezielter Portalanschluss und wechselnde Nervenringe/-fächer. Die Wache dreht während der Kernöffnung; Hell erhält vier Wiederholungen. Vollständige Warnungen, kompatibles Fortsetzen und 144 vollständige verlangsamte Ausweichrouten geprüft. [Verhalten und Vergleich](docs/EMPEROR_FINALE.md).

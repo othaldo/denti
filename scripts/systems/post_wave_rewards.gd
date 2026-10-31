@@ -70,8 +70,8 @@ func queue_affix_chest(value: Dictionary, items: ItemInventory = null) -> void:
 			pending_chests.append(chest)
 
 
-func resolve_weapons(loadout: WeaponLoadout) -> bool:
-	if step != Step.WEAPONS or not weapon_upgrades.commit(loadout): return false
+func resolve_weapons(loadout: WeaponLoadout, coins: int = 0, wave: int = 1) -> bool:
+	if step != Step.WEAPONS or not weapon_upgrades.commit(loadout, coins, wave): return false
 	_update_choice_total()
 	choices_resolved += 1
 	weapons_resolved = true

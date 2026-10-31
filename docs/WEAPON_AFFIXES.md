@@ -303,6 +303,10 @@ mit laufendem Feuer und Gift.
 
 ## Waffenwerte, vier Slots und Mk-Funde
 
+Die folgenden Kapsel-Fundregeln beschreiben den Altbestand. Neue Kapseln geben
+Waffenpunkte; Mk V+ wird gezielt gegen Punkte und Gold gekauft. Aktuelle Regeln:
+[Waffenverzauberung](WEAPON_UPGRADES.md) und [Mk-Aufstieg](WEAPON_ASCENSION.md).
+
 Reichweite und Angriffstempo sind eigene Affixe und belegen einen der bis zu vier
 Slots. Ihre Ausbauwerte sind Prozentpunkte (3/4/5, 7/9/11, 14/17/20, 25/30/35).
 Weitere legendäre Beiträge liefern +2 Prozentpunkte. Reichweite multipliziert
