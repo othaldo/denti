@@ -84,6 +84,7 @@ func _run() -> void:
 	_check(view.keyboard_focus and view.icon_buttons[0].get_theme_stylebox("focus") is StyleBoxFlat, "keyboard focus has no separate visual treatment")
 	var mouse := InputEventMouseMotion.new()
 	mouse.position = Vector2(10, 10)
+	mouse.relative = Vector2(8, 0)
 	root.push_input(mouse)
 	await _settle()
 	_check(not view.keyboard_focus and view.icon_buttons[0].get_theme_stylebox("focus") is StyleBoxEmpty, "pointer focus looks like selection")

@@ -205,7 +205,21 @@ gemeinsame Paare in einer festen unteren Aktionsleiste. Sie haben eine gemeinsam
 Mittellinie, konsistente Größen und Abstände und eigenen reservierten Platz.
 Keine schwebenden Tastensymbole an Karten- oder Button-Ecken. Fokus und Auswahl
 bleiben eigenständige visuelle Zustände; die Leiste nennt ausschließlich im
-aktuellen Kontext nutzbare Aktionen. Siehe [Recherche und Umsetzung](CONTROLLER_SUPPORT.md#tastensymbole).
+aktuellen Kontext nutzbare Aktionen. Schalterrahmen schließen Text und Schalter
+mit Innenabstand ein; ein geparkter Mauszeiger erzeugt bei Controllerbedienung
+keinen zweiten Auswahlrahmen. Shopangebote bleiben ein Fokusziel: A/Kreuz kauft,
+Y/Dreieck merkt, RB/R1 öffnet optionale Details. Auf schmalen Bildschirmen darf
+die Leiste in lesbare Zeilen umbrechen. Siehe [Recherche und Umsetzung](CONTROLLER_SUPPORT.md#controller-modus).
+
+Bei aktiver Controller-Bedienung ersetzt die Leiste die Shop-Buttons für
+Würfeln, Verzaubern und Wellenstart. LB/L1 öffnet Verzaubern, RT/R2 startet die
+Welle nach einem frischen Triggerdruck. Würfelkosten bleiben in der Leiste
+sichtbar; gesperrte oder durch Modals verdeckte Aktionen bleiben gesperrt.
+Maus-, Touch- und Tastaturbedienung stellen die Bildschirm-Buttons wieder her.
+Auch beim Verzaubern ersetzt die Controller-Leiste die Footer-Buttons.
+Nur X/Quadrat bestätigt beziehungsweise beendet den Entwurf mit „Fertig“.
+B/Kreis verlässt die Effektauswahl oder schließt Details und bestätigt nie
+den Entwurf. Der frei gewordene Footer-Platz gehört dem Inhalt.
 
 - Vor/Zurück und bereits besuchte Schritte behalten die Wahl. Der Schrittverlauf
   zeigt keine noch nicht existierende Klasse. Später wird der Klassenschritt

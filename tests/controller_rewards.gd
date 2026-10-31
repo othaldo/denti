@@ -31,6 +31,7 @@ func _run() -> void:
 	var session := root.get_node("GameSession")
 	session.save_path = "user://controller_rewards_run.json"
 	session.resume_requested = false
+	root.get_node("GameInput").device_info_provider = func(_device: int) -> Dictionary: return {"name": "Xbox Controller", "mapped": true}
 	session.pending_start_weapon_id = &"magic_toothbrush"
 	session.reduced_ui_motion = true
 	AudioServer.set_bus_mute(0, true)

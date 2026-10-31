@@ -102,18 +102,6 @@ func _layout_content() -> void:
 	if is_inside_tree() and content != null and content.has_method("layout_in"):
 		content.call("layout_in", body_scroll.size - body_scroll.get_theme_stylebox("panel").get_minimum_size())
 
-func _input(event: InputEvent) -> void:
-	if not is_visible_in_tree(): return
-	if event is InputEventJoypadMotion and absf(event.axis_value) < 0.5: return
-	var using_keyboard := event is InputEventKey or event is InputEventJoypadButton or event is InputEventJoypadMotion
-	if event is InputEventMouse or event is InputEventScreenTouch or event is InputEventScreenDrag:
-		using_keyboard = false
-	elif not using_keyboard:
-		return
-	if using_keyboard == keyboard_focus: return
-	keyboard_focus = using_keyboard
-	_refresh_focus()
-
 func _refresh_focus() -> void:
 	_style_focus(panel)
 

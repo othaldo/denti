@@ -34,12 +34,23 @@ static func backdrop(parent: Control, overlay: bool = false) -> void:
 	parent.add_child(glow)
 
 static func focus(control: Control, keyboard: bool, radius: int = 12) -> void:
+	# A parked pointer must not suggest a second keyboard/controller selection.
+	if control is BaseButton:
+		if keyboard:
+			if not control.has_meta("menu_pointer_hover"):
+				control.set_meta("menu_pointer_hover", control.get_theme_stylebox("hover"))
+			control.add_theme_stylebox_override("hover", control.get_theme_stylebox("normal"))
+		elif control.has_meta("menu_pointer_hover"):
+			control.add_theme_stylebox_override("hover", control.get_meta("menu_pointer_hover"))
+			control.remove_meta("menu_pointer_hover")
 	if not keyboard:
 		control.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 		return
 	var outline := box(Color.TRANSPARENT, DentiUIStyle.INK, radius, 2)
 	outline.draw_center = false
-	outline.set_expand_margin_all(-4)
+	# Toggle rows include their own inner padding; the frame encloses the label
+	# and painted switch instead of cutting through either edge.
+	outline.set_expand_margin_all(0 if control is CheckButton else -4)
 	control.add_theme_stylebox_override("focus", outline)
 
 static func action(button: Button, primary: bool = false, quiet_action: bool = false) -> void:

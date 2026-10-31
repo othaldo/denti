@@ -17,6 +17,7 @@ var graphics_option: OptionButton
 var ui_sound_toggle: CheckButton
 var motion_toggle: CheckButton
 var controller_option: OptionButton
+var controller_row: BoxContainer
 
 var session: Node
 var columns: GridContainer
@@ -27,8 +28,14 @@ var _built := false
 
 class SettingToggle extends CheckButton:
 
+	const INNER_PADDING := 10.0
+	const SWITCH_SIZE := Vector2(44, 24)
+
+	func switch_rect() -> Rect2:
+		return Rect2(Vector2(size.x - SWITCH_SIZE.x - INNER_PADDING, (size.y - SWITCH_SIZE.y) * 0.5), SWITCH_SIZE)
+
 	func _draw() -> void:
-		var track_rect := Rect2(Vector2(size.x - 44.0, (size.y - 24.0) * 0.5), Vector2(44, 24))
+		var track_rect := switch_rect()
 		var fill := DentiUIStyle.GOLD if button_pressed else DentiUIStyle.RAISED.lightened(0.10)
 		var track := StyleBoxFlat.new()
 		track.bg_color = fill
@@ -150,8 +157,8 @@ func _toggle(parent: VBoxContainer, title: String, method: StringName) -> CheckB
 		toggle.add_theme_icon_override(icon, blank)
 	for state in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
 		var surface := StyleBoxEmpty.new()
-		surface.content_margin_left = 0.0
-		surface.content_margin_right = 60.0
+		surface.content_margin_left = SettingToggle.INNER_PADDING
+		surface.content_margin_right = 60.0 + SettingToggle.INNER_PADDING
 		toggle.add_theme_stylebox_override(state, surface)
 	toggle.add_theme_stylebox_override("focus", _focus_box())
 	parent.add_child(toggle)
@@ -193,17 +200,19 @@ func _graphics_row(parent: VBoxContainer) -> void:
 
 
 func _controller_row(parent: VBoxContainer) -> void:
-	var row := HBoxContainer.new()
+	var row := BoxContainer.new()
+	controller_row = row
 	row.custom_minimum_size.y = ROW_HEIGHT
 	row.add_theme_constant_override("separation", 12)
 	parent.add_child(row)
-	var label := _label("Tastensymbole")
+	var label := _label("Controller-Modus")
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(label)
 	controller_option = OptionButton.new()
 	controller_option.name = "ControllerSymbols"
 	controller_option.custom_minimum_size.y = ROW_HEIGHT
-	for title in ["Automatisch", "Xbox", "PlayStation"]: controller_option.add_item(title)
+	controller_option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	for title in ["Automatisch", "Xbox", "PlayStation", "Aus"]: controller_option.add_item(title)
 	DentiUIStyle.style_button(controller_option)
 	controller_option.add_theme_font_size_override("font_size", LABEL_SIZE)
 	controller_option.add_theme_stylebox_override("focus", _focus_box())
@@ -245,7 +254,7 @@ func _sync_values() -> void:
 	ui_sound_toggle.set_pressed_no_signal(bool(session.get("ui_sounds")))
 	motion_toggle.set_pressed_no_signal(bool(session.get("reduced_ui_motion")))
 	graphics_option.select(clampi(int(session.get("graphics_mode")), 0, 2))
-	controller_option.select(clampi(int(session.get("controller_symbols")), 0, 2))
+	controller_option.select(clampi(int(session.get("controller_symbols")), 0, SessionSettings.ControllerMode.DISABLED))
 	for toggle: CheckButton in [fullscreen_toggle, fps_toggle, ui_sound_toggle, motion_toggle]:
 		toggle.queue_redraw()
 
@@ -261,3 +270,4 @@ func _update_columns() -> void:
 	if not is_instance_valid(columns):
 		return
 	columns.columns = 2 if size.x >= TWO_COLUMN_WIDTH else 1
+	if is_instance_valid(controller_row): controller_row.vertical = size.x < 400

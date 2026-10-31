@@ -44,6 +44,7 @@ func _ready() -> void:
 	footer = HBoxContainer.new()
 	footer.add_theme_constant_override("separation", 12)
 	panel.add_child(footer)
+	footer.visibility_changed.connect(_schedule_layout)
 	resized.connect(_layout)
 	get_viewport().size_changed.connect(_schedule_layout)
 	ControllerFocus.register(self, Callable(), 10)
@@ -96,7 +97,8 @@ func _layout() -> void:
 	footer.position = Vector2(0, bounds.size.y - 48)
 	footer.size = Vector2(bounds.size.x, 48)
 	body_scroll.position = Vector2(0, 64)
-	body_scroll.size = Vector2(bounds.size.x, maxf(48, bounds.size.y - 128))
+	var footer_space := 64.0 if footer.visible else 0.0
+	body_scroll.size = Vector2(bounds.size.x, maxf(48, bounds.size.y - 64 - footer_space))
 	_layout_content()
 	refresh_focus()
 
@@ -109,18 +111,6 @@ func _layout_content() -> void:
 	if not extent.is_equal_approx(last_extent):
 		last_extent = extent
 		layout_changed.emit(extent)
-
-func _input(event: InputEvent) -> void:
-	if not is_visible_in_tree(): return
-	if event is InputEventJoypadMotion and absf(event.axis_value) < 0.5: return
-	var using_keyboard := event is InputEventKey or event is InputEventJoypadButton or event is InputEventJoypadMotion
-	if event is InputEventMouse or event is InputEventScreenTouch or event is InputEventScreenDrag:
-		using_keyboard = false
-	elif not using_keyboard:
-		return
-	if using_keyboard == keyboard_focus: return
-	keyboard_focus = using_keyboard
-	refresh_focus()
 
 func refresh_focus() -> void:
 	_style_focus(panel)

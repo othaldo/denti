@@ -54,6 +54,7 @@ func _ready() -> void:
 	loadout.stats = stats
 	dash.stats = stats
 	stats.changed.connect(dash.clamp_charge)
+	get_node("/root/GameInput").changed.connect(_sync_dash_input)
 	dash_trail = DashTrail.new()
 	dash_trail.z_index = -1
 	add_child(dash_trail)
@@ -128,6 +129,11 @@ func _unhandled_input(event: InputEvent) -> void:
 func _notification(what: int) -> void:
 	if what in [NOTIFICATION_APPLICATION_FOCUS_IN, NOTIFICATION_UNPAUSED]:
 		_dash_held = Input.is_action_pressed("dash")
+
+
+func _sync_dash_input() -> void:
+	if not Input.is_action_pressed("dash"):
+		_dash_held = false
 
 
 func swept_dash_this_frame() -> bool:

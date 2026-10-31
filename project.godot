@@ -94,6 +94,42 @@ ui_details={
 "deadzone": 0.5,
 "events": [Object(InputEventJoypadButton,"device":-1,"button_index":3)]
 }
+ui_pin={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"physical_keycode":80), Object(InputEventJoypadButton,"device":-1,"button_index":3)]
+}
+ui_shop_details={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"physical_keycode":73), Object(InputEventJoypadButton,"device":-1,"button_index":10)]
+}
+ui_enchant={
+"deadzone": 0.5,
+"events": [Object(InputEventJoypadButton,"device":-1,"button_index":9)]
+}
+ui_confirm={
+"deadzone": 0.5,
+"events": [Object(InputEventJoypadButton,"device":-1,"button_index":2)]
+}
+ui_undo={
+"deadzone": 0.5,
+"events": [Object(InputEventJoypadButton,"device":-1,"button_index":3)]
+}
+ui_previous_weapon={
+"deadzone": 0.5,
+"events": [Object(InputEventJoypadButton,"device":-1,"button_index":9)]
+}
+ui_next_weapon={
+"deadzone": 0.5,
+"events": [Object(InputEventJoypadButton,"device":-1,"button_index":10)]
+}
+ui_ascend={
+"deadzone": 0.8,
+"events": [Object(InputEventJoypadMotion,"device":-1,"axis":5,"axis_value":1.0)]
+}
+ui_next_wave={
+"deadzone": 0.8,
+"events": [Object(InputEventJoypadMotion,"device":-1,"axis":5,"axis_value":1.0)]
+}
 ui_reroll={
 "deadzone": 0.5,
 "events": [Object(InputEventJoypadButton,"device":-1,"button_index":2)]

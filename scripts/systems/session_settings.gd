@@ -1,6 +1,8 @@
 class_name SessionSettings
 extends RefCounted
 
+enum ControllerMode { AUTOMATIC, XBOX, PLAYSTATION, DISABLED }
+
 var master_volume_percent: int = 100
 var music_volume_percent: int = 100
 var sfx_volume_percent: int = 100
@@ -25,7 +27,7 @@ func load_from(path: String) -> void:
 		graphics_mode = clampi(int(config.get_value("display", "graphics_mode", 0)), 0, 2)
 		code_entry_unlocked = bool(config.get_value("debug", "code_entry_unlocked", false))
 		fullscreen = bool(config.get_value("display", "fullscreen", false))
-		controller_symbols = clampi(int(config.get_value("input", "controller_symbols", 0)), 0, 2)
+		controller_symbols = clampi(int(config.get_value("input", "controller_symbols", 0)), 0, ControllerMode.DISABLED)
 
 
 func save_to(path: String, fullscreen: bool) -> Error:

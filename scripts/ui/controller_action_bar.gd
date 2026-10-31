@@ -6,9 +6,11 @@ const GLYPH_SIZE := 24.0
 const FONT_SIZE := 16
 const ICON_GAP := 8.0
 const ACTION_GAP := 22.0
-const ORDER: Array[StringName] = [&"ui_accept", &"ui_cancel", &"ui_reroll", &"ui_details", &"pause"]
+const ROW_STEP := 40.0
+const ORDER: Array[StringName] = [&"ui_accept", &"ui_cancel", &"ui_reroll", &"ui_confirm", &"ui_pin", &"ui_undo", &"ui_details", &"ui_shop_details", &"ui_enchant", &"ui_previous_weapon", &"ui_next_weapon", &"ui_next_wave", &"ui_ascend", &"pause"]
 
 var strip: Control
+var panel: Panel
 var entries: Array[Dictionary] = []
 var glyph_rects: Array[Rect2] = []
 var text_rects: Array[Rect2] = []
@@ -16,11 +18,14 @@ var input: Node
 var font: Font
 var render_font_size := FONT_SIZE
 var signature := ""
+var reserved_height := HEIGHT
+var visible_height := HEIGHT
+var context_key := ""
 
 static func reserve(control: Control) -> float:
 	if not is_instance_valid(control) or not control.is_inside_tree() or control.is_queued_for_deletion(): return 0.0
 	var source := control.get_node_or_null("/root/GameInput")
-	return HEIGHT * MenuLayout.ui_scale(control.get_viewport()) if source != null and source.using_controller else 0.0
+	return source.action_bar.reserved_height * MenuLayout.ui_scale(control.get_viewport()) if source != null and source.using_controller else 0.0
 
 static func content_rect(control: Control, bounds: Rect2) -> Rect2:
 	bounds.size.y = maxf(1, bounds.size.y - reserve(control))
@@ -30,6 +35,15 @@ func _ready() -> void:
 	layer = 80
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	input = get_parent()
+	panel = Panel.new()
+	panel.name = "ControllerActionPanel"
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var surface := StyleBoxFlat.new()
+	surface.bg_color = DentiUIStyle.BACKGROUND
+	surface.border_color = DentiUIStyle.LINE
+	surface.border_width_top = 1
+	panel.add_theme_stylebox_override("panel", surface)
+	add_child(panel)
 	strip = Control.new()
 	strip.name = "ControllerActions"
 	strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -55,13 +69,30 @@ func _process(_delta: float) -> void:
 	var safe := HUDLayout.safe_rect(extent)
 	var margin := 12.0 if safe.size.x / factor < 600 else 48.0
 	strip.scale = Vector2.ONE * factor
-	strip.position = Vector2(safe.position.x + margin * factor, safe.end.y - HEIGHT * factor)
-	strip.size = Vector2(maxf(1, safe.size.x / factor - margin * 2), HEIGHT)
-	var state: String = str(entries) + input.family() + str(strip.size) + str(factor)
+	var width := maxf(1, safe.size.x / factor - margin * 2)
+	var owner: Node = scope
+	var parent: Node = scope
+	while parent != null:
+		if parent.has_meta("controller_bar_context"): owner = parent
+		parent = parent.get_parent()
+	var context := str(owner.get_instance_id()) + ":" + str(width)
+	var state: String = str(entries) + input.family() + context + str(factor)
 	if state != signature:
 		signature = state
-		_layout_entries()
+		var previous_height := reserved_height
+		var same_context := context == context_key
+		context_key = context
+		strip.size.x = width
+		_layout_entries(same_context)
+		if not is_equal_approx(previous_height, reserved_height): input.changed.emit()
 		strip.queue_redraw()
+	strip.position = Vector2(safe.position.x + margin * factor, safe.end.y - visible_height * factor)
+	strip.size = Vector2(width, visible_height)
+	# The background fills the safe width; the margins belong to its contents.
+	# Keep them separate so the action panel cannot appear cut off at either side.
+	panel.scale = strip.scale
+	panel.position = Vector2(safe.position.x, strip.position.y)
+	panel.size = Vector2(safe.size.x / factor, visible_height)
 
 func _actions(scope: Control) -> Array[Dictionary]:
 	if input.navigation.popup_open(): return [{"action": &"ui_cancel", "label": "Schließen"}]
@@ -72,6 +103,9 @@ func _actions(scope: Control) -> Array[Dictionary]:
 		var action := prompt.action
 		if action == &"ui_accept" or action == &"dash": continue
 		shortcuts[action] = _shortcut_label(prompt)
+	if scope.has_meta("controller_shortcuts"):
+		var provider: Callable = scope.get_meta("controller_shortcuts")
+		shortcuts.merge(provider.call(), true)
 	var back := str(scope.get_meta("controller_back", ""))
 	# A parent screen can provide its Back action to its nested layout stage.
 	var parent := scope.get_parent()
@@ -82,8 +116,12 @@ func _actions(scope: Control) -> Array[Dictionary]:
 		shortcuts[&"ui_cancel"] = back
 	var focused_shortcut := focus.get_node_or_null("ControllerPrompt") as ControllerPrompt if focus != null else null
 	var redundant := focused_shortcut != null and not focused_shortcut.focused_only and shortcuts.has(focused_shortcut.action)
+	if focused_shortcut != null and focused_shortcut.action in [&"ui_enchant", &"ui_next_wave"]: redundant = false
 	if ControllerFocus.contains(scope, focus) and ControllerFocus.available(focus) and not focus is Range and not focus is LineEdit and not redundant:
-		shortcuts[&"ui_accept"] = _selection_label(focus)
+		if focus.has_method("controller_actions"):
+			shortcuts.merge(focus.controller_actions(), true)
+		else:
+			shortcuts[&"ui_accept"] = _selection_label(focus)
 	var result: Array[Dictionary] = []
 	for action in ORDER:
 		if shortcuts.has(action): result.append({"action": action, "label": shortcuts[action]})
@@ -93,7 +131,10 @@ func _shortcut_label(prompt: ControllerPrompt) -> String:
 	match prompt.action:
 		&"ui_reroll": return "Würfeln"
 		&"ui_details": return "Details"
+		&"ui_enchant": return "Verzaubern"
+		&"ui_next_wave": return "Welle starten"
 		&"pause": return "Fortsetzen"
+		&"ui_confirm", &"ui_undo": return prompt.target.text
 	var label: String = prompt.target.text if prompt.target is Button else ""
 	return label if label in ["Zurück", "Schließen", "Abbrechen", "Fertig"] else "Zurück"
 
@@ -109,29 +150,34 @@ func _selection_label(control: Control) -> String:
 		if control.tooltip_text.begins_with("Kaufen"): return "Kaufen"
 	return "Wählen"
 
-func _layout_entries() -> void:
+func _layout_entries(keep_height: bool = false) -> void:
 	glyph_rects.clear()
 	text_rects.clear()
-	var gap := 14.0 if strip.size.x < 600 else ACTION_GAP
-	var total := 0.0
-	for entry in entries:
-		total += GLYPH_SIZE + ICON_GAP + font.get_string_size(entry.label, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE).x
-	total += gap * maxi(0, entries.size() - 1)
-	var factor := minf(1, strip.size.x / maxf(total, 1))
+	var compact := strip.size.x < 600
+	var gap := 10.0 if compact else ACTION_GAP
+	var icon_gap := 6.0 if compact else ICON_GAP
 	var x := 0.0
-	var side := GLYPH_SIZE * factor
-	render_font_size = maxi(14, floori(FONT_SIZE * factor))
+	var row := 0
+	render_font_size = FONT_SIZE
 	for entry in entries:
-		var glyph := Rect2(x, (HEIGHT - side) * 0.5, side, side)
-		glyph_rects.append(glyph)
-		x += side + ICON_GAP * factor
 		var width := font.get_string_size(entry.label, HORIZONTAL_ALIGNMENT_LEFT, -1, render_font_size).x
-		text_rects.append(Rect2(x, (HEIGHT - font.get_height(render_font_size)) * 0.5, width, font.get_height(render_font_size)))
-		x += width + gap * factor
+		var span := GLYPH_SIZE + icon_gap + width
+		if x > 0 and x + span > strip.size.x:
+			row += 1
+			x = 0
+		var y := row * ROW_STEP
+		var glyph := Rect2(x, y + (HEIGHT - GLYPH_SIZE) * 0.5, GLYPH_SIZE, GLYPH_SIZE)
+		glyph_rects.append(glyph)
+		x += GLYPH_SIZE + icon_gap
+		text_rects.append(Rect2(x, y + (HEIGHT - font.get_height(render_font_size)) * 0.5, width, font.get_height(render_font_size)))
+		x += width + gap
+	var height := HEIGHT + row * ROW_STEP
+	visible_height = height
+	# Retain the shop's space while inspecting or moving onto its other actions.
+	# Background offers must not jump when a modal has fewer available shortcuts.
+	reserved_height = maxf(reserved_height, height) if keep_height else height
 
 func _draw_strip() -> void:
-	strip.draw_rect(Rect2(Vector2.ZERO, strip.size), DentiUIStyle.BACKGROUND)
-	strip.draw_line(Vector2.ZERO, Vector2(strip.size.x, 0), DentiUIStyle.LINE, 1, true)
 	for index in mini(entries.size(), glyph_rects.size()):
 		var entry := entries[index]
 		strip.draw_texture_rect(ControllerGlyphs.texture(entry.action, input.family()), glyph_rects[index], false)

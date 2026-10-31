@@ -78,23 +78,35 @@ func _run() -> void:
 		_check(menu.page == &"options" and menu.stage.visible and not menu.stage.content is MenuHome, "settings did not replace the home content")
 		_check(screen.encloses(_physical_rect(menu.stage.panel)), "settings stage escapes the physical screen at %s" % extent)
 		var controls: Array[Control] = [menu.fullscreen_toggle, menu.fps_toggle, menu.graphics_option,
-			menu.master_slider, menu.music_slider, menu.sfx_slider, menu.ui_sound_toggle, menu.motion_toggle]
+			menu.master_slider, menu.music_slider, menu.sfx_slider, menu.ui_sound_toggle, menu.motion_toggle, menu.settings_view.controller_option]
 		for control in controls:
 			_touch_target(control, control.get_class())
+			var bounds := _physical_rect(control)
+			_check(bounds.position.x >= 0 and bounds.end.x <= extent.x + 0.5, "setting exceeds the screen width at %s" % extent)
 		_touch_target(menu.actions[&"back"], "settings back")
 		_check(screen.encloses(_physical_rect(menu.actions[&"back"])), "settings back action scrolled out of view")
 		_check(menu.stage.back_button.get_theme_stylebox("focus") is StyleBoxFlat, "keyboard focus has no distinct menu treatment")
+		menu.ui_sound_toggle.grab_focus()
+		await _settle()
+		var outline: StyleBoxFlat = menu.ui_sound_toggle.get_theme_stylebox("focus")
+		var track: Rect2 = menu.ui_sound_toggle.switch_rect()
+		_check(is_zero_approx(outline.expand_margin_left) and is_zero_approx(outline.expand_margin_right), "toggle focus cuts into its contents")
+		_check(track.position.x >= 8 and track.end.x <= menu.ui_sound_toggle.size.x - 8 and menu.ui_sound_toggle.get_theme_stylebox("normal").content_margin_left >= 8, "toggle contents have no inner space around their focus")
+		_check(menu.graphics_option.get_theme_stylebox("hover") == menu.graphics_option.get_theme_stylebox("normal"), "parked mouse still paints a second selection")
 		var pointer := InputEventMouseMotion.new()
 		pointer.position = Vector2(1, 1)
+		pointer.relative = Vector2(32, 0)
 		root.push_input(pointer)
 		await _settle()
-		_check(menu.stage.back_button.get_theme_stylebox("focus") is StyleBoxEmpty, "pointer focus retains the keyboard outline")
+		_check(menu.stage.back_button.get_theme_stylebox("focus") is StyleBoxEmpty, "pointer focus retains the keyboard outline at %s" % extent)
+		_check(menu.graphics_option.get_theme_stylebox("hover") != menu.graphics_option.get_theme_stylebox("normal"), "pointer mode did not restore hover feedback")
 		menu.stage.body_scroll.ensure_control_visible(menu.motion_toggle)
 		# Reaching the bottom manually must expose the last whole touch target;
 		# Godot's focus scroll rounds the requested position down to whole units.
 		menu.stage.body_scroll.scroll_vertical = ceili(menu.stage.body_scroll.get_v_scroll_bar().max_value)
 		await _settle()
 		_check(_physical_rect(menu.stage.body_scroll).grow(0.5).encloses(_physical_rect(menu.motion_toggle)), "last setting is unreachable at %s: scroll %s, setting %s" % [extent, _physical_rect(menu.stage.body_scroll), _physical_rect(menu.motion_toggle)])
+		_check(_physical_rect(menu.stage.body_scroll).grow(0.5).encloses(_physical_rect(menu.settings_view.controller_option)), "controller mode is unreachable at %s" % extent)
 		await _escape()
 		_check(menu.page == &"home" and menu.home.visible and current_scene == menu and not session.has_run(), "Escape from settings started combat or lost home")
 		_check(menu.actions[&"settings"].has_focus(), "return from settings lost the keyboard source focus")

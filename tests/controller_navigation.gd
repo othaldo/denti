@@ -36,6 +36,26 @@ func _scroll(value: float) -> void:
 	Input.flush_buffered_events()
 	await process_frame
 
+func _trigger(value: float) -> void:
+	var event := InputEventJoypadMotion.new()
+	event.device = 3
+	event.axis = JOY_AXIS_TRIGGER_RIGHT
+	event.axis_value = value
+	Input.parse_input_event(event)
+	Input.flush_buffered_events()
+	await _settle()
+
+func _key(code: Key) -> void:
+	for down in [true, false]:
+		var event := InputEventKey.new()
+		event.keycode = code
+		event.physical_keycode = code
+		event.pressed = down
+		Input.parse_input_event(event)
+		Input.flush_buffered_events()
+		await process_frame
+	await _settle()
+
 func _run() -> void:
 	var session := root.get_node("GameSession")
 	session.save_path = "user://controller_navigation_run.json"
@@ -43,6 +63,7 @@ func _run() -> void:
 	session.progression_path = "user://controller_navigation_progression.cfg"
 	session.resume_requested = false
 	session.selected_story_mode = false
+	root.get_node("GameInput").device_info_provider = func(_device: int) -> Dictionary: return {"name": "Xbox Controller", "mapped": true}
 	session.reduced_ui_motion = true
 	session.clear_run()
 	RunStore.clear(session.save_path + ".setup.json")
@@ -113,6 +134,15 @@ func _run() -> void:
 	await _joy(JOY_BUTTON_RIGHT_SHOULDER)
 	_check(game.player.dash.active and game.player.dash.charge < game.player.dash.capacity, "RB does not dash")
 	game.player.dash.finish()
+	await _button(JOY_BUTTON_RIGHT_SHOULDER, true)
+	session.set_controller_symbols(3)
+	_check(not game.player._dash_held and not Input.is_action_pressed("dash"), "disabling a held controller dash leaves a stale latch")
+	await _button(JOY_BUTTON_RIGHT_SHOULDER, false)
+	session.set_controller_symbols(1)
+	game.player.dash.reset_wave()
+	await _joy(JOY_BUTTON_RIGHT_SHOULDER)
+	_check(game.player.dash.active, "first dash after re-enabling the controller is lost")
+	game.player.dash.finish()
 	root.get_node("GameInput")._connection_changed(3, false)
 	_check(paused and game.game_menu.visible, "disconnect does not pause combat")
 	root.get_node("GameInput")._connection_changed(3, true)
@@ -125,19 +155,61 @@ func _run() -> void:
 	game._update_shop_panel()
 	await _settle()
 	var shop: ShopPanel = game.shop_panel
+	_check(not shop.reroll_button.visible and not shop.continue_button.visible and not shop.enchant_button.visible, "controller shop retains redundant action buttons")
+	await _joy(JOY_BUTTON_LEFT_SHOULDER)
+	_check(shop.visible and not game.weapon_enchantment_panel.visible, "LB opens hidden enchantments without an available action")
 	_check(ControllerFocus.available(root.gui_get_focus_owner()) and ControllerFocus.contains(shop.get_node("Root"), root.gui_get_focus_owner()), "shop opens without usable focus")
 	shop.offer_buttons[0].grab_focus()
+	var coins_before: int = game.coins
+	game.coins = 0
+	game._update_shop_panel()
 	await _joy(JOY_BUTTON_A)
-	_check(shop.expanded, "A does not inspect a shop offer")
+	_check(game.coins == 0 and game.shop.offers[0] != null and not shop.expanded, "unaffordable A purchases or opens a modal")
+	game.coins = coins_before
+	game._update_shop_panel()
+	var was_reserved: bool = game.shop.reserved[0]
+	await _joy(JOY_BUTTON_Y)
+	_check(game.shop.reserved[0] != was_reserved and game.coins == coins_before and not shop.expanded and shop.offer_buttons[0].has_focus(), "Y does not pin an offer directly without leaving its card")
+	await _joy(JOY_BUTTON_Y)
+	_check(game.shop.reserved[0] == was_reserved, "Y does not release a pinned offer")
+	var purchase_price: int = game.shop.offers[0].price
+	await _button(JOY_BUTTON_A, true)
+	await _button(JOY_BUTTON_A, true)
+	await _button(JOY_BUTTON_A, false)
+	await _settle()
+	_check(game.coins == coins_before - purchase_price and game.shop.offers[0] == null and not shop.expanded, "A does not buy exactly one offer directly from its card")
+	_check(ControllerFocus.available(root.gui_get_focus_owner()), "direct purchase leaves an unusable focus")
+	shop.offer_buttons[1].grab_focus()
+	await _joy(JOY_BUTTON_DPAD_RIGHT)
+	_check(shop.offer_buttons[2].has_focus(), "offer navigation falls into nested buy/pin buttons")
+	var pin_before: bool = game.shop.reserved[2]
+	for down in [true, false]:
+		var key := InputEventKey.new()
+		key.keycode = KEY_P
+		key.physical_keycode = KEY_P
+		key.pressed = down
+		Input.parse_input_event(key)
+		Input.flush_buffered_events()
+		await process_frame
+	_check(game.shop.reserved[2] != pin_before and not shop.expanded, "keyboard cannot pin a focused offer directly")
+	await _joy(JOY_BUTTON_DPAD_LEFT)
+	_check(shop.offer_buttons[1].has_focus(), "offer navigation does not return to its neighboring card")
+	await _joy(JOY_BUTTON_RIGHT_SHOULDER)
+	_check(shop.expanded, "RB does not inspect an offer separately")
 	for step in 16:
 		await _joy([JOY_BUTTON_DPAD_LEFT, JOY_BUTTON_DPAD_DOWN, JOY_BUTTON_DPAD_RIGHT, JOY_BUTTON_DPAD_UP][step % 4])
 		_check(ControllerFocus.contains(shop.detail_popup, root.gui_get_focus_owner()), "shop modal leaked focus to the background")
-	var coins_before: int = game.coins
+	coins_before = game.coins
 	await _joy(JOY_BUTTON_X)
 	_check(game.coins == coins_before, "reroll shortcut activated behind a modal")
+	await _joy(JOY_BUTTON_LEFT_SHOULDER)
+	await _trigger(0.0)
+	await _trigger(0.95)
+	_check(shop.expanded and shop.visible and not game.weapon_enchantment_panel.visible, "shop shortcuts escape the detail modal")
+	await _trigger(0.0)
 	shop.detail_buy_button.grab_focus()
 	await _joy(JOY_BUTTON_A)
-	_check(game.coins < coins_before and game.shop.offers[0] == null, "A does not purchase inspected equipment")
+	_check(game.coins < coins_before and game.shop.offers[1] == null, "A does not purchase the inspected offer")
 	_check(ControllerFocus.available(root.gui_get_focus_owner()), "purchase left focus on a sold/disabled button")
 	var equipment_button: Control = shop.inventory_row.get_child(0).get_child(0)
 	equipment_button.grab_focus()
@@ -151,10 +223,17 @@ func _run() -> void:
 	_check(paused and not game.game_menu.visible and ControllerFocus.contains(shop.get_node("Root"), root.gui_get_focus_owner()), "closing pause did not restore shop focus/pause state")
 	game.rewards.weapon_upgrades.points = 8
 	game._update_shop_panel()
+	await _key(KEY_TAB)
+	_check(shop.reroll_button.visible and shop.enchant_button.visible and shop.continue_button.visible, "keyboard mode does not restore shop action buttons")
 	shop.enchant_button.grab_focus()
+	coins_before = game.coins
 	await _joy(JOY_BUTTON_A)
+	_check(shop.visible and not game.weapon_enchantment_panel.visible and game.coins == coins_before, "switching away from a hidden footer focus purchases an offer")
+	await _key(KEY_TAB)
+	shop.enchant_button.grab_focus()
+	await _key(KEY_ENTER)
 	var enchant: WeaponEnchantmentPanel = game.weapon_enchantment_panel
-	_check(enchant.visible and not shop.visible, "A does not open enchantments")
+	_check(enchant.visible and not shop.visible, "focused keyboard button does not open enchantments")
 	enchant.upgrade_buttons[0].grab_focus()
 	await _joy(JOY_BUTTON_A)
 	_check(enchant.picking_slot == 0 and root.gui_get_focus_owner() in enchant.effect_buttons, "empty slot does not focus its effects")
@@ -181,16 +260,41 @@ func _run() -> void:
 	_check(enchant.selected_effect != &"" and root.gui_get_focus_owner().get_meta("controller_focus_key", "") == effect_key, "selecting an effect lost focus during rebuild")
 	await _joy(JOY_BUTTON_B)
 	_check(enchant.visible and enchant.picking_slot < 0, "B exited enchantments instead of its picker")
-	_check(enchant.finish_button.get_node("ControllerPrompt").action == &"ui_cancel", "enchantment overview omits the actual B/Circle finish action")
+	_check(enchant.finish_button.get_node("ControllerPrompt").action == &"ui_confirm", "enchantment overview omits the actual X/Square finish action")
 	await _joy(JOY_BUTTON_B)
-	_check(not enchant.visible and shop.visible and ControllerFocus.available(root.gui_get_focus_owner()), "B did not finish enchantments and restore shop")
+	_check(enchant.visible and not shop.visible, "B unexpectedly confirms the enchantment draft")
+	await _joy(JOY_BUTTON_X)
+	_check(not enchant.visible and shop.visible and ControllerFocus.available(root.gui_get_focus_owner()), "X did not finish enchantments and restore shop")
+	shop._default_focus().grab_focus()
+	await _joy(JOY_BUTTON_LEFT_SHOULDER)
+	_check(enchant.visible and not shop.visible, "LB does not open enchantments from another focused shop control")
+	await _joy(JOY_BUTTON_X)
+	_check(shop.visible and not enchant.visible, "shortcut enchantment view does not return to the shop")
 	root.size = Vector2i(320, 568)
 	root.content_scale_size = root.size
 	await _settle()
+	await _key(KEY_TAB)
 	shop.continue_button.grab_focus()
 	ControllerFocus.reveal(shop.continue_button)
 	_check(shop.main_scroll.follow_focus and shop.left_scroll.follow_focus and shop.details_scroll.follow_focus, "shop scroll containers do not follow navigation")
-	await _joy(JOY_BUTTON_A)
-	_check(not shop.visible and not paused and game.run_flow.is_combat(), "A did not start the next wave")
+	await _key(KEY_ENTER)
+	_check(not shop.visible and not paused and game.run_flow.is_combat(), "focused keyboard button did not start the next wave")
+	game.wave.active = false
+	game._open_shop()
+	await _settle()
+	shop._default_focus().grab_focus()
+	await _trigger(0.0)
+	await _trigger(InputMap.action_get_deadzone(&"ui_next_wave"))
+	_check(shop.visible, "trigger resting on its deadzone starts a wave")
+	await _trigger(0.95)
+	_check(not shop.visible and not paused and game.run_flow.is_combat(), "RT does not start a wave from another focused shop control")
+	game.wave.active = false
+	game._open_shop()
+	await _settle()
+	await _trigger(0.98)
+	_check(shop.visible and paused, "held trigger automatically starts another wave")
+	await _trigger(0.0)
+	await _trigger(0.95)
+	_check(not shop.visible and game.run_flow.is_combat(), "released trigger cannot start another wave")
 	print("Controller route through preparation, combat, pause, shop and enchantments checked")
 	finish(0 if failures.is_empty() else 1)

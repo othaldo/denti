@@ -40,6 +40,15 @@ func _run() -> void:
 			menu.settings_view.controller_option.grab_focus()
 			ControllerFocus.reveal(menu.settings_view.controller_option)
 			await _capture("settings", family, extent)
+			menu.settings_view.controller_option.show_popup()
+			await _capture("settings_modes", family, extent)
+			menu.settings_view.controller_option.get_popup().hide()
+			var pointer := InputEventMouseMotion.new()
+			pointer.position = menu.settings_view.controller_option.get_global_rect().get_center()
+			root.push_input(pointer, true)
+			menu.ui_sound_toggle.grab_focus()
+			ControllerFocus.reveal(menu.ui_sound_toggle)
+			await _capture("settings_focus", family, extent)
 			menu.free()
 			session.pending_start_weapon_id = &"magic_toothbrush"
 			var game: Node2D = load("res://scenes/game/game.tscn").instantiate()
@@ -51,9 +60,12 @@ func _run() -> void:
 			game.coins = 100
 			game.game_menu.open_pause()
 			await _capture("pause", family, extent)
+			game.game_menu.actions[&"dentipedia"].grab_focus()
+			await _capture("pause_dentipedia", family, extent)
 			game.game_menu.close_pause()
 			game._open_shop()
 			game.shop.offers.assign([ShopController.by_id(&"turbo_drill"), ShopController.by_id(&"conductive_varnish"), ShopController.by_id(&"damage_1"), ShopController.by_id(&"cavity_bounty")])
+			game.rewards.weapon_upgrades.points = 8
 			game._update_shop_panel()
 			game.shop_panel.offer_buttons[0].grab_focus()
 			await _capture("shop", family, extent)
@@ -62,13 +74,38 @@ func _run() -> void:
 			await _capture("details", family, extent)
 			game.shop_panel.close_details()
 			game.rewards.weapon_upgrades.points = 8
+			var original_equipment: Array = game.player.loadout.save_data()
+			game.player.loadout.restore([
+				{"id": "floss_garrote", "tier": 4, "affixes": [{"id": "ice", "level": 10, "damage": 1}, {"id": "leech", "level": 10, "damage": 1}, {"id": "tempo", "level": 10, "damage": 1}, {"id": "impact", "level": 10, "damage": 1}]},
+				{"id": "floss_garrote", "tier": 4, "affixes": [{"id": "poison", "level": 10, "damage": 1}, {"id": "tempo", "level": 10, "damage": 1}, {"id": "leech", "level": 10, "damage": 1}]},
+				{"id": "mouthwash_mortar", "tier": 4}])
 			game._on_shop_enchant()
 			for frame in 8: await process_frame
-			game.weapon_enchantment_panel.open_picker(0)
+			game.weapon_enchantment_panel.select_weapon(1)
 			for frame in 8: await process_frame
-			game.weapon_enchantment_panel.effect_buttons[0].grab_focus()
+			game.weapon_enchantment_panel.open_picker(3)
+			for frame in 8: await process_frame
+			for button in game.weapon_enchantment_panel.effect_buttons:
+				if button.get_meta("effect_id") == &"range":
+					button.pressed.emit()
+					break
+			for frame in 8: await process_frame
+			if extent.x >= 720:
+				game.weapon_enchantment_panel.weapon_buttons[0].grab_focus()
+			else:
+				for button in game.weapon_enchantment_panel.effect_buttons:
+					if button.get_meta("effect_id") == &"range":
+						button.grab_focus()
+						break
 			await _capture("enchant", family, extent)
+			game.weapon_enchantment_panel._confirm()
+			for frame in 8: await process_frame
+			game.weapon_enchantment_panel.upgrade(3)
+			await _capture("enchant_overview", family, extent)
 			game.weapon_enchantment_panel.hide()
+			game.rewards.weapon_upgrades.actions.clear()
+			game.rewards.weapon_upgrades.cursor.clear()
+			game.player.loadout.restore(original_equipment)
 			game.shop_panel.hide()
 			game.rewards.pending_levels = 1
 			game.rewards.step = PostWaveRewards.Step.LEVELS

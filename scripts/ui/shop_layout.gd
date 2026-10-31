@@ -112,7 +112,7 @@ static func build(view: ShopPanel) -> void:
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		view.offers_grid.add_child(card)
 		view.offer_buttons.append(card)
-		card.pressed.connect(view._select.bind("offer", index))
+		card.inspection_requested.connect(view._select.bind("offer", index))
 		card.purchase_requested.connect(func() -> void: view.buy_requested.emit(index))
 		card.reservation_requested.connect(func() -> void: view.reservation_requested.emit(index))
 	view.inventory_label = DentiUIComponents.label(left, "", 17)

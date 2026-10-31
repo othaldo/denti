@@ -36,6 +36,7 @@ var ascension_button: Button
 var coins := 0
 var wave_number := 1
 var focus_after_layout := ""
+var block_controller_accept := false
 
 
 func _ready() -> void:
@@ -79,7 +80,54 @@ func _ready() -> void:
 	stage.present("Waffen verzaubern", body)
 	details = RunSetupDetails.new()
 	root_control.add_child(details)
-	ControllerPrompt.bind(finish_button)
+	stage.set_meta("controller_shortcuts", _controller_shortcuts)
+	ControllerFocus.tag(finish_button, "enchant:confirm")
+	ControllerFocus.tag(back_button, "enchant:back")
+	ControllerPrompt.bind(finish_button, &"ui_confirm", false)
+	get_node("/root/GameInput").changed.connect(_sync_input_mode)
+	_sync_input_mode()
+
+func _controller_shortcuts() -> Dictionary:
+	var result := {}
+	if not visible or details.visible or state == null: return result
+	if picking_slot >= 0: result[&"ui_cancel"] = "Zurück"
+	if not finish_button.disabled: result[&"ui_confirm"] = finish_button.text
+	if picking_slot < 0 and not state.actions.is_empty(): result[&"ui_undo"] = "Rückgängig"
+	if models.size() > 1:
+		result[&"ui_previous_weapon"] = "Vorige Waffe"
+		result[&"ui_next_weapon"] = "Nächste Waffe"
+	if picking_slot < 0 and ControllerFocus.available(ascension_button):
+		result[&"ui_ascend"] = "Aufsteigen"
+	return result
+
+func _sync_input_mode() -> void:
+	var input := get_node("/root/GameInput")
+	var controller: bool = input.controller_active
+	var focus := get_viewport().gui_get_focus_owner()
+	var reflow := stage.footer.visible == controller
+	if visible and reflow and ControllerFocus.contains(body, focus) and focus_after_layout.is_empty():
+		focus_after_layout = str(focus.get_meta("controller_focus_key", ""))
+	if visible and controller and ControllerFocus.contains(stage.footer, focus):
+		# Consuming the press prevents A from applying an upgrade to whichever
+		# card receives focus when the desktop footer disappears.
+		block_controller_accept = true
+		focus_after_layout = ("effect:%s" % selected_effect if selected_effect != &"" else "picker") if picking_slot >= 0 else "weapon"
+	elif not controller:
+		block_controller_accept = false
+	stage.footer.visible = not controller
+	finish_button.visible = not controller
+	back_button.visible = not controller and not back_button.disabled
+	if visible and reflow:
+		# Rebuild and restore focus before the acquiring button reaches the GUI;
+		# otherwise the resize can delete its pressed target before release.
+		stage.relayout()
+		_focus_after_refresh()
+	if visible and input.navigation_active: input.navigation.ensure_focus.call_deferred()
+
+func _input(event: InputEvent) -> void:
+	if visible and block_controller_accept and event is InputEventJoypadButton and event.device == get_node("/root/GameInput").controller_device and event.button_index == JOY_BUTTON_A:
+		if not event.pressed: block_controller_accept = false
+		get_viewport().set_input_as_handled()
 
 
 func show_upgrades(upgrades: WeaponUpgradeState, equipment: WeaponLoadout, player_stats: PlayerStats, items: ItemInventory, upgrade_income: WeaponUpgradeIncome = null, available_coins: int = 0, wave: int = 1) -> void:
@@ -94,6 +142,7 @@ func show_upgrades(upgrades: WeaponUpgradeState, equipment: WeaponLoadout, playe
 	visible = true
 	stage.body_scroll.scroll_vertical = 0
 	refresh()
+	focus_after_layout = ("effect:%s" % selected_effect if selected_effect != &"" else "picker") if picking_slot >= 0 else "weapon"
 	DentiUIMotion.reveal(body)
 	if get_node("/root/GameInput").navigation_active:
 		get_node("/root/GameInput").navigation.ensure_focus.call_deferred()
@@ -118,17 +167,17 @@ func _refresh() -> void:
 	count_label.text = _balance_text()
 	back_button.text = "Zurück" if picking_slot >= 0 else "Rückgängig"
 	back_button.disabled = picking_slot < 0 and state.actions.is_empty()
-	back_button.visible = not back_button.disabled
 	finish_button.text = "Verzaubern · %d" % _cost() if picking_slot >= 0 else "Fertig"
 	finish_button.disabled = picking_slot >= 0 and (selected_effect == &"" or remaining < _cost() or not _selection_allowed())
 	var back_prompt := ControllerPrompt.bind(back_button)
-	back_prompt.action = &"ui_cancel" if picking_slot >= 0 else &"ui_accept"
-	back_prompt.focused_only = picking_slot < 0
+	back_prompt.action = &"ui_cancel" if picking_slot >= 0 else &"ui_undo"
+	back_prompt.focused_only = false
 	back_prompt.refresh()
 	var finish_prompt := ControllerPrompt.bind(finish_button)
-	finish_prompt.action = &"ui_accept" if picking_slot >= 0 else &"ui_cancel"
-	finish_prompt.focused_only = picking_slot >= 0
+	finish_prompt.action = &"ui_confirm"
+	finish_prompt.focused_only = false
 	finish_prompt.refresh()
+	_sync_input_mode()
 	_layout(stage.last_extent)
 	if picking_slot >= 0 and selected_effect != &"": _reveal_selection.call_deferred()
 
@@ -207,6 +256,34 @@ func _layout(extent: Vector2) -> void:
 	stage.refresh_focus()
 	for index in weapon_buttons.size():
 		DentiUIStyle.mark_card(weapon_buttons[index], DentiUIStyle.GOLD if selected_weapon == index else Color.TRANSPARENT)
+	_wire_controller_focus()
+	if not focus_after_layout.is_empty(): _focus_after_refresh.call_deferred()
+
+func _wire_controller_focus() -> void:
+	var choices: Array[Button] = []
+	for button in effect_buttons if picking_slot >= 0 else upgrade_buttons:
+		if ControllerFocus.available(button): choices.append(button)
+	var footer: Button
+	if ControllerFocus.available(finish_button): footer = finish_button
+	elif ControllerFocus.available(back_button): footer = back_button
+	if not choices.is_empty():
+		var bottom := -INF
+		for button in choices: bottom = maxf(bottom, button.get_global_rect().get_center().y)
+		for button in choices:
+			if footer != null and is_equal_approx(button.get_global_rect().get_center().y, bottom):
+				button.focus_neighbor_bottom = button.get_path_to(footer)
+		finish_button.focus_neighbor_top = finish_button.get_path_to(choices.back())
+	for button in weapon_buttons:
+		var right: Button = choices[0] if not choices.is_empty() else footer
+		if right != null: button.focus_neighbor_right = button.get_path_to(right)
+	if footer == null: return
+	if not weapon_buttons.is_empty():
+		weapon_buttons.back().focus_neighbor_bottom = weapon_buttons.back().get_path_to(footer)
+		back_button.focus_neighbor_top = back_button.get_path_to(weapon_buttons[selected_weapon])
+		if choices.is_empty(): finish_button.focus_neighbor_top = finish_button.get_path_to(weapon_buttons[selected_weapon])
+	if ControllerFocus.available(back_button): finish_button.focus_neighbor_left = finish_button.get_path_to(back_button)
+	if ControllerFocus.available(finish_button): back_button.focus_neighbor_right = back_button.get_path_to(finish_button)
+	if ControllerFocus.available(ascension_button): ascension_button.focus_neighbor_bottom = ascension_button.get_path_to(footer)
 
 
 func _weapon_card(index: int, rect: Rect2, compact: bool) -> void:
@@ -263,6 +340,7 @@ func _root_info(rect: Rect2) -> void:
 	var data := current_data()
 	var meta := str(models[selected_weapon].meta)
 	var button := _button(body, meta, rect)
+	ControllerFocus.tag(button, "weapon:details")
 	MenuStyle.quiet(button)
 	button.add_theme_font_size_override("font_size", 16)
 	var text_width := button.get_theme_font("font").get_string_size(meta, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
@@ -412,6 +490,11 @@ func select_weapon(index: int) -> void:
 	_save_cursor()
 	_refresh.call_deferred()
 
+func _cycle_weapon(direction: int) -> void:
+	if models.size() < 2: return
+	focus_after_layout = "weapon"
+	select_weapon(posmod(selected_weapon + direction, models.size()))
+
 
 func open_picker(slot: int) -> void:
 	if remaining < _cost() or slot < models[selected_weapon].effects.size() or slot >= int(models[selected_weapon].slot_count): return
@@ -420,12 +503,12 @@ func open_picker(slot: int) -> void:
 	focus_after_layout = "picker"
 	_save_cursor()
 	_refresh.call_deferred()
-	_focus_after_refresh.call_deferred()
 
 
 func upgrade(slot: int) -> void:
 	if remaining < _cost() or slot < 0 or slot >= models[selected_weapon].effects.size(): return
 	if int(models[selected_weapon].effects[slot].level) >= MAX_LEVEL: return
+	focus_after_layout = "upgrade:%d" % slot
 	upgrade_requested.emit(str(models[selected_weapon].uid), StringName(models[selected_weapon].effects[slot].id))
 
 
@@ -434,6 +517,7 @@ func _confirm() -> void:
 		completed.emit()
 		return
 	if remaining < _cost() or not _selection_allowed(): return
+	focus_after_layout = "upgrade:%d" % picking_slot
 	upgrade_requested.emit(str(models[selected_weapon].uid), selected_effect)
 
 
@@ -444,26 +528,52 @@ func _back() -> void:
 		selected_effect = &""
 		_save_cursor()
 	else:
-		undo_requested.emit()
+		_undo()
 	_refresh.call_deferred()
-	_focus_after_refresh.call_deferred()
+
+func _undo() -> void:
+	if state == null or state.actions.is_empty(): return
+	focus_after_layout = "weapon"
+	undo_requested.emit()
+
+func _ascend() -> void:
+	if not ControllerFocus.available(ascension_button): return
+	focus_after_layout = "ascension"
+	ascension_requested.emit(str(models[selected_weapon].uid))
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not visible or details.visible or not ControllerFocus.active(stage) or not event.is_action_pressed("ui_cancel"): return
-	if picking_slot >= 0: _back()
-	else: _confirm()
+	if not visible or details.visible or not ControllerFocus.active(stage): return
+	if event.is_action_pressed("ui_confirm"):
+		if not finish_button.disabled: _confirm()
+	elif event.is_action_pressed("ui_undo"):
+		if picking_slot < 0: _undo()
+	elif event.is_action_pressed("ui_previous_weapon"):
+		_cycle_weapon(-1)
+	elif event.is_action_pressed("ui_next_weapon"):
+		_cycle_weapon(1)
+	elif event.is_action_pressed("ui_ascend"):
+		if picking_slot < 0: _ascend()
+	elif event.is_action_pressed("ui_cancel"):
+		if picking_slot >= 0: _back()
+	else: return
 	get_viewport().set_input_as_handled()
 
 
 func _focus_after_refresh() -> void:
-	if not get_node("/root/GameInput").navigation_active: return
-	for control in effect_buttons if focus_after_layout == "picker" else upgrade_buttons:
-		if ControllerFocus.available(control) and (focus_after_layout == "picker" or str(control.get_meta("controller_focus_key", "")) == focus_after_layout):
+	if not visible or details.visible or focus_after_layout.is_empty() or not get_node("/root/GameInput").navigation_active: return
+	var desired := focus_after_layout
+	focus_after_layout = ""
+	var candidates: Array[Control] = ControllerFocus.controls(body)
+	if desired == "picker": candidates.assign(effect_buttons)
+	elif desired == "weapon" and selected_weapon < weapon_buttons.size(): candidates = [weapon_buttons[selected_weapon]]
+	elif desired == "ascension" and is_instance_valid(ascension_button): candidates = [ascension_button]
+	for control in candidates:
+		if ControllerFocus.available(control) and (desired in ["picker", "weapon", "ascension"] or str(control.get_meta("controller_focus_key", "")) == desired):
 			control.grab_focus()
 			ControllerFocus.reveal(control)
-			break
-	focus_after_layout = ""
+			return
+	if ControllerFocus.available(finish_button): finish_button.grab_focus()
 
 
 func _save_cursor() -> void:
@@ -490,8 +600,7 @@ func _ascension(rect: Rect2, short: bool = false) -> void:
 	ascension_button.add_theme_font_size_override("font_size", 13 if short else (14 if rect.size.x < 220 else 16))
 	ascension_button.disabled = not str(offer.blocked).is_empty()
 	ascension_button.tooltip_text = (str(offer.blocked) + "\n" if ascension_button.disabled else "") + "%s · %d Punkte · %d Gold\n+10 %% Basisschaden · +3 %% Tempo und Reichweite\nFertig übernimmt den Aufstieg; Rückgängig nimmt ihn zurück." % [offer.next, offer.cost, offer.coins]
-	ascension_button.pressed.connect(func() -> void:
-		ascension_requested.emit(str(models[selected_weapon].uid)))
+	ascension_button.pressed.connect(_ascend)
 	ControllerFocus.tag(ascension_button, "ascension")
 
 

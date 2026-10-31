@@ -101,6 +101,7 @@ func _ready() -> void:
 	scrap_button.pressed.connect(func() -> void: scrapped.emit())
 	stage.footer.add_child(scrap_button)
 	stage.layout_changed.connect(_on_stage_layout)
+	get_node("/root/GameInput").changed.connect(_sync_input_mode)
 	stage.present("Upgrade-Kapsel", rows)
 	_layout()
 
@@ -323,16 +324,10 @@ func _label_height(label: Label) -> float:
 	return ceilf(label.get_theme_font("font").get_height(label.get_theme_font_size("font_size")) * lines + label.get_theme_constant("line_spacing") * maxi(lines - 1, 0))
 
 
-func _input(event: InputEvent) -> void:
-	if event is InputEventJoypadMotion and absf(event.axis_value) < 0.5: return
+func _sync_input_mode() -> void:
 	if not visible:
 		return
-	if event is InputEventKey or event is InputEventJoypadButton or event is InputEventJoypadMotion:
-		_keyboard_focus = true
-	elif event is InputEventMouseButton or event is InputEventScreenTouch:
-		_keyboard_focus = false
-	else:
-		return
+	_keyboard_focus = get_node("/root/GameInput").navigation_active
 	for index in weapon_buttons.size():
 		var selector := weapon_buttons[index] as RunSetupChoice
 		selector.keyboard_focus = _keyboard_focus

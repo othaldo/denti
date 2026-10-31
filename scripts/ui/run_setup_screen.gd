@@ -231,21 +231,6 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.echo and event.is_action_pressed("ui_accept"):
 		get_viewport().set_input_as_handled()
 		return
-	if event is InputEventJoypadMotion and absf(event.axis_value) < 0.5: return
-	var using_keyboard := event is InputEventKey or event is InputEventJoypadButton or event is InputEventJoypadMotion
-	if event is InputEventMouse or event is InputEventScreenTouch or event is InputEventScreenDrag:
-		using_keyboard = false
-	elif not using_keyboard:
-		return
-	if using_keyboard == keyboard_focus: return
-	keyboard_focus = using_keyboard
-	details.keyboard_focus = keyboard_focus
-	difficulty_view.keyboard_focus = keyboard_focus
-	difficulty_view.refresh()
-	weapon_view.keyboard_focus = keyboard_focus
-	weapon_view.refresh()
-	for button in [back_button, confirm_button, details_button, details.close_button] + step_buttons.values():
-		RunSetupStyle.focus(button, keyboard_focus)
 
 func _sync_input_mode() -> void:
 	var input := get_node_or_null("/root/GameInput")

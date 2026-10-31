@@ -49,7 +49,7 @@ var graphics_mode: GraphicsMode:
 	set(value): settings_data.graphics_mode = value
 var controller_symbols: int:
 	get: return settings_data.controller_symbols
-	set(value): settings_data.controller_symbols = clampi(value, 0, 2)
+	set(value): settings_data.controller_symbols = clampi(value, 0, SessionSettings.ControllerMode.DISABLED)
 var adaptive_graphics: AdaptiveGraphics = ADAPTIVE_GRAPHICS.new()
 var graphics_sample_us: int = -1
 var application_focused: bool = true
@@ -144,7 +144,7 @@ func set_graphics_mode(mode: int) -> void:
 func set_controller_symbols(mode: int) -> void:
 	controller_symbols = mode
 	_save_settings()
-	get_node("/root/GameInput").changed.emit()
+	get_node("/root/GameInput").apply_preferences()
 
 
 func apply_graphics() -> void:

@@ -22,6 +22,11 @@ func _actions() -> Array[StringName]:
 func _geometry(content: Control) -> void:
 	_check(bar.visible and bar.strip.is_visible_in_tree(), "controller action bar is absent")
 	var bounds := bar.strip.get_global_rect()
+	var panel_bounds := bar.panel.get_global_rect()
+	var safe := HUDLayout.safe_rect(root.get_visible_rect().size)
+	_check(is_equal_approx(panel_bounds.position.x, safe.position.x) and is_equal_approx(panel_bounds.size.x, safe.size.x), "controller panel stops at the content margins instead of filling the safe width")
+	_check(panel_bounds.grow(0.5).encloses(bounds), "controller panel clips its button contents")
+	_check(is_equal_approx(panel_bounds.size.y, bounds.size.y), "controller panel does not grow with its rows")
 	_check(Rect2(Vector2.ZERO, root.get_visible_rect().size).grow(1).encloses(bounds), "action bar leaves the viewport")
 	_check(content.get_global_rect().end.y <= bounds.position.y + 1, "controller bar overlays the screen's content")
 	_check(bar.glyph_rects.size() == bar.entries.size(), "action bar did not lay out its entries")
@@ -31,8 +36,10 @@ func _geometry(content: Control) -> void:
 		_check(is_equal_approx(glyph.size.x, glyph.size.y), "controller glyph was stretched")
 		_check(glyph.end.x + 5 <= text.position.x and is_equal_approx(glyph.get_center().y, text.get_center().y), "glyph and action label are not an aligned pair")
 		_check(Rect2(Vector2.ZERO, bar.strip.size).grow(0.5).encloses(glyph) and Rect2(Vector2.ZERO, bar.strip.size).grow(0.5).encloses(text), "controller entry is clipped")
-		if index > 0:
+		if index > 0 and is_equal_approx(bar.glyph_rects[index - 1].position.y, glyph.position.y):
 			_check(bar.text_rects[index - 1].end.x + 8 <= glyph.position.x, "adjacent controller actions overlap")
+		for previous in index:
+			_check(not bar.text_rects[previous].intersects(text), "controller rows overlap")
 	for prompt: ControllerPrompt in get_nodes_in_group("controller_prompts"):
 		if not prompt.target is DashButton:
 			_check(not prompt.visible, "a controller glyph is still floating on a menu button/card")
@@ -88,7 +95,9 @@ func _run() -> void:
 		_check(Rect2(Vector2.ZERO, Vector2(extent)).grow(1).encloses(physical), "action bar escapes the physical mobile screen")
 		_check(physical.size.y >= 47 and physical.size.y <= 49, "mobile canvas scaling changes the physical action-row height")
 	var pointer := InputEventMouseMotion.new()
-	pointer.relative = Vector2(5, 0)
+	session.set_controller_symbols(0)
+	input.last_controller_ms = -1000
+	pointer.relative = Vector2(8, 0)
 	root.push_input(pointer)
 	await _settle()
 	_check(not bar.visible and is_zero_approx(ControllerActionBar.reserve(menu.setup_selector)), "pointer input does not restore the original screen area")
@@ -104,20 +113,79 @@ func _run() -> void:
 	game.wave.set_process(false)
 	game.coins = 100
 	game._open_shop()
+	game.rewards.weapon_upgrades.points = 8
+	game._update_shop_panel()
 	input.use_controller(4)
 	await _settle()
 	game.shop_panel.offer_buttons[0].grab_focus()
 	await _settle()
 	_geometry(game.shop_panel.get_node("Root/Center/Panel"))
 	_check(game.shop_panel.offer_buttons[0].icon_rect.get_global_rect().position.y >= game.shop_panel.main_scroll.get_global_rect().position.y - 1, "focusing a tall shop card clips its identifying artwork")
-	_check(_actions() == [&"ui_accept", &"ui_cancel", &"ui_reroll"], "shop lacks its contextual select/back/reroll row")
+	_check(_actions() == [&"ui_accept", &"ui_cancel", &"ui_reroll", &"ui_pin", &"ui_shop_details", &"ui_enchant", &"ui_next_wave"] and bar.entries[0].label == "Kaufen", "shop lacks its purchase/pin/enchant/start actions")
+	_check(not game.shop_panel.reroll_button.visible and not game.shop_panel.enchant_button.visible and not game.shop_panel.continue_button.visible, "controller action bar leaves duplicate shop buttons")
+	_check(bar.entries[2].label.contains(str(game.shop.reroll_cost)), "hidden reroll button loses its visible price")
+	session.set_controller_symbols(1)
+	input._set_mode(false, true)
+	await _settle()
+	for control in [game.shop_panel.enchant_button, game.shop_panel.continue_button]:
+		control.grab_focus()
+		await _settle()
+		_check(&"ui_accept" in _actions() and &"ui_enchant" in _actions() and &"ui_next_wave" in _actions(), "focused footer action lost A or its independent shortcut")
+	input.use_controller(4)
+	await _settle()
+	game.shop_panel.offer_buttons[0].grab_focus()
+	await _settle()
+	_check(bar.visible_height > ControllerActionBar.HEIGHT, "narrow shop shortcuts did not wrap into readable rows")
+	var before_inspection: Rect2 = game.shop_panel.offer_buttons[0].get_global_rect()
 	game.shop_panel._select("offer", 0)
 	game.shop_panel.detail_buy_button.grab_focus()
 	await _settle()
 	_geometry(game.shop_panel.detail_popup)
+	_check(game.shop_panel.offer_buttons[0].get_global_rect().is_equal_approx(before_inspection), "inspection reflowed the offers behind the popup")
 	_check(_actions() == [&"ui_accept", &"ui_cancel"] and bar.entries[0].label == "Kaufen", "inspection advertises a hidden reroll or the wrong primary action")
 	game.shop_panel.close_details()
 	game.shop_panel.hide()
+	var enchant: WeaponEnchantmentPanel = game.weapon_enchantment_panel
+	game.player.loadout.restore([{"id": "floss_garrote", "tier": 4}, {"id": "floss_garrote", "tier": 4}, {"id": "mouthwash_mortar", "tier": 4}])
+	enchant.show_upgrades(game.rewards.weapon_upgrades, game.player.loadout, game.player.stats, game.items, null, game.coins)
+	await _settle()
+	enchant.open_picker(0)
+	await _settle()
+	for effect in enchant.effect_buttons:
+		if effect.get_meta("effect_id") == &"range":
+			effect.pressed.emit()
+			break
+	for extent in [Vector2i(1280, 720), Vector2i(320, 568), Vector2i(568, 320), Vector2i(1920, 1080)]:
+		root.size = extent
+		root.content_scale_size = extent
+		for family in [1, 2]:
+			session.set_controller_symbols(family)
+			input.use_controller(4)
+			await _settle()
+			_geometry(enchant.stage.panel)
+			_check(&"ui_confirm" in _actions() and &"ui_previous_weapon" in _actions() and &"ui_next_weapon" in _actions(), "enchantment picker omits its direct action mappings")
+			var confirm: Dictionary = bar.entries.filter(func(entry: Dictionary) -> bool: return entry.action == &"ui_confirm")[0]
+			_check(confirm.label == enchant.finish_button.text and confirm.label.contains("2"), "enchantment shortcut omits its primary action or point price")
+		enchant.details.present("Details", "Modal", enchant.weapon_buttons[0])
+		await _settle()
+		_check(_actions() == [&"ui_cancel"], "enchantment mappings leak into its detail modal")
+		enchant.details.dismiss()
+	enchant._back()
+	await _settle()
+	for extent in [Vector2i(1280, 720), Vector2i(320, 568), Vector2i(568, 320)]:
+		root.size = extent
+		root.content_scale_size = extent
+		for family in [1, 2]:
+			session.set_controller_symbols(family)
+			input.use_controller(4)
+			await _settle()
+			_geometry(enchant.stage.panel)
+			var done := bar.entries.filter(func(entry: Dictionary) -> bool: return entry.label == "Fertig")
+			_check(done.size() == 1 and done[0].action == &"ui_confirm" and &"ui_cancel" not in _actions(), "finish must be mapped only to X/Square, never B/Circle")
+			_check(not enchant.stage.footer.visible and not enchant.finish_button.visible, "controller overview repeats the finish action as a screen button")
+			var footprint: float = enchant.stage.body_scroll.position.y + enchant.stage.body_scroll.size.y
+			_check(is_equal_approx(footprint, enchant.stage.panel.size.y), "hidden controller footer still wastes body space")
+	enchant.hide()
 	game.player.loadout.restore([
 		{"id": "magic_toothbrush", "tier": 1, "affixes": [{"id": "fire", "level": 7, "damage": 1.0}]},
 		{"id": "magic_toothbrush", "tier": 1, "affixes": [{"id": "fire", "level": 6, "damage": 1.0}]}])
@@ -138,5 +206,15 @@ func _run() -> void:
 	_check(not bar.visible, "menu action legend remains in active combat")
 	var prompt := game.hud.dash_indicator.get_node("ControllerPrompt") as ControllerPrompt
 	_check(prompt.visible and is_equal_approx(prompt.get_rect().get_center().x, game.hud.dash_indicator.size.x * 0.5) and prompt.position.y >= game.hud.dash_indicator.size.y, "dash glyph is not centered beneath its stamina indicator")
+	game.game_menu.open_pause()
+	session.set_controller_symbols(2)
+	for extent in [Vector2i(1280, 720), Vector2i(320, 568), Vector2i(568, 320)]:
+		root.size = extent
+		root.content_scale_size = extent
+		input.use_controller(4)
+		game.game_menu.actions[&"dentipedia"].grab_focus()
+		await _settle()
+		_geometry(game.game_menu.stage.panel)
+		_check(_actions() == [&"ui_accept", &"pause"], "pause legend lost its focused action or resume shortcut")
 	print("Controller action rows, glyph/text alignment, safe area, modal context and pointer fallback checked")
 	finish(0 if failures.is_empty() else 1)

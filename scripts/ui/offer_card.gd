@@ -8,6 +8,7 @@ const INFO_ICON: Texture2D = preload("res://assets/ui/info.svg")
 
 signal purchase_requested
 signal reservation_requested
+signal inspection_requested
 
 var buy_button: Button
 var reserve_button: Button
@@ -88,6 +89,10 @@ func set_catalog_layout(vertical: bool, dense: bool = false, compact_grid: bool 
 func _ready() -> void:
 	custom_minimum_size.y = 100.0
 	_build_content()
+	if selection_only:
+		# One focus stop per offer. Its two painted actions stay clickable.
+		buy_button.focus_mode = Control.FOCUS_NONE
+		reserve_button.focus_mode = Control.FOCUS_NONE
 	DentiUIStyle.style_card(self)
 	resized.connect(func() -> void: pivot_offset = size / 2.0)
 	resized.connect(_queue_fit)
@@ -95,6 +100,26 @@ func _ready() -> void:
 	name_label.resized.connect(_queue_fit)
 	mouse_entered.connect(_on_hover.bind(true))
 	mouse_exited.connect(_on_hover.bind(false))
+	pressed.connect(_activate)
+
+func _activate() -> void:
+	if not selection_only: return
+	if get_node("/root/GameInput").navigation_active:
+		buy()
+	else:
+		inspection_requested.emit()
+
+func buy() -> void:
+	if not disabled and not buy_button.disabled:
+		purchase_requested.emit()
+
+func pin() -> void:
+	if not disabled and not reserve_button.disabled:
+		reservation_requested.emit()
+
+func controller_actions() -> Dictionary:
+	var result := {&"ui_accept": "Kaufen" if not buy_button.disabled else buy_caption.text, &"ui_pin": "Freigeben" if reserve_button.icon == PIN_ICON else "Merken", &"ui_shop_details": "Details"}
+	return result
 
 
 func show_offer(offer: ShopOfferData, coins: int, available: bool = true, _owned_count: int = 0, dps: float = 0.0) -> void:

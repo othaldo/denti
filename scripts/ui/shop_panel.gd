@@ -74,16 +74,55 @@ var popup_layout_queued := false
 var story_timeline: StoryTimeline
 var displayed_wave: int = 0
 var details_first_layout := false
+var enchant_available := false
+var block_controller_accept := false
 
 func _ready() -> void:
 	ShopLayout.build(self)
 	ControllerFocus.register($Root, _default_focus)
 	ControllerFocus.register(detail_popup, func() -> Control: return details.close_button, 100)
 	ControllerPrompt.bind(reroll_button, &"ui_reroll", false)
+	ControllerPrompt.bind(enchant_button, &"ui_enchant", false)
+	ControllerPrompt.bind(continue_button, &"ui_next_wave", false)
 	ControllerPrompt.bind(details.close_button, &"ui_cancel", false)
 	$Root.set_meta("controller_back", "Pause")
-	get_node("/root/GameInput").changed.connect(_queue_layout)
+	$Root.set_meta("controller_bar_context", true)
+	$Root.set_meta("controller_shortcuts", _controller_shortcuts)
+	get_node("/root/GameInput").changed.connect(_sync_input_mode)
+	_sync_input_mode()
 	_update_layout()
+
+func _controller_shortcuts() -> Dictionary:
+	var result := {}
+	if not visible or expanded: return result
+	if not reroll_button.disabled: result[&"ui_reroll"] = "Würfeln · %s" % reroll_button.text
+	if enchant_available and not enchant_button.disabled: result[&"ui_enchant"] = "Verzaubern"
+	if not continue_button.disabled: result[&"ui_next_wave"] = "Welle starten"
+	return result
+
+func _sync_input_mode() -> void:
+	_sync_action_buttons()
+	_queue_layout()
+	if visible and get_node("/root/GameInput").navigation_active:
+		get_node("/root/GameInput").navigation.ensure_focus.call_deferred()
+
+func _sync_action_buttons() -> void:
+	var controller: bool = get_node("/root/GameInput").controller_active
+	var focused := get_viewport().gui_get_focus_owner()
+	if visible and controller and focused in [reroll_button, enchant_button, continue_button]:
+		# Switching from a focused desktop action to the controller layout must
+		# not turn that same A press into a purchase on the newly focused card.
+		block_controller_accept = true
+	elif not controller:
+		block_controller_accept = false
+	reroll_button.visible = not controller
+	enchant_button.visible = enchant_available and not controller
+	continue_button.visible = not controller
+
+func _input(event: InputEvent) -> void:
+	if visible and block_controller_accept and event is InputEventJoypadButton and event.device == get_node("/root/GameInput").controller_device and event.button_index == JOY_BUTTON_A:
+		if not event.pressed: block_controller_accept = false
+		get_viewport().set_input_as_handled()
 
 func _default_focus() -> Control:
 	for button in offer_buttons:
@@ -299,8 +338,9 @@ func present(model: ShopViewData) -> void:
 	continue_button.tooltip_text = continue_button.text
 	continue_button.disabled = equipment.is_empty()
 	var points := model.upgrade_points
-	enchant_button.visible = points > 0 or equipment.any(func(entry: Dictionary) -> bool: return int(entry.get("tier", 1)) >= WeaponLoadout.MAX_TIER)
+	enchant_available = points > 0 or equipment.any(func(entry: Dictionary) -> bool: return int(entry.get("tier", 1)) >= WeaponLoadout.MAX_TIER)
 	enchant_button.text = "Verzaubern · %d" % points if points > 0 else "Verzaubern"
+	_sync_action_buttons()
 	if selected_kind == "equipment":
 		var found := -1
 		for index in equipment.size():
@@ -538,6 +578,25 @@ func close_details() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not ControllerFocus.active($Root): return
+	if visible and not expanded:
+		if event.is_action_pressed("ui_enchant") and enchant_available and not enchant_button.disabled:
+			enchant_requested.emit()
+			get_viewport().set_input_as_handled()
+			return
+		if event.is_action_pressed("ui_next_wave") and not continue_button.disabled:
+			continue_requested.emit()
+			get_viewport().set_input_as_handled()
+			return
+	var focused := get_viewport().gui_get_focus_owner() as OfferCard
+	if visible and not expanded and focused in offer_buttons:
+		if event.is_action_pressed("ui_pin"):
+			focused.pin()
+			get_viewport().set_input_as_handled()
+			return
+		if event.is_action_pressed("ui_shop_details"):
+			_select("offer", offer_buttons.find(focused))
+			get_viewport().set_input_as_handled()
+			return
 	if visible and not expanded and event.is_action_pressed("ui_reroll") and not reroll_button.disabled:
 		reroll_requested.emit()
 		get_viewport().set_input_as_handled()

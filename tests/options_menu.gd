@@ -25,6 +25,17 @@ func _run() -> void:
 	if _setting_control_count(menu.stage.content) != 9:
 		_fail("options page has duplicate controls")
 		return
+	var controller_option: OptionButton = menu.settings_view.controller_option
+	if controller_option.item_count != 4 or controller_option.get_item_text(3) != "Aus":
+		_fail("controller mode choices are incomplete")
+		return
+	controller_option.select(3)
+	controller_option.item_selected.emit(3)
+	if session.controller_symbols != 3 or root.get_node("GameInput").using_controller:
+		_fail("Off in the options menu did not disable controller input")
+		return
+	controller_option.select(0)
+	controller_option.item_selected.emit(0)
 	var master_bus := AudioServer.get_bus_index("Master")
 	var music_bus := AudioServer.get_bus_index("Music")
 	var sfx_bus := AudioServer.get_bus_index("SFX")
