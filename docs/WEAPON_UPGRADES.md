@@ -6,11 +6,20 @@ Stand: 27.10.2026. Im echten Belohnungsablauf einschließlich aller Waffenformen
 
 ## Regeln
 
-- Jede neue Upgrade-Kapsel gibt einen frei einsetzbaren Punkt. Auch eine goldene
-  Kapsel gibt einen Punkt; sie bleibt ein zusätzlicher Fund außerhalb des normalen
-  Wellenlimits. Dropchancen, Glücksgrenzen, Träger und Gauner bleiben erhalten.
-- Eine neue Verzauberung startet für einen Punkt auf **1/10**. Jeder weitere Rang
-  kostet einen Punkt; **10/10** ist die Obergrenze. Vier volle Effekte kosten 40 Punkte.
+- Jede neue Upgrade-Kapsel gibt **zwei frei einsetzbare Punkte**, auch eine goldene.
+  Gewöhnliche Drops bleiben auf drei pro Welle begrenzt; goldene Träger und Gauner
+  liefern zusätzliche Funde. Bonuskapseln aus Glück und Runenpolitur zählen nicht
+  zum gewöhnlichen Limit.
+- Aktivieren startet bei **1/10**, **10/10** bleibt die Obergrenze. Jeder Rang kostet
+  **einen Punkt pro Wurzel** der Zielwaffe: 1 oder 2 Punkte. Vier volle Effekte kosten
+  40 Punkte auf einer kleinen, 80 auf einer großen Waffe. Sechs kleine oder drei
+  große Waffen benötigen damit jeweils 120 Kapseln für den vollständigen Ausbau.
+- Glück würfelt nach dem vollständigen Loot-Sweep einmal eine zusätzliche Kapsel:
+  `0,25 × Glück / (Glück + 150)` für positives Glück; 10 % bei 100, maximal 25 %.
+  Kein neuer Wurf beim Fortsetzen, keine Unterbrechung des Kampfes.
+- **Runenpolitur**, ungewöhnlich, 12 Münzen, einmal kaufbar: Jede fünfte seit dem Erwerb
+  eingesammelte Kapsel gibt eine Bonuskapsel. Goldene Funde zählen mit, Boni nicht.
+  Fortschritt bleibt über Wellen und Speichern/Fortsetzen erhalten.
 - Die Mk-Stufe bestimmt die Plätze: **Mk I → 1**, **Mk II → 2**, **Mk III → 3**,
   **Mk IV → 4**. Die UI zeigt immer alle vier. Gesperrte Plätze nennen die nötige
   Mk-Stufe und öffnen sich durch den Waffenaufstieg, nicht durch einen Punktkauf.
@@ -22,7 +31,7 @@ Stand: 27.10.2026. Im echten Belohnungsablauf einschließlich aller Waffenformen
 - Die gesamte Wellenbeute wird zuerst eingesammelt. Nach den Level-ups und eventuell
   noch gespeicherten alten Kapsel-/Itementscheidungen folgt die Waffenverzauberung,
   danach Relikte, Story und Shop. Der Kampf wird nicht unterbrochen.
-- **+ 1** plant eine Verbesserung; **Rückgängig** nimmt die letzte geplante Investition
+- **+ Rang · Preis** plant eine Verbesserung; **Rückgängig** nimmt die letzte geplante Investition
   zurück. **Fertig** übernimmt die vollständige gültige Verteilung gemeinsam.
   Nicht ausgegebene Punkte bleiben für spätere Wellen gespeichert. Bei komplett
   ausgebauter oder fehlender Ausrüstung kann die Ansicht ebenfalls beendet werden.
@@ -66,24 +75,35 @@ Bei Fusion oder Evolution wird es aus Rang und endgültiger Waffe neu berechnet.
 Bisskraft, vorhandene Effektrollen, DoT-Dauern, Resistenzen, Proc-Limits und
 Boss-Schutzbudgets gelten weiterhin.
 
-Die sechs Verstärkungen verwenden sanftere Wurzelgewichtung
-(`sqrt(Wurzeln)`) und die bestehenden effektspezifischen Obergrenzen. Das sind
-Startkurven für weitere Run-Messungen, keine abgeschlossene Boss-TTK-Balance.
-Lebensraub besitzt seit 26.10. ein gemeinsames Heilintervall von **0,6 s** statt
-0,75 s für alle Waffen zusammen; Heilmenge und Schutz vor Folgeeffekt-Ketten bleiben erhalten.
+Verstärkungen besitzen je Rang die gleichen Werte für kleine und große Waffen.
+Prozentboni wirken bereits auf den gesamten Waffengrundwert; die zusätzliche
+Quadratwurzel-Gewichtung entfällt. Das Heilbudget des Lebensraubs einschließlich
+Basiswert und Obergrenze wächst linear mit den Wurzeln. Gleiche belegte Wurzeln
+haben damit das gleiche theoretische Heilbudget bei gleichwertigem Ausbau.
+Lebensraub besitzt ein eigenes Heilintervall von **0,6 s je Waffenexemplar**.
+Mehrere Waffen heilen unabhängig. Salven, durchschlagende Geschosse und
+Flächentreffer derselben Waffe teilen sich das Intervall; DoTs und Folgeeffekte
+heilen nicht. Der Heilanteil bleibt 5 % des wirksamen Treffers; die Obergrenze beträgt 2 HP pro Wurzel. Waffen-IDs reisen mit
+Geschossen und werden zusammen mit den Intervallen beim Fortsetzen erhalten.
 
 Evolutionen öffnen eine reversible Fusionsvorschau. Bei normalen Mk-Fusionen
 erscheint sie bei Platz-, Element- oder Rangkonflikten. Die Ausgangswaffen bleiben
-bis zur Bestätigung unverändert. Gleiche Effekte werden zusammengelegt, maximal
-10/10; ausgewählt werden höchstens so viele Effekte wie die Ergebnisstufe erlaubt,
+bis zur Bestätigung unverändert. Gleiche Effekte legen ihre mit den ursprünglichen Wurzelkosten bezahlten Punkte
+zusammen. Die Ergebnis-Wurzelkosten bestimmen daraus ganze Ränge, maximal 10/10; ausgewählt werden höchstens so viele Effekte wie die Ergebnisstufe erlaubt,
 mit höchstens einem Element. Der Elementwechsel ersetzt die vorherige Auswahl.
-Nicht übernommene Ränge und Überschüsse über 10/10 gehen vollständig als freie
-Upgradepunkte zurück. Beispiel: Feuer 7 + Feuer 6 ergibt Feuer 10 und drei Punkte.
+Nicht verwendete Punkte, auch Reste unter den nächsten Rangkosten, werden vollständig
+erstattet. Beispiel: Zwei kleine Waffen mit Feuer 7 + 6 ergeben für eine kleine
+Ergebniswaffe Feuer 10 und drei Punkte; für eine große Feuer 6 und einen Punkt.
 Die Effektstärke wird für die fertige Waffe neu berechnet. Erstattete Punkte lassen
 sich direkt im Shop verzaubern oder aufbewahren; der Shop bietet bei Restpunkten
 „Verzaubern“. Punkte und offene Verzauberungsentwürfe bleiben beim Fortsetzen
 erhalten. Eine unbestätigte Fusionsauswahl wird beim Fortsetzen verworfen; die
 unveränderten Zutaten bleiben erhalten. Verkauf erstattet weiterhin nur Münzen.
+
+Alte freie Punkte werden einmalig verdoppelt (gespeicherte Economy-Version 2).
+Offene Entwürfe werden mit den tatsächlichen Wurzelkosten erneut geprüft. Bereits
+verzauberte Ränge bleiben erhalten; Prozent- und Heilwerte folgen der neuen Balance.
+Noch nicht eingesammelte alte Punktekapseln geben ebenfalls zwei Punkte.
 
 Alte Waffen behalten ihren gespeicherten Schaden und vorhandene Effekte,
 einschließlich früher freigeschalteter zusätzlicher belegter Plätze. Neue
@@ -144,7 +164,7 @@ Originalvorlagen, kompakte Spieltexturen, Ressourcen und Prüfungen stehen in
 `tests/weapon_upgrades.gd` prüft den echten Weg von Kampf und Loot-Sweep über
 Level-ups und native UI-Klicks bis zum Shop; zusätzlich Mk-Plätze, getrennte
 Exemplare, 1/10-Aktivierung, Rückgängig, JSON-Fortsetzen mit offenem Katalog,
-Restpunkte, 40-Punkte-Vollausbau, Wurzel-/Salvenbudget, Fusionsschutz und Altbestand.
+Restpunkte, Wurzelkosten-Vollausbau, Wurzel-/Salvenbudget, Fusionsschutz und Altbestand.
 
 `tests/weapon_upgrade_layout.gd` ergänzt sieben Fenstergrößen, sechs gleichartige
 Waffen, vier belegte Effekte, Katalog, Mk-Sperren, leere Ausrüstung und ungültige
@@ -179,3 +199,19 @@ Ränge, vier Plätze, Elementwechsel samt Bild, Wurzelskalierung, exakte Erstatt
 Abbrechen, veränderte Zutaten, Doppelbestätigung, Mk-Konflikte, direktes Ausgeben im
 Shop und Save/Resume. Native Ansichten: [1280×720](screenshots/weapon_fusion/desktop.png),
 [Hochformat](screenshots/weapon_fusion/portrait.png), [kurzes Querformat](screenshots/weapon_fusion/landscape.png).
+
+## Neue Ökonomie prüfen
+
+`tests/weapon_upgrade_economy.gd` prüft sechs kleine gegen drei große Waffen,
+Kosten/Undo/Manipulation, alte und neue JSON-Saves, echte Heiltreffer, Prozentwerte,
+Fusion bei wechselnden Wurzelkosten, Restpunkte, Itemlimit, Kapselzählung ohne
+Bonusrekursion, Glücksgrenzen und die echten UI-Preise.
+
+Prüfung am 27.10.2026: **154/154 Godot-Tests erfolgreich** (199 s), einschließlich
+der neuen Ökonomieprüfung und der bestehenden Kampf-, Shop-, Save- und UI-Tests.
+Native Aufnahmen mit dem aktuellen Regelwerk, einschließlich 320 × 568:
+[Desktop](screenshots/upgrade_economy/overview_1280x720.png),
+[Hochformat](screenshots/upgrade_economy/overview_320x568.png),
+[Effektauswahl](screenshots/upgrade_economy/picker_360x640.png).
+
+Reproduzieren: `Godot_v4.7.2-stable_win64_console.exe --path . --fixed-fps 60 --script res://tools/preview_weapon_upgrades.gd -- --economy`.

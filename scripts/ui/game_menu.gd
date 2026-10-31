@@ -12,6 +12,8 @@ var home: MenuHome
 var settings_view: MenuSettings
 var updates_view: MenuUpdates
 var actions: Dictionary = {}
+var achievements_view: AchievementsMenu
+var achievement_details: RunSetupDetails
 var home_return_focus: StringName = &""
 
 var page: StringName = &"home"
@@ -134,6 +136,9 @@ func _clear_rows() -> void:
 	home = null
 	settings_view = null
 	updates_view = null
+	achievements_view = null
+	if is_instance_valid(achievement_details): achievement_details.queue_free()
+	achievement_details = null
 	menu_stage.visible = true
 	for edge in ["left", "right"]:
 		rows.get_parent().add_theme_constant_override("margin_" + edge, 32)
@@ -241,6 +246,7 @@ func _home_action(id: StringName) -> void:
 		&"settings": _show_options()
 		&"build": _show_stats()
 		&"dentipedia": _show_dentipedia()
+		&"achievements": _show_achievements()
 		&"credits": _show_credits()
 		&"updates": _show_updates()
 		&"code": _show_code_entry()
@@ -472,6 +478,23 @@ func _show_items() -> void:
 		item_details.show_item(owned[0], true)
 	_button("Zurück", _show_home, true)
 	_update_build_layout()
+
+
+func _show_achievements() -> void:
+	page = &"achievements"
+	_clear_rows()
+	menu_stage.hide()
+	home_return_focus = &"achievements"
+	achievements_view = AchievementsMenu.new()
+	stage.present("Achievements", achievements_view, "", 1400)
+	achievements_view.configure(session.progression_data.weapon_masteries)
+	achievement_details = RunSetupDetails.new()
+	root_control.add_child(achievement_details)
+	achievements_view.inspect_requested.connect(func(data: WeaponData, flags: int, source: Control) -> void:
+		achievement_details.present(data.display_name + " · Meisterschaften", WeaponMasteries.details(flags), source))
+	actions[&"back"] = stage.back_button
+	stage._refresh_focus()
+	stage.back_button.grab_focus()
 
 
 func _show_options() -> void:

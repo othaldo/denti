@@ -55,6 +55,7 @@ func _run() -> void:
 		game.player.global_position = Vector2(1050, 650)
 		game.player.get_node("Camera2D").force_update_scroll()
 		attack.cancel()
+		attack.cycle = 0
 		attack.begin()
 		attack.advance(0.80)
 		await _capture(output.path_join("flight_%d.png" % extent.x))
@@ -63,13 +64,18 @@ func _run() -> void:
 	DisplayServer.window_set_size(root.size)
 	game.player.global_position = Vector2(1050, 650)
 	boss.global_position = Vector2(780, 620)
-	var studies := [["heart-fan", CaramelEncounterData.Attack.HEART_FAN, 1.10], ["sugar-rush", CaramelEncounterData.Attack.SUGAR_RUSH, 0.65], ["heart-crown", CaramelEncounterData.Attack.SUGAR_RUSH, 2.40]]
+	var combo_phase := maxi(1, attack.profile.bomb_fan_phase)
+	var throws := attack.profile.throws_for_phase(combo_phase)
+	var combo_time := throws * (attack.profile.windup_seconds + attack.profile.flight_seconds) + throws * attack.profile.followup_seconds + attack.profile.heart_warning_seconds * 0.5
+	var studies := [["heart-fan", CaramelEncounterData.Attack.HEART_FAN, 1.10], ["sugar-rush", CaramelEncounterData.Attack.SUGAR_RUSH, 0.65], ["heart-crown", CaramelEncounterData.Attack.SUGAR_RUSH, 2.40], ["bomb-fan", CaramelEncounterData.Attack.BOMBS, combo_time]]
 	for study in studies:
+		boss.boss_phase = combo_phase if study[0] == "bomb-fan" else 1
 		game.player.global_position = Vector2(1050, 650)
 		game.player.velocity = Vector2.ZERO
 		game.player.get_node("Camera2D").force_update_scroll()
 		boss.global_position = Vector2(780, 620)
 		attack.cancel()
+		attack.cycle = 0
 		attack.begin(-1, study[1])
 		if study[0] == "heart-crown":
 			game.player.global_position += Vector2(0, 130)

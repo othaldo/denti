@@ -2,6 +2,26 @@
 
 Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü angezeigt. 0.1.0 wurde rückblickend anhand der Git-Historie dokumentiert; 0.2.0 bündelt die seitdem entstandenen Änderungen. Die Einträge beschreiben implementierte Funktionen. Weitere Pläne stehen in der [Roadmap](docs/ROADMAP.md).
 
+## Noch ohne neue Versionsnummer — 27.10.2026
+
+- **Imperator als aktiverer Finalboss:** Schnellere, weitreichend angekündigte Urteilsfächer, neu gezielter Portalanschluss und wechselnde Nervenringe/-fächer. Die Wache dreht während der Kernöffnung; Hell erhält vier Wiederholungen. Vollständige Warnungen, kompatibles Fortsetzen und 144 vollständige verlangsamte Ausweichrouten geprüft. [Verhalten und Vergleich](docs/EMPEROR_FINALE.md).
+
+- **König mit mehr Angriffsdruck:** Gezielte Säurefächer während jeder Säurebahn und jedes Pegelwechsels, 3/5/7/9 Tropfen von Easy bis Hell. Auf Hard/Hell setzt er zwischen zwei Stampffolgen nach und erfasst Denti neu. Vollständige feste Warnungen, begrenzte Geschossbatches und kompatibles Fortsetzen. [Verhalten und Messung](docs/KING_ASSAULT.md).
+
+- **Prinz wirft auf Hell doppelt so häufig:** Bomben einer Serie folgen alle 0,68 statt 1,36 s. Easy ×0,75, Normal ×1 und Hard ×1,5 des bisherigen Wurftakts. Überlappende Bomben behalten jeweils 1,1 s Vorwarnung und ein festes Ziel; Save/Fortsetzen erhält jede Flugbahn. [Takt und Prüfung](docs/PRINCE_BOMB_FREQUENCY.md).
+
+- **Kürzere, aktivere Bosskämpfe:** Prinz −17 %, König −18 %, Imperator −20 % Basisleben; kürzere Schutz- und Gesundheitspausen. Der Prinz setzt während des Bombenflugs nach, König und Imperator bewegen sich nach kurzer Atempause auch mit offenem Kern. Weniger Leerlauf und mehr Nähe auf allen vier Schwierigkeiten, mit vollständigen Warnfenstern. [Vorher-/Nachher-Messung](docs/BOSS_AGGRESSION.md).
+
+- **Imperator verfolgt Denti für seine AoE:** Vor Hofurteilen und der Kombination mit dem Nerventakt kommt er auf höchstens 300 px heran. Der gefährliche Sektor zielt bei Warnbeginn auf Denti und bleibt danach fest. Folgeurteile erfassen die neue Position erneut und setzen bei Bedarf erst nach. Gleiche Zielregel auf allen Schwierigkeiten, bestehende Warnzeiten bleiben erhalten.
+
+- **Einheitliche Bodenwarnungen:** Kreise, sichere Ringe, Sektoren, Charge-/Geschossbahnen, Säurekapseln, Kissenrechtecke, Zielstrahlen und Timer verwenden dieselben glatten Konturen und bewegten Lichtfronten. Beschleunigte Aufladung, freie Angriffsfarben und gemeinsam gezeichnete Flächen ersetzen die separaten Boss-Warnwege. [Vorschau und Messung](docs/UNIFIED_TELEGRAPHS.md).
+
+- **Waffenmeisterschaften:** Vier dauerhafte Auszeichnungen je Startwaffe, eigenes Menü Achievements im Hauptmenü und in der Zahnpause mit Waffenübersicht, gemalten Siegeln, Gesamtfortschritt, Suche, Filtern und Anforderungen auf Abruf. Die Run-Vorbereitung bleibt auf die Waffenauswahl begrenzt. Erste Bossprüfung auch auf Easy; Normal-/Hard-/Hell-Siege vergeben kumulative Medaillen. Neue Erfolge erscheinen nach der Welle und im Rückblick. Startwaffe, neue Erfolge und Debug-Ausschluss überleben Fortsetzen; bestehende Hell- und Evolutionseinträge bleiben erhalten. [Regeln und Vorschau](docs/WEAPON_MASTERIES.md).
+
+- Waffenverzauberung nach Wurzelkosten: zwei Punkte je Kapsel, gleiche Ausbaukosten für sechs kleine oder drei große Waffen; Prozentboni ohne zusätzliche Wurzelgewichtung, Lebensraub mit Heilbudget je Wurzel. Glück kann eine Bonuskapsel nach der Welle geben; das neue Item Runenpolitur belohnt jede fünfte gesammelte Kapsel. Fusion und alte Punkte werden entsprechend umgerechnet.
+
+- **Lebensraub je Waffe:** Jedes Waffenexemplar heilt mit seinem eigenen Intervall von 0,6 s. Salven und Flächentreffer teilen weiterhin den Takt ihrer Waffe; Der Heilanteil bleibt 5 % des wirksamen Treffers; das Heilbudget folgt den Wurzelkosten. Geschosse, Pooling und Fortsetzen behalten die Herkunft. Die Feen-Itemfamilie heilt nun 0,10 / 0,25 / 0,35 / 0,45 statt 0,15 / 0,35 / 0,45 / 0,60 Leben je XP. [Messung und Regeln](docs/SUSTAIN_BALANCE.md).
+
 ## 0.6.0 — 27.10.2026
 
 - **Dentipedia aktualisiert:** 25 Mechanikthemen erklären Waffenpunkte, Mk-Plätze, ein Element pro Waffe, manuelle Fusion mit Punkteerstattung, Dash und Ausdauer, Elementtreffer und die neuen Zahnseidenangriffe. Shop, Belohnungsfolge, Gauner, Endlos und Fortsetzen sind auf dem aktuellen Stand; alte Zufallskapseln stehen ausdrücklich unter Altbestand. Waffeneinträge zeigen ihre Normal- und sechs Elementformen als Ansicht. Suche nach „Garotte“ findet die Schneide; geheime Evolutionen bleiben geschützt. [Inhalte und native Ansichten](docs/DENTIPEDIA.md).

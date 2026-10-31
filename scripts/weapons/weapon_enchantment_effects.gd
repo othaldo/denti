@@ -2,7 +2,7 @@ class_name WeaponEnchantmentEffects
 extends RefCounted
 
 # All follow-up hits omit a weapon and cannot enter the weapon hit pipeline.
-# Cooldowns are shared per player, persisted by ItemInventory, and set before damage.
+# Proc clocks persist in ItemInventory. Lifesteal is scoped to the weapon UID.
 static func packets(effects: ItemEffectContext, enemy: Enemy, weapon: WeaponData, affixes: Array[Dictionary], factor: float) -> Array[Dictionary]:
 	var result := WeaponAffixes.packets(affixes, weapon, effects.player.stats, factor)
 	for packet in result:
@@ -13,7 +13,7 @@ static func packets(effects: ItemEffectContext, enemy: Enemy, weapon: WeaponData
 	return result
 
 
-static func after_hit(effects: ItemEffectContext, enemy: Enemy, weapon: WeaponData, affixes: Array[Dictionary], critical: bool, dealt: float, factor: float, was_chilled: bool) -> void:
+static func after_hit(effects: ItemEffectContext, enemy: Enemy, weapon: WeaponData, affixes: Array[Dictionary], critical: bool, dealt: float, factor: float, was_chilled: bool, source_uid: String = "") -> void:
 	if dealt <= 0:
 		return
 	if affixes.is_empty() and not critical:
@@ -41,8 +41,11 @@ static func after_hit(effects: ItemEffectContext, enemy: Enemy, weapon: WeaponDa
 	var leech := WeaponAffixes.find(affixes, &"leech")
 	if leech >= 0 and effects.player.stats.health > 0 and effects.player.stats.health < effects.player.stats.max_health:
 		var definition := WeaponAffixes.by_id(&"leech")
-		if effects.ready_proc(&"enchantment_leech", definition.proc_cooldown):
-			var healed := effects.player.stats.heal(minf(WeaponAffixes.utility_value(affixes[leech]), dealt * definition.proc_factor))
+		var key := StringName("enchantment_leech:" + source_uid) if not source_uid.is_empty() else &"enchantment_leech"
+		# Respect an old save's remaining shared clock. Historic in-flight shots
+		# without an owner UID keep that conservative fallback until they expire.
+		if float(effects.cooldowns.get("enchantment_leech", 0)) <= 0 and effects.ready_proc(key, definition.proc_cooldown):
+			var healed := effects.player.stats.heal(minf(WeaponAffixes.utility_value(affixes[leech], weapon.hands), dealt * definition.proc_factor))
 			if healed > 0:
 				effects.enchantment_support.emit(&"leech_healing", healed)
 				effects.announce("+%s" % DentiAttributes.number(healed), effects.player.global_position, definition.color)

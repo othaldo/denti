@@ -5,12 +5,12 @@ script = ExtResource("1")
 id = &"tooth_fairy_pact"
 icon_index = 15
 display_name = "Zahnfee-Pakt"
-description = "XP heilt 0,35 Leben je Punkt. -8 maximales Leben."
+description = "XP heilt 0,25 Leben je Punkt. -8 maximales Leben."
 rarity_tier = 2
 price = 9
 stat_changes = { &"max_health": -8.0 }
 effect_kind = &"xp_heal"
-effect_value = 0.35
+effect_value = 0.25
 max_stacks = 12
 tags = Array[StringName]([&"sustain", &"economy"])
 

@@ -51,7 +51,7 @@ func _run() -> void:
 			if item.icon_index >= 86:
 				expected_sheet = "item_icons_dodge_packed.png"
 			_check(atlas != null and atlas.atlas.resource_path.ends_with(expected_sheet) and atlas.region.size == Vector2(512, 512), "item selects the wrong padded atlas cell")
-	_check(count == 93 and families.size() == 17 and mythics.size() == 9, "incomplete 93-item expansion")
+	_check(count == 94 and families.size() == 17 and mythics.size() == 9, "incomplete item expansion including Runenpolitur")
 	new_cells.sort()
 	_check(new_cells.size() == 61 and new_cells[0] == 30 and new_cells[60] == 90, "new icon indices have gaps")
 	for family_id in families:

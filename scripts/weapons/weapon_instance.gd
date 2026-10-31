@@ -205,16 +205,16 @@ func _fire(targets: Array[Enemy], damage: float, critical: bool) -> void:
 			for index in count:
 				var angle := 0.0 if index == 0 else (-0.12 if index == 1 else 0.12)
 				var projectile := pool.acquire(data, tier)
-				projectile.launch(muzzle, aim.rotated(angle), damage if is_zero_approx(angle) else damage * 0.55, data, player.items, critical, tier, affixes, 1.0 if index == 0 else 0.55)
+				projectile.launch(muzzle, aim.rotated(angle), damage if is_zero_approx(angle) else damage * 0.55, data, player.items, critical, tier, affixes, 1.0 if index == 0 else 0.55, instance_uid)
 		&"beam":
-			WeaponAttackShapes.hit(targets[0], data, tier, damage, critical, player.items, aim, affixes)
+			WeaponAttackShapes.hit(targets[0], data, tier, damage, critical, player.items, aim, affixes, 1.0, true, instance_uid)
 		&"beam_line", &"cone":
 			# Acquisition uses Denti's range; the emitted shape uses the barrel's range.
 			for enemy in player.nearby_enemies(muzzle, data.range_at_tier(tier)):
 				if enemy == null or enemy.health <= 0:
 					continue
 				if WeaponAttackShapes.contains(data, tier, muzzle, aim, enemy.global_position, enemy.data.radius):
-					WeaponAttackShapes.hit(enemy, data, tier, damage, critical, player.items, aim, affixes)
+					WeaponAttackShapes.hit(enemy, data, tier, damage, critical, player.items, aim, affixes, 1.0, true, instance_uid)
 
 
 func save_motion(enemy_indices: Dictionary) -> Dictionary:

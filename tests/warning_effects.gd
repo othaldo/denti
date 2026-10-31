@@ -1,53 +1,48 @@
 extends "res://tests/support/test_runtime.gd"
-
-var failures: Array[String] = []
-
+const BATCH := preload("res://scripts/vfx/telegraph_batch.gd")
+var failures := 0
 func _initialize() -> void: call_deferred("_run")
-func _check(condition: bool, message: String) -> void:
-	if not condition:
-		failures.append(message)
-		push_error(message)
-
+func _check(value: bool, message: String) -> void:
+	if not value: failures += 1; push_error(message)
 func _run() -> void:
-	var image := WarningEffects.ATLAS.get_image()
-	var data := load("res://data/encounters/count_cloak.tres") as CloakEncounterData
-	var prepared = WarningEffects.PREPARED
-	_check(WarningEffects.ATLAS == AttackEffects.ATLAS, "warnings no longer share the attack atlas")
-	_check(data.strike(0).reach == prepared.FAN_REACH and data.strike(0).half_angle_degrees == prepared.FAN_ANGLE and data.strike(0).edge_half_angle_degrees == prepared.EDGE_ANGLE, "fan profile changed: regenerate the warning atlas")
-	_check(data.strike(1).reach == prepared.THRUST_REACH and data.strike(1).half_angle_degrees == prepared.THRUST_ANGLE, "thrust profile changed: regenerate the warning atlas")
-	_check(data.strike(2).inner_radius == prepared.RING_INNER and data.strike(2).reach == prepared.RING_OUTER, "ring profile changed: regenerate the warning atlas")
-	for row in [[Vector2i(1024, 0), 480, prepared.FAN_REACH], [Vector2i(1024, 480), 288, prepared.FAN_REACH], [Vector2i(1024, 768), 224, prepared.THRUST_REACH]]:
-		var center: Vector2i = row[0] + Vector2i(8, int(row[1]) / 2)
-		_check(image.get_pixelv(center + Vector2i(int(row[2]), 0)).a > 0.6, "sector boundary moved away from the actual reach")
-		_check(image.get_pixelv(center + Vector2i(int(row[2]) + 8, 0)).a < 0.01, "sector leaks beyond its padded edge")
-		_check(image.get_pixelv(center + Vector2i(50, 0)).a > 0.05 and image.get_pixelv(center + Vector2i(50, 0)).a < 0.1, "sector fill hides the arena or vanishes")
-	var ring_center := Vector2i(1328, 1296)
-	_check(image.get_pixelv(ring_center).a == 0, "ring texture fills the safe core")
-	for radius in [prepared.RING_INNER, prepared.RING_OUTER]:
-		for axis in [Vector2i.RIGHT, Vector2i.LEFT, Vector2i.UP, Vector2i.DOWN]:
-			_check(image.get_pixelv(ring_center + axis * int(radius)).a > 0.6, "ring contour does not mark its damage boundary")
-	_check(image.get_pixelv(ring_center + Vector2i(100, 0)).a == 0, "ring texture obscures the usable inner safe area")
-	for frame in 4:
-		var at := Vector2i(1024 + frame * 256, WarningEffects.LANE_Y)
-		_check(image.get_pixelv(at + Vector2i(4, 32)).a > 0.6 and image.get_pixelv(at + Vector2i(252, 32)).a > 0.6, "lane end caps lost the exact endpoints")
-		_check(image.get_pixelv(at + Vector2i(120, 4)).a > 0.6 and image.get_pixelv(at + Vector2i(120, 60)).a > 0.6, "lane width no longer matches the threat width")
-		for x in 256:
-			_check(image.get_pixelv(at + Vector2i(x, 0)).a == 0 and image.get_pixelv(at + Vector2i(x, 63)).a == 0, "lane atlas has no transparent gutter")
-	var first := image.get_region(Rect2i(1040, 1600, 224, 64))
-	_check(image.get_pixel(1056, 1760).a > 0.25 and image.get_pixel(1056, 1728).a == 0, "charge ribbon lost its soft core or transparent feather")
-	_check(image.get_pixel(1090, 1760).a < image.get_pixel(1148, 1760).a, "charge tail no longer fades into the floor")
-	_check(image.get_pixel(1248, 1760).a > 0.5 and image.get_pixel(1279, 1728).a == 0, "impact dust lost its core or transparent gutter")
-	_check(image.get_pixel(1248 + 27, 1760).a < image.get_pixel(1248 + 14, 1760).a, "impact dust gained a hard bright ring")
-	var second := image.get_region(Rect2i(1296, 1600, 224, 64))
-	_check(first.get_data() != second.get_data(), "lane light phases are identical")
-	WarningEffects.prepare()
-	var ids: Array[int] = []
-	for style in WarningEffects.lane_styles: ids.append(style.get_instance_id())
-	for repeat in 100: WarningEffects.prepare()
-	_check(WarningEffects.lane_styles.size() == 15, "warning styles allocate again during reuse")
-	_check(image.get_pixel(1144, 1696).a == 0 and image.get_pixel(1144, 1668).a > 0.6, "density outline layer fills the floor or loses its boundary")
-	for index in ids.size():
-		var style := WarningEffects.lane_styles[index]
-		_check(style.get_instance_id() == ids[index] and style.texture == WarningEffects.ATLAS and style.axis_stretch_horizontal == StyleBoxTexture.AXIS_STRETCH_MODE_TILE, "lane replaced its cached tiled styles")
-	if failures.is_empty(): print("PASS warning_effects: shared atlas, profile geometry, safe core, exact caps/width, light phases and cached tiling")
-	finish(0 if failures.is_empty() else 1)
+	var owner := Node2D.new()
+	root.add_child(owner)
+	var base := Transform2D(0.37, Vector2(80, 95))
+	var tint := Color(0.3, 0.8, 1, 0.7)
+	WarningEffects.charge(owner, Vector2(20, 0), Vector2(420, 0), 32, 300, tint, 0.6, base, PackedFloat32Array([1, 0.25, 0.5]))
+	var batch = BATCH.for_canvas(owner)
+	_check(owner.get_child_count() == 0 and owner.get_child_count(true) == 2, "render nodes leaked into gameplay collections")
+	_check(batch.count == 1 and batch.parameters[0].b == 400 and batch.parameters[0].a == 32, "charge footprint changed")
+	_check(is_equal_approx(fmod(batch.parameters[0].r, 1.0) * 2, 0.7), "charge front lost its locked target")
+	_check(batch.transforms[0].origin.is_equal_approx(base * Vector2(220, 0)), "batch ignored the caller transform")
+	_check(batch.colors[0] == tint and batch.densities[0] == 0.25, "density altered the contour tint")
+	WarningEffects.ring(owner, Vector2.ZERO, 67, 137, 0.6, false, false)
+	_check(batch.parameters[1].b == 137 and batch.parameters[1].a == 67, "ring lost its dynamic safe core")
+	WarningEffects.sector(owner, Vector2.ZERO, Vector2.UP, 243, deg_to_rad(127), 0.6, false, false)
+	_check(is_equal_approx(batch.parameters[2].a, deg_to_rad(127)), "sector rounded an arbitrary angle to a baked shape")
+	WarningEffects.capsule(owner, Vector2(20, 40), Vector2(180, 40), 29, tint, 0.6)
+	_check(batch.parameters[3].b == 160 and batch.parameters[3].a == 29, "capsule changed its damage segment/radius")
+	WarningEffects.rectangle(owner, Rect2(60, 90, 40, 170), 0.6, tint, Transform2D.IDENTITY, BATCH.Phase.WARNING, true)
+	_check(batch.parameters[4].b == 170 and batch.parameters[4].a == 20 and batch.transforms[4].origin.is_equal_approx(Vector2(80, 175)), "vertical rectangle fill or footprint is wrong")
+	var preserved: Transform2D = batch.transforms[0]
+	for i in 140: WarningEffects.circle(owner, Vector2(i, 20), 10, 0.5)
+	_check(batch.capacity == 256 and batch.transforms[0] == preserved and batch.count == 145, "growing the batch lost existing warnings")
+	var other := Node2D.new()
+	root.add_child(other)
+	WarningEffects.circle(other, Vector2.ZERO, 20, 0.5)
+	var second = BATCH.for_canvas(other)
+	_check(batch.fill.material == second.fill.material and batch.edge.material == second.edge.material and batch.fill.multimesh.mesh == second.fill.multimesh.mesh, "warnings allocate per-owner shader materials or geometry")
+	var material_id: int = batch.edge.material.get_instance_id()
+	for i in 20: WarningEffects.prepare()
+	_check(BATCH.edge_material.get_instance_id() == material_id, "prepare replaced shared resources")
+	batch.begin()
+	_check(batch.count == 0 and batch.edge.multimesh.visible_instance_count == 0 and batch.fill.multimesh.visible_instance_count == 0, "empty redraw retains stale danger")
+	WarningEffects.ring(owner, Vector2.ZERO, 50, 40, 0.5, false, false)
+	WarningEffects.lane(owner, Vector2.ZERO, Vector2.ZERO, 20, tint, 0.5)
+	WarningEffects.circle(owner, Vector2.ZERO, -1, 0.5)
+	_check(batch.count == 0, "invalid geometry was submitted")
+	_check(WarningEffects.fill_fraction(0) == 0 and WarningEffects.fill_fraction(1) == 1 and WarningEffects.fill_fraction(0.5) < 0.25, "unified easing lost its slow buildup or endpoints")
+	owner.free()
+	other.free()
+	if failures == 0: print("PASS warning_effects: shared batches, exact geometry/transforms, safe core, dynamic sectors, density, growth, reuse and cleanup")
+	finish(0 if failures == 0 else 1)

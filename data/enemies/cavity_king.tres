@@ -8,7 +8,7 @@
 [resource]
 script = ExtResource("1")
 display_name = "Karies-König"
-max_health = 1100.0
+max_health = 900.0
 damage_reduction = 0.18
 knockback_resistance = 0.82
 move_speed = 107.0
@@ -33,9 +33,9 @@ attack_radius = 145.0
 attack_speed = 640.0
 attack_duration = 0.66
 attack_damage = 30.0
-boss_guard_recharge_seconds = 32.0
+boss_guard_recharge_seconds = 28.0
 boss_guard_burst_fraction = 0.1
-boss_phase_duration = 2.0
+boss_phase_duration = 1.7
 boss_radial_count = 18
 boss_radial_volley_count = 5
 boss_radial_angle_step_degrees = 10.0

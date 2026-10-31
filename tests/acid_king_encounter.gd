@@ -97,6 +97,8 @@ func _run() -> void:
 		_check(AcidKingVisuals.channel_ends(attack.fields[0]) == fixed_ends, "camera movement changed a world-space river endpoint")
 	_fresh(AcidKingEncounter.Attack.TIDE)
 	attack.advance(attack.profile.warning_seconds + attack.profile.shift_flow_seconds)
+	_check(attack.state == AcidKingEncounter.State.PURSUE and attack.pending.is_empty(), "tide did not pursue before its next warning")
+	attack.advance(attack.profile.pursuit_seconds)
 	_check(attack.state == AcidKingEncounter.State.WARN_SHIFT and attack.pending.size() == 2, "tide did not warn its next banks")
 	planned = attack.pending.duplicate(true)
 	attack.advance(attack.profile.old_channel_fade + 0.001)
@@ -156,9 +158,9 @@ func _run() -> void:
 	_fresh()
 	attack.restore({})
 	_check(attack.state == AcidKingEncounter.State.POSITION and not attack.active and attack.fields.is_empty(), "legacy King save immediately activated new hazards")
-	# Actual game reload while both old banks and the next warning are present.
+	# Actual game reload during the next bank warning after pursuit.
 	_fresh(AcidKingEncounter.Attack.TIDE)
-	attack.advance(attack.profile.warning_seconds + attack.profile.shift_flow_seconds + 0.1)
+	attack.advance(attack.profile.warning_seconds + attack.profile.shift_flow_seconds + attack.profile.pursuit_seconds + 0.1)
 	var pending_save := attack.save_data()
 	game._save_run()
 	session.resume_requested = true

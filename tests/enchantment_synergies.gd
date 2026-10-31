@@ -31,7 +31,7 @@ func _effects(kinds: Array[String], value: float = 7) -> Array[Dictionary]:
 	return result
 
 func _hit(enemy: Enemy, kinds: Array[String], critical: bool = false, damage: float = 10) -> void:
-	WeaponAttackShapes.hit(enemy, brush, 1, damage, critical, game.items, Vector2.RIGHT, _effects(kinds))
+	WeaponAttackShapes.hit(enemy, brush, 1, damage, critical, game.items, Vector2.RIGHT, _effects(kinds), 1.0, true, "synergy_brush")
 
 func _reset() -> void:
 	game.weapon_chest_panel.hide()
@@ -208,19 +208,23 @@ func _leech_and_guards() -> void:
 	_check(healed > 0 and healed <= 0.5, "leech must heal no more than five percent of a ten-damage hit")
 	for index in 100:
 		_hit(source, ["leech"])
-	_check(is_equal_approx(game.player.stats.health, before + healed), "rapid hits bypass shared leech interval")
+	_check(is_equal_approx(game.player.stats.health, before + healed), "rapid hits bypass this weapon's leech interval")
 	_check(is_equal_approx(game.telemetry.enchantment_support.get("leech_healing", 0), healed), "healing telemetry counts requested rather than actual healing")
+	var other_target := _enemy(Vector2(80, 0))
+	WeaponAttackShapes.hit(other_target, WeaponCatalog.by_id(&"turbo_drill"), 1, 10, false, game.items, Vector2.RIGHT, _effects(["leech"]), 1.0, true, "synergy_drill")
+	_check(is_equal_approx(game.player.stats.health, before + healed * 2), "a second weapon is blocked by the first weapon's leech clock")
 	var interval := WeaponAffixes.by_id(&"leech").proc_cooldown
 	_check(is_equal_approx(interval, 0.6), "weapon healing did not receive its reduced cooldown")
 	game.items._process(interval - 0.01)
 	_hit(source, ["leech"])
-	_check(is_equal_approx(game.player.stats.health, before + healed), "leech cooldown ended early")
+	_check(is_equal_approx(game.player.stats.health, before + healed * 2), "leech cooldown ended early")
 	game.items._process(0.01001)
-	var other_target := _enemy(Vector2(80, 0))
-	WeaponAttackShapes.hit(other_target, WeaponCatalog.by_id(&"turbo_drill"), 1, 10, false, game.items, Vector2.RIGHT, _effects(["leech"]))
-	_check(is_equal_approx(game.player.stats.health, before + healed * 2), "a different enchanted weapon did not heal after the shared 0.6-second cooldown")
+	WeaponAttackShapes.hit(other_target, WeaponCatalog.by_id(&"turbo_drill"), 1, 10, false, game.items, Vector2.RIGHT, _effects(["leech"]), 1.0, true, "synergy_drill")
+	_check(is_equal_approx(game.player.stats.health, before + healed * 3), "second weapon did not recover its own leech clock")
 	_hit(source, ["leech"])
-	_check(is_equal_approx(game.player.stats.health, before + healed * 2), "separate weapons bypassed the shared healing cooldown")
+	_check(is_equal_approx(game.player.stats.health, before + healed * 4), "first weapon still shared the second weapon's clock")
+	_hit(source, ["leech"])
+	_check(is_equal_approx(game.player.stats.health, before + healed * 4), "one weapon healed repeatedly inside its own interval")
 	game.items._process(interval)
 	game._create_enemy(WaveController.BOSS, origin + Vector2(300, 0))
 	var boss: Enemy = game.get_node("Enemies").get_child(-1)

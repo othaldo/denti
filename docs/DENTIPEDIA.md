@@ -9,19 +9,19 @@ Titel und Text innerhalb des gewählten Bereichs.
 - **Items:** Effekte, Stapel- und Familienlimits aus den aktuellen Ressourcen.
 - **Relikte:** alle fünf Relikte mit ihren Effekten.
 - **Werte:** dieselben Attribute, Namen und Icons wie in HUD und Shop.
-- **Mechaniken:** 25 Themen zu aktuellen Systemen und ihrem Zusammenspiel.
+- **Mechaniken:** 26 Themen zu aktuellen Systemen und ihrem Zusammenspiel.
 - **Verzauberungen:** Übersicht und Einzeleinträge aller Elemente und
   Verstärkungen, einschließlich ausdrücklich markiertem Altbestand.
 
 ## Aktuelle Regeln
 
 Die Texte unterscheiden Waffenpunkte, Effektränge, Mk-Stufen und Wurzeln.
-Neue Kapseln geben Punkte für ein konkretes Waffenexemplar; Mk öffnet bis zu
-vier Plätze, jeder Effekt reicht bis 10/10, und pro Waffe ist ein Element wählbar.
+Neue Kapseln geben zwei Punkte; jeder Rang kostet einen Punkt pro belegter
+Wurzel der Zielwaffe. Mk öffnet bis zu vier Plätze, jeder Effekt reicht bis 10/10, und pro Waffe ist ein Element wählbar.
 Reichweite, Tempo, Lebensraub, Krit-Chance, Krit-Schaden und Wucht ergänzen es.
 
 Die manuelle Verzauberungsfusion erklärt Auswahl, Zusammenlegen und vollständige
-Punkteerstattung. Feuer 7/10 plus Feuer 6/10 ergibt Feuer 10/10 und drei Punkte.
+Punkteerstattung. Bei unveränderten Wurzelkosten ergeben Feuer 7/10 plus 6/10 maximal 10/10; die übrigen drei Ränge werden mit ihren Wurzelkosten erstattet. Wechselnde Wurzelkosten rechnen das investierte Budget in bezahlbare Ränge um.
 Konflikte blockieren die Fusion nicht pauschal. Neue Punkte erzeugen keine
 zufälligen Effekt-Seltenheiten, Slotfunde oder Mk-Aufstiege; alte gespeicherte
 Angebote werden im eigenen Altbestand-Thema erklärt.
@@ -36,7 +36,7 @@ Endlos und Fortsetzen. Kurze kosmetische Elementspuren sind von schädlichen
 Item-Bodenwirkungen getrennt.
 
 Dashkosten, Cooldown, Regeneration und Kontaktmultiplikator stammen direkt
-aus PlayerDash.DEFAULT. Lebensraub liest Intervall und Obergrenze aus seiner
+aus PlayerDash.DEFAULT. Lebensraub liest das Intervall je Waffenexemplar und die Obergrenze aus seiner
 Affix-Ressource; Gauner und Aufstiegswahl verwenden ebenfalls ihre aktuellen
 Spieldaten. Waffen-, Item-, Relikt- und Werteeinträge bleiben katalogbasiert.
 
@@ -72,3 +72,9 @@ tools/preview_dentipedia.gd erzeugt native Ansichten für Fusion, Dash,
 Waffenpunkte, Feuerform und Lebensraub in 1280×720, 360×640 und 568×320.
 Die Aufnahmen liegen unter docs/screenshots/dentipedia_update/; das Werkzeug
 verwendet getrennte Sitzungsdateien.
+
+Glück: einmalige Bonuskapsel nach dem Loot-Sweep (10 % bei 100 Glück, maximal 25 %). Runenpolitur: jede fünfte seit dem Erwerb gesammelte Kapsel erzeugt einen Bonus, ohne Rekursion. Beide Regeln und die einmalige Umrechnung alter Restpunkte sind ingame dokumentiert.
+
+Das Mechanikthema Waffenmeisterschaften erklärt die Regeln und verweist auf das
+eigene Menü **Achievements**. Persönliche Fortschrittsstände werden dort angezeigt;
+die Dentipedia bleibt das Nachschlagewerk für Mechaniken.

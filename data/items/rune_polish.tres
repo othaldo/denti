@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/items/rune_polish.png" id="2"]
+[resource]
+script = ExtResource("1")
+id = &"rune_polish"
+icon_texture = ExtResource("2")
+display_name = "Runenpolitur"
+description = "Jede fünfte gesammelte Upgrade-Kapsel gibt eine Bonuskapsel. Bonuskapseln zählen nicht mit."
+rarity_tier = 2
+price = 12
+effect_kind = &"capsule_polish"
+effect_value = 5.0
+max_stacks = 1
+tags = Array[StringName]([&"economy", &"luck", &"enchantment"])

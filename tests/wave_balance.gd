@@ -81,6 +81,8 @@ func _run() -> void:
 		_fail("mini-boss has too little health or defense")
 		return
 	var health_before := boss.health
+	var mini_boss_health := boss.max_health
+	var mini_boss_armor := boss.damage_reduction
 	boss.take_damage(100.0)
 	var actual_damage := health_before - boss.health
 	if actual_damage >= 100.0 or actual_damage <= 55.0:
@@ -114,7 +116,9 @@ func _run() -> void:
 	game.wave.current_wave = 20
 	game._create_enemy(WaveController.FINAL_BOSS, game.player.position + Vector2(90.0, 0.0))
 	var final_boss: Enemy = game.boss
-	if final_boss.max_health < 15000.0 or final_boss.damage_reduction < 0.3:
+	# Keep milestone scaling meaningful without restoring the old HP-sponge
+	# balance. Boss duration and actual mechanics have separate encounter tests.
+	if final_boss.max_health < mini_boss_health * 4.0 or final_boss.damage_reduction < mini_boss_armor + 0.10:
 		_fail("final boss did not scale above mini-boss")
 		return
 	final_boss.free()

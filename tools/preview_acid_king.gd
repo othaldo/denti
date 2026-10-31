@@ -53,7 +53,10 @@ func _run() -> void:
 	root.content_scale_size = root.size
 	DisplayServer.window_set_size(root.size)
 	game.player.get_node("Camera2D").force_update_scroll()
-	for study in [["channels", AcidKingEncounter.Attack.CHANNELS, 1.3], ["shift", AcidKingEncounter.Attack.TIDE, 2.65], ["stomp", AcidKingEncounter.Attack.STOMP, 1.5], ["open", AcidKingEncounter.Attack.CHANNELS, 4.5]]:
+	var channel_open_time := attack.profile.warning_seconds + attack.profile.flow_seconds + attack.profile.recall_seconds + 0.4
+	if boss.boss_phase >= attack.profile.combined_phase:
+		channel_open_time += attack.profile.stomp_sequences * (attack.profile.combined_stomp_warning_seconds + attack._stomp_duration()) + (attack.profile.stomp_sequences - 1) * attack.profile.stomp_chase_seconds
+	for study in [["channels", AcidKingEncounter.Attack.CHANNELS, 1.3], ["shift", AcidKingEncounter.Attack.TIDE, attack.profile.warning_seconds + attack.profile.shift_flow_seconds + attack.profile.pursuit_seconds + 0.5], ["stomp", AcidKingEncounter.Attack.STOMP, 1.5], ["open", AcidKingEncounter.Attack.CHANNELS, channel_open_time]]:
 		attack.cancel()
 		boss.global_position = Vector2(770, 620)
 		attack.begin(study[1])
@@ -77,9 +80,9 @@ func _run() -> void:
 	DisplayServer.window_set_size(root.size)
 	game.player.get_node("Camera2D").force_update_scroll()
 	attack.cancel()
-	boss.boss_phase = 2
+	boss.boss_phase = attack.profile.combined_phase
 	attack.begin(AcidKingEncounter.Attack.TIDE)
-	attack.advance(1 + attack.profile.shifts * (attack.profile.shift_flow_seconds + attack.profile.shift_warning_seconds) + attack.profile.shift_flow_seconds + 0.5)
+	attack.advance(attack.profile.warning_seconds + attack.profile.shifts * (attack.profile.shift_flow_seconds + attack.profile.pursuit_seconds + attack.profile.shift_warning_seconds) + attack.profile.shift_flow_seconds + 0.5)
 	await _capture(output.path_join("combined.png"))
 	boss.boss_phase = 1
 	for extent in [Vector2i(320, 568), Vector2i(568, 320)]:

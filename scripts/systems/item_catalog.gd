@@ -95,6 +95,7 @@ const ALL: Array[ShopOfferData] = [
 	preload("res://data/items/dodge_3.tres"),
 	preload("res://data/items/dodge_4.tres"),
 	preload("res://data/items/mythic_dodge.tres"),
+	preload("res://data/items/rune_polish.tres"),
 ]
 
 

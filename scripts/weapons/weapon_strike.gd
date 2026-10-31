@@ -54,7 +54,7 @@ func tick(weapon: WeaponInstance, from_progress: float, to_progress: float) -> v
 				hit_ids[enemy.get_instance_id()] = true
 				var at := enemy.global_position
 				var outward := offset.normalized() if not offset.is_zero_approx() else weapon.aim
-				var dealt := WeaponAttackShapes.hit(enemy, weapon.data, weapon.tier, damage, critical, weapon.player.items, outward, weapon.affixes)
+				var dealt := WeaponAttackShapes.hit(enemy, weapon.data, weapon.tier, damage, critical, weapon.player.items, outward, weapon.affixes, 1.0, true, weapon.instance_uid)
 				if dealt > 0 and weapon.data.element_skin == &"":
 					ElementImpactBatch.emit_from(enemy, &"bleed", at, outward, 30)
 		return
@@ -76,4 +76,4 @@ func tick(weapon: WeaponInstance, from_progress: float, to_progress: float) -> v
 			var radius := enemy.data.radius + weapon.data.attack_width * 0.5
 			if closest.distance_squared_to(enemy.global_position) <= radius * radius:
 				hit_ids[id] = true
-				WeaponAttackShapes.hit(enemy, weapon.data, weapon.tier, damage, critical, weapon.player.items, weapon.aim, weapon.affixes)
+				WeaponAttackShapes.hit(enemy, weapon.data, weapon.tier, damage, critical, weapon.player.items, weapon.aim, weapon.affixes, 1.0, true, weapon.instance_uid)

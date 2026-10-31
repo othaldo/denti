@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="WeaponMasteryData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/weapon_mastery_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"bronze"
+flag = 2
+display_name = "Bronze"
+requirement = "Gewinne auf Normal oder höher."
+minimum_difficulty = &"normal"
+requires_victory = true
+icon_index = 1

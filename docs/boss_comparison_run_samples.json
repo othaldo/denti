@@ -1,0 +1,102 @@
+{
+  "method": "Read-only excerpts from three local Hell reports saved 2026-10-27. No game version recorded. Damage/DPS refer to entire waves, not isolated bosses. Other files with the same resumed wave histories were excluded; these are illustrative reports, not an independent random sample.",
+  "reports": [
+    {
+      "source": "run_1793095612_135191071.json",
+      "difficulty": "hell",
+      "wave_reached": 20,
+      "final_level": 46,
+      "base_victory": true,
+      "boss_waves": [
+        {
+          "wave": 5.0,
+          "combat_seconds": 47.4333333333711,
+          "boss_ttk": 46.5333333333704,
+          "damage_taken": 107.804607123553,
+          "average_dps": 186.07206978554,
+          "peak_dps": 242.887578139888,
+          "kills": 106.0,
+          "peak_enemies_alive": 21.0
+        },
+        {
+          "wave": 10.0,
+          "combat_seconds": 45.0166666666257,
+          "boss_ttk": 34.8999999999683,
+          "damage_taken": 130.366968936386,
+          "average_dps": 1055.96113219728,
+          "peak_dps": 1828.61179883245,
+          "kills": 180.0,
+          "peak_enemies_alive": 27.0
+        },
+        {
+          "wave": 15.0,
+          "combat_seconds": 45.0166666666257,
+          "boss_ttk": 39.3166666666309,
+          "damage_taken": 83.4278398870299,
+          "average_dps": 3152.98766300074,
+          "peak_dps": 6029.22164263719,
+          "kills": 253.0,
+          "peak_enemies_alive": 47.0
+        },
+        {
+          "wave": 20,
+          "combat_seconds": 65.9666666666067,
+          "boss_ttk": 65.0666666666075,
+          "damage_taken": 118.810551347568,
+          "average_dps": 5089.8800000602,
+          "peak_dps": 13411.094809792,
+          "kills": 268,
+          "peak_enemies_alive": 62
+        }
+      ]
+    },
+    {
+      "source": "run_1793109803_1393301072.json",
+      "difficulty": "hell",
+      "wave_reached": 14,
+      "final_level": 31,
+      "base_victory": false,
+      "boss_waves": [
+        {
+          "wave": 5,
+          "combat_seconds": 45.0166620000357,
+          "boss_ttk": 35.8833333333619,
+          "damage_taken": 124.835727244708,
+          "average_dps": 188.897760576652,
+          "peak_dps": 257.246007634028,
+          "kills": 104,
+          "peak_enemies_alive": 30
+        },
+        {
+          "wave": 10,
+          "combat_seconds": 45.0160406666258,
+          "boss_ttk": 30.2160406666393,
+          "damage_taken": 136.608399796296,
+          "average_dps": 1033.57844831395,
+          "peak_dps": 1934.60298019596,
+          "kills": 172,
+          "peak_enemies_alive": 41
+        }
+      ]
+    },
+    {
+      "source": "run_1793096560_1083132536.json",
+      "difficulty": "hell",
+      "wave_reached": 8,
+      "final_level": 20,
+      "base_victory": false,
+      "boss_waves": [
+        {
+          "wave": 5,
+          "combat_seconds": 45.0148659999636,
+          "boss_ttk": 22.3657719999819,
+          "damage_taken": 0.0,
+          "average_dps": 172.369212498414,
+          "peak_dps": 283.165646968312,
+          "kills": 110,
+          "peak_enemies_alive": 29
+        }
+      ]
+    }
+  ]
+}

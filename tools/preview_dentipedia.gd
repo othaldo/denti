@@ -29,6 +29,10 @@ func _run() -> void:
 			pedia.category.selected = page[0]
 			pedia.search.text = page[1]
 			pedia._refresh()
+			for button: Button in pedia.listing.get_children():
+				if str(button.get_meta("entry").title) == str(page[1]):
+					button.pressed.emit()
+					break
 			if page[2] == "weapon_forms":
 				for frame in 4: await process_frame
 				var forms := pedia.detail.find_children("*", "HFlowContainer", false, false)

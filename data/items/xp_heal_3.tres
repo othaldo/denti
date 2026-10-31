@@ -4,13 +4,13 @@
 script = ExtResource("1")
 id = &"xp_heal_3"
 display_name = "Feenvertrag"
-description = "Jeder gesammelte XP-Punkt heilt 0,45 Leben. -2 Härte."
+description = "Jeder gesammelte XP-Punkt heilt 0,35 Leben. -2 Härte."
 rarity_tier = 3
 price = 14
 icon_index = 76
 stat_changes = { &"armor": -2.0 }
 effect_kind = &"xp_heal"
-effect_value = 0.45
+effect_value = 0.35
 max_stacks = 12
 family_id = &"xp_heal"
 family_limit = 12

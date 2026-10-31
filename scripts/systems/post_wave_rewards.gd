@@ -18,9 +18,11 @@ var choices_resolved: int = 0
 var choices_total: int = 0
 var weapon_upgrades := WeaponUpgradeState.new()
 var weapons_resolved := false
+var upgrade_income := WeaponUpgradeIncome.new()
 
 
 func begin_wave() -> void:
+	upgrade_income.begin_wave()
 	step = Step.COMBAT
 	pending_levels = 0
 	level_rerolls = 0
@@ -59,11 +61,11 @@ func queue_chest(item_id: StringName, scrap_coins: int) -> void:
 	pending_chests.append({"item_id": str(item_id), "scrap_coins": maxi(scrap_coins, 1)})
 
 
-func queue_affix_chest(value: Dictionary) -> void:
+func queue_affix_chest(value: Dictionary, items: ItemInventory = null) -> void:
 	var chest := WeaponAffixes.sanitize_chest(value)
 	if not chest.is_empty():
 		if chest.kind == WeaponUpgrades.KIND:
-			weapon_upgrades.points += 1
+			weapon_upgrades.points += WeaponUpgrades.POINTS_PER_CAPSULE + upgrade_income.collect(items)
 		else:
 			pending_chests.append(chest)
 
@@ -156,10 +158,11 @@ func save_data() -> Dictionary:
 	return {"step": step, "pending_levels": pending_levels, "level_rerolls": level_rerolls, "pending_chests": pending_chests.duplicate(true),
 		"pending_relics": pending_relics.duplicate(), "chest_spawned": chest_spawned, "random_chests_spawned": random_chests_spawned, "treasure_spawned": treasure_spawned, "final_wave": final_wave, "pending_story": str(pending_story),
 		"choices_resolved": choices_resolved, "choices_total": choices_total,
-		"weapon_upgrades": weapon_upgrades.save_data(), "weapons_resolved": weapons_resolved}
+		"weapon_upgrades": weapon_upgrades.save_data(), "weapons_resolved": weapons_resolved, "upgrade_income": upgrade_income.save_data()}
 
 
 func restore(saved: Dictionary) -> void:
+	upgrade_income.restore(saved.get("upgrade_income", {}))
 	step = clampi(int(saved.get("step", Step.COMBAT)), Step.COMBAT, Step.WEAPONS) as Step
 	weapon_upgrades.restore(saved.get("weapon_upgrades", {}))
 	weapons_resolved = bool(saved.get("weapons_resolved", false))

@@ -1,7 +1,7 @@
 class_name RunSaveData
 extends RefCounted
 
-const DICTIONARIES := ["player", "items", "relics", "telemetry", "rewards", "story"]
+const DICTIONARIES := ["player", "items", "relics", "telemetry", "rewards", "story", "weapon_mastery"]
 const ARRAYS := ["weapons", "owned_weapons", "enemies", "loot", "acid", "offers", "weapon_runtime", "player_projectiles", "upgrades", "horde_waves", "burst_times", "elite_times", "elite_counts"]
 const RECORD_ARRAYS := ["weapons", "enemies", "loot", "acid", "weapon_runtime", "player_projectiles"]
 
@@ -75,6 +75,10 @@ static func _containers(value: Dictionary, dictionaries: Array, arrays: Array) -
 
 static func _valid_structure(value: Dictionary) -> bool:
 	# Check container contracts before passing JSON values to typed subsystem APIs.
+	var mastery: Dictionary = value.get("weapon_mastery", {})
+	if not _containers(mastery, [], ["earned", "pending"]): return false
+	if mastery.has("eligible") and not mastery.eligible is bool: return false
+	if mastery.has("starter_id") and not mastery.starter_id is String: return false
 	var player: Dictionary = value.player
 	if not _containers(player, ["dash"], []): return false
 	var dash: Dictionary = player.get("dash", {})
@@ -98,10 +102,15 @@ static func _valid_structure(value: Dictionary) -> bool:
 		if not puddle is Dictionary or not _numeric_values(puddle):
 			return false
 	var rewards: Dictionary = value.get("rewards", {})
-	if not _containers(rewards, ["weapon_upgrades"], ["pending_chests", "pending_relics"]) or not _containers(value.get("relics", {}), [], ["owned"]):
+	if not _containers(rewards, ["weapon_upgrades", "upgrade_income"], ["pending_chests", "pending_relics"]) or not _containers(value.get("relics", {}), [], ["owned"]):
 		return false
+	var income: Dictionary = rewards.get("upgrade_income", {}).duplicate()
+	if income.has("resolved") and not income.resolved is bool: return false
+	income.erase("resolved")
+	if not _numeric_values(income): return false
 	var weapon_upgrades: Dictionary = rewards.get("weapon_upgrades", {})
 	if not _containers(weapon_upgrades, ["cursor"], ["actions"]): return false
+	if _invalid_upgrade_metadata(weapon_upgrades): return false
 	if weapon_upgrades.has("points") and not (weapon_upgrades.points is int or weapon_upgrades.points is float): return false
 	for action in weapon_upgrades.get("actions", []):
 		if not action is Dictionary: return false
@@ -148,6 +157,7 @@ static func _valid_structure(value: Dictionary) -> bool:
 		if not _containers(entry, ["crown_court"], []): return false
 		if not CrownCourtSnapshot.valid(entry.get("crown_court", {})): return false
 		var caramel: Dictionary = entry.get("caramel", {})
+		if not CaramelBombVolley.valid(caramel.get("bombs", [])): return false
 		if not _containers(caramel, [], ["origin", "destination", "splash_at", "pools", "aim", "rush_origin", "rush_end", "rays", "hearts"]): return false
 		for key in ["origin", "destination", "splash_at", "aim", "rush_origin", "rush_end"]:
 			if caramel.has(key):
@@ -230,3 +240,10 @@ static func _valid_scalars(value: Variant, field: String = "") -> bool:
 			if not _valid_scalars(entry):
 				return false
 	return true
+
+
+static func _invalid_upgrade_metadata(value: Dictionary) -> bool:
+	if value.has("economy_version") and not (value.economy_version is int or value.economy_version is float): return true
+	for action in value.get("actions", []):
+		if action is Dictionary and action.has("cost") and not (action.cost is int or action.cost is float): return true
+	return false

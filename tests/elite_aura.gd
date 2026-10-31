@@ -25,10 +25,12 @@ func _run() -> void:
 	game.wave.spawn_cooldown = 100.0
 	game.wave.burst_index = game.wave.burst_times.size()
 	game.wave.horde_spawned = true
+	# Only the elite pack belongs to this fixture, not an independent thief roll.
+	game.wave.goblin_checked = true
 	game.wave.remaining = game.wave.duration - game.wave.elite_times[0] + 0.01
 	game.wave._process(0.02)
 	if game.get_node("Enemies").get_child_count() != 4:
-		_fail("wave 12 did not spawn the elite and its escort")
+		_fail("wave 12 did not spawn the elite and its escort: " + str(game.get_node("Enemies").get_children().map(func(enemy): return enemy.data.resource_path)))
 		return
 	var leader: Enemy = game.get_node("Enemies").get_child(0)
 	if leader.data != WaveController.HUNT_GERM or leader.data.aura_move_bonus <= 0.0:

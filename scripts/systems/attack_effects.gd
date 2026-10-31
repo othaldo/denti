@@ -1,8 +1,9 @@
 class_name AttackEffects
 extends RefCounted
 
-# One shared, offline-baked atlas. Drawing never creates nodes or images.
+# Player attacks use a shared atlas; enemy warnings delegate to the analytic batch.
 const ATLAS: Texture2D = preload("res://assets/vfx/attack_effects.png")
+const ANTIALIAS := preload("res://scripts/vfx/warning_antialias.gd")
 const CELL := Vector2(256, 128)
 const FRAMES := 4
 const FPS := 12.0
@@ -42,19 +43,11 @@ static func flash(canvas: CanvasItem, at: Vector2, radius: float, tint: Color, s
 		return
 	canvas.draw_texture_rect_region(ATLAS, Rect2(at - Vector2.ONE * radius, Vector2.ONE * radius * 2.0), region(Shape.FLASH, seconds), tint)
 
-static func warning_ring(canvas: CanvasItem, at: Vector2, radius: float, progress: float, tint: Color) -> void:
-	var step := clampi(roundi(progress * 64.0), 0, 64)
-	if step == 0 or radius <= 0.0:
-		return
-	var extent := radius * 40.0 / 32.0
-	var source := Rect2(Vector2(step % 12 * 80, 1152 + step / 12 * 80), Vector2(80, 80))
-	canvas.draw_texture_rect_region(ATLAS, Rect2(at - Vector2.ONE * extent, Vector2.ONE * extent * 2), source, tint)
+static func warning_ring(canvas: CanvasItem, at: Vector2, radius: float, progress: float, tint: Color, base: Transform2D = Transform2D.IDENTITY) -> void:
+	WarningEffects.timer(canvas, at, radius, progress, tint, base)
 
-static func danger(canvas: CanvasItem, at: Vector2, radius: float, tint: Color) -> void:
-	if radius <= 0.0:
-		return
-	var extent := radius * GroundEffects.CELL / (GroundEffects.RADIUS * 2.0)
-	canvas.draw_texture_rect_region(ATLAS, Rect2(at - Vector2.ONE * extent, Vector2.ONE * extent * 2), Rect2(480, 1552, 128, 128), tint)
+static func danger(canvas: CanvasItem, at: Vector2, radius: float, tint: Color, progress: float = 1.0, base: Transform2D = Transform2D.IDENTITY) -> void:
+	WarningEffects.circle(canvas, at, radius, progress, tint, base)
 
 static func cone_points(degrees: float) -> PackedVector2Array:
 	if not cones.has(degrees):

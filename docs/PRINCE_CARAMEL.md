@@ -1,9 +1,14 @@
 # Karies-Prinz: die Karamellküche
 
-Stand 21.10.2026. Eigenständiger spielbarer Prinz-Encounter mit drei Angriffsabläufen für Welle 10,
+Neuester Prinzenstand: [Bombenfrequenz nach Schwierigkeit](PRINCE_BOMB_FREQUENCY.md) – Hell mit doppeltem Wurftakt innerhalb der Serie, weiterhin 1,1 s Vorwarnung je Bombe. Die älteren Messungen unten liegen vor dieser Taktänderung.
+
+Aktuell seit 31.10.: weniger Basisleben, kürzere Pausen und stärkeres Nachsetzen. Die gültigen Änderungen, alle vier Schwierigkeiten und der neue Vergleich stehen in [BOSS_AGGRESSION.md](BOSS_AGGRESSION.md). Die folgenden Detailwerte und älteren Aufnahmen dokumentieren den vorherigen Ausbau.
+
+Stand 30.10.2026. Eigenständiger spielbarer Prinz-Encounter mit drei Angriffsabläufen für Welle 10,
 Story und Endlos. Schwierigkeit skaliert jetzt auch Bewegung, Aktionsmenge
-und Projektile. Graf, König und Imperator verwenden dieselben gemeinsamen
-Druckfaktoren; König und Imperator behalten vorerst ihre bisherigen Repertoires.
+und Projektile. Die neue kurze Bomben-/Fächer-Verkettung, engeres Nachsetzen
+und begrenzter Vorhalt sind im [aktuellen Druckvergleich](ROYAL_PRESSURE_BALANCE.md)
+gemessen. Graf, König und Imperator verwenden dieselben gemeinsamen Druckfaktoren.
 Die alte Prinz-Grafik bleibt als Original erhalten.
 
 ## Figur
@@ -27,12 +32,19 @@ liegt in `assets/enemies/prince_caramel/portrait.png` (384×384).
 Vor dem Ausbau wurden die Ideen für Prinz, König und Imperator zusammen gelesen
 und zu unterscheidbaren Repertoires ausgearbeitet:
 [Bedeutung der Angriffe und Eskalation aller drei Bosse](BOSS_ATTACK_DIRECTION.md).
-König und Imperator sind dort Entwürfe, noch keine neuen Laufzeit-Encounter.
+Die ursprünglichen Entwürfe wurden inzwischen in eigene Königs-/Imperator-Encounter umgesetzt.
 
 Die Reihenfolge im Prinz-Profil ist Bombenfolge → Herzfächer → Zuckerrausch.
 Alle drei sind bereits in Phase 1 verfügbar. Jede beendete oder durch eine
 Gesundheitsphase abgebrochene Folge gibt an die nächste weiter. Das Repertoire
 wird nicht nach jedem Phasenwechsel wieder auf dieselbe Bombe zurückgesetzt.
+
+Ab der stufenabhängigen Kombophase folgt auf die letzte Bombe ohne volle
+Erholung direkt eine kurze, vollständig angekündigte Fächerfolge. Die bereits
+gefallenen Pfützen bleiben relevant. Der sonst folgende separate Fächerblock
+wird dabei verbraucht, damit als nächstes der Zuckerrausch folgt. Neue Bomben-
+und Fächerblöcke sind auf jeweils drei Aktionen begrenzt, der angehängte Fächer
+auf höchstens zwei Salven. Jede einzelne Zielwahl bleibt bis zur Freigabe fest.
 
 Die folgende Basistabelle gilt für Normal:
 
@@ -75,9 +87,12 @@ zu den bereits bestehenden Lebens-/Schadens-/Verteidigungskurven.
 
 | Eigenschaft | Easy | Normal | Hard | Hell |
 | --- | --- | --- | --- | --- |
-| Bomben je Folge, Gesundheitsphasen 1 / 2 / 3 | 1 / 2 / 2 | 2 / 3 / 3 | 3 / 4 / 4 | 4 / 5 / 5 |
+| Bomben je Folge, Gesundheitsphasen 1 / 2 / 3 | 1 / 2 / 2 | 2 / 3 / 3 | 3 / 3 / 3 | 3 / 3 / 3 |
 | Herzen je Fächer | 3 / 5 / 7 | 5 / 7 / 9 | 7 / 9 / 11 | 9 / 11 / 13 |
-| Fächersalven je Folge | 1 / 1 / 1 | 1 / 2 / 2 | 2 / 3 / 3 | 3 / 4 / 4 |
+| Fächersalven je Folge | 1 / 1 / 1 | 1 / 2 / 2 | 2 / 3 / 3 | 3 / 3 / 3 |
+| Bomben-/Fächer-Kombination ab Gesundheitsphase | 3 | 2 | 1 | 1 |
+| Vorhalt bei Fächer-Zielwahl, höchstens 90 px | 0 s | 0 s | 0,25 s | 0,50 s |
+| Zielabstand beim Nachsetzen für Fächer | 300 px | 300 px | 260 px | 220 px |
 | Herzgeschwindigkeit | 220,5 | 245 | 274,4 | 313,6 |
 | Herzkränze nach Ansturm | 1 | 1 | 1 | 2 |
 | Tatsächliche Geschosse je vollständigem Kranz | 8 / 10 / 12 | 12 / 14 / 16 | 16 / 18 / 20 | 20 / 22 / 24 |
@@ -91,6 +106,12 @@ zu den bereits bestehenden Lebens-/Schadens-/Verteidigungskurven.
 Ab Normal bewegt sich der Prinz zwischen Würfen und Salven sowie nach zunächst
 0,30 s stationärer Erholung. Er plant seitliche Positionswechsel und läuft
 nicht durch Denti. Warnungen fixieren weiter den Ursprung und die Schussbahnen.
+Hard/Hell schließen vor Fächern enger auf. Der Vorhalt wird ausschließlich beim
+Warnbeginn aus Dentis Bewegung abgeleitet; danach folgen die Strahlen nicht nach.
+
+Bereits gewarnte längere Bomben-/Salvenfolgen aus älteren Saves werden weiterhin
+vollständig geladen, einschließlich fünfter Bombe und vierter Hell-Salve.
+Die bestehende `FOLLOWUP`-Phase speichert auch den Übergang zum angehängten Fächer.
 
 Fächer besitzen durchgehend gleichmäßige 18°-Abstände. Es werden keine
 zusätzlichen Strahlen erzeugt und anschließend für eine freie Gasse entfernt.
@@ -109,6 +130,9 @@ aufeinanderfolgender Salven als auch die Geschosszahl im einzelnen Ring.
 Schritte beenden; neue Folgen verwenden die neue Stufung.
 
 ### Messung und Grenzen
+
+Die folgenden Messwerte und Testläufe beschreiben den Stand vom 21.10.2026.
+Den aktuellen Vorher-/Nachher-Vergleich enthält die [Messung vom 30.10.](ROYAL_PRESSURE_BALANCE.md).
 
 Im 40-s-Vergleich mit stationärem unbewaffnetem Ziel, zweiter Gesundheitsphase
 und ohne Adds ergeben Easy/Normal/Hard/Hell **45 / 84 / 99 / 176** Herzen,
@@ -140,6 +164,8 @@ das ist ein offener Reichweiten-/Balancepunkt und keine gemessene Kill-Zeit.
 
 ## Bombenfolge im Detail
 
+Die folgenden Zeitangaben gelten für Normal.
+
 1. Der Prinz sucht vor der Serie kurz eine Kochposition. Der Wunschabstand
    beträgt höchstens 300 Einheiten; Nähe wird nicht ständig durch Flucht auf
    volle Wurfweite aufgehoben. Auf schmalen Displays nutzt er sichtbaren Raum
@@ -155,9 +181,11 @@ das ist ein offener Reichweiten-/Balancepunkt und keine gemessene Kill-Zeit.
    auf den sichtbaren Bereich begrenzt. Diese Stelle bleibt anschließend fest.
    Es gibt keine nachführende Bombe. Die erste Phase hat zwei Würfe, spätere
    Gesundheitsphasen drei. Jede Bombe erhält die volle Vorwarn- und Flugzeit.
-5. Nach der Serie steht der Prinz 1,15 s still und öffnet ein Nahkampffenster.
-   Erst danach versetzt er sich während 0,65 s neu. Entzündung verkürzt nur
-   Erholung/Anlauf, bis maximal Faktor 1,4; Vorwarnung und Flug bleiben gleich lang.
+5. Ab Gesundheitsphase 2 geht die Serie nach dem kurzen Wurfabstand direkt in
+   den vollständig angekündigten Fächer über. Nach einer beendeten Folge gelten
+   1,15 s Erholung, davon zunächst 0,30 s stationär; danach darf er sich wieder
+   bewegen. Vor der nächsten Folge liegen 0,65 s Positionierung. Entzündung
+   verkürzt nur Erholung/Anlauf bis maximal Faktor 1,4; Warnung und Flug bleiben gleich lang.
 
 Es gibt keine zusätzlichen HP und keine alten generischen Charge-/HP-Ringsalven
 für den Prinzen. Der bestehende Schmelzschutz, die Gesundheitsphasen und deren
@@ -189,6 +217,10 @@ Zerstörbare Zuckerkerne aus der Roadmap sind ausdrücklich eine spätere
 Erweiterung. Das bereits generierte Kern-/Herzmotiv wird jetzt ausdrücklich als Projektil verwendet. Speicherformat 2 erhält die neuen Angriffe; Version-1-Saves beenden ihre bereits angekündigte Bombenfolge ohne sofortigen neuen Angriff.
 
 ## Prüfung und Grenzen
+
+Für die neuen Verkettungen, 360 geprüften Eckfälle beider überarbeiteten Bosse
+und die drei tatsächlichen Neuladungen gilt die [Prüfung vom 30.10.](ROYAL_PRESSURE_BALANCE.md).
+Die folgende Testhistorie beschreibt den ursprünglichen Ausbau.
 
 Der vollständige Lauf mit dem neuen Repertoire bestand mit **126/126 Tests**
 in `.godot/test_runs/20261020-232156-d88a815e`. Danach wurde die native

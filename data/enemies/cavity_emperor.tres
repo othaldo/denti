@@ -7,7 +7,7 @@
 [resource]
 script = ExtResource("1")
 display_name = "Karies-Imperator"
-max_health = 2500.0
+max_health = 2000.0
 damage_reduction = 0.22
 knockback_resistance = 0.88
 move_speed = 112.0
@@ -31,9 +31,9 @@ attack_radius = 165.0
 attack_speed = 700.0
 attack_duration = 0.7
 attack_damage = 34.0
-boss_guard_recharge_seconds = 52.0
+boss_guard_recharge_seconds = 40.0
 boss_guard_burst_fraction = 0.1
-boss_phase_duration = 3.6
+boss_phase_duration = 2.4
 boss_radial_count = 22
 boss_radial_volley_count = 9
 boss_radial_angle_step_degrees = 9.0

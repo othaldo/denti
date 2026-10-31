@@ -244,6 +244,7 @@ func _on_choice_pressed(index: int) -> void:
 
 
 func _end_summary(won: bool, coins: int, recap: Dictionary) -> String:
+	var mastery_line := WeaponMasteries.recap(recap.get("weapon_mastery", {}))
 	var run: Dictionary = recap.get("telemetry", {})
 	if run.is_empty():
 		return "Run beendet · %d Münzen übrig" % coins
@@ -253,7 +254,7 @@ func _end_summary(won: bool, coins: int, recap: Dictionary) -> String:
 	var outcome := "Sieg" if won or bool(recap.get("base_victory", false)) else "Niederlage"
 	var compact: bool = $Root.size.x < 600.0 or $Root.size.y < 600.0
 	if compact:
-		return "%s · %s\nWelle %d · Level %d · %02d:%02d\n%d Kills · %d Münzen übrig%s" % [outcome, DifficultyCatalog.by_id(StringName(str(recap.get("difficulty_id", "normal")))).display_name, int(recap.get("wave_reached", 0)), int(recap.get("final_level", 1)), minutes, seconds, int(run.get("kills", 0)), coins, "\nSieg in Welle 20 bleibt erhalten." if bool(recap.get("endless_enabled", false)) else ""]
+		return "%s · %s\nWelle %d · Level %d · %02d:%02d\n%d Kills · %d Münzen übrig%s" % [outcome, DifficultyCatalog.by_id(StringName(str(recap.get("difficulty_id", "normal")))).display_name, int(recap.get("wave_reached", 0)), int(recap.get("final_level", 1)), minutes, seconds, int(run.get("kills", 0)), coins, ("\nSieg in Welle 20 bleibt erhalten." if bool(recap.get("endless_enabled", false)) else "") + ("\n" + mastery_line if not mastery_line.is_empty() else "")]
 	var lines: PackedStringArray = [
 		"%s auf %s · Welle %d · Level %d · %02d:%02d Minuten" % [outcome, DifficultyCatalog.by_id(StringName(str(recap.get("difficulty_id", "normal")))).display_name, int(recap.get("wave_reached", 0)), int(recap.get("final_level", 1)), minutes, seconds],
 		"%s Gegner besiegt · %s Bosse · %s Gesamtschaden" % [
@@ -288,6 +289,7 @@ func _end_summary(won: bool, coins: int, recap: Dictionary) -> String:
 		for id in proc_ids.slice(0, mini(2, proc_ids.size())):
 			proc_lines.append("%s %s" % [_proc_name(StringName(str(id))), _format_number(roundi(float(proc_damage[id])))])
 		lines.append("Synergien · " + " · ".join(proc_lines))
+	if not mastery_line.is_empty(): lines.append(mastery_line)
 	return "\n".join(lines)
 
 

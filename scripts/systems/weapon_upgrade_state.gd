@@ -8,7 +8,9 @@ var cursor: Dictionary = {}
 
 
 func remaining() -> int:
-	return maxi(points - actions.size(), 0)
+	var spent := 0
+	for action in actions: spent += int(action.get("cost", 1))
+	return maxi(points - spent, 0)
 
 
 func preview(weapon: WeaponInstance) -> Array[Dictionary]:
@@ -25,8 +27,9 @@ func plan(loadout: WeaponLoadout, uid: String, id: StringName) -> bool:
 	if remaining() == 0: return false
 	for weapon in loadout.equipped():
 		if weapon.instance_uid != uid: continue
+		if remaining() < WeaponUpgrades.cost(weapon.data): return false
 		if WeaponUpgrades.advance(preview(weapon), id, weapon.data, weapon.tier).is_empty(): return false
-		actions.append({"uid": uid, "id": str(id)})
+		actions.append({"uid": uid, "id": str(id), "cost": WeaponUpgrades.cost(weapon.data)})
 		cursor = {"target_uid": uid}
 		return true
 	return false
@@ -39,13 +42,17 @@ func undo() -> void:
 
 
 func commit(loadout: WeaponLoadout) -> bool:
-	if actions.size() > points: return false
+	var spent := 0
 	var planned: Dictionary = {}
 	for action in actions:
 		var target: WeaponInstance
 		for weapon in loadout.equipped():
 			if weapon.instance_uid == str(action.uid): target = weapon
 		if target == null: return false
+		var cost := WeaponUpgrades.cost(target.data)
+		if int(action.get("cost", 0)) != cost: return false
+		spent += cost
+		if spent > points: return false
 		var before: Array[Dictionary] = planned.get(target, target.affixes)
 		var after := WeaponUpgrades.advance(before, StringName(action.id), target.data, target.tier)
 		if after.is_empty(): return false
@@ -54,7 +61,7 @@ func commit(loadout: WeaponLoadout) -> bool:
 		weapon.affixes.assign(planned[weapon])
 		weapon.affix_slots = maxi(WeaponUpgrades.slots(weapon.tier), weapon.affixes.size())
 		weapon.refresh_affix_stats()
-	points -= actions.size()
+	points -= spent
 	actions.clear()
 	cursor.clear()
 	if not planned.is_empty(): loadout.prepare_projectile_visuals()
@@ -62,16 +69,20 @@ func commit(loadout: WeaponLoadout) -> bool:
 
 
 func save_data() -> Dictionary:
-	return {"points": points, "actions": actions.duplicate(true), "cursor": cursor.duplicate(true)}
+	return {"economy_version": WeaponUpgrades.ECONOMY_VERSION, "points": points, "actions": actions.duplicate(true), "cursor": cursor.duplicate(true)}
 
 
 func restore(value: Dictionary) -> void:
 	points = maxi(int(value.get("points", 0)), 0)
+	if int(value.get("economy_version", 1)) < WeaponUpgrades.ECONOMY_VERSION:
+		# Old bank points represented whole capsules. Convert once, then replay
+		# open actions at their actual root cost in validate(loadout).
+		points *= WeaponUpgrades.POINTS_PER_CAPSULE
 	actions.clear()
 	for entry in value.get("actions", []):
 		if not entry is Dictionary or actions.size() >= points: continue
 		if WeaponAffixes.by_id(StringName(str(entry.get("id", "")))) == null: continue
-		actions.append({"uid": str(entry.get("uid", "")), "id": str(entry.id)})
+		actions.append({"uid": str(entry.get("uid", "")), "id": str(entry.id), "cost": maxi(int(entry.get("cost", 1)), 1)})
 	var saved_cursor: Dictionary = value.get("cursor", {})
 	var effect := str(saved_cursor.get("selected_effect", ""))
 	cursor = {"target_uid": str(saved_cursor.get("target_uid", "")),

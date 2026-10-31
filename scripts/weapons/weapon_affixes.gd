@@ -162,7 +162,7 @@ static func roll_chest(wave: int, luck: float, loadout: WeaponLoadout, golden: b
 
 static func sanitize_chest(value: Dictionary) -> Dictionary:
 	if value.get("kind", "") == WeaponUpgrades.KIND:
-		return {"kind": WeaponUpgrades.KIND, "points": 1, "golden": bool(value.get("golden", false)), "scrap_coins": maxi(int(value.get("scrap_coins", 1)), 1)}
+		return {"kind": WeaponUpgrades.KIND, "points": WeaponUpgrades.POINTS_PER_CAPSULE, "golden": bool(value.get("golden", false)), "scrap_coins": maxi(int(value.get("scrap_coins", 1)), 1)}
 	if value.get("kind", "") != "affix":
 		return {}
 	var options: Array[Dictionary] = []
@@ -243,6 +243,7 @@ static func effect_damage(value: float, kind: StringName, data: WeaponData, stat
 	return damage_for(value, data, stats) * by_id(kind).damage_factor
 
 
-static func utility_value(affix: Dictionary) -> float:
+static func utility_value(affix: Dictionary, roots: int = 1) -> float:
 	var data := by_id(StringName(affix.id))
-	return minf(data.utility_base + float(affix.damage) * data.utility_scale, data.utility_cap)
+	var weight := maxi(roots, 1) if data.effect_kind == "leech" else 1
+	return minf(data.utility_base + float(affix.damage) * data.utility_scale, data.utility_cap) * weight

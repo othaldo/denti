@@ -144,9 +144,9 @@ func _layout(extent: Vector2) -> void:
 	var bottom := y + ceili(float(plan.candidates.size()) / columns) * 58
 	body.custom_minimum_size.y = maxf(212 if short_layout else top + hero_height + 24, bottom + 8)
 	body.size = Vector2(extent.x, maxf(extent.y, body.custom_minimum_size.y))
-	refund_label.text = "+%d Upgrades" % plan.refund() if compact else "%d Upgradepunkte zurück" % plan.refund()
+	refund_label.text = "+%d Punkte" % plan.refund() if compact else "%d Upgradepunkte zurück" % plan.refund()
 	refund_label.add_theme_font_size_override("font_size", 13 if compact else 17)
-	refund_label.tooltip_text = "Nicht übernommene Stufen und Stufen über 10/10 werden als freie Upgradepunkte erstattet."
+	refund_label.tooltip_text = "Wurzelkosten bestimmen die übernommenen Ränge. Nicht übernommene Punkte werden vollständig erstattet."
 	confirm_button.disabled = not plan.valid()
 	stage.refresh_focus()
 

@@ -45,7 +45,7 @@ func _run() -> void:
 	var state := WeaponUpgradeState.new()
 	state.restore({"points": 3, "actions": [{"uid": target.instance_uid, "id": "fire"}, {"uid": target.instance_uid, "id": "ice"}, {"uid": target.instance_uid, "id": "tempo"}]})
 	state.validate(loadout)
-	_check(state.actions.size() == 2 and state.remaining() == 1 and state.commit(loadout), "old second-element draft lost points or partially committed")
+	_check(state.actions.size() == 2 and state.remaining() == 2 and state.commit(loadout), "old second-element draft lost points or partially committed")
 	_check(WeaponPresentation.weapon_name(target).ends_with("der Glut"), "support hides elemental weapon identity")
 	# Different-element fusion also stays blocked in the actual loadout.
 	loadout.restore([
@@ -56,7 +56,7 @@ func _run() -> void:
 	loadout.restore([{"id": "magic_toothbrush", "tier": 4}, {"id": "magic_toothbrush", "tier": 4}])
 	target = loadout.equipped()[0]
 	state = WeaponUpgradeState.new()
-	state.points = 30
+	state.points = 60
 	for id in [&"crit", &"crit_damage", &"knockback"]:
 		for rank in 10: _check(state.plan(loadout, target.instance_uid, id), "support rank was rejected")
 	_check(state.commit(loadout), "support draft cannot commit")

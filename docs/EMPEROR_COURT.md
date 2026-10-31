@@ -1,8 +1,18 @@
 # Karies-Imperator: das Kronengericht
 
-Stand: 21.10.2026. Eigener Encounter im Welle-20-Profil, in Story und Endlos.
-Der alte Charge-/Orb-/Phasenring-Ablauf wird ersetzt. Die vorhandenen HP,
-Rüstung, Phasenschwellen, Adds und das übergreifende Schadensbudget bleiben.
+Aktueller Ausbau: [Imperator als Finalboss](EMPEROR_FINALE.md), mit schnellen Urteilsfächern, neu gezieltem Portalanschluss, wechselndem Nerventakt und vier Hell-Wiederholungen. Die folgenden Details dokumentieren den vorherigen Stand; insbesondere die gleichzeitige Urteil-/Portal-Kombination und die zusätzliche Nerven-AoE bleiben nur für alte laufende Spielstände erhalten.
+
+Aktuelle Prüfung vom 31.10.: [Vergleich aller vier Bosse und Imperator-Befund](BOSS_AUDIT.md). Zielerfassung und Annähern funktionieren; insbesondere Flucht und der ähnliche Hard-/Hell-Takt bleiben Ansatzpunkte für den nächsten Ausbau.
+
+Stand: 31.10.2026. Eigener Encounter im Welle-20-Profil, in Story und Endlos.
+Der alte Charge-/Orb-/Phasenring-Ablauf wird ersetzt. Der aktuelle Stand reduziert
+das Basisleben auf 2.000 und verkürzt Schutzzeitraum, Gesundheitspausen und
+Erholung. Bewegung, alle vier Schwierigkeiten und neue Vergleichsmessungen stehen
+in [BOSS_AGGRESSION.md](BOSS_AGGRESSION.md). Rüstung, Phasenschwellen und Adds
+behalten ihre Regeln.
+
+Neu sind häufigere Neupositionierung und ein gemeinsam angekündigtes Urteil mit
+Portalstich. [Vorher-/Nachher-Messung und Grenzen](ROYAL_PRESSURE_BALANCE.md).
 
 [Native Vergleichsaufnahmen](concepts/emperor-court/fight.html) ·
 [Generierte Assets und vollständiger Prompt](concepts/emperor-court-art.md).
@@ -15,14 +25,15 @@ Gelenken bewegt. Alle Teile behalten ihr Seitenverhältnis. Warnung, Pose,
 Geschossgeburt und Treffer werden durch denselben Encounter-Timer gesteuert.
 
 Die drei Abläufe **Hofurteil → Portalstich → Nerventakt** beginnen bereits in
-der ersten Gesundheitsphase. Dazwischen liegt jeweils ein 1,8-s-Angriffsfenster,
+der ersten Gesundheitsphase. Dazwischen liegt jeweils ein 1,25-s-Angriffsfenster,
 Erholung, angekündigtes Drehen der Wache und eine kurze Neupositionierung.
 
 | Mechanik | Umsetzung | Antwort |
 | --- | --- | --- |
 | Kronenwache | Drei sichtbare Platten schützen ±70°; Richtungswechsel um 90° über angekündigte 0,7 s | Seitlich/hinten angreifen, neue Ausrichtung beobachten |
-| Hofurteil | Zwei gegenüberliegende Sektoren, je ±30° und 390 px; 1,05 s Warnung, 0,22 s Trefferphase; nächste Winkel mit neuer Warnung | Den wechselnden freien Boden lesen; ein Seitenschritt beantwortet nicht die ganze Folge |
+| Hofurteil | Zwei gegenüberliegende Sektoren, je ±30° und 390 px; ein Sektor zielt bei Warnbeginn mittig auf Denti; 1,05 s Warnung, 0,22 s Trefferphase | Aus der festgelegten Fläche ausweichen; jedes Folgeurteil erfasst Dentis neue Position |
 | Portalstich | Zwei gemalte Portale; feste Bahn durch die bei Warnbeginn erfasste Spielerposition; 1 s Warnung, dann echte Wurzellanze | Quer zur festgelegten Bahn ausweichen; weitere Stiche bekommen eigene Warnungen |
+| Urteil + Portalstich | Letztes Urteil einer kurzen Folge mit gleichzeitig festgelegter Portalbahn, gemeinsam 1,4 s angekündigt | Freien Sektor und feste Portalbahn zusammen berücksichtigen |
 | Blanker Nerv | Brust offen, vollständige gleichmäßig verteilte Geschossringe mit versetzten Winkeln; jede Salve 1,05 s angekündigt, 0,22 s Freigabe | Reguläre Geschossabstände und Takt nutzen; nicht beliebig kreisen |
 
 Die Kronenwache multipliziert Schaden von vorn mit **0,55**, Seite/Rücken mit
@@ -33,47 +44,74 @@ als Ursprung. Bestehende DoT-/Sondereffekt-Procs umgehen die Richtungsprüfung,
 profitieren aber ebenfalls vom offenen Kern. Debug-Profiling reicht die
 zusätzliche Richtung unverändert weiter.
 
-Hofurteile richten sich nach Zyklus und Schritt aus, **nicht nach Dentis
-Position**. Es wird kein passender freier Sektor für den Spieler ausgewählt.
+Hofurteile richten den gefährlichen Sektor bei jedem Warnbeginn **auf Dentis
+aktuelle Position**. Auch das mit dem Nerventakt kombinierte Urteil verwendet
+diese Zielerfassung. Ursprung und Winkel bleiben danach während Warnung und
+Trefferphase fest. Folgeurteile erfassen das Ziel erst nach der Neupositionierung
+erneut. Beginnt eine Warnung während eines Dash-Frames, zählt Dentis Position
+zum tatsächlichen Warnbeginn. Fortsetzen übernimmt den bereits angekündigten
+Winkel, statt neu zu zielen. Diese Regel gilt auf allen vier Schwierigkeiten.
 Urteilfächer bleiben innerhalb der angekündigten Winkel. Nervensalven sind
 vollständig, ohne ausgelassene Schüsse in Richtung Denti. Ihre Entstehung
 hängt nur von der Uhr ab; schnelleres Treffen erzeugt keine zusätzlichen Salven.
 
-Die zweite Gesundheitsphase verkettet Hofurteil und Portalfolge vor der
-Kernöffnung und ergänzt eine Nervensalve. In der letzten Phase kommen ein
-Urteil, ein Portalstich und vier Strahlen je Nervensalve dazu. Die erste
+Die neue Kombination beginnt auf Easy in der dritten Gesundheitsphase, auf
+Normal in der zweiten und auf Hard/Hell bereits in der ersten. Nach dem
+kombinierten Urteil setzt der Imperator neu an und wechselt zum Nerventakt.
+Außerhalb dieser Kombination bleiben selbstständige Portalfolgen verfügbar.
+Alle drei Folgen sind auf höchstens drei Wiederholungen begrenzt. In der letzten
+Phase kommen vier Strahlen je Nervensalve dazu. Die erste
 Nervensalve wird dann gemeinsam mit einem Hofurteil angekündigt und ausgelöst.
 Es werden höchstens zwei Hauptmechaniken gleichzeitig kombiniert.
 
 ## Alle vier Schwierigkeiten
 
-Warn-, Wachen-Dreh- und Kernöffnungszeiten bleiben gleich. Ressourcen werden
+Einzelne Warnungen, Wachen-Dreh- und Kernöffnungszeiten bleiben gleich; die neue
+Urteil-/Portal-Kombination warnt auf allen Stufen volle 1,4 s. Ressourcen werden
 pro Encounter kopiert, einschließlich beider externen Projektilprofile.
 
 | Wert | Easy | Normal | Hard | Hell |
 | --- | ---: | ---: | ---: | ---: |
-| Urteile / Portalstiche, erste und zweite Phase | 1 | 2 | 3 | 4 |
-| Urteile / Portalstiche, letzte Phase | 2 | 3 | 4 | 5 |
-| Nervensalven, erste / spätere Phasen | 1 / 2 | 2 / 3 | 3 / 4 | 4 / 5 |
+| Urteile / Portalstiche, erste und zweite Phase | 1 | 2 | 3 | 3 |
+| Urteile / Portalstiche, letzte Phase | 2 | 3 | 3 | 3 |
+| Nervensalven, erste / spätere Phasen | 1 / 2 | 2 / 3 | 3 / 3 | 3 / 3 |
 | Strahlen je Nervensalve, erste und zweite / letzte Phase | 10 / 14 | 12 / 16 | 14 / 18 | 16 / 20 |
 | Geschosse je Urteilsektor | 3 | 5 | 7 | 9 |
 | Geschossgeschwindigkeit, px/s | 202,5 | 225 | 252 | 288 |
 | Portalgeschwindigkeit, px/s | 684 | 760 | 851,2 | 972,8 |
-| Eigener Positionierungsfaktor vor gemeinsamem Schwierigkeitstempo | 0,825 | 1,1 | 1,375 | 1,65 |
+| Eigener Positionierungsfaktor vor gemeinsamem Schwierigkeitstempo | 1,125 | 1,5 | 1,875 | 2,25 |
 | Bewegung während des Portalfluges, Anteil der Positionierung | 0,10 | 0,16 | 0,22 | 0,28 |
 | Erholungs- und Positionierungszeit, Faktor | 1,20 | 1,00 | 0,80 | 0,55 |
+| Neue Position zwischen zwei Salven suchen, mindestens | 0,32 s | 0,32 s | 0,32 s | 0,32 s |
+
+Vor einem Hofurteil oder der ersten Urteil-/Nervenkombination nähert sich der
+Imperator gezielt auf 280 px an. Die Warnung beginnt erst bei höchstens 300 px
+Abstand; die Grenze wird zusätzlich auf die tatsächliche AoE-Reichweite begrenzt.
+Die vorbereitende Bewegung ist daher bei großer Entfernung länger als die
+bisherige feste Positionierungszeit. Auch zwischen Folgeurteilen setzt er
+nötigenfalls länger als 0,32 s nach. Er verbraucht dabei keine Angriffe und
+erzeugt keine verfrühte Warnung. Reine Fernangriffe behalten ihre Positionierung.
 
 Die gemeinsame Schwierigkeit beeinflusst zusätzlich das normale Boss-Bewegungstempo.
 Bei der Positionierung wird ein Weg durch Denti vermieden. Während fest
 angekündigter Hofurteile bleibt ihr Ursprung stehen. Die Portalbahnen behalten
 ihre Weltkoordinaten auch beim anschließenden Schweben des Imperators.
+Die Bewegung zwischen Salven endet vor der nächsten Warnung. Erst dort wird
+der neue Ursprung festgelegt; während der Warnung bleibt er stehen.
+
+`crown_court_positioning` prüft 48 Annäherungen an entfernte bzw. seitlich
+laufende Ziele auf allen vier Stufen und in drei Bildformaten. Dazu kommen
+erneutes Nachsetzen zwischen Urteilen, Pausieren/Fortsetzen, kein Weg durch
+Denti und eine feste Position während der Warnung. Der bestehende
+`REPOSITION`-Zustand speichert den noch ausstehenden Angriff; es entstehen
+keine neuen Zustandsnummern oder Savefelder. Native Hell-Prüfung: 580 px
+Startabstand, Warnbeginn bei 280 px, danach unveränderter Bossstandort.
 
 ## Darstellung, Grenzen und Fortsetzen
 
-Urteilflächen verwenden die vorhandene weiche Charge-Textur, auf eine
-zwischengespeicherte Sektorgeometrie gelegt. Eine ruhige Gesamtfläche zeigt
-den Umfang, die stärkere Füllung wächst bis zur Freigabe. Keine rechteckigen
-Umrisse, zusätzlichen Umrisskreise oder Laufzeit-Bilderzeugung. Die Siegel,
+Urteilflächen verwenden den [gemeinsamen analytischen Warnungsrenderer](UNIFIED_TELEGRAPHS.md).
+Eine ruhige Gesamtfläche zeigt den Umfang, die stärkere Füllung wächst bis zur
+Freigabe. Keine zusätzlichen Umrisskreise oder Laufzeit-Bilderzeugung. Die Siegel,
 Portale und Lanzen stammen aus dem generierten Teileatlas.
 
 Portalenden werden bei Warnbeginn in den sichtbaren, mit Abstand zu HUD und
@@ -97,7 +135,22 @@ starten mit einer sicheren Vorbereitung. Phasenwechsel und Tod räumen eigene
 Gefahren auf und verhindern die alten generischen Zusatzsalven. Warmup rendert
 das Rig, den Kern, die Sektorform und die Grafiken vor dem ersten Kampf.
 
+`REPOSITION` wurde an die Zustandsliste angehängt; alte Zustandsnummern bleiben
+gültig. Das gesondert gespeicherte `portal_combo`-Flag verhindert, dass eine
+bereits halb abgelaufene alte Urteilwarnung beim Laden eine ungezeigte Portalbahn
+erhält. Kombowarnung, Neupositionierung und fliegende Lanzen überstehen echtes
+Speichern/Fortsetzen.
+
 ## Nachweise und offene Balance
+
+Die folgende vollständige Test-/Messhistorie beschreibt den Stand vom 21.10.
+Für die neuen Abläufe gelten die [Prüfungen vom 30.10.](ROYAL_PRESSURE_BALANCE.md).
+Die Druckmessungen unten stammen noch aus der Zeit vor der Zielkorrektur vom
+31.10. Die aktuelle Zielerfassung ist für acht Spielerrichtungen, Folgesalven,
+die Nervenkombination, Dash-Geburtszeit und alle vier Stufen geprüft. Die
+Ecken-/Ausweichprüfungen einschließlich 216 Urteil-/Portalkombinationen haben
+mit der neuen Zielerfassung erneut bestanden, ebenso die Ziel-, Save- und
+Schwierigkeitsprüfungen. [Native Hell-Aufnahme](screenshots/emperor_targeting.png).
 
 **131/131 Tests bestanden**, vollständiger Logordner:
 `.godot/test_runs/20261021-111226-c3a538c4`.

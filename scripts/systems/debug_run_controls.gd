@@ -76,6 +76,7 @@ func start_wave(number: int) -> bool:
 
 
 func changed() -> void:
+	game.weapon_mastery.eligible = false
 	if game.weapon_enchantment_panel.visible:
 		game.rewards.weapon_upgrades.validate(game.player.loadout)
 		game.weapon_enchantment_panel.refresh()

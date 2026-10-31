@@ -11,7 +11,7 @@ static func progress_text(value: Dictionary) -> String:
 static func display_value(value: float, kind: StringName, weapon: WeaponData, stats: PlayerStats = null, items: ItemInventory = null) -> float:
 	var data := WeaponAffixes.by_id(kind)
 	if data.effect_kind in ["wet", "leech"]:
-		return WeaponAffixes.utility_value({"id": str(kind), "damage": value}) + (0.5 if kind == &"wet" and items != null and items.power(&"conductive_wet") > 0 else 0.0)
+		return WeaponAffixes.utility_value({"id": str(kind), "damage": value}, weapon.hands) + (0.5 if kind == &"wet" and items != null and items.power(&"conductive_wet") > 0 else 0.0)
 	if data.stat_key != &"":
 		return value
 	return WeaponAffixes.effect_damage(value, kind, weapon, stats) * (data.proc_factor if data.effect_kind == "holy" else 1.0)
@@ -124,5 +124,5 @@ static func mechanics_text(kind: StringName) -> String:
 		&"holy":
 			return "%d Krits; Markierungen halten jeweils %.0f s. Weitere Waffen können markierte Ziele auslösen. Lichtstoß trifft bis zu %d Ziele, Intervall %.1f s." % [data.mark_threshold, data.mark_duration, data.proc_targets, data.proc_cooldown]
 		&"leech":
-			return "Kein Zusatzschaden. Heilt bis zu %.0f %% des tatsächlich verursachten Trefferschadens, höchstens %.1f HP je Impuls. Gemeinsames Intervall %.2f s für alle Waffen; DoTs und Folgeeffekte heilen nicht." % [data.proc_factor * 100, data.utility_cap, data.proc_cooldown]
+			return "Kein Zusatzschaden. Heilt bis zu %.0f %% des tatsächlich verursachten Trefferschadens, höchstens %.1f HP pro Wurzel je Impuls. Eigenes Intervall %.2f s je Waffenexemplar. Salven und Flächentreffer derselben Waffe teilen es; DoTs und Folgeeffekte heilen nicht." % [data.proc_factor * 100, data.utility_cap, data.proc_cooldown]
 	return ""

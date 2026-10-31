@@ -3,9 +3,11 @@ extends "res://tests/support/test_runtime.gd"
 
 const OUTPUT := "res://docs/screenshots/weapon_upgrades/"
 var game: Node2D
+var output_path := OUTPUT
 
 
 func _initialize() -> void:
+	if "--economy" in OS.get_cmdline_user_args(): output_path = "res://docs/screenshots/upgrade_economy/"
 	call_deferred("_run")
 
 
@@ -35,12 +37,16 @@ func _run() -> void:
 		for effect: Dictionary in builds[index]:
 			for rank in int(effect.level): assert(state.plan(game.player.loadout, weapons[index].instance_uid, effect.id))
 	assert(state.commit(game.player.loadout))
+	if "--economy" in OS.get_cmdline_user_args():
+		game.items.acquire(ItemCatalog.by_id(&"rune_polish"))
+		game.rewards.upgrade_income.polish_progress = 3
+		game.rewards.upgrade_income.luck_bonus = 1
 	state.points = 3
 	game.rewards.step = PostWaveRewards.Step.WEAPONS
 	game._advance_post_wave_rewards()
 	var panel: WeaponEnchantmentPanel = game.weapon_enchantment_panel
 	if "--interactive" in OS.get_cmdline_user_args(): return
-	DirAccess.make_dir_recursive_absolute(OUTPUT)
+	DirAccess.make_dir_recursive_absolute(output_path)
 	for extent in [Vector2i(1280, 720), Vector2i(1040, 600), Vector2i(360, 640), Vector2i(320, 568), Vector2i(568, 320), Vector2i(720, 1280), Vector2i(1920, 1080)]:
 		root.content_scale_size = extent
 		root.size = extent
@@ -74,9 +80,12 @@ func _run() -> void:
 
 func _capture(filename: String) -> void:
 	for frame in 12: await process_frame
+	if filename.begins_with("overview_"):
+		game.weapon_enchantment_panel.stage.body_scroll.scroll_vertical = 0
+		for frame in 2: await process_frame
 	_check_bounds(game.weapon_enchantment_panel.body)
 	await RenderingServer.frame_post_draw
-	root.get_texture().get_image().save_png(OUTPUT + filename)
+	root.get_texture().get_image().save_png(output_path + filename)
 
 
 func _check_bounds(parent: Control) -> void:

@@ -65,8 +65,8 @@ func _run() -> void:
 			if attack.active: kinds[attack.attack_kind] = true
 			peak_fields = maxi(peak_fields, attack.fields.size())
 			peak_shards = maxi(peak_shards, attack.volley.entries.size())
-			_check(attack.fields.size() <= 2 and attack.volley.entries.size() <= profile.shards.maximum, "King exceeded a hazard budget")
-		results.append({"difficulty": str(difficulty.id), "seconds": 60, "warnings": warnings[0], "channels": attack.channels_created, "rows": attack.rows_fired, "projectiles": attack.volley.fired, "movement": snappedf(attack.movement, 0.1), "damage_acid": snappedf(attack.damage_by_source.acid, 0.1), "damage_stomp": snappedf(attack.damage_by_source.stomp, 0.1), "damage_shards": snappedf(attack.volley.damage_dealt, 0.1), "peak_fields": peak_fields, "peak_shards": peak_shards, "kinds": kinds.size()})
+			_check(attack.fields.size() <= 2 and attack.volley.entries.size() <= profile.shards.maximum and attack.spit.entries.size() <= profile.spit.maximum, "King exceeded a hazard budget")
+		results.append({"difficulty": str(difficulty.id), "seconds": 60, "warnings": warnings[0], "channels": attack.channels_created, "rows": attack.rows_fired, "projectiles": attack.volley.fired + attack.spit.fired, "spit_projectiles": attack.spit.fired, "movement": snappedf(attack.movement, 0.1), "damage_acid": snappedf(attack.damage_by_source.acid, 0.1), "damage_stomp": snappedf(attack.damage_by_source.stomp, 0.1), "damage_shards": snappedf(attack.volley.damage_dealt, 0.1), "damage_spit": snappedf(attack.spit.damage_dealt, 0.1), "peak_fields": peak_fields, "peak_shards": peak_shards, "kinds": kinds.size()})
 		_check(kinds.size() == 3, "King did not use its whole repertoire")
 		# Every difficulty/attack/state preserves its actual announced geometry.
 		for kind in [0, 1, 2]:
@@ -93,6 +93,11 @@ func _run() -> void:
 					var goal := (corner + Vector2.from_angle(route * TAU / 32) * (130 if kind == AcidKingEncounter.Attack.STOMP else 180)).clamp(Vector2.ONE * 48, game.player.arena.arena_size - Vector2.ONE * 48)
 					var body := false
 					for frame in 240:
+						# Judge the first channel escape until the next complete warning.
+						# The faster cycle now asks for a new decision before four seconds;
+						# The new fan needs its own response after the lane dodge.
+						# king_assault_routes covers complete warning-aware combinations.
+						if kind == AcidKingEncounter.Attack.CHANNELS and attack.state in [AcidKingEncounter.State.WARN_SPIT, AcidKingEncounter.State.WARN_STOMP]: break
 						game.player.global_position = game.player.global_position.move_toward(goal, PlayerStats.BASE_MOVE_SPEED * 0.72 / 60)
 						if game.player.global_position.distance_to(boss.global_position) <= boss.data.radius + 20:
 							body = true

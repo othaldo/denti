@@ -35,7 +35,7 @@ func _run() -> void:
 	for frame in 180:
 		await physics_frame
 		if game.rewards.step == PostWaveRewards.Step.LEVELS: break
-	_check(state.points == 2 and game.coins == 3 and game.get_node("Loot").get_child_count() == 0, "loot sweep lost point capsules or coins")
+	_check(state.points == 4 and game.coins == 3 and game.get_node("Loot").get_child_count() == 0, "loot sweep lost point capsules or coins")
 	_check(game.choice_panel.visible and not game.weapon_enchantment_panel.visible, "weapons preceded pending level choices")
 	while game.rewards.pending_levels > 0: choose_panel(game.choice_panel, 0)
 	await _settle()
@@ -47,10 +47,10 @@ func _run() -> void:
 	await _click(panel.upgrade_buttons[0])
 	await _click(_effect(panel, &"fire"))
 	await _click(panel.finish_button)
-	_check(state.actions.size() == 1 and state.preview(weapons[0])[0].level == 1 and weapons[0].affixes.is_empty(), "activation must cost one point at 1/10 and remain a draft")
+	_check(state.actions.size() == 1 and state.preview(weapons[0])[0].level == 1 and weapons[0].affixes.is_empty(), "activation must pay its two-root cost at 1/10 and remain a draft")
 	_check(state.preview(weapons[1]).is_empty(), "identical weapon copy inherited another target's effect")
 	await _click(panel.back_button)
-	_check(state.actions.is_empty() and state.remaining() == 2, "undo did not restore the point")
+	_check(state.actions.is_empty() and state.remaining() == 4, "undo did not restore the point")
 	await _click(panel.weapon_buttons[1])
 	_check(panel.models[1].slot_count == 2 and not panel.upgrade_buttons[1].disabled and panel.upgrade_buttons[2].disabled, "Mk II slot gate is wrong")
 	await _click(panel.upgrade_buttons[0])
@@ -75,7 +75,7 @@ func _run() -> void:
 	loadout = game.player.loadout
 	state = game.rewards.weapon_upgrades
 	_check(panel.visible and paused and panel.selected_weapon == 1 and panel.selected_effect == &"tempo" and panel.picking_slot == 1, "resume lost target, catalogue or selected effect")
-	_check(state.points == 2 and state.actions.size() == 1 and loadout.equipped()[1].affixes.is_empty(), "resume committed or lost the draft")
+	_check(state.points == 4 and state.actions.size() == 1 and loadout.equipped()[1].affixes.is_empty(), "resume committed or lost the draft")
 	await _click(panel.finish_button)
 	_check(state.remaining() == 0 and panel.upgrade_buttons[0].disabled, "empty budget still permits improvements")
 	_check(not state.plan(loadout, uid, &"fire"), "backend accepted an over-budget plan")
@@ -105,11 +105,11 @@ func _run() -> void:
 	loadout.restore([{"id": "turbo_drill", "tier": 4}])
 	var target := loadout.equipped()[0]
 	var max_state := WeaponUpgradeState.new()
-	max_state.points = 40
+	max_state.points = 40 * WeaponUpgrades.cost(target.data)
 	for effect in [&"fire", &"range", &"tempo", &"leech"]:
 		for rank in 10: _check(max_state.plan(loadout, target.instance_uid, effect), "rank below 10 was rejected")
 		_check(not max_state.plan(loadout, target.instance_uid, effect), "effect grew beyond 10/10")
-	_check(max_state.commit(loadout) and max_state.points == 0 and target.affixes.size() == 4, "full weapon did not cost exactly forty points")
+	_check(max_state.commit(loadout) and max_state.points == 0 and target.affixes.size() == 4, "full weapon did not pay its root-weighted cost")
 	for effect in target.affixes: _check(effect.level == 10, "full weapon contains an incomplete effect")
 	# New effect power is budgeted across roots, interval and the initial fan.
 	var base_budget := -1.0

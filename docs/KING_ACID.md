@@ -1,8 +1,13 @@
 # Karies-König: der Säuresammler
 
-Stand: 21.10.2026. Eigener Encounter im echten Welle-15-Gegnerprofil, damit auch
+Aktuell seit 31.10.: gezielte Säurefächer während der Bahnen und doppelte Stampffolgen auf Hard/Hell. Verhalten, Skalierung und Vergleich stehen in [KING_ASSAULT.md](KING_ASSAULT.md). Der vorherige Lebens-/Bewegungsabgleich steht in [BOSS_AGGRESSION.md](BOSS_AGGRESSION.md). Die folgenden Detailwerte und älteren Aufnahmen dokumentieren den vorherigen Ausbau.
+
+Stand: 30.10.2026. Eigener Encounter im echten Welle-15-Gegnerprofil, damit auch
 in Story und Endlos. Kein zusätzlicher HP-Multiplikator. Der alte generische
 Charge-/Pulsablauf und seine Phasensalven werden für diesen König ersetzt.
+
+Die Überarbeitung vom 30.10. ergänzt Nachsetzen und erneutes Zielen beim
+Pegelwechsel sowie frühere Kombinationen. [Vorher-/Nachher-Messung](KING_PRESSURE_BALANCE.md).
 
 [Native Vergleichsaufnahmen aller vier Stufen](concepts/king-acid/fight.html).
 [Generierte Assets, vollständige Prompts und Herkunft](concepts/king-acid-art.md).
@@ -20,8 +25,8 @@ ersten Gesundheitsphase. Jeder Ablauf endet mit Sammlerzug und offener Brust.
 | Mechanik | Umsetzung | Antwort |
 | --- | --- | --- |
 | Säurerinnen | 1 s feste Vorwarnung; 2,2 s Fluss; 48 px breite gemalte Ströme | Ufer früh wählen, die markierte Bahn verlassen |
-| Pegelwechsel | Erster Fluss 1,25 s, dann neuer Rinnensatz mit eigener 1-s-Warnung; alter Boden versiegt nach 0,30 s | Den freien Übergang nutzen, bevor der nächste Strom aktiv wird |
-| Splitterstampf | 1 s Vorwarnung für alle Reihen; Aufbruch alle 0,24 s, jeweils 0,16 s aktiv; jede Reihe schickt einen Splitterfächer nach außen | Seitlich aus der Folge oder rechtzeitig näher zum König wechseln |
+| Pegelwechsel | Erster Fluss 1,25 s; alter Boden versiegt nach 0,30 s, während der König 0,45 s nachsetzt; danach neu gezielter Rinnensatz mit eigener 1-s-Warnung | Neue Bahn lesen und das nächste Ufer wählen |
+| Splitterstampf | 1 s Vorwarnung einzeln, 1,4 s zusammen mit Rinnen; Aufbruch alle 0,24 s, jeweils 0,16 s aktiv; jede Reihe schickt einen Splitterfächer nach außen | Seitlich aus der Folge oder rechtzeitig näher zum König wechseln |
 | Sammlerzug | 0,95 s rückläufige Texturbewegung und wieder gefüllte Behälter; danach freie Flächen und 1,6 s offener Kern | Öffnung für einen Gegenangriff nutzen |
 
 Geschlossener/offener Kern multipliziert eingehenden Schaden mit 0,85/1,25;
@@ -31,18 +36,21 @@ Denti zugeschnittene Lücke auszulassen. Reihen liegen 105 px auseinander und
 sind 320 px lang. Alle Treffer benutzen den normalen Schadenspfad; ein Dash
 ist keine Unverwundbarkeit gegen die Säure.
 
-Die zweite Gesundheitsphase ergänzt eine Stampfreihe. In der letzten Phase
-kommen zwei Splitter je Reihe dazu; nach dem letzten Pegelwechsel folgt ein
-angekündigter Stampf, während der letzte Rinnensatz noch aktiv ist. Erst danach
-werden die Rinnen zurückgezogen. Höchstens diese zwei Mechaniken überlagern
-sich im neuen eigenen Ablauf.
+Die zweite Gesundheitsphase ergänzt eine Stampfreihe. Ab dieser Phase folgt auf
+reguläre Rinnen sowie den letzten Pegelwechsel ein angekündigter Stampf, während
+der letzte Rinnensatz noch aktiv ist. Auf Easy beginnt diese Kombination erst in der letzten Phase.
+In der letzten Phase kommen zusätzlich zwei Splitter je Reihe dazu. Erst nach
+dem Stampf werden die Rinnen zurückgezogen. Höchstens diese zwei Mechaniken
+überlagern sich im eigenen Ablauf.
 
 ## Schwierigkeit
 
 Die bestehenden gemeinsamen Schwierigkeitsdaten bleiben maßgeblich. Das
 Königsprofil leitet daraus seine Werte ab und kopiert seine Projektilressource
 explizit, damit mehrere Bosse oder Stufen keine gemeinsame Vorlage verändern.
-Alle Warnzeiten bleiben gleich.
+Rinnen und einzelne Stampfer behalten ihre 1-s-Warnung. Der kombinierte
+Stampfer warnt auf allen vier Stufen 1,4 s, damit auch langsame Spieler an
+schmalen Arenaecken ein freies Ufer erreichen können.
 
 | Wert | Easy | Normal | Hard | Hell |
 | --- | ---: | ---: | ---: | ---: |
@@ -53,12 +61,23 @@ Alle Warnzeiten bleiben gleich.
 | Splittergeschwindigkeit, px/s | 189 | 210 | 235,2 | 268,8 |
 | Gemeinsamer Bewegungsfaktor | 0,90 | 1,00 | 1,12 | 1,35 |
 | Bewegung während des Flusses, Anteil der eigenen Positionierung | 0,12 | 0,22 | 0,32 | 0,42 |
+| Nachsetzen vor jedem Pegelwechsel, Dauer | 0,45 s | 0,45 s | 0,45 s | 0,45 s |
+| Nachsetzen, Faktor der eigenen Positionierung | 0,75 | 1,00 | 1,25 | 1,50 |
+| Rinnenachse bei jedem Pegelwechsel drehen | nein | ja | ja | ja |
+| Rinnen-/Stampf-Kombination ab Gesundheitsphase (1–3) | 3 | 2 | 2 | 2 |
 | Erholungs- und Positionierungszeit, Faktor | 1,20 | 1,00 | 0,80 | 0,55 |
 
 Der König positioniert sich schwerfällig seitlich und bleibt im sichtbaren
 Bereich. Er bewegt sich auch während aktiver Ströme; deren festgelegte Orte
 bleiben dabei unverändert. Er läuft für die Positionierung nicht absichtlich
 durch Dentis Körper.
+
+Beim Nachsetzen zwischen zwei Rinnensätzen schließt er bis auf einen Zielabstand
+von 190 px auf. Anschließend erfasst er Dentis aktuelle Position neu, mit maximal
+0,30 s beziehungsweise 80 px Vorhalt. Ab Normal wechselt die nächste Rinne außerdem
+zwischen horizontaler und vertikaler Ausrichtung. Das Ziel wird ausschließlich
+**vor** Beginn der vollständigen Warnung aktualisiert. Während der Warnung und
+des Stampfs bleibt der König stehen; angekündigte und aktive Geometrie bleibt fest.
 
 ## Bahnenden, Warnung und Darstellung
 
@@ -100,7 +119,15 @@ neuen Vorbereitung. Pause friert die Uhr ein; Phasenwechsel und Tod räumen
 alle eigenen Gefahren auf. Die Ressourcen samt Flüssigkeitsshader werden
 über den vorhandenen Warmup vorbereitet.
 
+Der neue Zustand `PURSUE` wurde an die Zustandsliste angehängt. Bestehende
+Zustandsnummern und Save-Version 1 bleiben gültig. Nachsetzen und auslaufende
+Rinnen werden einschließlich Restzeiten gespeichert und fortgesetzt.
+
 ## Messung und Prüfung
+
+Die folgende historische Messung beschreibt den Stand vom 21.10.2026.
+Für den aktuellen Druck und die zusätzlichen 168 getesteten kombinierten
+Eck-/Uferkonstellationen gilt die [Messung vom 30.10.](KING_PRESSURE_BALANCE.md).
 
 - Vollständiger Lauf: **129/129 Tests**, Logordner
   `.godot/test_runs/20261021-085457-e1f41520`.

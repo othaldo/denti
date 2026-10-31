@@ -150,26 +150,21 @@ func _draw_lane(lane: int) -> void:
 	var end := center + forward * profile.fold_length
 	var corridor := Rect2(center - half, half * 2).expand(end - half).expand(end + half)
 	var amber := Color(1.0, 0.62, 0.20, 0.9)
+	var base := global_transform.affine_inverse()
 	if elapsed < slam:
 		var progress := clampf(elapsed / slam, 0, 1)
-		draw_rect(box, Color(0.65, 0.22, 0.10, 0.25 + progress * 0.15))
-		draw_rect(box, amber, false, 3, true)
-		draw_rect(corridor, Color(0.9, 0.52, 0.18, 0.08))
-		draw_rect(corridor, Color(1, 0.67, 0.28, 0.55), false, 2, true)
-		for step in 4:
-			var at := center + forward * (45 + step * 85)
-			var side := forward.orthogonal() * 9
-			draw_polyline(PackedVector2Array([at + side - forward * 9, at, at - side - forward * 9]), amber, 2, true)
+		WarningEffects.rectangle(self, box, progress, amber, base, WarningEffects.BATCH.Phase.WARNING, forward == Vector2.DOWN)
+		WarningEffects.rectangle(self, corridor, clampf(elapsed / fold_start, 0, 1), Color(1, 0.67, 0.28, 0.60), base, WarningEffects.BATCH.Phase.WARNING, forward == Vector2.DOWN)
 		_paint(pillow_art, center - Vector2(0, 55 * (1 - progress)), profile.lane_width * (0.65 + 0.35 * progress), Color(1, 1, 1, 0.3 + 0.6 * progress))
-		draw_arc(center, 23, -PI * 0.5, -PI * 0.5 + TAU * progress, 32, amber, 4, true)
+		WarningEffects.timer(self, center, 23, progress, amber, base)
 	elif elapsed < fold_start + profile.fold_seconds:
 		var since := elapsed - slam
 		if since < profile.fold_delay:
 			_paint(pillow_art, center, profile.lane_width, Color.WHITE)
-			draw_rect(box, Color(1, 0.32, 0.19, 0.9 * (1 - since / profile.fold_delay)), false, 4, true)
+			WarningEffects.rectangle(self, box, 1, Color(1, 0.32, 0.19, 0.9 * (1 - since / profile.fold_delay)), base, WarningEffects.BATCH.Phase.ACTIVE, forward == Vector2.DOWN)
+			WarningEffects.rectangle(self, corridor, clampf(elapsed / fold_start, 0, 1), Color(1, 0.67, 0.28, 0.60), base, WarningEffects.BATCH.Phase.WARNING, forward == Vector2.DOWN)
 		else:
-			draw_rect(corridor, Color(0.7, 0.32, 0.17, 0.08))
-			draw_rect(corridor, Color(1, 0.67, 0.28, 0.5), false, 2, true)
+			WarningEffects.rectangle(self, corridor, 1, Color(1, 0.67, 0.28, 0.60), base, WarningEffects.BATCH.Phase.ACTIVE, forward == Vector2.DOWN)
 			var at := center.lerp(end, clampf((elapsed - fold_start) / profile.fold_seconds, 0, 1))
 			# Rotate the generated ridge; every source pixel keeps its aspect ratio.
 			draw_set_transform_matrix(global_transform.affine_inverse() * Transform2D(forward.angle() - PI * 0.5, at))

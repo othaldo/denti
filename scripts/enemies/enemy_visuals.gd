@@ -38,16 +38,16 @@ static func draw(enemy: Enemy) -> void:
 				var first_preview_index := enemy.boss_radial_volley_index if enemy.boss_phase_burst_fired else 0
 				var current_angle := deg_to_rad(enemy.data.boss_radial_angle_step_degrees * float(first_preview_index))
 				for ray in EnemyProjectilePatterns.circle_directions(maxi(enemy.data.boss_radial_count + enemy.boss_phase * 2 + enemy.difficulty.boss_volley_bonus * 2, 4), current_angle):
-					AttackEffects.aim(enemy, ray * enemy.data.radius, ray * 290.0, Color(0.95, 0.25, 0.42, 0.6), 0.5)
+					WarningEffects.aim(enemy, ray * enemy.data.radius, ray * 290.0, Color(0.95, 0.25, 0.42, 0.6), 0.5)
 				if enemy.boss_phase >= 2:
 					var phase_aim := Vector2.RIGHT.rotated(enemy.boss_phase_gap_angle)
 					match enemy.data.boss_signature:
 						EnemyData.BossSignature.AIMED_FAN:
 							for ray in EnemyProjectilePatterns.fan_directions(phase_aim, enemy.data.boss_fan_count):
-								AttackEffects.aim(enemy, ray * enemy.data.radius, ray * 320.0, Color(1.0, 0.65, 0.3, 0.7), 0.5)
+								WarningEffects.aim(enemy, ray * enemy.data.radius, ray * 320.0, Color(1.0, 0.65, 0.3, 0.7), 0.5)
 						EnemyData.BossSignature.TRAIL_FAN:
 							for ray in EnemyProjectilePatterns.fan_directions(-phase_aim, enemy.data.boss_fan_count):
-								AttackEffects.aim(enemy, ray * enemy.data.radius, ray * 320.0, Color(1.0, 0.65, 0.3, 0.7), 0.5)
+								WarningEffects.aim(enemy, ray * enemy.data.radius, ray * 320.0, Color(1.0, 0.65, 0.3, 0.7), 0.5)
 						EnemyData.BossSignature.LANE:
 							var lane_half_width := enemy.data.boss_signature_projectile_spacing * float(enemy.data.boss_signature_projectile_count - 1) * 0.5 + 21.0
 							var lane_end := phase_aim * 520.0
@@ -55,7 +55,6 @@ static func draw(enemy: Enemy) -> void:
 						EnemyData.BossSignature.SPACE_ORB:
 							var orb_end := phase_aim * 520.0
 							AttackEffects.lane(enemy, Vector2.ZERO, orb_end, enemy.data.boss_signature_orb_radius * 0.7, Color(1.0, 0.43, 0.25, 0.65), 0.5)
-							GroundEffects.draw(enemy, GroundEffects.Shape.DANGER, orb_end, enemy.data.boss_signature_orb_radius, Color(1.0, 0.48, 0.3, 0.85))
 		elif enemy.boss_damage_budget <= enemy.max_health * 0.01:
 			CombatDrawCache.arc(enemy, Vector2.ZERO, enemy.data.radius + 19.0, 0.0, TAU, 48, Color(0.43, 0.84, 0.94, 0.8), 5.0)
 	if enemy.data.is_elite and enemy.data.elite_guard_fraction > 0.0:
@@ -65,12 +64,8 @@ static func draw(enemy: Enemy) -> void:
 			CombatDrawCache.arc(enemy, Vector2.ZERO, enemy.data.radius + 18.0, -PI / 2.0, -PI / 2.0 + TAU * guard_ratio, 40, Color(0.43, 0.84, 0.94, 0.85), 4.0)
 	if enemy.spatial_index == null:
 		enemy.draw_attack_visuals(enemy)
-	if enemy.pulse_flash_time > 0.0:
-		var flash_radius := enemy.data.dash_impact_radius if enemy.active_special_attack == EnemyData.SpecialAttack.DASH and enemy.data.dash_impact_radius > 0.0 else enemy.data.attack_radius
-		if enemy.active_special_attack == EnemyData.SpecialAttack.DASH and enemy.data.dash_impact_radius > 0.0:
-			WarningEffects.charge_impact(enemy, Vector2.ZERO, flash_radius, 1, Color(1, 1, 1, enemy.pulse_flash_time / Enemy.PULSE_FLASH_DURATION))
-		else:
-			CombatDrawCache.arc(enemy, Vector2.ZERO, flash_radius, 0.0, TAU, 64, Color(1.0, 0.72, 0.27, enemy.pulse_flash_time / Enemy.PULSE_FLASH_DURATION), 8.0)
+	if enemy.pulse_flash_time > 0.0 and enemy.active_special_attack != EnemyData.SpecialAttack.DASH:
+		WarningEffects.circle(enemy, Vector2.ZERO, enemy.data.attack_radius, 1, Color(1.0, 0.72, 0.27, enemy.pulse_flash_time / Enemy.PULSE_FLASH_DURATION), Transform2D.IDENTITY, WarningEffects.BATCH.Phase.ACTIVE)
 	enemy.affix_effects.draw_markers(enemy)
 	if enemy.bleed_stacks > 0:
 		CombatDrawCache.arc(enemy, Vector2.ZERO, enemy.data.radius + 4.0, 0.0, TAU, 24, Color(0.78, 0.25, 0.48, 0.85), 2.5 + enemy.bleed_stacks)
@@ -158,34 +153,28 @@ static func draw_attack_visuals(enemy: Enemy, canvas: CanvasItem, base: Transfor
 	if draw_fill:
 		enemy.draw_warning_fill(canvas, base, fill_scales)
 	if enemy.special_phase == Enemy.SpecialPhase.WARNING:
-		var warning_color := Color(0.73, 0.20, 0.19, 0.85)
-		var warning_progress := 1.0 - clampf(enemy.special_timer / maxf(enemy.data.warning_time, 0.01), 0.0, 1.0)
+		# Charge warnings are complete in the lane pass; no endpoint decoration.
 		if enemy.active_special_attack == EnemyData.SpecialAttack.DASH or enemy.active_special_attack == EnemyData.SpecialAttack.BOSS and enemy.boss_move == Enemy.BossMove.CHARGE:
-			var dash_path := enemy.warning_lane_end()
-			if enemy.active_special_attack == EnemyData.SpecialAttack.DASH and enemy.data.dash_impact_radius > 0.0:
-				WarningEffects.charge_impact(canvas, dash_path, enemy.data.dash_impact_radius, warning_progress, visual_tint)
-			else:
-				AttackEffects.flash(canvas, dash_path, enemy.data.radius * 0.55 if enemy.data.is_boss else 9.0, Color(1.0, 0.4, 0.32, 0.3) * visual_tint)
-		elif enemy.active_special_attack == EnemyData.SpecialAttack.SHOOT:
+			return
+		var warning_progress := 1.0 - clampf(enemy.special_timer / maxf(enemy.data.warning_time, 0.01), 0.0, 1.0)
+		if enemy.active_special_attack == EnemyData.SpecialAttack.SHOOT:
 			var shot_color := Color(DentiStatus.COLORS[int(enemy.inflicted_statuses[0]["kind"])], 0.9) if not enemy.inflicted_statuses.is_empty() else Color(enemy.data.projectile_color, 0.9)
 			for ray in enemy._warning_rays(EnemyData.SpecialAttack.SHOOT, enemy._aimed_projectile_count()):
-				AttackEffects.aim(canvas, ray * enemy.data.radius, ray * 150.0, shot_color * visual_tint, warning_progress, base)
-			AttackEffects.warning_ring(canvas, Vector2.ZERO, enemy.data.radius + 8.0, warning_progress, shot_color * visual_tint)
+				WarningEffects.aim(canvas, ray * enemy.data.radius, ray * 150.0, shot_color * visual_tint, warning_progress, base)
+			AttackEffects.warning_ring(canvas, Vector2.ZERO, enemy.data.radius + 8.0, warning_progress, shot_color * visual_tint, base)
 		elif enemy.active_special_attack == EnemyData.SpecialAttack.RADIAL:
 			var shot_color := Color(1.0, 0.48, 0.19, 0.9)
 			for ray in enemy._warning_rays(EnemyData.SpecialAttack.RADIAL, enemy.data.radial_count):
-				AttackEffects.aim(canvas, ray * enemy.data.radius, ray * 235.0, Color(shot_color, 0.3 + warning_progress * 0.35) * visual_tint, warning_progress, base)
-			AttackEffects.warning_ring(canvas, Vector2.ZERO, enemy.data.radius + 9.0, warning_progress, shot_color * visual_tint)
+				WarningEffects.aim(canvas, ray * enemy.data.radius, ray * 235.0, Color(shot_color, 0.3 + warning_progress * 0.35) * visual_tint, warning_progress, base)
+			AttackEffects.warning_ring(canvas, Vector2.ZERO, enemy.data.radius + 9.0, warning_progress, shot_color * visual_tint, base)
 		elif enemy.active_special_attack == EnemyData.SpecialAttack.LANE:
 			var lane_color := Color(0.50, 0.88, 0.14, 0.9)
-			AttackEffects.warning_ring(canvas, Vector2.ZERO, enemy.data.radius + 8.0, warning_progress, lane_color * visual_tint)
+			AttackEffects.warning_ring(canvas, Vector2.ZERO, enemy.data.radius + 8.0, warning_progress, lane_color * visual_tint, base)
 		elif enemy.active_special_attack == EnemyData.SpecialAttack.SPACE_ORB:
 			var orb_color := Color(1.0, 0.43, 0.25, 0.88)
-			var orb_end := enemy.warning_lane_end()
-			AttackEffects.danger(canvas, orb_end, enemy.data.space_orb_radius, orb_color * visual_tint)
-			AttackEffects.warning_ring(canvas, Vector2.ZERO, enemy.data.radius + 8.0, warning_progress, orb_color * visual_tint)
+			AttackEffects.warning_ring(canvas, Vector2.ZERO, enemy.data.radius + 8.0, warning_progress, orb_color * visual_tint, base)
 		else:
-			AttackEffects.danger(canvas, Vector2.ZERO, enemy.data.attack_radius, Color(1.0, 0.34, 0.29, 0.8 + warning_progress * 0.2) * visual_tint)
-			AttackEffects.warning_ring(canvas, Vector2.ZERO, enemy.data.attack_radius - 8.0, warning_progress, Color(1.0, 0.72, 0.27) * visual_tint)
+			AttackEffects.danger(canvas, Vector2.ZERO, enemy.data.attack_radius, Color(1.0, 0.34, 0.29, 0.8 + warning_progress * 0.2) * visual_tint, warning_progress, base)
+			AttackEffects.warning_ring(canvas, Vector2.ZERO, enemy.data.attack_radius - 8.0, warning_progress, Color(1.0, 0.72, 0.27) * visual_tint, base)
 	elif enemy.special_phase == Enemy.SpecialPhase.ACTIVE and (enemy.active_special_attack == EnemyData.SpecialAttack.DASH or enemy.active_special_attack == EnemyData.SpecialAttack.BOSS and enemy.boss_move == Enemy.BossMove.CHARGE):
 		AttackEffects.strip(canvas, AttackEffects.Shape.TRAIL, enemy.boss_dash_origin - enemy.global_position if enemy.data.is_boss else -enemy.special_direction * enemy.data.radius, Vector2.ZERO, 32.0 if enemy.data.is_boss else 16.0, Color(1.0, 0.72, 0.27, 0.7) * visual_tint, enemy.animation_time, base)

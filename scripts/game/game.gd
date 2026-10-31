@@ -50,6 +50,8 @@ var ended: bool:
 	get: return run_flow.phase == RunFlow.Phase.ENDED
 	set(value): run_flow.set_phase_flag(RunFlow.Phase.ENDED, value)
 var base_victory: bool = false
+var weapon_mastery := RunWeaponMastery.new()
+var mastery_notice: WeaponMasteryNotice
 # Compatibility accessor: the phase is the only stored source of truth.
 var in_shop: bool:
 	get: return run_flow.phase == RunFlow.Phase.SHOP
@@ -178,6 +180,8 @@ func _ready() -> void:
 		test_arena.name = "TestArena"
 		add_child(test_arena)
 		return
+	mastery_notice = WeaponMasteryNotice.new()
+	add_child(mastery_notice)
 	var prepared_weapon := WeaponCatalog.by_id(session.pending_start_weapon_id)
 	session.pending_start_weapon_id = &""
 	if session.resume_requested:
@@ -190,6 +194,7 @@ func _ready() -> void:
 			return
 	player.global_position = arena.arena_size / 2.0
 	if prepared_weapon in WeaponCatalog.ALL and player.loadout.acquire(prepared_weapon):
+		weapon_mastery.begin(prepared_weapon.id, session.test_scenario_id == &"")
 		if session.selected_story_mode:
 			story.start()
 			story.followup = &"wave"
@@ -275,10 +280,12 @@ func _on_starter_chosen(weapon: WeaponData) -> void:
 		_show_starters()
 		return
 	starter_pending = false
+	weapon_mastery.begin(weapon.id, session.test_scenario_id == &"")
 	_start_combat_wave()
 
 
 func _start_combat_wave() -> void:
+	if mastery_notice != null: mastery_notice.hide()
 	get_node("/root/SceneTransitions").present(&"combat", false)
 	run_flow.enter(RunFlow.Phase.COMBAT)
 	rewards.begin_wave()
@@ -473,6 +480,8 @@ func _create_enemy(data: EnemyData, at: Vector2, treasure: bool = false) -> void
 
 
 func _on_enemy_defeated(at: Vector2, data: EnemyData, treasure: bool = false) -> void:
+	if data.is_boss and not ended:
+		weapon_mastery.record(session, &"boss", wave.difficulty_id, wave.current_wave)
 	telemetry.record_kill(data.is_boss, data.is_elite)
 	if not data.is_boss:
 		sound.play_cue(&"down")
@@ -574,7 +583,7 @@ func _on_loot_collected(kind: StringName, amount: int, reward_id: StringName = &
 	sound.play_cue(&"pickup")
 	if kind == &"chest":
 		if reward_id == WeaponAffixes.CHEST_ID and drop != null:
-			rewards.queue_affix_chest(drop.reward_data)
+			rewards.queue_affix_chest(drop.reward_data, items)
 			if drop.reward_data.get("kind", "") == WeaponUpgrades.KIND: telemetry.record_chest_kept()
 		else:
 			rewards.queue_chest(reward_id, amount)
@@ -845,11 +854,14 @@ func _finish_loot_collection() -> void:
 		if dialogue_id != &"":
 			rewards.queue_story(dialogue_id)
 			story.completed_boss_wave = wave.current_wave
+	rewards.weapon_upgrades.points += rewards.upgrade_income.finish_wave(player.stats.luck, randf())
 	rewards.finish_collection(wave.current_wave >= WaveController.MAX_WAVES and not wave.endless_enabled)
 	_advance_post_wave_rewards()
 
 
 func _advance_post_wave_rewards() -> void:
+	if mastery_notice != null and rewards.step != PostWaveRewards.Step.END:
+		mastery_notice.present(weapon_mastery.starter_id, weapon_mastery.take_pending())
 	var progress := rewards.choice_progress()
 	if rewards.step in [PostWaveRewards.Step.LEVELS, PostWaveRewards.Step.CHESTS, PostWaveRewards.Step.RELICS, PostWaveRewards.Step.WEAPONS]:
 		get_node("/root/SceneTransitions").present(&"rewards")
@@ -860,7 +872,7 @@ func _advance_post_wave_rewards() -> void:
 		PostWaveRewards.Step.WEAPONS:
 			choice_panel.hide()
 			weapon_chest_panel.hide()
-			weapon_enchantment_panel.show_upgrades(rewards.weapon_upgrades, player.loadout, player.stats, items)
+			weapon_enchantment_panel.show_upgrades(rewards.weapon_upgrades, player.loadout, player.stats, items, rewards.upgrade_income)
 			get_tree().paused = true
 			_save_run()
 		PostWaveRewards.Step.CHESTS:
@@ -912,7 +924,7 @@ func _clear_arena(collect_drops: bool, keep_boss: bool = false) -> void:
 		if collect_drops:
 			if drop.kind == &"chest":
 				if drop.reward_id == WeaponAffixes.CHEST_ID:
-					rewards.queue_affix_chest(drop.reward_data)
+					rewards.queue_affix_chest(drop.reward_data, items)
 					if drop.reward_data.get("kind", "") == WeaponUpgrades.KIND: telemetry.record_chest_kept()
 				else:
 					rewards.queue_chest(drop.reward_id, drop.amount)
@@ -950,11 +962,14 @@ func _clear_combat(keep_boss: bool = false) -> void:
 func _finish_run() -> void:
 	if ended:
 		return
+	if mastery_notice != null: mastery_notice.hide()
 	get_node("/root/SceneTransitions").present(&"end")
 	rewards.step = PostWaveRewards.Step.END
 	ended = true
 	player.status_effects.clear()
 	base_victory = true
+	weapon_mastery.record(session, &"victory", wave.difficulty_id, wave.current_wave)
+	weapon_mastery.take_pending()
 	boss_pending = false
 	_sync_music()
 	_clear_arena(true)
@@ -1067,7 +1082,7 @@ func _on_shop_enchant() -> void:
 	if not in_shop or weapon_fusion_panel.visible or rewards.weapon_upgrades.points <= 0: return
 	shop_panel.close_details()
 	shop_panel.hide()
-	weapon_enchantment_panel.show_upgrades(rewards.weapon_upgrades, player.loadout, player.stats, items)
+	weapon_enchantment_panel.show_upgrades(rewards.weapon_upgrades, player.loadout, player.stats, items, rewards.upgrade_income)
 
 
 func _on_shop_reroll() -> void:
@@ -1110,6 +1125,7 @@ func _on_shop_continue() -> void:
 func _on_player_died() -> void:
 	if ended:
 		return
+	if mastery_notice != null: mastery_notice.hide()
 	get_node("/root/SceneTransitions").present(&"end")
 	ended = true
 	player.status_effects.clear()
@@ -1137,6 +1153,7 @@ func _run_recap_data() -> Dictionary:
 		"difficulty_id": str(wave.difficulty_id),
 		"endless_enabled": wave.endless_enabled,
 		"base_victory": base_victory,
+		"weapon_mastery": weapon_mastery.save_data(),
 		"wave_reached": wave.current_wave,
 		"final_level": level,
 		"coins_left": coins,
@@ -1151,6 +1168,7 @@ func _run_recap_data() -> Dictionary:
 func debug_start_wave(number: int) -> void:
 	if not DebugRunControls.allowed() or player.loadout.equipped().is_empty():
 		return
+	weapon_mastery.eligible = false
 	element_impacts.clear()
 	wave.active = false
 	# Remove immediately while paused so old loot callbacks and attacks cannot

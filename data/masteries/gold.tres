@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="WeaponMasteryData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/weapon_mastery_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"gold"
+flag = 8
+display_name = "Gold"
+requirement = "Gewinne auf Hell."
+minimum_difficulty = &"hell"
+requires_victory = true
+icon_index = 3

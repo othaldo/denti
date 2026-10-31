@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="BossProjectileData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/boss_projectile_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+speed = 370.0
+lifetime = 1.35
+radius = 9.0
+width = 29.0
+damage_factor = 0.4
+maximum = 24

@@ -8,7 +8,7 @@ Das nächste Ziel: ein kompakteres Kampf-HUD, eine bewusste Dash-Entscheidung, v
 
 - 20 Wellen, anschließend optional Endlos; Bossabschlüsse in Welle 5, 10, 15 und 20. Wellenlängen variieren, Bosswellen dauern vor der Entzündung 45 Sekunden.
 - Vier Story-Areas mit Dialogen und Ortswechseln: **Unter dem Kissen**, **Das süße Verderben**, **Tief im Säurestrom**, **Die letzte Krone**.
-- 18 reguläre Waffen, sechs geheime Evolutionen, 93 Shop-Items, fünf Relikte und zwölf Grundattribute. Alle 18 Standardwaffen sind als Mk-I-Start auswählbar; geheime Evolutionen bleiben ausgeschlossen. Die Wurzelanzahl ist ein gespeicherter Spielerparameter, Standard 6; [Konfiguration](PLAYER_ROOTS.md).
+- 18 reguläre Waffen, sechs geheime Evolutionen, 94 Shop-Items, fünf Relikte und zwölf Grundattribute. Alle 18 Standardwaffen sind als Mk-I-Start auswählbar; geheime Evolutionen bleiben ausgeschlossen. Die Wurzelanzahl ist ein gespeicherter Spielerparameter, Standard 6; [Konfiguration](PLAYER_ROOTS.md).
 - Ununterbrochener Kampf; danach Beutesammlung, Levelaufstiege, Upgrade-Kapseln, gegebenenfalls Relikt und Story-Übergang, anschließend Shop. Dieser Ablauf bleibt erhalten.
 - Gegnerdruck, Projektilmuster, Bossphasen und Entzündung sind vorhanden. Der Graf besitzt einen Umhang-/Sektorenablauf, der Prinz eine Karamellküche, der König Säurerinnen/Pegelwechsel/Splitterstampf und der Imperator Kronenwache/Hofurteile/Portalstiche/Nerventakt. Eigene Abläufe, alle vier Schwierigkeitsgrade, Speicherung und native Vergleichsaufnahmen sind vorhanden; vollständige Build-Abnahme bleibt offen.
 - Telemetrie, Run-Rückblick, Speichern/Fortsetzen und automatisierte Tests bilden die Grundlage für weitere Änderungen. Shopgrößen und Atlas-Ausschnitte wurden zuletzt korrigiert; entsprechende Layoutgrenzen sollen auch im Kampf gelten.
@@ -276,7 +276,7 @@ Nach Schritt 3 wird geprüft, ob Dash die bisherige Gegnerdichte zu stark entwer
 
 ## Weiterer Backlog
 
-- **Build-Tiefe:** Zusätzliche Items nur mit klarer Wechselwirkung. Blutung, Nässe/Elektro, Crit/Weihe, Schild/Vergeltung, Heilung, Ökonomie und Zucker-Risiko bleiben die Build-Familien. Der frühere Mengenplan „30–35 Items“ ist mit 93 Items überholt.
+- **Build-Tiefe:** Zusätzliche Items nur mit klarer Wechselwirkung. Blutung, Nässe/Elektro, Crit/Weihe, Schild/Vergeltung, Heilung, Ökonomie und Zucker-Risiko bleiben die Build-Familien. Der frühere Mengenplan „30–35 Items“ ist mit 94 Items überholt.
 - **Dash-Synergien:** Nach der Basis etwa begrenzte Erholung durch tatsächliche Schildblocks oder ein Zucker-Item mit schnellerer Erholung und klarer Gegenleistung prüfen. Keine automatischen Vollaufladungen durch jede Tötung, keine endlosen Proc-Ketten und kein Durchqueren von Gegnern durch ein Item.
 - **Gegnerdruck:** Dichte, gemischte Rollen, Burst-Rhythmus und Projektilräume weiter messen. Neue Bossmechaniken und Dash werden gemeinsam mit den vorhandenen Drucksystemen getestet.
 - **Gauner und Economy · umgesetzt, Balance offen:** Verfolgen zwischen Horden und Münzverluste durch entkommene Beute mit Nah-/Fernkampf-Builds vergleichen. Einnahmen, Rerollausgaben und gerettetes/verlorenes Gold in vollständigen Runs auswerten; [Startwerte und Prognose](LOOT_GOBLIN.md).
@@ -295,3 +295,9 @@ Nach Schritt 3 wird geprüft, ob Dash die bisherige Gegnerdichte zu stark entwer
 6. Kampf bleibt ununterbrochen. Beute und Pflichtentscheidungen werden nach der Welle abgearbeitet.
 7. Stats, Ablauf und Speichern haben jeweils eine maßgebliche Quelle; neue Systeme verwenden klare Schnittstellen.
 8. Jede Ausbaustufe wird implementiert, getestet, gespielt und gemessen, bevor die nächste mehr Komplexität hinzufügt.
+
+## Waffenmeisterschaften · 27.10.2026 umgesetzt
+
+Erster Achievement-Baustein: Zahnprüfung und drei kumulative Siegesmedaillen
+pro Startwaffe, dauerhafter Fortschritt, eigenes Achievement-Menü, Suche, Filter und abrufbare Anforderungen sowie Meldung nach der Welle und im Run-Rückblick.
+Keine Statboni oder Waffensperren. [Regeln und Prüfung](WEAPON_MASTERIES.md).

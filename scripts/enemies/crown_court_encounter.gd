@@ -1,14 +1,17 @@
 class_name CrownCourtEncounter
 extends Node2D
 ## One clock owns guard turns, fixed judgments, portal releases and pulse cadence.
-enum State { POSITION, TURN, EDICT_WARN, EDICT_HIT, PORTAL_WARN, PORTAL_FLIGHT, NERVE_WARN, NERVE_RELEASE, OPEN, RECOVERY }
+# Append new states; existing save-state numbers keep their meaning.
+enum State { POSITION, TURN, EDICT_WARN, EDICT_HIT, PORTAL_WARN, PORTAL_FLIGHT, NERVE_WARN, NERVE_RELEASE, OPEN, RECOVERY, REPOSITION }
 enum Attack { EDICT, PORTAL, NERVE }
-const SAVE_VERSION := 1
+const SAVE_VERSION := 2
 var enemy: Enemy
 var profile: CrownCourtData
 var rig: EmperorCourtRig
 var shots: BossPaintedVolley
 var lances: BossPaintedVolley
+var needles: BossPaintedVolley
+var needle_rays: Array[Vector2] = []
 var state := State.POSITION
 var attack_kind := Attack.EDICT
 var remaining := 0.65
@@ -24,6 +27,12 @@ var portal_a := Vector2.ZERO
 var portal_b := Vector2.ZERO
 var verdict_hit := false
 var combo := false
+# An old verdict warning must not gain an unannounced portal when restored.
+var portal_combo := false
+var portal_followup := false
+var legacy_sequence := false
+var guard_remaining := 0.0
+var guard_delay := 0.0
 var warnings := 0
 var verdicts_fired := 0
 var portals_fired := 0
@@ -47,6 +56,7 @@ func _ready() -> void:
 	enemy.sprite.add_child(rig)
 	shots = _batch(profile.shots)
 	lances = _batch(profile.lance)
+	needles = _batch(profile.needles)
 	sync_visual()
 
 func _batch(data: BossProjectileData) -> BossPaintedVolley:
@@ -68,55 +78,85 @@ func cancel() -> void:
 	state = State.POSITION
 	remaining = profile.position_seconds
 	combo = false
+	portal_combo = false
+	portal_followup = false
+	legacy_sequence = false
+	guard_remaining = 0.0
+	guard_delay = 0.0
 	verdict_hit = false
 	if shots != null: shots.clear()
 	if lances != null: lances.clear()
+	if needles != null: needles.clear()
+	needle_rays.clear()
 	sync_visual()
 	queue_redraw()
 
 func begin(forced: int = -1, seconds: float = -1) -> void:
+	legacy_sequence = false
+	portal_followup = false
 	attack_kind = clampi(forced, 0, 2) as Attack if forced >= 0 else posmod(cycle, 3) as Attack
 	cycle += 1
 	step_index = 0
 	origin = enemy.global_position
 	combo = false
-	if attack_kind == Attack.EDICT: _edict()
+	portal_combo = false
+	if attack_kind == Attack.EDICT: _edict(seconds)
 	elif attack_kind == Attack.PORTAL: _portal(seconds)
-	else: _nerve()
+	else: _nerve(seconds)
 
 func _warn() -> void:
 	warnings += 1
 	enemy.attack_performed.emit(&"boss_warning")
 
-func _edict() -> void:
+func _edict(seconds: float = -1) -> void:
+	if not _court_in_range(seconds):
+		_reposition(Attack.EDICT)
+		return
 	state = State.EDICT_WARN
-	remaining = profile.warning_seconds
-	# Arena/cycle-relative: never orient a free sector toward the player.
-	edict_angle = deg_to_rad(cycle * profile.court_cycle_degrees + step_index * profile.court_step_degrees)
-	verdict_hit = false
+	portal_combo = legacy_sequence and enemy.boss_phase >= profile.combo_phase and step_index >= profile.verdicts(enemy.boss_phase) - 1
+	remaining = edict_warning_duration()
+	_lock_verdict(seconds)
+	if portal_combo: _lock_portal(seconds)
 	_warn()
 
-func _portal(seconds: float = -1) -> void:
+func _lock_verdict(seconds: float = -1) -> void:
+	origin = enemy.global_position
+	var at := HazardGeometry.player_at(enemy.target, seconds) if seconds >= 0 else enemy.target.global_position
+	var direction := origin.direction_to(at)
+	# Aim the damaging sector at Denti once; the warning never tracks afterward.
+	edict_angle = (facing if direction.is_zero_approx() else direction).angle()
+	verdict_hit = false
+
+func _portal(seconds: float = -1, followup: bool = false) -> void:
+	portal_followup = followup
 	state = State.PORTAL_WARN
 	remaining = profile.portal_warning_seconds
-	var at := HazardGeometry.player_at(enemy.target, seconds) if seconds >= 0 else enemy.target.global_position
-	var aim := enemy.global_position.direction_to(at).rotated(PI * 0.5 + (step_index % 2) * profile.portal_angle_step_radians)
-	if aim.is_zero_approx(): aim = Vector2.RIGHT
-	var margin := Vector2.ONE * DentiArena.PLAYER_MARGIN
-	var visible := enemy.get_canvas_transform().affine_inverse() * enemy.get_viewport_rect()
-	var inset := Vector2(minf(50, visible.size.x * 0.16), minf(100, visible.size.y * 0.20))
-	var bounds := Rect2(visible.position + inset, visible.size - inset * 2).intersection(Rect2(margin, enemy.target.arena.arena_size - margin * 2))
-	portal_a = (at - aim * profile.portal_half_length).clamp(bounds.position, bounds.end)
-	portal_b = (at + aim * profile.portal_half_length).clamp(bounds.position, bounds.end)
+	_lock_portal(seconds)
 	_warn()
 
-func _nerve() -> void:
+func _lock_portal(seconds: float = -1) -> void:
+	CrownPortalPattern.plan(self, seconds)
+
+func _nerve(seconds: float = -1) -> void:
+	if _needs_court(Attack.NERVE, step_index) and not _court_in_range(seconds):
+		_reposition(Attack.NERVE)
+		return
 	state = State.NERVE_WARN
+	origin = enemy.global_position
 	remaining = profile.nerve_warning_seconds
-	combo = enemy.boss_phase >= 2 and step_index == 0
-	if combo:
-		edict_angle = deg_to_rad(cycle * profile.court_cycle_degrees)
-		verdict_hit = false
+	# New fights combine the ring with dodgeable flying needles. The old
+	# immediate floor sector plus a dense ring could seal slow corner exits.
+	combo = legacy_sequence and enemy.boss_phase >= 2 and step_index == 0
+	needle_rays.clear()
+	if not legacy_sequence and not combo and step_index % 2 == 0:
+		var at := HazardGeometry.player_at(enemy.target, seconds) if seconds >= 0 else enemy.target.global_position
+		at += (enemy.target.velocity * profile.needle_lead_seconds).limit_length(profile.needle_lead_distance)
+		var direction := origin.direction_to(at)
+		if direction.is_zero_approx(): direction = facing
+		needle_rays = EnemyProjectilePatterns.fan_directions(direction, profile.needle_count(), profile.needle_spacing)
+	if enemy.boss_phase >= 2 and step_index == 0:
+		_lock_verdict(seconds)
+	remaining = nerve_warning_duration()
 	_warn()
 
 func advance(delta: float) -> void:
@@ -126,11 +166,19 @@ func advance(delta: float) -> void:
 	var spent := 0.0
 	while left > 0.000001:
 		var step := minf(left, maxf(remaining, 0))
+		_tick_guard(step)
 		shots.advance(step, spent)
 		lances.advance(step, spent)
+		needles.advance(step, spent)
 		if state == State.EDICT_HIT or state == State.NERVE_RELEASE and combo: _hit_verdict(step, spent)
 		if state == State.POSITION: _move(step)
 		elif state == State.PORTAL_FLIGHT: _move(step, profile.portal_drift_factor)
+		elif state == State.REPOSITION: _move(step, profile.reposition_move_factor)
+		elif state == State.OPEN:
+			var before := profile.open_seconds - remaining
+			var walking := maxf(before + step - maxf(before, profile.recovery_settle_seconds), 0)
+			_move(walking, profile.recovery_move_factor)
+		elif state == State.RECOVERY: _move(step, profile.recovery_move_factor)
 		remaining = maxf(remaining - step, 0)
 		elapsed += step
 		left -= step
@@ -154,50 +202,109 @@ func _next(seconds: float) -> void:
 			state = State.EDICT_HIT
 			remaining = profile.impact_seconds
 			verdicts_fired += 1
+			if portal_combo: _fire_portal()
 			for side in [0, 1]:
 				var step_angle := deg_to_rad(profile.court_half_angle * 2 / maxi(profile.fan_count() - 1, 1))
-				shots.fire(origin, EnemyProjectilePatterns.fan_directions(Vector2.from_angle(edict_angle + side * PI), profile.fan_count(), step_angle), &"court_shard")
+				var rays := EnemyProjectilePatterns.fan_directions(Vector2.from_angle(edict_angle + side * PI), profile.fan_count(), step_angle)
+				if legacy_sequence: shots.fire(origin, rays, &"court_shard")
+				else: needles.fire(origin, rays, &"imperial_judgment")
 		State.EDICT_HIT:
 			step_index += 1
-			if step_index < profile.verdicts(enemy.boss_phase): _edict()
+			if not legacy_sequence and enemy.boss_phase >= profile.combo_phase and step_index >= profile.verdicts(enemy.boss_phase): _portal(seconds, true)
+			elif step_index < profile.verdicts(enemy.boss_phase): _reposition(Attack.EDICT)
+			elif portal_combo:
+				step_index = 0
+				_reposition(Attack.NERVE)
 			elif enemy.boss_phase >= 1:
 				step_index = 0
 				_portal(seconds)
 			else: _open()
 		State.PORTAL_WARN:
 			var distance := portal_a.distance_to(portal_b)
-			lances.fire(portal_a, [portal_a.direction_to(portal_b)], &"portal_lance")
-			if not lances.entries.is_empty(): lances.entries[-1].life = minf(distance / profile.lance.speed, profile.lance.lifetime)
-			portals_fired += 1
+			_fire_portal()
 			state = State.PORTAL_FLIGHT
 			remaining = maxf(distance / profile.lance.speed, 0.01)
 		State.PORTAL_FLIGHT:
-			step_index += 1
-			if step_index < profile.portals(enemy.boss_phase): _portal(seconds)
-			else: _open()
+			if portal_followup:
+				portal_followup = false
+				if step_index < profile.verdicts(enemy.boss_phase): _reposition(Attack.EDICT)
+				else:
+					step_index = 0
+					_reposition(Attack.NERVE)
+			else:
+				step_index += 1
+				if step_index < profile.portals(enemy.boss_phase): _reposition(Attack.PORTAL)
+				else: _open()
 		State.NERVE_WARN:
 			state = State.NERVE_RELEASE
 			remaining = profile.impact_seconds
 			pulses_fired += 1
 			shots.fire(origin, EnemyProjectilePatterns.circle_directions(profile.rays(enemy.boss_phase), pulse_angle()), &"nerve")
+			if not needle_rays.is_empty(): needles.fire(origin, needle_rays, &"imperial_needle")
+			needle_rays.clear()
 		State.NERVE_RELEASE:
 			step_index += 1
-			if step_index < profile.pulses(enemy.boss_phase): _nerve()
+			if step_index < profile.pulses(enemy.boss_phase): _reposition(Attack.NERVE)
 			else: _open()
+		State.REPOSITION:
+			if attack_kind == Attack.EDICT: _edict(seconds)
+			elif attack_kind == Attack.PORTAL: _portal(seconds)
+			else: _nerve(seconds)
 		State.OPEN:
 			state = State.RECOVERY
 			remaining = profile.recovery_seconds
 		State.RECOVERY:
-			state = State.TURN
-			remaining = profile.turn_seconds
-			turn_from = facing.angle()
-			turn_to = turn_from + deg_to_rad(profile.guard_turn_degrees) * (1 if cycle % 2 else -1)
-			_warn()
+			if legacy_sequence:
+				state = State.TURN
+				remaining = profile.turn_seconds
+				_plan_guard()
+				_warn()
+			else:
+				state = State.POSITION
+				remaining = profile.position_seconds
+
+func edict_warning_duration() -> float:
+	if portal_combo: return profile.combo_warning_seconds
+	return profile.followup_warning_seconds if not legacy_sequence and step_index > 0 else profile.warning_seconds
+
+func nerve_warning_duration() -> float:
+	return profile.needle_warning_seconds if not needle_rays.is_empty() else profile.nerve_warning_seconds
+
+func _reposition(kind: Attack) -> void:
+	attack_kind = kind
+	state = State.REPOSITION
+	remaining = profile.reposition_seconds
+	combo = false
+	portal_combo = false
+	needle_rays.clear()
+
+func _fire_portal() -> void:
+	lances.fire(portal_a, [portal_a.direction_to(portal_b)], &"portal_lance")
+	if not lances.entries.is_empty(): lances.entries[-1].life = minf(portal_a.distance_to(portal_b) / profile.lance.speed, profile.lance.lifetime)
+	portals_fired += 1
 
 func _open() -> void:
 	state = State.OPEN
 	remaining = profile.open_seconds
 	combo = false
+	portal_combo = false
+	if not legacy_sequence:
+		_plan_guard()
+		guard_remaining = profile.turn_seconds
+		guard_delay = profile.recovery_settle_seconds
+		_warn()
+
+func _plan_guard() -> void:
+	turn_from = facing.angle()
+	turn_to = turn_from + deg_to_rad(profile.guard_turn_degrees) * (1 if cycle % 2 else -1)
+
+func _tick_guard(delta: float) -> void:
+	if guard_remaining <= 0: return
+	var active_seconds := maxf(delta - guard_delay, 0)
+	guard_delay = maxf(guard_delay - delta, 0)
+	if active_seconds <= 0: return
+	guard_remaining = maxf(guard_remaining - active_seconds, 0)
+	facing = Vector2.from_angle(lerp_angle(turn_from, turn_to, smoothstep(0, 1, 1 - guard_remaining / profile.turn_seconds)))
 
 func pulse_angle() -> float:
 	return cycle * profile.nerve_cycle_radians + step_index * profile.nerve_step_radians
@@ -214,17 +321,33 @@ func _hit_verdict(delta: float, first: float) -> void:
 
 func _reserved() -> bool:
 	for other: CrownCourtEncounter in get_tree().get_nodes_in_group("crown_court_encounters"):
-		if other != self and other.enemy.target == enemy.target and other.enemy.health > 0 and (other.active or not other.shots.entries.is_empty() or not other.lances.entries.is_empty()): return true
+		if other != self and other.enemy.target == enemy.target and other.enemy.health > 0 and (other.active or not other.shots.entries.is_empty() or not other.lances.entries.is_empty() or not other.needles.entries.is_empty()): return true
 	return false
+
+func court_start_distance() -> float:
+	return minf(profile.court_approach_distance + profile.court_position_tolerance, profile.court_radius)
+
+func _court_in_range(seconds: float = -1) -> bool:
+	var at := HazardGeometry.player_at(enemy.target, seconds) if seconds >= 0 else enemy.target.global_position
+	return enemy.global_position.distance_squared_to(at) <= pow(court_start_distance(), 2)
+
+func _needs_court(kind: int, index: int) -> bool:
+	return kind == Attack.EDICT or kind == Attack.NERVE and enemy.boss_phase >= 2 and index == 0
 
 func _move(delta: float, speed_factor: float = 1.0) -> void:
 	var target := enemy.target.global_position
 	var away := target.direction_to(enemy.global_position)
 	if away.is_zero_approx(): away = Vector2.LEFT
+	var next_kind := posmod(cycle, 3) if state == State.POSITION else int(attack_kind)
+	var next_index := 0 if state == State.POSITION else step_index
+	var closing_for_court := state in [State.POSITION, State.REPOSITION] and _needs_court(next_kind, next_index)
+	var wanted := minf(profile.court_approach_distance, court_start_distance()) if closing_for_court else profile.preferred_distance
+	# Close distant gaps without retreating from a player who stays in melee.
+	var distance := clampf(enemy.global_position.distance_to(target), enemy.data.radius + HazardGeometry.PLAYER_RADIUS + 5, wanted)
 	var visible := enemy.get_canvas_transform().affine_inverse() * enemy.get_viewport_rect()
 	var inset := Vector2(minf(130, visible.size.x * 0.28), minf(140, visible.size.y * 0.28))
 	var bounds := Rect2(visible.position + inset, visible.size - inset * 2)
-	var desired := (target + away.rotated(0.22) * profile.preferred_distance).clamp(bounds.position, bounds.end)
+	var desired := (target + (away if closing_for_court else away.rotated(0.22)) * distance).clamp(bounds.position, bounds.end)
 	var margin := Vector2.ONE * (DentiArena.WALL_WIDTH + enemy.data.radius + 6)
 	desired = desired.clamp(margin, enemy.target.arena.arena_size - margin)
 	var next := enemy.global_position.move_toward(desired, enemy._movement_speed() * profile.movement_factor * speed_factor * delta)
@@ -235,9 +358,9 @@ func _move(delta: float, speed_factor: float = 1.0) -> void:
 
 func sync_visual() -> void:
 	if rig == null: return
-	var duration := profile.warning_seconds
+	var duration := edict_warning_duration()
 	if state == State.PORTAL_WARN: duration = profile.portal_warning_seconds
-	elif state == State.NERVE_WARN: duration = profile.nerve_warning_seconds
+	elif state == State.NERVE_WARN: duration = nerve_warning_duration()
 	var progress := clampf(1 - remaining / duration, 0, 1) if state in [State.EDICT_WARN, State.PORTAL_WARN, State.NERVE_WARN] else 0.0
 	rig.sample(elapsed, progress, int(attack_kind), facing, exposed)
 

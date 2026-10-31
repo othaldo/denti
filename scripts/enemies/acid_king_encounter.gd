@@ -2,14 +2,20 @@ class_name AcidKingEncounter
 extends Node2D
 ## The encounter clock owns warnings, field transitions, staggered stomps and recovery.
 
-enum State { POSITION, WARN_CHANNEL, FLOW, WARN_SHIFT, WARN_STOMP, STOMP, RECALL, OPEN, RECOVERY }
+# Append states so existing save-state numbers retain their meaning.
+enum State { POSITION, WARN_CHANNEL, FLOW, WARN_SHIFT, WARN_STOMP, STOMP, RECALL, OPEN, RECOVERY, PURSUE, WARN_SPIT, CHASE_STOMP }
 enum Attack { CHANNELS, STOMP, TIDE }
-const SAVE_VERSION := 1
+const SAVE_VERSION := 2
 const MAX_FIELDS := 2
 var enemy: Enemy
 var profile: AcidKingData
 var rig: KingAcidRig
 var volley: BossPaintedVolley
+var spit: BossPaintedVolley
+var spit_origin := Vector2.ZERO
+var spit_rays: Array[Vector2] = []
+var stomp_index := 0
+var stomp_total := 1
 var state := State.POSITION
 var remaining := 0.65
 var elapsed := 0.0
@@ -45,6 +51,11 @@ func _ready() -> void:
 	volley.profile = profile.shards
 	volley.texture = KingAcidArt.texture(7)
 	add_child(volley)
+	spit = BossPaintedVolley.new()
+	spit.enemy = enemy
+	spit.profile = profile.spit
+	spit.texture = KingAcidArt.texture(8)
+	add_child(spit)
 	sync_visual()
 
 func damage_factor() -> float:
@@ -56,7 +67,11 @@ func cancel() -> void:
 	pending.clear()
 	fields.clear()
 	rows.clear()
+	spit_rays.clear()
+	stomp_index = 0
+	stomp_total = 1
 	if volley != null: volley.clear()
+	if spit != null: spit.clear()
 	sync_visual()
 	queue_redraw()
 
@@ -89,9 +104,17 @@ func advance(delta: float) -> void:
 				if not row.fired and row.delay > 0.000001: step = minf(step, row.delay)
 		_tick_fields(step, spent)
 		volley.advance(step, spent)
+		spit.advance(step, spent)
 		if state == State.STOMP: _tick_rows(step, spent)
 		if state == State.POSITION: _move(step)
 		elif state == State.FLOW: _move(step, profile.flow_movement_factor)
+		elif state == State.PURSUE: _move(step, profile.pursuit_move_factor, profile.pursuit_distance)
+		elif state == State.CHASE_STOMP: _move(step, profile.pursuit_move_factor, profile.pursuit_distance)
+		elif state == State.OPEN:
+			var before := profile.open_seconds - remaining
+			var walking := maxf(before + step - maxf(before, profile.recovery_settle_seconds), 0)
+			_move(walking, profile.recovery_move_factor)
+		elif state == State.RECOVERY: _move(step, profile.recovery_move_factor)
 		remaining = maxf(remaining - step * rate, 0)
 		elapsed += step
 		spent += step
@@ -103,28 +126,47 @@ func advance(delta: float) -> void:
 func _next(seconds: float) -> void:
 	match state:
 		State.POSITION:
-			if _reserved() or not _visible_bounds().has_point(enemy.global_position): remaining = 0.15
+			if _reserved() or not _visible_bounds().has_point(enemy.global_position) or enemy.global_position.distance_to(enemy.target.global_position) > profile.attack_distance: remaining = 0.15
 			else: begin(-1, seconds)
 		State.WARN_CHANNEL, State.WARN_SHIFT:
 			var duration := profile.shift_flow_seconds if attack_kind == Attack.TIDE else profile.flow_seconds
-			_activate_fields(duration + profile.recall_seconds + (_stomp_duration() + profile.stomp_warning_seconds if attack_kind == Attack.TIDE and enemy.boss_phase >= 2 else 0))
+			var combo := profile.stomp_sequences * (_stomp_duration() + stomp_warning_duration()) + (profile.stomp_sequences - 1) * profile.stomp_chase_seconds if _combined_stomp() else 0.0
+			_activate_fields(duration + profile.recall_seconds + combo)
+			_warn_spit(seconds)
+		State.WARN_SPIT:
+			spit.fire(spit_origin, spit_rays, &"king_spit")
+			enemy.attack_performed.emit(&"boss_pulse")
+			spit_rays.clear()
 			state = State.FLOW
-			remaining = duration
+			remaining = maxf((profile.shift_flow_seconds if attack_kind == Attack.TIDE else profile.flow_seconds) - profile.spit_warning_seconds, 0)
 		State.FLOW:
 			if attack_kind == Attack.TIDE and shift_index < profile.shifts:
 				shift_index += 1
 				for field in fields: field.life = minf(field.life, profile.old_channel_fade)
-				_plan_channels(true)
-				state = State.WARN_SHIFT
-				remaining = profile.shift_warning_seconds
-				enemy.attack_performed.emit(&"boss_warning")
-			elif attack_kind == Attack.TIDE and enemy.boss_phase >= 2: _warn_stomp(seconds)
+				state = State.PURSUE
+				remaining = profile.pursuit_seconds
+			elif _combined_stomp(): _warn_stomp(seconds)
 			else: _recall()
+		State.PURSUE:
+			_plan_channels(true, seconds)
+			state = State.WARN_SHIFT
+			remaining = profile.shift_warning_seconds
+			enemy.attack_performed.emit(&"boss_warning")
 		State.WARN_STOMP:
 			state = State.STOMP
 			remaining = _stomp_duration()
 			_fire_due_rows()
-		State.STOMP: _recall()
+		State.STOMP:
+			stomp_index += 1
+			if stomp_index < stomp_total:
+				# Open one bank before retargeting, keeping a single river as
+				# pressure without sealing Denti inside the narrow double lane.
+				for index in range(1, fields.size()): fields[index].life = minf(fields[index].life, profile.old_channel_fade)
+				rows.clear()
+				state = State.CHASE_STOMP
+				remaining = profile.stomp_chase_seconds
+			else: _recall()
+		State.CHASE_STOMP: _warn_stomp(seconds, true)
 		State.RECALL:
 			fields.clear()
 			state = State.OPEN
@@ -143,14 +185,19 @@ func _visible_bounds() -> Rect2:
 
 func _reserved() -> bool:
 	for other: AcidKingEncounter in get_tree().get_nodes_in_group("acid_king_encounters"):
-		if other != self and other.enemy.target == enemy.target and other.enemy.health > 0 and (other.active or not other.fields.is_empty() or not other.volley.entries.is_empty()): return true
+		if other != self and other.enemy.target == enemy.target and other.enemy.health > 0 and (other.active or not other.fields.is_empty() or not other.volley.entries.is_empty() or not other.spit.entries.is_empty()): return true
 	return false
 
-func _move(delta: float, speed_factor: float = 1.0) -> void:
+func _combined_stomp() -> bool:
+	# Short channel combos stay visible when health phases interrupt long tides.
+	return attack_kind != Attack.STOMP and enemy.boss_phase >= profile.combined_phase
+
+func _move(delta: float, speed_factor: float = 1.0, preferred_distance: float = -1.0) -> void:
 	var target := enemy.target.global_position
 	var away := target.direction_to(enemy.global_position)
 	if away.is_zero_approx(): away = Vector2.LEFT
-	var distance := clampf(enemy.global_position.distance_to(target), enemy.data.radius + 45, profile.preferred_distance)
+	var wanted := profile.preferred_distance if preferred_distance < 0 else preferred_distance
+	var distance := clampf(enemy.global_position.distance_to(target), enemy.data.radius + 45, wanted)
 	var bounds := _visible_bounds()
 	var desired := (target + away.rotated(0.25 + 0.12 * profile.action_bonus) * distance).clamp(bounds.position, bounds.end)
 	var margin := Vector2.ONE * (DentiArena.WALL_WIDTH + enemy.data.radius + 6)
@@ -162,12 +209,16 @@ func _move(delta: float, speed_factor: float = 1.0) -> void:
 		movement += next.distance_to(enemy.global_position)
 		enemy.global_position = next
 
-func _plan_channels(shift: bool) -> void:
+func _plan_channels(shift: bool, seconds: float = -1.0) -> void:
 	pending.clear()
 	var visible := enemy.get_canvas_transform().affine_inverse() * enemy.get_viewport_rect()
 	var arena := Rect2(Vector2.ONE * DentiArena.PLAYER_MARGIN, enemy.target.arena.arena_size - Vector2.ONE * DentiArena.PLAYER_MARGIN * 2)
 	var area := visible.grow(80).intersection(arena)
-	if shift: anchor[axis] += profile.shift_distance * (1 if shift_index % 2 == 1 else -1)
+	if shift:
+		# Reacquire before the warning, never while its geometry is visible.
+		anchor = HazardGeometry.player_at(enemy.target, seconds) if seconds >= 0 else enemy.target.global_position
+		anchor += (enemy.target.velocity * profile.shift_lead_seconds).limit_length(profile.shift_lead_distance)
+		if profile.alternate_shift_axis: axis = 1 - axis
 	var coordinate: float = clampf(anchor[axis], area.position[axis] + profile.channel_half_width, area.end[axis] - profile.channel_half_width)
 	var side := 1.0 if cycle % 2 == 0 else -1.0
 	if coordinate + profile.channel_spacing * side < area.position[axis] or coordinate + profile.channel_spacing * side > area.end[axis]: side *= -1
@@ -209,9 +260,26 @@ func _tick_fields(delta: float, first: float) -> void:
 func _stomp_duration() -> float:
 	return (profile.rows(enemy.boss_phase) - 1) * profile.stomp_row_interval + profile.stomp_active_seconds
 
-func _warn_stomp(seconds: float) -> void:
+func stomp_warning_duration() -> float:
+	return profile.combined_stomp_warning_seconds if _combined_stomp() else profile.stomp_warning_seconds
+
+func _warn_spit(seconds: float) -> void:
+	state = State.WARN_SPIT
+	remaining = profile.spit_warning_seconds
+	spit_origin = enemy.global_position
+	var at := HazardGeometry.player_at(enemy.target, seconds) if seconds >= 0 else enemy.target.global_position
+	at += (enemy.target.velocity * profile.spit_lead_seconds).limit_length(profile.spit_lead_distance)
+	var direction := spit_origin.direction_to(at)
+	if direction.is_zero_approx(): direction = Vector2.DOWN
+	spit_rays = EnemyProjectilePatterns.fan_directions(direction, profile.spit_count(), profile.spit_ray_spacing)
+	enemy.attack_performed.emit(&"boss_warning")
+
+func _warn_stomp(seconds: float, followup: bool = false) -> void:
+	if not followup:
+		stomp_index = 0
+		stomp_total = profile.stomp_sequences
 	state = State.WARN_STOMP
-	remaining = profile.stomp_warning_seconds
+	remaining = stomp_warning_duration()
 	var at := HazardGeometry.player_at(enemy.target, seconds) if seconds >= 0 else enemy.target.global_position
 	aim = enemy.global_position.direction_to(at)
 	if aim.is_zero_approx(): aim = Vector2.DOWN
@@ -250,10 +318,12 @@ func sync_visual() -> void:
 	if rig == null: return
 	var kind := 1 if state in [State.WARN_STOMP, State.STOMP] else (2 if state in [State.RECALL, State.OPEN] else 0)
 	var prep := 0.0
-	if state == State.WARN_STOMP: prep = 1 - remaining / profile.stomp_warning_seconds
+	if state == State.WARN_STOMP: prep = 1 - remaining / stomp_warning_duration()
+	elif state == State.WARN_SPIT: prep = 1 - remaining / profile.spit_warning_seconds
 	elif state in [State.STOMP, State.FLOW, State.RECALL, State.OPEN]: prep = 1
 	elif state in [State.WARN_CHANNEL, State.WARN_SHIFT]: prep = 1 - remaining / (profile.warning_seconds if state == State.WARN_CHANNEL else profile.shift_warning_seconds)
-	rig.sample(elapsed, prep, clampf(1 - remaining / _stomp_duration(), 0, 1) if state == State.STOMP else 0, kind, state in [State.POSITION, State.FLOW], state == State.OPEN)
+	var walking := state in [State.POSITION, State.FLOW, State.PURSUE, State.CHASE_STOMP, State.RECOVERY] or state == State.OPEN and profile.open_seconds - remaining > profile.recovery_settle_seconds
+	rig.sample(elapsed, prep, clampf(1 - remaining / _stomp_duration(), 0, 1) if state == State.STOMP else 0, kind, walking, state == State.OPEN)
 	var level := 1.0
 	if state == State.FLOW: level = 0.25 + 0.75 * remaining / (profile.shift_flow_seconds if attack_kind == Attack.TIDE else profile.flow_seconds)
 	elif state == State.WARN_SHIFT: level = 1 - 0.75 * remaining / profile.shift_warning_seconds

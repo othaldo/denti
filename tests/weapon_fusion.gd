@@ -37,8 +37,8 @@ func _run() -> void:
 	_check(loadout.save_data() == before and bank.points == 2, "opening preview mutated weapons or points")
 	var plan := panel.plan
 	_check(plan.selected.size() == 4 and plan.valid(), "default draft is not usable")
-	_check(plan.total_points == 48 and plan.refund() == 19, "duplicate and discarded levels have an incorrect refund")
-	_check(plan.effects()[1].level == 10, "same effects did not combine to ten")
+	_check(plan.total_points == 96 and plan.refund() == 38, "duplicate and discarded levels have an incorrect refund")
+	_check(plan.effects()[1].level == 10, "same effects did not preserve their purchased root budget")
 	_check(plan.preview().element_skin == &"fire", "initial element skin incorrect")
 	await _settle()
 	await _click(panel.effect_buttons[WeaponAffixes.find(plan.candidates, &"ice")])
@@ -102,7 +102,7 @@ func _run() -> void:
 	RunSnapshot.restore(game, saved)
 	_check(game.weapon_enchantment_panel.visible and bank.actions.size() == 1, "shop enchantment draft was hidden on resume")
 	game._on_weapon_upgrades_completed()
-	_check(bank.points == 1 + refund and loadout.equipped()[0].affixes[2].level == 5, "refunded upgrade failed to commit")
+	_check(bank.points == refund and loadout.equipped()[0].affixes[2].level == 5, "refunded upgrade failed to commit")
 	# Ordinary MK conflicts use the same preview and the new MK slot capacity.
 	loadout.restore([
 		{"id": "turbo_drill", "tier": 1, "affixes": [_entry("fire", 7)]},
@@ -124,14 +124,14 @@ func _run() -> void:
 	_check(not loadout.commit_fusion(plan, game.items, bank), "two elements accepted")
 	plan.selected.assign([&"holy"])
 	_check(not loadout.commit_fusion(plan, game.items, bank), "foreign effect accepted")
-	# Fully invested weapons: all 80 points are accounted for, with eight candidates.
+	# Fully invested weapons: all 160 points are accounted for, with eight candidates.
 	loadout.restore([
 		{"id": str(recipe.base_weapon), "tier": 4, "affixes": [_entry("fire", 10), _entry("tempo", 10), _entry("range", 10), _entry("leech", 10)]},
 		{"id": str(recipe.partner_weapon), "tier": 4, "affixes": [_entry("ice", 10), _entry("crit", 10), _entry("crit_damage", 10), _entry("knockback", 10)]}])
 	plan = loadout.fusion_plan(0, recipe, game.items)
-	_check(plan.candidates.size() == 8 and plan.total_points == 80 and plan.refund() == 40, "fully invested fusion lost part of its eighty-point budget")
+	_check(plan.candidates.size() == 8 and plan.total_points == 160 and plan.refund() == 80, "fully invested fusion lost part of its root-weighted budget")
 	plan.selected.clear()
-	_check(plan.refund() == 80 and loadout.commit_fusion(plan, game.items, bank), "explicitly returning all effects lost points")
+	_check(plan.refund() == 160 and loadout.commit_fusion(plan, game.items, bank), "explicitly returning all effects lost points")
 	_check(loadout.equipped()[0].affixes.is_empty() and loadout.equipped()[0].data.element_skin == &"", "unenchanted evolution retained a discarded elemental form")
 	session.clear_run()
 	paused = false

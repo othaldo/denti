@@ -2,12 +2,13 @@ class_name CaramelEncounter
 extends Node2D
 ## One clock owns each locked aim, ballistic flight, impact and expiring floor pool.
 
-enum State { APPROACH, WINDUP, FLIGHT, FOLLOWUP, RECOVERY, HEART_WINDUP, HEART_RELEASE, RUSH_WINDUP, RUSH_ACTIVE, BURST_WINDUP, BURST_RELEASE }
-const SAVE_VERSION := 2
+enum State { APPROACH, WINDUP, FLIGHT, FOLLOWUP, RECOVERY, HEART_WINDUP, HEART_RELEASE, RUSH_WINDUP, RUSH_ACTIVE, BURST_WINDUP, BURST_RELEASE, BOMB_SEQUENCE }
+const SAVE_VERSION := 3
 var enemy: Enemy
 var profile: CaramelEncounterData
 var rig: PrinceCaramelRig
 var hearts: CaramelHeartVolley
+var bombs := CaramelBombVolley.new()
 var attack_kind := CaramelEncounterData.Attack.BOMBS
 var salvo_index := 0
 var salvo_count := 1
@@ -31,6 +32,7 @@ var active: bool:
 	get: return state not in [State.APPROACH, State.RECOVERY]
 
 func _ready() -> void:
+	bombs.encounter = self
 	add_to_group("caramel_encounters")
 	z_index = -2
 	remaining = profile.approach_seconds
@@ -47,6 +49,7 @@ func _ready() -> void:
 	sync_visual()
 
 func cancel(clear_pools := true) -> void:
+	bombs.clear()
 	state = State.APPROACH
 	remaining = profile.approach_seconds
 	throw_index = 0
@@ -58,12 +61,15 @@ func cancel(clear_pools := true) -> void:
 	queue_redraw()
 
 func begin(seconds_in_frame := -1.0, forced_attack: int = -1) -> void:
+	bombs.clear()
 	attack_kind = clampi(forced_attack, 0, 2) if forced_attack >= 0 else profile.attack_for_cycle(cycle)
 	count = profile.throws_for_phase(enemy.boss_phase)
 	throw_index = 0
 	cycle += 1
 	match attack_kind:
-		CaramelEncounterData.Attack.BOMBS: _warn(seconds_in_frame)
+		CaramelEncounterData.Attack.BOMBS:
+			if profile.bomb_frequency > 1.0: _queue_bomb(seconds_in_frame)
+			else: _warn(seconds_in_frame)
 		CaramelEncounterData.Attack.HEART_FAN:
 			salvo_index = 0
 			salvo_count = profile.salvos_for_phase(enemy.boss_phase)
@@ -71,8 +77,19 @@ func begin(seconds_in_frame := -1.0, forced_attack: int = -1) -> void:
 		CaramelEncounterData.Attack.SUGAR_RUSH: _warn_rush(seconds_in_frame)
 
 func _warn(seconds_in_frame: float) -> void:
+	bombs.clear()
 	state = State.WINDUP
 	remaining = profile.windup_seconds
+	_lock_bomb(seconds_in_frame)
+
+func _queue_bomb(seconds_in_frame: float) -> void:
+	state = State.BOMB_SEQUENCE
+	_lock_bomb(seconds_in_frame)
+	bombs.warn(destination)
+	throw_index += 1
+	remaining = profile.bomb_interval() if throw_index < count else profile.windup_seconds + profile.flight_seconds
+
+func _lock_bomb(seconds_in_frame: float) -> void:
 	origin = enemy.global_position + Vector2(38, -42)
 	var at := HazardGeometry.player_at(enemy.target, seconds_in_frame) if seconds_in_frame >= 0 else enemy.target.global_position
 	if throw_index % 2 == 1:
@@ -100,16 +117,21 @@ func advance(delta: float) -> void:
 	while left > 0.000001:
 		var rate := minf(enemy.overtime_attack_factor(), 1.4) if state in [State.APPROACH, State.RECOVERY] else 1.0
 		var step := minf(left, maxf(remaining, 0) / rate)
+		if state == State.BOMB_SEQUENCE: step = minf(step, bombs.next_event())
 		_age_pools(step)
 		hearts.advance(step, spent)
 		if state == State.APPROACH: _move(step)
 		if profile.move_between_volleys:
-			if state in [State.FOLLOWUP, State.HEART_RELEASE]: _move(step, profile.reposition_speed_factor)
+			# Airborne bombs retain their own origin/target while the Prince closes.
+			if state in [State.FLIGHT, State.FOLLOWUP, State.HEART_RELEASE]: _move(step, profile.reposition_speed_factor)
 			elif state == State.RECOVERY:
 				var before := profile.recovery_seconds - remaining
 				var walking := maxf(before + step * rate - maxf(before, profile.recovery_settle_seconds), 0) / rate
 				_move(walking, profile.reposition_speed_factor)
 		if state == State.RUSH_ACTIVE: _rush_step(step, spent)
+		if state == State.BOMB_SEQUENCE:
+			if profile.move_between_volleys and not bombs.winding(): _move(step, profile.reposition_speed_factor)
+			bombs.advance(step, spent)
 		remaining = maxf(remaining - step * rate, 0)
 		elapsed += step
 		spent += step
@@ -133,9 +155,16 @@ func _next(seconds_in_frame: float) -> void:
 		State.FLIGHT:
 			_land(seconds_in_frame)
 			throw_index += 1
-			state = State.FOLLOWUP if throw_index < count else State.RECOVERY
-			remaining = profile.followup_seconds if state == State.FOLLOWUP else profile.recovery_seconds
-		State.FOLLOWUP: _warn(seconds_in_frame)
+			if throw_index < count:
+				state = State.FOLLOWUP
+				remaining = profile.bomb_pause_seconds()
+			else: _after_bombs()
+		State.BOMB_SEQUENCE:
+			if throw_index < count: _queue_bomb(seconds_in_frame)
+			else: _after_bombs()
+		State.FOLLOWUP:
+			if attack_kind == CaramelEncounterData.Attack.HEART_FAN: _warn_fan(seconds_in_frame)
+			else: _warn(seconds_in_frame)
 		State.RECOVERY:
 			state = State.APPROACH
 			remaining = profile.approach_seconds
@@ -164,6 +193,16 @@ func _next(seconds_in_frame: float) -> void:
 			if salvo_index < salvo_count: _warn_burst(seconds_in_frame)
 			else: _recover()
 
+func _after_bombs() -> void:
+	if enemy.boss_phase >= profile.bomb_fan_phase:
+		attack_kind = CaramelEncounterData.Attack.HEART_FAN
+		salvo_index = 0
+		salvo_count = mini(profile.salvos_for_phase(enemy.boss_phase), profile.combo_fan_salvos)
+		if profile.attack_for_cycle(cycle) == CaramelEncounterData.Attack.HEART_FAN: cycle += 1
+		state = State.FOLLOWUP
+		remaining = profile.followup_seconds
+	else: _recover()
+
 func _recover() -> void:
 	state = State.RECOVERY
 	remaining = profile.recovery_seconds
@@ -175,7 +214,8 @@ func _aim_at(seconds_in_frame: float) -> Vector2:
 func _warn_fan(seconds_in_frame: float) -> void:
 	state = State.HEART_WINDUP
 	remaining = profile.heart_warning_seconds if salvo_index == 0 else profile.heart_followup_warning
-	aim = enemy.global_position.direction_to(_aim_at(seconds_in_frame))
+	var target := _aim_at(seconds_in_frame) + (enemy.target.velocity * profile.fan_lead_seconds).limit_length(profile.fan_lead_distance)
+	aim = enemy.global_position.direction_to(target)
 	if aim.is_zero_approx(): aim = Vector2.DOWN
 	# The follow-up is visibly offset and re-aimed, with its own full preparation.
 	if salvo_index > 0: aim = aim.rotated(deg_to_rad(profile.fan_step_degrees * (0.5 if salvo_index % 2 == 1 else -0.5)))
@@ -221,12 +261,15 @@ func _warn_burst(seconds_in_frame: float) -> void:
 	enemy.attack_performed.emit(&"boss_warning")
 
 func _land(seconds_in_frame: float) -> void:
-	if enemy.target.damage_circle_at(destination, profile.impact_radius + HazardGeometry.PLAYER_RADIUS, seconds_in_frame):
+	land_bomb_at(destination, seconds_in_frame)
+
+func land_bomb_at(at: Vector2, seconds_in_frame: float) -> void:
+	if enemy.target.damage_circle_at(at, profile.impact_radius + HazardGeometry.PLAYER_RADIUS, seconds_in_frame):
 		enemy.target.take_hit(enemy.attack_damage, enemy.inflicted_statuses)
-	splash_at = destination
+	splash_at = at
 	splash_remaining = 0.30
 	_make_pool_room()
-	pools.append({"at": destination, "life": profile.pool_seconds})
+	pools.append({"at": at, "life": profile.pool_seconds})
 	enemy.attack_performed.emit(&"boss_pulse")
 
 func _make_pool_room() -> void:
@@ -275,7 +318,8 @@ func _move(delta: float, speed_factor: float = 1.0) -> void:
 	var turn := 0.22 + profile.reposition_bias * 0.5
 	var tangent := away.rotated(turn if cycle % 2 == 0 else -turn)
 	var bounds := _cooking_bounds()
-	var cooking_distance := clampf(enemy.global_position.distance_to(player_at), enemy.data.radius + HazardGeometry.PLAYER_RADIUS + 30, profile.preferred_distance)
+	var preferred := minf(profile.preferred_distance, profile.fan_preferred_distance) if attack_kind == CaramelEncounterData.Attack.HEART_FAN else profile.preferred_distance
+	var cooking_distance := clampf(enemy.global_position.distance_to(player_at), enemy.data.radius + HazardGeometry.PLAYER_RADIUS + 30, preferred)
 	var desired := bounds.get_center()
 	var score := INF
 	# On a narrow phone, use the available vertical room instead of throwing
@@ -314,8 +358,13 @@ func sync_visual() -> void:
 	if state == State.FLIGHT:
 		windup = 1
 		release = clampf((1.0 - remaining / profile.flight_seconds) * 3, 0, 1)
+	if state == State.BOMB_SEQUENCE and not bombs.entries.is_empty():
+		var age: float = bombs.entries[-1].age
+		windup = clampf(age / profile.windup_seconds, 0, 1)
+		release = clampf((age - profile.windup_seconds) / profile.flight_seconds * 3, 0, 1)
 	if state == State.FOLLOWUP: release = 1
-	var walking := state == State.APPROACH or profile.move_between_volleys and (state in [State.FOLLOWUP, State.HEART_RELEASE] or state == State.RECOVERY and profile.recovery_seconds - remaining > profile.recovery_settle_seconds)
+	var walking := state == State.APPROACH or profile.move_between_volleys and (state in [State.FLIGHT, State.FOLLOWUP, State.HEART_RELEASE] or state == State.RECOVERY and profile.recovery_seconds - remaining > profile.recovery_settle_seconds)
+	if state == State.BOMB_SEQUENCE: walking = profile.move_between_volleys and not bombs.winding()
 	rig.sample(elapsed, windup, release, walking)
 	if state == State.HEART_WINDUP:
 		var duration := profile.heart_warning_seconds if salvo_index == 0 else profile.heart_followup_warning
@@ -333,15 +382,16 @@ func save_data() -> Dictionary:
 		fields.append({"position": SnapshotValues.vector_data(pool.at), "life": pool.life})
 	var directions: Array = []
 	for ray in rays: directions.append(SnapshotValues.vector_data(ray))
-	return {"version": SAVE_VERSION, "state": int(state), "remaining": remaining, "elapsed": elapsed, "throw_index": throw_index, "count": count, "cycle": cycle, "origin": SnapshotValues.vector_data(origin), "destination": SnapshotValues.vector_data(destination), "pools": fields, "splash_at": SnapshotValues.vector_data(splash_at), "splash_remaining": splash_remaining, "attack_kind": attack_kind, "salvo_index": salvo_index, "salvo_count": salvo_count, "aim": SnapshotValues.vector_data(aim), "rush_origin": SnapshotValues.vector_data(rush_origin), "rush_end": SnapshotValues.vector_data(rush_end), "rush_hit": rush_hit, "rays": directions, "hearts": hearts.save_data()}
+	return {"version": SAVE_VERSION, "state": int(state), "remaining": remaining, "elapsed": elapsed, "throw_index": throw_index, "count": count, "cycle": cycle, "origin": SnapshotValues.vector_data(origin), "destination": SnapshotValues.vector_data(destination), "pools": fields, "splash_at": SnapshotValues.vector_data(splash_at), "splash_remaining": splash_remaining, "attack_kind": attack_kind, "salvo_index": salvo_index, "salvo_count": salvo_count, "aim": SnapshotValues.vector_data(aim), "rush_origin": SnapshotValues.vector_data(rush_origin), "rush_end": SnapshotValues.vector_data(rush_end), "rush_hit": rush_hit, "rays": directions, "hearts": hearts.save_data(), "bombs": bombs.save_data()}
 
 func restore(saved: Dictionary) -> void:
 	cancel()
 	var version := int(saved.get("version", 0))
-	if version not in [1, SAVE_VERSION]: return
-	state = clampi(int(saved.get("state", 0)), 0, 4 if version == 1 else 10) as State
+	if version not in [1, 2, SAVE_VERSION]: return
+	state = clampi(int(saved.get("state", 0)), 0, 4 if version == 1 else (10 if version == 2 else State.BOMB_SEQUENCE)) as State
 	attack_kind = clampi(int(saved.get("attack_kind", 0)), 0, 2)
-	salvo_count = clampi(int(saved.get("salvo_count", 1)), 1, maxi(2, profile.salvos_for_phase(2)))
+	# Finish already announced longer sequences from pre-pressure saves.
+	salvo_count = clampi(int(saved.get("salvo_count", 1)), 1, maxi(2 + maxi(profile.action_bonus, 0), profile.salvos_for_phase(2)))
 	salvo_index = clampi(int(saved.get("salvo_index", 0)), 0, salvo_count)
 	aim = SnapshotValues.read_vector(saved.get("aim", [1, 0]))
 	rush_origin = SnapshotValues.read_vector(saved.get("rush_origin", [0, 0]))
@@ -350,9 +400,10 @@ func restore(saved: Dictionary) -> void:
 	for raw in saved.get("rays", []):
 		if rays.size() >= profile.max_hearts: break
 		rays.append(SnapshotValues.read_vector(raw))
-	count = clampi(int(saved.get("count", 2)), 1, maxi(3, profile.throws_for_phase(2)))
+	count = clampi(int(saved.get("count", 2)), 1, maxi(3 + maxi(profile.action_bonus, 0), profile.throws_for_phase(2)))
 	throw_index = clampi(int(saved.get("throw_index", 0)), 0, count)
-	var limit: float = [profile.approach_seconds, profile.windup_seconds, profile.flight_seconds, profile.followup_seconds, profile.recovery_seconds, profile.heart_warning_seconds if salvo_index == 0 else profile.heart_followup_warning, profile.heart_release_seconds, profile.rush_warning_seconds, profile.rush_seconds, profile.burst_warning_seconds, profile.burst_release_seconds][state]
+	var followup := profile.bomb_pause_seconds() if attack_kind == CaramelEncounterData.Attack.BOMBS else profile.followup_seconds
+	var limit: float = [profile.approach_seconds, profile.windup_seconds, profile.flight_seconds, followup, profile.recovery_seconds, profile.heart_warning_seconds if salvo_index == 0 else profile.heart_followup_warning, profile.heart_release_seconds, profile.rush_warning_seconds, profile.rush_seconds, profile.burst_warning_seconds, profile.burst_release_seconds, maxf(profile.bomb_interval(), profile.windup_seconds + profile.flight_seconds)][state]
 	remaining = clampf(float(saved.get("remaining", 0)), 0, limit)
 	elapsed = maxf(float(saved.get("elapsed", 0)), 0)
 	cycle = maxi(int(saved.get("cycle", 0)), 0)
@@ -367,6 +418,7 @@ func restore(saved: Dictionary) -> void:
 			_make_pool_room()
 			pools.append({"at": SnapshotValues.read_vector(entry.get("position", [0, 0])), "life": life})
 	hearts.restore(saved.get("hearts", []))
+	if state == State.BOMB_SEQUENCE: bombs.restore(saved.get("bombs", []))
 	enemy.special_phase = Enemy.SpecialPhase.COOLDOWN
 	enemy.boss_radial_volleys_remaining = 0
 	enemy.boss_phase_burst_fired = true

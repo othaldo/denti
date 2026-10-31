@@ -7,7 +7,7 @@
 [resource]
 script = ExtResource("1")
 display_name = "Karies-Prinz"
-max_health = 900.0
+max_health = 750.0
 damage_reduction = 0.15
 knockback_resistance = 0.79
 move_speed = 102.0
@@ -30,9 +30,9 @@ attack_radius = 132.0
 attack_speed = 600.0
 attack_duration = 0.64
 attack_damage = 27.0
-boss_guard_recharge_seconds = 26.0
+boss_guard_recharge_seconds = 23.0
 boss_guard_burst_fraction = 0.1
-boss_phase_duration = 1.9
+boss_phase_duration = 1.6
 boss_radial_count = 14
 boss_radial_volley_count = 3
 boss_radial_angle_step_degrees = 9.0

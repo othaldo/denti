@@ -65,7 +65,7 @@ func _run() -> void:
 	_check_text(panel.body)
 	# Reject malformed cursor/action containers before any typed restore call.
 	var saved := RunSnapshot.capture(game)
-	for broken in [{"points": []}, {"cursor": []}, {"actions": {}}, {"actions": [[]]}]:
+	for broken in [{"points": []}, {"cursor": []}, {"actions": {}}, {"actions": true}, {"actions": "bad"}, {"actions": [[]]}, {"economy_version": []}, {"actions": [{"cost": []}]}]:
 		var invalid := saved.duplicate(true)
 		invalid.rewards["weapon_upgrades"] = broken
 		_check(RunSaveData.normalize(invalid).is_empty(), "malformed weapon draft entered the restore path")

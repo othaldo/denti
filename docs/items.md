@@ -1,6 +1,6 @@
 # Items und Builds
 
-Die Zahnklinik bietet **93 Items**: 17 Familien mit je vier Seltenheiten, 16 ergänzende Spezialitems und neun einmalige Mythics. Alle ursprünglichen 32 Items behalten ihre IDs, Effekte und Icons; 61 neue Items ergänzen den Pool. [Zahnflutsch: Ausweichen und fünf neue Items](DODGE.md).
+Die Zahnklinik bietet **94 Items**: 17 Familien mit je vier Seltenheiten, 17 ergänzende Spezialitems und neun einmalige Mythics. Alle ursprünglichen 32 Items behalten ihre IDs, Effekte und Icons; 62 neue Items ergänzen den Pool. [Zahnflutsch: Ausweichen und fünf neue Items](DODGE.md).
 
 **Common / Gewöhnlich**, **Uncommon / Ungewöhnlich**, **Rare / Selten** und **Legendary / Legendär** bieten verschiedene Kombinationen aus Bonus, Synergie und Nachteil. Seltenere Varianten sind eigene Items: Sie ersetzen vorhandene Exemplare nicht und fusionieren nicht. Das **Familienlimit liegt bei zwölf Exemplaren über alle vier Seltenheiten zusammen**. Frühe Käufe lassen damit Platz für spätere, seltenere Varianten. Spezialitems lassen sich in der Regel sechsmal stapeln. Goldsonde, Zahnfee-Pfand, Speichelkelch, Amalgamkern und Zuckerschock behalten wegen ihrer begrenzten Spezialeffekte zwei Exemplare; Göttliches Siegel und Mythics bleiben einmalig. Gespeicherte Builds behalten ihren Besitz.
 
@@ -185,10 +185,10 @@ Gemeinsames Familienlimit: **12**.
 
 | Seltenheit | Item | Vollständiger Effekt | Basispreis |
 | --- | --- | --- | ---: |
-| Common | Feenquittung | Jeder gesammelte XP-Punkt heilt 0,15 Leben. -3 % Schaden. | 5 |
-| Uncommon | Zahnfee-Pakt | XP heilt 0,35 Leben je Punkt. -8 maximales Leben. | 9 |
-| Rare | Feenvertrag | Jeder gesammelte XP-Punkt heilt 0,45 Leben. -2 Härte. | 14 |
-| Legendary | Feenbund | Jeder gesammelte XP-Punkt heilt 0,6 Leben. -15 Leben, -4 % Angriffstempo. | 22 |
+| Common | Feenquittung | Jeder gesammelte XP-Punkt heilt 0,10 Leben. -3 % Schaden. | 5 |
+| Uncommon | Zahnfee-Pakt | XP heilt 0,25 Leben je Punkt. -8 maximales Leben. | 9 |
+| Rare | Feenvertrag | Jeder gesammelte XP-Punkt heilt 0,35 Leben. -2 Härte. | 14 |
+| Legendary | Feenbund | Jeder gesammelte XP-Punkt heilt 0,45 Leben. -15 Leben, -4 % Angriffstempo. | 22 |
 
 ## Zahnflutsch / Ausweichen
 
@@ -257,3 +257,9 @@ Beispiel-Builds:
 - **Unzerstörbarer Molar:** Metallkrone, Fluoridgel, Göttliches Siegel, Amalgamkern, Keramikschale und Splitterkrone. Geblockte Treffer geben Flächendruck zurück.
 - **Zahnfee-Ökonomie:** Glücks-Molar, Goldsonde, Goldextraktor, Goldfüllung, Karies-Kopfgeld, Zahnfee-Pfand und Zinszahn. Wertvolle Drops, Zerlegen und gesparte Münzen zahlen sich aus, aber Denti wird langsamer, schwächer und fragiler. Goldfüllung wirkt beim Einsammeln auf den bereits erhöhten Dropwert.
 - **Zuckerrausch:** Verbotener Lolli, Zuckerschock und Heil- oder Schilditems. Tempo nach Killserien kostet Leben und führt anschließend ins Zuckertief.
+
+## Runenpolitur
+
+| Seltenheit | Item | Vollständiger Effekt | Basispreis |
+| --- | --- | --- | ---: |
+| Uncommon | Runenpolitur | Jede fünfte seit dem Erwerb gesammelte Upgrade-Kapsel gibt eine Bonuskapsel. Goldene Kapseln zählen mit, Boni nicht. Einmal kaufbar; Fortschritt bleibt beim Fortsetzen erhalten. | 12 |

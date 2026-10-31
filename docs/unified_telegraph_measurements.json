@@ -1,0 +1,222 @@
+{
+	"adapter": "NVIDIA GeForce RTX 4070",
+	"method": "Native Compatibility, VSync off, 1280x720 logical area. Same mixed charge/ring/sector/timer/lane fixtures. Previous atlas renderer includes the earlier analytic timer/charge masks. 80 warmup + 200 sample frames, atlas/unified/unified/atlas. Wall frame time and complete isolated scene calls; not isolated GPU or full-game/browser/mobile FPS.",
+	"results": [
+		{
+			"draw_calls": 7.0,
+			"frame_ms_mean": 0.41975,
+			"frame_ms_p95": 0.624,
+			"mode": "atlas",
+			"size": "(1280, 720)",
+			"submit_ms_mean": 0.0163714285714286,
+			"warnings": 1
+		},
+		{
+			"draw_calls": 8.0,
+			"frame_ms_mean": 0.37864,
+			"frame_ms_p95": 0.526,
+			"mode": "unified",
+			"size": "(1280, 720)",
+			"submit_ms_mean": 0.0146548042704626,
+			"warnings": 1
+		},
+		{
+			"draw_calls": 8.0,
+			"frame_ms_mean": 0.322705,
+			"frame_ms_p95": 0.411,
+			"mode": "unified",
+			"size": "(1280, 720)",
+			"submit_ms_mean": 0.0127035714285714,
+			"warnings": 1
+		},
+		{
+			"draw_calls": 7.0,
+			"frame_ms_mean": 0.432179999999999,
+			"frame_ms_p95": 0.811,
+			"mode": "atlas",
+			"size": "(1280, 720)",
+			"submit_ms_mean": 0.0135373665480427,
+			"warnings": 1
+		},
+		{
+			"draw_calls": 14.0,
+			"frame_ms_mean": 0.476045,
+			"frame_ms_p95": 0.597,
+			"mode": "atlas",
+			"size": "(1280, 720)",
+			"submit_ms_mean": 0.0717928571428571,
+			"warnings": 20
+		},
+		{
+			"draw_calls": 8.0,
+			"frame_ms_mean": 0.56754,
+			"frame_ms_p95": 0.871,
+			"mode": "unified",
+			"size": "(1280, 720)",
+			"submit_ms_mean": 0.159850533807829,
+			"warnings": 20
+		},
+		{
+			"draw_calls": 8.0,
+			"frame_ms_mean": 0.4621,
+			"frame_ms_p95": 0.602,
+			"mode": "unified",
+			"size": "(1280, 720)",
+			"submit_ms_mean": 0.127482142857143,
+			"warnings": 20
+		},
+		{
+			"draw_calls": 14.0,
+			"frame_ms_mean": 0.42468,
+			"frame_ms_p95": 0.542,
+			"mode": "atlas",
+			"size": "(1280, 720)",
+			"submit_ms_mean": 0.0767437722419929,
+			"warnings": 20
+		},
+		{
+			"draw_calls": 30.0,
+			"frame_ms_mean": 0.581085000000001,
+			"frame_ms_p95": 0.749,
+			"mode": "atlas",
+			"size": "(1280, 720)",
+			"submit_ms_mean": 0.197296428571429,
+			"warnings": 60
+		},
+		{
+			"draw_calls": 8.0,
+			"frame_ms_mean": 0.65448,
+			"frame_ms_p95": 0.781,
+			"mode": "unified",
+			"size": "(1280, 720)",
+			"submit_ms_mean": 0.341227758007117,
+			"warnings": 60
+		},
+		{
+			"draw_calls": 8.0,
+			"frame_ms_mean": 0.69749,
+			"frame_ms_p95": 0.96,
+			"mode": "unified",
+			"size": "(1280, 720)",
+			"submit_ms_mean": 0.356735714285714,
+			"warnings": 60
+		},
+		{
+			"draw_calls": 30.0,
+			"frame_ms_mean": 0.637995,
+			"frame_ms_p95": 0.844,
+			"mode": "atlas",
+			"size": "(1280, 720)",
+			"submit_ms_mean": 0.208455516014235,
+			"warnings": 60
+		},
+		{
+			"draw_calls": 7.0,
+			"frame_ms_mean": 0.33972,
+			"frame_ms_p95": 0.459,
+			"mode": "atlas",
+			"size": "(2560, 1440)",
+			"submit_ms_mean": 0.0122562277580071,
+			"warnings": 1
+		},
+		{
+			"draw_calls": 8.0,
+			"frame_ms_mean": 0.34389,
+			"frame_ms_p95": 0.464,
+			"mode": "unified",
+			"size": "(2560, 1440)",
+			"submit_ms_mean": 0.0141459074733096,
+			"warnings": 1
+		},
+		{
+			"draw_calls": 8.0,
+			"frame_ms_mean": 0.343105,
+			"frame_ms_p95": 0.476,
+			"mode": "unified",
+			"size": "(2560, 1440)",
+			"submit_ms_mean": 0.0144607142857143,
+			"warnings": 1
+		},
+		{
+			"draw_calls": 7.0,
+			"frame_ms_mean": 0.322435,
+			"frame_ms_p95": 0.427,
+			"mode": "atlas",
+			"size": "(2560, 1440)",
+			"submit_ms_mean": 0.0113451957295374,
+			"warnings": 1
+		},
+		{
+			"draw_calls": 14.0,
+			"frame_ms_mean": 0.43333,
+			"frame_ms_p95": 0.543,
+			"mode": "atlas",
+			"size": "(2560, 1440)",
+			"submit_ms_mean": 0.0828785714285714,
+			"warnings": 20
+		},
+		{
+			"draw_calls": 8.0,
+			"frame_ms_mean": 0.48816,
+			"frame_ms_p95": 0.644,
+			"mode": "unified",
+			"size": "(2560, 1440)",
+			"submit_ms_mean": 0.129177935943061,
+			"warnings": 20
+		},
+		{
+			"draw_calls": 8.0,
+			"frame_ms_mean": 0.442825,
+			"frame_ms_p95": 0.549,
+			"mode": "unified",
+			"size": "(2560, 1440)",
+			"submit_ms_mean": 0.121935714285714,
+			"warnings": 20
+		},
+		{
+			"draw_calls": 14.0,
+			"frame_ms_mean": 0.388875,
+			"frame_ms_p95": 0.496,
+			"mode": "atlas",
+			"size": "(2560, 1440)",
+			"submit_ms_mean": 0.0721387900355872,
+			"warnings": 20
+		},
+		{
+			"draw_calls": 30.0,
+			"frame_ms_mean": 0.5642,
+			"frame_ms_p95": 0.704,
+			"mode": "atlas",
+			"size": "(2560, 1440)",
+			"submit_ms_mean": 0.187653571428571,
+			"warnings": 60
+		},
+		{
+			"draw_calls": 8.0,
+			"frame_ms_mean": 0.918855,
+			"frame_ms_p95": 1.27,
+			"mode": "unified",
+			"size": "(2560, 1440)",
+			"submit_ms_mean": 0.340512455516014,
+			"warnings": 60
+		},
+		{
+			"draw_calls": 8.0,
+			"frame_ms_mean": 0.91927,
+			"frame_ms_p95": 1.294,
+			"mode": "unified",
+			"size": "(2560, 1440)",
+			"submit_ms_mean": 0.350342857142857,
+			"warnings": 60
+		},
+		{
+			"draw_calls": 30.0,
+			"frame_ms_mean": 0.53218,
+			"frame_ms_p95": 0.62,
+			"mode": "atlas",
+			"size": "(2560, 1440)",
+			"submit_ms_mean": 0.178907473309609,
+			"warnings": 60
+		}
+	]
+}

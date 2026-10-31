@@ -119,3 +119,10 @@ Die ersten drei vollständigen Wellen mit jeder Waffe, Überlebensrate und erste
 Kaufmöglichkeiten benötigen noch Build-/Spielvergleiche. Die funktionierende
 Startauswahl ist keine Balancefreigabe für alle Starts; Werte wurden hier nicht
 pauschal angehoben.
+
+## Waffenmeisterschaften
+
+Waffenmeisterschaften besitzen das eigene Menü **Achievements** im Hauptmenü und
+in der Zahnpause. Die Run-Vorbereitung bleibt auf Schwierigkeit und Waffe begrenzt;
+sie zeigt keine Achievement-Siegel oder Fortschrittszeilen.
+[Regeln, Speicherung und native Ansichten](WEAPON_MASTERIES.md).

@@ -68,6 +68,13 @@ func _run() -> void:
 	attack.begin(CrownCourtEncounter.Attack.NERVE)
 	attack.advance(0.65)
 	await _capture(output.path_join("combined.png"))
+	attack.cancel()
+	boss.boss_phase = maxi(1, attack.profile.combo_phase)
+	attack.begin(CrownCourtEncounter.Attack.EDICT)
+	attack.step_index = attack.profile.verdicts(boss.boss_phase) - 1
+	attack._edict()
+	attack.advance(0.75)
+	await _capture(output.path_join("portal_verdict.png"))
 	boss.boss_phase = 1
 	for extent in [Vector2i(320, 568), Vector2i(568, 320)]:
 		root.size = extent
@@ -80,6 +87,14 @@ func _run() -> void:
 		attack.begin(CrownCourtEncounter.Attack.PORTAL)
 		attack.advance(0.75)
 		await _capture(output.path_join("mobile_%d.png" % extent.x))
+		attack.cancel()
+		boss.boss_phase = maxi(1, attack.profile.combo_phase)
+		attack.begin(CrownCourtEncounter.Attack.EDICT)
+		attack.step_index = attack.profile.verdicts(boss.boss_phase) - 1
+		attack._edict()
+		attack.advance(0.75)
+		await _capture(output.path_join("portal_verdict_%d.png" % extent.x))
+		boss.boss_phase = 1
 	if "--stills-only" in OS.get_cmdline_user_args():
 		session.clear_run()
 		finish()

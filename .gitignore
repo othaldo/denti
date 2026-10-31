@@ -33,3 +33,6 @@ __pycache__/
 
 # Approved weapon skins retain mipmaps in fresh checkouts and exports.
 !assets/weapons/element_forms/*/*.png.import
+
+# Painted mastery seals remain crisp at selection-card scale.
+!assets/ui/weapon_mastery_badges.png.import

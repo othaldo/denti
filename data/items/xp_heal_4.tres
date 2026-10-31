@@ -4,13 +4,13 @@
 script = ExtResource("1")
 id = &"xp_heal_4"
 display_name = "Feenbund"
-description = "Jeder gesammelte XP-Punkt heilt 0,6 Leben. -15 Leben, -4 % Angriffstempo."
+description = "Jeder gesammelte XP-Punkt heilt 0,45 Leben. -15 Leben, -4 % Angriffstempo."
 rarity_tier = 4
 price = 22
 icon_index = 77
 stat_changes = { &"max_health": -15.0, &"attack_speed": -4.0 }
 effect_kind = &"xp_heal"
-effect_value = 0.6
+effect_value = 0.45
 max_stacks = 12
 family_id = &"xp_heal"
 family_limit = 12

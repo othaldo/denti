@@ -78,7 +78,7 @@ func _run() -> void:
 		_check(profile != original and original.action_bonus == 0 and original.heart_speed == 245, "difficulty mutated shared boss resources")
 		_check(profile.windup_seconds == normal.windup_seconds and profile.heart_warning_seconds == normal.heart_warning_seconds and profile.heart_followup_warning == normal.heart_followup_warning and profile.rush_warning_seconds == normal.rush_warning_seconds and profile.burst_warning_seconds == normal.burst_warning_seconds, "difficulty shortened a warned reaction window")
 		var bonus := difficulty.boss_volley_bonus
-		_check(profile.throws_for_phase(1) == 3 + bonus and profile.fan_count(2) == 9 + bonus * 2 and profile.salvos_for_phase(1) == 2 + bonus, "difficulty does not scale custom attack counts")
+		_check(profile.throws_for_phase(1) == mini(3 + bonus, profile.max_bomb_throws) and profile.fan_count(2) == 9 + bonus * 2 and profile.salvos_for_phase(1) == mini(2 + bonus, profile.max_fan_salvos), "difficulty does not scale capped attack counts")
 		attack.begin(-1, CaramelEncounterData.Attack.HEART_FAN)
 		var at := boss.global_position
 		var rays := attack.rays.duplicate()
@@ -196,7 +196,7 @@ func _run() -> void:
 	_check(rows[3].hearts_launched > rows[1].hearts_launched * 1.8 and rows[3].warnings > rows[1].warnings, "Hell failed to materially increase actual attack/projectile pressure")
 	_check(rows[3].distance > rows[1].distance * 1.2 and rows[3].kinds == 3, "Hell failed to increase movement across the full repertoire")
 	for index in range(1, rows.size()):
-		_check(rows[index].hearts_launched > rows[index - 1].hearts_launched and rows[index].warnings > rows[index - 1].warnings and rows[index].distance > rows[index - 1].distance, "actual projectile/action pressure did not rise at every difficulty step")
+		_check(rows[index].hearts_launched > rows[index - 1].hearts_launched and rows[index].warnings >= rows[index - 1].warnings and rows[index].distance > rows[index - 1].distance, "projectiles/movement must rise without reducing warned actions between difficulties")
 	print("BOSS PRESSURE (stationary target, fixed health phase, no adds): ", JSON.stringify(rows))
 	# The Count uses the same difficulty source and preserves late combo saves.
 	game.wave.difficulty_id = &"hell"
@@ -257,6 +257,7 @@ func _run() -> void:
 	var saved_boss := _prince(DifficultyCatalog.HELL)
 	attack = saved_boss.caramel_encounter
 	attack.begin(-1, CaramelEncounterData.Attack.HEART_FAN)
+	attack.salvo_count = 4 # An already warned pre-cap Hell save must still resume.
 	attack.salvo_index = 3
 	attack._warn_fan(-1)
 	for repeat in 3: attack.hearts.fire(saved_boss.global_position, attack.rays, &"heart_fan")

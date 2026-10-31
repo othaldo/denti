@@ -8,30 +8,40 @@ static func _art(canvas: CanvasItem, index: int, at: Vector2, width: float, tint
 
 static func draw(encounter: CaramelEncounter) -> void:
 	var profile := encounter.profile
+	var base := encounter.global_transform.affine_inverse()
 	for pool: Dictionary in encounter.pools:
 		var opacity := minf(1, pool.life / 0.75) * 0.75
 		_art(encounter, 6, pool.at, profile.pool_radius * 2, Color(1, 1, 1, opacity))
+		WarningEffects.circle(encounter, pool.at, profile.pool_radius, 1.0, Color(1, 0.48, 0.18, opacity), base, WarningEffects.BATCH.Phase.ACTIVE)
 	if encounter.state in [CaramelEncounter.State.WINDUP, CaramelEncounter.State.FLIGHT]:
 		var total := profile.windup_seconds + profile.flight_seconds
 		var progress := 1.0 - (encounter.remaining + (profile.flight_seconds if encounter.state == CaramelEncounter.State.WINDUP else 0.0)) / total
-		WarningEffects.charge_impact(encounter, encounter.destination, profile.impact_radius, progress)
+		WarningEffects.charge_impact(encounter, encounter.destination, profile.impact_radius, progress, Color.WHITE, base)
 		if encounter.state == CaramelEncounter.State.FLIGHT:
 			var flight := 1.0 - encounter.remaining / profile.flight_seconds
 			var ground := encounter.origin.lerp(encounter.destination, flight)
 			AttackEffects.flash(encounter, ground, 13, Color(0.35, 0.12, 0.08, 0.25))
 			var airborne := ground - Vector2(0, sin(flight * PI) * profile.arc_height)
 			_art(encounter, 5, airborne, 27)
+	if encounter.state == CaramelEncounter.State.BOMB_SEQUENCE:
+		for entry in encounter.bombs.entries:
+			var total := profile.windup_seconds + profile.flight_seconds
+			WarningEffects.charge_impact(encounter, entry.at, profile.impact_radius, entry.age / total, Color.WHITE, base)
+			if entry.launched:
+				var flight := clampf((entry.age - profile.windup_seconds) / profile.flight_seconds, 0, 1)
+				var ground: Vector2 = entry.origin.lerp(entry.at, flight)
+				AttackEffects.flash(encounter, ground, 13, Color(0.35, 0.12, 0.08, 0.25))
+				_art(encounter, 5, ground - Vector2(0, sin(flight * PI) * profile.arc_height), 27)
 	if encounter.splash_remaining > 0:
 		var progress := 1.0 - encounter.splash_remaining / 0.3
 		_art(encounter, 7, encounter.splash_at, lerpf(90, profile.impact_radius * 2.1, progress), Color(1, 1, 1, 1 - progress))
-	var base := encounter.global_transform.affine_inverse()
 	if encounter.state in [CaramelEncounter.State.HEART_WINDUP, CaramelEncounter.State.BURST_WINDUP]:
 		var burst := encounter.state == CaramelEncounter.State.BURST_WINDUP
 		var duration := profile.burst_warning_seconds if burst else (profile.heart_warning_seconds if encounter.salvo_index == 0 else profile.heart_followup_warning)
 		var progress := 1 - encounter.remaining / duration
 		var at := encounter.enemy.global_position
 		for ray in encounter.rays:
-			AttackEffects.aim(encounter, at + ray * (encounter.enemy.data.radius + 12), at + ray * (310 if burst else 420), Color(1, 0.29, 0.16, 0.85), progress, base)
+			WarningEffects.aim(encounter, at + ray * (encounter.enemy.data.radius + 12), at + ray * (310 if burst else 420), Color(1, 0.29, 0.16, 0.85), progress, base)
 	elif encounter.state == CaramelEncounter.State.RUSH_WINDUP:
 		var progress := 1 - encounter.remaining / profile.rush_warning_seconds
 		var path := encounter.rush_end - encounter.rush_origin

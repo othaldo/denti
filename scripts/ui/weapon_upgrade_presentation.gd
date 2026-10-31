@@ -25,10 +25,10 @@ static func equipment(state: WeaponUpgradeState, loadout: WeaponLoadout, stats: 
 			options.append({"id": definition.id, "value": number(AffixPresentation.display_value(float(entry.damage), definition.id, weapon.data, stats, items)) + " " + unit_text(definition.id, items),
 				"description": AffixPresentation.effect_description(definition.id), "existing": existing,
 				"blocked": "Bereits auf dieser Waffe" if existing else WeaponUpgrades.blocked_reason(values, definition.id, weapon.tier)})
-		var roots_info := "%s · %d/%d Plätze\n\nMk I: 1 Platz\nMk II: 2 Plätze\nMk III: 3 Plätze\nMk IV: 4 Plätze\n\nAktivieren startet bei 1/10. Jeder Schritt kostet 1 Upgrade.\nSchadenseffekte teilen ihr Wurzelbudget auf die Basis-Angriffspause und die anfänglichen Projektile auf. Kontroll- und Heileffekte behalten ihre eigenen Obergrenzen." % [weapon.data.roots_text(), values.size(), WeaponUpgrades.slots(weapon.tier)]
+		var roots_info := "%s · %d/%d Plätze\n\nMk I: 1 Platz\nMk II: 2 Plätze\nMk III: 3 Plätze\nMk IV: 4 Plätze\n\nAktivieren startet bei 1/10. Jeder Schritt kostet %d Punkt(e) nach den Wurzelkosten. Eine Kapsel gibt 2 Punkte.\nSchadenseffekte teilen ihr Wurzelbudget auf die Basis-Angriffspause und die anfänglichen Projektile auf. Kontroll- und Heileffekte behalten ihre eigenen Obergrenzen." % [weapon.data.roots_text(), values.size(), WeaponUpgrades.slots(weapon.tier), WeaponUpgrades.cost(weapon.data)]
 		result.append({"id": weapon.data.id, "uid": weapon.instance_uid, "data": preview_data, "tier": weapon.tier,
 			"name": WeaponPresentation.name_for(weapon.data, values), "meta": WeaponPresentation.tier_text(weapon.data, weapon.tier) + " · " + weapon.data.roots_text(),
-			"slot_count": WeaponUpgrades.slots(weapon.tier), "root_info": roots_info + "\n\nEine Waffe trägt höchstens ein Element. Blutung und Wasser zählen als Elemente. Weitere Plätze können Verstärkungen tragen.", "element": WeaponAffixes.element(values), "effects": effects, "options": options})
+			"cost": WeaponUpgrades.cost(weapon.data), "slot_count": WeaponUpgrades.slots(weapon.tier), "root_info": roots_info + "\n\nEine Waffe trägt höchstens ein Element. Blutung und Wasser zählen als Elemente. Weitere Plätze können Verstärkungen tragen.", "element": WeaponAffixes.element(values), "effects": effects, "options": options})
 	return result
 
 

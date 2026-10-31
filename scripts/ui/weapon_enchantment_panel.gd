@@ -21,6 +21,7 @@ var weapon_buttons: Array[Button] = []
 var upgrade_buttons: Array[Button] = []
 var effect_buttons: Array[Button] = []
 var models: Array[Dictionary] = []
+var income: WeaponUpgradeIncome
 var state: WeaponUpgradeState
 var loadout: WeaponLoadout
 var stats: PlayerStats
@@ -75,7 +76,8 @@ func _ready() -> void:
 	root_control.add_child(details)
 
 
-func show_upgrades(upgrades: WeaponUpgradeState, equipment: WeaponLoadout, player_stats: PlayerStats, items: ItemInventory) -> void:
+func show_upgrades(upgrades: WeaponUpgradeState, equipment: WeaponLoadout, player_stats: PlayerStats, items: ItemInventory, upgrade_income: WeaponUpgradeIncome = null) -> void:
+	income = upgrade_income
 	state = upgrades
 	loadout = equipment
 	stats = player_stats
@@ -103,12 +105,12 @@ func refresh() -> void:
 
 func _refresh() -> void:
 	if stage == null: return
-	count_label.text = "%d Upgrade%s" % [remaining, "" if remaining == 1 else "s"]
+	count_label.text = "%d Punkt%s" % [remaining, "" if remaining == 1 else "e"]
 	back_button.text = "Zurück" if picking_slot >= 0 else "Rückgängig"
 	back_button.disabled = picking_slot < 0 and state.actions.is_empty()
 	back_button.visible = not back_button.disabled
-	finish_button.text = "Verzaubern · 1 Upgrade" if picking_slot >= 0 else "Fertig"
-	finish_button.disabled = picking_slot >= 0 and (selected_effect == &"" or remaining == 0 or not _selection_allowed())
+	finish_button.text = "Verzaubern · %d" % _cost() if picking_slot >= 0 else "Fertig"
+	finish_button.disabled = picking_slot >= 0 and (selected_effect == &"" or remaining < _cost() or not _selection_allowed())
 	_layout(stage.last_extent)
 	if picking_slot >= 0 and selected_effect != &"": _reveal_selection.call_deferred()
 
@@ -123,8 +125,9 @@ func _layout(extent: Vector2) -> void:
 	var narrow := extent.x < 720
 	var compact := extent.x < 420
 	stage.title_label.text = "Verzaubern" if compact else "Waffen verzaubern"
-	count_label.text = str(remaining) if compact else "%d Upgrade%s" % [remaining, "" if remaining == 1 else "s"]
-	count_label.tooltip_text = "%d verfügbare Upgrades" % remaining
+	count_label.text = "%d Punkt%s" % [remaining, "" if remaining == 1 else "e"]
+	count_label.tooltip_text = "%d Punkte · 2 je Kapsel" % remaining
+	if income != null: count_label.tooltip_text += "\n" + income.details()
 	stage.title_label.add_theme_font_size_override("font_size", 22 if compact else 32)
 	count_label.add_theme_font_size_override("font_size", 16 if compact else 20)
 	var top := 0.0
@@ -250,13 +253,13 @@ func _slots(rect: Rect2, compact: bool) -> float:
 			var locked := index >= int(models[selected_weapon].slot_count)
 			var empty := _button(body, "Ab Mk %s" % ["I", "II", "III", "IV"][index] if locked else "+  Verzaubern", row)
 			empty.add_theme_stylebox_override("normal", MenuStyle.box(Color(DentiUIStyle.PANEL, 0.55), DentiUIStyle.LINE, 14, 1))
-			empty.tooltip_text = "Öffnet sich beim Waffenupgrade auf Mk %s" % ["I", "II", "III", "IV"][index] if locked else "Neue Verzauberung · 1 Upgrade"
+			empty.tooltip_text = "Öffnet sich beim Waffenupgrade auf Mk %s" % ["I", "II", "III", "IV"][index] if locked else "Neue Verzauberung · %d Punkte" % _cost()
 			if locked:
 				empty.icon = preload("res://assets/ui/setup_lock.svg")
 				empty.expand_icon = true
 				empty.add_theme_constant_override("icon_max_width", 18)
 				empty.alignment = HORIZONTAL_ALIGNMENT_CENTER
-			empty.disabled = remaining == 0 or locked
+			empty.disabled = remaining < _cost() or locked
 			empty.pressed.connect(open_picker.bind(index))
 			upgrade_buttons.append(empty)
 			continue
@@ -269,10 +272,10 @@ func _slots(rect: Rect2, compact: bool) -> float:
 		_art(icon, DentiUIIcons.item(data.icon_index), Rect2(2, 3, 46, 46))
 		icon.tooltip_text = data.display_name + " · Details"
 		icon.pressed.connect(func() -> void: details.present(data.display_name, effect.details, icon))
-		var action_width := 72.0 if compact else 82.0
+		var action_width := 72.0 if compact else 106.0
 		var text_width := row.size.x - 90 - action_width
-		_text(panel, data.display_name, Rect2(72, 3 if compact else 9, text_width - 48, 25), 18 if compact else 19)
-		var rank := _text(panel, "%d/10" % level, Rect2(row.size.x - action_width - 66, 4 if compact else 10, 52, 24), 16, DentiUIStyle.MINT if level == MAX_LEVEL else DentiUIStyle.INK)
+		_text(panel, data.display_name, Rect2(72, 3 if compact else 9, text_width if compact else text_width - 48, 25), 16 if compact else 19)
+		var rank := _text(panel, "%d/10" % level, Rect2(row.size.x - action_width - 12 if compact else row.size.x - action_width - 66, 0 if compact else 10, action_width if compact else 52, 22 if compact else 24), 13 if compact else 16, DentiUIStyle.MINT if level == MAX_LEVEL else DentiUIStyle.INK)
 		rank.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		for pip in MAX_LEVEL:
 			var cell := ColorRect.new()
@@ -285,9 +288,10 @@ func _slots(rect: Rect2, compact: bool) -> float:
 		var preview_height := 50.0 if very_narrow else (36.0 if compact else 28.0)
 		var preview_top := 37.0 if compact else minf(53, row_height - 32)
 		_text(panel, preview, Rect2(72, preview_top, text_width + 4, preview_height), 13 if compact else 14, DentiUIStyle.MUTED, true)
-		var action := _button(panel, "MAX" if level == MAX_LEVEL else "+ 1", Rect2(row.size.x - action_width - 12, 13 if compact else 25, action_width, 48))
-		action.tooltip_text = "Maximalstufe erreicht" if level == MAX_LEVEL else "%s: %d/10 -> %d/10 · kostet 1 Upgrade" % [data.display_name, level, level + 1]
-		action.disabled = level == MAX_LEVEL or remaining == 0
+		var action := _button(panel, "MAX" if level == MAX_LEVEL else ("+ · %d" if compact else "+ Rang · %d") % _cost(), Rect2(row.size.x - action_width - 12, 25, action_width, 44 if compact else 48))
+		action.add_theme_font_size_override("font_size", 16)
+		action.tooltip_text = "Maximalstufe erreicht" if level == MAX_LEVEL else "%s: %d/10 -> %d/10 · kostet %d Punkte" % [data.display_name, level, level + 1, _cost()]
+		action.disabled = level == MAX_LEVEL or remaining < _cost()
 		action.pressed.connect(upgrade.bind(index))
 		upgrade_buttons.append(action)
 	return SLOT_COUNT * (row_height + gap) - gap
@@ -376,7 +380,7 @@ func select_weapon(index: int) -> void:
 
 
 func open_picker(slot: int) -> void:
-	if remaining == 0 or slot < models[selected_weapon].effects.size() or slot >= int(models[selected_weapon].slot_count): return
+	if remaining < _cost() or slot < models[selected_weapon].effects.size() or slot >= int(models[selected_weapon].slot_count): return
 	picking_slot = slot
 	selected_effect = &""
 	_save_cursor()
@@ -384,7 +388,7 @@ func open_picker(slot: int) -> void:
 
 
 func upgrade(slot: int) -> void:
-	if remaining == 0 or slot < 0 or slot >= models[selected_weapon].effects.size(): return
+	if remaining < _cost() or slot < 0 or slot >= models[selected_weapon].effects.size(): return
 	if int(models[selected_weapon].effects[slot].level) >= MAX_LEVEL: return
 	upgrade_requested.emit(str(models[selected_weapon].uid), StringName(models[selected_weapon].effects[slot].id))
 
@@ -393,7 +397,7 @@ func _confirm() -> void:
 	if picking_slot < 0:
 		completed.emit()
 		return
-	if remaining == 0 or not _selection_allowed(): return
+	if remaining < _cost() or not _selection_allowed(): return
 	upgrade_requested.emit(str(models[selected_weapon].uid), selected_effect)
 
 
@@ -411,6 +415,10 @@ func _save_cursor() -> void:
 	if state == null or models.is_empty(): return
 	state.cursor = {"target_uid": str(models[selected_weapon].uid), "picking_slot": picking_slot, "selected_effect": str(selected_effect)}
 	selection_changed.emit()
+
+
+func _cost() -> int:
+	return int(models[selected_weapon].cost) if not models.is_empty() else 1
 
 
 func _selection_allowed() -> bool:

@@ -3,10 +3,16 @@ extends RefCounted
 
 const MAX_LEVEL := 10
 const KIND := "weapon_upgrade"
+const POINTS_PER_CAPSULE := 2
+const ECONOMY_VERSION := 2
+
+
+static func cost(data: WeaponData) -> int:
+	return maxi(data.hands, 1)
 
 
 static func capsule(wave: int, golden: bool = false) -> Dictionary:
-	return {"kind": KIND, "points": 1, "golden": golden, "scrap_coins": 5 + wave / 2 + (5 if golden else 0)}
+	return {"kind": KIND, "points": POINTS_PER_CAPSULE, "golden": golden, "scrap_coins": 5 + wave / 2 + (5 if golden else 0)}
 
 
 static func slots(tier: int) -> int:
@@ -27,8 +33,9 @@ static func power(id: StringName, rank: int, data: WeaponData, tier: int) -> flo
 	var value := definition.upgrade_steps[clampi(rank, 1, MAX_LEVEL) - 1]
 	var roots := float(data.hands)
 	if definition.stat_key != &"" or definition.effect_kind == "leech":
-		# Utility uses its existing effect-specific caps; percentages grow more gently.
-		return value * sqrt(roots)
+		# Percentages already apply to the whole weapon. Healing is weighted once,
+		# including its flat base and cap, in utility_value instead.
+		return value
 	var template := WeaponCatalog.by_id(data.id)
 	var interval := template.interval if template != null else data.interval
 	var count := data.projectile_count_at_tier(tier) if data.attack_mode == &"projectile" else 1

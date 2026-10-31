@@ -12,6 +12,6 @@ static func paint(attack: CloakEncounter) -> void:
 		progress = clampf((age - attack.profile.hit_start) / (attack.profile.hit_end - attack.profile.hit_start), 0, 1)
 	var shape := attack.profile.strike(attack.variant)
 	if attack.variant == CloakStrikeData.Kind.RING:
-		WarningEffects.ring(attack, attack.origin, shape.inner_radius, shape.reach, progress, not warning, striking)
+		WarningEffects.ring(attack, attack.origin, shape.inner_radius, shape.reach, progress, not warning, striking, attack.global_transform.affine_inverse())
 	else:
 		WarningEffects.sector(attack, attack.origin, attack.direction, shape.reach, attack.half_angle, progress, not warning, striking, attack.global_transform.affine_inverse())

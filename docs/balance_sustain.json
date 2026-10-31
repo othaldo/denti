@@ -1,0 +1,43 @@
+{
+	"hz": 60,
+	"measurements": [
+		{
+			"clock": "shared_baseline",
+			"healing": 62.7,
+			"hp_per_second": 2.09,
+			"weapons": 1
+		},
+		{
+			"clock": "per_weapon",
+			"healing": 62.7,
+			"hp_per_second": 2.09,
+			"weapons": 1
+		},
+		{
+			"clock": "shared_baseline",
+			"healing": 62.7,
+			"hp_per_second": 2.09,
+			"weapons": 3
+		},
+		{
+			"clock": "per_weapon",
+			"healing": 186.45,
+			"hp_per_second": 6.22,
+			"weapons": 3
+		},
+		{
+			"clock": "shared_baseline",
+			"healing": 62.7,
+			"hp_per_second": 2.09,
+			"weapons": 6
+		},
+		{
+			"clock": "per_weapon",
+			"healing": 372.9,
+			"hp_per_second": 12.43,
+			"weapons": 6
+		}
+	],
+	"method": "Actual Mk-IV mirrors with rank-10 lifesteal, default offensive stats, no items, no incoming damage. Immortal anchored target, no armor/guard. Shared-clock baseline is emulated by giving each weapon the same proc owner; independent mode uses its real persisted UID. Not a survival or win-rate test.",
+	"seconds": 30.0
+}

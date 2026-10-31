@@ -208,8 +208,25 @@ func discover_fusion(id: StringName) -> void:
 	_save_progression()
 
 
-func _save_progression() -> void:
-	progression_data.save_to(progression_path)
+func _save_progression() -> Error:
+	return progression_data.save_to(progression_path)
+
+func record_weapon_mastery(id: StringName, flags: int) -> Array[String]:
+	if test_scenario_id != &"" or not WeaponMasteries.valid_weapon(id): return []
+	var before := mastery_flags(id)
+	var gained := (flags & WeaponMasteries.all_flags()) & ~before
+	if gained == 0: return []
+	progression_data.weapon_masteries[str(id)] = before | gained
+	if _save_progression() != OK:
+		if before > 0: progression_data.weapon_masteries[str(id)] = before
+		else: progression_data.weapon_masteries.erase(str(id))
+		return []
+	return WeaponMasteries.ids_for(gained)
+
+
+func mastery_flags(id: StringName) -> int:
+	return int(progression_data.weapon_masteries.get(str(id), 0))
+
 
 func can_select_difficulty(id: StringName) -> bool:
 	return DifficultyCatalog.by_id(id).id == id and (id != &"hell" or hell_unlocked)

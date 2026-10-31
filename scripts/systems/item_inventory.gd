@@ -55,8 +55,10 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	for key in cooldowns:
+	for key in cooldowns.keys():
 		cooldowns[key] = maxf(float(cooldowns[key]) - delta, 0.0)
+		if str(key).begins_with("enchantment_leech:") and float(cooldowns[key]) <= 0:
+			cooldowns.erase(key)
 	if sugar_rush_time > 0.0:
 		sugar_rush_time = maxf(sugar_rush_time - delta, 0.0)
 		if sugar_rush_time <= 0.0:

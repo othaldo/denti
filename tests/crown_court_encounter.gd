@@ -17,7 +17,7 @@ func _fresh(kind: int = 0, phase: int = 0) -> void:
 	boss.boss_phase = phase
 	boss.boss_phase_timer = 0
 	boss.global_position = Vector2(770, 620)
-	game.player.global_position = Vector2(1050, 650)
+	game.player.global_position = Vector2(1010, 650)
 	game.player.stats.health = 100000
 	game.player.hurt_time = 0
 	game.player.dash_moved = false
@@ -51,18 +51,49 @@ func _run() -> void:
 	paused = true
 	_check(attack != null and attack.rig.bones.size() == 8, "Emperor modular court was not connected")
 	for bone: Bone2D in attack.rig.bones.values(): _check(bone.scale == Vector2.ONE, "Emperor art was stretched")
+	# Every new floor attack aims its dangerous sector at Denti, across the
+	# whole arena. The combined nerve attack must use the same targeting rule.
+	for kind in [CrownCourtEncounter.Attack.EDICT, CrownCourtEncounter.Attack.NERVE]:
+		for index in 8:
+			_fresh(kind, 2)
+			game.player.global_position = boss.global_position + Vector2.from_angle(index * TAU / 8) * 250
+			attack.begin(kind)
+			var toward := attack.origin.direction_to(game.player.global_position)
+			_check(absf(Vector2.from_angle(attack.edict_angle).angle_to(toward)) < 0.0001, "new court warning did not aim its damaging sector at Denti")
+			var locked := attack.edict_angle
+			var fixed_origin := attack.origin
+			var saved_warning := attack.save_data()
+			game.player.global_position = attack.origin + toward.rotated(PI * 0.5) * 250
+			attack.advance(0.3)
+			_check(attack.edict_angle == locked and attack.origin == fixed_origin, "court warning chased Denti after locking")
+			attack.restore(saved_warning)
+			_check(attack.edict_angle == locked and attack.origin == fixed_origin, "restoring a court warning retargeted it")
+	# A warning beginning partway through a dash uses the position at its birth.
+	for kind in [CrownCourtEncounter.Attack.EDICT, CrownCourtEncounter.Attack.NERVE]:
+		_fresh(kind, 2)
+		game.player.motion_start = boss.global_position + Vector2(250, -120)
+		game.player.motion_end = boss.global_position + Vector2(250, 120)
+		game.player.global_position = game.player.motion_end
+		game.player.motion_tick = Engine.get_physics_frames()
+		game.player.dash_motion_seconds = 0.4
+		game.player.dash_moved = true
+		attack.begin(kind, 0.1)
+		var expected := attack.origin.direction_to(HazardGeometry.player_at(game.player, 0.1))
+		_check(absf(Vector2.from_angle(attack.edict_angle).angle_to(expected)) < 0.0001, "court aimed at the end of the frame instead of warning birth")
 	_fresh()
 	var fixed_angle := attack.edict_angle
-	game.player.global_position = attack.origin + Vector2.from_angle(fixed_angle) * 250
+	_check(HazardGeometry.circle_sector(game.player.global_position, attack.origin, Vector2.from_angle(fixed_angle), attack.profile.court_radius, deg_to_rad(attack.profile.court_half_angle)), "stationary Denti starts outside the targeted verdict")
 	attack.advance(attack.profile.warning_seconds - 0.001)
-	_check(game.player.stats.health == 100000 and attack.shots.entries.is_empty(), "court hit during its warning")
+	_check(game.player.stats.health == 100000 and attack.shots.entries.is_empty() and attack.needles.entries.is_empty(), "court hit during its warning")
 	attack.advance(0.011)
 	_check(game.player.stats.health < 100000 and attack.verdict_hit, "announced court sector missed stationary Denti")
-	for entry in attack.shots.entries:
+	_check(not attack.needles.entries.is_empty(), "new court failed to release its warned fast fan")
+	for entry in attack.needles.entries:
 		var angular_distance := minf(absf(Vector2.from_angle(fixed_angle).angle_to(entry.velocity)), absf(Vector2.from_angle(fixed_angle + PI).angle_to(entry.velocity)))
 		_check(angular_distance <= deg_to_rad(attack.profile.court_half_angle) + 0.0001, "court fan exceeded its announced angular footprint")
 	var health: float = game.player.stats.health
 	attack.shots.clear()
+	attack.needles.clear()
 	var save := attack.save_data()
 	attack.restore(save)
 	game.player.hurt_time = 0
@@ -71,7 +102,10 @@ func _run() -> void:
 	_fresh()
 	game.player.global_position += Vector2(-280, 180)
 	attack.advance(0.5)
-	_check(attack.edict_angle == fixed_angle, "court put a safety gap at Denti's changing location")
+	_check(attack.edict_angle == fixed_angle, "court retargeted its announced angle after Denti moved")
+	attack.advance(attack.remaining + attack.profile.impact_seconds + attack.profile.reposition_seconds)
+	var new_target := attack.origin.direction_to(game.player.global_position)
+	_check(attack.state == CrownCourtEncounter.State.EDICT_WARN and absf(Vector2.from_angle(attack.edict_angle).angle_to(new_target)) < 0.0001, "follow-up verdict did not acquire Denti's new position")
 	_fresh(CrownCourtEncounter.Attack.PORTAL)
 	var a := attack.portal_a
 	var b := attack.portal_b
@@ -102,7 +136,7 @@ func _run() -> void:
 	_check(game.player.stats.health < 100000, "dash tunneled through a court sector")
 	_fresh(CrownCourtEncounter.Attack.NERVE)
 	var shots_before := attack.shots.fired
-	attack.advance(attack.profile.nerve_warning_seconds + 0.01)
+	attack.advance(attack.nerve_warning_duration() + 0.01)
 	_check(attack.shots.fired - shots_before == attack.profile.rays(0), "nerve ring omitted rays or silently capped its volley")
 	var pulse_before := attack.pulses_fired
 	boss.boss_phase = 2
@@ -133,13 +167,15 @@ func _run() -> void:
 		_check(attack.profile.warning_seconds == 1.05 and attack.profile.portal_warning_seconds == 1 and attack.profile.nerve_warning_seconds == 1.05, "difficulty shortened Emperor reaction windows")
 		for kind in [0, 1, 2]:
 			_fresh(kind, 2)
+			if kind != CrownCourtEncounter.Attack.PORTAL:
+				_check(absf(Vector2.from_angle(attack.edict_angle).angle_to(attack.origin.direction_to(game.player.global_position))) < 0.0001, "court targeting differs by difficulty")
 			for seconds in [0.2, 0.8, 0.3, 0.5, 1.0, 1.2]:
 				attack.advance(seconds)
 				var before := attack.save_data()
 				EnemySnapshot.restore(boss, EnemySnapshot.capture(boss))
 				_check(before == attack.save_data(), "difficulty-specific court snapshot changed live hazards")
 		_fresh(0, 2)
-		var fired := attack.shots.fired
+		var fired := attack.shots.fired + attack.needles.fired
 		var warned := attack.warnings
 		var portaled := attack.portals_fired
 		var stepped := attack.movement
@@ -149,9 +185,9 @@ func _run() -> void:
 			game.player.hurt_time = maxf(game.player.hurt_time - 1.0 / 60, 0)
 			attack.advance(1.0 / 60)
 			kinds[attack.attack_kind] = true
-			peak = maxi(peak, attack.shots.entries.size())
-			_check(peak <= attack.profile.shots.maximum and attack.lances.entries.size() <= attack.profile.lance.maximum, "court exceeded its hazard budgets")
-		var total := attack.shots.fired - fired
+			peak = maxi(peak, attack.shots.entries.size() + attack.needles.entries.size())
+			_check(attack.shots.entries.size() <= attack.profile.shots.maximum and attack.needles.entries.size() <= attack.profile.needles.maximum and attack.lances.entries.size() <= attack.profile.lance.maximum, "court exceeded its hazard budgets")
+		var total := attack.shots.fired + attack.needles.fired - fired
 		_check(kinds.size() == 3 and total > previous_projectiles, "actual Emperor repertoire/pressure did not scale between difficulties")
 		previous_projectiles = total
 		measurements.append({"difficulty": str(difficulty.id), "seconds": 60, "projectiles": total, "portals": attack.portals_fired - portaled, "warnings": attack.warnings - warned, "movement": snappedf(attack.movement - stepped, 0.1), "peak_shots": peak})

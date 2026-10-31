@@ -1,0 +1,276 @@
+{
+	"adapter": "NVIDIA GeForce RTX 4070",
+	"method": "Native Compatibility, VSync off; 80 warmup + 200 measured frames. Raster/analytic repeated in reverse order. Frame wall time including submission, not isolated GPU time or full-game/mobile FPS. Same 1280x720 logical viewport at both pixel resolutions. Modern is a separate all-lanes stress load, not an equivalent replacement benchmark.",
+	"results": [
+		{
+			"draw_calls": 7.0,
+			"draw_submit_ms": 0.00532857142857143,
+			"frame_ms_mean": 0.46679,
+			"frame_ms_p95": 0.692,
+			"mode": "raster",
+			"size": "(1280, 720)",
+			"warnings": 1
+		},
+		{
+			"draw_calls": 7.0,
+			"draw_submit_ms": 0.00518214285714286,
+			"frame_ms_mean": 0.411665,
+			"frame_ms_p95": 0.532,
+			"mode": "analytic",
+			"size": "(1280, 720)",
+			"warnings": 1
+		},
+		{
+			"draw_calls": 7.0,
+			"draw_submit_ms": 0.0,
+			"frame_ms_mean": 0.32477,
+			"frame_ms_p95": 0.442,
+			"mode": "modern",
+			"size": "(1280, 720)",
+			"warnings": 1
+		},
+		{
+			"draw_calls": 7.0,
+			"draw_submit_ms": 0.00510320284697509,
+			"frame_ms_mean": 0.3649,
+			"frame_ms_p95": 0.471,
+			"mode": "analytic",
+			"size": "(1280, 720)",
+			"warnings": 1
+		},
+		{
+			"draw_calls": 7.0,
+			"draw_submit_ms": 0.00528571428571429,
+			"frame_ms_mean": 0.370345,
+			"frame_ms_p95": 0.523,
+			"mode": "raster",
+			"size": "(1280, 720)",
+			"warnings": 1
+		},
+		{
+			"draw_calls": 7.0,
+			"draw_submit_ms": 0.0734714285714286,
+			"frame_ms_mean": 0.428235,
+			"frame_ms_p95": 0.612,
+			"mode": "raster",
+			"size": "(1280, 720)",
+			"warnings": 20
+		},
+		{
+			"draw_calls": 7.0,
+			"draw_submit_ms": 0.0725321428571429,
+			"frame_ms_mean": 0.419705,
+			"frame_ms_p95": 0.553,
+			"mode": "analytic",
+			"size": "(1280, 720)",
+			"warnings": 20
+		},
+		{
+			"draw_calls": 26.0,
+			"draw_submit_ms": 0.0,
+			"frame_ms_mean": 0.419565,
+			"frame_ms_p95": 0.593,
+			"mode": "modern",
+			"size": "(1280, 720)",
+			"warnings": 20
+		},
+		{
+			"draw_calls": 7.0,
+			"draw_submit_ms": 0.0715231316725979,
+			"frame_ms_mean": 0.41506,
+			"frame_ms_p95": 0.552,
+			"mode": "analytic",
+			"size": "(1280, 720)",
+			"warnings": 20
+		},
+		{
+			"draw_calls": 7.0,
+			"draw_submit_ms": 0.0755357142857143,
+			"frame_ms_mean": 0.42759,
+			"frame_ms_p95": 0.556,
+			"mode": "raster",
+			"size": "(1280, 720)",
+			"warnings": 20
+		},
+		{
+			"draw_calls": 7.0,
+			"draw_submit_ms": 0.1893,
+			"frame_ms_mean": 0.536925,
+			"frame_ms_p95": 0.73,
+			"mode": "raster",
+			"size": "(1280, 720)",
+			"warnings": 60
+		},
+		{
+			"draw_calls": 7.0,
+			"draw_submit_ms": 0.184289285714286,
+			"frame_ms_mean": 0.5474,
+			"frame_ms_p95": 0.751,
+			"mode": "analytic",
+			"size": "(1280, 720)",
+			"warnings": 60
+		},
+		{
+			"draw_calls": 66.0,
+			"draw_submit_ms": 0.0,
+			"frame_ms_mean": 0.610275,
+			"frame_ms_p95": 0.88,
+			"mode": "modern",
+			"size": "(1280, 720)",
+			"warnings": 60
+		},
+		{
+			"draw_calls": 7.0,
+			"draw_submit_ms": 0.178192170818505,
+			"frame_ms_mean": 0.520835,
+			"frame_ms_p95": 0.672,
+			"mode": "analytic",
+			"size": "(1280, 720)",
+			"warnings": 60
+		},
+		{
+			"draw_calls": 7.0,
+			"draw_submit_ms": 0.176460714285714,
+			"frame_ms_mean": 0.510035,
+			"frame_ms_p95": 0.64,
+			"mode": "raster",
+			"size": "(1280, 720)",
+			"warnings": 60
+		},
+		{
+			"draw_calls": 7.0,
+			"draw_submit_ms": 0.00518149466192171,
+			"frame_ms_mean": 0.335195,
+			"frame_ms_p95": 0.455,
+			"mode": "raster",
+			"size": "(2560, 1440)",
+			"warnings": 1
+		},
+		{
+			"draw_calls": 7.0,
+			"draw_submit_ms": 0.00476785714285714,
+			"frame_ms_mean": 0.31198,
+			"frame_ms_p95": 0.42,
+			"mode": "analytic",
+			"size": "(2560, 1440)",
+			"warnings": 1
+		},
+		{
+			"draw_calls": 7.0,
+			"draw_submit_ms": 0.0,
+			"frame_ms_mean": 0.333945,
+			"frame_ms_p95": 0.433,
+			"mode": "modern",
+			"size": "(2560, 1440)",
+			"warnings": 1
+		},
+		{
+			"draw_calls": 7.0,
+			"draw_submit_ms": 0.00514946619217082,
+			"frame_ms_mean": 0.3642,
+			"frame_ms_p95": 0.557,
+			"mode": "analytic",
+			"size": "(2560, 1440)",
+			"warnings": 1
+		},
+		{
+			"draw_calls": 7.0,
+			"draw_submit_ms": 0.00470714285714286,
+			"frame_ms_mean": 0.33254,
+			"frame_ms_p95": 0.439,
+			"mode": "raster",
+			"size": "(2560, 1440)",
+			"warnings": 1
+		},
+		{
+			"draw_calls": 7.0,
+			"draw_submit_ms": 0.0789964285714286,
+			"frame_ms_mean": 0.422815,
+			"frame_ms_p95": 0.568,
+			"mode": "raster",
+			"size": "(2560, 1440)",
+			"warnings": 20
+		},
+		{
+			"draw_calls": 7.0,
+			"draw_submit_ms": 0.0692464285714286,
+			"frame_ms_mean": 0.379735,
+			"frame_ms_p95": 0.464,
+			"mode": "analytic",
+			"size": "(2560, 1440)",
+			"warnings": 20
+		},
+		{
+			"draw_calls": 26.0,
+			"draw_submit_ms": 0.0,
+			"frame_ms_mean": 0.43039,
+			"frame_ms_p95": 0.617,
+			"mode": "modern",
+			"size": "(2560, 1440)",
+			"warnings": 20
+		},
+		{
+			"draw_calls": 7.0,
+			"draw_submit_ms": 0.0771067615658363,
+			"frame_ms_mean": 0.420215,
+			"frame_ms_p95": 0.621,
+			"mode": "analytic",
+			"size": "(2560, 1440)",
+			"warnings": 20
+		},
+		{
+			"draw_calls": 7.0,
+			"draw_submit_ms": 0.0736678571428571,
+			"frame_ms_mean": 0.40012,
+			"frame_ms_p95": 0.525,
+			"mode": "raster",
+			"size": "(2560, 1440)",
+			"warnings": 20
+		},
+		{
+			"draw_calls": 7.0,
+			"draw_submit_ms": 0.195439285714286,
+			"frame_ms_mean": 0.542105,
+			"frame_ms_p95": 0.699,
+			"mode": "raster",
+			"size": "(2560, 1440)",
+			"warnings": 60
+		},
+		{
+			"draw_calls": 7.0,
+			"draw_submit_ms": 0.200271428571429,
+			"frame_ms_mean": 0.56668,
+			"frame_ms_p95": 0.955,
+			"mode": "analytic",
+			"size": "(2560, 1440)",
+			"warnings": 60
+		},
+		{
+			"draw_calls": 66.0,
+			"draw_submit_ms": 0.0,
+			"frame_ms_mean": 0.646645,
+			"frame_ms_p95": 0.878,
+			"mode": "modern",
+			"size": "(2560, 1440)",
+			"warnings": 60
+		},
+		{
+			"draw_calls": 7.0,
+			"draw_submit_ms": 0.200725978647687,
+			"frame_ms_mean": 0.568175,
+			"frame_ms_p95": 0.799,
+			"mode": "analytic",
+			"size": "(2560, 1440)",
+			"warnings": 60
+		},
+		{
+			"draw_calls": 7.0,
+			"draw_submit_ms": 0.208871428571429,
+			"frame_ms_mean": 0.556355,
+			"frame_ms_p95": 0.726,
+			"mode": "raster",
+			"size": "(2560, 1440)",
+			"warnings": 60
+		}
+	]
+}

@@ -83,6 +83,7 @@ func configure(is_pause: bool, can_continue: bool, run_context: String, code_unl
 	utilities.add_theme_constant_override("v_separation", 4)
 	column.add_child(utilities)
 	if not is_pause: _action(&"settings", "Einstellungen", utilities, false, true)
+	_action(&"achievements", "Achievements", utilities, false, true)
 	_action(&"dentipedia", "Dentipedia", utilities, false, true)
 	if not is_pause: _action(&"credits", "Credits", utilities, false, true)
 	if test_run: _action(&"test_restart", "Test neu starten", utilities, false, true)
@@ -117,7 +118,7 @@ func layout_in(extent: Vector2) -> void:
 	secondary.size_flags_stretch_ratio = float(maxi(1, secondary.get_child_count()))
 	utilities.columns = 3 if wide or extent.x >= 480 else 2
 	if paused_view: utilities.columns = 1 if not wide else 2
-	logo.custom_minimum_size.y = 150 if wide else (56 if short_view else 112)
+	logo.custom_minimum_size.y = 150 if wide else (40 if short_view else 112)
 	column.add_theme_constant_override("separation", 6 if short_view else 12)
 	for button: Button in actions.values():
 		button.add_theme_font_size_override("font_size", 16 if extent.x < 600 else 18)

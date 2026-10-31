@@ -4,13 +4,13 @@
 script = ExtResource("1")
 id = &"xp_heal_1"
 display_name = "Feenquittung"
-description = "Jeder gesammelte XP-Punkt heilt 0,15 Leben. -3 % Schaden."
+description = "Jeder gesammelte XP-Punkt heilt 0,10 Leben. -3 % Schaden."
 rarity_tier = 1
 price = 5
 icon_index = 75
 stat_changes = { &"damage_bonus": -3.0 }
 effect_kind = &"xp_heal"
-effect_value = 0.15
+effect_value = 0.1
 max_stacks = 12
 family_id = &"xp_heal"
 family_limit = 12

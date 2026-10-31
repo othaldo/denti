@@ -36,13 +36,15 @@ func _run() -> void:
 				for route in 64:
 					attack.cancel()
 					attack.cycle = 0
-					boss.global_position = corner + corner.direction_to(game.arena.arena_size * 0.5) * 280
+					boss.global_position = corner + corner.direction_to(game.arena.arena_size * 0.5) * 250
 					game.player.global_position = corner
 					game.player.hurt_time = 0
 					game.player.stats.health = 100000
 					game.player.get_node("Camera2D").force_update_scroll()
 					attack.begin(kind)
-					var goal := (corner + Vector2.from_angle(route * TAU / 64) * 220).clamp(Vector2.ONE * 48, game.arena.arena_size - Vector2.ONE * 48)
+					# Keep running past the inner ring gaps instead of stopping
+					# 220 px from the corner before the slower ring arrives.
+					var goal := (corner + Vector2.from_angle(route * TAU / 64) * 360).clamp(Vector2.ONE * 48, game.arena.arena_size - Vector2.ONE * 48)
 					var body := false
 					# First complete warned event, including outgoing projectiles.
 					for tick in 110:

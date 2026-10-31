@@ -12,9 +12,16 @@ var tier := 4
 var candidates: Array[Dictionary] = []
 var selected: Array[StringName] = []
 var total_points := 0
+var effect_points: Dictionary = {}
 
 
 func configure(primary: WeaponInstance, partner: WeaponInstance, result: WeaponData, result_tier: int, recipe: StringName = &"") -> void:
+	ingredients.clear()
+	source_data.clear()
+	candidates.clear()
+	selected.clear()
+	effect_points.clear()
+	total_points = 0
 	primary_uid = primary.instance_uid
 	partner_uid = partner.instance_uid if partner != null else ""
 	recipe_id = recipe
@@ -25,10 +32,22 @@ func configure(primary: WeaponInstance, partner: WeaponInstance, result: WeaponD
 		ingredients.append(snapshot(weapon))
 		source_data.append(weapon.data)
 		for entry: Dictionary in weapon.affixes:
-			total_points += WeaponUpgrades.level(entry)
+			var invested := WeaponUpgrades.level(entry) * WeaponUpgrades.cost(weapon.data)
+			total_points += invested
+			effect_points[str(entry.id)] = int(effect_points.get(str(entry.id), 0)) + invested
 			var index := WeaponAffixes.find(candidates, StringName(entry.id))
 			if index < 0: candidates.append(entry.duplicate(true))
 			else: candidates[index] = WeaponAffixes.merge_entries(candidates[index], entry)
+	# Transfer purchased root budgets, not free ranks across weapon sizes.
+	for index in range(candidates.size() - 1, -1, -1):
+		var entry := candidates[index]
+		var ranks := mini(int(effect_points[str(entry.id)]) / WeaponUpgrades.cost(result_data), WeaponUpgrades.MAX_LEVEL)
+		if ranks == 0:
+			candidates.remove_at(index)
+		elif entry.has("level") or ranks != WeaponUpgrades.level(entry):
+			if not entry.has("level"): entry["legacy_floor"] = float(entry.damage)
+			entry["level"] = ranks
+			entry.stacks = ranks
 	# Primary weapon first; compatible additions follow in source order.
 	for entry in candidates:
 		var id := StringName(entry.id)
@@ -86,7 +105,7 @@ func effects() -> Array[Dictionary]:
 
 func refund() -> int:
 	var kept := 0
-	for entry in effects(): kept += WeaponUpgrades.level(entry)
+	for entry in effects(): kept += WeaponUpgrades.level(entry) * WeaponUpgrades.cost(result_data)
 	return maxi(total_points - kept, 0)
 
 
