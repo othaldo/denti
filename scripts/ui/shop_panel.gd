@@ -128,6 +128,8 @@ func _update_layout() -> void:
 	reroll_button.add_theme_font_size_override("font_size", 14)
 	continue_button.custom_minimum_size = Vector2(148, 44)
 	continue_button.add_theme_font_size_override("font_size", 14)
+	enchant_button.custom_minimum_size = Vector2(148, 44)
+	enchant_button.add_theme_font_size_override("font_size", 14)
 	_refresh_header()
 	var body_height := _available_body_height()
 	var side_by_side := extent.x >= 1000

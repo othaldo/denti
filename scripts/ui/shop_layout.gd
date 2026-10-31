@@ -255,6 +255,8 @@ static func build(view: ShopPanel) -> void:
 	view.items_row.add_theme_constant_override("separation", 5)
 	view.items_scroll.add_child(view.items_row)
 	view.enchant_button = DentiUIComponents.button(actions, "Verzaubern")
+	view.enchant_button.size_flags_horizontal = Control.SIZE_SHRINK_END
+	view.enchant_button.size_flags_vertical = Control.SIZE_SHRINK_END
 	view.enchant_button.visible = false
 	view.enchant_button.pressed.connect(func() -> void: view.enchant_requested.emit())
 	view.continue_button = DentiUIComponents.button(actions, "Weiter", true)

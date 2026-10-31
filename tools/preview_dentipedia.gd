@@ -16,7 +16,7 @@ func _run() -> void:
 	session.reduced_ui_motion = true
 	AudioServer.set_bus_mute(0, true)
 	DirAccess.make_dir_recursive_absolute(OUTPUT)
-	for extent in [Vector2i(1280, 720), Vector2i(360, 640), Vector2i(568, 320)]:
+	for extent in [Vector2i(1280, 720), Vector2i(320, 568), Vector2i(360, 640), Vector2i(568, 320)]:
 		root.content_scale_size = extent
 		root.size = extent
 		var menu: GameMenu = load("res://scenes/ui/game_menu.tscn").instantiate()
@@ -25,10 +25,11 @@ func _run() -> void:
 		menu._show_dentipedia()
 		for frame in 8: await process_frame
 		var pedia := menu.dentipedia
-		for page in [[4, "Manuelle Verzauberungsfusion", "fusion"], [4, "Wurzelsprung & Ausdauer", "dash"], [4, "Waffenpunkte & Effektplätze", "points"], [0, "Garotte", "weapon_forms"], [5, "Lebensraub", "leech"]]:
-			pedia.category.selected = page[0]
+		for page in [[0, "", "weapons"], [1, "", "items"], [4, "Manuelle Verzauberungsfusion", "fusion"], [4, "Wurzelsprung & Ausdauer", "dash"], [4, "Waffenpunkte & Effektplätze", "points"], [0, "Garotte", "weapon_forms"], [5, "Lebensraub", "leech"]]:
+			pedia.select_category(page[0])
 			pedia.search.text = page[1]
 			pedia._refresh()
+			if not str(page[1]).is_empty() and not pedia.selected.is_empty(): pedia._show(pedia.selected)
 			for button: Button in pedia.listing.get_children():
 				if str(button.get_meta("entry").title) == str(page[1]):
 					button.pressed.emit()
@@ -46,8 +47,12 @@ func _run() -> void:
 			for frame in 12: await process_frame
 			await RenderingServer.frame_post_draw
 			var filename: String = "%s%s_%dx%d.png" % [OUTPUT, page[2], extent.x, extent.y]
-			root.get_texture().get_image().save_png(filename)
+			var error := root.get_texture().get_image().save_png(filename)
+			if error != OK:
+				push_error("Could not save Dentipedia preview: " + filename)
+				finish(1)
+				return
 		menu.queue_free()
 		await process_frame
-	print("PASS native Dentipedia: points, fusion, dash, fire-form preview and lifesteal; desktop, portrait and short landscape")
+	print("PASS native Dentipedia: visible categories, weapon/item lists, points, fusion, dash, fire forms and lifesteal; four viewports")
 	finish()

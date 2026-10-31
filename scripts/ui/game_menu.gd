@@ -256,6 +256,7 @@ func _home_action(id: StringName) -> void:
 
 
 func _return_home() -> void:
+	if page == &"dentipedia" and is_instance_valid(dentipedia) and dentipedia.go_back(): return
 	if page == &"updates":
 		var updates: GameUpdateService = get_node("/root/GameUpdates")
 		if updates.state == GameUpdateService.State.INSTALLING: return
@@ -299,11 +300,12 @@ func _compact_title(title: String) -> void:
 func _show_dentipedia() -> void:
 	page = &"dentipedia"
 	_clear_rows()
-	_compact_title("Dentipedia")
+	menu_stage.hide()
+	home_return_focus = &"dentipedia"
 	dentipedia = Dentipedia.new()
-	rows.add_child(dentipedia)
-	_button("Zurück", _show_home)
-	_update_build_layout()
+	stage.present("Dentipedia", dentipedia, "", 1600)
+	actions[&"back"] = stage.back_button
+	stage._refresh_focus()
 
 
 func _update_build_layout() -> void:
@@ -314,9 +316,6 @@ func _update_build_layout() -> void:
 	(menu_stage.get_parent() as Container).queue_sort()
 	var extent := root_control.size
 	if page == &"dentipedia":
-		build_panel.custom_minimum_size.x = minf(960, extent.x - 24)
-		if dentipedia != null:
-			dentipedia.custom_minimum_size.y = maxf(80, minf(570, extent.y - 180))
 		return
 	if page == &"boss_details" and build_scroll != null:
 		build_scroll.custom_minimum_size.y = maxf(60, minf(200, extent.y - 180))

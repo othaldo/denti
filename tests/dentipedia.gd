@@ -104,7 +104,15 @@ func _run() -> void:
 		for frame in 15:
 			await process_frame
 		var pedia: Dentipedia = game.game_menu.dentipedia
-		check(Rect2(Vector2.ZERO, Vector2(extent)).encloses(game.game_menu.build_panel.get_global_rect()), "Dentipedia escaped viewport %s" % extent)
+		check(game.game_menu.stage.visible and not game.game_menu.menu_stage.visible, "Dentipedia still uses the framed dialog")
+		check(pedia.find_children("*", "OptionButton", true, false).is_empty() and pedia.category_buttons.size() == DentipediaData.CATEGORIES.size(), "category dropdown was not replaced by visible navigation")
+		for index in pedia.category_buttons.size():
+			var tab := pedia.category_buttons[index]
+			check(tab.visible and Rect2(Vector2.ZERO, Vector2(extent)).encloses(tab.get_global_rect()) and tab.size.x >= 48 and tab.size.y >= 48, "category is clipped or too small for touch at %s" % extent)
+			tab.pressed.emit()
+			check(pedia.category_index == index and tab.button_pressed, "category button does not select its entries")
+		pedia.select_category(0)
+		check(Rect2(Vector2.ZERO, Vector2(extent)).encloses(game.game_menu.stage.panel.get_global_rect()), "Dentipedia escaped viewport %s" % extent)
 		pedia.search.text = WeaponEvolutions.ALL[1].result.display_name
 		pedia._refresh()
 		check(pedia.listing.get_child_count() == 0, "search exposed undiscovered name")
@@ -118,13 +126,18 @@ func _run() -> void:
 			await RenderingServer.frame_post_draw
 			root.get_texture().get_image().save_png("res://.godot/dentipedia-locked.png")
 		pedia._show(revealed[WeaponCatalog.ALL.size()])
+		if pedia.portrait:
+			check(pedia.detail_scroll.visible and not pedia.list_scroll.visible, "portrait detail remains squeezed beside the listing")
+			game.game_menu.stage.back_button.pressed.emit()
+			check(game.game_menu.page == &"dentipedia" and pedia.list_scroll.visible and not pedia.detail_scroll.visible and paused, "portrait back did not restore the listing and pause")
+			pedia._show(revealed[WeaponCatalog.ALL.size()])
 		if "--capture" in OS.get_cmdline_user_args():
 			await RenderingServer.frame_post_draw
 			root.get_texture().get_image().save_png("res://.godot/dentipedia-%d.png" % extent.x)
-		pedia.category.selected = 4
+		pedia.select_category(4)
 		pedia._refresh()
 		check(pedia.listing.get_child(0).get_meta("entry").title == "Verzauberungen", "mechanics overview is not reachable")
-		pedia.category.selected = enchantment_category
+		pedia.select_category(enchantment_category)
 		pedia.search.text = "Lebensraub"
 		pedia._refresh()
 		var found_leech := false
@@ -139,19 +152,19 @@ func _run() -> void:
 		pedia._show(enchantments[0])
 		for frame in 5:
 			await process_frame
-		check(Rect2(Vector2.ZERO, Vector2(extent)).encloses(game.game_menu.build_panel.get_global_rect()), "enchantment overview escaped viewport %s" % extent)
+		check(Rect2(Vector2.ZERO, Vector2(extent)).encloses(game.game_menu.stage.panel.get_global_rect()), "enchantment overview escaped viewport %s" % extent)
 		if "--capture" in OS.get_cmdline_user_args():
 			await RenderingServer.frame_post_draw
 			root.get_texture().get_image().save_png("res://.godot/dentipedia-enchantments-%dx%d.png" % [extent.x, extent.y])
 		pedia._show(enchantment_entries["holy"])
 		for frame in 5:
 			await process_frame
-		check(Rect2(Vector2.ZERO, Vector2(extent)).encloses(game.game_menu.build_panel.get_global_rect()), "individual enchantment escaped viewport %s" % extent)
+		check(Rect2(Vector2.ZERO, Vector2(extent)).encloses(game.game_menu.stage.panel.get_global_rect()), "individual enchantment escaped viewport %s" % extent)
 		if "--capture" in OS.get_cmdline_user_args():
 			await RenderingServer.frame_post_draw
 			root.get_texture().get_image().save_png("res://.godot/dentipedia-holy-%dx%d.png" % [extent.x, extent.y])
 		# Former names remain searchable, and a form preview must never enchant the build.
-		pedia.category.selected = 0
+		pedia.select_category(0)
 		pedia.search.text = "Garotte"
 		pedia._refresh()
 		check(pedia.listing.get_child_count() == 1, "former Garotte name is not searchable")
@@ -172,14 +185,14 @@ func _run() -> void:
 		check(form_rows[0].size.x <= pedia.detail_scroll.size.x + 1, "form choices overflow horizontally at %s" % extent)
 		pedia.detail_scroll.scroll_vertical = 500
 		for frame in 2: await process_frame
-		pedia.category.selected = 4
+		pedia.select_category(4)
 		pedia.search.text = "Wurzelsprung"
 		pedia._refresh()
 		check(pedia.selected.get("title") == "Wurzelsprung & Ausdauer", "new dash topic cannot be found")
 		for frame in 3: await process_frame
 		check(pedia.detail_scroll.scroll_vertical == 0, "opening another topic retains the previous scroll offset")
 		pedia.search.text = ""
-		pedia.category.selected = 1
+		pedia.select_category(1)
 		pedia._refresh()
 		for frame in 5:
 			await process_frame
@@ -207,7 +220,7 @@ func _run() -> void:
 		check(pedia.list_scroll.scroll_vertical > 0, "item list cannot be swiped %s" % extent)
 		for frame in 90:
 			await process_frame
-		pedia.category.selected = 0
+		pedia.select_category(0)
 		pedia._refresh()
 	game.game_menu._show_home()
 	check(paused, "reading encyclopedia resumed combat")

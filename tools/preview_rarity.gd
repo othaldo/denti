@@ -76,7 +76,7 @@ func _run() -> void:
 		game.game_menu._show_items()
 		await _capture("owned", extent)
 		game.game_menu._show_dentipedia()
-		game.game_menu.dentipedia.category.selected = 1
+		game.game_menu.dentipedia.select_category(1)
 		game.game_menu.dentipedia._refresh()
 		var item_entries := DentipediaData.entries(1, [])
 		for entry in item_entries:

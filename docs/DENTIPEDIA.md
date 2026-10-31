@@ -1,8 +1,17 @@
 # Dentipedia
 
-Stand: 27.10.2026. Das Nachschlagewerk ist im Hauptmenü und über Escape
+Stand: 31.10.2026. Das Nachschlagewerk ist im Hauptmenü und über Escape
 erreichbar. Ein pausierter Kampf bleibt beim Lesen pausiert. Die Suche filtert
 Titel und Text innerhalb des gewählten Bereichs.
+
+Die Dentipedia nutzt die rahmenlose gemeinsame Menüfläche. Alle sechs Bereiche
+sind direkt als Reiter sichtbar; ein Kategorie-Dropdown entfällt. Suche und
+Auswahl bleiben auf einer gemeinsamen Flucht. Auswahlzustand, Hover und
+Tastaturfokus sind getrennt erkennbar. Items behalten ihre Seltenheitskante.
+Waffendetails zeigen größere Bilder und eine kompakte Mk-Tabelle aus denselben
+Ressourcen wie bisher; „Basiswerte“ kennzeichnet den Vergleich ohne Build.
+
+![Rahmenlose Dentipedia mit sichtbaren Kategorien](screenshots/dentipedia_update/weapons_1280x720.png)
 
 - **Waffen:** 18 Standardwaffen mit Spielweise, Skalierung, Effekten und
   Basiswerten Mk I–IV; entdeckte Spezialwaffen ergänzen die Liste.
@@ -52,9 +61,14 @@ Die Formbilder werden über den vorhandenen Skin-Cache geladen.
 
 Die Suche findet die Zahnseiden-Schneide auch unter ihrem früheren Namen
 Garotte. Beim Öffnen eines anderen Eintrags beginnt dessen Text wieder oben.
-Im Hochformat stehen Liste und Details untereinander. Bei nur ein oder zwei
-Suchtreffern benötigt die Liste weniger Höhe; die Formbuttons umbrechen
-innerhalb des Detailbereichs. Kurzes Querformat behält die beiden Spalten.
+Am Desktop stehen Liste und Details nebeneinander. Im schmalen Hochformat
+nimmt die Liste zunächst die ganze Inhaltsfläche ein. Antippen öffnet den
+Eintrag; der Zurück-Pfeil oder Escape führt zuerst zur Liste und anschließend
+zum Menü. Kategorie, Suchtext und Listenposition bleiben beim Zurückgehen
+erhalten. Die Kategorien bleiben sichtbar; auf kleinen Flächen heißt der
+Verzauberungsreiter kurz „Effekte“. Formbuttons umbrechen innerhalb der
+Details und behalten mindestens 48 × 48 Touchfläche. Kurzes Querformat behält
+die beiden Spalten.
 
 Unentdeckte Spezialwaffen zeigen nur ihre schwarze Alpha-Silhouette.
 Namen, Zutaten, Effekte, Werte und Formvorschau bleiben verborgen, bis die
@@ -63,13 +77,16 @@ Verkäufe und Neustarts erhalten. Familienzutaten akzeptieren jede Seltenheit.
 
 ## Prüfung
 
-tests/dentipedia.gd prüft Kataloge, neue Themen, Schriftzeichen, echte
+tests/dentipedia.gd prüft sichtbare Kategorien ohne Dropdown, Touchgrößen,
+rahmenlose Menüintegration, Hochformat-Navigation und Pause sowie Kataloge,
+neue Themen, Schriftzeichen, echte
 Freischaltung, Spoilerschutz, Suche, alle sieben Formbuttons, unveränderte
 Waffenvorlagen, Scrollpositionen und vier Bildschirmgrößen. Menü- und
 Belohnungsansichten werden zusätzlich durch ihre bestehenden Tests geprüft.
 
-tools/preview_dentipedia.gd erzeugt native Ansichten für Fusion, Dash,
-Waffenpunkte, Feuerform und Lebensraub in 1280×720, 360×640 und 568×320.
+tools/preview_dentipedia.gd erzeugt native Ansichten für Waffen-/Itemübersicht,
+Fusion, Dash, Waffenpunkte, Feuerform und Lebensraub in 1280×720, 320×568,
+360×640 und 568×320.
 Die Aufnahmen liegen unter docs/screenshots/dentipedia_update/; das Werkzeug
 verwendet getrennte Sitzungsdateien.
 

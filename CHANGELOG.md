@@ -4,6 +4,8 @@ Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü an
 
 ## Noch ohne neue Versionsnummer — 27.10.2026
 
+- **Rahmenlose Dentipedia:** sechs direkt sichtbare Kategorien statt Dropdown, ruhigere Eintragsliste und größere Waffenvorschau mit kompakter Mk-Tabelle. Im schmalen Hochformat wechseln Liste und Details; Zurück/Escape bewahren Suche, Listenposition und Spielpause. [Native Ansichten](docs/DENTIPEDIA.md).
+
 - **Imperator als aktiverer Finalboss:** Schnellere, weitreichend angekündigte Urteilsfächer, neu gezielter Portalanschluss und wechselnde Nervenringe/-fächer. Die Wache dreht während der Kernöffnung; Hell erhält vier Wiederholungen. Vollständige Warnungen, kompatibles Fortsetzen und 144 vollständige verlangsamte Ausweichrouten geprüft. [Verhalten und Vergleich](docs/EMPEROR_FINALE.md).
 
 - **König mit mehr Angriffsdruck:** Gezielte Säurefächer während jeder Säurebahn und jedes Pegelwechsels, 3/5/7/9 Tropfen von Easy bis Hell. Auf Hard/Hell setzt er zwischen zwei Stampffolgen nach und erfasst Denti neu. Vollständige feste Warnungen, begrenzte Geschossbatches und kompatibles Fortsetzen. [Verhalten und Messung](docs/KING_ASSAULT.md).
