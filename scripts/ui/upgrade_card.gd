@@ -31,7 +31,7 @@ func _ready() -> void:
 	mouse_exited.connect(_on_hover.bind(false))
 
 
-func show_upgrade(upgrade: UpgradeData) -> void:
+func show_upgrade(upgrade: UpgradeData, stats: PlayerStats = null) -> void:
 	_restore_standard_content()
 	upgrade_tier = upgrade.tier
 	upgrade_description = upgrade.effect_text()
@@ -45,6 +45,11 @@ func show_upgrade(upgrade: UpgradeData) -> void:
 	effect_label.text = upgrade_description
 	var attribute := DentiAttributes.from_key(upgrade.stat)
 	tooltip_text = upgrade_description + ("\n" + DentiAttributes.meaning_for(attribute) if attribute >= 0 else "")
+	if stats != null and attribute >= 0:
+		var preview := DentiAttributes.upgrade_preview_text(stats, attribute, upgrade.amount)
+		upgrade_description += "\n" + preview
+		effect_label.text = upgrade_description
+		tooltip_text += "\n" + preview
 	disabled = false
 	DentiUIStyle.style_card(self, upgrade.tier)
 

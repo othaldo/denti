@@ -687,7 +687,7 @@ func _show_level_choice() -> void:
 	for index in ChoicePanel.UPGRADE_COUNT:
 		var choice := pool[index].with_tier(DentiRarity.upgrade_tier(earned_level, player.stats.luck))
 		choices.append(choice.with_stat_context(player.stats))
-	choice_panel.show_upgrades(choices)
+	choice_panel.show_upgrades(choices, player.stats)
 	var progress := rewards.choice_progress()
 	choice_panel.set_progress(progress.x, progress.y)
 	_update_level_reroll()

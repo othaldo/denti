@@ -99,6 +99,37 @@ static func compact_value_text(stats: PlayerStats, type: Type) -> String:
 		Type.DASH_RECOVERY: return number(stats.max_stamina())
 	return value_text(stats, type).trim_suffix(" (max.)")
 
+static func upgrade_preview_text(stats: PlayerStats, type: Type, amount: float) -> String:
+	# Add to the raw stat before applying effective limits: excess dodge/stamina
+	# still offsets penalties, but the choice must show what actually takes effect.
+	var before := float(stats.get(key_for(type)))
+	var after := before + amount
+	var maximum := INF
+	match type:
+		Type.DODGE:
+			maximum = PlayerStats.MAX_DODGE_CHANCE
+			before = clampf(before, 0.0, maximum)
+			after = clampf(after, 0.0, maximum)
+		Type.CRIT_CHANCE:
+			maximum = PlayerStats.MAX_CRIT_CHANCE
+			before = clampf(before, 0.0, maximum)
+			after = clampf(after, 0.0, maximum)
+		Type.DASH_RECOVERY:
+			var config := PlayerStats.DASH_CONFIG
+			maximum = config.capacity + config.max_stamina_bonus
+			before = config.capacity + clampf(before, 0.0, config.max_stamina_bonus)
+			after = config.capacity + clampf(after, 0.0, config.max_stamina_bonus)
+		Type.MAX_HEALTH:
+			after = maxf(after, 1.0)
+		Type.LUCK:
+			after = maxf(after, 0.0)
+	var factor := 100.0 if is_fraction(type) else 1.0
+	var unit := " %" if is_percent(type) else (" HP" if type == Type.MAX_HEALTH else "")
+	var preview := "%s%s → %s%s" % [number(before * factor), unit, number(after * factor), unit]
+	if is_finite(maximum):
+		preview += " · MAX" if is_equal_approx(after, maximum) else " · max. %s%s" % [number(maximum * factor), unit]
+	return preview
+
 static func resolve_text(source: String) -> String:
 	var result := source
 	for alias: String in ALIASES:

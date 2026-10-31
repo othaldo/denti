@@ -41,13 +41,14 @@ func _check_choices(stage: RewardStage, cards: Array[UpgradeCard], extent: Vecto
 	for card in cards:
 		if not card.is_visible_in_tree():
 			continue
+		var reward_card := card as RewardCard
 		_touch_target(card, "reward card")
 		var rect := _physical_rect(card)
 		var content_rect := Rect2(card.position, card.size)
 		for previous in rectangles:
 			_check(not content_rect.intersects(previous), "reward choices overlap at %s" % extent)
 		rectangles.append(content_rect)
-		for control in [card.icon_rect, card.name_label, card.rarity_label, card.effect_label, card.keep_label, card.progress_bar]:
+		for control in [card.icon_rect, card.name_label, card.rarity_label, card.effect_label, reward_card.preview_label, reward_card.detail_label, card.keep_label, card.progress_bar]:
 			if control.is_visible_in_tree():
 				_check(rect.grow(0.5).encloses(_physical_rect(control)), "reward content leaves its card at %s" % extent)
 		stage.body_scroll.ensure_control_visible(card)
@@ -59,6 +60,9 @@ func _check_choices(stage: RewardStage, cards: Array[UpgradeCard], extent: Vecto
 			# Short landscape can show only part of a tall description at once.
 			# Its final decision text must still be reachable through one scroll.
 			var last: Control = card.keep_label if card.keep_label.is_visible_in_tree() else card.effect_label
+			if not card.keep_label.is_visible_in_tree():
+				if reward_card.detail_label.is_visible_in_tree(): last = reward_card.detail_label
+				elif reward_card.preview_label.is_visible_in_tree(): last = reward_card.preview_label
 			stage.body_scroll.ensure_control_visible(last)
 			await _settle()
 			_check(scroll_bounds.grow(1.0).encloses(_physical_rect(last)), "the last reward line is unreachable at %s" % extent)
@@ -102,7 +106,7 @@ func _run() -> void:
 		root.content_scale_size = session.mobile_base_size(extent) if extent.x < 700 else Vector2i(1280, 720)
 		root.size = extent
 		capsule.hide()
-		panel.show_upgrades(upgrades)
+		panel.show_upgrades(upgrades, game.player.stats)
 		panel.update_level_reroll(100, 5, 12)
 		await _settle()
 		_check_stage(panel.stage, extent)

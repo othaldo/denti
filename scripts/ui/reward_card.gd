@@ -4,6 +4,7 @@ extends UpgradeCard
 # Reward presentation is separate from shop cards. The exposed UpgradeCard
 # controls remain available to the reward coordinator and affix comparisons.
 var detail_label: Label
+var preview_label: Label
 var card_body: Control
 var stat_header: HBoxContainer
 var _kind: StringName = &"upgrade"
@@ -13,6 +14,7 @@ var _tall := true
 var _name_source := ""
 var _effect_source := ""
 var _detail_source := ""
+var _preview_source := ""
 var _keep_source := ""
 var _wrapped_name := ""
 var _wrapped_effect := ""
@@ -34,7 +36,7 @@ func _ready() -> void:
 	_layout_content()
 
 
-func show_upgrade(upgrade: UpgradeData) -> void:
+func show_upgrade(upgrade: UpgradeData, stats: PlayerStats = null) -> void:
 	_restore_standard_content()
 	_kind = &"upgrade"
 	upgrade_tier = upgrade.tier
@@ -55,6 +57,9 @@ func show_upgrade(upgrade: UpgradeData) -> void:
 	else:
 		_effect_source = upgrade_description
 	tooltip_text = upgrade_description + ("\n" + DentiAttributes.meaning_for(attribute) if attribute >= 0 else "")
+	if stats != null and attribute >= 0:
+		_preview_source = DentiAttributes.upgrade_preview_text(stats, attribute, upgrade.amount)
+		tooltip_text += "\n" + _preview_source
 	_set_rarity(upgrade.tier)
 	_finish_content()
 
@@ -187,6 +192,7 @@ func _ensure_content() -> void:
 	name_label = _label(DentiUIStyle.INK)
 	rarity_label = _label(DentiUIStyle.MUTED)
 	effect_label = _label(DentiUIStyle.INK)
+	preview_label = _label(DentiUIStyle.INK)
 	detail_label = _label(DentiUIStyle.MUTED)
 	progress_bar = ProgressBar.new()
 	progress_bar.custom_minimum_size.y = 6
@@ -229,7 +235,9 @@ func _restore_standard_content() -> void:
 	progress_bar.hide()
 	keep_label.hide()
 	detail_label.hide()
+	preview_label.hide()
 	_detail_source = ""
+	_preview_source = ""
 	_keep_source = ""
 	_wrapped_keep = ""
 	_name_source = ""
@@ -256,6 +264,8 @@ func _finish_content() -> void:
 	_wrapped_effect = _effect_source
 	detail_label.text = _detail_source
 	detail_label.visible = not _detail_source.is_empty()
+	preview_label.text = _preview_source
+	preview_label.visible = not _preview_source.is_empty()
 	_style_surface()
 	_layout_content()
 
@@ -289,6 +299,7 @@ func _layout_content() -> void:
 	effect_label.add_theme_font_size_override("font_size", (26 if _compact else 36) if _kind == &"upgrade" else 16)
 	if _kind == &"item" and not _compact: effect_label.add_theme_font_size_override("font_size", 18)
 	detail_label.add_theme_font_size_override("font_size", 12 if _compact else 14)
+	preview_label.add_theme_font_size_override("font_size", 14 if _compact else 16)
 	keep_label.add_theme_font_size_override("font_size", 14)
 	content.add_theme_constant_override("separation", 2 if _compact else 7)
 	var compact_stat := _kind == &"upgrade" and _compact
@@ -315,7 +326,7 @@ func _layout_content() -> void:
 		_effect_source = effect_label.text
 	if keep_label.text != _wrapped_keep:
 		_keep_source = keep_label.text.replace("\n", " ")
-	for label in [name_label, rarity_label, effect_label, detail_label, keep_label]:
+	for label in [name_label, rarity_label, effect_label, preview_label, detail_label, keep_label]:
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER if centered else HORIZONTAL_ALIGNMENT_LEFT
 		label.size_flags_horizontal = Control.SIZE_FILL
 		label.custom_minimum_size = Vector2.ZERO
@@ -329,6 +340,7 @@ func _layout_content() -> void:
 		rarity_label.size_flags_horizontal = Control.SIZE_SHRINK_END
 	_wrap_chest_text(name_label, _name_source, name_width)
 	_wrap_chest_text(effect_label, _effect_source, text_width)
+	_wrap_chest_text(preview_label, _preview_source, text_width)
 	_wrap_chest_text(detail_label, _detail_source, text_width)
 	_wrap_chest_text(keep_label, _keep_source, text_width)
 	_wrapped_name = name_label.text
@@ -379,9 +391,10 @@ func _layout_affix(inner_width: float) -> void:
 	content.move_child(stat_header, 1)
 	content.move_child(rarity_label, 2)
 	content.move_child(effect_label, 3)
-	content.move_child(detail_label, 4)
-	content.move_child(progress_bar, 5)
-	content.move_child(keep_label, 6)
+	content.move_child(preview_label, 4)
+	content.move_child(detail_label, 5)
+	content.move_child(progress_bar, 6)
+	content.move_child(keep_label, 7)
 	affix_header.show()
 	icon_rect.custom_minimum_size = Vector2(34, 34)
 	icon_rect.size_flags_horizontal = Control.SIZE_SHRINK_CENTER

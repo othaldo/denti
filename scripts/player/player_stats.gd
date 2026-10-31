@@ -21,6 +21,7 @@ const REGEN_INTERVAL_SCALE := 11.25
 const REGEN_POINT_OFFSET := 1.25
 const LEGACY_REGEN_POINT_FACTOR := 2.0
 const MAX_DODGE_CHANCE := 0.60
+const MAX_CRIT_CHANCE := 0.65
 const DEFAULT_ROOT_CAPACITY := 6
 const DASH_CONFIG: DashData = preload("res://data/player/dash.tres")
 
@@ -103,7 +104,7 @@ func load_save_data(saved: Dictionary) -> void:
 		attack_speed = float(saved.get("attack_speed", 0.0))
 		regen = float(saved.get("regen", 0.0))
 		regen_progress = clampf(float(saved.get("regen_progress", 0.0)), 0.0, 0.999999)
-	crit_chance = clampf(float(saved.get("crit_chance", crit_chance)), 0.0, 0.65)
+	crit_chance = clampf(float(saved.get("crit_chance", crit_chance)), 0.0, MAX_CRIT_CHANCE)
 	luck = maxf(float(saved.get("luck", 0.0)), 0.0)
 	shield_charges = clampi(int(saved.get("shield_charges", 0)), 0, 5)
 	dodge_chance = float(saved.get("dodge_chance", 0.0))
@@ -250,7 +251,7 @@ func apply_upgrade(stat: StringName, amount: float) -> void:
 		&"regen":
 			regen += amount
 		&"crit_chance":
-			crit_chance = clampf(crit_chance + amount, 0.0, 0.65)
+			crit_chance = clampf(crit_chance + amount, 0.0, MAX_CRIT_CHANCE)
 		&"luck":
 			luck = maxf(luck + amount, 0.0)
 		&"dodge_chance":

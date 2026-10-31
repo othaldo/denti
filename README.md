@@ -123,6 +123,8 @@ Die ersten drei Kampfsekunden, Pausen, Menüs und Hintergrund-Tabs zählen nicht
 
 Putzeifer und Bewegung verwenden additive Prozentboni; Speichel zählt Regenerationspunkte mit langsamen HP-Ticks. Formeln, Level-up-Werte und die Umrechnung alter Spielstände stehen in [Tempo und Regeneration](docs/STATS_BALANCE.md). Bisskraft verstärkt Schaden prozentual; Nah- und Fernschaden ergänzen gewichteten Basisschaden. Härte reduziert Treffer prozentual. Formeln, Waffenkoeffizienten und gemessene Bosskämpfe stehen im [Schadens- und Verteidigungsbericht](docs/DAMAGE_DEFENSE_BALANCE.md).
 
+Level-up-Karten zeigen den aktuellen Attributwert und den wirksamen Wert nach der Auswahl. Bei Zahnflutsch, Glanz und Wurzelkraft steht die Obergrenze dabei; erreicht die Auswahl sie, erscheint **MAX**.
+
 Nach dem ersten Godot-Import lassen sich die Tests so ausführen:
 
 ```bash

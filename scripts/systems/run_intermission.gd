@@ -53,7 +53,7 @@ static func restore(game, saved: Dictionary) -> void:
 				option.with_stat_context(player.stats)
 			game.get_node("/root/SceneTransitions").present(&"rewards")
 			game.run_flow.enter(RunFlow.Phase.REWARDS)
-			game.choice_panel.show_upgrades(options)
+			game.choice_panel.show_upgrades(options, player.stats)
 			var progress: Vector2i = game.rewards.choice_progress()
 			game.choice_panel.set_progress(progress.x, progress.y)
 			game._update_level_reroll()

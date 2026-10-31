@@ -166,13 +166,13 @@ func update_level_reroll(coins: int, cost: int, earned_level: int = 0) -> void:
 	reroll_button.disabled = coins < cost
 	reroll_button.tooltip_text = "Neu würfeln · %d Münzen" % cost
 
-func show_upgrades(options: Array[UpgradeData]) -> void:
+func show_upgrades(options: Array[UpgradeData], stats: PlayerStats = null) -> void:
 	_use_rewards(&"upgrade")
 	current_upgrades = options
 	title_label.text = "Aufstieg"
 	for index in buttons.size():
 		buttons[index].visible = index < options.size()
-		if index < options.size(): buttons[index].show_upgrade(options[index])
+		if index < options.size(): buttons[index].show_upgrade(options[index], stats)
 	_finish_reward()
 
 func show_starters(options: Array[WeaponData], selected_id: StringName = &"") -> void:
