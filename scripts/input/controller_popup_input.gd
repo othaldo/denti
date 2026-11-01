@@ -10,6 +10,9 @@ static func attach(window: Window) -> void:
 	window.add_child(bridge, false, Node.INTERNAL_MODE_BACK)
 
 func _input(event: InputEvent) -> void:
+	if event is InputEventKey:
+		if get_node("/root/GameInput").key_input(event, get_viewport()): get_viewport().set_input_as_handled()
+		return
 	if not (event is InputEventJoypadButton or event is InputEventJoypadMotion): return
 	var viewport := get_viewport()
 	var consumed: bool = get_node("/root/GameInput")._joy_input(event)

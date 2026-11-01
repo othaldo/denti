@@ -73,6 +73,24 @@ func _decorate(control: Control) -> void:
 		ControllerPrompt.bind(control)
 
 func handle_event(event: InputEvent) -> void:
+	if event is InputEventKey:
+		if popup_open() or DesktopMenuInput.editing(get_viewport()): return
+		for action: StringName in DIRECTIONS:
+			if event.is_action_pressed(action, true):
+				if _navigate(action): get_viewport().set_input_as_handled()
+				return
+		if event.is_action_pressed("ui_focus_next", true) or event.is_action_pressed("ui_focus_prev", true):
+			var entry := top_scope()
+			if entry.is_empty(): return
+			var choices := ControllerFocus.controls(entry.scope.get_ref())
+			if choices.is_empty(): return
+			var step := -1 if event.is_action_pressed("ui_focus_prev", true) else 1
+			var index := choices.find(get_viewport().gui_get_focus_owner())
+			if index < 0 and step < 0: index = 0
+			choices[posmod(index + step, choices.size())].grab_focus()
+			ControllerFocus.reveal(get_viewport().gui_get_focus_owner())
+			get_viewport().set_input_as_handled()
+		return
 	if not (event is InputEventJoypadButton or event is InputEventJoypadMotion): return
 	for action: StringName in DIRECTIONS:
 		if event.is_action_pressed(action):

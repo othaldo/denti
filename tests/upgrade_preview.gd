@@ -80,7 +80,8 @@ func _check_bundled_arrow(font: Font) -> void:
 	var line := TextLine.new()
 	line.add_string("\u2192", font, 16)
 	var glyphs := TextServerManager.get_primary_interface().shaped_text_get_glyphs(line.get_rid())
-	_check(glyphs.size() == 1 and glyphs[0].index != 0 and glyphs[0].font_rid in DentiUIStyle.SYMBOL_FONT.get_rids(), "arrow was not shaped from the bundled symbol font")
+	var symbols := font.fallbacks[0] as FontVariation
+	_check(symbols != null and symbols.base_font == DentiUIStyle.SYMBOL_FONT and glyphs.size() == 1 and glyphs[0].index != 0 and glyphs[0].font_rid in symbols.get_rids(), "arrow was not shaped from the bundled symbol font")
 
 
 func _test_reward_flow() -> void:

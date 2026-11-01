@@ -24,10 +24,15 @@ static func make_theme() -> Theme:
 	if _ui_font == null:
 		_ui_font = FontVariation.new()
 		_ui_font.base_font = FONT
-		# Bundle missing symbols (e.g. upgrade arrows) for desktop and Web exports.
-		_ui_font.fallbacks = [SYMBOL_FONT]
 		var weight_tag := TextServerManager.get_primary_interface().name_to_tag("weight")
 		_ui_font.variation_opentype = {weight_tag: 450.0}
+		# Match Fredoka's generous, rounded text with larger, stronger symbols.
+		# Transform outlines only, preserving the existing line height/advance.
+		var symbols := FontVariation.new()
+		symbols.base_font = SYMBOL_FONT
+		symbols.variation_opentype = {weight_tag: 600.0}
+		symbols.variation_transform = Transform2D.IDENTITY.scaled(Vector2.ONE * 1.25)
+		_ui_font.fallbacks = [symbols]
 	theme.default_font = _ui_font
 	theme.default_font_size = 18
 	for type in ["Label", "RichTextLabel", "OptionButton", "CheckButton"]:

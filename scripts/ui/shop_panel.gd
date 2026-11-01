@@ -4,7 +4,7 @@ extends CanvasLayer
 const ICONS: Script = preload("res://scripts/ui/denti_ui_icons.gd")
 const RELOAD_ICON: Texture2D = preload("res://assets/ui/reload_light.svg")
 const FOOTER_ICONS_HEIGHT := 52.0
-const DESKTOP_MIN_BODY_HEIGHT := 380.0
+const DESKTOP_MIN_BODY_HEIGHT := 360.0
 const DENSE_BODY_HEIGHT := 460.0
 const MAX_OFFER_HEIGHT := 560.0
 signal buy_requested(index: int)
@@ -192,13 +192,18 @@ func _update_layout() -> void:
 	_refresh_header()
 	var body_height := _available_body_height()
 	var side_by_side := extent.x >= 1000
-	var wide := side_by_side and extent.y >= 560 and body_height >= DESKTOP_MIN_BODY_HEIGHT
+	var wide := side_by_side and body_height >= DESKTOP_MIN_BODY_HEIGHT
 	compact = not wide
 	dense_layout = side_by_side and (short or body_height < DENSE_BODY_HEIGHT)
+	build_column.add_theme_constant_override("separation", 4 if dense_layout else 6)
 	build_portrait.custom_minimum_size = Vector2(40, 40) if short or dense_layout else Vector2(56, 56)
 	for chip in stat_chips:
 		chip.custom_minimum_size.y = 30 if short or dense_layout else 34
 	amalgam_chip.custom_minimum_size.y = 30 if short or dense_layout else 34
+	# The PC action row leaves less vertical space. Scroll only when the actual
+	# build needs it (e.g. an extra Amalgam row), rather than using a tall cutoff.
+	wide = wide and left_scroll.get_child(0).get_combined_minimum_size().y <= body_height
+	compact = not wide
 	flow.vertical = not side_by_side
 	details.heading.add_theme_font_size_override("font_size", 17 if narrow else 21)
 	details.icon.custom_minimum_size = Vector2(32, 40) if extent.x < 420 else Vector2(64, 64)
@@ -272,7 +277,9 @@ func _layout_inventory() -> void:
 	if inventory_row == null:
 		return
 	var columns := 6 if compact and left_scroll.size.x >= 420 else 2
+	var previous_height := inventory_scroll.custom_minimum_size.y
 	inventory_scroll.custom_minimum_size.y = inventory_row.layout_slots(maxf(inventory_scroll.size.x, 180), columns, 44.0 if dense_layout or $Root.size.y < 700 else 56.0)
+	if not is_equal_approx(previous_height, inventory_scroll.custom_minimum_size.y): _queue_layout()
 
 
 func show_shop(wave_number: int, coins: int, reroll_cost: int, new_offers: Array[ShopOfferData], new_equipment: Array[Dictionary] = [], used_slots: int = 0, capacity: int = PlayerStats.DEFAULT_ROOT_CAPACITY, buyable: Array[bool] = [], luck: float = 0.0, collected: Array[Dictionary] = [], counts: Dictionary = {}, offer_dps: Array[float] = [], reserved: Array[bool] = []) -> void:
@@ -533,7 +540,7 @@ func _render_selection() -> void:
 func _fusion_comparison(result: WeaponData, tier: int, previous: WeaponData, previous_tier: int) -> String:
 	var before := WeaponPresentation.values(previous, previous_tier, player)
 	var after := WeaponPresentation.values(result, tier, player)
-	return WeaponPresentation.comparison(result, tier, previous, previous_tier, player) + "\nCrit %.1f -> %.1f %%" % [before.crit * 100.0, after.crit * 100.0]
+	return WeaponPresentation.comparison(result, tier, previous, previous_tier, player) + "\nCrit %.1f → %.1f %%" % [before.crit * 100.0, after.crit * 100.0]
 
 
 func _compare(index: int) -> void:

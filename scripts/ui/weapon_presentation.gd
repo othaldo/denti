@@ -150,7 +150,7 @@ static func card_effect(data: WeaponData, tier: int) -> String:
 static func comparison(data: WeaponData, tier: int, other: WeaponData, other_tier: int, player: Player) -> String:
 	var before := values(other, other_tier, player)
 	var after := values(data, tier, player)
-	return "Treffer %.1f -> %.1f · Pause %.2f -> %.2f s\nReichweite %d -> %d · Wurzeln %d -> %d" % [
+	return "Treffer %.1f → %.1f · Pause %.2f → %.2f s\nReichweite %d → %d · Wurzeln %d → %d" % [
 		before.damage, after.damage, before.pause, after.pause,
 		roundi(before.range), roundi(after.range), other.hands, data.hands]
 

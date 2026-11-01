@@ -79,9 +79,10 @@ func _check_text(parent: Control) -> void:
 	for child in parent.get_children():
 		if child is Label:
 			_check(Rect2(Vector2.ZERO, parent.size).grow(1).encloses(child.get_rect()), "text escapes its surface: " + child.text)
+			var font: Font = child.get_theme_font("font")
 			for index in child.text.length():
 				var code: int = child.text.unicode_at(index)
-				if code > 32: _check(DentiUIStyle.FONT.has_char(code), "bundled font misses U+%04X in %s" % [code, child.text])
+				if code > 32: _check(font.has_char(code), "bundled fonts miss U+%04X in %s" % [code, child.text])
 		if child is Control: _check_text(child)
 
 

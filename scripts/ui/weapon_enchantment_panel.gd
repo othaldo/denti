@@ -447,7 +447,7 @@ func _slots(rect: Rect2, compact: bool, row_height: float) -> float:
 		focus_row.pressed.connect(upgrade.bind(index))
 		var action := _button(panel, "MAX" if level == MAX_LEVEL else ("+ · %d" if compact else "+ Rang · %d") % _cost(), Rect2(row.size.x - action_width - 12, 25, action_width, 44 if compact else 48))
 		action.add_theme_font_size_override("font_size", 16)
-		action.tooltip_text = "Maximalstufe erreicht" if level == MAX_LEVEL else "%s: %d/10 -> %d/10 · kostet %d Punkte" % [data.display_name, level, level + 1, _cost()]
+		action.tooltip_text = "Maximalstufe erreicht" if level == MAX_LEVEL else "%s: %d/10 → %d/10 · kostet %d Punkte" % [data.display_name, level, level + 1, _cost()]
 		action.disabled = level == MAX_LEVEL or remaining < _cost()
 		action.pressed.connect(upgrade.bind(index))
 		ControllerFocus.tag(action, "upgrade:%d" % index)

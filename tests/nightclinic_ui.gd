@@ -55,7 +55,7 @@ func _run() -> void:
 			var bounds := Rect2(Vector2.ZERO, Vector2(extent))
 			for scroll in [ui.main_scroll, ui.left_scroll, ui.offer_scroll, ui.inventory_scroll]:
 				if scroll.get_h_scroll_bar().visible or scroll.get_v_scroll_bar().visible:
-					_fail("desktop shows unnecessary shop scrollbars at %s" % extent)
+					_fail("desktop shows unnecessary shop scrollbars at %s: %s body=%.1f offer_min=%s build_min=%s" % [extent, scroll, ui._available_body_height(), ui.offers_grid.get_combined_minimum_size(), ui.build_column.get_combined_minimum_size()])
 					return
 			if not ui.left_scroll.get_global_rect().encloses(ui.stat_grid.get_global_rect()) or not bounds.encloses(panel.get_global_rect()):
 				_fail("desktop build was clipped instead of fitting its space")

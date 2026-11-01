@@ -65,14 +65,14 @@ static func comparison(weapon: WeaponInstance, option: Dictionary, stats: Player
 	if option.id == "slot":
 		if weapon.affix_slots >= WeaponAffixes.MAX_SLOTS:
 			return "Alle 4 Plätze sind bereits offen.\nWähle eine andere Waffe."
-		return "Plätze %d -> %d\nFür eine weitere Verzauberung." % [weapon.affix_slots, mini(weapon.affix_slots + 1, WeaponAffixes.MAX_SLOTS)]
+		return "Plätze %d → %d\nFür eine weitere Verzauberung." % [weapon.affix_slots, mini(weapon.affix_slots + 1, WeaponAffixes.MAX_SLOTS)]
 	if option.id == "mk":
 		if weapon.tier < 4:
 			return "Benötigt Mk IV.\nVerbessere diese Waffe zuerst im Shop."
 		var upgrades := weapon.data.chest_upgrades.duplicate(true)
 		upgrades["mk"] = int(upgrades.get("mk", 0)) + 1
 		var next := WeaponRolls.resolve(weapon.data, weapon.data.rolls, upgrades)
-		return "%s -> %s\n+10 %% Basisschaden\n+3 %% Tempo und Reichweite\nBenötigt mindestens Mk IV" % [WeaponPresentation.tier_text(weapon.data, weapon.tier), WeaponPresentation.tier_text(next, weapon.tier)]
+		return "%s → %s\n+10 %% Basisschaden\n+3 %% Tempo und Reichweite\nBenötigt mindestens Mk IV" % [WeaponPresentation.tier_text(weapon.data, weapon.tier), WeaponPresentation.tier_text(next, weapon.tier)]
 	var data := WeaponAffixes.by_id(StringName(option.id))
 	var index := WeaponAffixes.find(weapon.affixes, data.id)
 	var before := float(weapon.affixes[index].damage) if index >= 0 else 0.0
@@ -82,20 +82,20 @@ static func comparison(weapon: WeaponInstance, option: Dictionary, stats: Player
 	var value_after := value_text(after, data.id, weapon.data, stats, items)
 	if compact:
 		var unit := "Schaden / %.0f s" % dot_duration(data.id, items) if data.dot_duration > 0 else damage_unit(data.id, items)
-		result = effect_description(data.id) + "\n" + ("+%s -> +%s" % [value_before, value_after] if index >= 0 else "+%s" % value_after) + " " + unit
+		result = effect_description(data.id) + "\n" + ("+%s → +%s" % [value_before, value_after] if index >= 0 else "+%s" % value_after) + " " + unit
 		if index >= 0:
-			result += "\n%s -> %s" % [progress_text(weapon.affixes[index]), progress_text(WeaponAffixes.upgraded(weapon.affixes[index], option))]
+			result += "\n%s → %s" % [progress_text(weapon.affixes[index]), progress_text(WeaponAffixes.upgraded(weapon.affixes[index], option))]
 		elif weapon.affixes.size() >= weapon.affix_slots:
 			result += "\nErsetzt: " + (WeaponAffixes.by_id(StringName(weapon.affixes[replace].id)).display_name if replace >= 0 and replace < weapon.affixes.size() else "Bitte Ersatz wählen")
 		if data.slow_fraction > 0:
 			result += "\nBis zu %.0f %% langsamer für %.1f s" % [data.slow_fraction * 100, data.slow_duration]
 		return result
 	if index >= 0:
-		result += "\nAuf dieser Waffe: +%s -> +%s %s" % [value_before, value_after, damage_unit(data.id, items)]
+		result += "\nAuf dieser Waffe: +%s → +%s %s" % [value_before, value_after, damage_unit(data.id, items)]
 	else:
 		result += "\nAuf dieser Waffe: +%s %s" % [value_after, damage_unit(data.id, items)]
 	if index >= 0:
-		result += "\n%s -> %s" % [progress_text(weapon.affixes[index]), progress_text(WeaponAffixes.upgraded(weapon.affixes[index], option))]
+		result += "\n%s → %s" % [progress_text(weapon.affixes[index]), progress_text(WeaponAffixes.upgraded(weapon.affixes[index], option))]
 		result += "\nFortschritt: +%.1f %% · danach %.1f %%" % [WeaponAffixes.progress_weight(weapon.affixes[index], option) * 100, float(WeaponAffixes.upgraded(weapon.affixes[index], option).get("progress", 0)) * 100]
 	elif weapon.affixes.size() >= weapon.affix_slots:
 		result += "\nErsetzt: " + (WeaponAffixes.by_id(StringName(weapon.affixes[replace].id)).display_name if replace >= 0 and replace < weapon.affixes.size() else "Bitte Effekt wählen")

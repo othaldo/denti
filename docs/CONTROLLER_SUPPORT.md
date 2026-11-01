@@ -18,6 +18,41 @@ automatisch; im Kampf bewegt der linke Stick Denti und RB/R1 löst den Dash aus.
 | Arbeitsschritt abschließen: Weiter, Anwenden, Fertig, Welle starten | RT | R2 |
 | Aktuellen Bereich oder Details scrollen | Rechter Stick | Rechter Stick |
 
+## Tastatur und anklickbare PC-Aktionsleiste
+
+Im automatischen Modus zeigt dieselbe Menüleiste auf dem PC Tastenkappen statt
+Gamepad-Symbolen. Ihre Einträge sind mit der Maus anklickbar und behalten das
+markierte Angebot beziehungsweise Bedienelement als Aktionsziel. Die Leiste
+zeigt nur verfügbare Aktionen der obersten Ansicht; Details sperren die Ansicht
+darunter. Controller-Eingaben stellen die gewählte Gamepad-Symbolfamilie wieder
+her. Mobilgeräte, Touch-Web-Builds und mobile Layouts zeigen keine Tastaturleiste
+und reservieren dafür keinen Platz. Aktive Kämpfe zeigen keine Menüleiste.
+
+| Taste | Aktion |
+| --- | --- |
+| Enter | Markierte Primäraktion: wählen, kaufen, Rang erhöhen |
+| Escape | Zurück oder schließen; an der Run-Basis Pause |
+| R | Neu würfeln |
+| F | Arbeitsschritt abschließen: Weiter, Verzaubern, Fertig, Welle starten |
+| I | Details |
+| P | Angebot merken/freigeben |
+| Backspace | Verzauberungsänderung rückgängig |
+| Q / E | Voriger/nächster Tab, Waffe oder Shopbereich |
+| Pfeiltasten, Tab / Shift+Tab | Im aktuellen Menü navigieren |
+
+Such- und Textfelder behalten ihre normale Texteingabe einschließlich Backspace;
+die Leiste blendet dort die entsprechenden Kontextkürzel aus. Tastenwiederholung
+kauft keine nächste Karte, würfelt nicht erneut und bestätigt keine Folgeansicht.
+Escape wird einmal als Zurück oder Pause angezeigt, je nach aktuellem Kontext.
+
+`desktop_menu_input` prüft echte Tastatur- und Mausklick-Ereignisse, Kauf und
+Würfelkosten, Merken, Fokus, Verzauberungsentwürfe, Textfelder, native Popups,
+Modalgrenzen, gehaltene Tasten sowie Gerätewechsel und fünf Fensterformate.
+Native Ansichten: [Shop](screenshots/keyboard/shop_1280x720.png) und
+[Verzaubern](screenshots/keyboard/enchant_1280x720.png),
+[kleineres PC-Fenster](screenshots/keyboard/shop_1040x600.png) und
+[Mobil ohne Tastaturleiste](screenshots/keyboard/shop_320x568.png).
+
 ## Gemeinsame Shopansicht
 
 Angebote, Waffen, gesammelte Items und Stats bleiben gemeinsam sichtbar.

@@ -79,16 +79,17 @@ func _run() -> void:
 	assert(brush_text.get_slice("\n", 1) != lamp_text.get_slice("\n", 1) and lamp_text.contains("Auf dieser Waffe:"), "weapon-specific damage is not identified separately")
 	assert(offer == original_offer, "preview changed the drop")
 	var upgrade_text := AffixPresentation.comparison(weapon, chest.options[0], game.player.stats, -1)
-	assert(upgrade_text.begins_with("Fundwert: +25.0 Basisschaden") and upgrade_text.get_slice("\n", 1).contains("->"), "upgrade preview lost fixed fund or before/after damage")
-	# Check the bundled font itself: system fallback can hide missing glyphs on desktop.
+	assert(upgrade_text.begins_with("Fundwert: +25.0 Basisschaden") and upgrade_text.get_slice("\n", 1).contains("→"), "upgrade preview lost fixed fund or before/after damage")
+	# Check the actual bundled font chain, including its symbol fallback.
 	var glyph_chest := {"kind": "affix", "options": [chest.options[0], {"id": "slot", "rarity": 3}, {"id": "mk", "rarity": 4}], "scrap_coins": 5}
 	panel.show_chest(glyph_chest, loadout, game.player.stats, 5)
 	assert(not panel.replacement.visible, "upgrades with no new effects waste space on a replacement selector")
 	for card in panel.buttons:
+		var font: Font = card.effect_label.get_theme_font("font")
 		for text in [card.effect_label.text, card.tooltip_text]:
 			for index in text.length():
 				var code: int = text.unicode_at(index)
-				if code > 32 and not DentiUIStyle.FONT.has_char(code):
+				if code > 32 and not font.has_char(code):
 					push_error("Affix card uses an unsupported glyph: U+%04X" % code)
 					finish(1)
 					return

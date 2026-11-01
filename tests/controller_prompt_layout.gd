@@ -100,7 +100,7 @@ func _run() -> void:
 	pointer.relative = Vector2(8, 0)
 	root.push_input(pointer)
 	await _settle()
-	_check(not bar.visible and is_zero_approx(ControllerActionBar.reserve(menu.setup_selector)), "pointer input does not restore the original screen area")
+	_check(not input.using_controller and bar.visible == DesktopMenuInput.available(root), "pointer input does not restore the appropriate desktop/mobile hints")
 	menu.queue_free()
 	await _settle()
 	root.size = Vector2i(320, 568)

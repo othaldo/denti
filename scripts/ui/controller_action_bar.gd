@@ -14,6 +14,7 @@ var panel: Panel
 var entries: Array[Dictionary] = []
 var glyph_rects: Array[Rect2] = []
 var text_rects: Array[Rect2] = []
+var click_targets: Array[Button] = []
 var input: Node
 var font: Font
 var render_font_size := FONT_SIZE
@@ -25,7 +26,7 @@ var context_key := ""
 static func reserve(control: Control) -> float:
 	if not is_instance_valid(control) or not control.is_inside_tree() or control.is_queued_for_deletion(): return 0.0
 	var source := control.get_node_or_null("/root/GameInput")
-	return source.action_bar.reserved_height * MenuLayout.ui_scale(control.get_viewport()) if source != null and source.using_controller else 0.0
+	return source.action_bar.reserved_height * MenuLayout.ui_scale(control.get_viewport()) if source != null and source.action_hints_visible() else 0.0
 
 static func content_rect(control: Control, bounds: Rect2) -> Rect2:
 	bounds.size.y = maxf(1, bounds.size.y - reserve(control))
@@ -54,11 +55,11 @@ func _ready() -> void:
 	visible = false
 
 func _process(_delta: float) -> void:
-	if not input.using_controller:
+	if not input.action_hints_visible():
 		visible = false
 		return
 	var current: Dictionary = input.navigation.top_scope()
-	visible = input.using_controller and not current.is_empty()
+	visible = not current.is_empty()
 	if not visible: return
 	var scope: Control = current.scope.get_ref()
 	entries = _actions(scope)
@@ -76,7 +77,7 @@ func _process(_delta: float) -> void:
 		if parent.has_meta("controller_bar_context"): owner = parent
 		parent = parent.get_parent()
 	var context := str(owner.get_instance_id()) + ":" + str(width)
-	var state: String = str(entries) + input.family() + context + str(factor)
+	var state: String = str(entries) + (input.family() if input.using_controller else "keyboard") + context + str(factor)
 	if state != signature:
 		signature = state
 		var previous_height := reserved_height
@@ -84,6 +85,7 @@ func _process(_delta: float) -> void:
 		context_key = context
 		strip.size.x = width
 		_layout_entries(same_context)
+		_sync_click_targets(scope)
 		if not is_equal_approx(previous_height, reserved_height): input.changed.emit()
 		strip.queue_redraw()
 	strip.position = Vector2(safe.position.x + margin * factor, safe.end.y - visible_height * factor)
@@ -97,7 +99,7 @@ func _process(_delta: float) -> void:
 func _actions(scope: Control) -> Array[Dictionary]:
 	if input.navigation.popup_open():
 		var popup_actions: Array[Dictionary] = [{"action": &"ui_cancel", "label": "Schließen"}]
-		if input.pause_available() and not input.pause_menu.get_ref().visible: popup_actions.append({"action": &"pause", "label": "Pause"})
+		if input.using_controller and input.pause_available() and not input.pause_menu.get_ref().visible: popup_actions.append({"action": &"pause", "label": "Pause"})
 		return popup_actions
 	var shortcuts: Dictionary = {}
 	var focus := get_viewport().gui_get_focus_owner()
@@ -129,6 +131,12 @@ func _actions(scope: Control) -> Array[Dictionary]:
 			shortcuts.merge(focus.controller_actions(), true)
 		else:
 			shortcuts[&"ui_accept"] = _selection_label(focus)
+	if not input.using_controller:
+		# Escape represents Back where available, and Pause at the run's base.
+		if shortcuts.has(&"ui_cancel"): shortcuts.erase(&"pause")
+		if DesktopMenuInput.editing(get_viewport()):
+			for action in DesktopMenuInput.SHORTCUTS:
+				if action not in [&"ui_cancel", &"pause"]: shortcuts.erase(action)
 	var result: Array[Dictionary] = []
 	for action in ORDER:
 		if shortcuts.has(action): result.append({"action": action, "label": shortcuts[action]})
@@ -167,14 +175,15 @@ func _layout_entries(keep_height: bool = false) -> void:
 	render_font_size = FONT_SIZE
 	for entry in entries:
 		var width := font.get_string_size(entry.label, HORIZONTAL_ALIGNMENT_LEFT, -1, render_font_size).x
-		var span := GLYPH_SIZE + icon_gap + width
+		var glyph_width := GLYPH_SIZE if input.using_controller else maxf(GLYPH_SIZE, font.get_string_size(DesktopMenuInput.key_label(entry.action), HORIZONTAL_ALIGNMENT_LEFT, -1, 13).x + 16)
+		var span := glyph_width + icon_gap + width
 		if x > 0 and x + span > strip.size.x:
 			row += 1
 			x = 0
 		var y := row * ROW_STEP
-		var glyph := Rect2(x, y + (HEIGHT - GLYPH_SIZE) * 0.5, GLYPH_SIZE, GLYPH_SIZE)
+		var glyph := Rect2(x, y + (HEIGHT - GLYPH_SIZE) * 0.5, glyph_width, GLYPH_SIZE)
 		glyph_rects.append(glyph)
-		x += GLYPH_SIZE + icon_gap
+		x += glyph_width + icon_gap
 		text_rects.append(Rect2(x, y + (HEIGHT - font.get_height(render_font_size)) * 0.5, width, font.get_height(render_font_size)))
 		x += width + gap
 	var height := HEIGHT + row * ROW_STEP
@@ -186,6 +195,37 @@ func _layout_entries(keep_height: bool = false) -> void:
 func _draw_strip() -> void:
 	for index in mini(entries.size(), glyph_rects.size()):
 		var entry := entries[index]
-		strip.draw_texture_rect(ControllerGlyphs.texture(entry.action, input.family()), glyph_rects[index], false)
+		if input.using_controller:
+			strip.draw_texture_rect(ControllerGlyphs.texture(entry.action, input.family()), glyph_rects[index], false)
+		else:
+			var rect := glyph_rects[index]
+			strip.draw_style_box(MenuStyle.box(DentiUIStyle.PANEL, DentiUIStyle.LINE, 5, 1), rect)
+			var key := DesktopMenuInput.key_label(entry.action)
+			var key_width := font.get_string_size(key, HORIZONTAL_ALIGNMENT_LEFT, -1, 13).x
+			var key_position := Vector2(rect.get_center().x - key_width * 0.5, rect.get_center().y - font.get_height(13) * 0.5 + font.get_ascent(13))
+			strip.draw_string(font, key_position, key, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, DentiUIStyle.INK)
 		var baseline := text_rects[index].position + Vector2(0, font.get_ascent(render_font_size))
 		strip.draw_string(font, baseline, entry.label, HORIZONTAL_ALIGNMENT_LEFT, -1, render_font_size, DentiUIStyle.INK)
+
+func _sync_click_targets(scope: Control) -> void:
+	for button in click_targets: button.free()
+	click_targets.clear()
+	if input.using_controller or input.navigation.popup_open(): return
+	for index in entries.size():
+		var button := Button.new()
+		button.focus_mode = Control.FOCUS_NONE
+		button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		button.add_theme_stylebox_override("normal", StyleBoxEmpty.new())
+		button.add_theme_stylebox_override("hover", MenuStyle.box(Color(1, 1, 1, 0.06), DentiUIStyle.LINE, 6, 1))
+		button.add_theme_stylebox_override("pressed", MenuStyle.box(Color(1, 1, 1, 0.12), DentiUIStyle.GOLD, 6, 1))
+		var action: StringName = entries[index].action
+		button.set_meta("menu_action", action)
+		button.pressed.connect(_activate.bind(action, weakref(scope)))
+		strip.add_child(button)
+		button.position = Vector2(glyph_rects[index].position.x - 4, glyph_rects[index].position.y - 6)
+		button.size = Vector2(text_rects[index].end.x - button.position.x + 4, GLYPH_SIZE + 12)
+		click_targets.append(button)
+
+func _activate(action: StringName, scope_ref: WeakRef) -> void:
+	var focus := get_viewport().gui_get_focus_owner()
+	input.activate_menu_action.call_deferred(action, scope_ref, weakref(focus) if focus != null else null)

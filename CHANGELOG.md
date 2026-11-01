@@ -2,6 +2,12 @@
 
 Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü angezeigt. 0.1.0 wurde rückblickend anhand der Git-Historie dokumentiert; 0.2.0 bündelt die seitdem entstandenen Änderungen. Die Einträge beschreiben implementierte Funktionen. Weitere Pläne stehen in der [Roadmap](docs/ROADMAP.md).
 
+## Noch ohne neue Versionsnummer — 01.11.2026
+
+- **Anklickbare Tastaturleiste:** Kontextabhängige Tastenkappen für Enter, Esc, R, F, I, P, Backspace und Q/E ergänzen die Controller-Leiste. Maus und Tastatur nutzen dieselben Aktionen; Suchfelder, native Details, gehaltene Tasten und Modalgrenzen bleiben geschützt. Pfeiltasten und Tab / Shift+Tab navigieren innerhalb des aktuellen Menüs. [Belegung und Ansichten](docs/CONTROLLER_SUPPORT.md#tastatur-und-anklickbare-pc-aktionsleiste).
+
+- Einheitliche Vergleichspfeile `→` auch bei Waffen, Fusionen, Verzauberungen und alten Upgrade-Kapseln statt der bisherigen `->`-Ausweichschreibweise. Die Pfeile sind passend zu Fredoka 25 % größer, kräftiger und optisch an den Ziffern ausgerichtet.
+
 ## 0.7.0 — 01.11.2026
 
 - **Controller-Steuerung:** Bewegung, Dash und Menüs mit Xbox- und PlayStation-Symbolen. Eine gemeinsame Aktionsleiste verwendet A/Kreuz für die Primäraktion, B/Kreis für Zurück, Menu/Options für Pause und RS/R3 für Details. X/Quadrat würfelt, Y/Dreieck merkt oder macht rückgängig und RT/R2 schließt einen Arbeitsschritt ab. Gehaltene Tasten und Trigger bestätigen keine folgende Ansicht automatisch. [Bedienung und geprüfte Ansichten](docs/CONTROLLER_SUPPORT.md).

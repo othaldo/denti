@@ -278,9 +278,10 @@ func _save_and_loot() -> void:
 	game.weapon_chest_panel.show_chest(chest, game.player.loadout, game.player.stats, 5, game.items)
 	for card in game.weapon_chest_panel.buttons:
 		_check(not card.effect_label.text.contains("Basisschaden"), "utility card is advertised as flat damage")
+		var font: Font = card.effect_label.get_theme_font("font")
 		for text in [card.effect_label.text, card.tooltip_text]:
 			for index in text.length():
-				_check(text.unicode_at(index) <= 32 or DentiUIStyle.FONT.has_char(text.unicode_at(index)), "new enchantment text uses an unsupported glyph")
+				_check(text.unicode_at(index) <= 32 or font.has_char(text.unicode_at(index)), "new enchantment text uses an unsupported glyph")
 	empty.free()
 
 func _automatic_attacks() -> void:

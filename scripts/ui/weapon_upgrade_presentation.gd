@@ -19,7 +19,7 @@ static func equipment(state: WeaponUpgradeState, loadout: WeaponLoadout, stats: 
 			var after := number(AffixPresentation.display_value(float(next.damage), id, weapon.data, stats, items)) if not next.is_empty() else ""
 			var unit := unit_text(id, items)
 			effects.append({"id": id, "level": WeaponUpgrades.level(entry), "value": before + " " + unit,
-				"preview": (before + " -> " + after if not after.is_empty() else before) + " " + unit,
+				"preview": (before + " → " + after if not after.is_empty() else before) + " " + unit,
 				"unit": unit, "details": AffixPresentation.effect_description(id) + "\n\n" + before + " " + unit})
 		for definition in WeaponAffixes.ALL:
 			if not definition.selectable: continue

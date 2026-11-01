@@ -11,6 +11,7 @@ const ANALOG_SWITCH_COOLDOWN_MS := 600
 var using_controller := false
 var controller_active := false
 var navigation_active := false
+var touch_active := OS.has_feature("mobile")
 var controller_device := -1
 var detected_family := "xbox"
 var navigation: ControllerNavigation
@@ -85,6 +86,48 @@ func pause_available() -> bool:
 	var menu: Node = pause_menu.get_ref() if pause_menu != null else null
 	return menu != null and menu.game != null and not menu.game.ended
 
+func action_hints_visible() -> bool:
+	return using_controller or (not touch_active and DesktopMenuInput.available(get_viewport()))
+
+func _desktop_mode(navigate: bool, touch: bool = false) -> void:
+	var changed_touch := touch_active != touch
+	touch_active = touch
+	_set_mode(false, navigate)
+	if changed_touch: changed.emit()
+
+func key_input(event: InputEventKey, viewport: Viewport) -> bool:
+	if not event.pressed: return false
+	last_pointer_ms = Time.get_ticks_msec()
+	_desktop_mode(true)
+	# Native text editing owns letters, Backspace, Enter and key repeat.
+	if DesktopMenuInput.editing(viewport): return false
+	if event.echo and DesktopMenuInput.shortcut(event): return true
+	if viewport == get_viewport():
+		if not (event.is_action_pressed("ui_focus_next", true) or event.is_action_pressed("ui_focus_prev", true)): navigation.ensure_focus()
+		navigation.handle_event(event)
+	return false
+
+func activate_menu_action(action: StringName, scope_ref: WeakRef, focus_ref: WeakRef) -> void:
+	var current := navigation.top_scope()
+	var scope: Control = scope_ref.get_ref()
+	if current.is_empty() or scope == null or current.scope.get_ref() != scope: return
+	if not action_bar._actions(scope).any(func(entry: Dictionary) -> bool: return entry.action == action): return
+	var focus: Control = focus_ref.get_ref() if focus_ref != null else null
+	if action == &"ui_accept" and not ControllerFocus.accepts(scope, focus): return
+	_desktop_mode(true)
+	if ControllerFocus.accepts(scope, focus): focus.grab_focus()
+	if action == &"pause" and pause_available():
+		var menu: Node = pause_menu.get_ref()
+		if menu.visible: menu.close_pause()
+		else: menu.open_pause()
+		return
+	# Use the same GUI/shortcut route as the keyboard, without stealing focus.
+	for pressed in [true, false]:
+		var event := InputEventAction.new()
+		event.action = action
+		event.pressed = pressed
+		get_viewport().push_input(event)
+
 func _unhandled_input(event: InputEvent) -> void:
 	if not navigation_active or not event.is_action_pressed("ui_details"): return
 	var focus := get_viewport().gui_get_focus_owner()
@@ -97,16 +140,15 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventJoypadButton or event is InputEventJoypadMotion:
 		_joy_input(event)
 		return
-	if event is InputEventKey and event.pressed and not event.echo:
-		last_pointer_ms = Time.get_ticks_msec()
-		_set_mode(false, true)
+	if event is InputEventKey:
+		if key_input(event, get_viewport()): get_viewport().set_input_as_handled()
 	elif event is InputEventMouseMotion:
 		if not _deliberate_pointer(event): return
 		last_pointer_ms = Time.get_ticks_msec()
-		_set_mode(false, false)
+		_desktop_mode(false)
 	elif ((event is InputEventMouseButton or event is InputEventScreenTouch) and event.pressed) or event is InputEventScreenDrag:
 		last_pointer_ms = Time.get_ticks_msec()
-		_set_mode(false, false)
+		_desktop_mode(false, event is InputEventScreenTouch or event is InputEventScreenDrag)
 	if navigation_active: navigation.ensure_focus()
 
 func _joy_input(event: InputEvent) -> bool:
