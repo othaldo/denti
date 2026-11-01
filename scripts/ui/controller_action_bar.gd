@@ -7,7 +7,7 @@ const FONT_SIZE := 16
 const ICON_GAP := 8.0
 const ACTION_GAP := 22.0
 const ROW_STEP := 40.0
-const ORDER: Array[StringName] = [&"ui_accept", &"ui_cancel", &"ui_reroll", &"ui_confirm", &"ui_pin", &"ui_undo", &"ui_details", &"ui_shop_details", &"ui_enchant", &"ui_previous_weapon", &"ui_next_weapon", &"ui_next_wave", &"ui_ascend", &"pause"]
+const ORDER: Array[StringName] = [&"ui_accept", &"ui_cancel", &"ui_reroll", &"ui_confirm", &"ui_pin", &"ui_undo", &"ui_details", &"ui_previous", &"ui_next", &"pause"]
 
 var strip: Control
 var panel: Panel
@@ -95,7 +95,10 @@ func _process(_delta: float) -> void:
 	panel.size = Vector2(safe.size.x / factor, visible_height)
 
 func _actions(scope: Control) -> Array[Dictionary]:
-	if input.navigation.popup_open(): return [{"action": &"ui_cancel", "label": "Schließen"}]
+	if input.navigation.popup_open():
+		var popup_actions: Array[Dictionary] = [{"action": &"ui_cancel", "label": "Schließen"}]
+		if input.pause_available() and not input.pause_menu.get_ref().visible: popup_actions.append({"action": &"pause", "label": "Pause"})
+		return popup_actions
 	var shortcuts: Dictionary = {}
 	var focus := get_viewport().gui_get_focus_owner()
 	for prompt: ControllerPrompt in get_tree().get_nodes_in_group("controller_prompts"):
@@ -106,18 +109,22 @@ func _actions(scope: Control) -> Array[Dictionary]:
 	if scope.has_meta("controller_shortcuts"):
 		var provider: Callable = scope.get_meta("controller_shortcuts")
 		shortcuts.merge(provider.call(), true)
+	if input.pause_available() and not input.pause_menu.get_ref().visible: shortcuts[&"pause"] = "Pause"
 	var back := str(scope.get_meta("controller_back", ""))
 	# A parent screen can provide its Back action to its nested layout stage.
 	var parent := scope.get_parent()
 	while back.is_empty() and parent != null:
 		back = str(parent.get_meta("controller_back", ""))
 		parent = parent.get_parent()
-	if not back.is_empty() and not shortcuts.has(&"ui_cancel") and not shortcuts.has(&"pause"):
+	if not back.is_empty() and not shortcuts.has(&"ui_cancel"):
 		shortcuts[&"ui_cancel"] = back
 	var focused_shortcut := focus.get_node_or_null("ControllerPrompt") as ControllerPrompt if focus != null else null
+	if focus != null and ControllerFocus.contains(scope, focus) and focus.has_meta("controller_details"): shortcuts[&"ui_details"] = "Details"
 	var redundant := focused_shortcut != null and not focused_shortcut.focused_only and shortcuts.has(focused_shortcut.action)
-	if focused_shortcut != null and focused_shortcut.action in [&"ui_enchant", &"ui_next_wave"]: redundant = false
-	if ControllerFocus.contains(scope, focus) and ControllerFocus.available(focus) and not focus is Range and not focus is LineEdit and not redundant:
+	if focused_shortcut != null and focused_shortcut.action == &"ui_confirm":
+		shortcuts.erase(&"ui_confirm")
+		redundant = false
+	if ControllerFocus.contains(scope, focus) and ControllerFocus.available(focus) and not focus is Range and not focus is LineEdit and not redundant and not bool(focus.get_meta("controller_info_only", false)):
 		if focus.has_method("controller_actions"):
 			shortcuts.merge(focus.controller_actions(), true)
 		else:
@@ -131,14 +138,13 @@ func _shortcut_label(prompt: ControllerPrompt) -> String:
 	match prompt.action:
 		&"ui_reroll": return "Würfeln"
 		&"ui_details": return "Details"
-		&"ui_enchant": return "Verzaubern"
-		&"ui_next_wave": return "Welle starten"
 		&"pause": return "Fortsetzen"
 		&"ui_confirm", &"ui_undo": return prompt.target.text
 	var label: String = prompt.target.text if prompt.target is Button else ""
 	return label if label in ["Zurück", "Schließen", "Abbrechen", "Fertig"] else "Zurück"
 
 func _selection_label(control: Control) -> String:
+	if control.has_meta("controller_action_label"): return str(control.get_meta("controller_action_label"))
 	if control is OfferCard or control is PanelContainer: return "Details"
 	if control is OptionButton: return "Öffnen"
 	if control is CheckButton: return "Ändern"

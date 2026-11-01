@@ -44,6 +44,8 @@ func _ready() -> void:
 		button.set_presentation([DentiUIIcons.stat(0), preload("res://assets/ui/reload_light.svg"), preload("res://assets/ui/range.svg")][index], 18, 24)
 		stat_buttons.append(button)
 		button.pressed.connect(_stat_details.bind(index))
+		button.set_meta("controller_info_only", true)
+		button.set_meta("controller_details", func() -> void: _stat_details(index))
 	resized.connect(_layout)
 
 func _label(font_size: int) -> Label:
@@ -65,6 +67,7 @@ func show_options(weapons: Array[WeaponData], selected: StringName = &"") -> voi
 		var button := RunSetupChoice.new()
 		button.tooltip_text = options[index].display_name + " · " + options[index].roots_text()
 		button.pressed.connect(select_weapon.bind(index))
+		button.set_meta("controller_details", func() -> void: details_requested.emit(options[index].display_name, RunSetupPresentation.details(options[index])))
 		grid.add_child(button)
 		button.show_artwork(RunSetupPresentation.weapon_icon(options[index]))
 		icon_buttons.append(button)

@@ -2,6 +2,7 @@ class_name DentiUIStyle
 extends RefCounted
 
 const FONT: FontFile = preload("res://assets/ui/Fredoka.ttf")
+const SYMBOL_FONT: FontFile = preload("res://assets/ui/Arimo.ttf")
 static var _ui_font: FontVariation
 const BACKGROUND := Color("19151f")
 const PANEL := Color("25212d")
@@ -23,6 +24,8 @@ static func make_theme() -> Theme:
 	if _ui_font == null:
 		_ui_font = FontVariation.new()
 		_ui_font.base_font = FONT
+		# Bundle missing symbols (e.g. upgrade arrows) for desktop and Web exports.
+		_ui_font.fallbacks = [SYMBOL_FONT]
 		var weight_tag := TextServerManager.get_primary_interface().name_to_tag("weight")
 		_ui_font.variation_opentype = {weight_tag: 450.0}
 	theme.default_font = _ui_font
@@ -55,7 +58,7 @@ static func style_hud_text(label: Label, color: Color, size: int, outline: int =
 
 
 static func style_dialog(panel: PanelContainer) -> void:
-	var style := _box(BACKGROUND, LINE, 22, 1)
+	var style := _box(BACKGROUND, Color.TRANSPARENT, 22, 0)
 	style.shadow_color = Color(0.11, 0.06, 0.12, 0.42)
 	style.shadow_size = 16
 	style.shadow_offset = Vector2(0, 9)

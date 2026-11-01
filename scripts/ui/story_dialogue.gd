@@ -118,6 +118,9 @@ func _process(delta: float) -> void:
 		return
 	if not revealing:
 		return
+	if not ControllerFocus.active(root_control):
+		speech.stop()
+		return
 	if not DentiUIMotion.enabled(root_control):
 		finish_reveal()
 		return

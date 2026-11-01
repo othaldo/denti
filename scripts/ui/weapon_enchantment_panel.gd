@@ -2,6 +2,7 @@ class_name WeaponEnchantmentPanel
 extends CanvasLayer
 
 signal completed
+signal cancelled
 signal upgrade_requested(uid: String, id: StringName)
 signal ascension_requested(uid: String)
 signal undo_requested
@@ -21,6 +22,10 @@ var finish_button: Button
 var weapon_buttons: Array[Button] = []
 var upgrade_buttons: Array[Button] = []
 var effect_buttons: Array[Button] = []
+var focus_rows: Array[WeaponEnchantmentAction] = []
+var focus_policy: WeaponEnchantmentFocus
+var exit_dialog: EnchantmentExitDialog
+var exit_focus := ""
 var models: Array[Dictionary] = []
 var income: WeaponUpgradeIncome
 var state: WeaponUpgradeState
@@ -80,6 +85,11 @@ func _ready() -> void:
 	stage.present("Waffen verzaubern", body)
 	details = RunSetupDetails.new()
 	root_control.add_child(details)
+	details.closed.connect(_focus_after_refresh)
+	focus_policy = WeaponEnchantmentFocus.new(self)
+	exit_dialog = EnchantmentExitDialog.new()
+	root_control.add_child(exit_dialog)
+	exit_dialog.decided.connect(_exit_decided)
 	stage.set_meta("controller_shortcuts", _controller_shortcuts)
 	ControllerFocus.tag(finish_button, "enchant:confirm")
 	ControllerFocus.tag(back_button, "enchant:back")
@@ -89,20 +99,25 @@ func _ready() -> void:
 
 func _controller_shortcuts() -> Dictionary:
 	var result := {}
-	if not visible or details.visible or state == null: return result
-	if picking_slot >= 0: result[&"ui_cancel"] = "Zurück"
+	if not visible or details.visible or exit_dialog.visible or state == null: return result
+	if not models.is_empty(): result[&"ui_details"] = "Details"
+	result[&"ui_cancel"] = "Zurück"
 	if not finish_button.disabled: result[&"ui_confirm"] = finish_button.text
 	if picking_slot < 0 and not state.actions.is_empty(): result[&"ui_undo"] = "Rückgängig"
-	if models.size() > 1:
-		result[&"ui_previous_weapon"] = "Vorige Waffe"
-		result[&"ui_next_weapon"] = "Nächste Waffe"
-	if picking_slot < 0 and ControllerFocus.available(ascension_button):
-		result[&"ui_ascend"] = "Aufsteigen"
+	if picking_slot < 0 and models.size() > 1:
+		result[&"ui_previous"] = "Vorige Waffe"
+		result[&"ui_next"] = "Nächste Waffe"
 	return result
 
 func _sync_input_mode() -> void:
 	var input := get_node("/root/GameInput")
 	var controller: bool = input.controller_active
+	if controller:
+		stage.set_meta("controller_focus_targets", focus_policy.targets)
+		stage.set_meta("controller_focus_neighbor", focus_policy.neighbor)
+	else:
+		for key in ["controller_focus_targets", "controller_focus_neighbor"]:
+			if stage.has_meta(key): stage.remove_meta(key)
 	var focus := get_viewport().gui_get_focus_owner()
 	var reflow := stage.footer.visible == controller
 	if visible and reflow and ControllerFocus.contains(body, focus) and focus_after_layout.is_empty():
@@ -139,6 +154,7 @@ func show_upgrades(upgrades: WeaponUpgradeState, equipment: WeaponLoadout, playe
 	stats = player_stats
 	item_context = items
 	details.hide()
+	exit_dialog.hide()
 	visible = true
 	stage.body_scroll.scroll_vertical = 0
 	refresh()
@@ -184,22 +200,33 @@ func _refresh() -> void:
 
 func _layout(extent: Vector2) -> void:
 	if body == null or extent.x < 1: return
+	var focused := get_viewport().gui_get_focus_owner()
+	if focus_after_layout.is_empty() and ControllerFocus.contains(body, focused):
+		focus_after_layout = str(focused.get_meta("controller_focus_key", ""))
 	for child in body.get_children(): child.free()
 	selection_preview = null
 	ascension_button = null
 	weapon_buttons.clear()
 	upgrade_buttons.clear()
 	effect_buttons.clear()
+	focus_rows.clear()
 	var narrow := extent.x < 720
 	var compact := extent.x < 420
 	finish_button.custom_minimum_size.x = 110 if compact else 180
 	finish_button.add_theme_font_size_override("font_size", 16 if compact else 20)
 	back_button.add_theme_font_size_override("font_size", 14 if compact else 20)
 	stage.title_label.text = "Verzaubern" if compact else "Waffen verzaubern"
+	stage.title_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if compact else TextServer.AUTOWRAP_OFF
+	if compact and not models.is_empty():
+		stage.title_label.text = current_data().display_name
+		var copies := 0
+		for model in models:
+			if model.id == models[selected_weapon].id: copies += 1
+		if copies > 1: stage.title_label.text += " · #%d" % (selected_weapon + 1)
 	count_label.text = _balance_text()
 	count_label.tooltip_text = "%d Punkte · 2 je Kapsel" % remaining
 	if income != null: count_label.tooltip_text += "\n" + income.details()
-	stage.title_label.add_theme_font_size_override("font_size", 22 if compact else 32)
+	stage.title_label.add_theme_font_size_override("font_size", 18 if compact else 32)
 	count_label.add_theme_font_size_override("font_size", 14 if compact else 18)
 	var top := 0.0
 	if models.is_empty():
@@ -216,9 +243,7 @@ func _layout(extent: Vector2) -> void:
 		var right := Rect2(144, 0, extent.x - 144, 0)
 		var height := 0.0
 		if picking_slot >= 0: height = _picker(right)
-		else:
-			_ascension(Rect2(right.position, Vector2(right.size.x, 72)))
-			height = 84 + _slots(Rect2(right.position + Vector2(0, 84), right.size), true)
+		else: height = _overview(right, true)
 		body.custom_minimum_size.y = maxf(212, height) + 8
 	elif narrow:
 		var columns := models.size()
@@ -229,9 +254,7 @@ func _layout(extent: Vector2) -> void:
 		top = ceili(float(models.size()) / columns) * (cell + 8) + 4
 		_hero(Rect2(0, top, extent.x, 64), true)
 		top += 72 if compact else 98
-		_ascension(Rect2(0, top, extent.x, 72))
-		top += 84
-		var height := _picker(Rect2(0, top, extent.x, 0)) if picking_slot >= 0 else _slots(Rect2(0, top, extent.x, 0), true)
+		var height := _picker(Rect2(0, top, extent.x, 0)) if picking_slot >= 0 else _overview(Rect2(0, top, extent.x, 0), true)
 		body.custom_minimum_size.y = top + height + 8
 	else:
 		var rail := clampf(extent.x * 0.22, 190, 260)
@@ -248,9 +271,8 @@ func _layout(extent: Vector2) -> void:
 				var gallery_top := maxf(0, (content_height - (rows * (cell + 12) - 12)) / 2)
 				_weapon_card(index, Rect2(index % 2 * (cell + 12), gallery_top + (index / 2) * (cell + 12), cell, cell), true)
 		_hero(Rect2(rail + gap, 0, hero_width, content_height), false)
-		var slot_height := minf(100, maxf(78, (extent.y - 38) / 4)) * 4 + 30
-		var right := Rect2(rail + hero_width + gap * 2, maxf(0, (content_height - slot_height) / 2), extent.x - rail - hero_width - gap * 2, 0)
-		var height := _picker(right) if picking_slot >= 0 else _slots(right, false)
+		var right := Rect2(rail + hero_width + gap * 2, 0, extent.x - rail - hero_width - gap * 2, 0)
+		var height := _picker(right) if picking_slot >= 0 else _overview(right, false)
 		body.custom_minimum_size.y = maxf(content_height, right.position.y + height) + 8
 	body.size = Vector2(extent.x, maxf(extent.y, body.custom_minimum_size.y))
 	stage.refresh_focus()
@@ -260,6 +282,7 @@ func _layout(extent: Vector2) -> void:
 	if not focus_after_layout.is_empty(): _focus_after_refresh.call_deferred()
 
 func _wire_controller_focus() -> void:
+	if get_node("/root/GameInput").controller_active: return
 	var choices: Array[Button] = []
 	for button in effect_buttons if picking_slot >= 0 else upgrade_buttons:
 		if ControllerFocus.available(button): choices.append(button)
@@ -327,13 +350,12 @@ func _hero(rect: Rect2, compact: bool) -> void:
 		_text(body, data.display_name, Rect2(rect.position + Vector2(64, 0), Vector2(rect.size.x - 64, 30)), 22)
 		_root_info(Rect2(rect.position + Vector2(64, 29), Vector2(rect.size.x - 64, 36)))
 		return
-	var art_height := minf(260, rect.size.y - 200)
-	var y := rect.position.y + (rect.size.y - art_height - 182) / 2
+	var art_height := minf(300, rect.size.y - 110)
+	var y := rect.position.y + (rect.size.y - art_height - 98) / 2
 	_art(body, RunSetupPresentation.weapon_icon(data), Rect2(rect.position.x + 28, y, rect.size.x - 56, art_height))
 	var title := _text(body, data.display_name, Rect2(rect.position.x, y + art_height + 16, rect.size.x, 38), 28)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_root_info(Rect2(rect.position.x, y + art_height + 58, rect.size.x, 40))
-	_ascension(Rect2(rect.position.x, y + art_height + 110, rect.size.x, 72))
 
 
 func _root_info(rect: Rect2) -> void:
@@ -350,17 +372,28 @@ func _root_info(rect: Rect2) -> void:
 		details.present(data.display_name, models[selected_weapon].root_info, button))
 
 
-func _slots(rect: Rect2, compact: bool) -> float:
+func _overview(rect: Rect2, compact: bool) -> float:
+	var ascension_height := 96.0
+	# Allocate the ascent, four gaps and the body inset before sizing the rows.
+	var row_height := (90.0 if rect.size.x < 310 else 74.0) if compact else clampf((stage.last_extent.y - ascension_height - 48) / 4, 78, 100)
+	var gap := 8.0 if compact else 10.0
+	_ascension(Rect2(rect.position, Vector2(rect.size.x, ascension_height)), compact)
+	var offset := ascension_height + gap
+	return offset + _slots(Rect2(rect.position + Vector2(0, offset), rect.size), compact, row_height)
+
+func _slots(rect: Rect2, compact: bool, row_height: float) -> float:
 	var very_narrow := compact and rect.size.x < 310
-	var row_height := (90.0 if very_narrow else 74.0) if compact else minf(100, maxf(78, (stage.last_extent.y - 38) / 4))
 	var gap := 8.0 if compact else 10.0
 	for index in SLOT_COUNT:
 		var row := Rect2(rect.position + Vector2(0, index * (row_height + gap)), Vector2(rect.size.x, row_height))
 		var effects: Array = models[selected_weapon].effects
+		var focus_row := _action_row(body, row)
+		ControllerFocus.tag(focus_row, "row:%d" % index)
+		focus_rows.append(focus_row)
 		if index >= effects.size():
 			var locked := index >= int(models[selected_weapon].slot_count)
-			var empty := _button(body, "Ab Mk %s" % ["I", "II", "III", "IV"][index] if locked else "+  Verzaubern", row)
-			empty.add_theme_stylebox_override("normal", MenuStyle.box(Color(DentiUIStyle.PANEL, 0.55), DentiUIStyle.LINE, 14, 1))
+			var empty := _button(focus_row, "Ab Mk %s" % ["I", "II", "III", "IV"][index] if locked else "+  Verzaubern", Rect2(Vector2.ZERO, row.size))
+			for style in ["normal", "hover", "pressed", "disabled"]: empty.add_theme_stylebox_override(style, StyleBoxEmpty.new())
 			empty.tooltip_text = "Öffnet sich beim Waffenupgrade auf Mk %s" % ["I", "II", "III", "IV"][index] if locked else "Neue Verzauberung · %d Punkte" % _cost()
 			if locked:
 				empty.icon = preload("res://assets/ui/setup_lock.svg")
@@ -368,6 +401,13 @@ func _slots(rect: Rect2, compact: bool) -> float:
 				empty.add_theme_constant_override("icon_max_width", 18)
 				empty.alignment = HORIZONTAL_ALIGNMENT_CENTER
 			empty.disabled = remaining < _cost() or locked
+			focus_row.blocked_reason = "Erst ab Mk %s" % ["I", "II", "III", "IV"][index] if locked else _points_blocked()
+			focus_row.action_label = "Verzaubern"
+			focus_row.details_title = "Platz %d" % (index + 1)
+			focus_row.details_text = (focus_row.blocked_reason + "\n\n" if not focus_row.blocked_reason.is_empty() else "") + "Neue Verzauberung · %d Punkte\n\n" % _cost() + str(models[selected_weapon].root_info)
+			focus_row.pressed.connect(open_picker.bind(index))
+			focus_row.status_label = _text(focus_row, "", Rect2(8, row_height - 28, row.size.x - 16, 24), 13, DentiUIStyle.GOLD)
+			focus_row.status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			empty.pressed.connect(open_picker.bind(index))
 			ControllerFocus.tag(empty, "slot:%d" % index)
 			upgrade_buttons.append(empty)
@@ -375,7 +415,7 @@ func _slots(rect: Rect2, compact: bool) -> float:
 		var effect: Dictionary = effects[index]
 		var data := WeaponAffixes.by_id(effect.id)
 		var level := int(effect.level)
-		var panel := _panel(body, row)
+		var panel := focus_row
 		var icon := _button(panel, "", Rect2(8, 12 if compact else 22, 50, 48))
 		MenuStyle.quiet(icon)
 		_art(icon, DentiUIIcons.item(data.icon_index), Rect2(2, 3, 46, 46))
@@ -397,7 +437,14 @@ func _slots(rect: Rect2, compact: bool) -> float:
 		if very_narrow: preview = preview.trim_suffix(" " + str(effect.unit)) + "\n" + str(effect.unit)
 		var preview_height := 50.0 if very_narrow else (36.0 if compact else 28.0)
 		var preview_top := 37.0 if compact else minf(53, row_height - 32)
-		_text(panel, preview, Rect2(72, preview_top, text_width + 4, preview_height), 13 if compact else 14, DentiUIStyle.MUTED, true)
+		var preview_label := _text(panel, preview, Rect2(72, preview_top, text_width + 4, preview_height), 13 if compact else 14, DentiUIStyle.MUTED, true)
+		focus_row.blocked_reason = "Maximalstufe erreicht" if level == MAX_LEVEL else _points_blocked()
+		focus_row.action_label = "+ Rang · %d" % _cost()
+		focus_row.details_title = data.display_name
+		focus_row.details_text = (focus_row.blocked_reason + "\n\n" if not focus_row.blocked_reason.is_empty() else "") + str(effect.details)
+		focus_row.status_label = preview_label
+		focus_row.original_status = preview
+		focus_row.pressed.connect(upgrade.bind(index))
 		var action := _button(panel, "MAX" if level == MAX_LEVEL else ("+ · %d" if compact else "+ Rang · %d") % _cost(), Rect2(row.size.x - action_width - 12, 25, action_width, 44 if compact else 48))
 		action.add_theme_font_size_override("font_size", 16)
 		action.tooltip_text = "Maximalstufe erreicht" if level == MAX_LEVEL else "%s: %d/10 -> %d/10 · kostet %d Punkte" % [data.display_name, level, level + 1, _cost()]
@@ -491,8 +538,9 @@ func select_weapon(index: int) -> void:
 	_refresh.call_deferred()
 
 func _cycle_weapon(direction: int) -> void:
-	if models.size() < 2: return
-	focus_after_layout = "weapon"
+	if picking_slot >= 0 or models.size() < 2: return
+	var focus := get_viewport().gui_get_focus_owner()
+	focus_after_layout = str(focus.get_meta("controller_focus_key", "weapon")) if ControllerFocus.contains(body, focus) else "weapon"
 	select_weapon(posmod(selected_weapon + direction, models.size()))
 
 
@@ -506,6 +554,7 @@ func open_picker(slot: int) -> void:
 
 
 func upgrade(slot: int) -> void:
+	if picking_slot >= 0: return
 	if remaining < _cost() or slot < 0 or slot >= models[selected_weapon].effects.size(): return
 	if int(models[selected_weapon].effects[slot].level) >= MAX_LEVEL: return
 	focus_after_layout = "upgrade:%d" % slot
@@ -533,29 +582,53 @@ func _back() -> void:
 
 func _undo() -> void:
 	if state == null or state.actions.is_empty(): return
-	focus_after_layout = "weapon"
+	var action: Dictionary = state.actions.back()
+	focus_after_layout = "ascension" if StringName(action.id) == WeaponAscension.ID else "row:0"
+	for model in models:
+		if str(model.uid) != str(action.uid): continue
+		for slot in model.effects.size():
+			if StringName(model.effects[slot].id) == StringName(action.id): focus_after_layout = "row:%d" % slot
 	undo_requested.emit()
 
 func _ascend() -> void:
-	if not ControllerFocus.available(ascension_button): return
+	if picking_slot >= 0 or models.is_empty() or not str(models[selected_weapon].ascension.blocked).is_empty(): return
 	focus_after_layout = "ascension"
 	ascension_requested.emit(str(models[selected_weapon].uid))
 
+func _request_close() -> void:
+	if picking_slot >= 0:
+		_back()
+	elif state.actions.is_empty():
+		cancelled.emit()
+	else:
+		var focus := get_viewport().gui_get_focus_owner()
+		exit_focus = str(focus.get_meta("controller_focus_key", "")) if focus != null else ""
+		exit_dialog.present()
+
+func _exit_decided(choice: StringName) -> void:
+	exit_dialog.hide()
+	match choice:
+		&"discard": cancelled.emit()
+		&"finish": _confirm()
+		_:
+			focus_after_layout = exit_focus
+			_focus_after_refresh()
+
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not visible or details.visible or not ControllerFocus.active(stage): return
+	if not visible or details.visible or exit_dialog.visible or not ControllerFocus.active(stage): return
 	if event.is_action_pressed("ui_confirm"):
 		if not finish_button.disabled: _confirm()
 	elif event.is_action_pressed("ui_undo"):
 		if picking_slot < 0: _undo()
-	elif event.is_action_pressed("ui_previous_weapon"):
+	elif event.is_action_pressed("ui_previous"):
 		_cycle_weapon(-1)
-	elif event.is_action_pressed("ui_next_weapon"):
+	elif event.is_action_pressed("ui_next"):
 		_cycle_weapon(1)
-	elif event.is_action_pressed("ui_ascend"):
-		if picking_slot < 0: _ascend()
+	elif event.is_action_pressed("ui_details"):
+		_show_focused_details()
 	elif event.is_action_pressed("ui_cancel"):
-		if picking_slot >= 0: _back()
+		_request_close()
 	else: return
 	get_viewport().set_input_as_handled()
 
@@ -564,6 +637,16 @@ func _focus_after_refresh() -> void:
 	if not visible or details.visible or focus_after_layout.is_empty() or not get_node("/root/GameInput").navigation_active: return
 	var desired := focus_after_layout
 	focus_after_layout = ""
+	if get_node("/root/GameInput").controller_active:
+		var target := focus_policy.resolve(desired)
+		if target != null:
+			target.grab_focus()
+			ControllerFocus.reveal(target)
+		return
+	# Desktop actions keep their original buttons instead of the row wrappers.
+	if desired.begins_with("row:"):
+		var index := desired.get_slice(":", 1).to_int()
+		if index < upgrade_buttons.size(): desired = str(upgrade_buttons[index].get_meta("controller_focus_key", ""))
 	var candidates: Array[Control] = ControllerFocus.controls(body)
 	if desired == "picker": candidates.assign(effect_buttons)
 	elif desired == "weapon" and selected_weapon < weapon_buttons.size(): candidates = [weapon_buttons[selected_weapon]]
@@ -585,6 +668,20 @@ func _save_cursor() -> void:
 func _cost() -> int:
 	return int(models[selected_weapon].cost) if not models.is_empty() else 1
 
+func _points_blocked() -> String:
+	return "Noch %d Punkte nötig" % (_cost() - remaining) if remaining < _cost() else ""
+
+func _show_focused_details() -> void:
+	if models.is_empty(): return
+	var source := get_viewport().gui_get_focus_owner()
+	if source is WeaponEnchantmentAction:
+		details.present(source.details_title, source.details_text, source)
+	elif source != null and source.has_meta("effect_id"):
+		var id := StringName(source.get_meta("effect_id"))
+		details.present(WeaponAffixes.by_id(id).display_name, AffixPresentation.effect_description(id), source)
+	else:
+		details.present(current_data().display_name, str(models[selected_weapon].root_info), source)
+
 
 func _balance_text() -> String:
 	var gold := state.remaining_gold(coins) if state != null else coins
@@ -596,12 +693,26 @@ func _ascension(rect: Rect2, short: bool = false) -> void:
 	var locked := int(models[selected_weapon].tier) < WeaponLoadout.MAX_TIER
 	var title := "Ab Mk IV" if locked else ("Aufstieg · " if short else "Aufsteigen · ") + str(offer.next)
 	var price := "%d P · %d G" % [offer.cost, offer.coins] if short else "%d Punkte · %d Gold" % [offer.cost, offer.coins]
-	ascension_button = _button(body, title if locked else title + "\n" + price, rect)
-	ascension_button.add_theme_font_size_override("font_size", 13 if short else (14 if rect.size.x < 220 else 16))
-	ascension_button.disabled = not str(offer.blocked).is_empty()
-	ascension_button.tooltip_text = (str(offer.blocked) + "\n" if ascension_button.disabled else "") + "%s · %d Punkte · %d Gold\n+10 %% Basisschaden · +3 %% Tempo und Reichweite\nFertig übernimmt den Aufstieg; Rückgängig nimmt ihn zurück." % [offer.next, offer.cost, offer.coins]
-	ascension_button.pressed.connect(_ascend)
-	ControllerFocus.tag(ascension_button, "ascension")
+	var row := _action_row(body, rect)
+	ascension_button = row
+	row.focus_mode = Control.FOCUS_ALL
+	row.mouse_filter = Control.MOUSE_FILTER_STOP
+	row.blocked_reason = str(offer.blocked)
+	row.disabled = not row.blocked_reason.is_empty() and not get_node("/root/GameInput").controller_active
+	row.action_label = "Aufsteigen"
+	row.details_title = title
+	row.details_text = (row.blocked_reason + "\n\n" if not row.blocked_reason.is_empty() else "") + "%s · %d Punkte · %d Gold\n+10 %% Basisschaden · +3 %% Tempo und Reichweite\nFertig übernimmt den Aufstieg; Rückgängig nimmt ihn zurück." % [offer.next, offer.cost, offer.coins]
+	row.tooltip_text = row.details_text
+	var blocked := not row.blocked_reason.is_empty()
+	var heading := _text(row, title, Rect2(12, 6 if blocked else 16, rect.size.x - 24, 28), 16 if short else 19)
+	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var cost := _text(row, price, Rect2(12, 34 if blocked else 48, rect.size.x - 24, 24), 14 if short else 16, DentiUIStyle.MUTED)
+	cost.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	if blocked:
+		var reason := _text(row, row.blocked_reason, Rect2(12, 60, rect.size.x - 24, 30), 13, DentiUIStyle.GOLD, true)
+		reason.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	row.pressed.connect(_ascend)
+	ControllerFocus.tag(row, "ascension")
 
 
 func _selection_allowed() -> bool:
@@ -653,10 +764,12 @@ func _button(parent: Node, value: String, rect: Rect2) -> Button:
 	_place(button, rect)
 	return button
 
-
-func _panel(parent: Node, rect: Rect2) -> Panel:
-	var panel := Panel.new()
-	panel.add_theme_stylebox_override("panel", MenuStyle.box(DentiUIStyle.PANEL, DentiUIStyle.LINE, 14, 1))
-	parent.add_child(panel)
-	_place(panel, rect)
-	return panel
+func _action_row(parent: Node, rect: Rect2) -> WeaponEnchantmentAction:
+	var row := WeaponEnchantmentAction.new()
+	MenuStyle.action(row)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.focus_mode = Control.FOCUS_ALL if get_node("/root/GameInput").controller_active else Control.FOCUS_NONE
+	row.add_theme_stylebox_override("normal", MenuStyle.box(DentiUIStyle.PANEL, DentiUIStyle.LINE, 14, 1))
+	parent.add_child(row)
+	_place(row, rect)
+	return row

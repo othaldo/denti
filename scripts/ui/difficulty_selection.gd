@@ -3,6 +3,7 @@ extends Control
 
 signal selected(id: StringName)
 signal locked_requested(id: StringName)
+signal details_requested(title: String, description: String)
 
 const MOTIFS := {
 	&"easy": preload("res://assets/ui/run_setup/easy.png"),
@@ -49,6 +50,8 @@ func _ready() -> void:
 		lock.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		card.add_child(lock)
 		card.pressed.connect(_choose.bind(data.id))
+		card.set_meta("controller_details", func() -> void:
+			details_requested.emit(data.display_name, "Ein Sieg auf Hard schaltet Hell frei." if bool(card.get_meta("locked", false)) else data.description))
 	resized.connect(_layout)
 
 func show_selection(id: StringName, eligible: Callable) -> void:

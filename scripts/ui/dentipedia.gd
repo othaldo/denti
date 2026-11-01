@@ -18,6 +18,51 @@ var detail_open := false
 var portrait := false
 var hero_art: TextureRect
 var hero_title: Label
+var category_focus: Dictionary = {}
+
+func controller_shortcuts() -> Dictionary:
+	var actions := {}
+	if category_index > 0: actions[&"ui_previous"] = "Voriger Tab"
+	if category_index < category_buttons.size() - 1: actions[&"ui_next"] = "Nächster Tab"
+	return actions
+
+func _controller_scope_active() -> bool:
+	if not ControllerFocus.visible(self): return false
+	var navigation: ControllerNavigation = get_node("/root/GameInput").navigation
+	if navigation.popup_open(): return false
+	var scope := navigation.top_scope()
+	return not scope.is_empty() and ControllerFocus.contains(scope.scope.get_ref(), self)
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not _controller_scope_active(): return
+	if not (event.is_action_pressed("ui_previous") or event.is_action_pressed("ui_next")): return
+	var direction := -1 if event.is_action_pressed("ui_previous") else 1
+	var next := clampi(category_index + direction, 0, category_buttons.size() - 1)
+	get_viewport().set_input_as_handled()
+	if next == category_index: return
+	var focus := get_viewport().gui_get_focus_owner()
+	var on_tabs := focus in category_buttons
+	var on_search := focus == search
+	if focus != null and focus.has_meta("entry"):
+		category_focus[category_index] = str(focus.get_meta("entry").title)
+	elif not selected.is_empty(): category_focus[category_index] = str(selected.title)
+	select_category(next)
+	_restore_category_focus.call_deferred(next, on_tabs, on_search)
+
+func _restore_category_focus(goal: int, on_tabs: bool, on_search: bool) -> void:
+	if category_index != goal or not _controller_scope_active(): return
+	var target: Control = category_buttons[category_index]
+	if on_search:
+		target = search
+	elif not on_tabs and listing.get_child_count() > 0:
+		target = listing.get_child(0)
+		for button: Button in listing.get_children():
+			if str(button.get_meta("entry").title) == str(category_focus.get(category_index, "")):
+				target = button
+				break
+		_show(target.get_meta("entry"), false)
+	target.grab_focus()
+	ControllerFocus.reveal(target)
 
 func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
@@ -91,6 +136,7 @@ func _tab_style(button: Button) -> void:
 	button.add_theme_color_override("font_color", DentiUIStyle.MUTED)
 	button.add_theme_color_override("font_pressed_color", DentiUIStyle.GOLD)
 	button.add_theme_color_override("font_hover_pressed_color", DentiUIStyle.GOLD)
+	MenuStyle.focus(button, get_node("/root/GameInput").navigation_active)
 
 func _scroll(parent: Node) -> ScrollContainer:
 	var scroll := ScrollContainer.new()
@@ -133,6 +179,8 @@ func layout_in(extent: Vector2) -> void:
 	split.add_theme_constant_override("separation", 16 if compact else 32)
 	list_scroll.visible = not portrait or not detail_open
 	detail_scroll.visible = not portrait or detail_open
+	detail_scroll.focus_mode = Control.FOCUS_ALL if portrait and detail_open else Control.FOCUS_NONE
+	detail_scroll.set_meta("controller_info_only", true)
 	list_scroll.custom_minimum_size.x = 0 if portrait else minf(320, extent.x * 0.36)
 	list_scroll.size_flags_stretch_ratio = 0.36
 	detail_scroll.size_flags_stretch_ratio = 0.64
@@ -142,7 +190,7 @@ func layout_in(extent: Vector2) -> void:
 		label.add_theme_font_size_override("font_size", 16 if compact else 18)
 		button.custom_minimum_size.y = 56 if compact else 64
 	if is_instance_valid(hero_art):
-		var art_size := 64 if extent.y < 300 else (88 if portrait else 144)
+		var art_size := 64 if extent.y < 300 or portrait and extent.x < 340 else (88 if portrait else 144)
 		hero_art.custom_minimum_size = Vector2(art_size, art_size)
 	if is_instance_valid(hero_title): hero_title.add_theme_font_size_override("font_size", 23 if compact else 32)
 	custom_minimum_size.y = extent.y
@@ -158,6 +206,11 @@ func go_back() -> bool:
 	if not portrait or not detail_open: return false
 	detail_open = false
 	_layout()
+	for button: Button in listing.get_children():
+		if button.get_meta("entry") == selected:
+			button.grab_focus()
+			ControllerFocus.reveal(button)
+			break
 	return true
 
 func _clear(parent: Node) -> void:
@@ -179,6 +232,7 @@ func _row_style(button: Button, entry: Dictionary) -> void:
 		style.content_margin_right = 14
 		button.add_theme_stylebox_override(state, style)
 	button.add_theme_color_override("font_pressed_color", DentiUIStyle.GOLD)
+	MenuStyle.focus(button, get_node("/root/GameInput").navigation_active)
 
 func _refresh() -> void:
 	_clear(listing)
@@ -207,6 +261,9 @@ func _refresh() -> void:
 		listing.add_child(button)
 		_entry_content(button, entry)
 		button.pressed.connect(_show.bind(entry))
+		ControllerFocus.tag(button, "dentipedia:%d:%s" % [category_index, entry.title])
+		button.set_meta("controller_info_only", true)
+		button.set_meta("controller_details", func() -> void: button.pressed.emit())
 	_show(first if retained.is_empty() else retained, false)
 	_layout()
 
@@ -285,6 +342,7 @@ func _show(entry: Dictionary, open_detail: bool = true) -> void:
 	else:
 		DentiUIComponents.label(detail, entry.body, 17)
 	_layout()
+	if open_detail and portrait: _focus_detail.call_deferred()
 	if entry.has("recipe"):
 		DentiUIComponents.label(detail, "Fusion", 20)
 		var ingredients := HFlowContainer.new()
@@ -300,6 +358,9 @@ func _show(entry: Dictionary, open_detail: bool = true) -> void:
 			DentiUIComponents.label(cell, ingredient.title, 14).custom_minimum_size.x = 115
 		DentiUIComponents.label(detail, "→ " + str(entry.title) + "\nItems bleiben erhalten; die beteiligten Waffen werden ersetzt.", 16)
 
+
+func _focus_detail() -> void:
+	if portrait and detail_open and ControllerFocus.available(detail_scroll): detail_scroll.grab_focus()
 
 func _forms(data: WeaponData, art: TextureRect, title: Label) -> void:
 	if data.element_skins.is_empty(): return

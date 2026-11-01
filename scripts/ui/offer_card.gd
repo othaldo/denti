@@ -118,7 +118,8 @@ func pin() -> void:
 		reservation_requested.emit()
 
 func controller_actions() -> Dictionary:
-	var result := {&"ui_accept": "Kaufen" if not buy_button.disabled else buy_caption.text, &"ui_pin": "Freigeben" if reserve_button.icon == PIN_ICON else "Merken", &"ui_shop_details": "Details"}
+	var result := {&"ui_pin": "Freigeben" if reserve_button.icon == PIN_ICON else "Merken", &"ui_details": "Details"}
+	if not buy_button.disabled: result[&"ui_accept"] = "Kaufen"
 	return result
 
 

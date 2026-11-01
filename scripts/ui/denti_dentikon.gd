@@ -37,8 +37,11 @@ static func open(source: Control, title: String, explanation: String, icon: Text
 	var popup := PopupPanel.new()
 	popup.process_mode = Node.PROCESS_MODE_ALWAYS
 	popup.theme = DentiUIStyle.make_theme()
-	popup.add_theme_stylebox_override("panel", DentiUIStyle._box(DentiUIStyle.PANEL, DentiUIStyle.LINE, 16, 1))
+	popup.add_theme_stylebox_override("panel", DentiUIStyle._box(DentiUIStyle.PANEL, Color.TRANSPARENT, 16, 0))
 	source.add_child(popup)
+	ControllerPopupInput.attach(popup)
+	popup.set_meta("pause_resume", func() -> void:
+		if is_instance_valid(source): open(source, title, explanation, icon))
 	var rows := VBoxContainer.new()
 	rows.add_theme_constant_override("separation", 12)
 	popup.add_child(rows)

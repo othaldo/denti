@@ -31,6 +31,7 @@ var end_coins := 0
 var chest_item: ShopOfferData
 var relic_options: Array[RelicData] = []
 var end_recap: Dictionary = {}
+var block_controller_accept := false
 
 @onready var legacy_panel: PanelContainer = $Root/Center/Panel
 @onready var legacy_cards: GridContainer = $Root/Center/Panel/Margin/Rows/Cards
@@ -89,9 +90,22 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_update_layout)
 	ControllerFocus.register($Root)
 	ControllerPrompt.bind(reroll_button, &"ui_reroll", false)
-	get_node("/root/GameInput").changed.connect(_update_layout.call_deferred)
+	stage.set_meta("controller_shortcuts", _controller_shortcuts)
+	get_node("/root/GameInput").changed.connect(_update_layout)
+
+func _controller_shortcuts() -> Dictionary:
+	return {&"ui_reroll": "Würfeln · %s" % reroll_button.text} if mode == &"upgrade" and not reroll_button.disabled else {}
+
+func _input(event: InputEvent) -> void:
+	if visible and block_controller_accept and event is InputEventJoypadButton and event.device == get_node("/root/GameInput").controller_device and event.button_index == JOY_BUTTON_A:
+		if not event.pressed: block_controller_accept = false
+		get_viewport().set_input_as_handled()
 
 func _unhandled_input(event: InputEvent) -> void:
+	if visible and ControllerFocus.active($Root) and mode == &"credits" and event.is_action_pressed("ui_cancel"):
+		show_end(end_won, end_coins, end_recap)
+		get_viewport().set_input_as_handled()
+		return
 	if visible and ControllerFocus.active($Root) and mode == &"upgrade" and event.is_action_pressed("ui_reroll") and not reroll_button.disabled:
 		level_reroll_requested.emit()
 		get_viewport().set_input_as_handled()
@@ -116,6 +130,12 @@ func _use_rewards(next: StringName) -> void:
 	stage.body_scroll.scroll_vertical = 0
 
 func _use_legacy(next: StringName) -> void:
+	for button in legacy_buttons:
+		var prompt := button.get_node_or_null("ControllerPrompt") as ControllerPrompt
+		if prompt != null:
+			prompt.action = &"ui_accept"
+			prompt.focused_only = true
+			prompt.refresh()
 	mode = next
 	stage.hide()
 	level_actions.hide()
@@ -128,6 +148,11 @@ func _use_legacy(next: StringName) -> void:
 	subtitle_label = legacy_subtitle
 
 func _update_layout() -> void:
+	var controller: bool = get_node("/root/GameInput").controller_active
+	if controller and reroll_button.has_focus(): block_controller_accept = true
+	if not controller: block_controller_accept = false
+	reroll_button.visible = not controller
+	$Root.set_meta("controller_back", "Zurück" if mode == &"credits" else "")
 	$Root/Center.offset_bottom = -ControllerActionBar.reserve($Root)
 	if mode in [&"upgrade", &"chest", &"relic"] and stage.visible:
 		stage.relayout()
@@ -156,6 +181,7 @@ func _update_layout() -> void:
 			buttons[index].custom_minimum_size = Vector2(0, 40 if compact else 48)
 			buttons[index].add_theme_font_size_override("font_size", 14 if compact else 18)
 			buttons[index].text = labels[index]
+			buttons[index].set_meta("controller_action_label", labels[index])
 
 func set_progress(current: int, total: int) -> void:
 	stage.set_progress(current, total)
@@ -333,6 +359,7 @@ func _show_credits() -> void:
 	subtitle_label.text = "Schrift: Fredoka · The Fredoka Project Authors\nSIL Open Font License 1.1\n\nDenti-, Waffen-, Gegner-, Arena- und Icon-Grafiken: OpenAI ImageGen\nMusik: othaldo · erstellt mit Suno\nSoundeffekte: eigens synthetisiert\nUI-Elemente: eigenes Godot-Design"
 	subtitle_label.custom_minimum_size.y = 120.0
 	buttons[0].show_action("Zurück", true)
+	ControllerPrompt.bind(buttons[0], &"ui_cancel", false)
 	buttons[1].visible = false
 	buttons[2].visible = false
 	buttons[3].visible = false

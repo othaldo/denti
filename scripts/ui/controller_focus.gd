@@ -32,8 +32,16 @@ static func available(control: Control) -> bool:
 
 static func controls(scope: Control) -> Array[Control]:
 	var result: Array[Control] = []
+	if scope.has_meta("controller_focus_targets"):
+		var provider: Callable = scope.get_meta("controller_focus_targets")
+		for control: Control in provider.call():
+			if contains(scope, control) and available(control): result.append(control)
+		return result
 	_collect(scope, result)
 	return result
+
+static func accepts(scope: Control, control: Control) -> bool:
+	return contains(scope, control) and available(control) and (not scope.has_meta("controller_focus_targets") or control in controls(scope))
 
 static func _collect(node: Node, result: Array[Control]) -> void:
 	if node is Control:
@@ -74,13 +82,20 @@ static func layout_rect(control: Control) -> Rect2:
 	return rect
 
 static func neighbor(scope: Control, source: Control, side: Side) -> Control:
+	if scope.has_meta("controller_focus_neighbor"):
+		var provider: Callable = scope.get_meta("controller_focus_neighbor")
+		var target: Control = provider.call(source, side)
+		return target if accepts(scope, target) else null
 	var native := source.find_valid_focus_neighbor(side)
 	if contains(scope, native) and native != source and available(native): return native
+	return spatial_neighbor(source, side, controls(scope))
+
+static func spatial_neighbor(source: Control, side: Side, candidates: Array[Control]) -> Control:
 	var direction: Vector2 = [Vector2.LEFT, Vector2.UP, Vector2.RIGHT, Vector2.DOWN][side]
 	var centre := source.get_global_rect().get_center()
 	var best: Control
 	var best_score := INF
-	for candidate in controls(scope):
+	for candidate in candidates:
 		if candidate == source: continue
 		var offset := candidate.get_global_rect().get_center() - centre
 		var forward := offset.dot(direction)

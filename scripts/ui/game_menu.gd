@@ -15,12 +15,16 @@ var actions: Dictionary = {}
 var achievements_view: AchievementsMenu
 var achievement_details: RunSetupDetails
 var home_return_focus: StringName = &""
+var build_return_focus := ""
+var paused_focus: WeakRef
+var paused_popups: Array[Callable] = []
 
 var page: StringName = &"home"
 var root_control: Control
 var rows: VBoxContainer
 var game: Node2D
 var build_panel: PanelContainer
+var legacy_scroll: ScrollContainer
 var build_scroll: ScrollContainer
 var build_grid: GridContainer
 var item_details: ShopDetails
@@ -42,6 +46,9 @@ var code_error: Label
 
 func _ready() -> void:
 	game = get_parent() as Node2D if overlay else null
+	if overlay:
+		layer = 70
+		get_node("/root/GameInput").pause_menu = weakref(self)
 	_build_ui()
 	ControllerFocus.register(root_control, func() -> Control: return home.primary_button if is_instance_valid(home) else stage.back_button)
 	get_node("/root/GameInput").changed.connect(_update_build_layout.call_deferred)
@@ -75,6 +82,18 @@ func _ready() -> void:
 func open_pause() -> void:
 	if not overlay or game == null or game.ended:
 		return
+	var focus := get_viewport().gui_get_focus_owner()
+	paused_focus = weakref(focus) if focus != null else null
+	paused_popups.clear()
+	for popup in get_viewport().get_embedded_subwindows():
+		if not popup.visible: continue
+		if popup.has_meta("pause_resume"):
+			paused_popups.append(popup.get_meta("pause_resume"))
+		elif popup is PopupMenu and popup.get_parent() is OptionButton:
+			var option: OptionButton = popup.get_parent()
+			paused_popups.append(func() -> void:
+				if is_instance_valid(option): option.show_popup())
+		popup.hide()
 	game._save_run()
 	get_tree().paused = true
 	visible = true
@@ -82,8 +101,22 @@ func open_pause() -> void:
 
 
 func close_pause() -> void:
+	for popup in get_viewport().get_embedded_subwindows():
+		if popup.visible and ControllerFocus.contains(root_control, popup.get_parent() as Control): popup.hide()
 	visible = false
 	get_tree().paused = game != null and game.run_flow.requires_pause()
+	for resume_popup in paused_popups: resume_popup.call_deferred()
+	paused_popups.clear()
+	_restore_pause_focus.call_deferred()
+
+func _restore_pause_focus() -> void:
+	if not is_inside_tree() or is_queued_for_deletion(): return
+	var focus: Control = paused_focus.get_ref() if paused_focus != null else null
+	var navigation: ControllerNavigation = get_node("/root/GameInput").navigation
+	if navigation.popup_open(): return
+	var entry := navigation.top_scope()
+	if focus != null and not entry.is_empty() and ControllerFocus.accepts(entry.scope.get_ref(), focus): focus.grab_focus()
+	navigation.ensure_focus()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -119,12 +152,17 @@ func _build_ui() -> void:
 	menu_stage.add_theme_constant_override("separation", 40)
 	center.add_child(menu_stage)
 	menu_stage.add_child(panel)
+	legacy_scroll = ScrollContainer.new()
+	legacy_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	legacy_scroll.follow_focus = true
+	panel.add_child(legacy_scroll)
 	var margin := MarginContainer.new()
+	margin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	margin.add_theme_constant_override("margin_left", 32)
 	margin.add_theme_constant_override("margin_right", 32)
 	margin.add_theme_constant_override("margin_top", 22)
 	margin.add_theme_constant_override("margin_bottom", 24)
-	panel.add_child(margin)
+	legacy_scroll.add_child(margin)
 	rows = VBoxContainer.new()
 	rows.add_theme_constant_override("separation", 10)
 	margin.add_child(rows)
@@ -225,7 +263,7 @@ func _show_home() -> void:
 	elif can_continue:
 		context = "Run vorbereiten"
 	home.configure(overlay, can_continue, context, session.code_entry_unlocked, session.test_scenario_id != &"")
-	if overlay: ControllerPrompt.bind(home.primary_button, &"pause", false)
+	if overlay: ControllerPrompt.bind(home.primary_button)
 	home.action_requested.connect(_home_action)
 	actions = home.actions
 	var updates: GameUpdateService = get_node("/root/GameUpdates")
@@ -262,6 +300,10 @@ func _home_action(id: StringName) -> void:
 
 
 func _return_home() -> void:
+	if page in [&"weapon_details", &"boss_details"]:
+		_show_stats()
+		_restore_build_focus.call_deferred()
+		return
 	if page == &"dentipedia" and is_instance_valid(dentipedia) and dentipedia.go_back(): return
 	if page == &"updates":
 		var updates: GameUpdateService = get_node("/root/GameUpdates")
@@ -322,8 +364,13 @@ func _update_build_layout() -> void:
 	(menu_stage.get_parent() as Container).queue_sort()
 	var reserve := ControllerActionBar.reserve(root_control)
 	menu_stage.get_parent().offset_bottom = -reserve
-	root_control.set_meta("controller_back", "Zurück" if page != &"home" else "")
+	root_control.set_meta("controller_back", "Zurück" if overlay or page != &"home" else "")
 	var extent := root_control.size - Vector2(0, reserve)
+	var margin := rows.get_parent() as MarginContainer
+	for edge in ["left", "right"]: margin.add_theme_constant_override("margin_" + edge, 8 if extent.x < 600 else 32)
+	var insets := build_panel.get_theme_stylebox("panel").get_minimum_size()
+	var content_height := rows.get_combined_minimum_size().y + margin.get_theme_constant("margin_top") + margin.get_theme_constant("margin_bottom")
+	legacy_scroll.custom_minimum_size.y = minf(content_height, maxf(64, extent.y - insets.y - 24))
 	if page == &"dentipedia":
 		return
 	if page == &"boss_details" and build_scroll != null:
@@ -340,6 +387,7 @@ func _update_build_layout() -> void:
 
 
 func _show_stats() -> void:
+	home_return_focus = &"build"
 	page = &"stats"
 	_clear_rows()
 	_build_navigation(&"stats")
@@ -360,6 +408,7 @@ func _show_stats() -> void:
 		boss_details.text = "Bossdetails"
 		boss_details.add_theme_color_override("font_color", DentiUIStyle.GOLD)
 		boss_details.pressed.connect(_show_boss_details)
+		ControllerFocus.tag(boss_details, "build:boss")
 		wallet.add_child(boss_details)
 	var grid := GridContainer.new()
 	grid.columns = 3
@@ -379,6 +428,9 @@ func _show_stats() -> void:
 		chip.add_theme_font_size_override("font_size", 14)
 		grid.add_child(chip)
 		chip.pressed.connect(func() -> void: DentiDentikon.open_attribute(chip, type))
+		ControllerFocus.tag(chip, "build:stat:%s" % type)
+		chip.set_meta("controller_info_only", true)
+		chip.set_meta("controller_details", func() -> void: chip.pressed.emit())
 	DentiUIComponents.label(rows, "Wurzeln · %d/%d" % [game.player.loadout.used_slots(), game.player.loadout.capacity], 16)
 	var weapon_scroll := ScrollContainer.new()
 	weapon_scroll.name = "WeaponScroll"
@@ -403,11 +455,15 @@ func _show_stats() -> void:
 		DentiUIStyle.style_card(chip, weapon.tier, WeaponPresentation.special_color(weapon.data))
 		weapons.add_child(chip)
 		chip.pressed.connect(_show_weapon_details.bind(weapon.data, weapon.tier, weapon))
+		ControllerFocus.tag(chip, "build:weapon:%s" % weapon.instance_uid)
+		chip.set_meta("controller_info_only", true)
+		chip.set_meta("controller_details", func() -> void: chip.pressed.emit())
 	_button("Zurück", _show_home, true)
 	_update_build_layout()
 
 
 func _show_boss_details() -> void:
+	build_return_focus = "build:boss"
 	page = &"boss_details"
 	_clear_rows()
 	_compact_title("Bossdetails")
@@ -425,18 +481,28 @@ func _show_boss_details() -> void:
 
 
 func _show_weapon_details(data: WeaponData, tier: int, weapon: WeaponInstance = null) -> void:
-	page = &"stats"
+	build_return_focus = "build:weapon:%s" % weapon.instance_uid if weapon != null else ""
+	page = &"weapon_details"
 	_clear_rows()
+	menu_stage.hide()
 	item_details = ShopDetails.new()
-	rows.add_child(item_details)
+	stage.present("Mein Build", item_details, "", 1000)
 	item_details.show_weapon(data, tier, game.player, true, [])
 	if weapon != null:
 		item_details.show_affixes(weapon, game.player.stats, game.items)
-	_button("Zurück", _show_stats, true)
 	_update_build_layout()
+
+func _restore_build_focus() -> void:
+	if not is_inside_tree() or not visible: return
+	for control in ControllerFocus.controls(root_control):
+		if str(control.get_meta("controller_focus_key", "")) == build_return_focus:
+			control.grab_focus()
+			ControllerFocus.reveal(control)
+			break
 
 
 func _show_items() -> void:
+	home_return_focus = &"build"
 	page = &"items"
 	_clear_rows()
 	_build_navigation(&"items")
@@ -483,6 +549,9 @@ func _show_items() -> void:
 			count.offset_right = -4
 			count.offset_bottom = -2
 			chip.pressed.connect(item_details.show_item.bind(entry, true))
+			ControllerFocus.tag(chip, "build:item:%s" % entry.get("id", entry.name))
+			chip.set_meta("controller_info_only", true)
+			chip.set_meta("controller_details", func() -> void: chip.pressed.emit())
 		item_details.show_item(owned[0], true)
 	_button("Zurück", _show_home, true)
 	_update_build_layout()

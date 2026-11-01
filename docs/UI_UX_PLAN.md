@@ -200,6 +200,10 @@ dabei erhalten; es wird keine neue Textschicht ins Kampfbild eingebaut.
 
 ## 7. Zustände, Navigation und Rückmeldung
 
+Ansichten und Detailfenster haben keine äußere Umrandung. Konturen kennzeichnen
+Karten, Bedienelemente und den Fokus; Hintergrundflächen und modale Abdunklung
+trennen die Ansichten.
+
 Controller-Prompts (31.10.2026): Tastenzeichen und kurze Aktionsnamen stehen als
 gemeinsame Paare in einer festen unteren Aktionsleiste. Sie haben eine gemeinsame
 Mittellinie, konsistente Größen und Abstände und eigenen reservierten Platz.
@@ -208,18 +212,22 @@ bleiben eigenständige visuelle Zustände; die Leiste nennt ausschließlich im
 aktuellen Kontext nutzbare Aktionen. Schalterrahmen schließen Text und Schalter
 mit Innenabstand ein; ein geparkter Mauszeiger erzeugt bei Controllerbedienung
 keinen zweiten Auswahlrahmen. Shopangebote bleiben ein Fokusziel: A/Kreuz kauft,
-Y/Dreieck merkt, RB/R1 öffnet optionale Details. Auf schmalen Bildschirmen darf
+Y/Dreieck merkt, RS/R3 öffnet optionale Details. Auf schmalen Bildschirmen darf
 die Leiste in lesbare Zeilen umbrechen. Siehe [Recherche und Umsetzung](CONTROLLER_SUPPORT.md#controller-modus).
 
-Bei aktiver Controller-Bedienung ersetzt die Leiste die Shop-Buttons für
-Würfeln, Verzaubern und Wellenstart. LB/L1 öffnet Verzaubern, RT/R2 startet die
-Welle nach einem frischen Triggerdruck. Würfelkosten bleiben in der Leiste
-sichtbar; gesperrte oder durch Modals verdeckte Aktionen bleiben gesperrt.
-Maus-, Touch- und Tastaturbedienung stellen die Bildschirm-Buttons wieder her.
-Auch beim Verzaubern ersetzt die Controller-Leiste die Footer-Buttons.
-Nur X/Quadrat bestätigt beziehungsweise beendet den Entwurf mit „Fertig“.
-B/Kreis verlässt die Effektauswahl oder schließt Details und bestätigt nie
-den Entwurf. Der frei gewordene Footer-Platz gehört dem Inhalt.
+Der Shop bleibt eine gemeinsame Vergleichsansicht mit Angeboten, Waffen und
+Stats. Es gibt keine getrennten Reiter. Der Stick bleibt zunächst in den
+Angeboten; LB/L1 führt gezielt zum sichtbaren Build, RB/R1 zurück. Beide
+Fokusgruppen merken ihre Position. Die Leiste ersetzt bei Controller-Bedienung
+die Shop-Buttons für Würfeln und Wellenstart, mit sichtbaren Kosten und Sperren.
+
+A/Kreuz führt die markierte Primäraktion aus, B/Kreis geht zurück, Menu/Options
+öffnet die zentrale Pause, RS/R3 zeigt überall Details. X/Quadrat bleibt Würfeln,
+Y/Dreieck ist Merken oder Rückgängig. RT/R2 schließt einen expliziten Arbeitsschritt
+ab und benötigt nach jedem Druck eine Freigabe; es trifft keine Pflichtwahl.
+Beim Verzaubern liegt Aufsteigen als reguläre Zeile vor den vier Effektplätzen.
+Die Effektauswahl ist abgeschlossen, und offene Entwürfe werden beim Zurückgehen
+weder stillschweigend bestätigt noch verworfen. Siehe [Bedienmodell](CONTROLLER_INTERACTION_PLAN.md).
 
 - Vor/Zurück und bereits besuchte Schritte behalten die Wahl. Der Schrittverlauf
   zeigt keine noch nicht existierende Klasse. Später wird der Klassenschritt

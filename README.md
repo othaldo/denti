@@ -2,7 +2,7 @@
 
 Ein kleiner 2D-Arena-Survivor über einen göttlichen Backenzahn, der Plaque, Zucker und Karies den Kampf ansagt. Du steuerst Denti direkt; seine Waffen greifen automatisch an. Zwischen den Wellen entscheiden Levelaufstiege und Einkäufe, wie der nächste Kampf läuft.
 
-**Aktuelle Version: 0.6.0.** Alle Änderungen seit 0.1 stehen in der [Patchnote-Historie](CHANGELOG.md).
+**Aktuelle Version: 0.7.0.** Alle Änderungen seit 0.1 stehen in der [Patchnote-Historie](CHANGELOG.md).
 
 GitHub Actions testet und baut **Web und Windows**. Testpakete stehen bei den
 [Actions-Läufen](https://github.com/othaldo/denti/actions) zum Download bereit;
@@ -57,7 +57,7 @@ Das Projekt mit **Godot 4.4 oder neuer** öffnen und mit **F5** starten. Unter L
 | F3 (Debug-Build) | Kampf-Telemetrie ein- und ausblenden |
 | F4 (lokaler Debug-Build) | Testmenü: Waffen, Items, Münzen, Stats und Wellen |
 | Maus | Waffen, Boni und Shopangebote wählen |
-| Controller | Linker Stick bewegt Denti; Steuerkreuz oder linker Stick navigieren Menüs. A / Kreuz bestätigt, B / Kreis geht zurück. RB / R1 löst den Dash aus, Menu / Options pausiert. X / Quadrat würfelt Angebote oder Level-Boni neu; Y / Dreieck öffnet Details in der Startauswahl. Rechter Stick scrollt Listen und Details. |
+| Controller | Linker Stick bewegt Denti; Steuerkreuz oder linker Stick navigieren Menüs. A / Kreuz bestätigt, B / Kreis geht zurück. RB / R1 löst den Dash aus, Menu / Options pausiert. X / Quadrat würfelt Angebote oder Level-Boni neu; RS / R3 zeigt Details. Y / Dreieck merkt Angebote oder nimmt Entwurfsänderungen zurück; RT / R2 schließt den aktuellen Arbeitsschritt ab. Rechter Stick scrollt Listen und Details. |
 | Touchscreen | Auf der freien Spielfläche ziehen und halten zum Bewegen. Nachziehen ändert die Richtung, Loslassen stoppt. Zweiter Finger auf Dash unten rechts für Wurzelsprung. Pause, Menüs und Shop per Tippen bedienen. |
 
 Unter **Einstellungen → Controller-Modus** lässt sich **Automatisch, Xbox, PlayStation oder Aus** speichern. Automatisch folgt dem bewusst verwendeten Gamepad; Xbox und PlayStation halten die jeweilige Anzeige fest. Aus deaktiviert Controller-Eingaben vollständig. Lenkräder und Simulator-Panels übernehmen nicht automatisch die Steuerung; nur das aktive Gamepad löst Spielaktionen aus. Verliert es während des Kampfes die Verbindung, öffnet sich die Pause; erneutes Verbinden setzt den Kampf nicht automatisch fort. [Controller-Steuerung und Prüfungen](docs/CONTROLLER_SUPPORT.md).
@@ -91,6 +91,8 @@ Ab Welle 8 kann in normalen Wellen höchstens ein **Goldzahn-Gauner** auftauchen
 - **Nachtklinik:** dunkle Spielansichten, große Objektbilder und kompakte Iconwerte. Hover erklärt Werte, Klick öffnet Details oder das Dentikon. Kurze Hover-, Klick-, Kauf- und Fusionsreaktionen laufen auch in der Shop-Pause. UI-Klänge und reduzierte Bewegung werden unter **Escape → Einstellungen** gespeichert; Kauf, Pins, Preisbindung, Vergleich, Verkauf und Fusion bleiben erhalten. [Gestaltung und Aufnahmen](docs/UI_ART_DIRECTION.md).
 
 Das Spiel ist ein **spielbarer Prototyp**. Balancing, Effekte und weitere Inhalte sind noch in Arbeit.
+
+**0.7.0** ergänzt Controller-Steuerung mit Xbox-/PlayStation-Symbolen, ein gemeinsames Tastenschema und gezielte Fokusführung in Shop, Verzaubern und Dentipedia. Einstellbare Controller-Modi schützen vor Eingaben angeschlossener Lenkräder und Simulator-Panels. Waffenmeisterschaften, gezielte Aufstiege ab Mk V und aktivere Bossangriffe bündeln die weiteren Änderungen seit 0.6.0. [Controller-Steuerung und Ansichten](docs/CONTROLLER_SUPPORT.md), [Waffenaufstiege](docs/WEAPON_ASCENSION.md) und [Patchnotes](CHANGELOG.md).
 
 **0.6.0** bringt gezielte Waffenpunkte mit Mk-abhängigen Effektplätzen, ein Element pro Waffe und manuelle Verzauberungsfusion mit Punkteerstattung. Alle 24 Waffen einschließlich Evolutionen besitzen sieben Formen sowie passende Elementangriffe und Einschläge. Überarbeitete Zahnseidenwaffen, schnellere Dashes mit festem Ausdauerregen und die aktualisierte Dentipedia ergänzen das Update. [Waffenverzauberung](docs/WEAPON_UPGRADES.md), [Waffenformen](docs/WEAPON_SKINS.md) und [Dentipedia](docs/DENTIPEDIA.md).
 
@@ -138,7 +140,7 @@ Unter Windows können die Tests mit dem Godot-Konsolenprogramm ausgeführt werde
 python tools/run_tests.py --godot Godot_v4.7.2-stable_win64_console.exe
 ```
 
-Der Runner benötigt Python 3.10+ (keine Zusatzpakete). Standardmäßig laufen 155 Tests für Spielfluss, Spielstände, Kampf, Balance, Shop und bedienbare UI. 15 zusätzliche Grafik-, Debug- und umfassende Boss-Routenprüfungen sind mit `--suite extended` gezielt aufrufbar; `--suite all --timeout 300` führt beide Gruppen aus. Normale CI-Builds verwenden die Kernprüfung, Release-Tags die vollständige Suite. Bis zu vier Tests laufen parallel, mit getrennten Godot-Benutzerdaten und unverändertem Simulationsschritt von 1/60 Sekunde. `--jobs 1` läuft seriell; `--filter 'weapon_*'` wählt innerhalb der Suite eine Teilmenge. Fehlercodes, `SCRIPT ERROR:`, Engine-`ERROR:`, Ressourcen-/Objektlecks und Zeitüberschreitungen lassen den Lauf fehlschlagen. Laufzeiten und Logs stehen unter `.godot/test_results.json` und `.godot/test_runs/`. [Auswahl, Befehle und Laufzeitvergleich](docs/TEST_RUNTIME.md).
+Der Runner benötigt Python 3.10+ (keine Zusatzpakete). Standardmäßig laufen 159 Tests für Spielfluss, Spielstände, Kampf, Balance, Shop und bedienbare UI. 15 zusätzliche Grafik-, Debug- und umfassende Boss-Routenprüfungen sind mit `--suite extended` gezielt aufrufbar; `--suite all --timeout 300` führt beide Gruppen aus. Normale CI-Builds verwenden die Kernprüfung, Release-Tags die vollständige Suite. Bis zu vier Tests laufen parallel, mit getrennten Godot-Benutzerdaten und unverändertem Simulationsschritt von 1/60 Sekunde. `--jobs 1` läuft seriell; `--filter 'weapon_*'` wählt innerhalb der Suite eine Teilmenge. Fehlercodes, `SCRIPT ERROR:`, Engine-`ERROR:`, Ressourcen-/Objektlecks und Zeitüberschreitungen lassen den Lauf fehlschlagen. Laufzeiten und Logs stehen unter `.godot/test_results.json` und `.godot/test_runs/`. [Auswahl, Befehle und Laufzeitvergleich](docs/TEST_RUNTIME.md).
 
 Eine Vorschau aller neuen Waffen im Shop und ihrer Effekte im Kampf erstellt
 `Godot_v4.7.2-stable_win64_console.exe --path . --script res://tools/preview_weapon_expansion.gd`

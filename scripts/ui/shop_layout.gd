@@ -112,6 +112,7 @@ static func build(view: ShopPanel) -> void:
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		view.offers_grid.add_child(card)
 		view.offer_buttons.append(card)
+		ControllerFocus.tag(card, "offer:%d" % index)
 		card.inspection_requested.connect(view._select.bind("offer", index))
 		card.purchase_requested.connect(func() -> void: view.buy_requested.emit(index))
 		card.reservation_requested.connect(func() -> void: view.reservation_requested.emit(index))
@@ -154,6 +155,9 @@ static func build(view: ShopPanel) -> void:
 			box.content_margin_bottom = 3
 		view.stat_grid.add_child(chip)
 		view.stat_chips.append(chip)
+		ControllerFocus.tag(chip, "stat:%s" % type)
+		chip.set_meta("controller_info_only", true)
+		chip.set_meta("controller_details", func() -> void: chip.pressed.emit())
 		chip.pressed.connect(func() -> void: DentiDentikon.open_attribute(chip, type))
 	view.amalgam_chip = Button.new()
 	view.amalgam_chip.visible = false
@@ -216,12 +220,13 @@ static func build(view: ShopPanel) -> void:
 	view.details.merge_button.pressed.connect(func() -> void: view.merge_requested.emit(view.selected_index))
 	view.details.evolution_requested.connect(func(id: StringName) -> void: view.evolution_requested.emit(view.selected_index, id))
 	view.details.sell_button.pressed.connect(view._confirm_sale)
+	view.details.enchant_button.pressed.connect(func() -> void: view.enchant_requested.emit(view.selected_uid))
 	view.details.confirm_button.pressed.connect(func() -> void: view.sell_requested.emit(view.selected_index))
 	view.details.cancel_button.pressed.connect(view._render_selection)
 	view.details.compare.item_selected.connect(view._compare)
 	view.detail_actions = BoxContainer.new()
 	view.detail_column.add_child(view.detail_actions)
-	for button in [view.details.merge_button, view.details.sell_button, view.details.confirm_button, view.details.cancel_button]:
+	for button in [view.details.merge_button, view.details.enchant_button, view.details.sell_button, view.details.confirm_button, view.details.cancel_button]:
 		button.reparent(view.detail_actions)
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.add_theme_font_size_override("font_size", 16)
@@ -258,7 +263,7 @@ static func build(view: ShopPanel) -> void:
 	view.enchant_button.size_flags_horizontal = Control.SIZE_SHRINK_END
 	view.enchant_button.size_flags_vertical = Control.SIZE_SHRINK_END
 	view.enchant_button.visible = false
-	view.enchant_button.pressed.connect(func() -> void: view.enchant_requested.emit())
+	view.enchant_button.pressed.connect(func() -> void: view.enchant_requested.emit(0))
 	view.continue_button = DentiUIComponents.button(actions, "Weiter", true)
 	view.continue_button.clip_text = true
 	view.continue_button.size_flags_horizontal = Control.SIZE_SHRINK_END

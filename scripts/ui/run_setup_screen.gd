@@ -85,6 +85,8 @@ func _ready() -> void:
 		current_difficulty = id
 		difficulty_chosen.emit(id))
 	difficulty_view.locked_requested.connect(_locked_details)
+	difficulty_view.details_requested.connect(func(title: String, description: String) -> void:
+		details.present(title, description, get_viewport().gui_get_focus_owner()))
 	weapon_view = WeaponSelection.new()
 	body.add_child(weapon_view)
 	weapon_view.selection_changed.connect(func() -> void:
@@ -124,7 +126,7 @@ func _ready() -> void:
 		if not visible: details.visible = false)
 	ControllerFocus.register(self, Callable(), 20)
 	ControllerPrompt.bind(back_button, &"ui_cancel", false)
-	ControllerPrompt.bind(confirm_button)
+	ControllerPrompt.bind(confirm_button, &"ui_confirm", false)
 	ControllerPrompt.bind(details_button, &"ui_details", false)
 	get_node("/root/GameInput").changed.connect(_sync_input_mode)
 	_sync_input_mode()
@@ -209,13 +211,19 @@ func confirm_selection() -> void:
 	chosen.emit(weapon)
 
 func show_details() -> void:
+	var source := get_viewport().gui_get_focus_owner()
+	if not ControllerFocus.contains(self, source): source = details_button
+	if source.has_meta("controller_details"):
+		var inspect: Callable = source.get_meta("controller_details")
+		inspect.call()
+		return
 	if current_step == &"difficulty":
 		var data := DifficultyCatalog.by_id(current_difficulty)
-		details.present(data.display_name, data.description, details_button)
+		details.present(data.display_name, data.description, source)
 	else:
 		var weapon := weapon_view.selected_weapon()
 		if weapon == null: return
-		details.present(weapon.display_name, RunSetupPresentation.details(weapon), details_button)
+		details.present(weapon.display_name, RunSetupPresentation.details(weapon), source)
 
 func _locked_details(id: StringName) -> void:
 	details.present(DifficultyCatalog.by_id(id).display_name, "Ein Sieg auf Hard schaltet Hell frei.", difficulty_view.buttons[id])
@@ -246,6 +254,10 @@ func _sync_input_mode() -> void:
 	_layout.call_deferred()
 
 func _unhandled_input(event: InputEvent) -> void:
+	if is_visible_in_tree() and ControllerFocus.active(self) and not details.visible and event.is_action_pressed("ui_confirm") and not confirm_button.disabled:
+		confirm_selection()
+		get_viewport().set_input_as_handled()
+		return
 	if is_visible_in_tree() and ControllerFocus.active(self) and not details.visible and event.is_action_pressed("ui_details") and not details_button.disabled:
 		show_details()
 		get_viewport().set_input_as_handled()

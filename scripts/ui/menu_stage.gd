@@ -60,6 +60,10 @@ func present(title: String, view: Control, footer_text: String = "", width: floa
 		body_scroll.remove_child(content)
 		content.queue_free()
 	content = view
+	if view.has_method("controller_shortcuts"):
+		set_meta("controller_shortcuts", Callable(view, "controller_shortcuts"))
+	elif has_meta("controller_shortcuts"):
+		remove_meta("controller_shortcuts")
 	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	content.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	body_scroll.add_child(content)

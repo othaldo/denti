@@ -2,7 +2,21 @@
 
 Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü angezeigt. 0.1.0 wurde rückblickend anhand der Git-Historie dokumentiert; 0.2.0 bündelt die seitdem entstandenen Änderungen. Die Einträge beschreiben implementierte Funktionen. Weitere Pläne stehen in der [Roadmap](docs/ROADMAP.md).
 
-## Noch ohne neue Versionsnummer — 27.10.2026
+## 0.7.0 — 01.11.2026
+
+- **Controller-Steuerung:** Bewegung, Dash und Menüs mit Xbox- und PlayStation-Symbolen. Eine gemeinsame Aktionsleiste verwendet A/Kreuz für die Primäraktion, B/Kreis für Zurück, Menu/Options für Pause und RS/R3 für Details. X/Quadrat würfelt, Y/Dreieck merkt oder macht rückgängig und RT/R2 schließt einen Arbeitsschritt ab. Gehaltene Tasten und Trigger bestätigen keine folgende Ansicht automatisch. [Bedienung und geprüfte Ansichten](docs/CONTROLLER_SUPPORT.md).
+
+- **Controller-Modus wählbar:** Automatisch, Xbox, PlayStation oder Aus. Bewusste Eingaben aktivieren ein geeignetes Gamepad; Lenkräder, Pedale und Simulator-Panels übernehmen weder Symbole noch Steuerung. Totzonen, Neutralstellung und Gerätebindung verhindern flackernde Eingabeanzeigen und Eingriffe anderer Geräte. Die Symbolfamilie lässt sich unabhängig von der Mausbedienung festlegen.
+
+- **Shop als gemeinsame Vergleichsansicht:** Angebote, Waffen und Stats bleiben zusammen sichtbar. Jede Angebotskarte ist ein Fokusziel zum Kaufen, Merken und Nachschlagen. L1/LB und R1/RB wechseln den Fokus zwischen Build und Angeboten; nach einem Kauf bleibt er beim nächsten verfügbaren Angebot. Waffenaktionen öffnen am gewählten Exemplar. Doppelte Shop-Buttons entfallen bei Controller-Bedienung.
+
+- **Verzaubern und Fusion gezielt bedienen:** Schultertasten wechseln Waffen; die Verzauberungsübersicht führt vertikal über Aufsteigen und die vier Effektplätze. Auch Mk V und weitere Stufen sind regulär erreichbar. Die Effektauswahl bleibt im eigenen Raster. RT/R2 übernimmt den angezeigten Abschluss, offene Entwürfe verlangen beim Zurückgehen eine ausdrückliche Entscheidung. Fusion, Pflichtbelohnungen, Details und Pause beachten dieselben Modalgrenzen.
+
+- **Fokus in den übrigen Ansichten:** R3 zeigt Informationen zur fokussierten Startwaffe, Schwierigkeit, Meisterschaft oder Belohnung. Dentipedia-Tabs wechseln über L1/R1 beziehungsweise LB/RB und merken ihren Eintrag. Kleine Build-/Itemansichten scrollen mit dem Fokus. Pause erhält Ansicht und Entwurf und hält Dialogtext und Kapitelreise an. Äußere View-Umrandungen entfallen; Karten, Buttons und Fokus behalten ihre Konturen. [Aktuelle Aufnahmen in 16:9](docs/screenshots/16x9/).
+
+- **Aufstiege besser vergleichen:** Auswahlkarten zeigen den resultierenden Attributwert und berücksichtigen Obergrenzen. Gespeicherte Upgrade-Kapseln bleiben bei Änderungen der Ausrüstung stabil bedienbar.
+
+- **Lesbare Vergleichspfeile:** Die mitgelieferte Ersatzschrift Arimo ergänzt fehlende Zeichen in Fredoka. Level-up-Vorschauen zeigen ihren Pfeil auch im Web und ohne installierte Systemschrift korrekt.
 
 - **Mk V und höher gezielt kaufen:** Ab Mk IV bietet Verzaubern den Waffenaufstieg gegen Punkte und Gold. Kosten steigen je Stufe und Wurzel; Endlos skaliert den Goldanteil. Gemeinsame Vorschau, Rückgängig, kompatibles Fortsetzen und budgettreue Vererbung bei Evolutionen. [Preise, native Ansichten und Nachschub-Prognose](docs/WEAPON_ASCENSION.md).
 

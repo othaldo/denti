@@ -123,6 +123,7 @@ func show_action(action_name: String, accent: bool = false) -> void:
 	_kind = &"action"
 	card_body.hide()
 	text = action_name
+	set_meta("controller_action_label", action_name)
 	custom_minimum_size = Vector2(0, 48)
 	MenuStyle.action(self, accent)
 
@@ -216,6 +217,8 @@ func _label(color: Color) -> Label:
 
 
 func _restore_standard_content() -> void:
+	for key in ["controller_details", "controller_action_label"]:
+		if has_meta(key): remove_meta(key)
 	_ensure_content()
 	if icon_rect.get_parent() != card_body:
 		icon_rect.reparent(card_body)
@@ -258,6 +261,8 @@ func _set_rarity(tier: int, caption: String = "") -> void:
 
 
 func _finish_content() -> void:
+	set_meta("controller_action_label", "Behalten" if _kind == &"item" else "Wählen")
+	set_meta("controller_details", func() -> void: DentiDentikon.open(self, _name_source, tooltip_text, icon_rect.texture))
 	name_label.text = _name_source
 	effect_label.text = _effect_source
 	_wrapped_name = _name_source

@@ -90,6 +90,7 @@ func present(state: StoryProgress) -> void:
 func _process(delta: float) -> void:
 	if not visible or progress == null or progress.travel_progress >= 1:
 		return
+	if not ControllerFocus.active(root_control): return
 	progress.travel_progress = minf(1, progress.travel_progress + delta / DURATION) if DentiUIMotion.enabled(root_control) else 1.0
 	_render()
 	if progress.travel_progress >= 1:

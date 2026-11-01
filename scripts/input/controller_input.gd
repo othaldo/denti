@@ -22,6 +22,7 @@ var last_controller_ms := -1000
 var last_pointer_ms := -1000
 var pointer_started_ms := -1000
 var pointer_travel := Vector2.ZERO
+var pause_menu: WeakRef
 # Platform metadata is kept separate from event routing (also used by fixtures).
 var device_info_provider: Callable = _read_device_info
 
@@ -80,6 +81,18 @@ func _read_device_info(device: int) -> Dictionary:
 	var info := Input.get_joy_info(device)
 	return {"name": Input.get_joy_name(device), "vendor_id": int(info.get("vendor_id", 0)), "mapped": Input.is_joy_known(device)}
 
+func pause_available() -> bool:
+	var menu: Node = pause_menu.get_ref() if pause_menu != null else null
+	return menu != null and menu.game != null and not menu.game.ended
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not navigation_active or not event.is_action_pressed("ui_details"): return
+	var focus := get_viewport().gui_get_focus_owner()
+	if focus != null and focus.has_meta("controller_details"):
+		var inspect: Callable = focus.get_meta("controller_details")
+		inspect.call()
+		get_viewport().set_input_as_handled()
+
 func _input(event: InputEvent) -> void:
 	if event is InputEventJoypadButton or event is InputEventJoypadMotion:
 		_joy_input(event)
@@ -96,30 +109,30 @@ func _input(event: InputEvent) -> void:
 		_set_mode(false, false)
 	if navigation_active: navigation.ensure_focus()
 
-func _joy_input(event: InputEvent) -> void:
+func _joy_input(event: InputEvent) -> bool:
 	if mode() == SessionSettings.ControllerMode.DISABLED or (controller_device >= 0 and event.device != controller_device):
 		get_viewport().set_input_as_handled()
-		return
+		return true
 	if controller_device < 0 and not _eligible(event.device):
 		get_viewport().set_input_as_handled()
-		return
+		return true
 	var deliberate := false
 	if event is InputEventJoypadMotion:
 		if event.axis not in [JOY_AXIS_LEFT_X, JOY_AXIS_LEFT_Y, JOY_AXIS_RIGHT_Y, JOY_AXIS_TRIGGER_RIGHT]:
 			get_viewport().set_input_as_handled()
-			return
+			return true
 		var key := Vector2i(event.device, event.axis)
 		if event.axis == JOY_AXIS_TRIGGER_RIGHT:
 			# A trigger is a press, not a repeating analog direction. It must be
 			# released before another wave can start, including across shop visits.
 			if absf(event.axis_value) <= NEUTRAL_THRESHOLD:
 				neutral_axes[key] = true
-			elif event.axis_value > InputMap.action_get_deadzone(&"ui_next_wave") and bool(neutral_axes.get(key, false)):
+			elif event.axis_value > InputMap.action_get_deadzone(&"ui_confirm") and bool(neutral_axes.get(key, false)):
 				neutral_axes[key] = false
 				deliberate = true
 			if not deliberate:
 				get_viewport().set_input_as_handled()
-				return
+				return true
 		elif absf(event.axis_value) <= NEUTRAL_THRESHOLD:
 			neutral_axes[key] = true
 		elif absf(event.axis_value) >= SWITCH_THRESHOLD and bool(neutral_axes.get(key, false)):
@@ -128,14 +141,14 @@ func _joy_input(event: InputEvent) -> void:
 	if event is InputEventJoypadButton:
 		if not bindings.uses_button(event.button_index):
 			get_viewport().set_input_as_handled()
-			return
+			return true
 		var key := Vector2i(event.device, event.button_index)
 		if not event.pressed:
 			held_buttons.erase(key)
-			return
+			return false
 		if held_buttons.has(key):
 			get_viewport().set_input_as_handled()
-			return
+			return true
 		deliberate = true
 	# Replay the acquiring event once after rebinding. This updates Godot's global
 	# action state and delivers that first button press to native GUI controls.
@@ -145,18 +158,25 @@ func _joy_input(event: InputEvent) -> void:
 			neutral_axes[Vector2i(event.device, event.axis)] = true
 		Input.parse_input_event(event.duplicate())
 		get_viewport().set_input_as_handled()
-		return
+		return true
 	if controller_device < 0:
 		get_viewport().set_input_as_handled()
-		return
+		return true
 	if event is InputEventJoypadButton:
 		var key := Vector2i(event.device, event.button_index)
 		held_buttons[key] = true
 	if deliberate:
 		last_controller_ms = Time.get_ticks_msec()
 		_set_mode(true, true)
+	if event.is_action_pressed("pause") and pause_available():
+		var menu: Node = pause_menu.get_ref()
+		if menu.visible: menu.close_pause()
+		else: menu.open_pause()
+		get_viewport().set_input_as_handled()
+		return true
 	if navigation_active: navigation.ensure_focus()
 	if controller_active: navigation.handle_event(event)
+	return false
 
 func _deliberate_pointer(event: InputEventMouseMotion) -> bool:
 	if event.relative.length() < 1.0 or Time.get_ticks_msec() - last_controller_ms < ANALOG_SWITCH_COOLDOWN_MS: return false

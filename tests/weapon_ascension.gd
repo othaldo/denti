@@ -134,7 +134,10 @@ func _real_flow(session: Node) -> void:
 	game._advance_post_wave_rewards()
 	await _settle()
 	var panel: WeaponEnchantmentPanel = game.weapon_enchantment_panel
-	_check(not panel.ascension_button.disabled and panel.ascension_button.text.contains("120 Gold"), "real purchase does not show the two-root quote")
+	var quote := ""
+	for label in panel.ascension_button.get_children():
+		if label is Label: quote += label.text + " "
+	_check(not panel.ascension_button.disabled and quote.contains("120 Gold"), "real purchase does not show the two-root quote")
 	await _click(panel.ascension_button)
 	_check(game.coins == 300 and game.rewards.weapon_upgrades.points == 12 and game.rewards.weapon_upgrades.remaining() == 6 and WeaponAscension.level(game.player.loadout.equipped()[0].data) == 0, "native click spent resources before confirmation")
 	await _click(panel.back_button)

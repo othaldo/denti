@@ -20,6 +20,8 @@ func show_entries(entries: Array[Dictionary], player: Player, used_slots: int, c
 		var button := DentiUIComponents.button(slot, "")
 		DentiUIStyle.style_card(button, int(entry.tier), WeaponPresentation.special_color(data))
 		button.set_meta("hands", int(entry.get("hands", 1)))
+		button.set_meta("controller_action_label", "Aktionen")
+		button.set_meta("weapon_label", data.display_name if data != null else str(entry.name))
 		var icon := TextureRect.new()
 		icon.name = "WeaponIcon"
 		icon.texture = entry.get("icon")
@@ -107,6 +109,7 @@ func layout_slots(width: float, columns: int, slot_height: float) -> float:
 	columns = maxi(widest, mini(columns, floori((width + gap) / (minimum_unit + gap))))
 	var unit := floorf((width - gap * (columns - 1)) / columns)
 	var occupied: Array[bool] = []
+	var controller: bool = is_inside_tree() and get_node("/root/GameInput").controller_active
 	for slot in get_children():
 		var button: Button = slot.get_child(0)
 		var roots := maxi(int(button.get_meta("hands", 1)), 1)
@@ -130,6 +133,43 @@ func layout_slots(width: float, columns: int, slot_height: float) -> float:
 		var desired := Vector2(unit * roots + gap * (roots - 1), slot_height)
 		button.custom_minimum_size = desired
 		slot.size = desired
+		var icon := button.get_node_or_null("WeaponIcon") as TextureRect
+		if icon != null:
+			icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+			icon.offset_left = 6
+			icon.offset_top = 6
+			icon.offset_right = -6
+			icon.offset_bottom = -6
+			var label := button.get_node_or_null("WeaponName") as Label
+			if controller:
+				if label == null:
+					label = Label.new()
+					label.name = "WeaponName"
+					label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+					label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+					label.clip_text = true
+					label.add_theme_font_size_override("font_size", 13)
+					button.add_child(label)
+				label.text = str(button.get_meta("weapon_label", ""))
+				label.position = Vector2(36, 3)
+				label.size = Vector2(maxf(1, desired.x - 42), 19)
+				icon.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+				icon.position = Vector2(6, 6)
+				icon.size = Vector2(24, slot_height - 12)
+			if label != null: label.visible = controller
+			var tier: Label = button.get_node("WeaponTier")
+			if controller:
+				tier.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+				tier.position = Vector2(36, 24)
+				tier.size = Vector2(maxf(1, desired.x - 42), 16)
+				tier.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+			else:
+				tier.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+				tier.offset_left = -51
+				tier.offset_top = -27
+				tier.offset_right = -5
+				tier.offset_bottom = -3
+				tier.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	var height := maxf(ceili(float(occupied.size()) / columns) * (slot_height + gap) - gap, 0)
 	custom_minimum_size = Vector2(0, height)
 	return height + 4

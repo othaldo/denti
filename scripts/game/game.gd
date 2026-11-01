@@ -150,6 +150,7 @@ func _ready() -> void:
 	weapon_enchantment_panel.ascension_requested.connect(_on_weapon_ascension_requested)
 	weapon_enchantment_panel.undo_requested.connect(_on_weapon_upgrade_undo)
 	weapon_enchantment_panel.completed.connect(_on_weapon_upgrades_completed)
+	weapon_enchantment_panel.cancelled.connect(_on_weapon_upgrades_cancelled)
 	weapon_fusion_panel = WeaponFusionPanel.new()
 	add_child(weapon_fusion_panel)
 	weapon_fusion_panel.confirmed.connect(_on_fusion_confirmed)
@@ -332,7 +333,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		hud.toggle_telemetry()
 		get_viewport().set_input_as_handled()
 		return
-	if event.is_action_pressed("pause") and run_flow.is_combat() and not game_menu.visible:
+	if event.is_action_pressed("pause") and not ended and not game_menu.visible:
 		get_viewport().set_input_as_handled()
 		game_menu.open_pause()
 
@@ -772,6 +773,12 @@ func _on_weapon_upgrades_completed() -> void:
 	weapon_enchantment_panel.hide()
 	_advance_post_wave_rewards()
 
+func _on_weapon_upgrades_cancelled() -> void:
+	if not weapon_enchantment_panel.visible or (not in_shop and rewards.step != PostWaveRewards.Step.WEAPONS): return
+	rewards.weapon_upgrades.actions.clear()
+	rewards.weapon_upgrades.cursor.clear()
+	_on_weapon_upgrades_completed()
+
 
 func _on_affix_chosen(uid: String, option_index: int, replace: int) -> void:
 	var chest := rewards.current_chest()
@@ -1097,11 +1104,14 @@ func _on_fusion_confirmed(plan: WeaponFusionPlan) -> void:
 	if plan.refund() > 0: _on_shop_enchant()
 
 
-func _on_shop_enchant() -> void:
+func _on_shop_enchant(uid: int = 0) -> void:
 	if not in_shop or weapon_fusion_panel.visible: return
 	if rewards.weapon_upgrades.points <= 0 and not player.loadout.equipped().any(func(weapon: WeaponInstance) -> bool: return weapon.tier >= WeaponLoadout.MAX_TIER): return
 	shop_panel.close_details()
 	shop_panel.hide()
+	if uid != 0:
+		for weapon in player.loadout.equipped():
+			if weapon.get_instance_id() == uid: rewards.weapon_upgrades.cursor = {"target_uid": weapon.instance_uid}
 	weapon_enchantment_panel.show_upgrades(rewards.weapon_upgrades, player.loadout, player.stats, items, rewards.upgrade_income, coins, wave.current_wave)
 
 

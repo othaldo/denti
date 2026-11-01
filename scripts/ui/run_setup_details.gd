@@ -17,7 +17,7 @@ func _ready() -> void:
 	shade.color = Color(0.04, 0.02, 0.06, 0.8)
 	add_child(shade)
 	panel = Panel.new()
-	panel.add_theme_stylebox_override("panel", RunSetupStyle.box(DentiUIStyle.PANEL, DentiUIStyle.LINE, 22, 1))
+	panel.add_theme_stylebox_override("panel", RunSetupStyle.box(DentiUIStyle.PANEL, Color.TRANSPARENT, 22, 0))
 	add_child(panel)
 	heading = Label.new()
 	heading.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -63,7 +63,7 @@ func dismiss() -> void:
 	closed.emit()
 
 func _input(event: InputEvent) -> void:
-	if not is_visible_in_tree(): return
+	if not is_visible_in_tree() or not ControllerFocus.active(self): return
 	if event.is_action_pressed("ui_cancel"):
 		dismiss()
 		get_viewport().set_input_as_handled()

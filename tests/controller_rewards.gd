@@ -78,6 +78,8 @@ func _run() -> void:
 	capsule.buttons[0].grab_focus()
 	await _joy(JOY_BUTTON_A)
 	_check(not capsule.visible and game.shop_panel.visible, "capsule choice did not advance to the shop")
+	game.shop_panel.controller_focus.change(-1)
+	await _settle()
 	var stat := game.shop_panel.stat_chips[0] as Button
 	stat.grab_focus()
 	await _joy(JOY_BUTTON_A)
@@ -92,6 +94,8 @@ func _run() -> void:
 		{"id": "magic_toothbrush", "tier": 1, "affixes": [{"id": "fire", "level": 7, "damage": 1.0}]},
 		{"id": "magic_toothbrush", "tier": 1, "affixes": [{"id": "fire", "level": 6, "damage": 1.0}]}])
 	game._update_shop_panel()
+	await _settle()
+	game.shop_panel.controller_focus.change(-1)
 	await _settle()
 	game.shop_panel.inventory_row.get_child(0).get_child(0).grab_focus()
 	await _joy(JOY_BUTTON_A)

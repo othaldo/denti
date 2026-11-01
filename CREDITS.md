@@ -4,6 +4,8 @@
 
 **Fredoka** — The Fredoka Project Authors. Bezogen aus dem [Google-Fonts-Repository](https://github.com/google/fonts/tree/main/ofl/fredoka). Veröffentlicht unter der **SIL Open Font License 1.1**; der vollständige Lizenztext liegt in [`assets/ui/Fredoka-OFL.txt`](assets/ui/Fredoka-OFL.txt).
 
+**Arimo** — The Arimo Project Authors, Design Steve Matteson. Ergänzt fehlende Pfeile und mathematische Zeichen in Fredoka, auch ohne installierte Systemschriften. Bezogen aus dem [Google-Fonts-Repository](https://github.com/google/fonts/tree/main/ofl/arimo), unverändert unter der **SIL Open Font License 1.1**; Lizenztext: [`assets/ui/Arimo-OFL.txt`](assets/ui/Arimo-OFL.txt).
+
 ## Grafiken und UI
 
 - Denti basiert auf den vorhandenen Referenzbildern unter `assets/denti/reference/`.

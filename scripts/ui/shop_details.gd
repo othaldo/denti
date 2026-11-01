@@ -11,6 +11,7 @@ var compare: OptionButton
 var compare_text: Label
 var action_hint: Label
 var sell_button: Button
+var enchant_button: Button
 var merge_button: Button
 var confirm_button: Button
 var cancel_button: Button
@@ -70,6 +71,7 @@ func _ready() -> void:
 	compare_text = DentiUIComponents.label(self, "", 15)
 	action_hint = DentiUIComponents.label(self, "", 16)
 	merge_button = _button("Fusionieren", true)
+	enchant_button = _button("Verzaubern")
 	sell_button = _button("Verkaufen")
 	confirm_button = _button("Verkauf bestätigen")
 	cancel_button = _button("Abbrechen")
@@ -80,7 +82,7 @@ func show_weapon(data: WeaponData, tier: int, player: Player, equipped: bool, eq
 	clear_actions()
 	heading.text = data.display_name + " · " + WeaponPresentation.tier_text(data, tier)
 	icon.texture = data.sprite
-	subtitle.text = "%s · %s · %s · %s" % ["Ausgerüstet" if equipped else "Angebot", WeaponPresentation.tier_text(data, tier), data.roots_text(), data.damage_type_label()]
+	subtitle.text = "%s · %s · %s" % ["Ausgerüstet" if equipped else "Angebot", data.roots_text(), data.damage_type_label()]
 	subtitle.add_theme_color_override("font_color", WeaponPresentation.EVOLUTION_COLOR if data.evolution_kind != &"" else DentiUIStyle.INK)
 	if data.evolution_kind != &"":
 		subtitle.text = "Evolution · %s · %s · %s" % [WeaponPresentation.tier_text(data, tier), data.roots_text(), data.damage_type_label()]
@@ -147,7 +149,7 @@ func clear_actions() -> void:
 	if evolution_options != null:
 		for child in evolution_options.get_children():
 			child.free()
-	for button in [sell_button, merge_button, confirm_button, cancel_button]:
+	for button in [sell_button, merge_button, enchant_button, confirm_button, cancel_button]:
 		button.visible = false
 	action_hint.text = ""
 	action_hint.visible = false
@@ -224,6 +226,8 @@ func _terms(text: String) -> void:
 		link.add_theme_font_size_override("font_size", 13)
 		terms_row.add_child(link)
 		link.pressed.connect(func() -> void: DentiDentikon.open_term(link, term))
+		link.set_meta("controller_info_only", true)
+		link.set_meta("controller_details", func() -> void: link.pressed.emit())
 
 
 func _clear_values() -> void:

@@ -45,7 +45,8 @@ func _ready() -> void:
 	stage.layout_changed.connect(_layout)
 	stage.present("Waffen fusionieren", body)
 	ControllerPrompt.bind(cancel_button, &"ui_cancel", false)
-	ControllerPrompt.bind(confirm_button)
+	ControllerPrompt.bind(confirm_button, &"ui_confirm", false)
+	get_node("/root/GameInput").changed.connect(_sync_input_mode)
 
 
 func show_plan(value: WeaponFusionPlan) -> void:
@@ -65,9 +66,18 @@ func _cancel() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if visible and event.is_action_pressed("ui_cancel"):
+	if not visible or not ControllerFocus.active(stage): return
+	if event.is_action_pressed("ui_cancel"):
 		_cancel()
 		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("ui_confirm"):
+		if plan != null and plan.valid(): confirmed.emit(plan)
+		get_viewport().set_input_as_handled()
+
+func _sync_input_mode() -> void:
+	var controller: bool = get_node("/root/GameInput").controller_active
+	for button in slot_buttons:
+		button.focus_mode = Control.FOCUS_NONE if controller else Control.FOCUS_ALL
 
 
 func toggle(id: StringName) -> void:
@@ -151,6 +161,7 @@ func _layout(extent: Vector2) -> void:
 		button.tooltip_text = ("Alle %d Plätze belegt\n" % WeaponUpgrades.slots(plan.tier) if button.disabled else "") + AffixPresentation.effect_description(id)
 		button.pressed.connect(toggle.bind(id))
 		ControllerFocus.tag(button, "fusion:%s" % id)
+		button.set_meta("controller_details", func() -> void: DentiDentikon.open(button, definition.display_name, button.tooltip_text, DentiUIIcons.item(definition.icon_index)))
 		effect_buttons.append(button)
 	var bottom := y + ceili(float(plan.candidates.size()) / columns) * 58
 	body.custom_minimum_size.y = maxf(212 if short_layout else top + hero_height + 24, bottom + 8)
@@ -159,6 +170,7 @@ func _layout(extent: Vector2) -> void:
 	refund_label.add_theme_font_size_override("font_size", 13 if compact else 17)
 	refund_label.tooltip_text = "Wurzelkosten bestimmen die übernommenen Ränge. Nicht übernommene Punkte werden vollständig erstattet."
 	confirm_button.disabled = not plan.valid()
+	_sync_input_mode()
 	stage.refresh_focus()
 
 

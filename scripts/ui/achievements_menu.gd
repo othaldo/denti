@@ -82,6 +82,9 @@ func _rebuild() -> void:
 		card.flags = flags
 		grid.add_child(card)
 		card.pressed.connect(func() -> void: inspect_requested.emit(card.data, card.flags, card))
+		ControllerFocus.tag(card, "mastery:%s" % data.id)
+		card.set_meta("controller_info_only", true)
+		card.set_meta("controller_details", func() -> void: card.pressed.emit())
 		cards.append(card)
 	empty_label.visible = cards.is_empty()
 	layout_in(size if size.x > 0 else available)

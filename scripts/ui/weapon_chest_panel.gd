@@ -129,6 +129,7 @@ func show_chest(chest: Dictionary, loadout: WeaponLoadout, player_stats: PlayerS
 		button.set_meta("art", button.artwork)
 		button.pressed.connect(_select_weapon.bind(index))
 		ControllerFocus.tag(button, "weapon:%s" % weapon.instance_uid)
+		button.set_meta("controller_details", func() -> void: DentiDentikon.open(button, WeaponPresentation.weapon_name(weapon), button.tooltip_text, RunSetupPresentation.weapon_icon(weapon.data)))
 		weapon_buttons.append(button)
 		if weapon.instance_uid == str(chest.get("target_uid", "")):
 			selected = index
@@ -221,6 +222,7 @@ func _select_weapon(index: int, reset_replace: bool = true) -> void:
 		button.set_meta("text_rows", text_rows)
 		button.set_meta("effect_source", effect.text)
 		button.set_meta("rarity_source", rarity.text)
+		button.set_meta("controller_details", func() -> void: DentiDentikon.open(button, data.display_name, AffixPresentation.effect_description(data.id), DentiUIIcons.item(data.icon_index)))
 		button.pressed.connect(func() -> void:
 			reward["replace"] = affix_index
 			_refresh_cards()

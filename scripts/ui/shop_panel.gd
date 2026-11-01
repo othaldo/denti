@@ -11,7 +11,7 @@ signal buy_requested(index: int)
 signal sell_requested(index: int)
 signal merge_requested(index: int)
 signal evolution_requested(index: int, recipe_id: StringName)
-signal enchant_requested
+signal enchant_requested(uid: int)
 signal reroll_requested
 signal reservation_requested(index: int)
 signal continue_requested
@@ -76,16 +76,17 @@ var displayed_wave: int = 0
 var details_first_layout := false
 var enchant_available := false
 var block_controller_accept := false
+var controller_focus: ShopControllerFocus
+var information_only := false
 
 func _ready() -> void:
 	ShopLayout.build(self)
+	controller_focus = ShopControllerFocus.new(self)
 	ControllerFocus.register($Root, _default_focus)
 	ControllerFocus.register(detail_popup, func() -> Control: return details.close_button, 100)
 	ControllerPrompt.bind(reroll_button, &"ui_reroll", false)
-	ControllerPrompt.bind(enchant_button, &"ui_enchant", false)
-	ControllerPrompt.bind(continue_button, &"ui_next_wave", false)
+	ControllerPrompt.bind(continue_button, &"ui_confirm", false)
 	ControllerPrompt.bind(details.close_button, &"ui_cancel", false)
-	$Root.set_meta("controller_back", "Pause")
 	$Root.set_meta("controller_bar_context", true)
 	$Root.set_meta("controller_shortcuts", _controller_shortcuts)
 	get_node("/root/GameInput").changed.connect(_sync_input_mode)
@@ -96,12 +97,16 @@ func _controller_shortcuts() -> Dictionary:
 	var result := {}
 	if not visible or expanded: return result
 	if not reroll_button.disabled: result[&"ui_reroll"] = "Würfeln · %s" % reroll_button.text
-	if enchant_available and not enchant_button.disabled: result[&"ui_enchant"] = "Verzaubern"
-	if not continue_button.disabled: result[&"ui_next_wave"] = "Welle starten"
+	if not continue_button.disabled: result[&"ui_confirm"] = "Welle starten"
+	if controller_focus.area == ShopControllerFocus.Area.OFFERS: result[&"ui_previous"] = "Mein Build"
+	else: result[&"ui_next"] = "Angebote"
+	var focus := get_viewport().gui_get_focus_owner()
+	if focus != null and focus != controller_focus.empty: result[&"ui_details"] = "Details"
 	return result
 
 func _sync_input_mode() -> void:
 	_sync_action_buttons()
+	controller_focus.sync()
 	_queue_layout()
 	if visible and get_node("/root/GameInput").navigation_active:
 		get_node("/root/GameInput").navigation.ensure_focus.call_deferred()
@@ -125,6 +130,7 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 func _default_focus() -> Control:
+	if controller_focus != null and controller_focus.active(): return controller_focus.preferred()
 	for button in offer_buttons:
 		if ControllerFocus.available(button): return button
 	return continue_button
@@ -170,12 +176,13 @@ func _update_layout() -> void:
 	if offer_scroll == null or not is_inside_tree() or is_queued_for_deletion():
 		return
 	var extent := ControllerActionBar.content_rect($Root, Rect2(Vector2.ZERO, $Root.size)).size
+	controller_focus.sync()
 	$Root/Center.offset_bottom = -ControllerActionBar.reserve($Root)
 	var narrow := extent.x < 600
 	var short := extent.y < 700
 	rows.add_theme_constant_override("separation", 8 if short else 12)
 	shop_actions.vertical = narrow and extent.y >= 480
-	detail_actions.vertical = narrow and extent.y >= 480
+	detail_actions.vertical = extent.x < 420
 	reroll_button.custom_minimum_size = Vector2(72, 40)
 	reroll_button.add_theme_font_size_override("font_size", 14)
 	continue_button.custom_minimum_size = Vector2(148, 44)
@@ -194,7 +201,7 @@ func _update_layout() -> void:
 	amalgam_chip.custom_minimum_size.y = 30 if short or dense_layout else 34
 	flow.vertical = not side_by_side
 	details.heading.add_theme_font_size_override("font_size", 17 if narrow else 21)
-	details.icon.custom_minimum_size = Vector2(48, 48) if narrow else Vector2(64, 64)
+	details.icon.custom_minimum_size = Vector2(32, 40) if extent.x < 420 else Vector2(64, 64)
 	left_scroll.custom_minimum_size.x = 280 if side_by_side else 0
 	left_scroll.size_flags_horizontal = Control.SIZE_FILL if side_by_side else Control.SIZE_EXPAND_FILL
 	left_scroll.size_flags_vertical = Control.SIZE_SHRINK_BEGIN if compact else Control.SIZE_EXPAND_FILL
@@ -361,11 +368,13 @@ func present(model: ShopViewData) -> void:
 	if not visible:
 		DentiUIMotion.reveal($Root/Center/Panel)
 	visible = true
+	controller_focus.sync()
 	_queue_layout()
 	if get_node("/root/GameInput").navigation_active:
 		get_node("/root/GameInput").navigation.ensure_focus.call_deferred()
 
-func _select(kind: String, index: int) -> void:
+func _select(kind: String, index: int, info_only: bool = false) -> void:
+	information_only = info_only
 	details_first_layout = true
 	expanded = true
 	details_scroll.scroll_vertical = 0
@@ -459,6 +468,10 @@ func _render_selection() -> void:
 		details.show_weapon(data, tier, player, true, equipment)
 		if player != null and selected_index < player.loadout.equipped().size():
 			details.show_affixes(player.loadout.equipped()[selected_index], player.stats, player.items)
+		if information_only:
+			detail_actions.hide()
+			return
+		details.enchant_button.visible = enchant_available
 		if player != null:
 			details.show_evolutions(player.loadout.ready_evolutions(selected_index, player.items))
 		details.sell_button.visible = true
@@ -532,6 +545,7 @@ func _compare(index: int) -> void:
 		details.compare_text.text = WeaponPresentation.comparison(offers[selected_index].weapon_data, offers[selected_index].weapon_tier, data, int(entry.tier), player)
 
 func _confirm_sale() -> void:
+	details.enchant_button.hide()
 	details.sell_button.visible = false
 	details.merge_button.visible = false
 	details.confirm_button.visible = true
@@ -579,12 +593,16 @@ func close_details() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if not ControllerFocus.active($Root): return
 	if visible and not expanded:
-		if event.is_action_pressed("ui_enchant") and enchant_available and not enchant_button.disabled:
-			enchant_requested.emit()
+		if event.is_action_pressed("ui_previous") or event.is_action_pressed("ui_next"):
+			controller_focus.change(-1 if event.is_action_pressed("ui_previous") else 1)
 			get_viewport().set_input_as_handled()
 			return
-		if event.is_action_pressed("ui_next_wave") and not continue_button.disabled:
+		if event.is_action_pressed("ui_confirm") and not continue_button.disabled:
 			continue_requested.emit()
+			get_viewport().set_input_as_handled()
+			return
+		if event.is_action_pressed("ui_details"):
+			controller_focus.details()
 			get_viewport().set_input_as_handled()
 			return
 	var focused := get_viewport().gui_get_focus_owner() as OfferCard
@@ -593,24 +611,18 @@ func _unhandled_input(event: InputEvent) -> void:
 			focused.pin()
 			get_viewport().set_input_as_handled()
 			return
-		if event.is_action_pressed("ui_shop_details"):
-			_select("offer", offer_buttons.find(focused))
-			get_viewport().set_input_as_handled()
-			return
 	if visible and not expanded and event.is_action_pressed("ui_reroll") and not reroll_button.disabled:
 		reroll_requested.emit()
-		get_viewport().set_input_as_handled()
-		return
-	if visible and not expanded and event.is_action_pressed("pause") and event is InputEventJoypadButton:
-		pause_requested.emit()
 		get_viewport().set_input_as_handled()
 		return
 	if visible and event.is_action_pressed("ui_cancel"):
 		if expanded:
 			close_details()
+			get_viewport().set_input_as_handled()
+		elif event is InputEventJoypadButton: get_viewport().set_input_as_handled()
 		else:
 			pause_requested.emit()
-		get_viewport().set_input_as_handled()
+			get_viewport().set_input_as_handled()
 
 
 func animate_purchase(source: Rect2, offer: ShopOfferData) -> void:
@@ -628,6 +640,9 @@ func animate_purchase(source: Rect2, offer: ShopOfferData) -> void:
 			if owned_items[index].name == offer.display_name:
 				target = items_row.get_child(index)
 	var image: Texture2D = offer.weapon_data.sprite if offer.weapon_data != null else (offer.icon_texture if offer.icon_texture != null else ICONS.item(offer.icon_index))
+	if not target.is_visible_in_tree():
+		DentiUIMotion.pulse(coins_label)
+		return
 	DentiUIMotion.fly($Root, image, source, target.get_global_rect())
 	DentiUIMotion.pulse(coins_label)
 

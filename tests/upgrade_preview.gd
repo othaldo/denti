@@ -14,6 +14,14 @@ func _check(condition: bool, message: String) -> void:
 
 
 func _run() -> void:
+	# Desktop system fonts must not hide glyphs missing from an exported game.
+	var primary_font := DentiUIStyle.FONT
+	var symbol_font := DentiUIStyle.SYMBOL_FONT
+	primary_font.allow_system_fallback = false
+	symbol_font.allow_system_fallback = false
+	for theme in [DentiUIStyle.make_theme(), MenuStyle.make_theme()]:
+		_check_bundled_glyphs(theme.default_font, "ÄÖÜäöüß 58 % → 60 % · MAX")
+		_check_bundled_arrow(theme.default_font)
 	var stats := new_stats()
 	var cases: Array = [
 		["zahnflutsch", 0.30, 1, "30 % → 33 % · max. 60 %"],
@@ -46,11 +54,33 @@ func _run() -> void:
 		var rng_state := stats.dodge_rng.state
 		var preview := DentiAttributes.upgrade_preview_text(stats, DentiAttributes.from_key(upgrade.stat), upgrade.amount)
 		_check(preview == entry[3], "wrong preview for %s: %s" % [entry[0], preview])
+		_check_bundled_glyphs(DentiUIStyle.make_theme().default_font, preview)
 		_check(stats.to_save_data() == before and stats.dodge_rng.state == rng_state, "preview changed the real build")
 	await _test_reward_flow()
 	if failures == 0:
 		print("PASS upgrade previews: values, caps, raw penalties, queued choices, rerolls and resume")
 	finish(0 if failures == 0 else 1)
+
+
+func _check_bundled_glyphs(font: Font, text: String) -> void:
+	var text_server := TextServerManager.get_primary_interface()
+	for index in text.length():
+		var code := text.unicode_at(index)
+		if code <= 32:
+			continue
+		var supported := false
+		for rid in font.get_rids():
+			if text_server.font_has_char(rid, code):
+				supported = true
+				break
+		_check(supported, "preview lacks a bundled glyph for U+%04X: %s" % [code, text])
+
+
+func _check_bundled_arrow(font: Font) -> void:
+	var line := TextLine.new()
+	line.add_string("\u2192", font, 16)
+	var glyphs := TextServerManager.get_primary_interface().shaped_text_get_glyphs(line.get_rid())
+	_check(glyphs.size() == 1 and glyphs[0].index != 0 and glyphs[0].font_rid in DentiUIStyle.SYMBOL_FONT.get_rids(), "arrow was not shaped from the bundled symbol font")
 
 
 func _test_reward_flow() -> void:
@@ -77,6 +107,10 @@ func _test_reward_flow() -> void:
 	for id in ["zahnflutsch", "glanz", "wurzelkraft", "schmelz"]:
 		choices.append(load("res://data/upgrades/%s.tres" % id).with_tier(4).with_stat_context(game.player.stats))
 	game.choice_panel.show_upgrades(choices, game.player.stats)
+	for button in game.choice_panel.buttons:
+		var card := button as RewardCard
+		_check_bundled_glyphs(card.preview_label.get_theme_font("font"), card.preview_label.text)
+		_check_bundled_arrow(card.preview_label.get_theme_font("font"))
 	_check((game.choice_panel.buttons[0] as RewardCard).preview_label.text.replace("\n", " ") == "58 % → 60 % · MAX", "real card hides the cap-reaching value")
 	game._save_run()
 	game.free()

@@ -36,7 +36,7 @@ func _run() -> void:
 	_check(INPUT.family_for("Generic USB Gamepad") == "xbox", "unknown devices lack a predictable fallback")
 	input.use_controller(7)
 	for device in [0, 7]:
-		for binding in [[JOY_BUTTON_A, &"ui_accept"], [JOY_BUTTON_B, &"ui_cancel"], [JOY_BUTTON_START, &"pause"], [JOY_BUTTON_RIGHT_SHOULDER, &"dash"], [JOY_BUTTON_X, &"ui_reroll"], [JOY_BUTTON_Y, &"ui_details"]]:
+		for binding in [[JOY_BUTTON_A, &"ui_accept"], [JOY_BUTTON_B, &"ui_cancel"], [JOY_BUTTON_START, &"pause"], [JOY_BUTTON_RIGHT_SHOULDER, &"dash"], [JOY_BUTTON_X, &"ui_reroll"], [JOY_BUTTON_RIGHT_STICK, &"ui_details"]]:
 			var event := InputEventJoypadButton.new()
 			event.device = device
 			event.button_index = binding[0]
@@ -230,7 +230,7 @@ func _routing_regressions(input: Node, session: Node, screen: Control, buttons: 
 	await _axis(JOY_AXIS_LEFT_X, 1.0)
 	await _axis(JOY_AXIS_TRIGGER_RIGHT, 0.0)
 	await _axis(JOY_AXIS_TRIGGER_RIGHT, 0.95)
-	_check(not Input.is_action_pressed("ui_next_wave"), "Off permits the trigger shortcut")
+	_check(not Input.is_action_pressed("ui_confirm"), "Off permits the trigger shortcut")
 	_check(activations.count == 0 and buttons[0].has_focus(), "Off permits gamepad GUI activation or navigation")
 	_check(Input.get_vector("move_left", "move_right", "move_up", "move_down").is_zero_approx() and not Input.is_action_pressed("dash") and not Input.is_action_pressed("pause"), "Off permits movement, dash or pause")
 	session.set_controller_symbols(0)
@@ -261,4 +261,4 @@ func _routing_regressions(input: Node, session: Node, screen: Control, buttons: 
 	_check(input.controller_device == -1, "held trigger acquired a controller without first reaching neutral")
 	await _axis(JOY_AXIS_TRIGGER_RIGHT, 0.0)
 	await _axis(JOY_AXIS_TRIGGER_RIGHT, 0.95)
-	_check(input.controller_device == 7 and input.using_controller and Input.is_action_pressed("ui_next_wave"), "deliberate trigger acquisition lost its first press")
+	_check(input.controller_device == 7 and input.using_controller and Input.is_action_pressed("ui_confirm"), "deliberate trigger acquisition lost its first press")

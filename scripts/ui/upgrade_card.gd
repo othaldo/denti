@@ -125,6 +125,7 @@ func show_action(action_name: String, accent: bool = false) -> void:
 	custom_minimum_size.y = 60.0
 	content.visible = false
 	text = action_name
+	set_meta("controller_action_label", action_name)
 	disabled = false
 	scale = Vector2.ONE
 	DentiUIStyle.style_button(self, accent)
@@ -216,6 +217,7 @@ func _wrap_chest_text(label: Label, source: String, width: float) -> void:
 
 
 func _restore_standard_content() -> void:
+	if has_meta("controller_action_label"): remove_meta("controller_action_label")
 	progress_bar.hide()
 	if affix_header != null and affix_header.visible:
 		icon_rect.reparent(content)

@@ -44,7 +44,7 @@ func ensure_focus() -> void:
 	if entry.is_empty(): return
 	var scope: Control = entry.scope.get_ref()
 	var focus := get_viewport().gui_get_focus_owner()
-	if ControllerFocus.contains(scope, focus) and ControllerFocus.available(focus):
+	if ControllerFocus.accepts(scope, focus):
 		_decorate(focus)
 		return
 	var target: Control
@@ -68,6 +68,7 @@ func _focus_changed(control: Control) -> void:
 	_decorate(control)
 
 func _decorate(control: Control) -> void:
+	if control is OptionButton: ControllerPopupInput.attach(control.get_popup())
 	if get_parent().using_controller and control != null and not control is Range and not control is OptionButton and not control is CheckButton and not control is CheckBox:
 		ControllerPrompt.bind(control)
 
@@ -110,6 +111,9 @@ func _process(delta: float) -> void:
 	var input := get_parent()
 	if not input.navigation_active: return
 	ensure_focus()
+	if popup_open():
+		reset_repeat()
+		return
 	var focused := get_viewport().gui_get_focus_owner()
 	if focused != null and not popup_open():
 		var rect := ControllerFocus.layout_rect(focused)
