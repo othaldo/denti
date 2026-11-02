@@ -32,6 +32,7 @@ var strike := WeaponStrike.new()
 var focus_target_id: int = 0
 var focus_hits: int = 0
 var focus_time: float = 0.0
+var crit_cycle_progress: int = 0
 var evolution: WeaponEvolutionEffects
 var floss_cut: WeaponFlossCut
 
@@ -168,8 +169,10 @@ func _begin_attack(targets: Array[Enemy]) -> void:
 	if focus_target_id != nearest.get_instance_id() or focus_time <= 0.0:
 		focus_target_id = nearest.get_instance_id()
 		focus_hits = 0
-	var guaranteed := data.crit_cycle > 0 and (focus_hits + 1) % data.crit_cycle == 0
+	var guaranteed := data.crit_cycle > 0 and crit_cycle_progress + 1 >= data.crit_cycle
 	var damage := player.stats.roll_critical_damage(data.raw_damage_with_stats(tier, player.stats), data.crit_bonus, data.crit_multiplier, guaranteed)
+	if data.crit_cycle > 0:
+		crit_cycle_progress = (crit_cycle_progress + 1) % data.crit_cycle
 	damage *= 1.0 + minf(float(focus_hits) * data.focus_step, data.focus_cap)
 	focus_hits = mini(focus_hits + 1, 1000)
 	cooldown = attack_interval()
@@ -184,7 +187,7 @@ func _begin_attack(targets: Array[Enemy]) -> void:
 		aim_at(nearest.global_position)
 	var evolution_attack := evolution != null and evolution.on_attack(targets, damage, critical)
 	if WeaponMotion.is_contact(data):
-		strike.begin(damage, critical, nearest)
+		strike.begin(damage, critical, nearest, 1 + data.contact_extra_targets)
 	elif not evolution_attack:
 		_fire(targets, damage, critical)
 	var sound_kind: StringName = &"brush"
@@ -225,6 +228,8 @@ func save_motion(enemy_indices: Dictionary) -> Dictionary:
 	return {"remaining": attack_time, "duration": attack_duration, "damage": strike.damage,
 		"beam_target": enemy_indices.get(beam_target_id, -1), "beam_hit": [beam_hit_world.x, beam_hit_world.y], "beam_tracking": beam_tracking,
 		"critical": strike.critical, "target": enemy_indices.get(strike.target_id, -1), "hits": hit_enemies,
+		"contact_hits": strike.contact_hits, "contact_limit": strike.contact_limit,
+		"primary_contact": [strike.primary_contact.x, strike.primary_contact.y],
 		"aim": [aim.x, aim.y], "hit_point": [hit_point.x, hit_point.y], "idle_time": idle_time, "aim_distance": aim_distance,
 		"hold": [hold_position.x, hold_position.y], "engagement_pending": engagement_pending,
 		"evolution": evolution.save_state(enemy_indices) if evolution != null else {}}
@@ -253,6 +258,12 @@ func restore_motion(saved: Dictionary, enemies: Array[Node]) -> void:
 			strike.hit_ids[enemies[int(index)].get_instance_id()] = true
 	var target_index := int(saved.get("target", -1))
 	strike.target_id = enemies[target_index].get_instance_id() if target_index >= 0 and target_index < enemies.size() else 0
+	# Preserve the consumed budget even when a killed target is absent on resume.
+	strike.contact_limit = clampi(int(saved.get("contact_limit", 1)), 1, 4)
+	strike.contact_hits = clampi(int(saved.get("contact_hits", strike.hit_ids.size())), 0, strike.contact_limit)
+	if not saved.has("contact_hits") and strike.target_id == 0 and attack_time > 0:
+		strike.contact_hits = strike.contact_limit
+	strike.primary_contact = SnapshotValues.read_vector(saved.get("primary_contact", [0.0, 0.0]))
 	var saved_aim: Array = saved.get("aim", [1.0, 0.0])
 	if saved_aim.size() == 2:
 		aim = Vector2(float(saved_aim[0]), float(saved_aim[1])).normalized()

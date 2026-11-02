@@ -16,6 +16,8 @@ extends Resource
 @export var court_radius: float = 390.0
 @export var court_half_angle: float = 30.0
 @export var verdict_damage_factor: float = 0.7
+@export var verdict_lead_seconds: float = 0.0
+@export var verdict_lead_distance: float = 0.0
 @export var guard_turn_degrees: float = 90.0
 @export var portal_angle_step_radians: float = 0.3
 @export var nerve_cycle_radians: float = 0.31
@@ -51,6 +53,10 @@ func for_difficulty(difficulty: DifficultyData) -> CrownCourtData:
 	result.lance = lance.duplicate() as BossProjectileData
 	result.needles = needles.duplicate() as BossProjectileData
 	result.action_bonus = clampi(difficulty.boss_volley_bonus, -1, 2)
+	# Easy retains direct aim. Other tiers expose the same fixed, readable lead.
+	if result.action_bonus < 0:
+		result.verdict_lead_seconds = 0.0
+		result.verdict_lead_distance = 0.0
 	var extra := maxi(result.action_bonus - 1, 0)
 	result.max_verdicts += extra
 	result.max_portals += extra

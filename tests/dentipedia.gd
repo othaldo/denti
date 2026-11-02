@@ -35,6 +35,18 @@ func _run() -> void:
 	check(items.size() == expected_items, "item category includes weapon offers")
 	for weapon in WeaponCatalog.ALL:
 		check(not items.any(func(entry: Dictionary) -> bool: return entry.title == weapon.display_name), "weapon leaked into item category")
+	# Scaling belongs to the visible summary, including discovered evolutions.
+	var described: Array[WeaponData] = WeaponCatalog.ALL.duplicate()
+	for recipe in WeaponEvolutions.ALL:
+		described.append(recipe.result)
+	for weapon in described:
+		var body := VBoxContainer.new()
+		root.add_child(body)
+		DentipediaWeaponDetails.build(body, weapon, "")
+		var metadata: Label = body.get_child(1)
+		check(metadata.is_visible_in_tree() and metadata.text.contains(weapon.roots_text()) and metadata.text.contains(weapon.scaling_label()), "Dentipedia hides the weapon's scaling: " + str(weapon.id))
+		check(not (body.get_child(2) as Label).text.contains(weapon.scaling_text()), "Dentipedia repeats scaling in the mechanics paragraph")
+		body.free()
 	var enchantment_category := DentipediaData.CATEGORIES.find("Verzauberungen")
 	check(enchantment_category >= 0, "dedicated enchantment category missing")
 	var enchantments := DentipediaData.entries(enchantment_category, [])

@@ -17,6 +17,7 @@ static func capture(game) -> Dictionary:
 			player_projectiles.append(projectile.save_state(enemy_indices))
 	for weapon: WeaponInstance in game.player.loadout.equipped():
 		weapon_runtime.append({"cooldown": weapon.cooldown, "focus_hits": weapon.focus_hits,
+			"crit_cycle_progress": weapon.crit_cycle_progress,
 			"focus_time": weapon.focus_time, "focus_target": enemy_indices.get(weapon.focus_target_id, -1),
 			"motion": weapon.save_motion(enemy_indices)})
 	var loot_data: Array[Dictionary] = []
@@ -135,6 +136,7 @@ static func restore(game, saved: Dictionary) -> void:
 		var entry: Dictionary = runtime[index]
 		var weapon := weapons[index]
 		weapon.cooldown = clampf(float(entry.get("cooldown", 0.0)), 0.0, 30.0)
+		weapon.crit_cycle_progress = clampi(int(entry.get("crit_cycle_progress", 0)), 0, maxi(weapon.data.crit_cycle - 1, 0))
 		weapon.restore_motion(entry.get("motion", {}), restored_enemies)
 		var target_index := int(entry.get("focus_target", -1))
 		if target_index >= 0 and target_index < restored_enemies.size():

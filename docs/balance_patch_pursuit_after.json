@@ -1,0 +1,6409 @@
+{
+  "controller": "boss_pursuit",
+  "difficulty": "normal",
+  "engine": "4.7.2-stable (official)",
+  "hz": 60,
+  "schema_version": 1,
+  "samples": [
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 24.6499999999999,
+      "build": "uv_floss",
+      "chests_collected": 0,
+      "coins_collected": 20,
+      "damage_dealt": 3166.07325102881,
+      "damage_taken": 79.4727272727273,
+      "distance_travelled": 5552.08394861221,
+      "dps": 128.354320987654,
+      "healing": 0.0,
+      "health_end": 47.5272727272727,
+      "health_min": 47.5272727272727,
+      "health_start": 127.0,
+      "kills": 37,
+      "leech_healing": 0.0,
+      "max_step_distance": 3.75672078132629,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.189864864864865,
+      "near_enemy_seconds": 4.68333333333333,
+      "outcome": "boss_killed",
+      "overheal": 0.0,
+      "peak_enemies": 15,
+      "peak_enemy_projectiles": 1,
+      "pending_levels": 2,
+      "proc_damage": {
+        "affix_fire": 292.090194,
+        "bleed": 135.5904
+      },
+      "seconds": 24.6666666666667,
+      "seed": 13579,
+      "setup": "5/uv_floss/shop",
+      "spawn_plan": "d1acd19e6ccb84416c964f242cdcfe41d7f8cb116b9f2b0400bb9c5efc3bc4fa",
+      "spawns": 42,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.98963963963964,
+      "wave": 5,
+      "weapon_damage": {
+        "floss_garrote": 891.954320695473,
+        "uv_lamp": 1846.43833633333
+      },
+      "xp_collected": 18
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 20.2500000000001,
+      "build": "uv_floss",
+      "chests_collected": 0,
+      "coins_collected": 11,
+      "damage_dealt": 2831.9975308642,
+      "damage_taken": 40.5818181818182,
+      "distance_travelled": 4564.35051655769,
+      "dps": 139.736720272905,
+      "healing": 0.0,
+      "health_end": 86.4181818181818,
+      "health_min": 86.4181818181818,
+      "health_start": 127.0,
+      "kills": 28,
+      "leech_healing": 0.0,
+      "max_step_distance": 3.75672030448914,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.0699013157894737,
+      "near_enemy_seconds": 1.41666666666667,
+      "outcome": "boss_killed",
+      "overheal": 0.0,
+      "peak_enemies": 13,
+      "peak_enemy_projectiles": 1,
+      "pending_levels": 1,
+      "proc_damage": {
+        "affix_fire": 314.552600000001,
+        "bleed": 110.498448
+      },
+      "seconds": 20.2666666666667,
+      "seed": 24680,
+      "setup": "5/uv_floss/shop",
+      "spawn_plan": "c3b0b3f9f2fbc9c7031b36c45996b28ef871316ee5e78372abcaad1004bc65f3",
+      "spawns": 36,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.991228070175439,
+      "wave": 5,
+      "weapon_damage": {
+        "floss_garrote": 725.083931127572,
+        "uv_lamp": 1681.86255173662
+      },
+      "xp_collected": 9
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 26.5333333333331,
+      "build": "uv_floss",
+      "chests_collected": 0,
+      "coins_collected": 26,
+      "damage_dealt": 3643.19423868313,
+      "damage_taken": 124.281818181818,
+      "distance_travelled": 5976.8562400341,
+      "dps": 137.220121984299,
+      "healing": 0.0,
+      "health_end": 2.71818181818183,
+      "health_min": 2.71818181818183,
+      "health_start": 127.0,
+      "kills": 40,
+      "leech_healing": 0.0,
+      "max_step_distance": 3.75670838356018,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.263025737602009,
+      "near_enemy_seconds": 6.98333333333333,
+      "outcome": "boss_killed",
+      "overheal": 0.0,
+      "peak_enemies": 14,
+      "peak_enemy_projectiles": 1,
+      "pending_levels": 2,
+      "proc_damage": {
+        "affix_fire": 391.800465,
+        "bleed": 124.242682
+      },
+      "seconds": 26.55,
+      "seed": 112233,
+      "setup": "5/uv_floss/shop",
+      "spawn_plan": "2ae5d6964e4b480a373564c7cadb4ab6b2fdf4b87df7c1e85a46b59ddf37b174",
+      "spawns": 45,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.988909813768571,
+      "wave": 5,
+      "weapon_damage": {
+        "floss_garrote": 1160.53421813992,
+        "uv_lamp": 1966.61687354321
+      },
+      "xp_collected": 20
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 19.3833333333335,
+      "build": "melee_single",
+      "chests_collected": 0,
+      "coins_collected": 5,
+      "damage_dealt": 2598.26874469136,
+      "damage_taken": 48.1909090909091,
+      "distance_travelled": 4365.24748873711,
+      "dps": 133.931378592338,
+      "healing": 0.0,
+      "health_end": 78.8090909090909,
+      "health_min": 78.8090909090909,
+      "health_start": 127.0,
+      "kills": 25,
+      "leech_healing": 0.0,
+      "max_step_distance": 3.75670480728149,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.163230240549828,
+      "near_enemy_seconds": 3.16666666666667,
+      "outcome": "boss_killed",
+      "overheal": 0.0,
+      "peak_enemies": 16,
+      "peak_enemy_projectiles": 0,
+      "pending_levels": 1,
+      "proc_damage": {
+        "affix_fire": 167.9748
+      },
+      "seconds": 19.4,
+      "seed": 13579,
+      "setup": "5/melee_single/shop",
+      "spawn_plan": "d1acd19e6ccb84416c964f242cdcfe41d7f8cb116b9f2b0400bb9c5efc3bc4fa",
+      "spawns": 35,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.938144329896907,
+      "wave": 5,
+      "weapon_damage": {
+        "turbo_drill": 2430.29394469136
+      },
+      "xp_collected": 11
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 18.9000000000002,
+      "build": "melee_single",
+      "chests_collected": 2,
+      "coins_collected": 11,
+      "damage_dealt": 2674.73533366255,
+      "damage_taken": 55.8,
+      "distance_travelled": 4260.06072258949,
+      "dps": 141.395700457932,
+      "healing": 0.0,
+      "health_end": 71.2,
+      "health_min": 71.2,
+      "health_start": 127.0,
+      "kills": 24,
+      "leech_healing": 0.0,
+      "max_step_distance": 3.75670742988586,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.170925110132159,
+      "near_enemy_seconds": 3.23333333333333,
+      "outcome": "boss_killed",
+      "overheal": 0.0,
+      "peak_enemies": 15,
+      "peak_enemy_projectiles": 0,
+      "pending_levels": 1,
+      "proc_damage": {
+        "affix_fire": 191.344616
+      },
+      "seconds": 18.9166666666667,
+      "seed": 24680,
+      "setup": "5/melee_single/shop",
+      "spawn_plan": "c3b0b3f9f2fbc9c7031b36c45996b28ef871316ee5e78372abcaad1004bc65f3",
+      "spawns": 34,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.938325991189427,
+      "wave": 5,
+      "weapon_damage": {
+        "turbo_drill": 2483.39071766255
+      },
+      "xp_collected": 11
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 19.7833333333335,
+      "build": "melee_single",
+      "chests_collected": 0,
+      "coins_collected": 15,
+      "damage_dealt": 2929.49528625514,
+      "damage_taken": 53.2636363636364,
+      "distance_travelled": 4459.16269850731,
+      "dps": 147.954307386623,
+      "healing": 0.0,
+      "health_end": 73.7363636363636,
+      "health_min": 73.7363636363636,
+      "health_start": 127.0,
+      "kills": 30,
+      "leech_healing": 0.0,
+      "max_step_distance": 3.75670456886292,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.172558922558923,
+      "near_enemy_seconds": 3.41666666666667,
+      "outcome": "boss_killed",
+      "overheal": 0.0,
+      "peak_enemies": 15,
+      "peak_enemy_projectiles": 0,
+      "pending_levels": 2,
+      "proc_damage": {
+        "affix_fire": 182.39704
+      },
+      "seconds": 19.8,
+      "seed": 112233,
+      "setup": "5/melee_single/shop",
+      "spawn_plan": "2ae5d6964e4b480a373564c7cadb4ab6b2fdf4b87df7c1e85a46b59ddf37b174",
+      "spawns": 35,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.924242424242424,
+      "wave": 5,
+      "weapon_damage": {
+        "turbo_drill": 2747.09824625514
+      },
+      "xp_collected": 16
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 24.1666666666666,
+      "build": "melee_area",
+      "chests_collected": 0,
+      "coins_collected": 25,
+      "damage_dealt": 2991.62304526749,
+      "damage_taken": 40.5818181818182,
+      "distance_travelled": 5237.91498017311,
+      "dps": 123.70598395317,
+      "healing": 0.0,
+      "health_end": 86.4181818181818,
+      "health_min": 86.4181818181818,
+      "health_start": 127.0,
+      "kills": 33,
+      "leech_healing": 0.0,
+      "max_step_distance": 3.7566978931427,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.866299104066161,
+      "near_enemy_seconds": 20.95,
+      "outcome": "boss_killed",
+      "overheal": 0.0,
+      "peak_enemies": 19,
+      "peak_enemy_projectiles": 2,
+      "pending_levels": 3,
+      "proc_damage": {
+        "affix_fire": 160.720134,
+        "bleed": 64.9147600740747
+      },
+      "seconds": 24.1833333333333,
+      "seed": 13579,
+      "setup": "5/melee_area/shop",
+      "spawn_plan": "d1acd19e6ccb84416c964f242cdcfe41d7f8cb116b9f2b0400bb9c5efc3bc4fa",
+      "spawns": 42,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.534114403859407,
+      "wave": 5,
+      "weapon_damage": {
+        "interdental_brush": 2765.98815119342
+      },
+      "xp_collected": 24
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 23.7166666666666,
+      "build": "melee_area",
+      "chests_collected": 0,
+      "coins_collected": 27,
+      "damage_dealt": 3177.05046271605,
+      "damage_taken": 20.2909090909091,
+      "distance_travelled": 5111.47605776787,
+      "dps": 133.864485788598,
+      "healing": 0.0,
+      "health_end": 106.709090909091,
+      "health_min": 106.709090909091,
+      "health_start": 127.0,
+      "kills": 32,
+      "leech_healing": 0.0,
+      "max_step_distance": 3.75670123100281,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.903089887640449,
+      "near_enemy_seconds": 21.4333333333333,
+      "outcome": "boss_killed",
+      "overheal": 0.0,
+      "peak_enemies": 19,
+      "peak_enemy_projectiles": 1,
+      "pending_levels": 3,
+      "proc_damage": {
+        "affix_fire": 182.37847173251,
+        "bleed": 69.9193060740741
+      },
+      "seconds": 23.7333333333333,
+      "seed": 24680,
+      "setup": "5/melee_area/shop",
+      "spawn_plan": "c3b0b3f9f2fbc9c7031b36c45996b28ef871316ee5e78372abcaad1004bc65f3",
+      "spawns": 41,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.612359550561798,
+      "wave": 5,
+      "weapon_damage": {
+        "interdental_brush": 2924.75268490947
+      },
+      "xp_collected": 25
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 24.3499999999999,
+      "build": "melee_area",
+      "chests_collected": 0,
+      "coins_collected": 11,
+      "damage_dealt": 2996.84121693827,
+      "damage_taken": 40.5818181818182,
+      "distance_travelled": 5451.54346776009,
+      "dps": 122.98937962811,
+      "healing": 0.0,
+      "health_end": 86.4181818181818,
+      "health_min": 86.4181818181818,
+      "health_start": 127.0,
+      "kills": 29,
+      "leech_healing": 0.0,
+      "max_step_distance": 3.75670409202576,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.844049247606019,
+      "near_enemy_seconds": 20.5666666666667,
+      "outcome": "boss_killed",
+      "overheal": 0.0,
+      "peak_enemies": 20,
+      "peak_enemy_projectiles": 1,
+      "pending_levels": 1,
+      "proc_damage": {
+        "affix_fire": 189.619402148148,
+        "bleed": 88.65984
+      },
+      "seconds": 24.3666666666667,
+      "seed": 112233,
+      "setup": "5/melee_area/shop",
+      "spawn_plan": "2ae5d6964e4b480a373564c7cadb4ab6b2fdf4b87df7c1e85a46b59ddf37b174",
+      "spawns": 42,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.539671682626539,
+      "wave": 5,
+      "weapon_damage": {
+        "interdental_brush": 2718.56197479012
+      },
+      "xp_collected": 10
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 19.7333333333335,
+      "build": "ranged_single",
+      "chests_collected": 0,
+      "coins_collected": 5,
+      "damage_dealt": 2749.05766979424,
+      "damage_taken": 40.5818181818182,
+      "distance_travelled": 4409.20767021179,
+      "dps": 139.192793407303,
+      "healing": 0.0,
+      "health_end": 86.4181818181818,
+      "health_min": 86.4181818181818,
+      "health_start": 127.0,
+      "kills": 26,
+      "leech_healing": 0.0,
+      "max_step_distance": 3.75670576095581,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.00843881856540084,
+      "near_enemy_seconds": 0.166666666666667,
+      "outcome": "boss_killed",
+      "overheal": 0.0,
+      "peak_enemies": 15,
+      "peak_enemy_projectiles": 1,
+      "pending_levels": 1,
+      "proc_damage": {
+        "affix_fire": 196.203848
+      },
+      "seconds": 19.75,
+      "seed": 13579,
+      "setup": "5/ranged_single/shop",
+      "spawn_plan": "d1acd19e6ccb84416c964f242cdcfe41d7f8cb116b9f2b0400bb9c5efc3bc4fa",
+      "spawns": 35,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.983122362869198,
+      "wave": 5,
+      "weapon_damage": {
+        "enamel_mirror": 2552.85382179424
+      },
+      "xp_collected": 5
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 23.7499999999999,
+      "build": "ranged_single",
+      "chests_collected": 1,
+      "coins_collected": 11,
+      "damage_dealt": 3414.26979423868,
+      "damage_taken": 81.1636363636363,
+      "distance_travelled": 5216.66332936287,
+      "dps": 143.657915606116,
+      "healing": 0.0,
+      "health_end": 45.8363636363637,
+      "health_min": 45.8363636363637,
+      "health_start": 127.0,
+      "kills": 38,
+      "leech_healing": 0.0,
+      "max_step_distance": 3.75671482086182,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.0855539971949509,
+      "near_enemy_seconds": 2.03333333333333,
+      "outcome": "boss_killed",
+      "overheal": 0.0,
+      "peak_enemies": 17,
+      "peak_enemy_projectiles": 1,
+      "pending_levels": 1,
+      "proc_damage": {
+        "affix_fire": 214.950325
+      },
+      "seconds": 23.7666666666667,
+      "seed": 24680,
+      "setup": "5/ranged_single/shop",
+      "spawn_plan": "c3b0b3f9f2fbc9c7031b36c45996b28ef871316ee5e78372abcaad1004bc65f3",
+      "spawns": 41,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.993688639551192,
+      "wave": 5,
+      "weapon_damage": {
+        "enamel_mirror": 3199.31946923868
+      },
+      "xp_collected": 9
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 21.2666666666667,
+      "build": "ranged_single",
+      "chests_collected": 0,
+      "coins_collected": 12,
+      "damage_dealt": 3188.8304526749,
+      "damage_taken": 81.1636363636364,
+      "distance_travelled": 4791.23758268356,
+      "dps": 149.827585873527,
+      "healing": 0.0,
+      "health_end": 45.8363636363637,
+      "health_min": 45.8363636363637,
+      "health_start": 127.0,
+      "kills": 32,
+      "leech_healing": 0.0,
+      "max_step_distance": 3.75670909881592,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.072043852779953,
+      "near_enemy_seconds": 1.53333333333333,
+      "outcome": "boss_killed",
+      "overheal": 0.0,
+      "peak_enemies": 11,
+      "peak_enemy_projectiles": 0,
+      "pending_levels": 2,
+      "proc_damage": {
+        "affix_fire": 227.16476875
+      },
+      "seconds": 21.2833333333333,
+      "seed": 112233,
+      "setup": "5/ranged_single/shop",
+      "spawn_plan": "2ae5d6964e4b480a373564c7cadb4ab6b2fdf4b87df7c1e85a46b59ddf37b174",
+      "spawns": 37,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.978073610023493,
+      "wave": 5,
+      "weapon_damage": {
+        "enamel_mirror": 2961.6656839249
+      },
+      "xp_collected": 14
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 32.2666666666661,
+      "build": "uv_floss",
+      "chests_collected": 1,
+      "coins_collected": 47,
+      "damage_dealt": 15843.7428118629,
+      "damage_taken": 183.945,
+      "distance_travelled": 5181.60510408878,
+      "dps": 490.771589422703,
+      "healing": 81.7796840073696,
+      "health_end": 38.8346840073695,
+      "health_min": 35.1768087185437,
+      "health_start": 141.0,
+      "kills": 74,
+      "leech_healing": 63.5796840073697,
+      "max_step_distance": 3.68004727363586,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.4460505937016,
+      "near_enemy_seconds": 14.4,
+      "outcome": "boss_killed",
+      "overheal": 2.33146835171283e-13,
+      "peak_enemies": 34,
+      "peak_enemy_projectiles": 15,
+      "pending_levels": 4,
+      "proc_damage": {
+        "affix_fire": 1671.83771918417,
+        "bleed": 117.926965984234
+      },
+      "seconds": 32.2833333333333,
+      "seed": 13579,
+      "setup": "10/uv_floss/shop",
+      "spawn_plan": "9249feb4ff27f55754cb63f25e3bde6a1cfbd99e97435c4e6ecb115eca578e45",
+      "spawns": 107,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.992256066081569,
+      "wave": 10,
+      "weapon_damage": {
+        "floss_garrote": 2798.56630665035,
+        "uv_lamp": 11255.4118200442
+      },
+      "xp_collected": 42
+    },
+    {
+      "boss_health_fraction": 0.0922140846519086,
+      "boss_ttk": null,
+      "build": "uv_floss",
+      "chests_collected": 1,
+      "coins_collected": 34,
+      "damage_dealt": 11015.8779043278,
+      "damage_taken": 220.488701828949,
+      "distance_travelled": 4877.6426564455,
+      "dps": 371.113236529853,
+      "healing": 79.4887018289495,
+      "health_end": 0.0,
+      "health_min": 0.0,
+      "health_start": 141.0,
+      "kills": 67,
+      "leech_healing": 63.0887018289495,
+      "max_step_distance": 3.68003702163696,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.481751824817518,
+      "near_enemy_seconds": 14.3,
+      "outcome": "death",
+      "overheal": 1.47021284035986e-13,
+      "peak_enemies": 22,
+      "peak_enemy_projectiles": 17,
+      "pending_levels": 3,
+      "proc_damage": {
+        "affix_fire": 1039.45426403663,
+        "bleed": 103.200165609234
+      },
+      "seconds": 29.6833333333333,
+      "seed": 24680,
+      "setup": "10/uv_floss/shop",
+      "spawn_plan": "0dd693bb3fd1216c0cd4fd96eb8c628860a1f66899c87caf0efe8bed24ccd0af",
+      "spawns": 84,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.994010855324724,
+      "wave": 10,
+      "weapon_damage": {
+        "floss_garrote": 3386.32030619394,
+        "uv_lamp": 6486.90316848798
+      },
+      "xp_collected": 34
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 26.1833333333331,
+      "build": "uv_floss",
+      "chests_collected": 2,
+      "coins_collected": 49,
+      "damage_dealt": 10117.4421203973,
+      "damage_taken": 193.871379310345,
+      "distance_travelled": 4239.57982325554,
+      "dps": 386.161912992262,
+      "healing": 71.438235237568,
+      "health_end": 18.5668559272232,
+      "health_min": 16.6284764455661,
+      "health_start": 141.0,
+      "kills": 62,
+      "leech_healing": 56.5382352375681,
+      "max_step_distance": 3.68005561828613,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.494910941475827,
+      "near_enemy_seconds": 12.9666666666667,
+      "outcome": "boss_killed",
+      "overheal": 1.60482738209566e-13,
+      "peak_enemies": 22,
+      "peak_enemy_projectiles": 3,
+      "pending_levels": 4,
+      "proc_damage": {
+        "affix_fire": 871.516794588529,
+        "bleed": 145.731512834783
+      },
+      "seconds": 26.2,
+      "seed": 112233,
+      "setup": "10/uv_floss/shop",
+      "spawn_plan": "d5f6cb22a74b084eb0b8d0e72775bc30150a5da1779f2ad2f799a0171c0f087e",
+      "spawns": 74,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.983884648006785,
+      "wave": 10,
+      "weapon_damage": {
+        "floss_garrote": 2477.13062290081,
+        "uv_lamp": 6623.06319007316
+      },
+      "xp_collected": 39
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 24.4833333333332,
+      "build": "melee_single",
+      "chests_collected": 0,
+      "coins_collected": 47,
+      "damage_dealt": 9207.42,
+      "damage_taken": 93.6806896551724,
+      "distance_travelled": 4974.63603210449,
+      "dps": 375.81306122449,
+      "healing": 59.2745668282737,
+      "health_end": 106.593877173101,
+      "health_min": 97.6498179527115,
+      "health_start": 141.0,
+      "kills": 57,
+      "leech_healing": 46.8745668282739,
+      "max_step_distance": 3.68005537986755,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.606122448979592,
+      "near_enemy_seconds": 14.85,
+      "outcome": "boss_killed",
+      "overheal": 0.308163418291252,
+      "peak_enemies": 24,
+      "peak_enemy_projectiles": 3,
+      "pending_levels": 3,
+      "proc_damage": {
+        "affix_fire": 272.76805451
+      },
+      "seconds": 24.5,
+      "seed": 13579,
+      "setup": "10/melee_single/shop",
+      "spawn_plan": "9249feb4ff27f55754cb63f25e3bde6a1cfbd99e97435c4e6ecb115eca578e45",
+      "spawns": 70,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.934013605442177,
+      "wave": 10,
+      "weapon_damage": {
+        "turbo_drill": 8934.65194549
+      },
+      "xp_collected": 36
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 24.5666666666666,
+      "build": "melee_single",
+      "chests_collected": 2,
+      "coins_collected": 32,
+      "damage_dealt": 9405.18530630267,
+      "damage_taken": 95.5608620689655,
+      "distance_travelled": 4987.89625382423,
+      "dps": 382.583809069939,
+      "healing": 60.6254656138857,
+      "health_end": 106.06460354492,
+      "health_min": 102.36460354492,
+      "health_start": 141.0,
+      "kills": 59,
+      "leech_healing": 47.9254656138859,
+      "max_step_distance": 3.68003797531128,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.642033898305085,
+      "near_enemy_seconds": 15.7833333333333,
+      "outcome": "boss_killed",
+      "overheal": 3.06671354977084e-13,
+      "peak_enemies": 19,
+      "peak_enemy_projectiles": 9,
+      "pending_levels": 3,
+      "proc_damage": {
+        "affix_fire": 368.334458474346
+      },
+      "seconds": 24.5833333333333,
+      "seed": 24680,
+      "setup": "10/melee_single/shop",
+      "spawn_plan": "0dd693bb3fd1216c0cd4fd96eb8c628860a1f66899c87caf0efe8bed24ccd0af",
+      "spawns": 70,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.947796610169492,
+      "wave": 10,
+      "weapon_damage": {
+        "turbo_drill": 9036.85084782833
+      },
+      "xp_collected": 27
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 27.1833333333331,
+      "build": "melee_single",
+      "chests_collected": 1,
+      "coins_collected": 42,
+      "damage_dealt": 10759.051551748,
+      "damage_taken": 200.424310344828,
+      "distance_travelled": 4563.46458232403,
+      "dps": 395.553365873089,
+      "healing": 74.1451088231549,
+      "health_end": 14.7207984783273,
+      "health_min": 13.3707984783273,
+      "health_start": 141.0,
+      "kills": 65,
+      "leech_healing": 58.945108823155,
+      "max_step_distance": 3.68003940582275,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.742647058823529,
+      "near_enemy_seconds": 20.2,
+      "outcome": "boss_killed",
+      "overheal": 1.22714338690599e-13,
+      "peak_enemies": 30,
+      "peak_enemy_projectiles": 3,
+      "pending_levels": 3,
+      "proc_damage": {
+        "affix_fire": 329.236622246252
+      },
+      "seconds": 27.2,
+      "seed": 112233,
+      "setup": "10/melee_single/shop",
+      "spawn_plan": "d5f6cb22a74b084eb0b8d0e72775bc30150a5da1779f2ad2f799a0171c0f087e",
+      "spawns": 77,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.933823529411765,
+      "wave": 10,
+      "weapon_damage": {
+        "turbo_drill": 10429.8149295018
+      },
+      "xp_collected": 32
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 22.4333333333333,
+      "build": "melee_area",
+      "chests_collected": 1,
+      "coins_collected": 41,
+      "damage_dealt": 8622.05254106828,
+      "damage_taken": 70.4979310344828,
+      "distance_travelled": 4388.36438250542,
+      "dps": 384.055792475202,
+      "healing": 46.4634156252855,
+      "health_end": 116.965484590803,
+      "health_min": 116.965484590803,
+      "health_start": 141.0,
+      "kills": 50,
+      "leech_healing": 37.2582855621693,
+      "max_step_distance": 3.6800332069397,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.937639198218263,
+      "near_enemy_seconds": 21.05,
+      "outcome": "boss_killed",
+      "overheal": 1.22854385307404,
+      "peak_enemies": 25,
+      "peak_enemy_projectiles": 3,
+      "pending_levels": 3,
+      "proc_damage": {
+        "affix_fire": 329.251096547375,
+        "bleed": 97.8557102782608
+      },
+      "seconds": 22.45,
+      "seed": 13579,
+      "setup": "10/melee_area/shop",
+      "spawn_plan": "9249feb4ff27f55754cb63f25e3bde6a1cfbd99e97435c4e6ecb115eca578e45",
+      "spawns": 65,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.84112843355605,
+      "wave": 10,
+      "weapon_damage": {
+        "interdental_brush": 8194.94573424266
+      },
+      "xp_collected": 32
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 22.15,
+      "build": "melee_area",
+      "chests_collected": 2,
+      "coins_collected": 29,
+      "damage_dealt": 7844.81158182853,
+      "damage_taken": 64.2956896551724,
+      "distance_travelled": 4317.33091115952,
+      "dps": 353.901274368204,
+      "healing": 37.3729327499848,
+      "health_end": 114.077243094812,
+      "health_min": 114.077243094812,
+      "health_start": 141.0,
+      "kills": 48,
+      "leech_healing": 32.333925348657,
+      "max_step_distance": 3.68005180358887,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.948872180451128,
+      "near_enemy_seconds": 21.0333333333333,
+      "outcome": "boss_killed",
+      "overheal": 4.8746580330361,
+      "peak_enemies": 22,
+      "peak_enemy_projectiles": 9,
+      "pending_levels": 3,
+      "proc_damage": {
+        "affix_fire": 314.94734750741,
+        "bleed": 94.4039486782609
+      },
+      "seconds": 22.1666666666667,
+      "seed": 24680,
+      "setup": "10/melee_area/shop",
+      "spawn_plan": "0dd693bb3fd1216c0cd4fd96eb8c628860a1f66899c87caf0efe8bed24ccd0af",
+      "spawns": 64,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.855639097744361,
+      "wave": 10,
+      "weapon_damage": {
+        "interdental_brush": 7435.46028564286
+      },
+      "xp_collected": 37
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 22.9166666666666,
+      "build": "melee_area",
+      "chests_collected": 0,
+      "coins_collected": 38,
+      "damage_dealt": 8691.1404581844,
+      "damage_taken": 65.7713793103448,
+      "distance_travelled": 4800.17945122719,
+      "dps": 378.974147885948,
+      "healing": 42.8531454096711,
+      "health_end": 118.081766099326,
+      "health_min": 112.508060344828,
+      "health_start": 141.0,
+      "kills": 54,
+      "leech_healing": 33.8531454096712,
+      "max_step_distance": 3.68003940582275,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.917151162790698,
+      "near_enemy_seconds": 21.0333333333333,
+      "outcome": "boss_killed",
+      "overheal": 2.47455395974719,
+      "peak_enemies": 23,
+      "peak_enemy_projectiles": 3,
+      "pending_levels": 3,
+      "proc_damage": {
+        "affix_fire": 234.315159737081,
+        "bleed": 98.4665235826087
+      },
+      "seconds": 22.9333333333333,
+      "seed": 112233,
+      "setup": "10/melee_area/shop",
+      "spawn_plan": "d5f6cb22a74b084eb0b8d0e72775bc30150a5da1779f2ad2f799a0171c0f087e",
+      "spawns": 66,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.880087209302326,
+      "wave": 10,
+      "weapon_damage": {
+        "interdental_brush": 8358.35877486472
+      },
+      "xp_collected": 34
+    },
+    {
+      "boss_health_fraction": 0.199793851620872,
+      "boss_ttk": null,
+      "build": "ranged_single",
+      "chests_collected": 0,
+      "coins_collected": 31,
+      "damage_dealt": 10281.0527814457,
+      "damage_taken": 249.054570387496,
+      "distance_travelled": 3739.58894896507,
+      "dps": 340.244438437255,
+      "healing": 108.054570387496,
+      "health_end": 0.0,
+      "health_min": 0.0,
+      "health_start": 141.0,
+      "kills": 61,
+      "leech_healing": 93.5545703874958,
+      "max_step_distance": 3.68003487586975,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.268063982349697,
+      "near_enemy_seconds": 8.1,
+      "outcome": "death",
+      "overheal": 0.100000000000527,
+      "peak_enemies": 40,
+      "peak_enemy_projectiles": 9,
+      "pending_levels": 3,
+      "proc_damage": {
+        "affix_fire": 515.578676048539
+      },
+      "seconds": 30.2166666666667,
+      "seed": 13579,
+      "setup": "10/ranged_single/shop",
+      "spawn_plan": "9249feb4ff27f55754cb63f25e3bde6a1cfbd99e97435c4e6ecb115eca578e45",
+      "spawns": 101,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.988416988416988,
+      "wave": 10,
+      "weapon_damage": {
+        "enamel_mirror": 9765.47410539716
+      },
+      "xp_collected": 26
+    },
+    {
+      "boss_health_fraction": 0.333333333333333,
+      "boss_ttk": null,
+      "build": "ranged_single",
+      "chests_collected": 2,
+      "coins_collected": 33,
+      "damage_dealt": 13317.0287351224,
+      "damage_taken": 283.743131018387,
+      "distance_travelled": 5386.41534334421,
+      "dps": 353.393066832085,
+      "healing": 142.743131018386,
+      "health_end": 0.0,
+      "health_min": 0.0,
+      "health_start": 141.0,
+      "kills": 78,
+      "leech_healing": 124.143131018387,
+      "max_step_distance": 3.68004822731018,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.372401592215834,
+      "near_enemy_seconds": 14.0333333333333,
+      "outcome": "death",
+      "overheal": 0.289710735550531,
+      "peak_enemies": 52,
+      "peak_enemy_projectiles": 25,
+      "pending_levels": 3,
+      "proc_damage": {
+        "affix_fire": 683.66164709307
+      },
+      "seconds": 37.6833333333333,
+      "seed": 24680,
+      "setup": "10/ranged_single/shop",
+      "spawn_plan": "0dd693bb3fd1216c0cd4fd96eb8c628860a1f66899c87caf0efe8bed24ccd0af",
+      "spawns": 130,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.996461742591774,
+      "wave": 10,
+      "weapon_damage": {
+        "enamel_mirror": 12633.3670880293
+      },
+      "xp_collected": 36
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 50.4666666666651,
+      "build": "ranged_single",
+      "chests_collected": 1,
+      "coins_collected": 53,
+      "damage_dealt": 16577.2668533706,
+      "damage_taken": 258.429310344828,
+      "distance_travelled": 9545.08454287052,
+      "dps": 328.37108326254,
+      "healing": 198.48369654732,
+      "health_end": 81.0543862024937,
+      "health_min": 75.7986688111893,
+      "health_start": 141.0,
+      "kills": 95,
+      "leech_healing": 174.18369654732,
+      "max_step_distance": 3.68005871772766,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.332122812809508,
+      "near_enemy_seconds": 16.7666666666667,
+      "outcome": "boss_killed",
+      "overheal": 1.02870489904205e-12,
+      "peak_enemies": 61,
+      "peak_enemy_projectiles": 33,
+      "pending_levels": 4,
+      "proc_damage": {
+        "affix_fire": 934.858015242123
+      },
+      "seconds": 50.4833333333333,
+      "seed": 112233,
+      "setup": "10/ranged_single/shop",
+      "spawn_plan": "d5f6cb22a74b084eb0b8d0e72775bc30150a5da1779f2ad2f799a0171c0f087e",
+      "spawns": 156,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.988114889402443,
+      "wave": 10,
+      "weapon_damage": {
+        "enamel_mirror": 15642.4088381284
+      },
+      "xp_collected": 43
+    },
+    {
+      "boss_health_fraction": 0.146149802045208,
+      "boss_ttk": null,
+      "build": "uv_floss",
+      "chests_collected": 1,
+      "coins_collected": 63,
+      "damage_dealt": 51978.6829473911,
+      "damage_taken": 313.635386068677,
+      "distance_travelled": 6915.50007259846,
+      "dps": 1351.85131202578,
+      "healing": 163.635386068677,
+      "health_end": 0.0,
+      "health_min": 0.0,
+      "health_start": 150.0,
+      "kills": 134,
+      "leech_healing": 102.560386068677,
+      "max_step_distance": 3.60337066650391,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.662332032943216,
+      "near_enemy_seconds": 25.4666666666667,
+      "outcome": "death",
+      "overheal": 9.17797531517707,
+      "peak_enemies": 50,
+      "peak_enemy_projectiles": 20,
+      "pending_levels": 5,
+      "proc_damage": {
+        "affix_fire": 6216.16136537984,
+        "bleed": 643.867522295343
+      },
+      "seconds": 38.45,
+      "seed": 13579,
+      "setup": "15/uv_floss/shop",
+      "spawn_plan": "738dc97e44572402f0831031e0d51d5932c131ffa39b227ba5287c47ba71357a",
+      "spawns": 177,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.995087415113423,
+      "wave": 15,
+      "weapon_damage": {
+        "floss_garrote": 16286.2119856806,
+        "uv_lamp": 28832.4420740352
+      },
+      "xp_collected": 55
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 43.6333333333321,
+      "build": "uv_floss",
+      "chests_collected": 2,
+      "coins_collected": 75,
+      "damage_dealt": 67312.7870208256,
+      "damage_taken": 339.944583333333,
+      "distance_travelled": 8039.01825773716,
+      "dps": 1542.10279543701,
+      "healing": 222.475889600001,
+      "health_end": 32.5313062666671,
+      "health_min": 24.5313062666672,
+      "health_start": 150.0,
+      "kills": 176,
+      "leech_healing": 135.660889600001,
+      "max_step_distance": 3.60336637496948,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.627338678885071,
+      "near_enemy_seconds": 27.3833333333333,
+      "outcome": "boss_killed",
+      "overheal": 6.62176845714306,
+      "peak_enemies": 48,
+      "peak_enemy_projectiles": 36,
+      "pending_levels": 5,
+      "proc_damage": {
+        "affix_fire": 7347.68775322752,
+        "bleed": 688.321778158405
+      },
+      "seconds": 43.65,
+      "seed": 24680,
+      "setup": "15/uv_floss/shop",
+      "spawn_plan": "53a500da08643c020c262a4f5f58c8cb1dd43308640876e9d42c494dec67f5c3",
+      "spawns": 201,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.997072674048619,
+      "wave": 15,
+      "weapon_damage": {
+        "floss_garrote": 21770.5867881943,
+        "uv_lamp": 37506.190701245
+      },
+      "xp_collected": 60
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 31.8999999999995,
+      "build": "uv_floss",
+      "chests_collected": 0,
+      "coins_collected": 60,
+      "damage_dealt": 32193.9513260074,
+      "damage_taken": 198.2375,
+      "distance_travelled": 6603.76599359512,
+      "dps": 1008.68777000545,
+      "healing": 142.8670244625,
+      "health_end": 94.6295244625004,
+      "health_min": 77.6295244625003,
+      "health_start": 150.0,
+      "kills": 113,
+      "leech_healing": 85.310595891072,
+      "max_step_distance": 3.60337114334106,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.502349869451697,
+      "near_enemy_seconds": 16.0333333333333,
+      "outcome": "boss_killed",
+      "overheal": 3.04357142857164,
+      "peak_enemies": 43,
+      "peak_enemy_projectiles": 11,
+      "pending_levels": 4,
+      "proc_damage": {
+        "affix_fire": 3327.8623980911,
+        "bleed": 246.990025142855
+      },
+      "seconds": 31.9166666666667,
+      "seed": 112233,
+      "setup": "15/uv_floss/shop",
+      "spawn_plan": "c53323a1673bf4315cde45ae40d266e1e551eccc3434a538535ddd7d83d317af",
+      "spawns": 154,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.992689295039164,
+      "wave": 15,
+      "weapon_damage": {
+        "floss_garrote": 7870.3064033897,
+        "uv_lamp": 20748.7924993836
+      },
+      "xp_collected": 53
+    },
+    {
+      "boss_health_fraction": 0.412727013355719,
+      "boss_ttk": null,
+      "build": "melee_single",
+      "chests_collected": 1,
+      "coins_collected": 45,
+      "damage_dealt": 20331.4443416154,
+      "damage_taken": 260.14138221889,
+      "distance_travelled": 5475.36015868187,
+      "dps": 787.531736925065,
+      "healing": 110.14138221889,
+      "health_end": 0.0,
+      "health_min": 0.0,
+      "health_start": 150.0,
+      "kills": 84,
+      "leech_healing": 69.1413822188904,
+      "max_step_distance": 3.60336709022522,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.589412524209167,
+      "near_enemy_seconds": 15.2166666666667,
+      "outcome": "death",
+      "overheal": 3.68732142857184,
+      "peak_enemies": 27,
+      "peak_enemy_projectiles": 22,
+      "pending_levels": 3,
+      "proc_damage": {
+        "affix_fire": 524.312116236011
+      },
+      "seconds": 25.8166666666667,
+      "seed": 13579,
+      "setup": "15/melee_single/shop",
+      "spawn_plan": "738dc97e44572402f0831031e0d51d5932c131ffa39b227ba5287c47ba71357a",
+      "spawns": 106,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.96901226597805,
+      "wave": 15,
+      "weapon_damage": {
+        "turbo_drill": 19807.1322253794
+      },
+      "xp_collected": 37
+    },
+    {
+      "boss_health_fraction": 0.313454062681731,
+      "boss_ttk": null,
+      "build": "melee_single",
+      "chests_collected": 2,
+      "coins_collected": 61,
+      "damage_dealt": 32908.7890677037,
+      "damage_taken": 313.649943001828,
+      "distance_travelled": 7757.60604023933,
+      "dps": 901.610659389143,
+      "healing": 163.649943001828,
+      "health_end": 0.0,
+      "health_min": 0.0,
+      "health_start": 150.0,
+      "kills": 113,
+      "leech_healing": 107.249943001828,
+      "max_step_distance": 3.60338664054871,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.73013698630137,
+      "near_enemy_seconds": 26.65,
+      "outcome": "death",
+      "overheal": 3.47982142857185,
+      "peak_enemies": 59,
+      "peak_enemy_projectiles": 23,
+      "pending_levels": 3,
+      "proc_damage": {
+        "affix_fire": 962.552602852784
+      },
+      "seconds": 36.5,
+      "seed": 24680,
+      "setup": "15/melee_single/shop",
+      "spawn_plan": "53a500da08643c020c262a4f5f58c8cb1dd43308640876e9d42c494dec67f5c3",
+      "spawns": 170,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.98310502283105,
+      "wave": 15,
+      "weapon_damage": {
+        "turbo_drill": 31946.236464851
+      },
+      "xp_collected": 34
+    },
+    {
+      "boss_health_fraction": 0.61645428232032,
+      "boss_ttk": null,
+      "build": "melee_single",
+      "chests_collected": 1,
+      "coins_collected": 31,
+      "damage_dealt": 26919.3280521891,
+      "damage_taken": 295.890490485922,
+      "distance_travelled": 6918.40113019943,
+      "dps": 840.353633262927,
+      "healing": 145.890490485921,
+      "health_end": 0.0,
+      "health_min": 0.0,
+      "health_start": 150.0,
+      "kills": 103,
+      "leech_healing": 95.8904904859218,
+      "max_step_distance": 3.60337400436401,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.728928199791884,
+      "near_enemy_seconds": 23.35,
+      "outcome": "death",
+      "overheal": 0.432142857143807,
+      "peak_enemies": 45,
+      "peak_enemy_projectiles": 19,
+      "pending_levels": 2,
+      "proc_damage": {
+        "affix_fire": 853.140420619357
+      },
+      "seconds": 32.0333333333333,
+      "seed": 112233,
+      "setup": "15/melee_single/shop",
+      "spawn_plan": "c53323a1673bf4315cde45ae40d266e1e551eccc3434a538535ddd7d83d317af",
+      "spawns": 148,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.962018730489074,
+      "wave": 15,
+      "weapon_damage": {
+        "turbo_drill": 26066.1876315698
+      },
+      "xp_collected": 21
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 26.4999999999998,
+      "build": "melee_area",
+      "chests_collected": 2,
+      "coins_collected": 42,
+      "damage_dealt": 25558.8207531312,
+      "damage_taken": 138.666666666667,
+      "distance_travelled": 5729.30085301399,
+      "dps": 963.877589684394,
+      "healing": 81.6472454775412,
+      "health_end": 92.9805788108745,
+      "health_min": 92.9805788108745,
+      "health_start": 150.0,
+      "kills": 95,
+      "leech_healing": 51.6472454775413,
+      "max_step_distance": 3.60337376594543,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.960402262727844,
+      "near_enemy_seconds": 25.4666666666667,
+      "outcome": "boss_killed",
+      "overheal": 13.6116939669703,
+      "peak_enemies": 41,
+      "peak_enemy_projectiles": 16,
+      "pending_levels": 3,
+      "proc_damage": {
+        "affix_fire": 655.264673076724,
+        "bleed": 221.922127632554
+      },
+      "seconds": 26.5166666666667,
+      "seed": 13579,
+      "setup": "15/melee_area/shop",
+      "spawn_plan": "738dc97e44572402f0831031e0d51d5932c131ffa39b227ba5287c47ba71357a",
+      "spawns": 135,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.952859836580767,
+      "wave": 15,
+      "weapon_damage": {
+        "interdental_brush": 24681.633952422
+      },
+      "xp_collected": 25
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 26.3333333333331,
+      "build": "melee_area",
+      "chests_collected": 3,
+      "coins_collected": 45,
+      "damage_dealt": 23537.4817675141,
+      "damage_taken": 91.9291666666667,
+      "distance_travelled": 5693.26716661453,
+      "dps": 893.263065180799,
+      "healing": 63.3494642857142,
+      "health_end": 121.420297619048,
+      "health_min": 111.407261904762,
+      "health_start": 150.0,
+      "kills": 90,
+      "leech_healing": 42.9004948853428,
+      "max_step_distance": 3.60337471961975,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.967741935483871,
+      "near_enemy_seconds": 25.5,
+      "outcome": "boss_killed",
+      "overheal": 23.3643238857146,
+      "peak_enemies": 32,
+      "peak_enemy_projectiles": 21,
+      "pending_levels": 3,
+      "proc_damage": {
+        "affix_fire": 687.247613775756,
+        "bleed": 218.053110857143
+      },
+      "seconds": 26.35,
+      "seed": 24680,
+      "setup": "15/melee_area/shop",
+      "spawn_plan": "53a500da08643c020c262a4f5f58c8cb1dd43308640876e9d42c494dec67f5c3",
+      "spawns": 115,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.959519291587603,
+      "wave": 15,
+      "weapon_damage": {
+        "interdental_brush": 22632.1810428812
+      },
+      "xp_collected": 36
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 26.9499999999998,
+      "build": "melee_area",
+      "chests_collected": 0,
+      "coins_collected": 48,
+      "damage_dealt": 26436.9587875355,
+      "damage_taken": 170.499166666667,
+      "distance_travelled": 5826.5899066925,
+      "dps": 980.356938969179,
+      "healing": 116.827867624114,
+      "health_end": 96.328700957447,
+      "health_min": 90.008700957447,
+      "health_start": 150.0,
+      "kills": 100,
+      "leech_healing": 75.0212604812561,
+      "max_step_distance": 3.60337352752686,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.944993819530284,
+      "near_enemy_seconds": 25.4833333333333,
+      "outcome": "boss_killed",
+      "overheal": 8.19339285714324,
+      "peak_enemies": 35,
+      "peak_enemy_projectiles": 14,
+      "pending_levels": 3,
+      "proc_damage": {
+        "affix_fire": 819.057581142857,
+        "bleed": 191.572435135433
+      },
+      "seconds": 26.9666666666667,
+      "seed": 112233,
+      "setup": "15/melee_area/shop",
+      "spawn_plan": "c53323a1673bf4315cde45ae40d266e1e551eccc3434a538535ddd7d83d317af",
+      "spawns": 117,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.937577255871446,
+      "wave": 15,
+      "weapon_damage": {
+        "interdental_brush": 25426.3287712573
+      },
+      "xp_collected": 30
+    },
+    {
+      "boss_health_fraction": 0.666217680148768,
+      "boss_ttk": null,
+      "build": "ranged_single",
+      "chests_collected": 1,
+      "coins_collected": 21,
+      "damage_dealt": 21387.0832165,
+      "damage_taken": 255.558215003125,
+      "distance_travelled": 7045.91082596779,
+      "dps": 652.376712247075,
+      "healing": 105.558215003125,
+      "health_end": 0.0,
+      "health_min": 0.0,
+      "health_start": 150.0,
+      "kills": 80,
+      "leech_healing": 67.3082150031248,
+      "max_step_distance": 3.60337519645691,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.56532791052364,
+      "near_enemy_seconds": 18.5333333333333,
+      "outcome": "death",
+      "overheal": 3.65232142857163,
+      "peak_enemies": 71,
+      "peak_enemy_projectiles": 39,
+      "pending_levels": 2,
+      "proc_damage": {
+        "affix_fire": 1150.71248091964
+      },
+      "seconds": 32.7833333333333,
+      "seed": 13579,
+      "setup": "15/ranged_single/shop",
+      "spawn_plan": "738dc97e44572402f0831031e0d51d5932c131ffa39b227ba5287c47ba71357a",
+      "spawns": 150,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.992374173868836,
+      "wave": 15,
+      "weapon_damage": {
+        "enamel_mirror": 20236.3707355804
+      },
+      "xp_collected": 19
+    },
+    {
+      "boss_health_fraction": 0.620260129102743,
+      "boss_ttk": null,
+      "build": "ranged_single",
+      "chests_collected": 0,
+      "coins_collected": 33,
+      "damage_dealt": 29529.7367778499,
+      "damage_taken": 266.358333333334,
+      "distance_travelled": 8978.31018400192,
+      "dps": 703.368085220721,
+      "healing": 116.358333333334,
+      "health_end": 0.0,
+      "health_min": 0.0,
+      "health_start": 150.0,
+      "kills": 107,
+      "leech_healing": 74.343458666071,
+      "max_step_distance": 3.60337352752686,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.579198094481937,
+      "near_enemy_seconds": 24.3166666666667,
+      "outcome": "death",
+      "overheal": 11.3851253327382,
+      "peak_enemies": 81,
+      "peak_enemy_projectiles": 57,
+      "pending_levels": 3,
+      "proc_damage": {
+        "affix_fire": 1474.09604971964
+      },
+      "seconds": 41.9833333333333,
+      "seed": 24680,
+      "setup": "15/ranged_single/shop",
+      "spawn_plan": "53a500da08643c020c262a4f5f58c8cb1dd43308640876e9d42c494dec67f5c3",
+      "spawns": 188,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.998412068281064,
+      "wave": 15,
+      "weapon_damage": {
+        "enamel_mirror": 28055.6407281303
+      },
+      "xp_collected": 27
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 61.1833333333311,
+      "build": "ranged_single",
+      "chests_collected": 2,
+      "coins_collected": 62,
+      "damage_dealt": 36305.2869733921,
+      "damage_taken": 317.2,
+      "distance_travelled": 12984.4116642475,
+      "dps": 593.22364335608,
+      "healing": 190.614202550857,
+      "health_end": 23.4142025508576,
+      "health_min": 10.1761154285717,
+      "health_start": 150.0,
+      "kills": 114,
+      "leech_healing": 126.414202550858,
+      "max_step_distance": 3.60337233543396,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.461601307189543,
+      "near_enemy_seconds": 28.25,
+      "outcome": "boss_killed",
+      "overheal": 6.40000000000027,
+      "peak_enemies": 92,
+      "peak_enemy_projectiles": 72,
+      "pending_levels": 4,
+      "proc_damage": {
+        "affix_fire": 2215.17781681057
+      },
+      "seconds": 61.2,
+      "seed": 112233,
+      "setup": "15/ranged_single/shop",
+      "spawn_plan": "c53323a1673bf4315cde45ae40d266e1e551eccc3434a538535ddd7d83d317af",
+      "spawns": 205,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.993464052287582,
+      "wave": 15,
+      "weapon_damage": {
+        "enamel_mirror": 34090.1091565816
+      },
+      "xp_collected": 48
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 44.3999999999988,
+      "build": "uv_floss",
+      "chests_collected": 2,
+      "coins_collected": 56,
+      "damage_dealt": 145622.447565349,
+      "damage_taken": 317.727627906977,
+      "distance_travelled": 9395.03951239586,
+      "dps": 3278.55416657447,
+      "healing": 289.330086515934,
+      "health_end": 127.602458608957,
+      "health_min": 85.668306784132,
+      "health_start": 156.0,
+      "kills": 170,
+      "leech_healing": 183.130086515934,
+      "max_step_distance": 3.52670907974243,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.643151969981238,
+      "near_enemy_seconds": 28.5666666666667,
+      "outcome": "boss_killed",
+      "overheal": 10.3716279069769,
+      "peak_enemies": 59,
+      "peak_enemy_projectiles": 42,
+      "pending_levels": 3,
+      "proc_damage": {
+        "affix_fire": 21538.3140361288,
+        "bleed": 1007.38493135568
+      },
+      "seconds": 44.4166666666667,
+      "seed": 13579,
+      "setup": "20/uv_floss/shop",
+      "spawn_plan": "28147036d819622b3981b154238944c4cc4eb57f0873efb30577b32228bae8b6",
+      "spawns": 219,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.995997498436523,
+      "wave": 20,
+      "weapon_damage": {
+        "floss_garrote": 32410.0128044144,
+        "uv_lamp": 90666.7357934506
+      },
+      "xp_collected": 37
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 42.0999999999989,
+      "build": "uv_floss",
+      "chests_collected": 1,
+      "coins_collected": 70,
+      "damage_dealt": 146430.751054199,
+      "damage_taken": 332.781720930233,
+      "distance_travelled": 8335.43521475792,
+      "dps": 3476.78870726234,
+      "healing": 282.62573942608,
+      "health_end": 105.844018495848,
+      "health_min": 77.2202790697677,
+      "health_start": 156.0,
+      "kills": 175,
+      "leech_healing": 167.987599891196,
+      "max_step_distance": 3.52670216560364,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.52789869410368,
+      "near_enemy_seconds": 22.2333333333333,
+      "outcome": "boss_killed",
+      "overheal": 10.5297209302328,
+      "peak_enemies": 57,
+      "peak_enemy_projectiles": 38,
+      "pending_levels": 5,
+      "proc_damage": {
+        "affix_fire": 22350.9118134031,
+        "bleed": 1146.10878207604
+      },
+      "seconds": 42.1166666666667,
+      "seed": 24680,
+      "setup": "20/uv_floss/shop",
+      "spawn_plan": "483f79dccc1b15e5c3cb8d1fb0959a289168d4fe9fde430541b9c8e5410a47f7",
+      "spawns": 211,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.997361825616673,
+      "wave": 20,
+      "weapon_damage": {
+        "floss_garrote": 35898.3945905014,
+        "uv_lamp": 87035.3358682189
+      },
+      "xp_collected": 59
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 46.383333333332,
+      "build": "uv_floss",
+      "chests_collected": 1,
+      "coins_collected": 45,
+      "damage_dealt": 137182.942973279,
+      "damage_taken": 325.242,
+      "distance_travelled": 9811.18886899948,
+      "dps": 2956.52894338963,
+      "healing": 284.072143989932,
+      "health_end": 114.830143989932,
+      "health_min": 96.6092540922868,
+      "health_start": 156.0,
+      "kills": 166,
+      "leech_healing": 182.756795152722,
+      "max_step_distance": 3.52670741081238,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.602011494252874,
+      "near_enemy_seconds": 27.9333333333333,
+      "outcome": "boss_killed",
+      "overheal": 13.9934883720932,
+      "peak_enemies": 60,
+      "peak_enemy_projectiles": 36,
+      "pending_levels": 4,
+      "proc_damage": {
+        "affix_fire": 21007.8332456236,
+        "bleed": 1105.64400880889
+      },
+      "seconds": 46.4,
+      "seed": 112233,
+      "setup": "20/uv_floss/shop",
+      "spawn_plan": "76d4392ba0663fa4036368ca43bf6d137581a572c3011962b0964950738d5bef",
+      "spawns": 221,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.994731800766284,
+      "wave": 20,
+      "weapon_damage": {
+        "floss_garrote": 32722.016972419,
+        "uv_lamp": 82347.448746429
+      },
+      "xp_collected": 44
+    },
+    {
+      "boss_health_fraction": 0.666666666666667,
+      "boss_ttk": null,
+      "build": "melee_single",
+      "chests_collected": 1,
+      "coins_collected": 22,
+      "damage_dealt": 43968.2912833387,
+      "damage_taken": 315.646598030722,
+      "distance_travelled": 5691.2587647438,
+      "dps": 1630.46815636608,
+      "healing": 159.646598030722,
+      "health_end": 0.0,
+      "health_min": 0.0,
+      "health_start": 156.0,
+      "kills": 89,
+      "leech_healing": 96.2465980307215,
+      "max_step_distance": 3.52670407295227,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.685414091470952,
+      "near_enemy_seconds": 18.4833333333333,
+      "outcome": "death",
+      "overheal": 3.07198710913781e-13,
+      "peak_enemies": 37,
+      "peak_enemy_projectiles": 29,
+      "pending_levels": 2,
+      "proc_damage": {
+        "affix_fire": 1781.09980268418
+      },
+      "seconds": 26.9666666666667,
+      "seed": 13579,
+      "setup": "20/melee_single/shop",
+      "spawn_plan": "28147036d819622b3981b154238944c4cc4eb57f0873efb30577b32228bae8b6",
+      "spawns": 119,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.969715698393078,
+      "wave": 20,
+      "weapon_damage": {
+        "turbo_drill": 42187.1914806545
+      },
+      "xp_collected": 21
+    },
+    {
+      "boss_health_fraction": 0.540526731447958,
+      "boss_ttk": null,
+      "build": "melee_single",
+      "chests_collected": 2,
+      "coins_collected": 29,
+      "damage_dealt": 49612.6229257774,
+      "damage_taken": 333.375629918867,
+      "distance_travelled": 6363.25765872002,
+      "dps": 1640.08670829016,
+      "healing": 177.375629918867,
+      "health_end": 0.0,
+      "health_min": 0.0,
+      "health_start": 156.0,
+      "kills": 99,
+      "leech_healing": 108.775629918867,
+      "max_step_distance": 3.52670168876648,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.667217630853994,
+      "near_enemy_seconds": 20.1833333333333,
+      "outcome": "death",
+      "overheal": 2.11053396981242e-13,
+      "peak_enemies": 56,
+      "peak_enemy_projectiles": 36,
+      "pending_levels": 2,
+      "proc_damage": {
+        "affix_fire": 2181.2924726613
+      },
+      "seconds": 30.25,
+      "seed": 24680,
+      "setup": "20/melee_single/shop",
+      "spawn_plan": "483f79dccc1b15e5c3cb8d1fb0959a289168d4fe9fde430541b9c8e5410a47f7",
+      "spawns": 155,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.980165289256198,
+      "wave": 20,
+      "weapon_damage": {
+        "turbo_drill": 47431.330453116
+      },
+      "xp_collected": 19
+    },
+    {
+      "boss_health_fraction": 0.588668818855553,
+      "boss_ttk": null,
+      "build": "melee_single",
+      "chests_collected": 1,
+      "coins_collected": 25,
+      "damage_dealt": 47797.9431805053,
+      "damage_taken": 328.606279069768,
+      "distance_travelled": 6348.0003991127,
+      "dps": 1591.49644330206,
+      "healing": 172.606279069768,
+      "health_end": 0.0,
+      "health_min": 0.0,
+      "health_start": 156.0,
+      "kills": 96,
+      "leech_healing": 103.12625,
+      "max_step_distance": 3.52670502662659,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.60377358490566,
+      "near_enemy_seconds": 18.1333333333333,
+      "outcome": "death",
+      "overheal": 2.53574938824386e-13,
+      "peak_enemies": 59,
+      "peak_enemy_projectiles": 39,
+      "pending_levels": 3,
+      "proc_damage": {
+        "affix_fire": 1988.35007129482
+      },
+      "seconds": 30.0333333333333,
+      "seed": 112233,
+      "setup": "20/melee_single/shop",
+      "spawn_plan": "76d4392ba0663fa4036368ca43bf6d137581a572c3011962b0964950738d5bef",
+      "spawns": 154,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.967813540510544,
+      "wave": 20,
+      "weapon_damage": {
+        "turbo_drill": 45809.5931092106
+      },
+      "xp_collected": 24
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 37.2166666666658,
+      "build": "melee_area",
+      "chests_collected": 2,
+      "coins_collected": 80,
+      "damage_dealt": 123923.16476699,
+      "damage_taken": 213.661627906977,
+      "distance_travelled": 7118.27302145958,
+      "dps": 3328.28553537126,
+      "healing": 205.476697674419,
+      "health_end": 147.815069767442,
+      "health_min": 127.249174270699,
+      "health_start": 156.0,
+      "kills": 154,
+      "leech_healing": 119.683146389186,
+      "max_step_distance": 3.52669906616211,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.972694717994628,
+      "near_enemy_seconds": 36.2166666666667,
+      "outcome": "boss_killed",
+      "overheal": 29.4814614536431,
+      "peak_enemies": 56,
+      "peak_enemy_projectiles": 44,
+      "pending_levels": 5,
+      "proc_damage": {
+        "affix_fire": 10866.6812737991,
+        "bleed": 880.108122984529
+      },
+      "seconds": 37.2333333333333,
+      "seed": 13579,
+      "setup": "20/melee_area/shop",
+      "spawn_plan": "28147036d819622b3981b154238944c4cc4eb57f0873efb30577b32228bae8b6",
+      "spawns": 188,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.96911369740376,
+      "wave": 20,
+      "weapon_damage": {
+        "interdental_brush": 112176.375370205
+      },
+      "xp_collected": 68
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 37.0166666666658,
+      "build": "melee_area",
+      "chests_collected": 2,
+      "coins_collected": 74,
+      "damage_dealt": 117468.162806752,
+      "damage_taken": 221.531348837209,
+      "distance_travelled": 7179.0842063427,
+      "dps": 3171.95759154145,
+      "healing": 181.802005958759,
+      "health_end": 116.27065712155,
+      "health_min": 115.900969588217,
+      "health_start": 156.0,
+      "kills": 142,
+      "leech_healing": 112.405513710697,
+      "max_step_distance": 3.52670168876648,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.977947794779478,
+      "near_enemy_seconds": 36.2166666666667,
+      "outcome": "boss_killed",
+      "overheal": 30.0919426408753,
+      "peak_enemies": 54,
+      "peak_enemy_projectiles": 39,
+      "pending_levels": 4,
+      "proc_damage": {
+        "affix_fire": 10271.661248883,
+        "bleed": 851.732592837517
+      },
+      "seconds": 37.0333333333333,
+      "seed": 24680,
+      "setup": "20/melee_area/shop",
+      "spawn_plan": "483f79dccc1b15e5c3cb8d1fb0959a289168d4fe9fde430541b9c8e5410a47f7",
+      "spawns": 187,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.974347434743474,
+      "wave": 20,
+      "weapon_damage": {
+        "interdental_brush": 106344.768965031
+      },
+      "xp_collected": 52
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 37.3666666666658,
+      "build": "melee_area",
+      "chests_collected": 2,
+      "coins_collected": 49,
+      "damage_dealt": 111881.462819432,
+      "damage_taken": 182.26576744186,
+      "distance_travelled": 7906.78795599937,
+      "dps": 2992.81666035039,
+      "healing": 182.160837209302,
+      "health_end": 155.895069767442,
+      "health_min": 126.604599435351,
+      "health_start": 156.0,
+      "kills": 142,
+      "leech_healing": 116.236031305736,
+      "max_step_distance": 3.5267071723938,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.968345965225145,
+      "near_enemy_seconds": 36.2,
+      "outcome": "boss_killed",
+      "overheal": 34.8254558873498,
+      "peak_enemies": 63,
+      "peak_enemy_projectiles": 39,
+      "pending_levels": 4,
+      "proc_damage": {
+        "affix_fire": 8978.87275217734,
+        "bleed": 741.285286400003
+      },
+      "seconds": 37.3833333333333,
+      "seed": 112233,
+      "setup": "20/melee_area/shop",
+      "spawn_plan": "76d4392ba0663fa4036368ca43bf6d137581a572c3011962b0964950738d5bef",
+      "spawns": 188,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.964779313419527,
+      "wave": 20,
+      "weapon_damage": {
+        "interdental_brush": 102161.304780854
+      },
+      "xp_collected": 54
+    },
+    {
+      "boss_health_fraction": 0.666666666666667,
+      "boss_ttk": null,
+      "build": "ranged_single",
+      "chests_collected": 0,
+      "coins_collected": 29,
+      "damage_dealt": 60245.9340369848,
+      "damage_taken": 395.352020373333,
+      "distance_travelled": 9720.82801508904,
+      "dps": 1289.60258373853,
+      "healing": 239.352020373333,
+      "health_end": 0.0,
+      "health_min": 0.0,
+      "health_start": 156.0,
+      "kills": 114,
+      "leech_healing": 158.752020373333,
+      "max_step_distance": 3.52670836448669,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.586514448804852,
+      "near_enemy_seconds": 27.4,
+      "outcome": "death",
+      "overheal": 4.51518848124006,
+      "peak_enemies": 92,
+      "peak_enemy_projectiles": 60,
+      "pending_levels": 3,
+      "proc_damage": {
+        "affix_fire": 4150.80245968885
+      },
+      "seconds": 46.7166666666667,
+      "seed": 13579,
+      "setup": "20/ranged_single/shop",
+      "spawn_plan": "28147036d819622b3981b154238944c4cc4eb57f0873efb30577b32228bae8b6",
+      "spawns": 213,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.995005351409204,
+      "wave": 20,
+      "weapon_damage": {
+        "enamel_mirror": 56095.1315772959
+      },
+      "xp_collected": 24
+    },
+    {
+      "boss_health_fraction": 0.0365216751076534,
+      "boss_ttk": null,
+      "build": "ranged_single",
+      "chests_collected": 3,
+      "coins_collected": 66,
+      "damage_dealt": 75557.9591639326,
+      "damage_taken": 498.896759902359,
+      "distance_travelled": 13421.6621916294,
+      "dps": 1105.99598678603,
+      "healing": 342.896759902355,
+      "health_end": 0.0,
+      "health_min": 0.0,
+      "health_start": 156.0,
+      "kills": 123,
+      "leech_healing": 238.096759902358,
+      "max_step_distance": 3.52670454978943,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.351061234447426,
+      "near_enemy_seconds": 23.9833333333333,
+      "outcome": "death",
+      "overheal": 4.24610564465058,
+      "peak_enemies": 98,
+      "peak_enemy_projectiles": 81,
+      "pending_levels": 4,
+      "proc_damage": {
+        "affix_fire": 5247.89794652253
+      },
+      "seconds": 68.3166666666667,
+      "seed": 24680,
+      "setup": "20/ranged_single/shop",
+      "spawn_plan": "483f79dccc1b15e5c3cb8d1fb0959a289168d4fe9fde430541b9c8e5410a47f7",
+      "spawns": 221,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.999512076116126,
+      "wave": 20,
+      "weapon_damage": {
+        "enamel_mirror": 70310.0612174103
+      },
+      "xp_collected": 52
+    },
+    {
+      "boss_health_fraction": 0.0,
+      "boss_ttk": 68.5833333333307,
+      "build": "ranged_single",
+      "chests_collected": 2,
+      "coins_collected": 60,
+      "damage_dealt": 75512.9310160265,
+      "damage_taken": 467.456581395349,
+      "distance_travelled": 13556.5847258568,
+      "dps": 1100.77158915491,
+      "healing": 339.914282545204,
+      "health_end": 28.4577011498584,
+      "health_min": 15.6897078610853,
+      "health_start": 156.0,
+      "kills": 126,
+      "leech_healing": 237.314282545207,
+      "max_step_distance": 3.52671480178833,
+      "mode": "shop",
+      "movement": "pursuit",
+      "near_enemy_fraction": 0.3488824101069,
+      "near_enemy_seconds": 23.9333333333333,
+      "outcome": "boss_killed",
+      "overheal": 9.110133635755,
+      "peak_enemies": 98,
+      "peak_enemy_projectiles": 90,
+      "pending_levels": 5,
+      "proc_damage": {
+        "affix_fire": 5168.41328597581
+      },
+      "seconds": 68.6,
+      "seed": 112233,
+      "setup": "20/ranged_single/shop",
+      "spawn_plan": "76d4392ba0663fa4036368ca43bf6d137581a572c3011962b0964950738d5bef",
+      "spawns": 221,
+      "spawns_blocked": 0,
+      "target_in_range_fraction": 0.994169096209913,
+      "wave": 20,
+      "weapon_damage": {
+        "enamel_mirror": 70344.5177300511
+      },
+      "xp_collected": 60
+    }
+  ],
+  "setups": {
+    "5/melee_area/shop": {
+      "build": "melee_area",
+      "capsules": 6,
+      "effective_stats": {
+        "armor": 7.0,
+        "attack_speed": 6.0,
+        "crit_chance": 0.075,
+        "damage_bonus": 10.0,
+        "dash_recovery_bonus": 0.0,
+        "dodge_chance": 0.0,
+        "health": 127.0,
+        "luck": 0.0,
+        "max_health": 127.0,
+        "melee_damage": 4.0,
+        "ranged_damage": 0.0,
+        "regen": 0.0,
+        "regen_progress": 0.0,
+        "root_capacity": 6,
+        "shield_charges": 0,
+        "speed_bonus": -2.0,
+        "stat_model_version": 3
+      },
+      "equipment": [
+        {
+          "affix_slots": 1,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 3.52796496871399,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "interdental_brush",
+          "invested_coins": 15,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 1,
+          "uid": "probe_0"
+        },
+        {
+          "affix_slots": 1,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 3.52796496871399,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "interdental_brush",
+          "invested_coins": 15,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 1,
+          "uid": "probe_1"
+        },
+        {
+          "affix_slots": 1,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 3.52796496871399,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "interdental_brush",
+          "invested_coins": 15,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 1,
+          "uid": "probe_2"
+        },
+        {
+          "affix_slots": 1,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 3.52796496871399,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "interdental_brush",
+          "invested_coins": 15,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 1,
+          "uid": "probe_3"
+        },
+        {
+          "affix_slots": 1,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 3.52796496871399,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "interdental_brush",
+          "invested_coins": 15,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 1,
+          "uid": "probe_4"
+        },
+        {
+          "affix_slots": 1,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 3.52796496871399,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "interdental_brush",
+          "invested_coins": 15,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 1,
+          "uid": "probe_5"
+        }
+      ],
+      "gold_budget": 250,
+      "gold_unspent": 133,
+      "item_gold": 27,
+      "items": [
+        "health_1",
+        "armor_2"
+      ],
+      "mode": "shop",
+      "roots": 6,
+      "stats": {
+        "armor": 3.0,
+        "attack_speed": 10.0,
+        "crit_chance": 0.075,
+        "damage_bonus": 10.0,
+        "max_health": 115.0,
+        "melee_damage": 4.0,
+        "ranged_damage": 0.0
+      },
+      "tier": 1,
+      "upgrade_points": 12,
+      "wave": 5,
+      "weapon_gold": 90
+    },
+    "5/melee_single/shop": {
+      "build": "melee_single",
+      "capsules": 6,
+      "effective_stats": {
+        "armor": 7.0,
+        "attack_speed": 6.0,
+        "crit_chance": 0.075,
+        "damage_bonus": 10.0,
+        "dash_recovery_bonus": 0.0,
+        "dodge_chance": 0.0,
+        "health": 127.0,
+        "luck": 0.0,
+        "max_health": 127.0,
+        "melee_damage": 4.0,
+        "ranged_damage": 0.0,
+        "regen": 0.0,
+        "regen_progress": 0.0,
+        "root_capacity": 6,
+        "shield_charges": 0,
+        "speed_bonus": -2.0,
+        "stat_model_version": 3
+      },
+      "equipment": [
+        {
+          "affix_slots": 1,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 4.97294115689751,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "turbo_drill",
+          "invested_coins": 16,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 1,
+          "uid": "probe_0"
+        },
+        {
+          "affix_slots": 1,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 4.97294115689751,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "turbo_drill",
+          "invested_coins": 16,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 1,
+          "uid": "probe_1"
+        },
+        {
+          "affix_slots": 1,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 4.97294115689751,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "turbo_drill",
+          "invested_coins": 16,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 1,
+          "uid": "probe_2"
+        },
+        {
+          "affix_slots": 1,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 4.97294115689751,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "turbo_drill",
+          "invested_coins": 16,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 1,
+          "uid": "probe_3"
+        },
+        {
+          "affix_slots": 1,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 4.97294115689751,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "turbo_drill",
+          "invested_coins": 16,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 1,
+          "uid": "probe_4"
+        },
+        {
+          "affix_slots": 1,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 4.97294115689751,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "turbo_drill",
+          "invested_coins": 16,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 1,
+          "uid": "probe_5"
+        }
+      ],
+      "gold_budget": 250,
+      "gold_unspent": 127,
+      "item_gold": 27,
+      "items": [
+        "health_1",
+        "armor_2"
+      ],
+      "mode": "shop",
+      "roots": 6,
+      "stats": {
+        "armor": 3.0,
+        "attack_speed": 10.0,
+        "crit_chance": 0.075,
+        "damage_bonus": 10.0,
+        "max_health": 115.0,
+        "melee_damage": 4.0,
+        "ranged_damage": 0.0
+      },
+      "tier": 1,
+      "upgrade_points": 12,
+      "wave": 5,
+      "weapon_gold": 96
+    },
+    "5/ranged_single/shop": {
+      "build": "ranged_single",
+      "capsules": 6,
+      "effective_stats": {
+        "armor": 7.0,
+        "attack_speed": 6.0,
+        "crit_chance": 0.075,
+        "damage_bonus": 10.0,
+        "dash_recovery_bonus": 0.0,
+        "dodge_chance": 0.0,
+        "health": 127.0,
+        "luck": 0.0,
+        "max_health": 127.0,
+        "melee_damage": 0.0,
+        "ranged_damage": 4.0,
+        "regen": 0.0,
+        "regen_progress": 0.0,
+        "root_capacity": 6,
+        "shield_charges": 0,
+        "speed_bonus": -2.0,
+        "stat_model_version": 3
+      },
+      "equipment": [
+        {
+          "affix_slots": 1,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 5.71022986845895,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "enamel_mirror",
+          "invested_coins": 19,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 1,
+          "uid": "probe_0"
+        },
+        {
+          "affix_slots": 1,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 5.71022986845895,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "enamel_mirror",
+          "invested_coins": 19,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 1,
+          "uid": "probe_1"
+        },
+        {
+          "affix_slots": 1,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 5.71022986845895,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "enamel_mirror",
+          "invested_coins": 19,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 1,
+          "uid": "probe_2"
+        },
+        {
+          "affix_slots": 1,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 5.71022986845895,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "enamel_mirror",
+          "invested_coins": 19,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 1,
+          "uid": "probe_3"
+        },
+        {
+          "affix_slots": 1,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 5.71022986845895,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "enamel_mirror",
+          "invested_coins": 19,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 1,
+          "uid": "probe_4"
+        },
+        {
+          "affix_slots": 1,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 5.71022986845895,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "enamel_mirror",
+          "invested_coins": 19,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 1,
+          "uid": "probe_5"
+        }
+      ],
+      "gold_budget": 250,
+      "gold_unspent": 109,
+      "item_gold": 27,
+      "items": [
+        "health_1",
+        "armor_2"
+      ],
+      "mode": "shop",
+      "roots": 6,
+      "stats": {
+        "armor": 3.0,
+        "attack_speed": 10.0,
+        "crit_chance": 0.075,
+        "damage_bonus": 10.0,
+        "max_health": 115.0,
+        "melee_damage": 0.0,
+        "ranged_damage": 4.0
+      },
+      "tier": 1,
+      "upgrade_points": 12,
+      "wave": 5,
+      "weapon_gold": 114
+    },
+    "5/uv_floss/shop": {
+      "build": "uv_floss",
+      "capsules": 6,
+      "effective_stats": {
+        "armor": 7.0,
+        "attack_speed": 6.0,
+        "crit_chance": 0.075,
+        "damage_bonus": 10.0,
+        "dash_recovery_bonus": 0.0,
+        "dodge_chance": 0.0,
+        "health": 127.0,
+        "luck": 0.0,
+        "max_health": 127.0,
+        "melee_damage": 1.33333333333333,
+        "ranged_damage": 2.66666666666667,
+        "regen": 0.0,
+        "regen_progress": 0.0,
+        "root_capacity": 6,
+        "shield_charges": 0,
+        "speed_bonus": -2.0,
+        "stat_model_version": 3
+      },
+      "equipment": [
+        {
+          "affix_slots": 1,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 13.40023040838,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "uv_lamp",
+          "invested_coins": 27,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 1,
+          "uid": "probe_0"
+        },
+        {
+          "affix_slots": 1,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 13.40023040838,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "uv_lamp",
+          "invested_coins": 27,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 1,
+          "uid": "probe_1"
+        },
+        {
+          "affix_slots": 1,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 12.3934940124432,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "floss_garrote",
+          "invested_coins": 25,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 1,
+          "uid": "probe_2"
+        }
+      ],
+      "gold_budget": 250,
+      "gold_unspent": 144,
+      "item_gold": 27,
+      "items": [
+        "health_1",
+        "armor_2"
+      ],
+      "mode": "shop",
+      "roots": 6,
+      "stats": {
+        "armor": 3.0,
+        "attack_speed": 10.0,
+        "crit_chance": 0.075,
+        "damage_bonus": 10.0,
+        "max_health": 115.0,
+        "melee_damage": 1.33333333333333,
+        "ranged_damage": 2.66666666666667
+      },
+      "tier": 1,
+      "upgrade_points": 12,
+      "wave": 5,
+      "weapon_gold": 79
+    },
+    "10/melee_area/shop": {
+      "build": "melee_area",
+      "capsules": 15,
+      "effective_stats": {
+        "armor": 14.0,
+        "attack_speed": 26.0,
+        "crit_chance": 0.1,
+        "damage_bonus": 19.0,
+        "dash_recovery_bonus": 0.0,
+        "dodge_chance": 0.0,
+        "health": 141.0,
+        "luck": 0.0,
+        "max_health": 141.0,
+        "melee_damage": 8.0,
+        "ranged_damage": 0.0,
+        "regen": 1.0,
+        "regen_progress": 0.0,
+        "root_capacity": 6,
+        "shield_charges": 0,
+        "speed_bonus": -4.0,
+        "stat_model_version": 3
+      },
+      "equipment": [
+        {
+          "affix_slots": 2,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 4.93915095619958,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "interdental_brush",
+          "invested_coins": 33,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 2,
+          "uid": "probe_0"
+        },
+        {
+          "affix_slots": 2,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 4.93915095619958,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "interdental_brush",
+          "invested_coins": 33,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 2,
+          "uid": "probe_1"
+        },
+        {
+          "affix_slots": 2,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 4.93915095619958,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "interdental_brush",
+          "invested_coins": 33,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 2,
+          "uid": "probe_2"
+        },
+        {
+          "affix_slots": 2,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 4.93915095619958,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "interdental_brush",
+          "invested_coins": 33,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 2,
+          "uid": "probe_3"
+        },
+        {
+          "affix_slots": 2,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 4.93915095619958,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "interdental_brush",
+          "invested_coins": 33,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 2,
+          "uid": "probe_4"
+        },
+        {
+          "affix_slots": 2,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 4.93915095619958,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "interdental_brush",
+          "invested_coins": 33,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 2,
+          "uid": "probe_5"
+        }
+      ],
+      "gold_budget": 700,
+      "gold_unspent": 334,
+      "item_gold": 168,
+      "items": [
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1",
+        "tempo_2",
+        "xp_heal_1",
+        "health_1",
+        "armor_2"
+      ],
+      "mode": "shop",
+      "roots": 6,
+      "stats": {
+        "armor": 6.0,
+        "attack_speed": 20.0,
+        "crit_chance": 0.1,
+        "damage_bonus": 20.0,
+        "max_health": 130.0,
+        "melee_damage": 8.0,
+        "ranged_damage": 0.0
+      },
+      "tier": 2,
+      "upgrade_points": 30,
+      "wave": 10,
+      "weapon_gold": 198
+    },
+    "10/melee_single/shop": {
+      "build": "melee_single",
+      "capsules": 15,
+      "effective_stats": {
+        "armor": 14.0,
+        "attack_speed": 26.0,
+        "crit_chance": 0.1,
+        "damage_bonus": 19.0,
+        "dash_recovery_bonus": 0.0,
+        "dodge_chance": 0.0,
+        "health": 141.0,
+        "luck": 0.0,
+        "max_health": 141.0,
+        "melee_damage": 8.0,
+        "ranged_damage": 0.0,
+        "regen": 1.0,
+        "regen_progress": 0.0,
+        "root_capacity": 6,
+        "shield_charges": 0,
+        "speed_bonus": -4.0,
+        "stat_model_version": 3
+      },
+      "equipment": [
+        {
+          "affix_slots": 2,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 6.96211761965652,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "turbo_drill",
+          "invested_coins": 37,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 2,
+          "uid": "probe_0"
+        },
+        {
+          "affix_slots": 2,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 6.96211761965652,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "turbo_drill",
+          "invested_coins": 37,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 2,
+          "uid": "probe_1"
+        },
+        {
+          "affix_slots": 2,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 6.96211761965652,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "turbo_drill",
+          "invested_coins": 37,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 2,
+          "uid": "probe_2"
+        },
+        {
+          "affix_slots": 2,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 6.96211761965652,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "turbo_drill",
+          "invested_coins": 37,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 2,
+          "uid": "probe_3"
+        },
+        {
+          "affix_slots": 2,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 6.96211761965652,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "turbo_drill",
+          "invested_coins": 37,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 2,
+          "uid": "probe_4"
+        },
+        {
+          "affix_slots": 2,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 6.96211761965652,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "turbo_drill",
+          "invested_coins": 37,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 2,
+          "uid": "probe_5"
+        }
+      ],
+      "gold_budget": 700,
+      "gold_unspent": 310,
+      "item_gold": 168,
+      "items": [
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1",
+        "tempo_2",
+        "xp_heal_1",
+        "health_1",
+        "armor_2"
+      ],
+      "mode": "shop",
+      "roots": 6,
+      "stats": {
+        "armor": 6.0,
+        "attack_speed": 20.0,
+        "crit_chance": 0.1,
+        "damage_bonus": 20.0,
+        "max_health": 130.0,
+        "melee_damage": 8.0,
+        "ranged_damage": 0.0
+      },
+      "tier": 2,
+      "upgrade_points": 30,
+      "wave": 10,
+      "weapon_gold": 222
+    },
+    "10/ranged_single/shop": {
+      "build": "ranged_single",
+      "capsules": 15,
+      "effective_stats": {
+        "armor": 14.0,
+        "attack_speed": 26.0,
+        "crit_chance": 0.1,
+        "damage_bonus": 19.0,
+        "dash_recovery_bonus": 0.0,
+        "dodge_chance": 0.0,
+        "health": 141.0,
+        "luck": 0.0,
+        "max_health": 141.0,
+        "melee_damage": 0.0,
+        "ranged_damage": 8.0,
+        "regen": 1.0,
+        "regen_progress": 0.0,
+        "root_capacity": 6,
+        "shield_charges": 0,
+        "speed_bonus": -4.0,
+        "stat_model_version": 3
+      },
+      "equipment": [
+        {
+          "affix_slots": 2,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 7.99432181584253,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "enamel_mirror",
+          "invested_coins": 43,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 2,
+          "uid": "probe_0"
+        },
+        {
+          "affix_slots": 2,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 7.99432181584253,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "enamel_mirror",
+          "invested_coins": 43,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 2,
+          "uid": "probe_1"
+        },
+        {
+          "affix_slots": 2,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 7.99432181584253,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "enamel_mirror",
+          "invested_coins": 43,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 2,
+          "uid": "probe_2"
+        },
+        {
+          "affix_slots": 2,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 7.99432181584253,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "enamel_mirror",
+          "invested_coins": 43,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 2,
+          "uid": "probe_3"
+        },
+        {
+          "affix_slots": 2,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 7.99432181584253,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "enamel_mirror",
+          "invested_coins": 43,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 2,
+          "uid": "probe_4"
+        },
+        {
+          "affix_slots": 2,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 7.99432181584253,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "enamel_mirror",
+          "invested_coins": 43,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 2,
+          "uid": "probe_5"
+        }
+      ],
+      "gold_budget": 700,
+      "gold_unspent": 274,
+      "item_gold": 168,
+      "items": [
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1",
+        "tempo_2",
+        "xp_heal_1",
+        "health_1",
+        "armor_2"
+      ],
+      "mode": "shop",
+      "roots": 6,
+      "stats": {
+        "armor": 6.0,
+        "attack_speed": 20.0,
+        "crit_chance": 0.1,
+        "damage_bonus": 20.0,
+        "max_health": 130.0,
+        "melee_damage": 0.0,
+        "ranged_damage": 8.0
+      },
+      "tier": 2,
+      "upgrade_points": 30,
+      "wave": 10,
+      "weapon_gold": 258
+    },
+    "10/uv_floss/shop": {
+      "build": "uv_floss",
+      "capsules": 15,
+      "effective_stats": {
+        "armor": 14.0,
+        "attack_speed": 26.0,
+        "crit_chance": 0.1,
+        "damage_bonus": 19.0,
+        "dash_recovery_bonus": 0.0,
+        "dodge_chance": 0.0,
+        "health": 141.0,
+        "luck": 0.0,
+        "max_health": 141.0,
+        "melee_damage": 2.66666666666667,
+        "ranged_damage": 5.33333333333333,
+        "regen": 1.0,
+        "regen_progress": 0.0,
+        "root_capacity": 6,
+        "shield_charges": 0,
+        "speed_bonus": -4.0,
+        "stat_model_version": 3
+      },
+      "equipment": [
+        {
+          "affix_slots": 2,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 18.760322571732,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "uv_lamp",
+          "invested_coins": 62,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 2,
+          "uid": "probe_0"
+        },
+        {
+          "affix_slots": 2,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 18.760322571732,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "uv_lamp",
+          "invested_coins": 62,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 2,
+          "uid": "probe_1"
+        },
+        {
+          "affix_slots": 2,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 17.3508916174205,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "floss_garrote",
+          "invested_coins": 56,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 2,
+          "uid": "probe_2"
+        }
+      ],
+      "gold_budget": 700,
+      "gold_unspent": 352,
+      "item_gold": 168,
+      "items": [
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1",
+        "tempo_2",
+        "xp_heal_1",
+        "health_1",
+        "armor_2"
+      ],
+      "mode": "shop",
+      "roots": 6,
+      "stats": {
+        "armor": 6.0,
+        "attack_speed": 20.0,
+        "crit_chance": 0.1,
+        "damage_bonus": 20.0,
+        "max_health": 130.0,
+        "melee_damage": 2.66666666666667,
+        "ranged_damage": 5.33333333333333
+      },
+      "tier": 2,
+      "upgrade_points": 30,
+      "wave": 10,
+      "weapon_gold": 180
+    },
+    "15/melee_area/shop": {
+      "build": "melee_area",
+      "capsules": 24,
+      "effective_stats": {
+        "armor": 21.0,
+        "attack_speed": 46.0,
+        "crit_chance": 0.125,
+        "damage_bonus": 30.0,
+        "dash_recovery_bonus": 0.0,
+        "dodge_chance": 0.0,
+        "health": 150.0,
+        "luck": 0.0,
+        "max_health": 150.0,
+        "melee_damage": 12.0,
+        "ranged_damage": 0.0,
+        "regen": 3.0,
+        "regen_progress": 0.0,
+        "root_capacity": 6,
+        "shield_charges": 0,
+        "speed_bonus": -6.0,
+        "stat_model_version": 3
+      },
+      "equipment": [
+        {
+          "affix_slots": 3,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 7.05592993742797,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 4,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 4
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "interdental_brush",
+          "invested_coins": 59,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 3,
+          "uid": "probe_0"
+        },
+        {
+          "affix_slots": 3,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 7.05592993742797,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 4,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 4
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "interdental_brush",
+          "invested_coins": 59,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 3,
+          "uid": "probe_1"
+        },
+        {
+          "affix_slots": 3,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 7.05592993742797,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 4,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 4
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "interdental_brush",
+          "invested_coins": 59,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 3,
+          "uid": "probe_2"
+        },
+        {
+          "affix_slots": 3,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 7.05592993742797,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 4,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 4
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "interdental_brush",
+          "invested_coins": 59,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 3,
+          "uid": "probe_3"
+        },
+        {
+          "affix_slots": 3,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 7.05592993742797,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 4,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 4
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "interdental_brush",
+          "invested_coins": 59,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 3,
+          "uid": "probe_4"
+        },
+        {
+          "affix_slots": 3,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 7.05592993742797,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 4,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 4
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "interdental_brush",
+          "invested_coins": 59,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 3,
+          "uid": "probe_5"
+        }
+      ],
+      "gold_budget": 1300,
+      "gold_unspent": 485,
+      "item_gold": 461,
+      "items": [
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1",
+        "tempo_2",
+        "xp_heal_1",
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1",
+        "tempo_2",
+        "xp_heal_1",
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1"
+      ],
+      "mode": "shop",
+      "roots": 6,
+      "stats": {
+        "armor": 9.0,
+        "attack_speed": 30.0,
+        "crit_chance": 0.125,
+        "damage_bonus": 30.0,
+        "max_health": 145.0,
+        "melee_damage": 12.0,
+        "ranged_damage": 0.0
+      },
+      "tier": 3,
+      "upgrade_points": 48,
+      "wave": 15,
+      "weapon_gold": 354
+    },
+    "15/melee_single/shop": {
+      "build": "melee_single",
+      "capsules": 24,
+      "effective_stats": {
+        "armor": 21.0,
+        "attack_speed": 46.0,
+        "crit_chance": 0.125,
+        "damage_bonus": 30.0,
+        "dash_recovery_bonus": 0.0,
+        "dodge_chance": 0.0,
+        "health": 150.0,
+        "luck": 0.0,
+        "max_health": 150.0,
+        "melee_damage": 12.0,
+        "ranged_damage": 0.0,
+        "regen": 3.0,
+        "regen_progress": 0.0,
+        "root_capacity": 6,
+        "shield_charges": 0,
+        "speed_bonus": -6.0,
+        "stat_model_version": 3
+      },
+      "equipment": [
+        {
+          "affix_slots": 3,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 9.94588231379503,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 4,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 4
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "turbo_drill",
+          "invested_coins": 66,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 3,
+          "uid": "probe_0"
+        },
+        {
+          "affix_slots": 3,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 9.94588231379503,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 4,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 4
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "turbo_drill",
+          "invested_coins": 66,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 3,
+          "uid": "probe_1"
+        },
+        {
+          "affix_slots": 3,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 9.94588231379503,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 4,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 4
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "turbo_drill",
+          "invested_coins": 66,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 3,
+          "uid": "probe_2"
+        },
+        {
+          "affix_slots": 3,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 9.94588231379503,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 4,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 4
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "turbo_drill",
+          "invested_coins": 66,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 3,
+          "uid": "probe_3"
+        },
+        {
+          "affix_slots": 3,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 9.94588231379503,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 4,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 4
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "turbo_drill",
+          "invested_coins": 66,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 3,
+          "uid": "probe_4"
+        },
+        {
+          "affix_slots": 3,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 9.94588231379503,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 4,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 4
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "turbo_drill",
+          "invested_coins": 66,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 3,
+          "uid": "probe_5"
+        }
+      ],
+      "gold_budget": 1300,
+      "gold_unspent": 443,
+      "item_gold": 461,
+      "items": [
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1",
+        "tempo_2",
+        "xp_heal_1",
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1",
+        "tempo_2",
+        "xp_heal_1",
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1"
+      ],
+      "mode": "shop",
+      "roots": 6,
+      "stats": {
+        "armor": 9.0,
+        "attack_speed": 30.0,
+        "crit_chance": 0.125,
+        "damage_bonus": 30.0,
+        "max_health": 145.0,
+        "melee_damage": 12.0,
+        "ranged_damage": 0.0
+      },
+      "tier": 3,
+      "upgrade_points": 48,
+      "wave": 15,
+      "weapon_gold": 396
+    },
+    "15/ranged_single/shop": {
+      "build": "ranged_single",
+      "capsules": 24,
+      "effective_stats": {
+        "armor": 21.0,
+        "attack_speed": 46.0,
+        "crit_chance": 0.125,
+        "damage_bonus": 30.0,
+        "dash_recovery_bonus": 0.0,
+        "dodge_chance": 0.0,
+        "health": 150.0,
+        "luck": 0.0,
+        "max_health": 150.0,
+        "melee_damage": 0.0,
+        "ranged_damage": 12.0,
+        "regen": 3.0,
+        "regen_progress": 0.0,
+        "root_capacity": 6,
+        "shield_charges": 0,
+        "speed_bonus": -6.0,
+        "stat_model_version": 3
+      },
+      "equipment": [
+        {
+          "affix_slots": 3,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 11.4204597369179,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 4,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 4
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "enamel_mirror",
+          "invested_coins": 76,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 3,
+          "uid": "probe_0"
+        },
+        {
+          "affix_slots": 3,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 11.4204597369179,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 4,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 4
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "enamel_mirror",
+          "invested_coins": 76,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 3,
+          "uid": "probe_1"
+        },
+        {
+          "affix_slots": 3,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 11.4204597369179,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 4,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 4
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "enamel_mirror",
+          "invested_coins": 76,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 3,
+          "uid": "probe_2"
+        },
+        {
+          "affix_slots": 3,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 11.4204597369179,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 4,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 4
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "enamel_mirror",
+          "invested_coins": 76,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 3,
+          "uid": "probe_3"
+        },
+        {
+          "affix_slots": 3,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 11.4204597369179,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 4,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 4
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "enamel_mirror",
+          "invested_coins": 76,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 3,
+          "uid": "probe_4"
+        },
+        {
+          "affix_slots": 3,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 11.4204597369179,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 4,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 4
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "enamel_mirror",
+          "invested_coins": 76,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 3,
+          "uid": "probe_5"
+        }
+      ],
+      "gold_budget": 1300,
+      "gold_unspent": 383,
+      "item_gold": 461,
+      "items": [
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1",
+        "tempo_2",
+        "xp_heal_1",
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1",
+        "tempo_2",
+        "xp_heal_1",
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1"
+      ],
+      "mode": "shop",
+      "roots": 6,
+      "stats": {
+        "armor": 9.0,
+        "attack_speed": 30.0,
+        "crit_chance": 0.125,
+        "damage_bonus": 30.0,
+        "max_health": 145.0,
+        "melee_damage": 0.0,
+        "ranged_damage": 12.0
+      },
+      "tier": 3,
+      "upgrade_points": 48,
+      "wave": 15,
+      "weapon_gold": 456
+    },
+    "15/uv_floss/shop": {
+      "build": "uv_floss",
+      "capsules": 24,
+      "effective_stats": {
+        "armor": 21.0,
+        "attack_speed": 46.0,
+        "crit_chance": 0.125,
+        "damage_bonus": 30.0,
+        "dash_recovery_bonus": 0.0,
+        "dodge_chance": 0.0,
+        "health": 150.0,
+        "luck": 0.0,
+        "max_health": 150.0,
+        "melee_damage": 4.0,
+        "ranged_damage": 8.0,
+        "regen": 3.0,
+        "regen_progress": 0.0,
+        "root_capacity": 6,
+        "shield_charges": 0,
+        "speed_bonus": -6.0,
+        "stat_model_version": 3
+      },
+      "equipment": [
+        {
+          "affix_slots": 3,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 26.80046081676,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 4,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 4
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "uv_lamp",
+          "invested_coins": 112,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 3,
+          "uid": "probe_0"
+        },
+        {
+          "affix_slots": 3,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 26.80046081676,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 4,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 4
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "uv_lamp",
+          "invested_coins": 112,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 3,
+          "uid": "probe_1"
+        },
+        {
+          "affix_slots": 3,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 24.7869880248865,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 4,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 4
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            },
+            {
+              "bonus": 0.0,
+              "damage": 5.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 2,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 2
+            }
+          ],
+          "id": "floss_garrote",
+          "invested_coins": 100,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 3,
+          "uid": "probe_2"
+        }
+      ],
+      "gold_budget": 1300,
+      "gold_unspent": 515,
+      "item_gold": 461,
+      "items": [
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1",
+        "tempo_2",
+        "xp_heal_1",
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1",
+        "tempo_2",
+        "xp_heal_1",
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1"
+      ],
+      "mode": "shop",
+      "roots": 6,
+      "stats": {
+        "armor": 9.0,
+        "attack_speed": 30.0,
+        "crit_chance": 0.125,
+        "damage_bonus": 30.0,
+        "max_health": 145.0,
+        "melee_damage": 4.0,
+        "ranged_damage": 8.0
+      },
+      "tier": 3,
+      "upgrade_points": 48,
+      "wave": 15,
+      "weapon_gold": 324
+    },
+    "20/melee_area/shop": {
+      "build": "melee_area",
+      "capsules": 36,
+      "effective_stats": {
+        "armor": 28.0,
+        "attack_speed": 80.0,
+        "crit_chance": 0.15,
+        "damage_bonus": 36.0,
+        "dash_recovery_bonus": 0.0,
+        "dodge_chance": 0.0,
+        "health": 156.0,
+        "luck": 0.0,
+        "max_health": 156.0,
+        "melee_damage": 16.0,
+        "ranged_damage": 0.0,
+        "regen": 4.0,
+        "regen_progress": 0.0,
+        "root_capacity": 6,
+        "shield_charges": 0,
+        "speed_bonus": -8.0,
+        "stat_model_version": 3
+      },
+      "equipment": [
+        {
+          "affix_slots": 4,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 12.7006738873703,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 6,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 6
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            }
+          ],
+          "id": "interdental_brush",
+          "invested_coins": 94,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 4,
+          "uid": "probe_0"
+        },
+        {
+          "affix_slots": 4,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 12.7006738873703,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 6,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 6
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            }
+          ],
+          "id": "interdental_brush",
+          "invested_coins": 94,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 4,
+          "uid": "probe_1"
+        },
+        {
+          "affix_slots": 4,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 12.7006738873703,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 6,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 6
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            }
+          ],
+          "id": "interdental_brush",
+          "invested_coins": 94,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 4,
+          "uid": "probe_2"
+        },
+        {
+          "affix_slots": 4,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 12.7006738873703,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 6,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 6
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            }
+          ],
+          "id": "interdental_brush",
+          "invested_coins": 94,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 4,
+          "uid": "probe_3"
+        },
+        {
+          "affix_slots": 4,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 12.7006738873703,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 6,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 6
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            }
+          ],
+          "id": "interdental_brush",
+          "invested_coins": 94,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 4,
+          "uid": "probe_4"
+        },
+        {
+          "affix_slots": 4,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 12.7006738873703,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 6,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 6
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            }
+          ],
+          "id": "interdental_brush",
+          "invested_coins": 94,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 4,
+          "uid": "probe_5"
+        }
+      ],
+      "gold_budget": 2200,
+      "gold_unspent": 748,
+      "item_gold": 888,
+      "items": [
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1",
+        "tempo_2",
+        "xp_heal_1",
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1",
+        "tempo_2",
+        "xp_heal_1",
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1",
+        "tempo_2",
+        "xp_heal_1",
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1",
+        "tempo_2",
+        "xp_heal_1"
+      ],
+      "mode": "shop",
+      "roots": 6,
+      "stats": {
+        "armor": 12.0,
+        "attack_speed": 40.0,
+        "crit_chance": 0.15,
+        "damage_bonus": 40.0,
+        "max_health": 160.0,
+        "melee_damage": 16.0,
+        "ranged_damage": 0.0
+      },
+      "tier": 4,
+      "upgrade_points": 72,
+      "wave": 20,
+      "weapon_gold": 564
+    },
+    "20/melee_single/shop": {
+      "build": "melee_single",
+      "capsules": 36,
+      "effective_stats": {
+        "armor": 28.0,
+        "attack_speed": 80.0,
+        "crit_chance": 0.15,
+        "damage_bonus": 36.0,
+        "dash_recovery_bonus": 0.0,
+        "dodge_chance": 0.0,
+        "health": 156.0,
+        "luck": 0.0,
+        "max_health": 156.0,
+        "melee_damage": 16.0,
+        "ranged_damage": 0.0,
+        "regen": 4.0,
+        "regen_progress": 0.0,
+        "root_capacity": 6,
+        "shield_charges": 0,
+        "speed_bonus": -8.0,
+        "stat_model_version": 3
+      },
+      "equipment": [
+        {
+          "affix_slots": 4,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 17.902588164831,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 6,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 6
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            }
+          ],
+          "id": "turbo_drill",
+          "invested_coins": 106,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 4,
+          "uid": "probe_0"
+        },
+        {
+          "affix_slots": 4,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 17.902588164831,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 6,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 6
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            }
+          ],
+          "id": "turbo_drill",
+          "invested_coins": 106,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 4,
+          "uid": "probe_1"
+        },
+        {
+          "affix_slots": 4,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 17.902588164831,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 6,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 6
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            }
+          ],
+          "id": "turbo_drill",
+          "invested_coins": 106,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 4,
+          "uid": "probe_2"
+        },
+        {
+          "affix_slots": 4,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 17.902588164831,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 6,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 6
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            }
+          ],
+          "id": "turbo_drill",
+          "invested_coins": 106,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 4,
+          "uid": "probe_3"
+        },
+        {
+          "affix_slots": 4,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 17.902588164831,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 6,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 6
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            }
+          ],
+          "id": "turbo_drill",
+          "invested_coins": 106,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 4,
+          "uid": "probe_4"
+        },
+        {
+          "affix_slots": 4,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 17.902588164831,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 6,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 6
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            }
+          ],
+          "id": "turbo_drill",
+          "invested_coins": 106,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 4,
+          "uid": "probe_5"
+        }
+      ],
+      "gold_budget": 2200,
+      "gold_unspent": 676,
+      "item_gold": 888,
+      "items": [
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1",
+        "tempo_2",
+        "xp_heal_1",
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1",
+        "tempo_2",
+        "xp_heal_1",
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1",
+        "tempo_2",
+        "xp_heal_1",
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1",
+        "tempo_2",
+        "xp_heal_1"
+      ],
+      "mode": "shop",
+      "roots": 6,
+      "stats": {
+        "armor": 12.0,
+        "attack_speed": 40.0,
+        "crit_chance": 0.15,
+        "damage_bonus": 40.0,
+        "max_health": 160.0,
+        "melee_damage": 16.0,
+        "ranged_damage": 0.0
+      },
+      "tier": 4,
+      "upgrade_points": 72,
+      "wave": 20,
+      "weapon_gold": 636
+    },
+    "20/ranged_single/shop": {
+      "build": "ranged_single",
+      "capsules": 36,
+      "effective_stats": {
+        "armor": 28.0,
+        "attack_speed": 80.0,
+        "crit_chance": 0.15,
+        "damage_bonus": 36.0,
+        "dash_recovery_bonus": 0.0,
+        "dodge_chance": 0.0,
+        "health": 156.0,
+        "luck": 0.0,
+        "max_health": 156.0,
+        "melee_damage": 0.0,
+        "ranged_damage": 16.0,
+        "regen": 4.0,
+        "regen_progress": 0.0,
+        "root_capacity": 6,
+        "shield_charges": 0,
+        "speed_bonus": -8.0,
+        "stat_model_version": 3
+      },
+      "equipment": [
+        {
+          "affix_slots": 4,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 20.5568275264522,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 6,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 6
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            }
+          ],
+          "id": "enamel_mirror",
+          "invested_coins": 123,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 4,
+          "uid": "probe_0"
+        },
+        {
+          "affix_slots": 4,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 20.5568275264522,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 6,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 6
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            }
+          ],
+          "id": "enamel_mirror",
+          "invested_coins": 123,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 4,
+          "uid": "probe_1"
+        },
+        {
+          "affix_slots": 4,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 20.5568275264522,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 6,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 6
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            }
+          ],
+          "id": "enamel_mirror",
+          "invested_coins": 123,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 4,
+          "uid": "probe_2"
+        },
+        {
+          "affix_slots": 4,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 20.5568275264522,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 6,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 6
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            }
+          ],
+          "id": "enamel_mirror",
+          "invested_coins": 123,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 4,
+          "uid": "probe_3"
+        },
+        {
+          "affix_slots": 4,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 20.5568275264522,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 6,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 6
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            }
+          ],
+          "id": "enamel_mirror",
+          "invested_coins": 123,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 4,
+          "uid": "probe_4"
+        },
+        {
+          "affix_slots": 4,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 20.5568275264522,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 6,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 6
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            }
+          ],
+          "id": "enamel_mirror",
+          "invested_coins": 123,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 4,
+          "uid": "probe_5"
+        }
+      ],
+      "gold_budget": 2200,
+      "gold_unspent": 574,
+      "item_gold": 888,
+      "items": [
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1",
+        "tempo_2",
+        "xp_heal_1",
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1",
+        "tempo_2",
+        "xp_heal_1",
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1",
+        "tempo_2",
+        "xp_heal_1",
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1",
+        "tempo_2",
+        "xp_heal_1"
+      ],
+      "mode": "shop",
+      "roots": 6,
+      "stats": {
+        "armor": 12.0,
+        "attack_speed": 40.0,
+        "crit_chance": 0.15,
+        "damage_bonus": 40.0,
+        "max_health": 160.0,
+        "melee_damage": 0.0,
+        "ranged_damage": 16.0
+      },
+      "tier": 4,
+      "upgrade_points": 72,
+      "wave": 20,
+      "weapon_gold": 738
+    },
+    "20/uv_floss/shop": {
+      "build": "uv_floss",
+      "capsules": 36,
+      "effective_stats": {
+        "armor": 28.0,
+        "attack_speed": 80.0,
+        "crit_chance": 0.15,
+        "damage_bonus": 36.0,
+        "dash_recovery_bonus": 0.0,
+        "dodge_chance": 0.0,
+        "health": 156.0,
+        "luck": 0.0,
+        "max_health": 156.0,
+        "melee_damage": 5.33333333333333,
+        "ranged_damage": 10.6666666666667,
+        "regen": 4.0,
+        "regen_progress": 0.0,
+        "root_capacity": 6,
+        "shield_charges": 0,
+        "speed_bonus": -8.0,
+        "stat_model_version": 3
+      },
+      "equipment": [
+        {
+          "affix_slots": 4,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 48.240829470168,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 6,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 6
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            }
+          ],
+          "id": "uv_lamp",
+          "invested_coins": 181,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 4,
+          "uid": "probe_0"
+        },
+        {
+          "affix_slots": 4,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 48.240829470168,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 6,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 6
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            }
+          ],
+          "id": "uv_lamp",
+          "invested_coins": 181,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 4,
+          "uid": "probe_1"
+        },
+        {
+          "affix_slots": 4,
+          "affixes": [
+            {
+              "bonus": 0.0,
+              "damage": 44.6165784447957,
+              "id": "fire",
+              "legacy_floor": 0.0,
+              "level": 6,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 6
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "leech",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            },
+            {
+              "bonus": 0.0,
+              "damage": 7.0,
+              "id": "tempo",
+              "legacy_floor": 0.0,
+              "level": 3,
+              "progress": 0.0,
+              "rank": 1,
+              "rarity": 1,
+              "stacks": 3
+            }
+          ],
+          "id": "floss_garrote",
+          "invested_coins": 164,
+          "rolls": {
+            "crit": 0.04,
+            "damage": 1.12,
+            "interval": 0.95,
+            "quality": 2,
+            "range": 1.05
+          },
+          "tier": 4,
+          "uid": "probe_2"
+        }
+      ],
+      "gold_budget": 2200,
+      "gold_unspent": 786,
+      "item_gold": 888,
+      "items": [
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1",
+        "tempo_2",
+        "xp_heal_1",
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1",
+        "tempo_2",
+        "xp_heal_1",
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1",
+        "tempo_2",
+        "xp_heal_1",
+        "health_1",
+        "armor_2",
+        "damage_1",
+        "regen_1",
+        "tempo_2",
+        "xp_heal_1"
+      ],
+      "mode": "shop",
+      "roots": 6,
+      "stats": {
+        "armor": 12.0,
+        "attack_speed": 40.0,
+        "crit_chance": 0.15,
+        "damage_bonus": 40.0,
+        "max_health": 160.0,
+        "melee_damage": 5.33333333333333,
+        "ranged_damage": 10.6666666666667
+      },
+      "tier": 4,
+      "upgrade_points": 72,
+      "wave": 20,
+      "weapon_gold": 526
+    }
+  },
+  "revision": "df8788a4aaaf0b895e83ffe52fd709cd560d6e6e",
+  "source_sha256": "49a6fb68d095e002f44ec9d5b0befe96f3edc14ee4b9ba4d50fd472f6874b960",
+  "source_dirty": true
+}

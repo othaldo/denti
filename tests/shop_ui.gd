@@ -44,6 +44,9 @@ func _run() -> void:
 		_fail("two-handed weapon does not occupy two hand widths: weapon %s, free %s, hands %s" % [weapon_button.size, free_hand.size, weapon_button.get_meta("hands", 1)])
 		return
 	var offer_card: OfferCard = game.shop_panel.offer_buttons[0]
+	if not offer_card.category_label.is_visible_in_tree() or not offer_card.category_label.text.contains("Nahkampf · 100 %"):
+		_fail("shop offer hides its damage scaling before inspection")
+		return
 	var rarity_border := offer_card.get_theme_stylebox("normal") as StyleBoxFlat
 	if offer_card.rarity_label.visible or rarity_border.border_width_top != 4 or rarity_border.border_width_left != 1 or rarity_border.border_color != DentiRarity.color_for(game.shop.offers[0].rarity_tier).lightened(0.20) or not offer_card.tooltip_text.contains("Seltenheit:"):
 		_fail("shop rarity lacks a visible border or accessible name")
@@ -81,6 +84,11 @@ func _run() -> void:
 		root.push_input(click, true)
 	if not game.shop_panel.expanded or game.shop_panel.selected_kind != "offer":
 		_fail("stat hover cells block clicks on the purchase card")
+		return
+	game.shop_panel.close_details()
+	game.shop_panel._select("offer", 0)
+	if not game.shop_panel.details.subtitle.text.contains("Nahkampf · 100 %") or not game.shop_panel.details.subtitle.tooltip_text.contains("+1 Nahschaden ergibt +1,00 Basis-Schaden"):
+		_fail("weapon details hide scaling or confuse the coefficient with total damage")
 		return
 	game.shop_panel.close_details()
 	weapon_button = game.shop_panel.inventory_row.get_child(0).get_child(0)

@@ -32,6 +32,11 @@ func _run() -> void:
 	game._on_loot_collected(&"coin", 2)
 	game._on_loot_collected(&"xp", 3)
 	game.player.take_hit(8.0)
+	game.player.stats.heal(3.0)
+	game.player.stats.heal(100.0)
+	if not is_equal_approx(game.telemetry.healing, 8.0) or not is_equal_approx(game.telemetry.overheal, 95.0):
+		_fail("actual healing and overhealing were not separated")
+		return
 	if game.telemetry.wave_spawns != 1 or game.telemetry.wave_coins < 2 or game.telemetry.wave_xp < 3 or game.telemetry.damage_taken <= 0.0:
 		_fail("wave economy or incoming damage was not recorded")
 		return
@@ -43,6 +48,10 @@ func _run() -> void:
 	await process_frame
 	await process_frame
 	game = current_scene
+	var expected_json: Dictionary = JSON.parse_string(JSON.stringify(expected))
+	if game.telemetry.healing != expected.healing or game.telemetry.overheal != expected.overheal or game.telemetry.wave_build != expected_json.wave_build:
+		_fail("save/resume changed healing or the wave-start build")
+		return
 	if game.telemetry.kills != int(expected["kills"]) or game.telemetry.wave_spawns != int(expected["wave_spawns"]) or absf(game.telemetry.total_damage - float(expected["total_damage"])) > 0.01 or game.telemetry.weapon_damage != expected["weapon_damage"] or game.telemetry.proc_damage != expected["proc_damage"]:
 		_fail("save/resume changed run telemetry")
 		return
@@ -79,12 +88,27 @@ func _run() -> void:
 		_fail("boss time-to-kill was not recorded")
 		return
 	var trend := RunTelemetry.new()
-	trend.begin_wave(1)
+	var build := {"player_stats": {"max_health": 123.0}, "weapons": [{"id": "turbo_drill"}]}
+	trend.begin_wave(1, &"", build)
+	build.player_stats.max_health = 456.0
+	trend.record_healing(3.0, 7.0)
 	trend.tick(10.0, 8, 3)
 	trend.record_damage(100.0, &"test_weapon")
+	trend.record_damage(20.0, &"", &"affix_fire")
 	trend.record_spawn(false)
 	trend.begin_wave(2)
-	if trend.wave_history.size() != 1 or absf(float(trend.wave_history[0]["average_dps"]) - 10.0) > 0.01 or int(trend.wave_history[0]["peak_enemies_alive"]) != 8 or absf(float(trend.wave_history[0]["average_enemies_alive"]) - 8.0) > 0.01 or int(trend.wave_history[0]["peak_enemy_projectiles"]) != 3 or trend.recent_dps() != 0.0:
+	if trend.wave_history[0].weapon_damage.get("test_weapon", 0) != 100.0 or trend.wave_history[0].proc_damage.get("affix_fire", 0) != 20.0 or not trend.wave_weapon_damage.is_empty() or not trend.wave_proc_damage.is_empty():
+		_fail("per-wave damage sources were lost or leaked into the next wave")
+		return
+	if trend.healing != 3.0 or trend.wave_healing != 0 or trend.wave_history[0].healing != 3.0 or trend.wave_history[0].overheal != 7.0 or trend.wave_history[0].build.player_stats.max_health != 123.0:
+		_fail("wave healing reset or immutable build history is incorrect")
+		return
+	var historic := RunTelemetry.new()
+	historic.restore({}, 1)
+	if historic.healing != 0 or not historic.wave_build.is_empty():
+		_fail("historic telemetry needs zero healing and an empty build fallback")
+		return
+	if trend.wave_history.size() != 1 or absf(float(trend.wave_history[0]["average_dps"]) - 12.0) > 0.01 or int(trend.wave_history[0]["peak_enemies_alive"]) != 8 or absf(float(trend.wave_history[0]["average_enemies_alive"]) - 8.0) > 0.01 or int(trend.wave_history[0]["peak_enemy_projectiles"]) != 3 or trend.recent_dps() != 0.0:
 		_fail("per-wave trends or rolling-window reset are incorrect")
 		return
 	session.report_dir = "user://test_run_reports_%d" % Time.get_ticks_usec()
@@ -95,6 +119,9 @@ func _run() -> void:
 		return
 	var report_path: String = session.report_dir.path_join(reports.get_files()[0])
 	var report: Variant = JSON.parse_string(FileAccess.get_file_as_string(report_path))
+	if not report is Dictionary or report.get("player_stats", {}).get("health", -1) != 0 or report.get("player_stats", {}).get("max_health", 0) != game.player.stats.max_health:
+		_fail("completed report lost the final player stats")
+		return
 	if not report is Dictionary or report.get("outcome") != "death" or report.get("wave_reached") != game.wave.current_wave or float(report.get("telemetry", {}).get("damage_taken", 0.0)) <= float(expected["damage_taken"]) or report.get("waves", []).size() != 1:
 		_fail("completed run report lost the final damage or run metadata")
 		return

@@ -4,9 +4,10 @@ extends RefCounted
 
 static func build(parent: VBoxContainer, data: WeaponData, searchable_body: String) -> void:
 	DentiUIComponents.label(parent, data.description.trim_prefix(data.roots_text() + " · "), 18)
-	var roots := DentiUIComponents.label(parent, data.roots_text(), 16)
+	var roots := DentiUIComponents.label(parent, data.roots_text() + "\n" + data.scaling_label(), 16)
+	roots.tooltip_text = data.scaling_description()
 	roots.add_theme_color_override("font_color", DentiUIStyle.MINT)
-	var combat := DentiUIComponents.label(parent, data.combat_text(), 15)
+	var combat := DentiUIComponents.label(parent, data.combat_text().replace(" · " + data.scaling_text(), ""), 15)
 	combat.add_theme_color_override("font_color", DentiUIStyle.MUTED)
 	for paragraph in searchable_body.split("\n\n"):
 		if paragraph.begins_with("Die Griffe bleiben") or paragraph.begins_with("Der Griff bleibt"):

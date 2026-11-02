@@ -36,7 +36,8 @@ func _run() -> void:
 		ids.append(weapon.id)
 		view.icon_buttons[index].pressed.emit()
 		_check(view.selected_id == weapon.id and view.weapon_name.text.replace("\n", "").replace(" ", "") == weapon.display_name.replace(" ", ""), "preview and selected icon differ")
-		_check(view.weapon_view.stat_buttons[0].value == str(roundi(weapon.damage_at_tier(1))) and view.weapon_view.roots_label.text == weapon.roots_text(), "preview lost starting damage or roots")
+		_check(view.weapon_view.stat_buttons[0].value == str(roundi(weapon.damage_at_tier(1))) and view.weapon_view.roots_label.text.begins_with(weapon.roots_text()), "preview lost starting damage or roots")
+		_check(view.weapon_view.roots_label.text.contains(weapon.scaling_label()), "preview hides its scaling: " + str(weapon.id))
 		_check(game.starter_pending and game.player.loadout.equipped().is_empty() and not game.wave.active, "icon click started a run")
 	_check(session.load_run().get("starter_preview", "") == str(view.selected_id), "preview not persisted")
 	var saved: Dictionary = session.load_run()
@@ -54,6 +55,14 @@ func _run() -> void:
 		await _settle()
 		_check(view.catalog_scroll.get_global_rect().encloses(view.icon_buttons[-1].get_global_rect()), "last weapon inaccessible at %s" % extent)
 		_check(view.weapon_view.preview.get_global_rect().encloses(view.weapon_name.get_global_rect()), "weapon name exceeds preview at %s: %s in %s" % [extent, view.weapon_name.get_global_rect(), view.weapon_view.preview.get_global_rect()])
+		for index in view.options.size():
+			view.select_weapon(index)
+			await _settle()
+			var meta := view.weapon_view.roots_label
+			_check(meta.is_visible_in_tree() and view.weapon_view.preview.get_global_rect().encloses(meta.get_global_rect()), "weapon scaling leaves preview at %s: %s" % [extent, view.selected_id])
+			for line in meta.text.split("\n"):
+				_check(meta.get_theme_font("font").get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1, meta.get_theme_font_size("font_size")).x <= meta.size.x + 1, "weapon scaling clipped at %s: %s" % [extent, line])
+			_check(view.weapon_name.get_global_rect().end.y <= meta.global_position.y + 1 and meta.get_global_rect().end.y <= view.weapon_view.stat_buttons[0].global_position.y + 1, "weapon metadata overlaps name or stats at %s: %s" % [extent, view.selected_id])
 		_check(not view.details.visible, "details clutter the default preview")
 		view.details_button.pressed.emit()
 		await _settle()

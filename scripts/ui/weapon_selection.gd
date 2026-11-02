@@ -36,6 +36,7 @@ func _ready() -> void:
 	weapon_name.autowrap_mode = TextServer.AUTOWRAP_OFF
 	weapon_name.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	roots_label = _label(17)
+	roots_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	roots_label.add_theme_color_override("font_color", DentiUIStyle.MUTED)
 	for index in 3:
 		var button := RunSetupValue.new()
@@ -93,11 +94,11 @@ func select_weapon(index: int, notify: bool = true) -> void:
 	selected_id = weapon.id
 	art.texture = RunSetupPresentation.weapon_icon(weapon)
 	weapon_name.text = weapon.display_name
-	roots_label.text = weapon.roots_text()
+	roots_label.text = weapon.roots_text() + "\n" + weapon.scaling_label()
 	var values := RunSetupPresentation.values(weapon)
 	for stat in 3:
 		stat_buttons[stat].value = values[stat]
-		stat_buttons[stat].tooltip_text = ["Grundschaden", "Angriffspause", "Reichweite"][stat]
+		stat_buttons[stat].tooltip_text = [weapon.scaling_description(), "Angriffspause", "Reichweite"][stat]
 		stat_buttons[stat].visible = true
 	refresh()
 	_layout()
@@ -125,7 +126,7 @@ func _stat_details(index: int) -> void:
 	var weapon := selected_weapon()
 	if weapon == null: return
 	var title: String = ["Grundschaden", "Angriffspause", "Reichweite"][index]
-	var text: String = ["Grundschaden auf Mk I: %d.\n%s" % [roundi(weapon.damage_at_tier(1)), weapon.combat_text()],
+	var text: String = ["Grundschaden auf Mk I: %d.\n%s\n%s" % [roundi(weapon.damage_at_tier(1)), weapon.scaling_description(), weapon.combat_text().replace(" · " + weapon.scaling_text(), "")],
 		"Zeit zwischen zwei Angriffen auf Mk I: %.2f Sekunden. Putzeifer verkürzt die Angriffspause." % weapon.interval_at_tier(1),
 		"Zielreichweite auf Mk I: %d." % roundi(weapon.range_at_tier(1))][index]
 	details_requested.emit(title, text)
@@ -162,13 +163,14 @@ func _layout() -> void:
 		weapon_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 		_place_name(Rect2(left, 0, extent.x - left, 48), font_size)
 		roots_label.position = Vector2(left, 49)
-		roots_label.size = Vector2(extent.x - left, 22)
+		roots_label.size = Vector2(extent.x - left, 40)
 		roots_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 		_place_stats(Rect2(left, extent.y - 48, extent.x - left, 48), 14)
 	else:
-		var art_size := minf(260, minf(extent.x * 0.8, extent.y * (0.28 if compact else 0.52)))
 		var name_height := 42.0 if compact else 76.0
-		var roots_height := 18.0 if compact else 26.0
+		var roots_height := 38.0 if compact else 48.0
+		var art_size := minf(260, minf(extent.x * 0.8, extent.y * (0.28 if compact else 0.52)))
+		art_size = minf(art_size, maxf(0, extent.y - name_height - roots_height - 52))
 		var height := art_size + name_height + roots_height + 52
 		var top := maxf(0, (extent.y - height) * 0.5)
 		art.position = Vector2((extent.x - art_size) * 0.5, top)

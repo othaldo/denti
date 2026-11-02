@@ -125,7 +125,15 @@ func _run() -> void:
 		game.wave.current_wave = milestone
 		game._clear_arena(false)
 		await process_frame
+		# Exercise the mandatory weapon step explicitly instead of depending on
+		# whether a random level choice/luck roll produced upgrade points.
+		if milestone == 10: game.rewards.weapon_upgrades.points += 1
 		game._begin_loot_collection()
+		if game.rewards.step == PostWaveRewards.Step.WEAPONS:
+			if not _check(not game.story_dialogue.visible, "arrival interrupted weapon reward"):
+				return
+			game._on_weapon_upgrades_completed()
+			await process_frame
 		if game.rewards.step == PostWaveRewards.Step.RELICS:
 			choose_panel(game.choice_panel, 0)
 		var previous: int = game.story.chapter_index
@@ -148,6 +156,11 @@ func _run() -> void:
 	if not _check(not game.ended and game.rewards.step == PostWaveRewards.Step.LEVELS, "finale skipped final rewards"):
 		return
 	choose_panel(game.choice_panel, 0)
+	if game.rewards.step == PostWaveRewards.Step.WEAPONS:
+		if not _check(not game.story_dialogue.visible and not game.ended, "finale interrupted weapon reward"):
+			return
+		game._on_weapon_upgrades_completed()
+		await process_frame
 	if not _check(game.story.dialogue_id == &"finale" and not game.ended, "victory appeared before epilogue"):
 		return
 	_finish_dialogue(game)

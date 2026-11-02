@@ -19,6 +19,17 @@ func _run() -> void:
 	for invalid in [[], {"wave": 1, "player": []}, {"wave": [], "player": {}}, {"wave": 1, "player": {"stats": {"health": []}}}, {"wave": 1, "player": {}, "items": {"cooldowns": []}}, {"wave": 1, "player": {}, "rewards": {"pending_chests": {}}}, {"wave": 1, "player": {}, "weapons": [{"rolls": []}]}, {"wave": 1, "player": {}, "loot": [{"position": [{}, 1]}]}, {"wave": 1, "player": {}, "player_projectiles": [{"id": "water_jet"}]}, {"wave": 1, "player": {}, "coins": INF}]:
 		_check(RunSaveData.normalize(invalid).is_empty(), "invalid save accepted: " + str(invalid))
 	var legacy := original.duplicate(true)
+	var malformed_cycle := original.duplicate(true)
+	malformed_cycle["weapon_runtime"] = [{"crit_cycle_progress": []}]
+	_check(RunSaveData.normalize(malformed_cycle).is_empty(), "invalid critical attack cycle accepted")
+	for motion in [{"contact_hits": []}, {"contact_limit": "two"}, {"primary_contact": [1, {}]}, {"primary_contact": [1]}]:
+		var malformed := original.duplicate(true)
+		malformed["weapon_runtime"] = [{"motion": motion}]
+		_check(RunSaveData.normalize(malformed).is_empty(), "invalid melee contact budget accepted")
+	for malformed_telemetry in [{"wave_build": []}, {"wave_weapon_damage": {"uv_lamp": []}}, {"wave_proc_damage": []}]:
+		var malformed := original.duplicate(true)
+		malformed["telemetry"] = malformed_telemetry
+		_check(RunSaveData.normalize(malformed).is_empty(), "invalid balance telemetry accepted")
 	legacy.offers = [{"id": "floss"}]
 	legacy.upgrades = [{"stat": "move_speed"}]
 	var migrated := RunSaveData.normalize(legacy)

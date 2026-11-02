@@ -122,6 +122,8 @@ func _edict(seconds: float = -1) -> void:
 func _lock_verdict(seconds: float = -1) -> void:
 	origin = enemy.global_position
 	var at := HazardGeometry.player_at(enemy.target, seconds) if seconds >= 0 else enemy.target.global_position
+	if not legacy_sequence:
+		at += (enemy.target.velocity * profile.verdict_lead_seconds).limit_length(profile.verdict_lead_distance)
 	var direction := origin.direction_to(at)
 	# Aim the damaging sector at Denti once; the warning never tracks afterward.
 	edict_angle = (facing if direction.is_zero_approx() else direction).angle()

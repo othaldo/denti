@@ -2,3 +2,5 @@
 [ext_resource type="Script" path="res://scripts/enemies/crown_court_data.gd" id="1"]
 [resource]
 script = ExtResource("1")
+verdict_lead_seconds = 0.55
+verdict_lead_distance = 125.0

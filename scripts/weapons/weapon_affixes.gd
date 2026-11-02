@@ -248,4 +248,7 @@ static func effect_damage(value: float, kind: StringName, data: WeaponData, stat
 static func utility_value(affix: Dictionary, roots: int = 1) -> float:
 	var data := by_id(StringName(affix.id))
 	var weight := maxi(roots, 1) if data.effect_kind == "leech" else 1
-	return minf(data.utility_base + float(affix.damage) * data.utility_scale, data.utility_cap) * weight
+	var value := data.utility_base + float(affix.damage) * data.utility_scale
+	if data.utility_soft_threshold > 0 and value > data.utility_soft_threshold:
+		value = data.utility_soft_threshold + (value - data.utility_soft_threshold) * data.utility_soft_factor
+	return minf(value, data.utility_cap) * weight

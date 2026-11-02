@@ -18,6 +18,46 @@ Details zum Iststand: [README](../README.md), [Story-Modus](STORY_MODE.md), [Waf
 
 ## Prioritäten
 
+Ergänzung 01.11.2026: Der [Buildvergleich auf Normal](BUILD_COMPARISON.md) ergänzt
+die stationären Waffenmessungen um vollständige Wellen, Verzauberungen, Heilung
+und normale Bewegung. Buffs für unattraktive Alternativen haben Vorrang;
+gezielte Nerfs benötigen Hinweise auf verdrängte Entscheidungen oder trivialisierte
+Gefahren. Die Beurteilung des Spielgefühls bleibt Teil der menschlichen Abnahme.
+Der [erste spielbare Pass](BALANCE_FIRST_PASS.md) verbessert den Raumgewinn der
+Bürste, ergänzt begrenztes Vorhalten beim Imperator und bremst den Heilertrag
+hoher Lebensraub-Ränge. Vollständige menschliche Runs bleiben die nächste Abnahme.
+Der [verdiente Hell-Einstieg](EARNED_PROGRESSION.md) ergänzt die Prüfung um den
+Weg zum Boss: Killrate, Einkommen, echte Käufe und verbleibendes Leben müssen
+zusammen bewertet werden, bevor ein Einzelziel-Start als stark gilt.
+Der [anschließende Bohrwerkzeug-Pass](DRILL_CONTACT_BALANCE.md) ist umgesetzt:
+begrenzter Vorwärtskontakt beim Bohrer, sichere Reichweite und normaler
+Gegnerschaden bei der Fräse. Eine kleine Mindestversorgung half den geprüften
+Farm-Pfaden nicht und wurde nicht als neues System eingebaut.
+
+Ergänzung 02.11.: Der [Kontaktwaffen-Spieltest-Pass](CONTACT_WEAPON_BALANCE.md)
+ergänzt kleine Rückstöße, Kratzer-Folgetreffer und den zielunabhängigen
+Polierer-Crit-Zyklus. Die Hell-Lücke zu sicheren Linienwaffen bleibt offen.
+
+Nächster Ausbau der Diagnose auf Nutzeranregung: mehrere regelbasierte
+Testpiloten. **Spielstärke** (Reaktionszeit, Entscheidungsfehler, Ausweichen und
+Dash-Nutzung) getrennt von **Strategie** (Distanzhalten, offensiver Nahkampf,
+Loot-Routen, Bossfokus) konfigurieren. Auch Shop-/Buildregeln müssen als eigene
+Vergleichsachse sichtbar bleiben. Die bisherigen Piloten beherrschen Kreisroute,
+reichweitenabhängige Zielsuche und Boss-Nachsetzen, aber keine bewusste Reaktion
+auf Gefahren oder Dash. Nicht als menschliche Winrates interpretieren.
+
+Die Diagnose läuft bereits headless ohne Echtzeitsynchronisation mit festem
+1/60-Sekunden-Schritt und parallelen Seeds. Weitere Beschleunigung soll diese
+Schrittweite erhalten; eine höhere Zeitskalierung bei gröberer Kollisionsprüfung
+wäre keine gleichwertige Balanceprobe. Ein sichtbarer Zeitraffer kann zusätzlich
+zum Nachprüfen auffälliger Läufe dienen. Neue Pilotprofile und der sichtbare
+Zeitraffer sind geplant, noch nicht implementiert.
+
+Zurückgestellt: [Waffenfamilien-Setboni](WEAPON_SET_IDEA.md), zunächst höchstens
+eine kleine Nah-/Fernkampf-Schwelle mit Platz für 4+2-Mischbuilds. Fusion,
+Wurzelkosten und die zusätzliche Regelkomplexität müssen vor einer Umsetzung
+geklärt werden. Das ersetzt nicht die Grundbalance schwächerer Starts.
+
 Die Run-Vorbereitung ist nun als gemeinsame native Auswahlbühne umgesetzt:
 vier gemalte Schwierigkeitsmotive, 18 Waffen, kompakte Vorschau und Details auf Abruf.
 [Nutzerfeedback, Gestaltungsplan und native Prüfung](UI_UX_PLAN.md).

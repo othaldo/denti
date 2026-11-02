@@ -119,10 +119,13 @@ func _run() -> void:
 	_clear()
 	front = _enemy(Vector2(50, 0))
 	var grinder := _equip(&"cavity_grinder")
+	# Keep the stationary focus/save dummy in range despite repeated push.
+	var focus_position := front.global_position
 	var health_before := front.health
 	_attack(grinder)
 	var first_hit := health_before - front.health
 	for index in 15:
+		front.global_position = focus_position
 		grinder.cooldown = 0.0
 		_attack(grinder)
 	snapshot = RunSnapshot.capture(game)

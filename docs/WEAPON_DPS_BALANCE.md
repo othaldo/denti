@@ -1,5 +1,9 @@
 # Waffen-DPS und Nahkampf-Balance
 
+Aktueller Stand: [Gesamtvergleich vom 01.11.2026](WEAPON_ROSTER_REVIEW.md),
+einschließlich voller Wellen, Mischbuilds und separater Evolutionsmessung.
+Die folgenden Zahlen dokumentieren den historischen Balancepass vom 04.10.
+
 Gemessen am 4. Oktober 2026 mit Godot 4.7.2. Alle 18 Waffen wurden auf allen vier Stufen vor und nach dem Pass mit echten Angriffen geprüft: 392 Fälle pro Stand. [Vorher](balance_weapon_dps_before.json), [nachher](balance_weapon_dps_after.json), [Bosskontrolle](balance_weapon_dps_bosses.json).
 
 Anschließend wurde [Nass um Verlangsamung ergänzt](WET_STATUS.md). Der stationäre Durchsatz bleibt gleich; eine zusätzliche Bosskontrolle prüft die Auswirkung auf Bewegung und Begegnungen.

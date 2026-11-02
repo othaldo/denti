@@ -6,6 +6,11 @@ const WINDOW := 10.0
 var elapsed: float = 0.0
 var total_damage: float = 0.0
 var damage_taken: float = 0.0
+var healing: float = 0.0
+var overheal: float = 0.0
+var wave_healing: float = 0.0
+var wave_overheal: float = 0.0
+var wave_build: Dictionary = {}
 var dodges: int = 0
 var wave_dodges: int = 0
 var dashes: int = 0
@@ -29,6 +34,8 @@ var chests_kept: int = 0
 var chests_scrapped: int = 0
 var weapon_damage: Dictionary = {}
 var proc_damage: Dictionary = {}
+var wave_weapon_damage: Dictionary = {}
+var wave_proc_damage: Dictionary = {}
 var enchantment_support: Dictionary = {}
 var wave_enchantment_support: Dictionary = {}
 var other_damage: float = 0.0
@@ -68,11 +75,16 @@ var kill_head: int = 0
 var taken_head: int = 0
 
 
-func begin_wave(number: int, profile_id: StringName = &"") -> void:
+func begin_wave(number: int, profile_id: StringName = &"", build: Dictionary = {}) -> void:
 	if current_wave > 0:
 		wave_history.append(current_wave_summary())
 	current_wave = number
 	current_profile_id = profile_id
+	wave_build = build.duplicate(true)
+	wave_healing = 0.0
+	wave_overheal = 0.0
+	wave_weapon_damage.clear()
+	wave_proc_damage.clear()
 	wave_started_at = elapsed
 	wave_spawns = 0
 	wave_spawns_blocked = 0
@@ -144,14 +156,25 @@ func record_damage(amount: float, weapon_id: StringName = &"", proc_id: StringNa
 	if weapon_id != &"":
 		var key := str(weapon_id)
 		weapon_damage[key] = float(weapon_damage.get(key, 0.0)) + amount
+		wave_weapon_damage[key] = float(wave_weapon_damage.get(key, 0.0)) + amount
 	elif proc_id != &"":
 		var key := str(proc_id)
 		proc_damage[key] = float(proc_damage.get(key, 0.0)) + amount
+		wave_proc_damage[key] = float(wave_proc_damage.get(key, 0.0)) + amount
 	else:
 		other_damage += amount
 	var dps := recent_dps()
 	peak_dps = maxf(peak_dps, dps)
 	wave_peak_dps = maxf(wave_peak_dps, dps)
+
+
+func record_healing(amount: float, excess: float) -> void:
+	var actual := maxf(amount, 0.0)
+	var wasted := maxf(excess, 0.0)
+	healing += actual
+	overheal += wasted
+	wave_healing += actual
+	wave_overheal += wasted
 
 
 func record_kill(is_boss: bool, is_elite: bool = false) -> void:
@@ -273,6 +296,8 @@ func current_wave_summary() -> Dictionary:
 		"peak_enemy_projectiles": wave_peak_enemy_projectiles,
 		"damage_dealt": wave_damage, "average_dps": wave_damage / maxf(duration, 1.0),
 		"peak_dps": wave_peak_dps, "damage_taken": wave_taken,
+		"healing": wave_healing, "overheal": wave_overheal, "build": wave_build.duplicate(true),
+		"weapon_damage": wave_weapon_damage.duplicate(), "proc_damage": wave_proc_damage.duplicate(),
 		"dodges": wave_dodges,
 		"dashes": wave_dashes, "dash_contacts": wave_dash_contacts, "dash_damage": wave_dash_damage,
 		"status_damage": wave_status_damage.duplicate(), "status_applications": wave_status_applications.duplicate(),
@@ -295,6 +320,9 @@ func wave_summaries() -> Array[Dictionary]:
 func save_data() -> Dictionary:
 	return {
 		"elapsed": elapsed, "total_damage": total_damage, "damage_taken": damage_taken,
+		"healing": healing, "overheal": overheal,
+		"wave_healing": wave_healing, "wave_overheal": wave_overheal, "wave_build": wave_build.duplicate(true),
+		"wave_weapon_damage": wave_weapon_damage.duplicate(), "wave_proc_damage": wave_proc_damage.duplicate(),
 		"dodges": dodges, "wave_dodges": wave_dodges,
 		"dashes": dashes, "dash_contacts": dash_contacts, "dash_damage": dash_damage,
 		"wave_dashes": wave_dashes, "wave_dash_contacts": wave_dash_contacts, "wave_dash_damage": wave_dash_damage,
@@ -330,6 +358,13 @@ func restore(saved: Dictionary, wave_number: int) -> void:
 	elapsed = maxf(float(saved.get("elapsed", 0.0)), 0.0)
 	total_damage = maxf(float(saved.get("total_damage", 0.0)), 0.0)
 	damage_taken = maxf(float(saved.get("damage_taken", 0.0)), 0.0)
+	healing = maxf(float(saved.get("healing", 0.0)), 0.0)
+	overheal = maxf(float(saved.get("overheal", 0.0)), 0.0)
+	wave_healing = maxf(float(saved.get("wave_healing", 0.0)), 0.0)
+	wave_overheal = maxf(float(saved.get("wave_overheal", 0.0)), 0.0)
+	wave_build = saved.get("wave_build", {}).duplicate(true)
+	wave_weapon_damage = saved.get("wave_weapon_damage", {}).duplicate()
+	wave_proc_damage = saved.get("wave_proc_damage", {}).duplicate()
 	dodges = maxi(int(saved.get("dodges", 0)), 0)
 	wave_dodges = maxi(int(saved.get("wave_dodges", 0)), 0)
 	dashes = maxi(int(saved.get("dashes", 0)), 0)

@@ -90,6 +90,10 @@ Mehrere Waffen heilen unabhängig. Salven, durchschlagende Geschosse und
 Flächentreffer derselben Waffe teilen sich das Intervall; DoTs und Folgeeffekte
 heilen nicht. Der Heilanteil bleibt 5 % des wirksamen Treffers; die Obergrenze beträgt 2 HP pro Wurzel. Waffen-IDs reisen mit
 Geschossen und werden zusammen mit den Intervallen beim Fortsetzen erhalten.
+Seit dem [Balancepass vom 01.11.2026](BALANCE_FIRST_PASS.md) wächst der Heilwert
+oberhalb von 0,75 HP pro Wurzel nur noch mit 40 % des bisherigen Zuwachses.
+Rang 1–4 bleibt gleich, Rang 10 liefert 1,11 statt 1,65 HP pro Wurzel und Impuls.
+Jeder Rang verbessert die Heilung; Karten und Kampf verwenden dieselbe Kurve.
 
 Evolutionen öffnen eine reversible Fusionsvorschau. Bei normalen Mk-Fusionen
 erscheint sie bei Platz-, Element- oder Rangkonflikten. Die Ausgangswaffen bleiben

@@ -114,7 +114,7 @@ func show_weapon(weapon: WeaponData) -> void:
 	_effect_source = "%s\n%d Schaden · %.2f s\n%d Reichweite" % [weapon.description, roundi(weapon.damage_at_tier(1)), weapon.interval_at_tier(1), roundi(weapon.attack_range)]
 	upgrade_description = _effect_source
 	tooltip_text = "%s\n%s" % [weapon.description, weapon.combat_text()]
-	_set_rarity(1)
+	_set_rarity(1, weapon.scaling_label())
 	_finish_content()
 
 

@@ -63,8 +63,8 @@ func show_weapon(weapon: WeaponData) -> void:
 	content.visible = true
 	icon_rect.texture = weapon.sprite
 	name_label.text = weapon.display_name.to_upper()
-	# All starters are tier I; keep the badge short enough for landscape cards.
-	rarity_label.text = "%s · %s" % [DentiRarity.name_for(1).to_upper(), weapon.damage_type_label().to_upper()]
+	# All starters are tier I; use the badge for the relevant build stat.
+	rarity_label.text = weapon.scaling_label()
 	DentiUIStyle.style_rarity_label(rarity_label, 1)
 	effect_label.text = "%s\n%d Schaden · %.2f s\n%d Reichweite" % [weapon.description, roundi(weapon.damage_at_tier(1)), weapon.interval_at_tier(1), roundi(weapon.attack_range)]
 	tooltip_text = "%s\n%s" % [weapon.description, weapon.combat_text()]

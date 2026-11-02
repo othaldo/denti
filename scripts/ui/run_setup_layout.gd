@@ -38,7 +38,7 @@ static func weapons(extent: Vector2, count: int) -> Dictionary:
 	var cell := clampf(floorf((gallery_width - (columns - 1) * separation) / columns), 48, 112)
 	var rows := ceili(float(count) / columns)
 	var gallery_height := rows * cell + maxi(0, rows - 1) * separation
-	var preview_height := clampf(extent.x * 0.28, 124, 190) if portrait else extent.y
+	var preview_height := clampf(extent.x * 0.28, 146, 190) if portrait else extent.y
 	var max_gallery := extent.y - preview_height - gap if portrait else extent.y
 	gallery_height = minf(gallery_height, max_gallery)
 	var group_height := gallery_height + gap + preview_height if portrait else maxf(gallery_height, preview_height)

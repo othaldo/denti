@@ -49,6 +49,15 @@ The most important current player feedback is:
 
 Do not solve the difficulty problem only by multiplying all enemy HP. Trash enemies may still die quickly. The desired late-run feeling is that Denti is extremely powerful while the arena remains dangerous because of density, elites, projectiles, telegraphed attacks and boss mechanics.
 
+### Balance philosophy: buffs before nerfs
+
+- Prefer making weaker alternatives attractive before reducing an established strength.
+- Preserve satisfying mechanics and meaningful differences between weapon roles.
+- Assess player experience, build variety and positioning risk alongside numerical throughput.
+- Avoid blanket buffs and power creep; evaluate progression, sustain, economy and enemy pressure together.
+- Use targeted nerfs when a mechanic trivializes danger, displaces alternatives or structurally breaks the system. High damage alone is not sufficient evidence.
+- Treat automated combat probes as diagnostic measurements; perceived fun and actual difficulty still require human playtests.
+
 ### Immediate implementation priority
 
 Work in approximately this order unless a task explicitly says otherwise:

@@ -105,7 +105,10 @@ Weihe speichert höchstens drei Krit-Markierungen für 4 s; Krits anderer Waffen
 können ein markiertes Ziel auslösen. Der Lichtstoß trifft höchstens acht Ziele
 in 105 Reichweite, Intervall 0,8 s. Sein Schaden beträgt Stärke × Waffen-/Bisskraft-
 Skalierung × 0,9 × 1,3. Lebensraub heilt höchstens 5 % des tatsächlich gezählten
-Trefferschadens und `min(0,25 + Stärke × 0,04; 2)` HP je Impuls, alle 0,6 s.
+Trefferschadens und einen rangabhängigen HP-Wert je Wurzel und Impuls, alle 0,6 s.
+Aus `x = 0,25 + Stärke × 0,04` wird oberhalb von 0,75 der Wert
+`0,75 + (x − 0,75) × 0,4`, abschließend begrenzt auf 2 HP pro Wurzel.
+Rang 1–4 bleibt gleich; Rang 10 ergibt 1,11 HP pro Wurzel. [Messung](BALANCE_FIRST_PASS.md).
 Alle Waffen teilen diese Intervalle. DoTs und Folgeeffekte lösen keine neuen
 Waffentreffer oder Lebensraub aus. Gegnerverteidigung und Boss-/Elitebudgets
 gelten auch für alle Folgeeffekte.

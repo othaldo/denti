@@ -42,6 +42,9 @@ var element_skin: StringName = &""
 @export var boss_bonus_tiers: PackedFloat32Array
 @export var attack_width: float = 18.0
 @export var arc_degrees: float = 60.0
+@export var contact_retarget: bool = false
+@export_range(0, 3) var contact_extra_targets: int = 0
+@export_range(0.0, 1.0) var contact_extra_damage: float = 0.5
 @export var crit_bonus: float = 0.0
 @export var crit_multiplier: float = 1.5
 @export var crit_cycle: int = 0
@@ -116,8 +119,21 @@ func damage_with_stats(tier: int, stats: PlayerStats, additional_bonus: float = 
 	return stats.scale_damage(raw_damage_with_stats(tier, stats), additional_bonus)
 
 
+func scaling_family() -> String:
+	return "Nahkampf" if damage_stat == "melee" else "Fernkampf"
+
+
+func scaling_label() -> String:
+	return "%s · %.0f %%" % [scaling_family(), stat_scaling * 100.0]
+
+
 func scaling_text() -> String:
-	return "%s: %.0f %%" % [DentiAttributes.name_for(DentiAttributes.Type.MELEE_DAMAGE if damage_stat == "melee" else DentiAttributes.Type.RANGED_DAMAGE), stat_scaling * 100.0]
+	return "%s: %.0f %% %s" % [scaling_family(), stat_scaling * 100.0, DentiAttributes.name_for(DentiAttributes.Type.MELEE_DAMAGE if damage_stat == "melee" else DentiAttributes.Type.RANGED_DAMAGE)]
+
+
+func scaling_description() -> String:
+	var stat_name := DentiAttributes.name_for(DentiAttributes.Type.MELEE_DAMAGE if damage_stat == "melee" else DentiAttributes.Type.RANGED_DAMAGE)
+	return "%s\n+1 %s ergibt +%s Basis-Schaden pro Treffer, vor Bisskraft." % [scaling_text(), stat_name, ("%.2f" % stat_scaling).replace(".", ",")]
 
 
 func cooldown_at_tier(tier: int, player_interval: float, item_interval_factor: float) -> float:
@@ -174,7 +190,7 @@ func combat_text() -> String:
 	if focus_cap > 0.0:
 		result += " · Ziel-Fokus bis +%d %%" % roundi(focus_cap * 100.0)
 	if crit_cycle > 0:
-		result += " · Jeder %d. Treffer auf dasselbe Ziel kritisch" % crit_cycle
+		result += " · Jeder %d. Angriff kritisch (auch nach Zielwechsel)" % crit_cycle
 	if enamel_exposure > 0.0:
 		result += " · +%d %% Schmelzbruch-Schaden für %.1f s (nicht stapelbar)" % [roundi(enamel_exposure * 100.0), exposure_duration]
 	if trash_damage_factor < 1.0:
@@ -183,6 +199,8 @@ func combat_text() -> String:
 		result += " · +%d %% gegen Eliten" % roundi(elite_damage_bonus * 100.0)
 	if attack_mode in [&"thrust", &"beam_line"]:
 		result += " · Durchgehende Trefferlinie"
+	if attack_mode == &"melee" and contact_extra_targets > 0:
+		result += " · +%d Ziel vorwärts (%d %%)" % [contact_extra_targets, roundi(contact_extra_damage * 100.0)]
 	if attack_mode in [&"cone", &"sweep"]:
 		result += " · %d° Frontbogen" % roundi(arc_degrees)
 	return result

@@ -2,7 +2,15 @@
 
 Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü angezeigt. 0.1.0 wurde rückblickend anhand der Git-Historie dokumentiert; 0.2.0 bündelt die seitdem entstandenen Änderungen. Die Einträge beschreiben implementierte Funktionen. Weitere Pläne stehen in der [Roadmap](docs/ROADMAP.md).
 
-## Noch ohne neue Versionsnummer — 01.11.2026
+## Noch ohne neue Versionsnummer — 02.11.2026
+
+- **Kontaktwaffen gezielt stärken:** Kleine Rückstöße bei Bohrer, Fräse, Kratzer und Polierer schaffen Raum. Der Kratzer kann ein weiteres Ziel auf seiner Hiebspur für 50 % Trefferschaden treffen. Der Polierer erhält 110 Reichweite und einen gespeicherten Crit-Zyklus pro Waffenexemplar: Jeder dritte Angriff ist kritisch, auch nach Zielwechsel und Pausen. Kratzer und Polierer können ein bereits totes Ziel innerhalb derselben sichtbaren Bewegung ersetzen. [78 Einstiegsproben, Grenzen und Spieltest-Punkte](docs/CONTACT_WEAPON_BALANCE.md).
+
+- **Waffenskalierung direkt sichtbar:** Startauswahl, Shopkarten, Waffendetails und Dentipedia zeigen Nahkampf/Fernkampf samt individuellem Faktor. Die Details erklären den Beitrag von Nah-/Fernschaden; Schadensarten wie Licht oder Schnitt bleiben davon getrennt. Auch geheime Evolutionen verwenden ihre tatsächlichen Ressourcendaten.
+
+- **Bohrwerkzeuge im frühen Ausbau:** Der Turbo-Bohrer kann bei verlorenem Ziel einen Gegner auf derselben Stoßbahn treffen und einen weiteren Gegner vorwärts für 50 % Schaden durchbohren. Die Karies-Fräse erhält 110 statt 78 Reichweite und verursacht gegen normale Gegner vollen statt 75 % Schaden. Hauptziel-/Bossschaden des Bohrers und Boss-/Eliteboni der Fräse bleiben erhalten. Gespeicherte Angriffe bewahren ihr verbrauchtes Kontaktbudget. [Kontrollproben, Auswertung und Grenzen](docs/DRILL_CONTACT_BALANCE.md).
+
+- **Erster gemessener Balancepass:** Die Interdental-Bürste erreicht weiter und stößt Gegner radial zurück. Der Imperator hält auf Normal/Hard/Hell bei seinen fest angekündigten Urteilen begrenzt vor. Lebensraub bleibt bis Rang 4 unverändert und wächst danach langsamer; Rang 10 heilt maximal 1,11 statt 1,65 HP je Wurzel und Impuls. UV-/Elementschaden bleibt erhalten. Reproduzierbare Kampfproben und verbesserte Run-Telemetrie erfassen auch tatsächliche Heilung, Überheilung und den Build zu Wellenbeginn. [Werte, Vergleiche und Grenzen](docs/BALANCE_FIRST_PASS.md).
 
 - **Anklickbare Tastaturleiste:** Kontextabhängige Tastenkappen für Enter, Esc, R, F, I, P, Backspace und Q/E ergänzen die Controller-Leiste. Maus und Tastatur nutzen dieselben Aktionen; Suchfelder, native Details, gehaltene Tasten und Modalgrenzen bleiben geschützt. Pfeiltasten und Tab / Shift+Tab navigieren innerhalb des aktuellen Menüs. [Belegung und Ansichten](docs/CONTROLLER_SUPPORT.md#tastatur-und-anklickbare-pc-aktionsleiste).
 

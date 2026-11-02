@@ -11,6 +11,25 @@ func _check(condition: bool, message: String) -> void:
 		push_error(message)
 
 func _run() -> void:
+	# The displayed percentage is a contribution from the named flat stat,
+	# including evolved weapons and higher tiers, not a total-damage multiplier.
+	var scaling_weapons: Array[WeaponData] = WeaponCatalog.ALL.duplicate()
+	for recipe in WeaponEvolutions.ALL:
+		scaling_weapons.append(recipe.result)
+	for data in scaling_weapons:
+		var scaling_stats := new_stats()
+		var coefficient := float(data.scaling_label().get_slice(" · ", 1).trim_suffix(" %")) / 100.0
+		var matching: StringName = &"melee_damage" if data.damage_stat == "melee" else &"ranged_damage"
+		var other: StringName = &"ranged_damage" if data.damage_stat == "melee" else &"melee_damage"
+		_check(data.scaling_label().begins_with("Nahkampf" if matching == &"melee_damage" else "Fernkampf"), "weapon names the wrong scaling family: " + str(data.id))
+		for tier in [1, 4]:
+			scaling_stats.set(matching, 0.0)
+			scaling_stats.set(other, 0.0)
+			var baseline := data.raw_damage_with_stats(tier, scaling_stats)
+			scaling_stats.set(matching, 4.0)
+			_check(is_equal_approx(data.raw_damage_with_stats(tier, scaling_stats) - baseline, 4.0 * coefficient), "displayed scaling differs from actual damage: " + str(data.id))
+			scaling_stats.set(other, 20.0)
+			_check(is_equal_approx(data.raw_damage_with_stats(tier, scaling_stats) - baseline, 4.0 * coefficient), "opposite damage stat changes the weapon: " + str(data.id))
 	_check(DentiAttributes.name_for(DentiAttributes.Type.ARMOR) == "Härte", "armor lost its canonical name")
 	_check(DentiAttributes.name_for(DentiAttributes.Type.MAX_HEALTH) == "Schmelz", "max HP is confused with armor")
 	_check(DentiAttributes.meaning_for(DentiAttributes.Type.MAX_HEALTH).contains("HP"), "max HP lacks an explanation")
@@ -70,6 +89,11 @@ func _run() -> void:
 	_check(weapon.damage_type == "Schmelz" and weapon.damage_type_label() == "Schmelzbruch", "damage type compatibility or HP distinction was lost")
 	ui._select("equipment", 0)
 	_check(ui.details.subtitle.text.contains("Schmelzbruch"), "weapon details still confuse damage type with max HP")
+	for data in scaling_weapons:
+		ui.details.show_weapon(data, 4, game.player, true, [])
+		_check(ui.details.subtitle.is_visible_in_tree() and ui.details.subtitle.text.contains(data.scaling_label()), "weapon/evolution details hide scaling: " + str(data.id))
+		_check(not ui.details.effect.text.contains(data.scaling_text()), "weapon details repeat scaling in the effect paragraph")
+	ui._select("equipment", 0)
 	game._save_run()
 	var expected := ui.stats_label.text
 	game.free()

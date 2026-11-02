@@ -42,7 +42,7 @@ func _run() -> void:
 	game._update_shop_panel()
 	var offer: ShopOfferData = game.shop.offers[0]
 	var offer_card := game.shop_panel.offer_buttons[0] as OfferCard
-	if offer.rarity_tier != 2 or offer.price <= drill.price or offer_card.summary_row.get_child_count() != 4 or not offer_card.category_label.text.contains("II") or not offer_card.tooltip_text.contains("Basis-Schaden"):
+	if offer.rarity_tier != 2 or offer.price <= drill.price or offer_card.summary_row.get_child_count() != 4 or not offer_card.name_label.text.contains("II") or not offer_card.tooltip_text.contains("Basis-Schaden"):
 		_fail("tiered weapon offer did not show its rarity, price and stats")
 		return
 	game._save_run()

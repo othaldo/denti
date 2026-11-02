@@ -118,8 +118,8 @@ static func _valid_structure(value: Dictionary) -> bool:
 		if not chest is Dictionary or not _containers(chest, [], ["choices"]):
 			return false
 	var telemetry: Dictionary = value.get("telemetry", {})
-	var metric_maps := ["status_damage", "status_applications", "wave_status_damage", "wave_status_applications", "weapon_damage", "proc_damage", "enchantment_support", "wave_enchantment_support", "wave_gold_sources", "wave_shop_spending", "goblin_stats", "wave_goblin_stats"]
-	if not _containers(telemetry, metric_maps, ["wave_history", "damage_events", "kill_events", "taken_events"]):
+	var metric_maps := ["status_damage", "status_applications", "wave_status_damage", "wave_status_applications", "weapon_damage", "proc_damage", "wave_weapon_damage", "wave_proc_damage", "enchantment_support", "wave_enchantment_support", "wave_gold_sources", "wave_shop_spending", "goblin_stats", "wave_goblin_stats"]
+	if not _containers(telemetry, metric_maps + ["wave_build"], ["wave_history", "damage_events", "kill_events", "taken_events"]):
 		return false
 	for key in metric_maps:
 		if not _numeric_values(telemetry.get(key, {})):
@@ -135,6 +135,13 @@ static func _valid_structure(value: Dictionary) -> bool:
 	for entry in value.get("weapon_runtime", []):
 		if not _containers(entry, ["motion"], []):
 			return false
+		var motion: Dictionary = entry.get("motion", {})
+		for key in ["contact_hits", "contact_limit"]:
+			if motion.has(key) and not (motion[key] is float or motion[key] is int): return false
+		if motion.has("primary_contact"):
+			if not motion.primary_contact is Array or motion.primary_contact.size() != 2: return false
+			for coordinate in motion.primary_contact:
+				if not (coordinate is float or coordinate is int): return false
 	for entry in value.get("enemies", []):
 		if not _containers(entry, ["loot_goblin"], []): return false
 		var goblin: Dictionary = entry.get("loot_goblin", {})
@@ -221,7 +228,7 @@ static func _valid_structure(value: Dictionary) -> bool:
 static func _valid_scalars(value: Variant, field: String = "") -> bool:
 	# These fields are numeric maps or arrays; other primitive fields may be bools/IDs.
 	const NUMBER_ARRAYS := ["position", "direction", "boss_dash_end", "boss_dash_origin", "horde_waves", "burst_times", "elite_times", "elite_counts", "hits", "orbit_hits", "kill_events"]
-	const NUMBER_FIELDS := ["wave", "xp", "xp_goal", "level", "coins", "duration", "remaining", "spawn_cooldown", "burst_index", "elite_index", "elite_time", "reroll_cost", "tier", "price", "invested_coins", "affix_slots", "x", "y", "dx", "dy", "damage", "health", "timer", "phase", "boss_move", "cooldown", "focus_target", "focus_hits", "focus_time", "pending_levels", "level_rerolls", "shop_rerolls", "step", "scrap_coins", "charge_aim_distance", "contact_timer"]
+	const NUMBER_FIELDS := ["wave", "xp", "xp_goal", "level", "coins", "duration", "remaining", "spawn_cooldown", "burst_index", "elite_index", "elite_time", "reroll_cost", "tier", "price", "invested_coins", "affix_slots", "x", "y", "dx", "dy", "damage", "health", "timer", "phase", "boss_move", "cooldown", "focus_target", "focus_hits", "focus_time", "crit_cycle_progress", "pending_levels", "level_rerolls", "shop_rerolls", "step", "scrap_coins", "charge_aim_distance", "contact_timer"]
 	if field in NUMBER_ARRAYS:
 		if not value is Array:
 			return false

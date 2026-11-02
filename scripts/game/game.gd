@@ -125,6 +125,7 @@ func _ready() -> void:
 	player.stats.shield_blocked.connect(items.on_shield_blocked)
 	player.stats.shield_blocked.connect(relics.on_shield_blocked)
 	player.stats.healed.connect(items.on_healed)
+	player.stats.healed.connect(telemetry.record_healing)
 	player.stats.dodged.connect(items.on_player_dodged)
 	player.stats.dodged.connect(telemetry.record_dodge)
 	player.stats.status_damage_taken.connect(_on_status_damage_taken)
@@ -294,7 +295,7 @@ func _start_combat_wave() -> void:
 	rewards.begin_wave()
 	player.dash.reset_wave()
 	var profile_id := wave.prepare_next_wave_profile()
-	telemetry.begin_wave(wave.current_wave + 1, profile_id)
+	telemetry.begin_wave(wave.current_wave + 1, profile_id, _combat_build_snapshot())
 	wave.start_next_wave()
 	items.on_wave_start()
 	relics.on_wave_start()
@@ -1180,6 +1181,7 @@ func _save_completed_report(won: bool) -> void:
 
 func _run_recap_data() -> Dictionary:
 	return {
+		"player_stats": player.stats.to_save_data(),
 		"difficulty_id": str(wave.difficulty_id),
 		"endless_enabled": wave.endless_enabled,
 		"base_victory": base_victory,
@@ -1193,6 +1195,12 @@ func _run_recap_data() -> Dictionary:
 		"telemetry": telemetry.save_data(),
 		"waves": telemetry.wave_summaries(),
 	}
+
+
+func _combat_build_snapshot() -> Dictionary:
+	return {"player_stats": player.stats.to_save_data(), "weapons": player.loadout.save_data(),
+		"items": items.owned.duplicate(), "relics": relics.owned.duplicate(),
+		"upgrade_points": rewards.weapon_upgrades.points}
 
 
 func debug_start_wave(number: int) -> void:
@@ -1239,7 +1247,7 @@ func debug_start_wave(number: int) -> void:
 	wave.current_wave = clampi(number, 1, WaveController.MAX_WAVES) - 1
 	wave.next_profile_id = &""
 	var profile_id := wave.prepare_next_wave_profile()
-	telemetry.begin_wave(wave.current_wave + 1, profile_id)
+	telemetry.begin_wave(wave.current_wave + 1, profile_id, _combat_build_snapshot())
 	wave.start_next_wave()
 	items.on_wave_start()
 	relics.on_wave_start()

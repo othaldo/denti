@@ -27,6 +27,8 @@ extends Resource
 @export var utility_base: float = 0.0
 @export var utility_scale: float = 0.0
 @export var utility_cap: float = 0.0
+@export var utility_soft_threshold: float = 0.0
+@export_range(0.0, 1.0) var utility_soft_factor: float = 1.0
 @export var buildup_limit: int = 0
 @export var buildup_interval: float = 0.0
 @export var buildup_bonus: float = 0.0

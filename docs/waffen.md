@@ -10,30 +10,48 @@ Startwaffen müssen in das aktuelle Limit passen. [Konfiguration und Regeln](PLA
 
 Bisskraft verstärkt alle Waffen prozentual. Nah- oder Fernschaden ergänzt ihren Basisschaden mit einem individuellen Gewicht; die Waffenkarte zeigt den passenden Stat und seine Skalierung. Schnelle Flächenwaffen erhalten kleinere Gewichte als schwere Einzelangriffe. Fusion erhöht die Waffenbasis, ohne die rohen Stat-Beiträge zusätzlich zu vervielfachen. Die vollständigen Faktoren und Messungen stehen im [Schadens- und Verteidigungsbericht](DAMAGE_DEFENSE_BALANCE.md).
 
+Startauswahl, Shopkarten, Waffendetails und Dentipedia zeigen die Skalierung direkt,
+beispielsweise **Fernkampf · 150 %** bei der UV-Lampe: +1 Fernschaden ergibt
++1,5 Basis-Schaden vor Bisskraft. Die Erklärung steht in den Details beziehungsweise
+im Tooltip. **Nahkampf** bezeichnet dabei den verwendeten Schadensstat, nicht
+automatisch eine kurze Reichweite oder nur einen getroffenen Gegner. Die
+Zahnseiden-Schneide nutzt **Nahkampf · 150 %**, obwohl ihre langen Fäden mehrere
+Gegner treffen. Licht, Schnitt oder Bohrung sind davon getrennte Schadensarten.
+
 Der aktuelle [DPS-Balancepass vom 4. Oktober 2026](WEAPON_DPS_BALANCE.md) vergleicht alle 18 Waffen auf Stufe I–IV vor und nach den Buffs, einschließlich Blutung, Fokus, Gruppen und DPS pro Wurzel. Nahkampf erhält mehr Schaden für das Risiko; schwächere Fernwaffen erhalten gezielte Verbesserungen. Die Zauberbürste bleibt unverändert.
+
+Der [aktuelle Gesamtvergleich vom 1. November](WEAPON_ROSTER_REVIEW.md) ergänzt
+erneuerte Schadensmessungen um volle Wellen, echte Bosse und Mischbuilds.
+Besonders Turbine und Bürste zeigen dort, wie stark Kontrolle und Verzauberungen
+die Einschätzung gegenüber reinen Einzelziel-DPS verändern.
 
 | Waffe | Wurzeln | Angriff | Rolle |
 | --- | ---: | --- | --- |
 | Zauberbürste | 2 | Schmelz-Projektil | Verlässliche Reichweite; ab Stufe III zwei, ab IV drei Pastegeschosse mit leichtem Streuwinkel. |
-| Turbo-Bohrer | 1 | Bohrung im Nahkampf | Kompakte, schnelle Bohrstöße; Bossbonus wächst von 25 % auf 40 %. |
+| Turbo-Bohrer | 1 | Bohrung im Nahkampf | Schneller Stoß mit 8 Rückstoß; ein weiterer Gegner vorwärts erhält 50 % Schaden. Bossbonus wächst von 25 % auf 40 %. |
 | Zahnseidenpeitsche | 1 | Einzelner Zahnseidenhieb nach vorn | Fester Griff, ausfahrender Faden; trifft Gegner auf seinem Weg. 180–210 Reichweite und Blutung. |
 | Wasserflosser | 1 | Schnelles Wasserprojektil | Macht Ziele nass und verlangsamt sie, hat niedrigen Rohschaden und wachsenden Rückstoß. |
 | Kronenwerfer | 2 | Schweres Metallprojektil | Durchdringt auf Stufe I einen weiteren Gegner, auf Stufe IV drei. |
 | Schmelzspiegel | 1 | Sofortiger Lichtstrahl | Präziser Treffer ohne Flugzeit. |
-| Zahnsteinkratzer | 1 | Schneller Nahkampfschnitt | Sehr kurze Reichweite und hoher Angriffstakt bauen kleine Blutungen schnell auf. |
+| Zahnsteinkratzer | 1 | Schneller Nahkampfschnitt | 110 Reichweite, 6 Rückstoß und Blutung. Ein weiteres Ziel auf der sichtbaren Hiebspur erhält 50 % Trefferschaden; bei totem Ziel ist Ersatzkontakt möglich. |
 | Mundspülungs-Mörser | 2 | Minzprojektil | Flächenschaden beim Einschlag; Explosionsradius wächst mit der Stufe. |
 | Zahnstocher-Speer | 1 | Stichlinie / Schnitt | Lange, schmale Nahkampflinie trifft mehrere hintereinander stehende Gegner. |
-| Karies-Fräse | 2 | Schneller Bohrungs-Nahkampf | Kurze Reichweite; Fokus wächst um 5 % pro Folgetreffer bis +50 %. 75 % Schaden gegen normale Gegner, +40 % gegen Eliten, +35–50 % gegen Bosse. |
-| Interdental-Bürste | 1 | Winziger Rundumschnitt | Sehr schnelle Treffer mit 1,2 Blutungsschaden/s für 2,5 s; Radius wächst mit der Stufe. |
+| Karies-Fräse | 2 | Schneller Bohrungs-Nahkampf | 110 Reichweite und 6 Rückstoß; Fokus wächst um 5 % pro Folgetreffer bis +50 %. Voller Schaden gegen normale Gegner, +40 % gegen Eliten, +35–50 % gegen Bosse. |
+| Interdental-Bürste | 1 | Schneller Rundumschnitt | Sehr schnelle Treffer mit 1,2 Blutungsschaden/s für 2,5 s; 82–102 Reichweite und radialer Rückstoß schaffen Platz. |
 | Fluorid-Sprüher | 2 | 65°-Minzkegel | Markiert Gegner für 2 s: +20 % Schaden durch Schmelzwaffen, etwa Zauberbürste und Fluorid-Rakete. Mehrere Sprüher stapeln den Bonus nicht. |
 | Mundduschen-Turbine | 2 | 48°-Wasserkegel | Macht Gruppen 3 s nass, verlangsamt sie und stößt sie kräftig zurück; geringer Rohschaden. |
 | UV-Lampe | 2 | Breite Lichtlinie | Sofortstrahl trifft alle Gegner entlang einer 36 Pixel breiten Linie; +10 Prozentpunkte Waffen-Crit und ×2 Crit-Schaden. |
 | Amalgam-Schleuder | 1 | Schweres Metallprojektil | Langsame Kugel, kleiner Splash und hoher Rückstoß, auch bei Explosionen. |
 | Zahnseiden-Schneide | 2 | Doppelter Zahnseidenhieb nach vorn | Zwei feste Griffe, zwei ausfahrende Fäden; 220–270 Reichweite, kurzer Rückstoß und 3,2 Blutungsschaden/s für 3,5 s. |
-| Prophylaxe-Polierer | 1 | Schneller Licht-Nahkampf | +10 Prozentpunkte Waffen-Crit; jeder dritte fortlaufende Treffer auf dasselbe Ziel ist garantiert kritisch. |
+| Prophylaxe-Polierer | 1 | Schneller Licht-Nahkampf | 110 Reichweite, 4 Rückstoß und +10 Prozentpunkte Waffen-Crit. Jeder dritte Angriff pro Waffenexemplar ist kritisch, auch nach Zielwechsel und Pausen; Ersatzkontakt bei totem Ziel. |
 | Fluorid-Rakete | 2 | Schmelz-Rakete | Hoher Flächenschaden, große Explosion und lange Pause; explodiert auch am Reichweitenende. |
 
 Die Waffen haben eigene Sprites unter `assets/weapons/` und werden getrennt von Dentis Körper animiert. Alle Standardwaffen und Evolutionen verwenden ihre [Normal- und Elementformen](WEAPON_SKINS.md). Projektilfarbe, Tempo, Reichweite und Trefferform liegen in den jeweiligen `WeaponData`-Ressourcen unter `data/weapons/`.
+
+Der [Kontaktwaffen-Pass vom 2. November](CONTACT_WEAPON_BALANCE.md) prüft kleine
+Rückstöße, begrenzte Kratzerkontakte und den zielunabhängigen Polierer-Crit-Zyklus
+mit verdienter Progression. Die Hell-Lücke zu sicheren Linienwaffen ist damit
+weiter nicht geschlossen; insbesondere der Fräsen-Rückstoß zeigt gemischte Werte.
 
 Eine [Vergleichsansicht mit Denti und allen 18 Waffen](WEAPON_SIZE_BALANCE.md) zeigt Ruhehaltung und Angriff bei gleicher Vergrößerung. Der Bohrer ist auf Stufe I 60 Pixel groß, trifft jetzt für 28 Basisschaden alle 0,64 Sekunden und skaliert mit 100 % Nahschaden. Kratzer, Peitsche, Garotte und Speer wurden ebenfalls in ihren Proportionen angepasst; Reichweiten bleiben erhalten.
 
@@ -51,8 +69,8 @@ pro Treffer und Ziel, nicht der Gesamtschaden eines Kegels oder einer Explosion.
 | Waffe | Schaden | Pause | Reichweite | Preis |
 | --- | ---: | ---: | ---: | ---: |
 | Zahnstocher-Speer | 28 | 0,85 s | 205 | 10 |
-| Karies-Fräse | 12 | 0,20 s | 78 | 15 |
-| Interdental-Bürste | 6 | 0,24 s | 62 | 8 |
+| Karies-Fräse | 12 | 0,20 s | 110 | 15 |
+| Interdental-Bürste | 6 | 0,24 s | 82 | 8 |
 | Fluorid-Sprüher | 7 | 0,25 s | 155 | 14 |
 | Mundduschen-Turbine | 7 | 0,36 s | 195 | 14 |
 | UV-Lampe | 42 | 1,50 s | 600 | 17 |
@@ -66,6 +84,11 @@ Fusion, Verkauf und Fortsetzen. Alle Standardwaffen stehen auch als Mk-I-Start z
 Die Erweiterung nutzt individuelle Schadenskurven; Speer, Bürste, Sprüher,
 Turbine, UV-Lampe und Zahnseiden-Schneide gewinnen Reichweite. Schleuder und Rakete
 gewinnen Explosionsradius, Turbine Rückstoß, Fräse Bossbonus.
+
+Der [Bohrwerkzeug-Pass](DRILL_CONTACT_BALANCE.md) ergänzt einen begrenzten
+Vorwärtskontakt beim Turbo-Bohrer und verbessert den frühen Fräsen-Einstieg.
+Der Bohrer kann bei verlorenem Ziel einen passenden Gegner auf derselben
+Stoßbahn treffen; Reichweite, Windup und Hauptzielschaden bleiben erhalten.
 
 Blutung, Nass, Licht-Crits und Projektiltreffer verwenden dieselben Item- und
 Reliktsignale wie die bisherigen Waffen. Ziel-Fokus und Politur beginnen beim

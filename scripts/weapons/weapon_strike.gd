@@ -5,19 +5,28 @@ var damage: float = 0.0
 var critical: bool = false
 var hit_ids: Dictionary[int, bool] = {}
 var target_id: int = 0
+var contact_hits: int = 0
+var contact_limit: int = 1
+var primary_contact := Vector2.ZERO
 
 
-func begin(amount: float, is_critical: bool, target: Enemy) -> void:
+func begin(amount: float, is_critical: bool, target: Enemy, max_contacts: int = 1) -> void:
 	damage = amount
 	critical = is_critical
 	target_id = target.get_instance_id()
 	hit_ids.clear()
+	contact_hits = 0
+	contact_limit = clampi(max_contacts, 1, 4)
+	primary_contact = Vector2.ZERO
 
 
 func tick(weapon: WeaponInstance, from_progress: float, to_progress: float) -> void:
 	var start := maxf(from_progress, WeaponMotion.ACTIVE_START)
 	var end := minf(to_progress, WeaponMotion.ACTIVE_END)
 	if end < start:
+		return
+	if weapon.data.attack_mode == &"melee" and (weapon.data.contact_retarget or weapon.data.contact_extra_targets > 0):
+		WeaponSingleContact.tick(self, weapon, start, end)
 		return
 	var enemies: Array[Enemy] = []
 	var candidates: Array[Enemy] = []
@@ -76,4 +85,9 @@ func tick(weapon: WeaponInstance, from_progress: float, to_progress: float) -> v
 			var radius := enemy.data.radius + weapon.data.attack_width * 0.5
 			if closest.distance_squared_to(enemy.global_position) <= radius * radius:
 				hit_ids[id] = true
-				WeaponAttackShapes.hit(enemy, weapon.data, weapon.tier, damage, critical, weapon.player.items, weapon.aim, weapon.affixes, 1.0, true, weapon.instance_uid)
+				if weapon.data.attack_mode == &"melee":
+					contact_hits += 1
+					primary_contact = enemy.global_position
+				var outward := enemy.global_position - weapon.player.global_position if weapon.data.attack_mode == &"area" else weapon.aim
+				outward = outward.normalized() if not outward.is_zero_approx() else weapon.aim
+				WeaponAttackShapes.hit(enemy, weapon.data, weapon.tier, damage, critical, weapon.player.items, outward, weapon.affixes, 1.0, true, weapon.instance_uid)

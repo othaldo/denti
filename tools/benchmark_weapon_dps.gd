@@ -76,7 +76,7 @@ func _measure(data: WeaponData, tier: int, scenario: String) -> Dictionary:
 	var distance := 45.0 if scenario == "close" else data.range_at_tier(tier) * (1.0 if scenario == "edge" else 0.65)
 	var targets: Array[Enemy] = []
 	var positions: Array[Vector2] = []
-	var totals := {"direct": 0.0, "bleed": 0.0, "hits": 0}
+	var totals := {"direct": 0.0, "bleed": 0.0, "evolution": 0.0, "hits": 0}
 	var angles: Array = [0.0, 12.0, -12.0, 24.0, -24.0] if scenario == "pack" else ([0.0, 0.0, 0.0, 0.0, 0.0] if scenario == "lane" else [0.0])
 	for index in angles.size():
 		var target_distance := data.range_at_tier(tier) * (0.25 + float(index) * 0.15) if scenario == "lane" else distance
@@ -95,6 +95,8 @@ func _measure(data: WeaponData, tier: int, scenario: String) -> Dictionary:
 		enemy.damage_recorded.connect(func(amount: float, _id: StringName, proc: StringName) -> void:
 			if proc == &"bleed":
 				totals.bleed += amount
+			elif proc == &"evolution":
+				totals.evolution += amount
 			else:
 				totals.direct += amount
 				totals.hits += 1)
@@ -105,6 +107,8 @@ func _measure(data: WeaponData, tier: int, scenario: String) -> Dictionary:
 			targets[index].global_position = positions[index]
 			targets[index].spatial_index.update(targets[index])
 		weapon._physics_process(STEP)
+		# Child clocks do not advance automatically in this paused/manual fixture.
+		if weapon.evolution != null: weapon.evolution._physics_process(STEP)
 		for projectile: WeaponProjectile in game.get_node("Projectiles").get_children():
 			if not projectile.is_queued_for_deletion():
 				projectile._physics_process(STEP)
@@ -112,7 +116,8 @@ func _measure(data: WeaponData, tier: int, scenario: String) -> Dictionary:
 				projectile.free()
 		for enemy in targets:
 			enemy._physics_process(STEP)
-	var dps := (float(totals.direct) + float(totals.bleed)) / SECONDS
+	var dps := (float(totals.direct) + float(totals.bleed) + float(totals.evolution)) / SECONDS
 	return {"weapon": str(data.id), "tier": tier, "scenario": scenario, "distance": distance,
 		"direct_dps": float(totals.direct) / SECONDS, "bleed_dps": float(totals.bleed) / SECONDS,
+		"evolution_dps": float(totals.evolution) / SECONDS,
 		"total_dps": dps, "dps_per_root": dps / data.hands, "hits": totals.hits}

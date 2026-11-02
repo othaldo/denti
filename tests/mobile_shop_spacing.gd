@@ -107,6 +107,12 @@ func _run() -> void:
 				if control.is_visible_in_tree() and not card.get_global_rect().encloses(control.get_global_rect()):
 					_fail("wrapped content overflows at %s for %s" % [extent, template.id])
 					return
+			if template.weapon_data != null:
+				var scaling := card.category_label
+				var text_width := scaling.get_theme_font("font").get_string_size(template.weapon_data.scaling_label(), HORIZONTAL_ALIGNMENT_LEFT, -1, scaling.get_theme_font_size("font_size")).x
+				if not scaling.is_visible_in_tree() or not scaling.text.contains(template.weapon_data.scaling_label()) or text_width > scaling.size.x + 1 or scaling.size.y < scaling.get_minimum_size().y:
+					_fail("weapon scaling is hidden or clipped at %s for %s" % [extent, template.id])
+					return
 	paused = false
 	session.clear_run()
 	print("Denti mobile shop spacing test passed")

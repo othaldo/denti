@@ -59,7 +59,7 @@ func set_catalog_layout(vertical: bool, dense: bool = false, compact_grid: bool 
 	effect_label.add_theme_font_size_override("font_size", 13 if dense else 14)
 	stat_font_size = 14 if dense else 17
 	secondary_font_size = 13 if dense else 14
-	category_label.custom_minimum_size.y = ceilf(category_label.get_theme_font("font").get_height(category_label.get_theme_font_size("font_size")))
+	category_label.custom_minimum_size.y = 2.0 * ceilf(category_label.get_theme_font("font").get_height(category_label.get_theme_font_size("font_size"))) + category_label.get_theme_constant("line_spacing")
 	if summary_row != null:
 		for cell in summary_row.get_children():
 			for child in cell.get_children():
@@ -71,8 +71,8 @@ func set_catalog_layout(vertical: bool, dense: bool = false, compact_grid: bool 
 	name_label.vertical_alignment = VERTICAL_ALIGNMENT_TOP
 	catalog_header.custom_minimum_size.y = name_label.custom_minimum_size.y if dense else 0.0
 	effect_label.max_lines_visible = 2 if dense else 3
-	info_box.add_theme_constant_override("separation", 6 if compact_grid else 8)
-	content.add_theme_constant_override("separation", 6 if compact_grid else 8)
+	info_box.add_theme_constant_override("separation", 6 if compact_grid or dense else 8)
+	content.add_theme_constant_override("separation", 6 if compact_grid or dense else 8)
 	action_box.add_theme_constant_override("separation", 4)
 	if summary_row != null:
 		summary_row.custom_minimum_size.y = 56 if dense else 60
@@ -143,8 +143,8 @@ func show_offer(offer: ShopOfferData, coins: int, available: bool = true, _owned
 		rarity_label.text += " · %s\n%s" % [["I", "II", "III", "IV"][offer.weapon_tier - 1], offer.weapon_data.damage_type_label().to_upper()]
 	rarity_label.visible = false
 	category_label.visible = selection_only
-	category_label.text = "%s · %s · %s" % [offer.weapon_data.damage_type_label(), ["I", "II", "III", "IV"][offer.weapon_tier - 1], offer.weapon_data.roots_text()] if offer.weapon_data != null else ""
-	category_label.tooltip_text = rarity_label.text + " · " + category_label.text
+	category_label.text = "%s\n%s · %s" % [offer.weapon_data.scaling_label(), offer.weapon_data.roots_text(), offer.weapon_data.damage_type_label()] if offer.weapon_data != null else ""
+	category_label.tooltip_text = offer.weapon_data.scaling_description() if offer.weapon_data != null else ""
 	effect_label.text = offer.weapon_data.stats_text(offer.weapon_tier) if offer.weapon_data != null else offer.effect_text()
 	_show_summary(offer)
 	price_label.text = "%d" % offer.price
@@ -165,7 +165,7 @@ func show_offer(offer: ShopOfferData, coins: int, available: bool = true, _owned
 	reserve_button.visible = selection_only
 	disabled = (coins < offer.price or not available) and not selection_only
 	if offer.weapon_data != null:
-		tooltip_text = "%s\n%s\n%s\n%s\nca. %.1f DPS pro Ziel" % [offer.display_name, offer.description, offer.weapon_data.combat_text(), offer.weapon_data.stats_text(offer.weapon_tier), dps]
+		tooltip_text = "%s\n%s\n%s\n%s\n%s\nca. %.1f DPS pro Ziel" % [offer.display_name, offer.description, offer.weapon_data.combat_text().replace(" · " + offer.weapon_data.scaling_text(), ""), offer.weapon_data.scaling_description(), offer.weapon_data.stats_text(offer.weapon_tier), dps]
 		if not available:
 			tooltip_text += "\nAusrüstung voll: Platz schaffen oder passende Waffe verschmelzen"
 	else:

@@ -86,6 +86,8 @@ func show_weapon(data: WeaponData, tier: int, player: Player, equipped: bool, eq
 	subtitle.add_theme_color_override("font_color", WeaponPresentation.EVOLUTION_COLOR if data.evolution_kind != &"" else DentiUIStyle.INK)
 	if data.evolution_kind != &"":
 		subtitle.text = "Evolution · %s · %s · %s" % [WeaponPresentation.tier_text(data, tier), data.roots_text(), data.damage_type_label()]
+	subtitle.text += "\n" + data.scaling_label()
+	subtitle.tooltip_text = data.scaling_description()
 	var current := WeaponPresentation.values(data, tier, player)
 	_clear_values()
 	_rolled_value("Treffer", "%.1f" % current.damage, data, "damage")
@@ -98,7 +100,7 @@ func show_weapon(data: WeaponData, tier: int, player: Player, equipped: bool, eq
 		_value("Explosionsradius", "%d" % roundi(data.splash_at_tier(tier)))
 	var mechanics: PackedStringArray = []
 	for part in data.combat_text().split(" · "):
-		if part.begins_with("Schadensart:") or part.contains("Waffen-Crit") or part.ends_with("Crit"):
+		if part.begins_with("Schadensart:") or part == data.scaling_text() or part.contains("Waffen-Crit") or part.ends_with("Crit"):
 			continue
 		mechanics.append(part)
 	effect.text = " · ".join(mechanics)
@@ -132,6 +134,7 @@ func show_item(entry: Dictionary, owned: bool) -> void:
 	heading.text = str(entry.get("name", "Item"))
 	icon.texture = entry.get("icon")
 	subtitle.text = "×%d" % int(entry.get("count", 1)) if owned else "Item"
+	subtitle.tooltip_text = ""
 	subtitle.add_theme_color_override("font_color", DentiUIStyle.INK)
 	_clear_values()
 	effect.text = DentiAttributes.resolve_text(str(entry.get("description", "")))

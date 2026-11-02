@@ -14,5 +14,7 @@ build_tags = Array[StringName]([&"heal", &"defense"])
 utility_base = 0.25
 utility_scale = 0.04
 utility_cap = 2.0
+utility_soft_threshold = 0.75
+utility_soft_factor = 0.4
 proc_factor = 0.05
 proc_cooldown = 0.6

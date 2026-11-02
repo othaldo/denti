@@ -141,7 +141,23 @@ Unter Windows können die Tests mit dem Godot-Konsolenprogramm ausgeführt werde
 python tools/run_tests.py --godot Godot_v4.7.2-stable_win64_console.exe
 ```
 
-Der Runner benötigt Python 3.10+ (keine Zusatzpakete). Standardmäßig laufen 160 Tests für Spielfluss, Spielstände, Kampf, Balance, Shop und bedienbare UI. 15 zusätzliche Grafik-, Debug- und umfassende Boss-Routenprüfungen sind mit `--suite extended` gezielt aufrufbar; `--suite all --timeout 300` führt beide Gruppen aus. Normale CI-Builds verwenden die Kernprüfung, Release-Tags die vollständige Suite. Bis zu vier Tests laufen parallel, mit getrennten Godot-Benutzerdaten und unverändertem Simulationsschritt von 1/60 Sekunde. `--jobs 1` läuft seriell; `--filter 'weapon_*'` wählt innerhalb der Suite eine Teilmenge. Fehlercodes, `SCRIPT ERROR:`, Engine-`ERROR:`, Ressourcen-/Objektlecks und Zeitüberschreitungen lassen den Lauf fehlschlagen. Laufzeiten und Logs stehen unter `.godot/test_results.json` und `.godot/test_runs/`. [Auswahl, Befehle und Laufzeitvergleich](docs/TEST_RUNTIME.md).
+Der Runner benötigt Python 3.10+ (keine Zusatzpakete). Standardmäßig laufen 164 Tests für Spielfluss, Spielstände, Kampf, Balance, Shop und bedienbare UI. 19 zusätzliche Grafik-, Debug-, Waffenvergleichs- und umfassende Boss-Routenprüfungen sind mit `--suite extended` gezielt aufrufbar; `--suite all --timeout 300` führt beide Gruppen aus. Normale CI-Builds verwenden die Kernprüfung, Release-Tags die vollständige Suite. Bis zu vier Tests laufen parallel, mit getrennten Godot-Benutzerdaten und unverändertem Simulationsschritt von 1/60 Sekunde. `--jobs 1` läuft seriell; `--filter 'weapon_*'` wählt innerhalb der Suite eine Teilmenge. Fehlercodes, `SCRIPT ERROR:`, Engine-`ERROR:`, Ressourcen-/Objektlecks und Zeitüberschreitungen lassen den Lauf fehlschlagen. Laufzeiten und Logs stehen unter `.godot/test_results.json` und `.godot/test_runs/`. [Auswahl, Befehle und Laufzeitvergleich](docs/TEST_RUNTIME.md).
+
+Ein reproduzierbarer [Buildvergleich auf Normal](docs/BUILD_COMPARISON.md) prüft ganze Wellen mit vier Waffenrollen, Verzauberungen, Heilung und normaler Spielerbewegung. `python tools/run_build_comparison.py --godot Godot_v4.7.2-stable_win64_console.exe` erzeugt Rohdaten und Vergleichstabellen mit isolierten Benutzerdaten.
+
+Der [erste darauf aufbauende Balancepass](docs/BALANCE_FIRST_PASS.md) verbessert die Interdental-Bürste, lässt den Imperator begrenzt vorhalten und reduziert nur den Heilertrag hoher Lebensraub-Ränge.
+
+Der [anschließende Kontaktwaffen-Pass](docs/CONTACT_WEAPON_BALANCE.md) ergänzt
+kleine Rückstöße, begrenzte Kratzer-Folgetreffer und einen gespeicherten
+Polierer-Crit-Zyklus über Zielwechsel hinweg. 78 neue verdiente Einstiegsproben
+zeigen bessere Bossankünfte auf Hell, aber weiterhin eine deutliche Lücke zu
+sicheren Linienwaffen und gemischte Werte beim Fräsen-Rückstoß.
+
+Der anschließende [Vergleich aller 18 Standardwaffen und sechs Evolutionen](docs/WEAPON_ROSTER_REVIEW.md) trennt Rohschaden, tatsächliche Kampfleistung und den Wert einer Unterstützungswaffe; einschließlich gezielter Turbinen-/Wasserflosser-Vergleiche.
+
+Der [verdiente Einstieg auf Hell](docs/EARNED_PROGRESSION.md) ergänzt echte Startwaffen, verdientes Gold/XP, bezahlte Angebote und mitgenommenes Leben über die Wellen 1–5. `python tools/run_earned_progression.py` prüft den Weg zum ersten Boss ohne vorgegebene Ausbau-Budgets.
+
+Der [Bohrwerkzeug-Pass](docs/DRILL_CONTACT_BALANCE.md) verbessert den Turbo-Bohrer durch begrenzten Vorwärtskontakt und die Karies-Fräse durch sichere Reichweite und vollen normalen Gegnerschaden. Neun Hell-Seeds je Variante prüfen den verdienten Einstieg; Speichern und Kontaktgrenzen sind automatisiert abgedeckt.
 
 Eine Vorschau aller neuen Waffen im Shop und ihrer Effekte im Kampf erstellt
 `Godot_v4.7.2-stable_win64_console.exe --path . --script res://tools/preview_weapon_expansion.gd`

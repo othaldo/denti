@@ -126,10 +126,12 @@ static func quick_text(data: WeaponData, tier: int, player: Player) -> String:
 
 static func card_effect(data: WeaponData, tier: int) -> String:
 	var hints: PackedStringArray = []
+	if data.attack_mode == &"melee" and data.contact_extra_targets > 0:
+		hints.append("+%d Ziel auf der Hiebspur: %d %% Trefferschaden." % [data.contact_extra_targets, roundi(data.contact_extra_damage * 100)])
 	if data.boss_bonus_tiers.size() > 0:
 		hints.append("+%d %% Schaden gegen Bosse." % roundi(data.boss_bonus_tiers[clampi(tier, 1, 4) - 1] * 100))
 	if data.crit_cycle > 0:
-		hints.append("Jeder %d. Treffer auf dasselbe Ziel ist kritisch." % data.crit_cycle)
+		hints.append("Jeder %d. Angriff ist kritisch." % data.crit_cycle)
 	if data.attack_mode in [&"beam_line", &"thrust"]:
 		hints.append("Trifft alle Gegner entlang der Linie.")
 	if data.wet_duration > 0:

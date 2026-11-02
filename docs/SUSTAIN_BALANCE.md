@@ -2,6 +2,12 @@
 
 Stand: 27.10.2026, nach v0.6.0.
 
+**Ergänzung 01.11.2026:** Der [neue Balancepass](BALANCE_FIRST_PASS.md) reduziert
+den Zuwachs hoher Lebensraub-Ränge: Rang 1–4 bleibt gleich, Rang 10 heilt maximal
+1,11 statt 1,65 HP pro Wurzel und Impuls. Das Intervall und die 5-%-Regel bleiben
+erhalten. Die folgende Durchsatzmessung dokumentiert den historischen Stand
+vom 27.10.; sie wurde nicht mit der neuen Kurve überschrieben.
+
 Lebensraub verwendet jetzt **0,6 Sekunden je Waffenexemplar**. Zwei gleiche
 Waffentypen besitzen getrennte Heilintervalle. Weitere Waffen mit Lebensraub
 werden deshalb nicht mehr von einer zuerst treffenden Waffe blockiert.
