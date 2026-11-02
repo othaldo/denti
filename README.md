@@ -144,7 +144,7 @@ python tools/run_tests.py --godot Godot_v4.7.2-stable_win64_console.exe
 Der Runner benötigt Python 3.10+ (keine Zusatzpakete). Standardmäßig laufen 165 Tests für Spielfluss, Spielstände, Kampf, Balance, Shop und bedienbare UI. 20 zusätzliche Grafik-, Debug-, Waffenvergleichs- und umfassende Boss-Routenprüfungen sind mit `--suite extended` gezielt aufrufbar; `--suite all --timeout 300` führt beide Gruppen aus. Normale CI-Builds verwenden die Kernprüfung, Release-Tags die vollständige Suite. Bis zu vier Tests laufen parallel, mit getrennten Godot-Benutzerdaten und unverändertem Simulationsschritt von 1/60 Sekunde. `--jobs 1` läuft seriell; `--filter 'weapon_*'` wählt innerhalb der Suite eine Teilmenge. Fehlercodes, `SCRIPT ERROR:`, Engine-`ERROR:`, Ressourcen-/Objektlecks und Zeitüberschreitungen lassen den Lauf fehlschlagen. Laufzeiten und Logs stehen unter `.godot/test_results.json` und `.godot/test_runs/`. [Auswahl, Befehle und Laufzeitvergleich](docs/TEST_RUNTIME.md).
 
 [Testpiloten und Zeitraffer](docs/BOT_SIMULATION.md) vergleichen Reaktion,
-Kampfstrategie und Buildregel getrennt über den verdienten Einstieg W1–5.
+Kampfstrategie und Buildregel getrennt über verdiente Runs bis W20 (`--last-wave 20`).
 `python tools/bot_launcher.py` öffnet den lokalen UI-Launcher mit Waffen-,
 Bot-, Strategie- und Schwierigkeitsauswahl sowie Berichtzugriff.
 `python tools/run_bot_comparison.py --visible --speed 8` zeigt einen Botlauf mit

@@ -20,8 +20,9 @@ from run_build_comparison import source_fingerprint
 from run_tests import ROOT, isolated_environment, stop_process
 
 SKILLS = ("novice", "regular", "expert")
-STRATEGIES = ("aggressive", "kite", "collector", "boss")
-POLICIES = ("simple", "synergy")
+STRATEGIES = ("aggressive", "kite", "collector", "boss", "orbit")
+POLICIES = ("simple", "synergy", "element_leech", "full_build", "random", "no_shop")
+LOADOUT_PLANS = ("single", "uv_floss")
 AXES = ("weapons", "skills", "strategies", "build_policies", "difficulties")
 
 
@@ -44,7 +45,8 @@ def parse_args(argv=None):
     parser.add_argument("--godot", default="Godot_v4.7.2-stable_win64_console.exe")
     for flag in ["weapons", "skills", "strategies", "build-policies", "difficulties", "seeds"]:
         parser.add_argument("--" + flag)
-    parser.add_argument("--last-wave", type=int, choices=range(1, 6), default=5)
+    parser.add_argument("--last-wave", type=int, choices=range(1, 21), default=5)
+    parser.add_argument("--loadout-plan", choices=LOADOUT_PLANS, default="single")
     parser.add_argument("--jobs", type=int, choices=range(1, 5))
     parser.add_argument("--timeout", type=float, default=600)
     parser.add_argument("--visible", action="store_true")
@@ -64,6 +66,8 @@ def parse_args(argv=None):
     try:
         for axis in AXES:
             setattr(args, axis, csv_values(getattr(args, axis) or defaults[axis], allowed[axis]))
+        if args.loadout_plan == "uv_floss" and args.weapons != ["uv_lamp"]:
+            raise ValueError("The uv_floss plan starts with --weapons uv_lamp; the other weapons are bought normally")
         seeds = csv_values(args.seeds or defaults["seeds"])
         args.seeds = [int(value) for value in seeds]
         if len(set(args.seeds)) != len(args.seeds) or any(not 0 <= value <= 2147483647 for value in args.seeds):
@@ -129,7 +133,8 @@ def run_job(index, case, seeds, args, directory, running):
     command += ["--audio-driver", "Dummy", "--fixed-fps", "60", "--path", str(ROOT),
                 "--log-file", str(folder / "engine.log"), "--script", "res://tools/benchmark_bot_comparison.gd", "--"]
     command += [f"--{key.replace('_', '-')}={value}" for key, value in case.items()]
-    command += ["--seeds=" + ",".join(map(str, seeds)), f"--last-wave={args.last_wave}", "--output=" + output.as_posix()]
+    command += ["--seeds=" + ",".join(map(str, seeds)), f"--last-wave={args.last_wave}",
+                f"--loadout-plan={args.loadout_plan}", "--output=" + output.as_posix()]
     if args.visible:
         command += ["--visible", f"--speed={args.speed}"]
         if args.capture:
@@ -158,7 +163,7 @@ def run_job(index, case, seeds, args, directory, running):
         raise RuntimeError("Bot worker omitted or duplicated a requested seed")
     for row in report["samples"]:
         expected = dict(build=case["weapons"], skill=case["skills"], strategy=case["strategies"],
-                        build_policy=case["build_policies"], difficulty=case["difficulties"])
+                        build_policy=case["build_policies"], difficulty=case["difficulties"], loadout_plan=args.loadout_plan)
         if any(row[key] != value for key, value in expected.items()) or row["physics_hz"] != 60 or row["time_scale"] != 1:
             raise RuntimeError("Bot case metadata or physics timestep differs from the request")
     print(f"{index + 1}: {' / '.join(case.values())}: {len(report['samples'])} runs", flush=True)
@@ -166,6 +171,8 @@ def run_job(index, case, seeds, args, directory, running):
 
 
 def summary(report):
+    if report.get("last_wave", 5) > 5:
+        return full_run_summary(report)
     groups = {}
     for row in report["samples"]:
         key = tuple(row[name] for name in ["difficulty", "build", "skill", "strategy", "build_policy"])
@@ -198,6 +205,55 @@ def summary(report):
         values = [f"{statistics.median(w['all_loot'][field] for w in waves):.1f}" if waves else "—"
                   for field in ["kills", "coins_collected", "xp_collected", "damage_taken", "dashes"]]
         lines.append("| " + " / ".join(key) + f" | {len(waves)}/{len(samples)} | " + " | ".join(values) + " |")
+    return "\n".join(lines) + "\n"
+
+
+def full_run_summary(report):
+    groups = {}
+    for row in report["samples"]:
+        key = tuple(row[name] for name in ["difficulty", "build", "skill", "strategy", "build_policy"])
+        key += (row.get("loadout_plan", "single"),)
+        groups.setdefault(key, []).append(row)
+    lines = ["# Vollständiger Botvergleich", "", report["method"], "",
+             "Diagnoseprofile, keine menschlichen Winrates. Abbrüche zählen separat. Bosskills zählen auch dann, "
+             "wenn der Pilot später stirbt. TTK nur unter Kills; Gold/XP/HP nur unter tatsächlichen Ankünften. "
+             "Ein Kill vor Timerende beendet die Bosswelle nicht. Zufall betrifft angebotene Stats, legale "
+             "Verzauberungen und Items innerhalb des gewählten Waffenplans; keine zufällige Waffenmischung.", "",
+             "| Grad / Start / Pilot / Strategie / Buildregel / Waffenplan | Läufe / Abbrüche | Sieg W20 | Letzte erreichte Welle (Median) |",
+             "| --- | ---: | ---: | ---: |"]
+    for key, rows in sorted(groups.items()):
+        valid = [row for row in rows if row["outcome"] != "aborted"]
+        wins = f"{sum(row['outcome'] == 'victory' for row in valid)}/{len(valid)}" if valid and report["last_wave"] == 20 else "—"
+        reached = f"{statistics.median(row['wave'] for row in valid):.0f}" if valid else "—"
+        lines.append("| " + " / ".join(key) + f" | {len(valid)} / {len(rows) - len(valid)} | {wins} | {reached} |")
+    for boss in range(5, report["last_wave"] + 1, 5):
+        lines += ["", f"## Bosswelle {boss}", "",
+                  "| Konfiguration | Erreicht / Läufe | Kills / Ankünfte | TTK | Gold / XP vor Boss | HP vor Boss % |",
+                  "| --- | ---: | ---: | ---: | ---: | ---: |"]
+        for key, rows in sorted(groups.items()):
+            valid = [row for row in rows if row["outcome"] != "aborted"]
+            waves = [wave for row in valid for wave in row["waves"] if wave["wave"] == boss]
+            times = [wave["combat"]["boss_ttk"] for wave in waves if wave["combat"].get("boss_ttk", 0) > 0]
+            starts = [wave["start"] for wave in waves]
+            arrived = f"{len(waves)}/{len(valid)}" if valid else "—"
+            kills = f"{len(times)}/{len(waves)}" if waves else "—"
+            ttk = f"{statistics.median(times):.2f} s" if times else "—"
+            income = f"{statistics.median(s['gold_earned'] for s in starts):.0f} / {statistics.median(s['xp_earned'] for s in starts):.0f}" if starts else "—"
+            hp = f"{statistics.median(s['stats']['health'] / s['stats']['max_health'] * 100 for s in starts):.1f}" if starts else "—"
+            lines.append("| " + " / ".join(key) + f" | {arrived} | {kills} | {ttk} | {income} | {hp} |")
+    lines += ["", "## Vollständig beendete Wellen", "",
+              "Nur vollständig beendete Wellen gleicher Nummer vergleichen; spätere Werte sind durch Überleben selektiert.", "",
+              "| Konfiguration | Welle / n | Gold | XP | Schaden erhalten | Effektive Heilung | Gegner-Peak | Projektil-Peak |",
+              "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"]
+    for key, rows in sorted(groups.items()):
+        for number in range(1, report["last_wave"] + 1):
+            waves = [w for row in rows if row["outcome"] != "aborted" for w in row["waves"]
+                     if w["wave"] == number and w["outcome"] in ("wave_complete", "victory")]
+            if not waves:
+                continue
+            values = [f"{statistics.median(w['all_loot'].get(field, 0) for w in waves):.1f}"
+                      for field in ["coins_collected", "xp_collected", "damage_taken", "healing", "peak_enemies_alive", "peak_enemy_projectiles"]]
+            lines.append("| " + " / ".join(key) + f" | {number} / {len(waves)} | " + " | ".join(values) + " |")
     return "\n".join(lines) + "\n"
 
 

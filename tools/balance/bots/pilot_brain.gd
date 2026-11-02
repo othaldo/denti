@@ -8,7 +8,7 @@ const PROFILES := {
 	"regular": preload("res://tools/balance/bots/regular.tres"),
 	"expert": preload("res://tools/balance/bots/expert.tres"),
 }
-const STRATEGIES := ["aggressive", "kite", "collector", "boss"]
+const STRATEGIES := ["aggressive", "kite", "collector", "boss", "orbit"]
 const PLAYER_RADIUS := 18.0
 const WARNING_SPEEDS := [1.0, 0.65, 0.35]
 var profile: PROFILE
@@ -36,6 +36,13 @@ func begin_wave() -> void:
 
 func step(frame: int, observation: Dictionary) -> Vector2:
 	dash = false
+	if strategy == "orbit":
+		# Deliberately blind control: fixed manual-looking movement, no attacks,
+		# loot, warnings or dash decisions. This is not a novice human model.
+		var angle := float(frame) / 60 * 0.65
+		var target := Vector2(observation.get("arena", Vector2(2400, 1400))) * 0.5 + Vector2(cos(angle) * 300, sin(angle) * 200)
+		if not observation.is_empty(): direction = Vector2(observation.position).direction_to(target)
+		return direction
 	if frame % int(profile.decision_ticks) == 0:
 		pending.append({"ready": frame + int(profile.reaction_ticks), "world": observation})
 	if pending.is_empty() or int(pending[0].ready) > frame:
@@ -104,7 +111,7 @@ func danger(world: Dictionary, candidate: Vector2, horizon: float = -1) -> float
 	for enemy: Dictionary in world.enemies:
 		result += _collision_risk(enemy.position - at, Vector2(enemy.velocity) - velocity, float(enemy.radius) + PLAYER_RADIUS + 10, seconds)
 	for projectile: Dictionary in world.projectiles:
-		result += _collision_risk(projectile.position - at, Vector2(projectile.velocity) - velocity, float(projectile.radius) + 6, minf(seconds, float(projectile.life))) * 2
+		result += _projectile_risk(projectile, at, velocity, seconds) * 2
 	if profile.reads_warnings:
 		for hazard: Dictionary in world.hazards:
 			result += HAZARDS.risk(hazard, at, velocity, seconds)
@@ -123,7 +130,7 @@ func dash_risk(world: Dictionary, candidate: Vector2) -> float:
 	var seconds := maxf(float(world.get("dash_seconds", 0.15)), 0.001)
 	var velocity := (end - start) / seconds
 	for projectile: Dictionary in world.projectiles:
-		result += _collision_risk(projectile.position - start, Vector2(projectile.velocity) - velocity, float(projectile.radius) + 6, minf(seconds, float(projectile.life))) * 2
+		result += _projectile_risk(projectile, start, velocity, seconds) * 2
 	if profile.reads_warnings:
 		for hazard: Dictionary in world.hazards:
 			for step in 5:
@@ -140,6 +147,13 @@ static func _collision_risk(offset: Vector2, velocity: Vector2, radius: float, s
 	var distance := (offset + velocity * time).length()
 	return maxf(1.0 - distance / maxf(radius, 1), 0.0) * (1.0 + 0.3 / (time + 0.2))
 
+static func _projectile_risk(projectile: Dictionary, at: Vector2, velocity: Vector2, seconds: float) -> float:
+	var delay := maxf(float(projectile.get("delay", 0)), 0)
+	var active := minf(seconds - delay, float(projectile.life))
+	if active <= 0: return 0
+	return _collision_risk(projectile.position - at - velocity * delay, Vector2(projectile.velocity) - velocity,
+		float(projectile.radius) + 6, active)
+
 static func _hazard_contains(hazard: Dictionary, point: Vector2) -> bool:
 	return HAZARDS.contains(hazard, point)
 
@@ -149,8 +163,11 @@ func _predict_observation(observed: Dictionary, frame: int) -> Dictionary:
 	world.position += Vector2(world.get("velocity", Vector2.ZERO)) * age
 	for enemy: Dictionary in world.enemies: enemy.position += Vector2(enemy.velocity) * age
 	for projectile: Dictionary in world.projectiles:
-		projectile.position += Vector2(projectile.velocity) * age
-		projectile.life = maxf(float(projectile.life) - age, 0)
+		var delay := float(projectile.get("delay", 0))
+		var flying := maxf(age - delay, 0)
+		projectile.position += Vector2(projectile.velocity) * flying
+		projectile.life = maxf(float(projectile.life) - flying, 0)
+		projectile.delay = maxf(delay - age, 0)
 	for hazard: Dictionary in world.hazards: hazard.time = float(hazard.time) - age
 	return world
 

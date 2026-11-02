@@ -4,8 +4,10 @@ extends Node2D
 
 var encounter: CaramelEncounter
 var entries: Array[Dictionary] = []
+var _generation := 0
 
 func _ready() -> void:
+	add_to_group("boss_projectile_batches")
 	z_index = 10
 	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 
@@ -18,6 +20,7 @@ func fire(at: Vector2, rays: Array[Vector2], source: StringName) -> void:
 
 func advance(delta: float, seconds_in_frame: float) -> void:
 	var player := encounter.enemy.target
+	var generation := _generation
 	for index in range(entries.size() - 1, -1, -1):
 		var entry := entries[index]
 		var step := minf(delta, entry.life)
@@ -26,13 +29,17 @@ func advance(delta: float, seconds_in_frame: float) -> void:
 		entry.at = after
 		entry.life -= delta
 		if HazardGeometry.moving_circle(player, before, after, encounter.profile.heart_radius, seconds_in_frame, seconds_in_frame + step):
-			player.take_hit(entry.damage, encounter.enemy.inflicted_statuses)
 			entries.remove_at(index)
+			player.take_hit(entry.damage, encounter.enemy.inflicted_statuses)
+			# Retaliation can kill the boss and cancel this entire volley inside
+			# take_hit(). Never continue iterating a cleared/restored batch.
+			if generation != _generation: return
 		elif entry.life <= 0:
 			entries.remove_at(index)
 	if not entries.is_empty() or delta > 0: queue_redraw()
 
 func clear() -> void:
+	_generation += 1
 	entries.clear()
 	queue_redraw()
 

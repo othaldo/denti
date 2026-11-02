@@ -4,6 +4,10 @@ Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü an
 
 ## Noch ohne neue Versionsnummer — 02.11.2026
 
+- **Verdiente Botläufe bis Welle 20:** Vollständige Bosswellen mit Beutesammlung, angebotenen Relikten und echten Folgeshops. Neue UV-/Schneide-Kaufpläne, Element/Lebensraub-, Zufalls- und Ohne-Shop-Regeln sowie ein blinder Kreisfahrer trennen Bewegung und Buildbeitrag. Die späteren Bosswarnungen und gemalten Projektile werden erfasst. Launcher und Berichte unterstützen alle 20 Wellen. [Schwierigkeitsprüfung und Grenzen](docs/DIFFICULTY_AUDIT.md).
+
+- **Bossprojektile bei Gegenschaden sicher abbrechen:** Stirbt ein Boss durch einen Treffer-Callback, stoppt die Verarbeitung seines inzwischen gelöschten Projektilbatches sofort. Die Bohrer-Vollrunprobe deckte den Arrayfehler beim Prinzen auf; Herzen und allgemeine Bossbatches sind abgesichert.
+
 - **Testpilot weicht dem ersten Boss gezielter aus:** Warnungen werden zum tatsächlichen Trefferfenster bewertet; verzögerte Beobachtungen werden fortgeschrieben. Langsame Schritte erlauben sichere Positionen in Ringangriffen. Eine Gegenprobe mit gleichen gespeicherten Startbuilds verbessert sich von 6/18 auf 17/18 Bosskills, ohne Waffen- oder Gegnerwerte zu ändern. [Messung, weitere Seeds und Grenzen](docs/BOSS_PILOT.md).
 
 - **Bot-Test per UI starten:** Lokaler Python-Launcher mit Waffen-, Bot-, Strategie-, Build- und Schwierigkeitsauswahl, gespeicherten Einstellungen und Berichtzugriff. Sichtbare Testläufe zeigen jetzt die echten Aufstiege, Verzauberungspläne, Käufe und Rerolls. Die Tempowahl gilt auch im Shop; Leertaste hält die aktuelle Entscheidung an. [Aufruf und Bedienung](docs/BOT_SIMULATION.md).

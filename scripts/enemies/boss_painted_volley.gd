@@ -9,8 +9,10 @@ var orient_to_velocity := false
 var entries: Array[Dictionary] = []
 var fired := 0
 var damage_dealt := 0.0
+var _generation := 0
 
 func _ready() -> void:
+	add_to_group("boss_projectile_batches")
 	z_index = 10
 	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 
@@ -22,6 +24,7 @@ func fire(at: Vector2, rays: Array[Vector2], source: StringName) -> void:
 	queue_redraw()
 
 func advance(delta: float, first: float) -> void:
+	var generation := _generation
 	for index in range(entries.size() - 1, -1, -1):
 		var entry := entries[index]
 		var step := minf(delta, entry.life)
@@ -30,13 +33,15 @@ func advance(delta: float, first: float) -> void:
 		entry.life -= delta
 		if HazardGeometry.moving_circle(enemy.target, before, entry.at, profile.radius, first, first + step):
 			var health := enemy.target.stats.health
+			entries.remove_at(index)
 			enemy.target.take_hit(entry.damage, enemy.inflicted_statuses)
 			damage_dealt += maxf(health - enemy.target.stats.health, 0)
-			entries.remove_at(index)
+			if generation != _generation: return
 		elif entry.life <= 0: entries.remove_at(index)
 	queue_redraw()
 
 func clear() -> void:
+	_generation += 1
 	entries.clear()
 	queue_redraw()
 

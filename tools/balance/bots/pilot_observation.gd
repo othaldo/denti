@@ -5,6 +5,7 @@ extends RefCounted
 const VIEW_HALF := Vector2(640, 360)
 const MAX_ENEMIES := 32
 const MAX_PROJECTILES := 64
+const BOSS_OBSERVATION = preload("res://tools/balance/bots/boss_observation.gd")
 var previous_positions: Dictionary = {}
 var previous_frame := -1
 
@@ -26,7 +27,10 @@ func capture(game, frame: int) -> Dictionary:
 	var loot: Array[Vector2] = []
 	var positions: Dictionary = {}
 	for enemy: Enemy in game.get_node("Enemies").get_children():
-		if enemy.health <= 0 or enemy.is_queued_for_deletion() or not visible_area.grow(enemy.data.radius).has_point(enemy.global_position): continue
+		if enemy.health <= 0 or enemy.is_queued_for_deletion(): continue
+		# A floor warning/projectile can be visible while its owner is offscreen.
+		BOSS_OBSERVATION.capture(enemy, visible_area, hazards, projectiles)
+		if not visible_area.grow(enemy.data.radius).has_point(enemy.global_position): continue
 		var id := enemy.get_instance_id()
 		var velocity := Vector2.ZERO
 		if previous_positions.has(id) and frame > previous_frame:

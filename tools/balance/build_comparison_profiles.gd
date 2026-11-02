@@ -71,13 +71,17 @@ static func setup_equipment(ids: Array, build: String, wave_number: int, mode: S
 		"upgrade_points": points, "capsules": points / WeaponUpgrades.POINTS_PER_CAPSULE}
 
 
-static func spawn_plan(wave_number: int, sample_seed: int, difficulty_id: StringName = &"normal") -> Dictionary:
+static func spawn_plan(wave_number: int, sample_seed: int, difficulty_id: StringName = &"normal", context: Dictionary = {}) -> Dictionary:
 	# Build the actual wave's requests before combat can consume random numbers.
 	seed(sample_seed)
 	var planner := WaveController.new()
 	planner.current_wave = wave_number - 1
 	planner.difficulty_id = difficulty_id
-	planner.plan_hordes()
+	if context.has("horde_waves"):
+		planner.horde_waves.assign(context.horde_waves)
+		planner.current_profile_id = StringName(str(context.current_profile))
+		planner.next_profile_id = StringName(str(context.next_profile))
+	else: planner.plan_hordes()
 	var events: Array[Dictionary] = []
 	var clock := {"frame": 0}
 	planner.enemy_requested.connect(func(data: EnemyData): events.append({"frame": clock.frame, "kind": "enemy", "data": data, "count": 1}))
@@ -94,6 +98,7 @@ static func spawn_plan(wave_number: int, sample_seed: int, difficulty_id: String
 	for event in events:
 		trace.append([event.frame, event.kind, event.data.resource_path if event.has("data") else "", event.count])
 	var result := {"events": events, "trace": trace, "digest": JSON.stringify(trace).sha256_text(),
-		"profile": str(planner.current_profile_id), "duration": planner.duration}
+		"profile": str(planner.current_profile_id), "duration": planner.duration,
+		"planner_state": {"horde_waves": planner.horde_waves.duplicate(), "current_profile": str(planner.current_profile_id), "next_profile": str(planner.next_profile_id)}}
 	planner.free()
 	return result

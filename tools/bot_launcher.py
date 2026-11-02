@@ -27,8 +27,9 @@ SETTINGS_FILE = ROOT / ".godot/bot_launcher_settings.json"
 DIFFICULTIES = ("easy", "normal", "hard", "hell")
 LABELS = {
     "skills": {"novice": "Anfänger", "regular": "Geübt", "expert": "Erfahren"},
-    "strategies": {"aggressive": "Nah herangehen", "kite": "Abstand halten", "collector": "Beute sammeln", "boss": "Boss fokussieren"},
-    "build_policies": {"simple": "Feuer-Referenz", "synergy": "Synergie-Heuristik"},
+    "strategies": {"aggressive": "Nah herangehen", "kite": "Abstand halten", "collector": "Beute sammeln", "boss": "Boss fokussieren", "orbit": "Starrer Kreis (ohne Reaktion)"},
+    "build_policies": {"simple": "Feuer-Referenz", "synergy": "Synergie-Heuristik", "element_leech": "Element + Lebensraub", "full_build": "Voller Ausbau (Heuristik)", "random": "Zufallsentscheidungen", "no_shop": "Ohne Shopkäufe"},
+    "loadout_plan": {"single": "Nur Startwaffe", "uv_floss": "2 UV + 1 Schneide (Start: UV)"},
     "difficulties": {"easy": "Easy", "normal": "Normal", "hard": "Hard", "hell": "Hell"},
 }
 
@@ -56,6 +57,7 @@ class Settings:
     skills: str = "expert"
     strategies: str = "kite"
     build_policies: str = "simple"
+    loadout_plan: str = "single"
     difficulties: str = "normal"
     seeds: str = "13579"
     last_wave: str = "5"
@@ -69,7 +71,7 @@ class Settings:
             raise ValueError("Unbekannter Testmodus")
         if not self.godot or not shutil.which(self.godot):
             raise ValueError("Bitte die Godot-Anwendung auswählen.")
-        arguments = ["--godot", self.godot, "--last-wave", self.last_wave, "--seeds", self.seeds.strip()]
+        arguments = ["--godot", self.godot, "--last-wave", self.last_wave, "--seeds", self.seeds.strip(), "--loadout-plan", self.loadout_plan]
         allowed = dict(weapons=weapon_ids(), skills=SKILLS, strategies=STRATEGIES,
                        build_policies=POLICIES, difficulties=DIFFICULTIES)
         for key, values in allowed.items():
@@ -185,7 +187,7 @@ class BotLauncher:
         frame.columnconfigure(0, weight=1)
         frame.rowconfigure(6, weight=1)
         ttk.Label(frame, text="Bot-Test", style="Title.TLabel").grid(row=0, column=0, sticky="w")
-        ttk.Label(frame, text="Welle 1–5 · echte Beute, Aufstiege und Shops").grid(row=1, column=0, sticky="w", pady=(0, 14))
+        ttk.Label(frame, text="Welle 1–20 · echte Beute, Aufstiege, Relikte und Shops").grid(row=1, column=0, sticky="w", pady=(0, 14))
         modes = ttk.Frame(frame)
         modes.grid(row=2, column=0, sticky="ew", pady=(0, 12))
         for text, value in [("Zuschauen", "visible"), ("Vergleich berechnen", "comparison")]:
@@ -198,7 +200,7 @@ class BotLauncher:
         form.columnconfigure(3, weight=1)
         for index, (key, title) in enumerate([( "weapons", "Startwaffe"), ("difficulties", "Schwierigkeit"),
                                               ("skills", "Botprofil"), ("strategies", "Kampfstrategie"),
-                                              ("build_policies", "Buildregel")]):
+                                              ("build_policies", "Buildregel"), ("loadout_plan", "Waffenplan")]):
             row, column = divmod(index, 2)
             column *= 2
             ttk.Label(form, text=title).grid(row=row, column=column, sticky="w", padx=(0, 10), pady=6)
@@ -207,12 +209,12 @@ class BotLauncher:
             combo.bind("<<ComboboxSelected>>", lambda _event, axis=key: self.select_axis(axis))
             self.combos[key] = combo
             self.controls.append(combo)
-        ttk.Label(form, text="Seeds (mit Komma)").grid(row=2, column=2, sticky="w", padx=(0, 10))
-        self.entry(form, "seeds", 2, 3)
-        for index, (key, title, choices) in enumerate([("last_wave", "Bis Welle", ["1", "2", "3", "4", "5"]),
+        ttk.Label(form, text="Seeds (mit Komma)").grid(row=3, column=2, sticky="w", padx=(0, 10))
+        self.entry(form, "seeds", 3, 3)
+        for index, (key, title, choices) in enumerate([("last_wave", "Bis Welle", list(map(str, range(1, 21)))),
                                                        ("speed", "Kampftempo", ["1", "4", "8", "16"]),
                                                        ("jobs", "Parallele Worker", ["1", "2", "3", "4"])]):
-            row, column = 3 + index // 2, (index % 2) * 2
+            row, column = [(3, 0), (4, 0), (4, 2)][index]
             ttk.Label(form, text=title).grid(row=row, column=column, sticky="w", padx=(0, 10), pady=6)
             control = ttk.Combobox(form, textvariable=self.values[key], values=choices, state="readonly", width=8)
             control.grid(row=row, column=column + 1, sticky="w", pady=6)
@@ -221,11 +223,11 @@ class BotLauncher:
             if key == "speed": self.speed_control = control
             if key == "jobs": self.jobs_control = control
         self.capture_control = ttk.Checkbutton(form, text="Screenshots speichern", variable=self.values["capture"])
-        self.capture_control.grid(row=4, column=2, columnspan=2, sticky="w", pady=6)
+        self.capture_control.grid(row=5, column=0, columnspan=4, sticky="w", pady=6)
         self.controls.append(self.capture_control)
-        ttk.Label(form, text="Godot").grid(row=5, column=0, sticky="w", pady=(10, 6))
+        ttk.Label(form, text="Godot").grid(row=6, column=0, sticky="w", pady=(10, 6))
         path_row = ttk.Frame(form)
-        path_row.grid(row=5, column=1, columnspan=3, sticky="ew", pady=(10, 6))
+        path_row.grid(row=6, column=1, columnspan=3, sticky="ew", pady=(10, 6))
         path_row.columnconfigure(0, weight=1)
         path_entry = ttk.Entry(path_row, textvariable=self.values["godot"])
         path_entry.grid(row=0, column=0, sticky="ew", padx=(0, 8))
@@ -274,9 +276,13 @@ class BotLauncher:
             options = self.options[key]
             if self.values[key].get() not in options and (visible or self.values[key].get() != "*"):
                 self.values[key].set(self.defaults[key])
-            labels = list(options.values()) + ([] if visible else [f"Alle ({len(options)})"])
+            labels = list(options.values()) + ([] if visible or key == "loadout_plan" else [f"Alle ({len(options)})"])
             combo.configure(values=labels)
             combo.set(options.get(self.values[key].get(), labels[-1]))
+        if self.values["loadout_plan"].get() == "uv_floss":
+            self.values["weapons"].set("uv_lamp")
+            self.combos["weapons"].set(self.options["weapons"]["uv_lamp"])
+            self.combos["weapons"].configure(state="disabled")
         self.speed_control.configure(state="readonly" if visible else "disabled")
         self.jobs_control.configure(state="disabled" if visible else "readonly")
         self.capture_control.configure(state="normal" if visible else "disabled")
@@ -285,6 +291,9 @@ class BotLauncher:
     def select_axis(self, key):
         label = self.combos[key].get()
         self.values[key].set(next((key for key, value in self.options[key].items() if value == label), "*"))
+        if key == "loadout_plan" and self.values[key].get() == "uv_floss":
+            self.values["weapons"].set("uv_lamp")
+            self.refresh_mode()
         self.refresh_summary()
 
     def refresh_summary(self):

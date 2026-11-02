@@ -40,9 +40,16 @@ class LauncherTests(unittest.TestCase):
     @patch("bot_launcher.shutil.which", side_effect=lambda path: path)
     def test_invalid_requests_fail_before_starting_a_process(self, _which):
         for values in [dict(weapons="*"), dict(seeds="1,2"), dict(seeds="oops"),
-                       dict(last_wave="6"), dict(mode="unknown"), dict(strategies="perfect")]:
+                       dict(last_wave="21"), dict(mode="unknown"), dict(strategies="perfect")]:
             with self.subTest(values=values), self.assertRaises(ValueError):
                 self.settings(**values).arguments()
+
+    @patch("bot_launcher.shutil.which", side_effect=lambda path: path)
+    def test_full_run_and_mixed_paid_plan(self, _which):
+        args = parse_args(self.settings(weapons="uv_lamp", loadout_plan="uv_floss",
+                                       build_policies="element_leech", last_wave="20").arguments())
+        self.assertEqual(args.last_wave, 20)
+        self.assertEqual(args.loadout_plan, "uv_floss")
 
     @patch("bot_launcher.shutil.which", return_value=None)
     def test_missing_godot_can_be_reported_in_the_launcher(self, _which):

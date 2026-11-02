@@ -25,6 +25,14 @@ class BotComparisonTests(unittest.TestCase):
         self.assertEqual(len(jobs), 4)
         self.assertEqual(sorted(seed for _, seeds in jobs for seed in seeds), [1, 2, 3, 4, 5])
 
+    def test_full_run_controls_validate_the_real_starter(self):
+        args = parse_args(["--weapons", "uv_lamp", "--loadout-plan", "uv_floss", "--last-wave", "20",
+                           "--build-policies", "element_leech,random,no_shop", "--strategies", "orbit,boss"])
+        self.assertEqual(args.last_wave, 20)
+        self.assertEqual(len(jobs_for(args)), 18)
+        with redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+            parse_args(["--loadout-plan", "uv_floss", "--weapons", "turbo_drill"])
+
     def test_cancel_stops_only_registered_child_processes(self):
         running = RunningProcesses()
         first, second = object(), object()
@@ -61,6 +69,17 @@ class BotComparisonTests(unittest.TestCase):
         self.assertNotIn("999", text)
         only_aborted = summary({"method": "fixture", "last_wave": 5, "samples": [self.row(outcome="aborted")]})
         self.assertNotIn("0/0", only_aborted)
+
+    def test_full_summary_counts_an_earlier_boss_kill_even_after_later_death(self):
+        row = self.row(wave=6)
+        row["waves"] = [dict(wave=number, outcome="wave_complete" if number < 6 else "death",
+                             start=row["waves"][0]["start"], all_loot={},
+                             combat={"boss_ttk": 12.5 if number == 5 else 0}) for number in range(1, 7)]
+        text = summary({"method": "fixture", "last_wave": 20, "samples": [row]})
+        self.assertIn("12.50 s", text)
+        self.assertIn("## Bosswelle 20", text)
+        self.assertIn("| 1/1 | 1/1 | 12.50 s", text)
+        self.assertNotIn("0/0", text)
 
 
 if __name__ == "__main__":

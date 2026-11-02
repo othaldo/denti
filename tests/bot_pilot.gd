@@ -83,6 +83,18 @@ func _run() -> void:
 	_check(brain.dash_risk(world, Vector2.RIGHT) > 0, "dash planner checked landing only and crossed a projectile mid-route")
 	world.projectiles[0].position = Vector2(1110, 540)
 	_check(brain.dash_risk(world, Vector2.RIGHT * 0.35) == brain.dash_risk(world, Vector2.RIGHT), "partial walking input incorrectly shortened the real normalized dash")
+	world = _world()
+	world.frame = 0
+	world.projectiles = [{"position": Vector2(1080, 540), "velocity": Vector2(-300, 0), "radius": 21.0, "life": 2.0, "delay": 0.5}]
+	var delayed := brain._predict_observation(world, 6)
+	_check(delayed.projectiles[0].position == Vector2(1080, 540) and is_equal_approx(delayed.projectiles[0].delay, 0.4), "announced projectile moved before its visible release")
+	_check(brain._projectile_risk(world.projectiles[0], world.position, Vector2.ZERO, 0.4) == 0, "pending projectile hit before launch")
+	brain.configure("expert", "orbit", 42)
+	world.hazards = [{"shape": "circle", "position": world.position, "radius": 1000, "time": 0.0}]
+	var blind := brain.step(0, world)
+	world.hazards = []
+	world.projectiles = []
+	_check(brain.step(0, world) == blind and not brain.dash, "blind orbit control reacted to a warning/projectile")
 	# Strategy changes a goal without changing reaction/avoidance settings.
 	world = _world()
 	world.enemies = [{"position": Vector2(1000, 540), "velocity": Vector2.ZERO, "radius": 20.0, "boss": false},

@@ -75,8 +75,17 @@ func sample_run(build: String, difficulty: StringName, movement: String, sample_
 	var game = make_run(build, difficulty, sample_seed)
 	var waves: Array[Dictionary] = []
 	var aborted := false
+	# Historical W1-5 probes deliberately stop at the first boss kill. Longer
+	# runs follow the actual timer, loot, relic and shop flow after every boss.
+	var full_flow := last_wave > 5
+	var planner_state: Dictionary = {}
 	for number in range(first_wave, last_wave + 1):
-		var plan: Dictionary = PROFILES.spawn_plan(number, sample_seed + number * 7919, difficulty)
+		game.probe_boss_killed = false
+		var plan: Dictionary = PROFILES.spawn_plan(number, sample_seed + number * 7919, difficulty, planner_state)
+		if full_flow:
+			planner_state = plan.planner_state
+			game.wave.horde_waves.assign(planner_state.horde_waves)
+			game.wave.next_profile_id = StringName(plan.profile)
 		seed(sample_seed + number * 104729)
 		if number == first_wave: game._start_combat_wave()
 		else: game._on_shop_continue()
@@ -92,7 +101,7 @@ func sample_run(build: String, difficulty: StringName, movement: String, sample_
 			weapon.strike.metrics = strike_metrics
 		var frame := 0
 		var event_index := 0
-		var limit := 90.0 if WaveController.is_boss_wave(number) else float(plan.duration)
+		var limit := (180.0 if full_flow else 90.0) if WaveController.is_boss_wave(number) else float(plan.duration)
 		while frame < roundi(limit * 60):
 			if not await before_combat_step(game, frame):
 				aborted = true
@@ -112,7 +121,7 @@ func sample_run(build: String, difficulty: StringName, movement: String, sample_
 			paused = false
 			await process_frame
 			frame += 1
-			if game.probe_dead or game.probe_boss_killed: break
+			if game.probe_dead or (game.probe_boss_killed and not full_flow): break
 			if game.wave.active and frame >= roundi(float(plan.duration) * 60):
 				game.wave.active = false
 				game.wave.remaining = 0
@@ -123,14 +132,18 @@ func sample_run(build: String, difficulty: StringName, movement: String, sample_
 		for weapon: WeaponInstance in game.player.loadout.equipped(): weapon.strike.flush()
 		var battle: Dictionary = game.telemetry.current_wave_summary()
 		var outcome := "death" if game.probe_dead else ("boss_killed" if game.probe_boss_killed else ("timeout" if WaveController.is_boss_wave(number) else "wave_complete"))
+		if full_flow and not game.probe_dead:
+			outcome = "wave_complete" if game.rewards.step != PostWaveRewards.Step.COMBAT else "timeout"
 		if aborted: outcome = "aborted"
 		if outcome == "wave_complete":
 			await resolve_intermission(game)
 			if run_aborted(): outcome = "aborted"
+			elif game.base_victory: outcome = "victory"
 		var end := snapshot(game)
 		waves.append({"wave": number, "outcome": outcome, "seconds": float(frame) / 60,
 			"spawn_plan": plan.digest, "start": start, "after_rewards": end,
 			"combat": battle, "all_loot": game.telemetry.current_wave_summary(), "strikes": strike_metrics.duplicate()})
+		if full_flow: print("W%d %s · %.1fs · %d Gold · Stufe %d" % [number, outcome, float(frame) / 60, game.coins, game.level])
 		if outcome != "wave_complete" or number == last_wave: break
 		await shop_policy(game, build)
 		waves[-1]["after_shop"] = snapshot(game)
@@ -180,7 +193,7 @@ func run_aborted() -> bool:
 func snapshot(game) -> Dictionary:
 	return {"coins": game.coins, "level": game.level, "xp": game.xp, "xp_goal": game.xp_goal,
 		"stats": game.player.stats.to_save_data().duplicate(true), "equipment": game.player.loadout.save_data().duplicate(true),
-		"items": game.items.save_data().duplicate(true), "upgrade_points": game.rewards.weapon_upgrades.points,
+		"items": game.items.save_data().duplicate(true), "relics": game.relics.save_data().duplicate(true), "upgrade_points": game.rewards.weapon_upgrades.points,
 		"gold_earned": game.telemetry.coins_collected, "xp_earned": game.telemetry.xp_collected,
 		"chests": game.telemetry.chests_found}
 
@@ -194,6 +207,7 @@ func resolve_intermission(game) -> void:
 		await process_frame
 	paused = true
 	for choice in 300:
+		if game.ended and game.base_victory: return
 		if game.in_shop:
 			await before_intermission_action(game, "Shop", "Angebote · %d Gold" % game.coins)
 			return
@@ -209,6 +223,11 @@ func resolve_intermission(game) -> void:
 				if not await before_intermission_action(game, "Truhe", "Kapsel verschrotten" if game.weapon_chest_panel.visible else "Item behalten"): return
 				if game.weapon_chest_panel.visible: game._on_affix_scrapped()
 				else: game._on_chest_resolved(true)
+			PostWaveRewards.Step.RELICS:
+				var relic_id := StringName(str(game.rewards.pending_relics[0]))
+				await before_intermission_action(game, "Relikt", "Wählt " + RelicCatalog.by_id(relic_id).display_name)
+				if run_aborted(): return
+				game._on_relic_chosen(relic_id)
 			_:
 				push_error("Unexpected earned-run intermission step: " + str(game.rewards.step))
 				failures += 1
@@ -291,7 +310,7 @@ func shop_policy(game, build: String) -> void:
 	for roll in range(MAX_REROLLS + 1):
 		for index in game.shop.offers.size():
 			var offer: ShopOfferData = game.shop.offers[index]
-			if offer != null and offer.weapon_data != null and str(offer.weapon_data.id) == build and game.coins >= offer.price:
+			if offer != null and offer.weapon_data != null and wants_weapon(game, offer, build) and game.coins >= offer.price:
 				if not await before_shop_purchase(game, offer): return
 				game._on_shop_buy(index)
 		if not item_bought:
@@ -306,6 +325,10 @@ func shop_policy(game, build: String) -> void:
 		game._on_shop_reroll()
 		if not await before_intermission_action(game, "Shop", "Neue Angebote · %d Gold" % game.coins): return
 	await before_intermission_action(game, "Shop", "Fertig · %d Gold übrig" % game.coins)
+
+
+func wants_weapon(_game, offer: ShopOfferData, build: String) -> bool:
+	return str(offer.weapon_data.id) == build
 
 
 func before_shop_purchase(game, offer: ShopOfferData) -> bool:

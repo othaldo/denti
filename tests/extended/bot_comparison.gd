@@ -2,9 +2,17 @@ extends "res://tools/benchmark_bot_comparison.gd"
 
 var inspect_intermission := false
 var enchantment_drafts: Array[Dictionary] = []
+var final_flow_fixture := false
 
 func make_run(build: String, difficulty: StringName, sample_seed: int):
 	var game = super.make_run(build, difficulty, sample_seed)
+	if final_flow_fixture:
+		# Flow-only fixture: reach the real final reward coordinator cheaply.
+		# These artificial stats never enter a balance report or ordinary probe.
+		game.wave.current_wave = 19
+		game.player.stats.max_health = 1000000
+		game.player.stats.health = 1000000
+		game.player.stats.damage_bonus = 1000000
 	if inspect_intermission:
 		viewer = VIEWER.new()
 		viewer.game = game
@@ -93,9 +101,73 @@ func _run() -> void:
 	_check(shown_steps >= 2, "enchantment fixture never showed individual rank increases")
 	_check(enchantment_drafts.size() == shown_steps + 2 * shown_budgets, "enchantment viewer repeated or omitted budget/confirmation steps")
 	viewer.free()
+	viewer = null
+	inspect_intermission = false
+	_pilot("expert", "full_build")
+	loadout_plan = "uv_floss"
+	var continued := await sample_run("uv_lamp", &"normal", "kite", 101, 6)
+	_check(continued.waves.size() == 6 and continued.outcome == "wave_complete", "full-flow probe did not continue after the first boss")
+	if continued.waves.size() == 6:
+		var boss_wave: Dictionary = continued.waves[4]
+		_check(boss_wave.combat.boss_ttk > 0 and boss_wave.seconds >= WaveController.DURATION, "full-flow boss kill skipped the remaining combat timer")
+		_check(boss_wave.after_rewards.relics.owned.size() == 1, "full-flow probe skipped its real offered boss relic")
+		var carried: Dictionary = continued.waves[5].start
+		for key in ["coins", "level", "xp", "xp_goal", "equipment", "upgrade_points", "gold_earned", "xp_earned", "chests"]:
+			_check(carried[key] == boss_wave.after_shop[key], "post-boss shop did not carry earned state into W6: " + key)
+		var before_stats: Dictionary = boss_wave.after_shop.stats.duplicate()
+		var after_stats: Dictionary = carried.stats.duplicate()
+		var shields_before := int(before_stats.shield_charges)
+		before_stats.erase("shield_charges")
+		after_stats.erase("shield_charges")
+		_check(before_stats == after_stats and carried.stats.shield_charges >= shields_before and carried.stats.shield_charges <= 5, "W6 replaced health/stats or lost legitimate wave-start shields")
+		_check(carried.items.owned == boss_wave.after_shop.items.owned and carried.relics.owned == boss_wave.after_shop.relics.owned, "W6 replaced earned items/relics")
+		for state: Dictionary in [boss_wave.after_shop, continued.final]:
+			var counts := {"uv_lamp": 0, "floss_garrote": 0}
+			for entry: Dictionary in state.equipment: counts[entry.id] += 1
+			_check(counts.uv_lamp <= 2 and counts.floss_garrote <= 1, "mixed plan occupied roots reserved for its other weapon family")
+	await _later_boss_observations()
+	_pilot("expert", "element_leech")
+	final_flow_fixture = true
+	var final_flow := await sample_run("uv_lamp", &"normal", "kite", 101, 20, 20)
+	_check(final_flow.outcome == "victory" and final_flow.waves.size() == 1 and final_flow.waves[0].seconds >= WaveController.DURATION, "W20 probe did not wait for the real final reward queue and victory")
+	final_flow_fixture = false
 	_check(not root.get_node("GameSession").has_run(), "bot wrote a real player save")
 	print("PASS bot integration: bounded current-world perception, real projectile avoidance/dash costs, earned purchases/persistence and repeated deterministic inputs")
 	finish(1 if failures else 0)
+
+func _later_boss_observations() -> void:
+	loadout_plan = "single"
+	var game = make_run("uv_lamp", &"normal", 101)
+	game._start_combat_wave()
+	paused = true
+	for child in game.get_node("Enemies").get_children(): child.free()
+	for number in [10, 15, 20]:
+		game.wave.current_wave = number
+		game._create_enemy(WaveController.boss_for_wave(number), game.player.global_position + Vector2(180, 0))
+		var enemy: Enemy = game.get_node("Enemies").get_child(0)
+		var encounter: Node2D = enemy.caramel_encounter if number == 10 else (enemy.acid_king_encounter if number == 15 else enemy.crown_court_encounter)
+		observation.reset()
+		var before := observation.capture(game, 0)
+		_check(before.hazards.is_empty() and before.projectiles.is_empty(), "later boss exposed an unannounced attack")
+		encounter.begin(0)
+		var warned := observation.capture(game, 3)
+		_check(not warned.hazards.is_empty() or not warned.projectiles.is_empty(), "later boss sensor missed its painted warning")
+		var rays: Array[Vector2] = [Vector2.LEFT]
+		if number == 10:
+			encounter.hearts.fire(enemy.global_position, rays, &"test")
+		elif number == 15: encounter.volley.fire(enemy.global_position, rays, &"test")
+		else: encounter.shots.fire(enemy.global_position, rays, &"test")
+		var flying := observation.capture(game, 6)
+		_check(flying.projectiles.any(func(shot: Dictionary): return float(shot.get("delay", 0)) == 0), "later boss sensor missed a live painted projectile")
+		_check(game._enemy_projectile_count() >= 1, "live boss batch was missing from pressure telemetry")
+		enemy.free()
+	_stop_audio(game)
+	game.wave.active = false
+	game.run_flow.enter(RunFlow.Phase.ENDED)
+	game._clear_arena(false)
+	game.queue_free()
+	await process_frame
+	await process_frame
 
 func _earned_state(value: Dictionary) -> Dictionary:
 	var normalized := value.duplicate(true)

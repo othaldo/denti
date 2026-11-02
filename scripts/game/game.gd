@@ -310,7 +310,7 @@ func _process(delta: float) -> void:
 	mobile_controls.set_combat_active(combat_active)
 	session.update_graphics_performance(combat_active)
 	if not ended and (wave.active or boss_pending):
-		telemetry.tick(delta, $Enemies.get_child_count(), $EnemyProjectiles.get_child_count())
+		telemetry.tick(delta, $Enemies.get_child_count(), _enemy_projectile_count())
 	hud_refresh_time -= delta
 	if hud_refresh_time <= 0.0:
 		hud_refresh_time = 0.1
@@ -359,11 +359,18 @@ func _refresh_hud() -> void:
 	hud.chests_label.tooltip_text = "In dieser Welle eingesammelt"
 	hud.update_ailments(player.status_effects)
 	hud.update_bosses(BossEncounter.remaining($Enemies))
-	hud.update_telemetry(telemetry, $Enemies.get_child_count(), $Projectiles.get_child_count() + $EnemyProjectiles.get_child_count())
+	hud.update_telemetry(telemetry, $Enemies.get_child_count(), $Projectiles.get_child_count() + _enemy_projectile_count())
 	if session.test_scenario_id != &"":
 		hud.timer_label.text = "TEST"
 		if visible_boss != null:
 			hud.boss_label.text = "%s · Test" % visible_boss.data.display_name
+
+
+func _enemy_projectile_count() -> int:
+	var total := $EnemyProjectiles.get_child_count()
+	for batch in get_tree().get_nodes_in_group("boss_projectile_batches"):
+		if not batch.is_queued_for_deletion(): total += batch.entries.size()
+	return total
 
 
 func _spawn_enemy(data: EnemyData) -> void:

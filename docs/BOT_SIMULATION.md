@@ -2,8 +2,9 @@
 
 Die Diagnose kann jetzt Spielstärke, Kampfstrategie und Buildentscheidungen
 getrennt vergleichen. Es sind regelbasierte, reproduzierbare Testpiloten, keine
-an menschlichen Spielern kalibrierten Leistungsstufen. Der erste Ausbau prüft
-den verdienten Einstieg **von Welle 1 bis höchstens Welle 5**.
+an menschlichen Spielern kalibrierten Leistungsstufen. Mit `--last-wave 20`
+prüft der Runner jetzt den **vollständig verdienten Run von Welle 1 bis 20**.
+Die Voreinstellung bleibt der kurze Einstieg bis Welle 5.
 
 ## Einen Lauf ansehen
 
@@ -28,6 +29,19 @@ Im Projektordner unter Windows, mit Python und Godot im PATH:
 ```powershell
 python tools/run_bot_comparison.py --visible --weapons turbo_drill --skills expert --strategies aggressive --build-policies synergy --speed 8
 ```
+
+Der UV-/Schneide-Vergleich mit Element, Lebensraub und gezieltem Itemausbau:
+
+```powershell
+python tools/run_bot_comparison.py --visible --weapons uv_lamp --loadout-plan uv_floss --skills expert --strategies boss --build-policies full_build --last-wave 20 --speed 16 --timeout 86400
+```
+
+Der Waffenplan startet mit einer Mk-I-UV-Lampe. Zwei UV-Lampen und eine
+Zahnseiden-Schneide sind das Kaufziel für sechs Wurzeln; Angebote, Gold und
+Fusionen bestimmen, wann der Build entsteht. Es gibt keine gratis Vollausrüstung
+oder garantierten Maximalränge. Auch im Launcher sind Waffenplan und Welle 20
+auswählbar. Nach den ersten drei Bossen wählt der Pilot das erste der tatsächlich
+angebotenen Relikte und trägt es in den nächsten Kampf.
 
 `--visible` allein startet einen einzelnen geübten Distanzpiloten mit Bohrer.
 In der Leiste unten wechseln **1× / 4× / 8× / 16×** das gewünschte Tempo.
@@ -102,6 +116,7 @@ Entscheidung stehen.
 | `kite` | Abstand an Waffenreichweite ausrichten und seitlich bewegen. |
 | `collector` | Sichtbare Beute priorisieren; Gefahren trotzdem nach Profil bewerten. |
 | `boss` | Einen sichtbaren Boss gegenüber näheren normalen Gegnern bevorzugen. |
+| `orbit` | Blinde Kreisbewegung, keine Gefahrenreaktion und kein Dash. Bewusste Kontrollregel, kein Modell eines unerfahrenen Menschen. |
 
 Eine Strategie gibt das Ziel vor; das Pilotenprofil bestimmt, wann und wie
 zuverlässig der Bot darauf reagiert. Deshalb kann auch ein langsamer Anfänger
@@ -111,9 +126,13 @@ die gleiche Grundstrategie wie ein erfahrener Pilot fahren.
 | --- | --- |
 | `simple` – Feuer-Referenz | Bisherige Levelprioritäten, ausschließlich Feuer-Upgrades, passende Exemplare der Startwaffe und höchstens ein Standarditem je Shop. |
 | `synergy` – Synergie-Heuristik | Wertet tatsächlich angebotene Stats, passende Itemtags, Lebenszustand und Waffenmechanik heuristisch aus. Etwa Eis/Crit-Schaden beim Polierer, Elektrizität bei einer Nasswaffe oder Blutung bei Schnittwaffen. |
+| `element_leech` | Feuer und Lebensraub auf legalen freien Plätzen ausbauen; gleiche Level-/Itemprioritäten wie die Feuer-Referenz. |
+| `full_build` | Element/Lebensraub, heuristische Levelwahl und alle bezahlbaren positiv bewerteten Itemangebote je Reroll statt des Ein-Item-Limits. Stackgrenzen und höchstens vier bezahlte Rerolls bleiben erhalten. Keine optimale Buildsuche. |
+| `random` | Angebotene Levelstats, legale Verzauberungen und bezahlbare Items mit eigenem reproduzierbarem Zufall wählen. Waffen folgen weiterhin dem Waffenplan; höchstens ein Item und vier Rerolls je Shop. |
+| `no_shop` | Alle Shopkäufe und Rerolls auslassen. Verdiente Levelaufstiege, Feuer-Verzauberungen und Belohnungen werden weiterhin gewählt. |
 
-Beide Regeln kaufen reguläre Angebote, bezahlen Rerolls und nutzen nur verdiente
-Waffenpunkte. Beide bleiben beim gleichen Waffenstarter, höchstens einem
+Die kaufenden Regeln kaufen reguläre Angebote, bezahlen Rerolls und nutzen nur verdiente
+Waffenpunkte. Die beiden bisherigen Regeln bleiben beim gleichen Waffenstarter, höchstens einem
 Shopitem und maximal vier bezahlten Rerolls je Shop. Ein Hybrid, der den
 Starter still durch UV ersetzt, würde die Starterdiagnose verdecken und ist
 deshalb kein Teil dieser beiden Regeln. Normale Itemtruhen werden behalten;
@@ -129,8 +148,8 @@ Das Reaktionsprofil „Erfahren“ verändert diese Kauf-/Verzauberungsregel nic
 
 Alle Profile erhalten dasselbe virtuelle **1280×720-Sichtfenster**, zentriert
 auf Denti wie die Kamera, auch an Arenarändern. Darin sieht
-der Sensor höchstens die 32 nächsten lebenden Gegner und 64 nächsten normalen
-Säureprojektile sowie sichtbare Beute. Gegnergeschwindigkeit wird aus vergangenen
+der Sensor höchstens die 32 nächsten lebenden Gegner und 64 nächsten Projektile
+einschließlich sichtbar angekündigter Flugbahnen sowie sichtbare Beute. Gegnergeschwindigkeit wird aus vergangenen
 Beobachtungen geschätzt. Künftige Spawns, nächste zufällige Angriffe und noch
 nicht sichtbare Zielpunkte werden nicht übergeben.
 
@@ -144,8 +163,12 @@ Beim Dash werden Gegner, Projektile und aktive Warnflächen auch **auf dem Weg**
 geprüft. Ausgeführt wird der echte `PlayerDash` mit Kosten, Cooldown und den
 normalen Kollisions-/Schadensregeln.
 
-Die Spezialfelder der späteren Bosse sind noch keine vollständige
-Sensorimplementierung. Darum ist dieser Runner ausdrücklich auf W1–5 begrenzt.
+Die späteren Bosse liefern ihre bereits gemalten Bombenziele, Sturmspuren,
+Säurerinnen, Stampfreihen, Hofsektoren und Projektilwarnungen sowie tatsächlich
+fliegende Herzen, Splitter, Nadeln und Lanzen. Noch nicht angekündigte
+Folgeangriffe werden nicht ausgelesen. Angekündigte Geschosse bewegen sich erst
+nach ihrer sichtbaren Auslösung. Klebrige Karamellfelder werden noch nicht als
+eigene taktische Wegkosten bewertet; ihre reale Verlangsamung wirkt trotzdem.
 Die alten Checkpoint-Vergleiche für späte Wellen bleiben separat vorhanden.
 „Erfahren“ ist außerdem kein Beweis dafür, dass der Pilot in jeder Waffen- und
 Strategiesituation besser spielt. Mehr Ausweichen kann Angriffszeit kosten;
@@ -185,10 +208,29 @@ python tools/run_bot_comparison.py --summarize .godot/mein_vergleich.json
 ```
 
 Die Zusammenfassung vermischt keine Profile/Strategien/Buildregeln. Gold, XP und
-HP vor dem Boss werden nur unter tatsächlich bis W5 gelangten Läufen gemittelt;
+HP vor dem Boss werden nur unter tatsächlich bis zur jeweiligen Bosswelle gelangten Läufen gemittelt;
 Boss-TTK nur unter erfolgreichen Kills. Abbrüche bleiben sichtbar und zählen
 nicht als verlorene vollständige Runs. Für kurze Proben vor W5 wird keine
 Boss-Erfolgsquote erfunden. Vollständig beendete W1 hat eine eigene Tabelle.
+
+Vollrun-Berichte trennen den Sieg in W20, Ankünfte und Kills an jedem der vier
+Bosse sowie Einnahmen, Schaden, effektive Heilung und Spitzenbelegung pro
+vollständig beendeter Welle. Ein früher Bosskill zählt auch dann, wenn der Pilot
+später stirbt. Abbrüche gehen in keinen dieser Erfolgsnenner ein. Die
+Projektiltelemetrie zählt nun auch die gemalten Boss-Projektilbatches.
+
+**Methodengrenze:** Proben mit Endwelle 1–5 behalten den historischen Stopp beim
+ersten Bosskill. Längere Proben warten auch nach einem frühen Bosskill den echten
+Wellentimer ab, sammeln alle Beute und lösen die komplette Belohnungsfolge vor
+dem nächsten Shop auf. Ein Sieg wird erst nach dem tatsächlichen W20-Abschluss
+gemeldet. Hordenplan und Wellenprofil-Vorschau werden über den Vollrun getragen.
+Die beiden Messmethoden dürfen daher nicht als identische W5-Einkommensphase
+verglichen werden.
+
+Die erste [Schwierigkeitsprüfung](DIFFICULTY_AUDIT.md) vergleicht gezielten Ausbau
+mit Zufallsentscheidungen, Shopverzicht und blinder Kreisbewegung. Sie ergänzt
+frische Seeds und gesonderte Maximalrang-Kontrollen, bevor weitere Gegnerbuffs
+aus den Botresultaten abgeleitet werden.
 
 ## Prüfung dieses Ausbaus
 

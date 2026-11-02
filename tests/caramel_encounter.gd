@@ -209,11 +209,34 @@ func _run() -> void:
 	attack.remaining = 0
 	attack.advance(0.001)
 	_check(attack.state == CaramelEncounter.State.APPROACH, "offscreen Prince began an unseen throw")
+	# Damage callbacks can clear a volley (e.g. retaliation kills its owner).
+	# Exercise several pending entries so stale reverse-iteration indices fail.
+	var rays: Array[Vector2] = [Vector2.RIGHT, Vector2.RIGHT, Vector2.RIGHT, Vector2.RIGHT]
+	var batch := BossPaintedVolley.new()
+	batch.enemy = boss
+	batch.profile = preload("res://data/encounters/king_shards.tres")
+	game.add_child(batch)
+	game.player.hurt_time = 0
+	game.player.dodge_time = 0
+	game.player.dash_moved = false
+	game.player.stats.shield_charges = 0
+	game.player.stats.dodge_chance = 0
+	game.player.stats.health = 10000
+	game.player.damaged.connect(func(_at: Vector2, _amount: float): batch.clear(), CONNECT_ONE_SHOT)
+	batch.fire(game.player.global_position, rays, &"test_callback")
+	batch.advance(0.01, 0)
+	_check(batch.entries.is_empty(), "painted volley retained projectiles after an in-hit cancellation")
+	batch.free()
 	attack.pools.append({"at": game.player.global_position, "life": 5.0})
 	boss.boss_damage_budget = boss.max_health * 10
 	boss.boss_phase = 2
-	boss.take_damage(1e9)
+	boss.boss_phase_timer = 0
+	game.player.hurt_time = 0
+	game.player.damaged.connect(func(_at: Vector2, _amount: float): boss.take_damage(1e9), CONNECT_ONE_SHOT)
+	attack.hearts.fire(game.player.global_position - Vector2.RIGHT * (boss.data.radius + 12), rays, &"test_retaliation")
+	attack.hearts.advance(0.01, 0)
 	_check(boss.dying and attack.pools.is_empty() and attack.state == CaramelEncounter.State.APPROACH, "boss death left live caramel or an invisible pending bomb")
+	_check(attack.hearts.entries.is_empty(), "boss death left an in-flight heart batch active during a hit callback")
 	session.clear_run()
 	if failures.is_empty(): print("PASS caramel_encounter: aim/flight, exact impacts, no stacking, bounded shared pools, phases, death, pause, legacy saves, snapshots and swept dash timing")
 	finish(0 if failures.is_empty() else 1)
