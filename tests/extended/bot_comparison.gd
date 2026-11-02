@@ -1,6 +1,7 @@
 extends "res://tools/benchmark_bot_comparison.gd"
 
 var inspect_intermission := false
+var enchantment_drafts: Array[Dictionary] = []
 
 func make_run(build: String, difficulty: StringName, sample_seed: int):
 	var game = super.make_run(build, difficulty, sample_seed)
@@ -18,7 +19,16 @@ func before_intermission_action(game, phase_name: String, detail: String) -> boo
 			"Aufstieg": _check(game.choice_panel.visible and game.choice_panel.mode == &"upgrade", "viewer did not show the real stat offers")
 			"Verzauberungen": _check(game.weapon_enchantment_panel.visible, "viewer skipped its real enchantment panel")
 			"Shop": _check(game.shop_panel.visible and game.in_shop, "viewer did not show the real shop offers")
-	return await super.before_intermission_action(game, phase_name, detail)
+	var continuing := await super.before_intermission_action(game, phase_name, detail)
+	if inspect_intermission and phase_name == "Verzauberungen":
+		var state: WeaponUpgradeState = game.rewards.weapon_upgrades
+		enchantment_drafts.append({"wave": game.wave.current_wave, "actions": state.actions.size(),
+			"remaining": state.remaining(), "detail": detail})
+		if detail.begins_with("Plant #"):
+			var panel: WeaponEnchantmentPanel = game.weapon_enchantment_panel
+			_check(str(panel.models[panel.selected_weapon].uid) == str(state.cursor.target_uid), "enchantment viewer displayed a different weapon than the planned step")
+			_check(panel.remaining == state.remaining(), "enchantment viewer hid the remaining point budget")
+	return continuing
 
 func _check(condition: bool, message: String) -> void:
 	if not condition:
@@ -66,6 +76,24 @@ func _run() -> void:
 	_check(viewer.events.any(func(event: Dictionary): return str(event.get("decision", "")).begins_with("Kauft ")), "viewer hid paid purchases")
 	_check(viewer.events.any(func(event: Dictionary): return str(event.get("decision", "")).begins_with("Reroll")), "viewer hid paid rerolls")
 	_check(viewer.events.any(func(event: Dictionary): return str(event.get("decision", "")).begins_with("Neue Angebote")), "viewer hid new random offers after rerolls")
+	var previous_wave_number := -1
+	var previous_actions := 0
+	var shown_steps := 0
+	var shown_budgets := 0
+	for draft in enchantment_drafts:
+		_check(not str(draft.detail).is_empty(), "enchantment viewer added an empty reading step")
+		if draft.wave != previous_wave_number:
+			shown_budgets += 1
+			previous_wave_number = int(draft.wave)
+			previous_actions = 0
+			_check(draft.actions == 0, "enchantments were already applied before the initial reading pause")
+		if str(draft.detail).begins_with("Plant #"):
+			_check(draft.actions == previous_actions + 1, "enchantment viewer skipped or bundled point decisions")
+			shown_steps += 1
+		else: _check(draft.actions == previous_actions, "enchantment plan changed outside a visible point decision")
+		previous_actions = int(draft.actions)
+	_check(shown_steps >= 2, "enchantment fixture never showed individual rank increases")
+	_check(enchantment_drafts.size() == shown_steps + 2 * shown_budgets, "enchantment viewer repeated or omitted budget/confirmation steps")
 	viewer.free()
 	_check(not root.get_node("GameSession").has_run(), "bot wrote a real player save")
 	print("PASS bot integration: bounded current-world perception, real projectile avoidance/dash costs, earned purchases/persistence and repeated deterministic inputs")

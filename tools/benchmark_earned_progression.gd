@@ -225,24 +225,61 @@ func level_choice(game) -> UpgradeData:
 
 
 func spend_upgrade_points(game) -> void:
-	plan_weapon_upgrades(game)
+	var state: WeaponUpgradeState = game.rewards.weapon_upgrades
+	if not await before_intermission_action(game, "Verzauberungen", "%d Punkte verfügbar" % state.remaining()): return
+	for action in weapon_upgrade_actions(game):
+		var detail: String = plan_weapon_upgrade(game, action)
+		if detail.is_empty():
+			push_error("Cannot apply the planned bot enchantment step")
+			failures += 1
+			return
+		if not await before_intermission_action(game, "Verzauberungen", detail): return
 	if not await before_intermission_action(game, "Verzauberungen", "Geplante Upgrades übernehmen"): return
 	game._on_weapon_upgrades_completed()
 
 
-func plan_weapon_upgrades(game) -> void:
-	var state: WeaponUpgradeState = game.rewards.weapon_upgrades
+func weapon_upgrade_actions(game) -> Array[Dictionary]:
+	# Project the same deterministic policy on a private draft. The live draft
+	# receives one action at a time, so the viewer never reveals future steps.
+	var actual: WeaponUpgradeState = game.rewards.weapon_upgrades
+	var draft := WeaponUpgradeState.new()
+	draft.points = actual.points
+	draft.actions.assign(actual.actions.duplicate(true))
+	var actions: Array[Dictionary] = []
 	for point in 100:
-		var selected: WeaponInstance
-		var lowest := 11
-		for weapon: WeaponInstance in game.player.loadout.equipped():
-			var values := state.preview(weapon)
-			var index := WeaponAffixes.find(values, &"fire")
-			var rank := WeaponUpgrades.level(values[index]) if index >= 0 else 0
-			if state.remaining() >= WeaponUpgrades.cost(weapon.data) and rank < lowest and rank < 10:
-				selected = weapon
-				lowest = rank
-		if selected == null or not state.plan(game.player.loadout, selected.instance_uid, &"fire"): break
+		var selected := next_weapon_upgrade(game, draft)
+		if selected.is_empty(): break
+		var weapon: WeaponInstance = selected.weapon
+		if not draft.plan(game.player.loadout, weapon.instance_uid, StringName(selected.id)): break
+		actions.append(draft.actions[-1].duplicate())
+	return actions
+
+
+func plan_weapon_upgrade(game, action: Dictionary) -> String:
+	var weapon: WeaponInstance
+	for equipped: WeaponInstance in game.player.loadout.equipped():
+		if equipped.instance_uid == str(action.uid): weapon = equipped
+	if weapon == null: return ""
+	var state: WeaponUpgradeState = game.rewards.weapon_upgrades
+	var kind := StringName(action.id)
+	if not state.plan(game.player.loadout, weapon.instance_uid, kind): return ""
+	var values := state.preview(weapon)
+	var rank := WeaponUpgrades.level(values[WeaponAffixes.find(values, kind)])
+	var number: int = game.player.loadout.equipped().find(weapon) + 1
+	return "Plant #%d · %s · %s %d/10" % [number, weapon.data.display_name, WeaponAffixes.by_id(kind).display_name, rank]
+
+
+func next_weapon_upgrade(game, state: WeaponUpgradeState) -> Dictionary:
+	var selected: WeaponInstance
+	var lowest := 11
+	for weapon: WeaponInstance in game.player.loadout.equipped():
+		var values := state.preview(weapon)
+		var index := WeaponAffixes.find(values, &"fire")
+		var rank := WeaponUpgrades.level(values[index]) if index >= 0 else 0
+		if state.remaining() >= WeaponUpgrades.cost(weapon.data) and rank < lowest and rank < 10:
+			selected = weapon
+			lowest = rank
+	return {} if selected == null else {"weapon": selected, "id": &"fire"}
 
 
 func shop_policy(game, build: String) -> void:

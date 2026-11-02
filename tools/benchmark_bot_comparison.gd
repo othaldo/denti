@@ -67,7 +67,7 @@ func make_run(build: String, difficulty: StringName, sample_seed: int):
 	if "--visible" in OS.get_cmdline_user_args():
 		viewer = VIEWER.new()
 		var tactics := {"aggressive": "Nahkampf", "kite": "Distanz", "collector": "Sammeln", "boss": "Bossfokus"}
-		viewer.description = "%s · %s · %s" % [pilot.profile.display_name, tactics[pilot.strategy], "Synergie" if build_policy == "synergy" else "Einfach"]
+		viewer.description = "%s · %s · %s" % [pilot.profile.display_name, tactics[pilot.strategy], "Synergie-Heuristik" if build_policy == "synergy" else "Feuer-Referenz"]
 		viewer.game = game
 		viewer.speed = float(_arguments("speed", ["4"])[0])
 		viewer.capture_path = str(_arguments("capture", [""])[0])
@@ -106,9 +106,8 @@ func farm_direction(game, _movement: String, elapsed: float) -> Vector2:
 func level_choice(game) -> UpgradeData:
 	return BUILD_POLICY.level_choice(game) if build_policy == "synergy" else super.level_choice(game)
 
-func plan_weapon_upgrades(game) -> void:
-	if build_policy == "synergy": BUILD_POLICY.plan_upgrades(game)
-	else: super.plan_weapon_upgrades(game)
+func next_weapon_upgrade(game, state: WeaponUpgradeState) -> Dictionary:
+	return BUILD_POLICY.next_upgrade(game, state) if build_policy == "synergy" else super.next_weapon_upgrade(game, state)
 
 func shop_item_index(game) -> int:
 	return BUILD_POLICY.shop_item_index(game) if build_policy == "synergy" else super.shop_item_index(game)

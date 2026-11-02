@@ -28,7 +28,7 @@ DIFFICULTIES = ("easy", "normal", "hard", "hell")
 LABELS = {
     "skills": {"novice": "Anfänger", "regular": "Geübt", "expert": "Erfahren"},
     "strategies": {"aggressive": "Nah herangehen", "kite": "Abstand halten", "collector": "Beute sammeln", "boss": "Boss fokussieren"},
-    "build_policies": {"simple": "Einfach", "synergy": "Synergien"},
+    "build_policies": {"simple": "Feuer-Referenz", "synergy": "Synergie-Heuristik"},
     "difficulties": {"easy": "Easy", "normal": "Normal", "hard": "Hard", "hell": "Hell"},
 }
 

@@ -46,28 +46,26 @@ static func affix_order(weapon: WeaponData) -> Array[StringName]:
 	if weapon.bleed_dps > 0: return [&"bleed", &"tempo", &"leech"]
 	return [&"fire", &"tempo", &"leech"]
 
-static func plan_upgrades(game) -> void:
-	var state: WeaponUpgradeState = game.rewards.weapon_upgrades
-	for point in 100:
-		var selected: WeaponInstance
-		var selected_kind: StringName
-		var best := INF
-		for weapon: WeaponInstance in game.player.loadout.equipped():
-			if state.remaining() < WeaponUpgrades.cost(weapon.data): continue
-			var values := state.preview(weapon)
-			var order := affix_order(weapon.data)
-			for index in order.size():
-				var kind := order[index]
-				var found := WeaponAffixes.find(values, kind)
-				var rank := WeaponUpgrades.level(values[found]) if found >= 0 else 0
-				if rank >= 10 or WeaponUpgrades.advance(values, kind, weapon.data, weapon.tier).is_empty(): continue
-				# Establish the primary effect first, then diversify when slots permit.
-				var priority := rank + index * 3
-				if priority < best:
-					best = priority
-					selected = weapon
-					selected_kind = kind
-		if selected == null or not state.plan(game.player.loadout, selected.instance_uid, selected_kind): break
+static func next_upgrade(game, state: WeaponUpgradeState) -> Dictionary:
+	var selected: WeaponInstance
+	var selected_kind: StringName
+	var best := INF
+	for weapon: WeaponInstance in game.player.loadout.equipped():
+		if state.remaining() < WeaponUpgrades.cost(weapon.data): continue
+		var values := state.preview(weapon)
+		var order := affix_order(weapon.data)
+		for index in order.size():
+			var kind := order[index]
+			var found := WeaponAffixes.find(values, kind)
+			var rank := WeaponUpgrades.level(values[found]) if found >= 0 else 0
+			if rank >= 10 or WeaponUpgrades.advance(values, kind, weapon.data, weapon.tier).is_empty(): continue
+			# Establish the primary effect first, then diversify when slots permit.
+			var priority := rank + index * 3
+			if priority < best:
+				best = priority
+				selected = weapon
+				selected_kind = kind
+	return {} if selected == null else {"weapon": selected, "id": selected_kind}
 
 static func shop_item_index(game) -> int:
 	var best := 0.0

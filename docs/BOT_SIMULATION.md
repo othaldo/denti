@@ -40,6 +40,10 @@ Belohnungen**: Bei 16× dauert ein Schritt etwa 0,125 Sekunden. Tempoänderungen
 wirken sofort auf den laufenden Countdown. Mit Pause hält auch dieser an.
 Die normalen Karten lassen sich mit
 der Maus ansehen, Entscheidungen und Käufe führt weiterhin der Bot aus.
+Verzauberungen werden Punkt für Punkt geplant: Der Bot zeigt erst das Budget,
+dann jeweils das betroffene Waffenexemplar und den neuen Effekt-Rang samt
+verbleibenden Punkten. Erst nach einer eigenen Abschlussanzeige wird der Plan
+übernommen. Für jeden dieser Schritte gelten Tempo und Pause ebenfalls.
 **Esc**, das Schließsymbol oder das Schließen des Fensters brechen ab und
 speichern den begonnenen Lauf als `aborted` im Bericht.
 
@@ -105,8 +109,8 @@ die gleiche Grundstrategie wie ein erfahrener Pilot fahren.
 
 | `--build-policies` | Entscheidungen |
 | --- | --- |
-| `simple` | Bisherige Levelprioritäten, Feuer-Upgrades, passende Exemplare der Startwaffe und höchstens ein Standarditem je Shop. |
-| `synergy` | Wertet tatsächlich angebotene Stats, passende Itemtags, Lebenszustand und Waffenmechanik heuristisch aus. Etwa Eis/Crit-Schaden beim Polierer, Elektrizität bei einer Nasswaffe oder Blutung bei Schnittwaffen. |
+| `simple` – Feuer-Referenz | Bisherige Levelprioritäten, ausschließlich Feuer-Upgrades, passende Exemplare der Startwaffe und höchstens ein Standarditem je Shop. |
+| `synergy` – Synergie-Heuristik | Wertet tatsächlich angebotene Stats, passende Itemtags, Lebenszustand und Waffenmechanik heuristisch aus. Etwa Eis/Crit-Schaden beim Polierer, Elektrizität bei einer Nasswaffe oder Blutung bei Schnittwaffen. |
 
 Beide Regeln kaufen reguläre Angebote, bezahlen Rerolls und nutzen nur verdiente
 Waffenpunkte. Beide bleiben beim gleichen Waffenstarter, höchstens einem
@@ -115,6 +119,11 @@ Starter still durch UV ersetzt, würde die Starterdiagnose verdecken und ist
 deshalb kein Teil dieser beiden Regeln. Normale Itemtruhen werden behalten;
 zufällige Waffen-Verzauberungskapseln werden wie in der Referenz verschrottet.
 Die Synergieregel ist eine nachvollziehbare Heuristik, keine optimale Buildsuche.
+Ihre Verzauberungen folgen einer festen Priorität je Waffenmechanik. Identische
+Waffenexemplare erhalten deshalb oft denselben ersten Effekt. Der Bot würfelt
+keine Abwechslung zur Schau und bewertet noch nicht den Zusatznutzen eines
+anderen Elements, Lebensraubs oder einer Kontrollrolle im gesamten Build.
+Das Reaktionsprofil „Erfahren“ verändert diese Kauf-/Verzauberungsregel nicht.
 
 ## Wahrnehmung und Grenzen
 

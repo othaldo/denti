@@ -195,6 +195,7 @@ func _process(_delta: float) -> void:
 	if not decision_detail.is_empty() and not capture_path.is_empty():
 		decision_draws += 1
 		var suffix: String = {"Aufstieg": "level", "Verzauberungen": "enchantments", "Shop": "shop", "Truhe": "chest"}.get(phase, "")
+		if phase == "Verzauberungen" and decision_detail.begins_with("Plant #"): suffix = "enchantment_step"
 		if decision_draws >= 2 and not suffix.is_empty() and not captured_phases.has(suffix):
 			DirAccess.make_dir_recursive_absolute(capture_path.get_base_dir())
 			get_viewport().get_texture().get_image().save_png(capture_path.get_basename() + "_" + suffix + ".png")
