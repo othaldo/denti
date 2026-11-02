@@ -4,6 +4,7 @@ const BRAIN = preload("res://tools/balance/bots/pilot_brain.gd")
 const VIEWER = preload("res://tools/balance/bots/run_viewer.gd")
 var failures := 0
 var viewer_step_done := false
+var viewer_decision_done := false
 
 func _initialize() -> void: call_deferred("_run")
 
@@ -78,6 +79,10 @@ func _wait_viewer(view: CanvasLayer) -> void:
 	await view.before_step()
 	viewer_step_done = true
 
+func _wait_decision(view: CanvasLayer) -> void:
+	await view.present_decision("Shop", "Angebote")
+	viewer_decision_done = true
+
 func _viewer_controls() -> void:
 	root.size = Vector2i(1280, 720)
 	root.content_scale_size = root.size
@@ -112,6 +117,25 @@ func _viewer_controls() -> void:
 	root.push_input(pause_key, true)
 	for frame in 3: await process_frame
 	_check(viewer_step_done and view.ticks == 3, "viewer did not resume from the same pending step")
+	view.decision_remaining = 2.0
+	view.set_speed(1)
+	view.advance_reading_time(0.25)
+	_check(is_equal_approx(view.decision_remaining, 1.75), "1x shop reading time did not use the base duration")
+	view.set_speed(16)
+	view.advance_reading_time(0.1)
+	_check(is_equal_approx(view.decision_remaining, 0.15), "changing speed mid-purchase did not accelerate the remaining reading time")
+	view.toggle_pause()
+	view.advance_reading_time(1.0)
+	_check(is_equal_approx(view.decision_remaining, 0.15), "paused shop reading time kept counting down")
+	view.toggle_pause()
+	view.decision_seconds = 0.02
+	view.toggle_pause()
+	call_deferred("_wait_decision", view)
+	for frame in 6: await process_frame
+	_check(not viewer_decision_done and view.ticks == 3 and paused and view.decision_detail == "Angebote", "paused reading time hid the shop or advanced combat")
+	view.toggle_pause()
+	while not viewer_decision_done: await process_frame
+	_check(view.ticks == 3 and view.next_tick_at == 0 and Engine.physics_ticks_per_second == hz and Engine.time_scale == scale, "intermission presentation fabricated combat/catch-up time")
 	var escape := InputEventKey.new()
 	escape.keycode = KEY_ESCAPE
 	escape.pressed = true

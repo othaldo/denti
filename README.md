@@ -145,8 +145,10 @@ Der Runner benötigt Python 3.10+ (keine Zusatzpakete). Standardmäßig laufen 1
 
 [Testpiloten und Zeitraffer](docs/BOT_SIMULATION.md) vergleichen Reaktion,
 Kampfstrategie und Buildregel getrennt über den verdienten Einstieg W1–5.
+`python tools/bot_launcher.py` öffnet den lokalen UI-Launcher mit Waffen-,
+Bot-, Strategie- und Schwierigkeitsauswahl sowie Berichtzugriff.
 `python tools/run_bot_comparison.py --visible --speed 8` zeigt einen Botlauf mit
-Pause und Tempowahl; ohne `--visible` werden Vergleichsmatrizen headless und mit
+Pause, Tempowahl und sichtbaren Belohnungs-/Shopentscheidungen; ohne `--visible` werden Vergleichsmatrizen headless und mit
 bis zu vier Workern berechnet. Messdaten landen in einem neuen Verzeichnis
 unter `.godot/bot_runs/`.
 

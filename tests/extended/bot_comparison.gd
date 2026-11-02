@@ -1,5 +1,25 @@
 extends "res://tools/benchmark_bot_comparison.gd"
 
+var inspect_intermission := false
+
+func make_run(build: String, difficulty: StringName, sample_seed: int):
+	var game = super.make_run(build, difficulty, sample_seed)
+	if inspect_intermission:
+		viewer = VIEWER.new()
+		viewer.game = game
+		viewer.decision_seconds = 0.02
+		root.add_child(viewer)
+	return game
+
+func before_intermission_action(game, phase_name: String, detail: String) -> bool:
+	if inspect_intermission:
+		_check(paused and not game.wave.active, "viewer exposed a reward/shop while combat was still active")
+		match phase_name:
+			"Aufstieg": _check(game.choice_panel.visible and game.choice_panel.mode == &"upgrade", "viewer did not show the real stat offers")
+			"Verzauberungen": _check(game.weapon_enchantment_panel.visible, "viewer skipped its real enchantment panel")
+			"Shop": _check(game.shop_panel.visible and game.in_shop, "viewer did not show the real shop offers")
+	return await super.before_intermission_action(game, phase_name, detail)
+
 func _check(condition: bool, message: String) -> void:
 	if not condition:
 		failures += 1
@@ -33,9 +53,29 @@ func _run() -> void:
 	for key in ["outcome", "wave", "level", "kills", "gold_earned", "xp_earned", "chests"]:
 		_check(results[1][key] == results[2][key], "repeated pilot changed earned progression: " + key)
 	_check(metrics[1] == metrics[2], "repeated pilot changed delayed actions or mistake RNG")
+	# Present the same earned run through real, paused intermission frames.
+	# These frames must expose choices without improving income or combat inputs.
+	inspect_intermission = true
+	_pilot("regular", "synergy")
+	var watched := await sample_run("turbo_drill", &"normal", "kite", 13579, 2)
+	for index in watched.waves.size():
+		for key in ["start", "after_rewards", "after_shop"]:
+			if first.waves[index].has(key): _check(_earned_state(watched.waves[index][key]) == _earned_state(first.waves[index][key]), "intermission reading frames changed earned state: " + key)
+	_check(pilot.metrics() == metrics[1], "intermission viewer advanced the combat pilot")
+	_check(viewer.events.any(func(event: Dictionary): return event.get("phase") == "Aufstieg"), "viewer never presented stat decisions")
+	_check(viewer.events.any(func(event: Dictionary): return str(event.get("decision", "")).begins_with("Kauft ")), "viewer hid paid purchases")
+	_check(viewer.events.any(func(event: Dictionary): return str(event.get("decision", "")).begins_with("Reroll")), "viewer hid paid rerolls")
+	_check(viewer.events.any(func(event: Dictionary): return str(event.get("decision", "")).begins_with("Neue Angebote")), "viewer hid new random offers after rerolls")
+	viewer.free()
 	_check(not root.get_node("GameSession").has_run(), "bot wrote a real player save")
 	print("PASS bot integration: bounded current-world perception, real projectile avoidance/dash costs, earned purchases/persistence and repeated deterministic inputs")
 	finish(1 if failures else 0)
+
+func _earned_state(value: Dictionary) -> Dictionary:
+	var normalized := value.duplicate(true)
+	# Newly purchased instances have wall-clock identities, not seeded stats.
+	for weapon in normalized.equipment: weapon.erase("uid")
+	return normalized
 
 func _projectile_trial(skill_id: String) -> Dictionary:
 	_pilot(skill_id)

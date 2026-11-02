@@ -84,6 +84,11 @@ func before_loot_step(_game, _frame: int) -> bool:
 	viewer.phase = "Beute"
 	return await viewer.before_step()
 
+func before_intermission_action(game, phase_name: String, detail: String) -> bool:
+	if not is_instance_valid(viewer): return true
+	if phase_name == "Verzauberungen": game.weapon_enchantment_panel.refresh()
+	return await viewer.present_decision(phase_name, detail)
+
 func run_aborted() -> bool:
 	return is_instance_valid(viewer) and viewer.cancelled
 
@@ -101,10 +106,9 @@ func farm_direction(game, _movement: String, elapsed: float) -> Vector2:
 func level_choice(game) -> UpgradeData:
 	return BUILD_POLICY.level_choice(game) if build_policy == "synergy" else super.level_choice(game)
 
-func spend_upgrade_points(game) -> void:
+func plan_weapon_upgrades(game) -> void:
 	if build_policy == "synergy": BUILD_POLICY.plan_upgrades(game)
-	else: super.spend_upgrade_points(game)
+	else: super.plan_weapon_upgrades(game)
 
-func shop_policy(game, build: String) -> void:
-	if build_policy == "synergy": BUILD_POLICY.shop(game, build, MAX_REROLLS)
-	else: super.shop_policy(game, build)
+func shop_item_index(game) -> int:
+	return BUILD_POLICY.shop_item_index(game) if build_policy == "synergy" else super.shop_item_index(game)

@@ -4,6 +4,8 @@ Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü an
 
 ## Noch ohne neue Versionsnummer — 02.11.2026
 
+- **Bot-Test per UI starten:** Lokaler Python-Launcher mit Waffen-, Bot-, Strategie-, Build- und Schwierigkeitsauswahl, gespeicherten Einstellungen und Berichtzugriff. Sichtbare Testläufe zeigen jetzt die echten Aufstiege, Verzauberungspläne, Käufe und Rerolls. Die Tempowahl gilt auch im Shop; Leertaste hält die aktuelle Entscheidung an. [Aufruf und Bedienung](docs/BOT_SIMULATION.md).
+
 - **Testpiloten und sichtbarer Zeitraffer:** Entwicklerwerkzeug mit drei verzögerten Reaktions-/Fehlerprofilen, vier Kampfstrategien und unabhängigen Buildregeln für W1–5. Bots beobachten aktuelle Gegner, Projektilbahnen und Graf-Warnungen und benutzen den echten Dash. Native Pause und 1×/4×/8×/16× erhalten feste Physikschritte; Headless-Matrizen verteilen Konfigurationen und Seeds auf isolierte Worker. [Start, Grenzen und Prüfungen](docs/BOT_SIMULATION.md).
 
 - **Kontaktwaffen gezielt stärken:** Kleine Rückstöße bei Bohrer, Fräse, Kratzer und Polierer schaffen Raum. Der Kratzer kann ein weiteres Ziel auf seiner Hiebspur für 50 % Trefferschaden treffen. Der Polierer erhält 110 Reichweite und einen gespeicherten Crit-Zyklus pro Waffenexemplar: Jeder dritte Angriff ist kritisch, auch nach Zielwechsel und Pausen. Kratzer und Polierer können ein bereits totes Ziel innerhalb derselben sichtbaren Bewegung ersetzen. [78 Einstiegsproben, Grenzen und Spieltest-Punkte](docs/CONTACT_WEAPON_BALANCE.md).

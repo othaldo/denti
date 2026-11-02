@@ -68,28 +68,15 @@ static func plan_upgrades(game) -> void:
 					selected = weapon
 					selected_kind = kind
 		if selected == null or not state.plan(game.player.loadout, selected.instance_uid, selected_kind): break
-	game._on_weapon_upgrades_completed()
 
-static func shop(game, build: String, rerolls: int) -> void:
-	var item_bought := false
-	for roll in range(rerolls + 1):
-		for index in game.shop.offers.size():
-			var offer: ShopOfferData = game.shop.offers[index]
-			if offer != null and offer.weapon_data != null and str(offer.weapon_data.id) == build and game.coins >= offer.price:
-				game._on_shop_buy(index)
-		if not item_bought:
-			var best := 0.0
-			var selected := -1
-			for index in game.shop.offers.size():
-				var offer: ShopOfferData = game.shop.offers[index]
-				if offer == null or offer.weapon_data != null or offer.price > game.coins or not game.items.can_acquire(offer): continue
-				var score := item_score(offer, game)
-				if score > best:
-					best = score
-					selected = index
-			if selected >= 0:
-				game._on_shop_buy(selected)
-				item_bought = true
-		var cheapest := EconomyRules.shop_price(WeaponCatalog.by_id(StringName(build)).price, game.wave.current_wave)
-		if roll == rerolls or game.coins < game.shop.reroll_cost + cheapest: break
-		game._on_shop_reroll()
+static func shop_item_index(game) -> int:
+	var best := 0.0
+	var selected := -1
+	for index in game.shop.offers.size():
+		var offer: ShopOfferData = game.shop.offers[index]
+		if offer == null or offer.weapon_data != null or offer.price > game.coins or not game.items.can_acquire(offer): continue
+		var score := item_score(offer, game)
+		if score > best:
+			best = score
+			selected = index
+	return selected

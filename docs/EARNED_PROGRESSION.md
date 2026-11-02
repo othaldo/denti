@@ -3,6 +3,22 @@
 02.11.2026 · Spielerfeedback: Sechs Turbo-Bohrer scheitern am ersten Hell-Boss;
 Flächenwaffen verdienen vorher mehr Gold, XP und potenziell Upgrades.
 
+**Nachgereichte Buildangabe (02.11.):** Beim gemeldeten ersten Hell-Boss waren
+die meisten der sechs Bohrer auf Mk III; jeder trug ein Element und Lebensraub.
+Die konkreten Elemente, Effektränge und übrigen Mk-Stufen sind noch offen.
+Die Maximalränge aus dem früheren UV-/Zahnseiden-Spieltest des Vaters dürfen
+nicht auf diesen anderen Run übertragen werden.
+
+Auch die späteren neuen Bot-Proben rekonstruieren diesen Build nicht: In der
+36er-Matrix mit einfacher Buildregel hatten die bis W5 gelangten Hell-Bohrer
+vier bis fünf Exemplare auf Mk II und ein bis zwei auf Mk III, Feuer auf Rang
+1–4 oder noch keinen Effekt und keinen Lebensraub. Das ist ein anderer
+verdienter Ausbaupfad. Für den direkten Spieltestvergleich brauchen wir deshalb
+zusätzlich einen ausdrücklich vorgegebenen Element-/Lebensraub-Build mit
+überwiegend Mk III und getrennten Defensiv-/Bewegungsvarianten. Offene Ränge
+sollten als Varianten ausgewiesen werden. Der feste Kampfvergleich und der
+realistisch bezahlbare Weg zu diesem Build bleiben getrennte Fragen.
+
 Die anschließende [Prüfung und Umsetzung für Bohrer/Fräse](DRILL_CONTACT_BALANCE.md)
 misst Zielverluste, begrenzten Durchschlag und sichere Reichweite getrennt.
 Die folgenden Werte dokumentieren die Ausgangsdiagnose vor diesem zweiten Pass.

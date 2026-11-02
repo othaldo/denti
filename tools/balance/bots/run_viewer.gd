@@ -7,11 +7,17 @@ var cancelled := false
 var ticks := 0
 var capture_path := ""
 var captured := false
+var captured_phases: Dictionary = {}
+var decision_draws := 0
 var description := ""
 var phase := "Kampf"
+var decision_detail := ""
+var decision_seconds := 2.0
+var decision_remaining := 0.0
 var game: Node
 var caption: Label
 var pause_button: Button
+var toolbar: PanelContainer
 var speeds: Array[Button] = []
 var next_tick_at := 0
 var next_draw_at := 0
@@ -36,6 +42,7 @@ func _ready() -> void:
 	window.close_requested.connect(cancel)
 	window.min_size = Vector2i(960, 600)
 	var panel := PanelContainer.new()
+	toolbar = panel
 	panel.theme = DentiUIStyle.make_theme()
 	add_child(panel)
 	panel.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
@@ -111,6 +118,18 @@ func pace_delay(now: int) -> int:
 	return delay
 
 func _input(event: InputEvent) -> void:
+	# Keep this a spectator: hovering/scrolling may inspect cards, but purchases
+	# and reward choices belong to the pilot. Viewer buttons still receive clicks.
+	if is_instance_valid(game):
+		if event is InputEventMouseButton and event.button_index <= MOUSE_BUTTON_MIDDLE and not toolbar.get_global_rect().has_point(event.position):
+			get_viewport().set_input_as_handled()
+			return
+		if event is InputEventJoypadButton or event is InputEventJoypadMotion:
+			get_viewport().set_input_as_handled()
+			return
+		if event is InputEventKey and event.keycode not in [KEY_SPACE, KEY_ESCAPE]:
+			get_viewport().set_input_as_handled()
+			return
 	if not event is InputEventKey or not event.pressed or event.echo: return
 	if event.keycode == KEY_SPACE:
 		toggle_pause()
@@ -121,6 +140,7 @@ func _input(event: InputEvent) -> void:
 	get_viewport().set_input_as_handled()
 
 func before_step() -> bool:
+	decision_detail = ""
 	while held and not cancelled:
 		get_tree().paused = true
 		await get_tree().process_frame
@@ -134,10 +154,36 @@ func before_step() -> bool:
 	ticks += 1
 	return true
 
+func present_decision(phase_name: String, detail: String) -> bool:
+	phase = phase_name
+	decision_detail = detail
+	decision_draws = 0
+	events.append({"tick": ticks, "wave": int(game.wave.current_wave) if is_instance_valid(game) else 0,
+		"phase": phase_name, "decision": detail})
+	get_tree().paused = true
+	# The selected speed also advances shop/reward reading time. No gameplay or
+	# physics ticks or pilot observations are added while these panels are open.
+	decision_remaining = decision_seconds
+	var previous := Time.get_ticks_usec()
+	while decision_remaining > 0 or held:
+		if cancelled: return false
+		var was_held := held
+		await get_tree().process_frame
+		OS.delay_msec(8)
+		var now := Time.get_ticks_usec()
+		if not was_held: advance_reading_time((now - previous) / 1000000.0)
+		previous = now
+	next_tick_at = 0
+	return not cancelled
+
+func advance_reading_time(seconds: float) -> void:
+	if not held: decision_remaining = maxf(0.0, decision_remaining - seconds * speed)
+
 func _process(_delta: float) -> void:
 	var elapsed := maxf((Time.get_ticks_usec() - started_at) / 1000000.0, 0.001)
 	var wave := int(game.wave.current_wave) if is_instance_valid(game) else 0
 	caption.text = "Bot · %s · W%d · %s · %.0f× (%.1f×)" % [description, wave, phase, speed, ticks / 60.0 / elapsed]
+	if not decision_detail.is_empty(): caption.text = "Bot · W%d · %s · %s" % [wave, phase, decision_detail]
 	if not manual_render or Time.get_ticks_usec() < next_draw_at: return
 	RenderingServer.force_draw()
 	# Schedule after drawing: a slow draw must not make every simulation tick draw.
@@ -146,6 +192,13 @@ func _process(_delta: float) -> void:
 		DirAccess.make_dir_recursive_absolute(capture_path.get_base_dir())
 		get_viewport().get_texture().get_image().save_png(capture_path)
 		captured = true
+	if not decision_detail.is_empty() and not capture_path.is_empty():
+		decision_draws += 1
+		var suffix: String = {"Aufstieg": "level", "Verzauberungen": "enchantments", "Shop": "shop", "Truhe": "chest"}.get(phase, "")
+		if decision_draws >= 2 and not suffix.is_empty() and not captured_phases.has(suffix):
+			DirAccess.make_dir_recursive_absolute(capture_path.get_base_dir())
+			get_viewport().get_texture().get_image().save_png(capture_path.get_basename() + "_" + suffix + ".png")
+			captured_phases[suffix] = true
 
 func _exit_tree() -> void:
 	if manual_render: RenderingServer.render_loop_enabled = old_render_loop

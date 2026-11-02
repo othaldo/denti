@@ -7,6 +7,22 @@ den verdienten Einstieg **von Welle 1 bis höchstens Welle 5**.
 
 ## Einen Lauf ansehen
 
+Der lokale Launcher öffnet Auswahlfelder statt langer Konsolenbefehle:
+
+```powershell
+python tools/bot_launcher.py
+```
+
+**Zuschauen** startet genau einen konfigurierten Bot. **Vergleich berechnen**
+kann auch alle Waffen, Profile, Strategien oder Schwierigkeiten mit mehreren
+Seeds prüfen und zeigt vorher die Anzahl der Läufe. Einstellungen bleiben
+lokal gespeichert. Der Launcher erkennt Godot im PATH; sonst lässt sich die
+Anwendung auswählen. Ergebnisordner und Bericht öffnen sich über die Buttons.
+Abbrechen beendet nur den gestarteten Test samt seinen Workern. Im sichtbaren
+Spielfenster speichert Esc dagegen einen regulären Teilbericht.
+
+Die bisherigen direkten Aufrufe funktionieren ebenfalls:
+
 Im Projektordner unter Windows, mit Python und Godot im PATH:
 
 ```powershell
@@ -16,6 +32,14 @@ python tools/run_bot_comparison.py --visible --weapons turbo_drill --skills expe
 `--visible` allein startet einen einzelnen geübten Distanzpiloten mit Bohrer.
 In der Leiste unten wechseln **1× / 4× / 8× / 16×** das gewünschte Tempo.
 **Pause / Weiter** und **Leertaste** halten den Lauf an derselben Stelle an.
+Nach jeder Welle bleiben die echten Statangebote, der Verzauberungsplan und
+die Shopangebote sichtbar. Vor jeder Auswahl, jedem Kauf und jedem Reroll
+wartet der Bot bei 1× zwei Sekunden; neue Angebote und der fertige Einkauf
+werden ebenfalls gezeigt. **1× / 4× / 8× / 16× gelten auch im Shop und bei
+Belohnungen**: Bei 16× dauert ein Schritt etwa 0,125 Sekunden. Tempoänderungen
+wirken sofort auf den laufenden Countdown. Mit Pause hält auch dieser an.
+Die normalen Karten lassen sich mit
+der Maus ansehen, Entscheidungen und Käufe führt weiterhin der Bot aus.
 **Esc**, das Schließsymbol oder das Schließen des Fensters brechen ab und
 speichern den begonnenen Lauf als `aborted` im Bericht.
 
@@ -24,8 +48,10 @@ Tempo. Hohe Dichte, Darstellung oder andere laufende Programme können das
 gewünschte Tempo begrenzen. Pause und Tempo ändern nur die Wartezeit zwischen
 Schritten; alle Physikschritte werden weiter berechnet.
 
-`--capture` legt zusätzlich nach fünf simulierten Sekunden ein natives PNG
-im Arbeitsverzeichnis des Laufs ab. Für einen kurzen Funktionstest:
+`--capture` legt nach fünf simulierten Sekunden ein natives PNG sowie je eine
+Aufnahme der sichtbaren Aufstiegs-, Verzauberungs-, Truhen- und Shopansichten
+im Arbeitsverzeichnis des Laufs ab, sofern diese im Lauf vorkommen.
+Für einen kurzen Funktionstest:
 
 ```powershell
 python tools/run_bot_comparison.py --visible --last-wave 1 --speed 8 --capture
@@ -163,18 +189,24 @@ Boss-Erfolgsquote erfunden. Vollständig beendete W1 hat eine eigene Tabelle.
 - In der abschließenden 36er-Probe wurden insgesamt rund 102 Minuten Kampfzeit in rund
   80 Sekunden Wandzeit auf drei Workern berechnet. Das ist der aggregierte
   Durchsatz dieser Maschine, keine zugesicherte Beschleunigung eines Einzellaufs.
-- Der native 8×-Kontrolllauf berechnete rund 181 Sekunden Kampfzeit in rund
+- Der ursprüngliche native 8×-Kontrolllauf ohne Lesepausen berechnete rund 181 Sekunden Kampfzeit in rund
   23 Sekunden Wandzeit und behielt dieselben Kampfergebnisse wie Headless.
 - Abgeschlossen: 165/165 Kerntests, die beiden gezielten Zusatzprüfungen für
   Bot-/Referenzläufe und 39/39 Python-Tests. Die nach der Sichtprüfung ergänzten
   Rand-Sichtfeld- und Starttempo-Prüfungen bestehen ebenfalls.
+- Launcher und sichtbare Entscheidungen: 45/45 Python-Prüfungen sowie die drei
+  gezielten Godot-Prüfungen für Bot, verdiente Progression und Viewer bestehen.
+  Echte pausierte Aufstiegs-/Shopansichten verändern weder verdiente Zustände
+  noch Bot-Eingaben. Lesen, Pause und ein Tempowechsel mitten im Shop sind
+  geprüft. Neue Waffeninstanz-IDs werden beim Zustandsvergleich ausgenommen,
+  weil diese bewusst Uhrzeit und Objektidentität enthalten.
 
 Gezielte Prüfungen:
 
 ```powershell
 python tools/run_tests.py --godot Godot_v4.7.2-stable_win64_console.exe --filter bot_pilot
 python tools/run_tests.py --godot Godot_v4.7.2-stable_win64_console.exe --suite extended --filter bot_comparison --filter earned_progression
-python -m unittest discover -s tools/tests -p test_bot_comparison.py
+python -m unittest discover -s tools/tests -p "test_bot*.py"
 ```
 
 Die Werkzeuge sind durch die bestehenden Exportfilter vom normalen Web- und

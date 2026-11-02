@@ -131,8 +131,11 @@ func sample_run(build: String, difficulty: StringName, movement: String, sample_
 			"spawn_plan": plan.digest, "start": start, "after_rewards": end,
 			"combat": battle, "all_loot": game.telemetry.current_wave_summary(), "strikes": strike_metrics.duplicate()})
 		if outcome != "wave_complete" or number == last_wave: break
-		shop_policy(game, build)
+		await shop_policy(game, build)
 		waves[-1]["after_shop"] = snapshot(game)
+		if run_aborted():
+			waves[-1].outcome = "aborted"
+			break
 	var final := snapshot(game)
 	var result := {"difficulty": str(difficulty), "build": build, "movement": movement, "seed": sample_seed,
 		"outcome": waves[-1].outcome, "wave": game.wave.current_wave,
@@ -165,6 +168,10 @@ func before_loot_step(_game, _frame: int) -> bool:
 	return true
 
 
+func before_intermission_action(_game, _phase: String, _detail: String) -> bool:
+	return true
+
+
 func run_aborted() -> bool:
 	return false
 
@@ -186,13 +193,19 @@ func resolve_intermission(game) -> void:
 		await process_frame
 	paused = true
 	for choice in 300:
-		if game.in_shop: return
+		if game.in_shop:
+			await before_intermission_action(game, "Shop", "Angebote · %d Gold" % game.coins)
+			return
 		match game.rewards.step:
 			PostWaveRewards.Step.LEVELS:
-				game._on_upgrade_chosen(level_choice(game))
+				var upgrade := level_choice(game)
+				if not await before_intermission_action(game, "Aufstieg", "Wählt " + upgrade.effect_text()): return
+				game._on_upgrade_chosen(upgrade)
 			PostWaveRewards.Step.WEAPONS:
-				spend_upgrade_points(game)
+				await spend_upgrade_points(game)
+				if run_aborted(): return
 			PostWaveRewards.Step.CHESTS:
+				if not await before_intermission_action(game, "Truhe", "Kapsel verschrotten" if game.weapon_chest_panel.visible else "Item behalten"): return
 				if game.weapon_chest_panel.visible: game._on_affix_scrapped()
 				else: game._on_chest_resolved(true)
 			_:
@@ -212,6 +225,12 @@ func level_choice(game) -> UpgradeData:
 
 
 func spend_upgrade_points(game) -> void:
+	plan_weapon_upgrades(game)
+	if not await before_intermission_action(game, "Verzauberungen", "Geplante Upgrades übernehmen"): return
+	game._on_weapon_upgrades_completed()
+
+
+func plan_weapon_upgrades(game) -> void:
 	var state: WeaponUpgradeState = game.rewards.weapon_upgrades
 	for point in 100:
 		var selected: WeaponInstance
@@ -224,7 +243,6 @@ func spend_upgrade_points(game) -> void:
 				selected = weapon
 				lowest = rank
 		if selected == null or not state.plan(game.player.loadout, selected.instance_uid, &"fire"): break
-	game._on_weapon_upgrades_completed()
 
 
 func shop_policy(game, build: String) -> void:
@@ -233,19 +251,33 @@ func shop_policy(game, build: String) -> void:
 		for index in game.shop.offers.size():
 			var offer: ShopOfferData = game.shop.offers[index]
 			if offer != null and offer.weapon_data != null and str(offer.weapon_data.id) == build and game.coins >= offer.price:
+				if not await before_shop_purchase(game, offer): return
 				game._on_shop_buy(index)
 		if not item_bought:
-			for id: String in STAPLES:
-				for index in game.shop.offers.size():
-					var offer: ShopOfferData = game.shop.offers[index]
-					if offer != null and str(offer.id) == id and game.coins >= offer.price and game.items.can_acquire(offer):
-						game._on_shop_buy(index)
-						item_bought = true
-						break
-				if item_bought: break
+			var index := shop_item_index(game)
+			if index >= 0:
+				if not await before_shop_purchase(game, game.shop.offers[index]): return
+				game._on_shop_buy(index)
+				item_bought = true
 		var cheapest := EconomyRules.shop_price(WeaponCatalog.by_id(StringName(build)).price, game.wave.current_wave)
 		if roll == MAX_REROLLS or game.coins < game.shop.reroll_cost + cheapest: break
+		if not await before_intermission_action(game, "Shop", "Reroll · %d Gold" % game.shop.reroll_cost): return
 		game._on_shop_reroll()
+		if not await before_intermission_action(game, "Shop", "Neue Angebote · %d Gold" % game.coins): return
+	await before_intermission_action(game, "Shop", "Fertig · %d Gold übrig" % game.coins)
+
+
+func before_shop_purchase(game, offer: ShopOfferData) -> bool:
+	if offer.weapon_data != null and not game.player.loadout.can_acquire(offer.weapon_data, offer.weapon_tier): return true
+	return await before_intermission_action(game, "Shop", "Kauft %s · %d Gold" % [offer.display_name, offer.price])
+
+
+func shop_item_index(game) -> int:
+	for id: String in STAPLES:
+		for index in game.shop.offers.size():
+			var offer: ShopOfferData = game.shop.offers[index]
+			if offer != null and str(offer.id) == id and game.coins >= offer.price and game.items.can_acquire(offer): return index
+	return -1
 
 
 func farm_direction(game, movement: String, elapsed: float) -> Vector2:
