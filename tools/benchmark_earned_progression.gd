@@ -70,14 +70,15 @@ func make_run(build: String, difficulty: StringName, sample_seed: int):
 	return game
 
 
-func sample_run(build: String, difficulty: StringName, movement: String, sample_seed: int, last_wave: int = 5) -> Dictionary:
+func sample_run(build: String, difficulty: StringName, movement: String, sample_seed: int, last_wave: int = 5, first_wave: int = 1) -> Dictionary:
+	assert(first_wave >= 1 and first_wave <= last_wave)
 	var game = make_run(build, difficulty, sample_seed)
 	var waves: Array[Dictionary] = []
 	var aborted := false
-	for number in range(1, last_wave + 1):
+	for number in range(first_wave, last_wave + 1):
 		var plan: Dictionary = PROFILES.spawn_plan(number, sample_seed + number * 7919, difficulty)
 		seed(sample_seed + number * 104729)
-		if number == 1: game._start_combat_wave()
+		if number == first_wave: game._start_combat_wave()
 		else: game._on_shop_continue()
 		paused = true
 		game.wave.current_profile_id = StringName(plan.profile)
@@ -226,15 +227,18 @@ func level_choice(game) -> UpgradeData:
 
 func spend_upgrade_points(game) -> void:
 	var state: WeaponUpgradeState = game.rewards.weapon_upgrades
-	if not await before_intermission_action(game, "Verzauberungen", "%d Punkte verfügbar" % state.remaining()): return
+	await before_intermission_action(game, "Verzauberungen", "%d Punkte verfügbar" % state.remaining())
+	if run_aborted(): return
 	for action in weapon_upgrade_actions(game):
 		var detail: String = plan_weapon_upgrade(game, action)
 		if detail.is_empty():
 			push_error("Cannot apply the planned bot enchantment step")
 			failures += 1
 			return
-		if not await before_intermission_action(game, "Verzauberungen", detail): return
-	if not await before_intermission_action(game, "Verzauberungen", "Geplante Upgrades übernehmen"): return
+		await before_intermission_action(game, "Verzauberungen", detail)
+		if run_aborted(): return
+	await before_intermission_action(game, "Verzauberungen", "Geplante Upgrades übernehmen")
+	if run_aborted(): return
 	game._on_weapon_upgrades_completed()
 
 

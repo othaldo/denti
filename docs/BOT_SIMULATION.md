@@ -136,6 +136,10 @@ nicht sichtbare Zielpunkte werden nicht übergeben.
 
 Der Ausweichplaner bewertet Körperkontakt, aktuelle Projektilbahnen, sichtbare
 Puls-/Sturmwarnungen und die gerade angekündigten Mantelsektoren des Grafen.
+Warnflächen werden zur sichtbaren Einschlagszeit statt schon beim Durchqueren
+der Vorbereitung bewertet. Verzögerte Beobachtungen werden aus ihren bisherigen
+Bewegungen fortgeschrieben; bei Warnungen kann der Pilot auch langsamer gehen,
+um etwa innerhalb eines sicheren Ringlochs abzubremsen.
 Beim Dash werden Gegner, Projektile und aktive Warnflächen auch **auf dem Weg**
 geprüft. Ausgeführt wird der echte `PlayerDash` mit Kosten, Cooldown und den
 normalen Kollisions-/Schadensregeln.
@@ -146,6 +150,9 @@ Die alten Checkpoint-Vergleiche für späte Wellen bleiben separat vorhanden.
 „Erfahren“ ist außerdem kein Beweis dafür, dass der Pilot in jeder Waffen- und
 Strategiesituation besser spielt. Mehr Ausweichen kann Angriffszeit kosten;
 die Profile benötigen weitere Kalibrierung und menschliche Gegenproben.
+Die [erste gezielte Boss-Kalibrierung](BOSS_PILOT.md) vergleicht alte und neue
+Bewegung mit identischen gespeicherten Boss-Startbuilds und prüft zusätzliche
+Seeds sowie alle 18 Startwaffen.
 
 ## Zeit, Ergebnisse und Reproduktion
 

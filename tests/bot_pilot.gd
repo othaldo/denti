@@ -57,12 +57,32 @@ func _run() -> void:
 	_check(brain.danger(world, Vector2.ZERO) > 0, "pilot ignored a currently announced cloak sector")
 	world.hazards[0].time = 2.0
 	_check(brain.danger(world, Vector2.ZERO) == 0, "pilot treated a far future warning as an immediate hit")
+	world.hazards[0].time = 0.7
+	_check(brain.danger(world, Vector2.UP) < brain.danger(world, Vector2.ZERO), "starting inside a warning made a safe side exit look equally dangerous")
+	world.hazards[0].time = 0.1
+	_check(brain.danger(world, Vector2.UP) < brain.danger(world, Vector2.ZERO), "urgent warning gave no preference to progress toward safety")
+	world.hazards[0].time = -0.2
+	world.hazards[0].duration = 0.1
+	_check(brain.danger(world, Vector2.ZERO) == 0, "pilot avoided a strike after its damage window ended")
+	world.hazards = [{"shape": "sector", "position": Vector2(800, 540), "direction": Vector2.RIGHT,
+		"radius": 340.0, "inner": 140.0, "angle": PI, "time": 0.7, "duration": 0.1}]
+	_check(brain.danger(world, Vector2.LEFT) < brain.danger(world, Vector2.RIGHT), "pilot missed the safe inner opening of a warned ring")
+	world.enemies = [{"position": Vector2(800, 540), "velocity": Vector2.ZERO, "radius": 48.0, "boss": true}]
+	_check(brain.danger(world, Vector2.LEFT * 0.35) < brain.danger(world, Vector2.LEFT), "pilot failed to distinguish braking into a safe ring opening from crossing the boss")
+	world.enemies = []
+	world.frame = 0
+	world.velocity = Vector2(100, 0)
+	var predicted := brain._predict_observation(world, 6)
+	_check(is_equal_approx(float(predicted.hazards[0].time), 0.6) and predicted.position == world.position + Vector2(10, 0), "pilot ignored the age of its delayed warning/self observation")
+	_check(world.hazards[0].time == 0.7 and world.position == Vector2(960, 540), "prediction mutated a frozen delayed observation")
 	world.enemies = [{"position": Vector2(1050, 540), "velocity": Vector2.ZERO, "radius": 20.0, "boss": false}]
 	_check(brain.dash_risk(world, Vector2.RIGHT) >= 3, "dash planner ignored enemies along its path")
 	world.enemies = []
 	world.hazards = []
 	world.projectiles = [{"position": Vector2(1050, 540), "velocity": Vector2.ZERO, "radius": 21.0, "life": 2.0}]
 	_check(brain.dash_risk(world, Vector2.RIGHT) > 0, "dash planner checked landing only and crossed a projectile mid-route")
+	world.projectiles[0].position = Vector2(1110, 540)
+	_check(brain.dash_risk(world, Vector2.RIGHT * 0.35) == brain.dash_risk(world, Vector2.RIGHT), "partial walking input incorrectly shortened the real normalized dash")
 	# Strategy changes a goal without changing reaction/avoidance settings.
 	world = _world()
 	world.enemies = [{"position": Vector2(1000, 540), "velocity": Vector2.ZERO, "radius": 20.0, "boss": false},
@@ -71,6 +91,16 @@ func _run() -> void:
 	_check(brain.goal_direction(world).x > 0.9, "collector did not seek visible loot")
 	brain.strategy = "boss"
 	_check(brain.goal_direction(world).x < 0, "boss strategy ignored the visible boss")
+	# Conservative planning geometry must include every actual sector/ring hit,
+	# including the circle around a sector's origin and its radial edge caps.
+	for inner: float in [0.0, 130.0]:
+		var hazard := {"shape": "sector", "position": Vector2.ZERO, "direction": Vector2.RIGHT,
+			"radius": 340.0, "inner": inner, "angle": PI if inner > 0 else deg_to_rad(40.0)}
+		for radius: float in [0.0, 10.0, 20.0, 70.0, 110.0, 130.0, 290.0, 309.0, 340.0, 360.0]:
+			for index in 48:
+				var point := Vector2.from_angle(TAU * index / 48.0) * radius
+				var actual := HazardGeometry.circle_ring(point, Vector2.ZERO, inner, 340.0) if inner > 0 else HazardGeometry.circle_sector(point, Vector2.ZERO, Vector2.RIGHT, 340.0, deg_to_rad(40.0))
+				_check(not actual or BRAIN._hazard_contains(hazard, point), "pilot marked an actual sector/ring collision as safe")
 	await _viewer_controls()
 	print("PASS bot pilots: delayed perception, isolated mistakes, projectile/sector avoidance, safe dash routes, distinct goals and invariant viewer clock")
 	finish(1 if failures else 0)

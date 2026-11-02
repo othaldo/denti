@@ -4,6 +4,8 @@ Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü an
 
 ## Noch ohne neue Versionsnummer — 02.11.2026
 
+- **Testpilot weicht dem ersten Boss gezielter aus:** Warnungen werden zum tatsächlichen Trefferfenster bewertet; verzögerte Beobachtungen werden fortgeschrieben. Langsame Schritte erlauben sichere Positionen in Ringangriffen. Eine Gegenprobe mit gleichen gespeicherten Startbuilds verbessert sich von 6/18 auf 17/18 Bosskills, ohne Waffen- oder Gegnerwerte zu ändern. [Messung, weitere Seeds und Grenzen](docs/BOSS_PILOT.md).
+
 - **Bot-Test per UI starten:** Lokaler Python-Launcher mit Waffen-, Bot-, Strategie-, Build- und Schwierigkeitsauswahl, gespeicherten Einstellungen und Berichtzugriff. Sichtbare Testläufe zeigen jetzt die echten Aufstiege, Verzauberungspläne, Käufe und Rerolls. Die Tempowahl gilt auch im Shop; Leertaste hält die aktuelle Entscheidung an. [Aufruf und Bedienung](docs/BOT_SIMULATION.md).
 
 - **Verzauberungsschritte im Botlauf:** Jeder Punkteeinsatz zeigt einzeln das Waffenexemplar, den neuen Rang und die verbleibenden Punkte. Tempo und Pause gelten auch zwischen diesen Schritten. Die Buildregeln heißen im Launcher jetzt „Feuer-Referenz“ und „Synergie-Heuristik“, um ihre festen Entscheidungsregeln kenntlich zu machen.

@@ -41,10 +41,13 @@ func capture(game, frame: int) -> Dictionary:
 		var cloak := enemy.cloak_encounter
 		if cloak != null and cloak.state in [CloakEncounter.State.WARNING, CloakEncounter.State.STRIKE]:
 			var shape := cloak.profile.strike(cloak.variant)
-			hazards.append({"shape": "sector", "position": cloak.origin, "direction": cloak.direction,
-				"radius": shape.reach, "inner": shape.inner_radius,
-				"angle": PI if cloak.variant == CloakStrikeData.Kind.RING else cloak.half_angle,
-				"time": cloak.remaining if cloak.state == CloakEncounter.State.WARNING else 0.0})
+			var age := cloak.profile.strike_seconds - cloak.remaining if cloak.state == CloakEncounter.State.STRIKE else 0.0
+			if cloak.state == CloakEncounter.State.WARNING or age < cloak.profile.hit_end:
+				hazards.append({"shape": "sector", "position": cloak.origin, "direction": cloak.direction,
+					"radius": shape.reach, "inner": shape.inner_radius,
+					"angle": PI if cloak.variant == CloakStrikeData.Kind.RING else cloak.half_angle,
+					"time": cloak.remaining + cloak.profile.hit_start if cloak.state == CloakEncounter.State.WARNING else maxf(cloak.profile.hit_start - age, 0),
+					"duration": cloak.profile.hit_end - maxf(age, cloak.profile.hit_start)})
 	previous_positions = positions
 	previous_frame = frame
 	for projectile: AcidProjectile in game.get_node("EnemyProjectiles").get_children():
@@ -56,7 +59,7 @@ func capture(game, frame: int) -> Dictionary:
 	projectiles.sort_custom(func(a: Dictionary, b: Dictionary): return at.distance_squared_to(a.position) < at.distance_squared_to(b.position))
 	var reach := INF
 	for weapon: WeaponInstance in player.loadout.equipped(): reach = minf(reach, weapon.data.range_at_tier(weapon.tier))
-	return {"position": at, "arena": arena, "speed": player.stats.move_speed,
+	return {"frame": frame, "position": at, "velocity": player.velocity, "arena": arena, "speed": player.stats.move_speed,
 		"reach": reach if is_finite(reach) else 100.0, "health": player.stats.health / player.stats.max_health,
 		"dash_distance": player.dash.config.distance, "dash_seconds": player.dash.config.duration, "dash_ready": player.dash.ready_to_dash(),
 		"enemies": enemies.slice(0, MAX_ENEMIES), "projectiles": projectiles.slice(0, MAX_PROJECTILES), "hazards": hazards, "loot": loot}

@@ -2,6 +2,7 @@ extends RefCounted
 ## Deterministic delayed perception. This RNG never consumes combat/shop draws.
 
 const PROFILE = preload("res://tools/balance/bots/pilot_profile.gd")
+const HAZARDS = preload("res://tools/balance/bots/pilot_hazards.gd")
 const PROFILES := {
 	"novice": preload("res://tools/balance/bots/novice.tres"),
 	"regular": preload("res://tools/balance/bots/regular.tres"),
@@ -9,6 +10,7 @@ const PROFILES := {
 }
 const STRATEGIES := ["aggressive", "kite", "collector", "boss"]
 const PLAYER_RADIUS := 18.0
+const WARNING_SPEEDS := [1.0, 0.65, 0.35]
 var profile: PROFILE
 var strategy := "kite"
 var rng := RandomNumberGenerator.new()
@@ -38,19 +40,21 @@ func step(frame: int, observation: Dictionary) -> Vector2:
 		pending.append({"ready": frame + int(profile.reaction_ticks), "world": observation})
 	if pending.is_empty() or int(pending[0].ready) > frame:
 		return direction
-	var world: Dictionary = pending.pop_front().world
+	var world: Dictionary = _predict_observation(pending.pop_front().world, frame)
 	decisions += 1
 	observed_warnings += world.hazards.size() if profile.reads_warnings else 0
 	observed_projectiles += world.projectiles.size()
 	var desired := goal_direction(world)
 	var best := Vector2.ZERO
 	var best_cost := INF
+	var speeds := WARNING_SPEEDS if profile.reads_warnings and not world.hazards.is_empty() else [1.0]
 	for index in range(-1, 16):
-		var candidate := Vector2.ZERO if index < 0 else Vector2.RIGHT.rotated(TAU * index / 16.0)
-		var cost := candidate.distance_squared_to(desired) + danger(world, candidate) * float(profile.avoidance_weight)
-		if cost < best_cost:
-			best_cost = cost
-			best = candidate
+		for speed: float in speeds:
+			var candidate := Vector2.ZERO if index < 0 else Vector2.RIGHT.rotated(TAU * index / 16.0) * speed
+			var cost := candidate.distance_squared_to(desired) + danger(world, candidate) * float(profile.avoidance_weight)
+			if cost < best_cost:
+				best_cost = cost
+				best = candidate
 	# Draw twice on every decision, even on the error-free profile.
 	var error_roll := rng.randf()
 	var error_angle := rng.randf_range(-1, 1)
@@ -103,18 +107,14 @@ func danger(world: Dictionary, candidate: Vector2, horizon: float = -1) -> float
 		result += _collision_risk(projectile.position - at, Vector2(projectile.velocity) - velocity, float(projectile.radius) + 6, minf(seconds, float(projectile.life))) * 2
 	if profile.reads_warnings:
 		for hazard: Dictionary in world.hazards:
-			if float(hazard.time) > seconds: continue
-			for fraction in [0.0, 0.5, 1.0]:
-				if _hazard_contains(hazard, at + velocity * seconds * fraction):
-					result += 2.0
-					break
+			result += HAZARDS.risk(hazard, at, velocity, seconds)
 	return result
 
 func dash_risk(world: Dictionary, candidate: Vector2) -> float:
 	var result := 0.0
 	# Dash contact remains dangerous in Denti: check the whole path, not just landing.
 	var start: Vector2 = world.position
-	var end := start + candidate * float(world.dash_distance)
+	var end := start + candidate.normalized() * float(world.dash_distance)
 	var margin := DentiArena.PLAYER_MARGIN + 8
 	if end != end.clamp(Vector2.ONE * margin, Vector2(world.arena) - Vector2.ONE * margin): return 1000
 	for enemy: Dictionary in world.enemies:
@@ -141,14 +141,18 @@ static func _collision_risk(offset: Vector2, velocity: Vector2, radius: float, s
 	return maxf(1.0 - distance / maxf(radius, 1), 0.0) * (1.0 + 0.3 / (time + 0.2))
 
 static func _hazard_contains(hazard: Dictionary, point: Vector2) -> bool:
-	if hazard.get("shape", "circle") == "capsule":
-		return Geometry2D.get_closest_point_to_segment(point, hazard.position, hazard.end).distance_to(point) <= float(hazard.radius) + PLAYER_RADIUS
-	var offset: Vector2 = point - Vector2(hazard.position)
-	var distance := offset.length()
-	if distance > float(hazard.radius) + PLAYER_RADIUS or distance < maxf(float(hazard.get("inner", 0)) - PLAYER_RADIUS, 0): return false
-	if hazard.get("shape", "circle") == "sector" and distance > PLAYER_RADIUS:
-		return absf(Vector2(hazard.direction).angle_to(offset)) <= float(hazard.angle) + asin(minf(PLAYER_RADIUS / distance, 1))
-	return true
+	return HAZARDS.contains(hazard, point)
+
+func _predict_observation(observed: Dictionary, frame: int) -> Dictionary:
+	var world := observed.duplicate(true)
+	var age := maxf((frame - int(world.get("frame", frame))) / 60.0, 0)
+	world.position += Vector2(world.get("velocity", Vector2.ZERO)) * age
+	for enemy: Dictionary in world.enemies: enemy.position += Vector2(enemy.velocity) * age
+	for projectile: Dictionary in world.projectiles:
+		projectile.position += Vector2(projectile.velocity) * age
+		projectile.life = maxf(float(projectile.life) - age, 0)
+	for hazard: Dictionary in world.hazards: hazard.time = float(hazard.time) - age
+	return world
 
 func metrics() -> Dictionary:
 	return {"decisions": decisions, "mistakes": mistakes, "dash_requests": dash_requests,

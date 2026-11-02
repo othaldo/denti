@@ -1,0 +1,6569 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-02",
+  "baseline_revision": "b748f4dffe752d298f920d5d667ec61227d5e6df",
+  "candidate_source_sha256": "49cf2ee3cae2446e525d79d90f566a33cdf830382b7721edebbe9475d0aab1dd",
+  "replay_source_sha256": "7e2b574fc9b998a0c3b4e065efde4c0645c024740e55fe87cd3056d87d3eb6a8",
+  "method": "Paired W5 reconstruction from the same earned arrival. Identical HP, stats, equipment, items, wallet and spawn plan. Fresh weapon runtime, status state and pilot RNG in BOTH arms; not a bit-exact full-run replay. Expert only. No purchases or player/enemy balance changes.",
+  "limits": [
+    "W1-5 only; rule-based pilots, no human winrates.",
+    "Development seeds were used for tuning; final holdout seeds were inspected only after the policy was frozen.",
+    "Roster coverage is one seed per weapon/difficulty and uses the fire reference build.",
+    "Both reconstruction arms have fresh weapon runtime, status state and pilot RNG; this is not exact save/resume replay."
+  ],
+  "samples": [
+    {
+      "difficulty": "hell",
+      "build": "floss_whip",
+      "strategy": "boss",
+      "seed": 112233,
+      "skill": "expert",
+      "build_policy": "simple",
+      "waves": [
+        {
+          "wave": 5,
+          "start": {
+            "chests": 6,
+            "coins": 59,
+            "equipment": [
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 11.4204597369179,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 4,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 4
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 19,
+                "rolls": {
+                  "crit": 0.008,
+                  "damage": 1.0,
+                  "interval": 1.0,
+                  "quality": 2,
+                  "range": 1.0
+                },
+                "tier": 2,
+                "uid": "earned_starter",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 5.71022986845895,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 21,
+                "rolls": {
+                  "crit": 0.022,
+                  "damage": 0.833,
+                  "interval": 1.188,
+                  "quality": 1,
+                  "range": 0.944
+                },
+                "tier": 2,
+                "uid": "22409160:2187077881775",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 5.71022986845895,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 20,
+                "rolls": {
+                  "crit": 0.035,
+                  "damage": 1.008,
+                  "interval": 1.227,
+                  "quality": 1,
+                  "range": 0.911
+                },
+                "tier": 2,
+                "uid": "22446193:2203586663773",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 5.71022986845895,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 20,
+                "rolls": {
+                  "crit": 0.063,
+                  "damage": 0.935,
+                  "interval": 0.963,
+                  "quality": 2,
+                  "range": 0.924
+                },
+                "tier": 2,
+                "uid": "22476150:2217528532058",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 3.42613792107537,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 1,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 1
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 38,
+                "rolls": {
+                  "crit": 0.098,
+                  "damage": 1.551,
+                  "interval": 0.807,
+                  "quality": 4,
+                  "range": 1.234
+                },
+                "tier": 3,
+                "uid": "24005407:2366996749569",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 3.42613792107537,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 1,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 1
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 23,
+                "rolls": {
+                  "crit": 0.036,
+                  "damage": 0.939,
+                  "interval": 1.204,
+                  "quality": 1,
+                  "range": 0.909
+                },
+                "tier": 2,
+                "uid": "24041147:2383522306961",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              }
+            ],
+            "gold_earned": 260,
+            "items": {
+              "coin_fraction": 0.0,
+              "cooldowns": {
+                "enchantment_fire": 0.0,
+                "xp_heal_feedback": 0.333333333333333
+              },
+              "dodge_guard": 0,
+              "kill_burst": 0,
+              "kill_coin": 0,
+              "kill_heal": 0,
+              "overheal_bank": 0.0,
+              "owned": {
+                "damage_1": 1,
+                "health_1": 2,
+                "xp_heal_1": 1
+              },
+              "puddles": [],
+              "sugar_crash": 0.0,
+              "sugar_kills": 0,
+              "sugar_rush": 0.0,
+              "xp_fraction": 0.0
+            },
+            "level": 12,
+            "stats": {
+              "armor": 2.0,
+              "attack_speed": 30.0,
+              "crit_chance": 0.05,
+              "damage_bonus": 6.0,
+              "dash_recovery_bonus": 0.0,
+              "dodge_chance": 0.0,
+              "health": 131.287324717984,
+              "luck": 0.0,
+              "max_health": 154.0,
+              "melee_damage": 10.0,
+              "ranged_damage": 0.0,
+              "regen": 0.0,
+              "regen_progress": 0.0,
+              "root_capacity": 6,
+              "shield_charges": 0,
+              "speed_bonus": -4.0,
+              "stat_model_version": 3
+            },
+            "upgrade_points": 0,
+            "xp": 31,
+            "xp_earned": 251,
+            "xp_goal": 38
+          }
+        }
+      ],
+      "original_full_run": {
+        "difficulty": "hell",
+        "build": "floss_whip",
+        "strategy": "boss",
+        "seed": 112233,
+        "outcome": "death",
+        "wave": 5,
+        "seconds": 12.1333333333333,
+        "level": 12,
+        "gold_earned": 267,
+        "xp_earned": 254,
+        "wave_start_hp": 131.287324717984,
+        "wave_start_max_hp": 154.0,
+        "damage_taken": 131.587324717984,
+        "dashes": 3
+      },
+      "paired_reconstruction": {
+        "reference": {
+          "difficulty": "hell",
+          "build": "floss_whip",
+          "strategy": "boss",
+          "seed": 112233,
+          "outcome": "death",
+          "wave": 5,
+          "seconds": 12.1333333333333,
+          "level": 12,
+          "gold_earned": 7,
+          "xp_earned": 3,
+          "wave_start_hp": 131.287324717984,
+          "wave_start_max_hp": 154.0,
+          "damage_taken": 131.587324717984,
+          "dashes": 3
+        },
+        "revised": {
+          "difficulty": "hell",
+          "build": "floss_whip",
+          "strategy": "boss",
+          "seed": 112233,
+          "outcome": "boss_killed",
+          "wave": 5,
+          "seconds": 25.3166666666667,
+          "level": 13,
+          "gold_earned": 37,
+          "xp_earned": 33,
+          "wave_start_hp": 131.287324717984,
+          "wave_start_max_hp": 154.0,
+          "damage_taken": 69.8877499382139,
+          "dashes": 6
+        }
+      }
+    },
+    {
+      "difficulty": "hell",
+      "build": "floss_whip",
+      "strategy": "boss",
+      "seed": 13579,
+      "skill": "expert",
+      "build_policy": "simple",
+      "waves": [
+        {
+          "wave": 5,
+          "start": {
+            "chests": 4,
+            "coins": 20,
+            "equipment": [
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 5.71022986845895,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 39,
+                "rolls": {
+                  "crit": 0.033,
+                  "damage": 1.203,
+                  "interval": 0.997,
+                  "quality": 2,
+                  "range": 1.032
+                },
+                "tier": 3,
+                "uid": "earned_starter",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 5.71022986845895,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 21,
+                "rolls": {
+                  "crit": 0.066,
+                  "damage": 1.146,
+                  "interval": 1.059,
+                  "quality": 2,
+                  "range": 1.031
+                },
+                "tier": 2,
+                "uid": "5498273:465215427520",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 3.42613792107537,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 1,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 1
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 21,
+                "rolls": {
+                  "crit": 0.062,
+                  "damage": 1.42,
+                  "interval": 0.96,
+                  "quality": 3,
+                  "range": 1.111
+                },
+                "tier": 2,
+                "uid": "5576775:489827604407",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 3.42613792107537,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 1,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 1
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 22,
+                "rolls": {
+                  "crit": 0.046,
+                  "damage": 1.132,
+                  "interval": 1.022,
+                  "quality": 2,
+                  "range": 0.978
+                },
+                "tier": 2,
+                "uid": "7250633:635403507737",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 3.42613792107537,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 1,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 1
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 23,
+                "rolls": {
+                  "crit": 0.033,
+                  "damage": 0.951,
+                  "interval": 1.299,
+                  "quality": 1,
+                  "range": 0.947
+                },
+                "tier": 2,
+                "uid": "7318620:666474911017",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 3.42613792107537,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 1,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 1
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 18,
+                "rolls": {
+                  "crit": 0.037,
+                  "damage": 0.691,
+                  "interval": 1.246,
+                  "quality": 1,
+                  "range": 0.859
+                },
+                "tier": 2,
+                "uid": "9353329:837015313351",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              }
+            ],
+            "gold_earned": 221,
+            "items": {
+              "coin_fraction": 0.0,
+              "cooldowns": {
+                "enchantment_fire": 0.0
+              },
+              "dodge_guard": 0,
+              "kill_burst": 0,
+              "kill_coin": 0,
+              "kill_heal": 5,
+              "overheal_bank": 0.0,
+              "owned": {
+                "damage_1": 1,
+                "health_1": 1,
+                "regen_1": 1
+              },
+              "puddles": [],
+              "sugar_crash": 0.0,
+              "sugar_kills": 0,
+              "sugar_rush": 0.0,
+              "xp_fraction": 0.0
+            },
+            "level": 11,
+            "stats": {
+              "armor": 5.0,
+              "attack_speed": 20.0,
+              "crit_chance": 0.05,
+              "damage_bonus": 14.0,
+              "dash_recovery_bonus": 0.0,
+              "dodge_chance": 0.0,
+              "health": 95.1209907153833,
+              "luck": 0.0,
+              "max_health": 107.0,
+              "melee_damage": 14.0,
+              "ranged_damage": 0.0,
+              "regen": 1.0,
+              "regen_progress": 0.966666666666663,
+              "root_capacity": 6,
+              "shield_charges": 0,
+              "speed_bonus": -2.0,
+              "stat_model_version": 3
+            },
+            "upgrade_points": 0,
+            "xp": 21,
+            "xp_earned": 206,
+            "xp_goal": 35
+          }
+        }
+      ],
+      "original_full_run": {
+        "difficulty": "hell",
+        "build": "floss_whip",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "death",
+        "wave": 5,
+        "seconds": 13.35,
+        "level": 11,
+        "gold_earned": 231,
+        "xp_earned": 218,
+        "wave_start_hp": 95.1209907153833,
+        "wave_start_max_hp": 107.0,
+        "damage_taken": 103.120990715383,
+        "dashes": 3
+      },
+      "paired_reconstruction": {
+        "reference": {
+          "difficulty": "hell",
+          "build": "floss_whip",
+          "strategy": "boss",
+          "seed": 13579,
+          "outcome": "death",
+          "wave": 5,
+          "seconds": 13.35,
+          "level": 11,
+          "gold_earned": 10,
+          "xp_earned": 12,
+          "wave_start_hp": 95.1209907153833,
+          "wave_start_max_hp": 107.0,
+          "damage_taken": 103.120990715383,
+          "dashes": 3
+        },
+        "revised": {
+          "difficulty": "hell",
+          "build": "floss_whip",
+          "strategy": "boss",
+          "seed": 13579,
+          "outcome": "boss_killed",
+          "wave": 5,
+          "seconds": 26.05,
+          "level": 12,
+          "gold_earned": 31,
+          "xp_earned": 37,
+          "wave_start_hp": 95.1209907153833,
+          "wave_start_max_hp": 107.0,
+          "damage_taken": 29.7022937237409,
+          "dashes": 6
+        }
+      }
+    },
+    {
+      "difficulty": "hell",
+      "build": "floss_whip",
+      "strategy": "boss",
+      "seed": 24680,
+      "skill": "expert",
+      "build_policy": "simple",
+      "waves": [
+        {
+          "wave": 5,
+          "start": {
+            "chests": 5,
+            "coins": 19,
+            "equipment": [
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 5.71022986845895,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 20,
+                "rolls": {
+                  "crit": 0.088,
+                  "damage": 1.394,
+                  "interval": 0.831,
+                  "quality": 3,
+                  "range": 1.138
+                },
+                "tier": 2,
+                "uid": "earned_starter",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 3,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 5.71022986845895,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 38,
+                "rolls": {
+                  "crit": 0.081,
+                  "damage": 1.319,
+                  "interval": 0.957,
+                  "quality": 3,
+                  "range": 1.109
+                },
+                "tier": 3,
+                "uid": "14383788:1335097302274",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 5.71022986845895,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 22,
+                "rolls": {
+                  "crit": 0.066,
+                  "damage": 1.075,
+                  "interval": 1.051,
+                  "quality": 2,
+                  "range": 0.987
+                },
+                "tier": 2,
+                "uid": "15819921:1492819909031",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 5.71022986845895,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 23,
+                "rolls": {
+                  "crit": 0.057,
+                  "damage": 0.942,
+                  "interval": 1.006,
+                  "quality": 2,
+                  "range": 1.029
+                },
+                "tier": 2,
+                "uid": "15865948:1513774650589",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 3.42613792107537,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 1,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 1
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 25,
+                "rolls": {
+                  "crit": 0.033,
+                  "damage": 0.844,
+                  "interval": 1.117,
+                  "quality": 1,
+                  "range": 0.959
+                },
+                "tier": 2,
+                "uid": "17926520:1671530812654",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 3.42613792107537,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 1,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 1
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 25,
+                "rolls": {
+                  "crit": 0.038,
+                  "damage": 0.903,
+                  "interval": 1.167,
+                  "quality": 1,
+                  "range": 0.938
+                },
+                "tier": 2,
+                "uid": "17964449:1687922154333",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              }
+            ],
+            "gold_earned": 223,
+            "items": {
+              "coin_fraction": 0.0,
+              "cooldowns": {
+                "enchantment_fire": 0.0
+              },
+              "dodge_guard": 0,
+              "kill_burst": 0,
+              "kill_coin": 0,
+              "kill_heal": 0,
+              "overheal_bank": 0.0,
+              "owned": {
+                "damage_1": 1,
+                "health_1": 1
+              },
+              "puddles": [],
+              "sugar_crash": 0.0,
+              "sugar_kills": 0,
+              "sugar_rush": 0.0,
+              "xp_fraction": 0.0
+            },
+            "level": 11,
+            "stats": {
+              "armor": 1.0,
+              "attack_speed": 15.0,
+              "crit_chance": 0.05,
+              "damage_bonus": 5.0,
+              "dash_recovery_bonus": 0.0,
+              "dodge_chance": 0.0,
+              "health": 74.6133914170293,
+              "luck": 0.0,
+              "max_health": 142.0,
+              "melee_damage": 20.0,
+              "ranged_damage": 0.0,
+              "regen": 0.0,
+              "regen_progress": 0.0,
+              "root_capacity": 6,
+              "shield_charges": 0,
+              "speed_bonus": -2.0,
+              "stat_model_version": 3
+            },
+            "upgrade_points": 0,
+            "xp": 31,
+            "xp_earned": 216,
+            "xp_goal": 35
+          }
+        }
+      ],
+      "original_full_run": {
+        "difficulty": "hell",
+        "build": "floss_whip",
+        "strategy": "boss",
+        "seed": 24680,
+        "outcome": "death",
+        "wave": 5,
+        "seconds": 9.73333333333333,
+        "level": 11,
+        "gold_earned": 225,
+        "xp_earned": 218,
+        "wave_start_hp": 74.6133914170293,
+        "wave_start_max_hp": 142.0,
+        "damage_taken": 74.6133914170293,
+        "dashes": 3
+      },
+      "paired_reconstruction": {
+        "reference": {
+          "difficulty": "hell",
+          "build": "floss_whip",
+          "strategy": "boss",
+          "seed": 24680,
+          "outcome": "death",
+          "wave": 5,
+          "seconds": 9.73333333333333,
+          "level": 11,
+          "gold_earned": 2,
+          "xp_earned": 2,
+          "wave_start_hp": 74.6133914170293,
+          "wave_start_max_hp": 142.0,
+          "damage_taken": 74.6133914170293,
+          "dashes": 3
+        },
+        "revised": {
+          "difficulty": "hell",
+          "build": "floss_whip",
+          "strategy": "boss",
+          "seed": 24680,
+          "outcome": "boss_killed",
+          "wave": 5,
+          "seconds": 29.1166666666667,
+          "level": 12,
+          "gold_earned": 43,
+          "xp_earned": 38,
+          "wave_start_hp": 74.6133914170293,
+          "wave_start_max_hp": 142.0,
+          "damage_taken": 0.0,
+          "dashes": 6
+        }
+      }
+    },
+    {
+      "difficulty": "hell",
+      "build": "floss_whip",
+      "strategy": "kite",
+      "seed": 112233,
+      "skill": "expert",
+      "build_policy": "simple",
+      "waves": [
+        {
+          "wave": 5,
+          "start": {
+            "chests": 6,
+            "coins": 59,
+            "equipment": [
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 11.4204597369179,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 4,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 4
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 19,
+                "rolls": {
+                  "crit": 0.008,
+                  "damage": 1.0,
+                  "interval": 1.0,
+                  "quality": 2,
+                  "range": 1.0
+                },
+                "tier": 2,
+                "uid": "earned_starter",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 5.71022986845895,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 21,
+                "rolls": {
+                  "crit": 0.022,
+                  "damage": 0.833,
+                  "interval": 1.188,
+                  "quality": 1,
+                  "range": 0.944
+                },
+                "tier": 2,
+                "uid": "22870010:2211908161440",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 5.71022986845895,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 20,
+                "rolls": {
+                  "crit": 0.035,
+                  "damage": 1.008,
+                  "interval": 1.227,
+                  "quality": 1,
+                  "range": 0.911
+                },
+                "tier": 2,
+                "uid": "22905861:2228416942521",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 5.71022986845895,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 20,
+                "rolls": {
+                  "crit": 0.063,
+                  "damage": 0.935,
+                  "interval": 0.963,
+                  "quality": 2,
+                  "range": 0.924
+                },
+                "tier": 2,
+                "uid": "22936428:2242358811738",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 3.42613792107537,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 1,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 1
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 38,
+                "rolls": {
+                  "crit": 0.098,
+                  "damage": 1.551,
+                  "interval": 0.807,
+                  "quality": 4,
+                  "range": 1.234
+                },
+                "tier": 3,
+                "uid": "24484259:2391843806477",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 3.42613792107537,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 1,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 1
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 23,
+                "rolls": {
+                  "crit": 0.036,
+                  "damage": 0.939,
+                  "interval": 1.204,
+                  "quality": 1,
+                  "range": 0.909
+                },
+                "tier": 2,
+                "uid": "24521256:2408369363857",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              }
+            ],
+            "gold_earned": 260,
+            "items": {
+              "coin_fraction": 0.0,
+              "cooldowns": {
+                "enchantment_fire": 0.0,
+                "xp_heal_feedback": 0.333333333333333
+              },
+              "dodge_guard": 0,
+              "kill_burst": 0,
+              "kill_coin": 0,
+              "kill_heal": 0,
+              "overheal_bank": 0.0,
+              "owned": {
+                "damage_1": 1,
+                "health_1": 2,
+                "xp_heal_1": 1
+              },
+              "puddles": [],
+              "sugar_crash": 0.0,
+              "sugar_kills": 0,
+              "sugar_rush": 0.0,
+              "xp_fraction": 0.0
+            },
+            "level": 12,
+            "stats": {
+              "armor": 2.0,
+              "attack_speed": 30.0,
+              "crit_chance": 0.05,
+              "damage_bonus": 6.0,
+              "dash_recovery_bonus": 0.0,
+              "dodge_chance": 0.0,
+              "health": 131.287324717984,
+              "luck": 0.0,
+              "max_health": 154.0,
+              "melee_damage": 10.0,
+              "ranged_damage": 0.0,
+              "regen": 0.0,
+              "regen_progress": 0.0,
+              "root_capacity": 6,
+              "shield_charges": 0,
+              "speed_bonus": -4.0,
+              "stat_model_version": 3
+            },
+            "upgrade_points": 0,
+            "xp": 31,
+            "xp_earned": 251,
+            "xp_goal": 38
+          }
+        }
+      ],
+      "original_full_run": {
+        "difficulty": "hell",
+        "build": "floss_whip",
+        "strategy": "kite",
+        "seed": 112233,
+        "outcome": "death",
+        "wave": 5,
+        "seconds": 11.7833333333333,
+        "level": 12,
+        "gold_earned": 270,
+        "xp_earned": 257,
+        "wave_start_hp": 131.287324717984,
+        "wave_start_max_hp": 154.0,
+        "damage_taken": 131.887324717984,
+        "dashes": 3
+      },
+      "paired_reconstruction": {
+        "reference": {
+          "difficulty": "hell",
+          "build": "floss_whip",
+          "strategy": "kite",
+          "seed": 112233,
+          "outcome": "death",
+          "wave": 5,
+          "seconds": 11.7833333333333,
+          "level": 12,
+          "gold_earned": 10,
+          "xp_earned": 6,
+          "wave_start_hp": 131.287324717984,
+          "wave_start_max_hp": 154.0,
+          "damage_taken": 131.887324717984,
+          "dashes": 3
+        },
+        "revised": {
+          "difficulty": "hell",
+          "build": "floss_whip",
+          "strategy": "kite",
+          "seed": 112233,
+          "outcome": "boss_killed",
+          "wave": 5,
+          "seconds": 56.2,
+          "level": 14,
+          "gold_earned": 56,
+          "xp_earned": 57,
+          "wave_start_hp": 131.287324717984,
+          "wave_start_max_hp": 154.0,
+          "damage_taken": 0.0,
+          "dashes": 12
+        }
+      }
+    },
+    {
+      "difficulty": "hell",
+      "build": "floss_whip",
+      "strategy": "kite",
+      "seed": 13579,
+      "skill": "expert",
+      "build_policy": "simple",
+      "waves": [
+        {
+          "wave": 5,
+          "start": {
+            "chests": 4,
+            "coins": 20,
+            "equipment": [
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 5.71022986845895,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 39,
+                "rolls": {
+                  "crit": 0.033,
+                  "damage": 1.203,
+                  "interval": 0.997,
+                  "quality": 2,
+                  "range": 1.032
+                },
+                "tier": 3,
+                "uid": "earned_starter",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 5.71022986845895,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 21,
+                "rolls": {
+                  "crit": 0.066,
+                  "damage": 1.146,
+                  "interval": 1.059,
+                  "quality": 2,
+                  "range": 1.031
+                },
+                "tier": 2,
+                "uid": "5485464:465215427520",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 3.42613792107537,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 1,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 1
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 21,
+                "rolls": {
+                  "crit": 0.062,
+                  "damage": 1.42,
+                  "interval": 0.96,
+                  "quality": 3,
+                  "range": 1.111
+                },
+                "tier": 2,
+                "uid": "5542445:489827604407",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 3.42613792107537,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 1,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 1
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 22,
+                "rolls": {
+                  "crit": 0.046,
+                  "damage": 1.132,
+                  "interval": 1.022,
+                  "quality": 2,
+                  "range": 0.978
+                },
+                "tier": 2,
+                "uid": "7274363:635403507737",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 3.42613792107537,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 1,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 1
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 23,
+                "rolls": {
+                  "crit": 0.033,
+                  "damage": 0.951,
+                  "interval": 1.299,
+                  "quality": 1,
+                  "range": 0.947
+                },
+                "tier": 2,
+                "uid": "7340163:666474911017",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 3.42613792107537,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 1,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 1
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 18,
+                "rolls": {
+                  "crit": 0.037,
+                  "damage": 0.691,
+                  "interval": 1.246,
+                  "quality": 1,
+                  "range": 0.859
+                },
+                "tier": 2,
+                "uid": "9383086:837015313351",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              }
+            ],
+            "gold_earned": 221,
+            "items": {
+              "coin_fraction": 0.0,
+              "cooldowns": {
+                "enchantment_fire": 0.0
+              },
+              "dodge_guard": 0,
+              "kill_burst": 0,
+              "kill_coin": 0,
+              "kill_heal": 5,
+              "overheal_bank": 0.0,
+              "owned": {
+                "damage_1": 1,
+                "health_1": 1,
+                "regen_1": 1
+              },
+              "puddles": [],
+              "sugar_crash": 0.0,
+              "sugar_kills": 0,
+              "sugar_rush": 0.0,
+              "xp_fraction": 0.0
+            },
+            "level": 11,
+            "stats": {
+              "armor": 5.0,
+              "attack_speed": 20.0,
+              "crit_chance": 0.05,
+              "damage_bonus": 14.0,
+              "dash_recovery_bonus": 0.0,
+              "dodge_chance": 0.0,
+              "health": 95.1209907153833,
+              "luck": 0.0,
+              "max_health": 107.0,
+              "melee_damage": 14.0,
+              "ranged_damage": 0.0,
+              "regen": 1.0,
+              "regen_progress": 0.966666666666663,
+              "root_capacity": 6,
+              "shield_charges": 0,
+              "speed_bonus": -2.0,
+              "stat_model_version": 3
+            },
+            "upgrade_points": 0,
+            "xp": 21,
+            "xp_earned": 206,
+            "xp_goal": 35
+          }
+        }
+      ],
+      "original_full_run": {
+        "difficulty": "hell",
+        "build": "floss_whip",
+        "strategy": "kite",
+        "seed": 13579,
+        "outcome": "death",
+        "wave": 5,
+        "seconds": 22.3333333333333,
+        "level": 11,
+        "gold_earned": 229,
+        "xp_earned": 218,
+        "wave_start_hp": 95.1209907153833,
+        "wave_start_max_hp": 107.0,
+        "damage_taken": 107.120990715383,
+        "dashes": 5
+      },
+      "paired_reconstruction": {
+        "reference": {
+          "difficulty": "hell",
+          "build": "floss_whip",
+          "strategy": "kite",
+          "seed": 13579,
+          "outcome": "death",
+          "wave": 5,
+          "seconds": 22.3333333333333,
+          "level": 11,
+          "gold_earned": 8,
+          "xp_earned": 12,
+          "wave_start_hp": 95.1209907153833,
+          "wave_start_max_hp": 107.0,
+          "damage_taken": 107.120990715383,
+          "dashes": 5
+        },
+        "revised": {
+          "difficulty": "hell",
+          "build": "floss_whip",
+          "strategy": "kite",
+          "seed": 13579,
+          "outcome": "boss_killed",
+          "wave": 5,
+          "seconds": 51.9333333333333,
+          "level": 13,
+          "gold_earned": 70,
+          "xp_earned": 58,
+          "wave_start_hp": 95.1209907153833,
+          "wave_start_max_hp": 107.0,
+          "damage_taken": 29.7022937237409,
+          "dashes": 11
+        }
+      }
+    },
+    {
+      "difficulty": "hell",
+      "build": "floss_whip",
+      "strategy": "kite",
+      "seed": 24680,
+      "skill": "expert",
+      "build_policy": "simple",
+      "waves": [
+        {
+          "wave": 5,
+          "start": {
+            "chests": 5,
+            "coins": 19,
+            "equipment": [
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 5.71022986845895,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 20,
+                "rolls": {
+                  "crit": 0.088,
+                  "damage": 1.394,
+                  "interval": 0.831,
+                  "quality": 3,
+                  "range": 1.138
+                },
+                "tier": 2,
+                "uid": "earned_starter",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 3,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 5.71022986845895,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 38,
+                "rolls": {
+                  "crit": 0.081,
+                  "damage": 1.319,
+                  "interval": 0.957,
+                  "quality": 3,
+                  "range": 1.109
+                },
+                "tier": 3,
+                "uid": "14923506:1363970890986",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 5.71022986845895,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 22,
+                "rolls": {
+                  "crit": 0.066,
+                  "damage": 1.075,
+                  "interval": 1.051,
+                  "quality": 2,
+                  "range": 0.987
+                },
+                "tier": 2,
+                "uid": "16351163:1521693497767",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 5.71022986845895,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 23,
+                "rolls": {
+                  "crit": 0.057,
+                  "damage": 0.942,
+                  "interval": 1.006,
+                  "quality": 2,
+                  "range": 1.029
+                },
+                "tier": 2,
+                "uid": "16397127:1542648239325",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 3.42613792107537,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 1,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 1
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 25,
+                "rolls": {
+                  "crit": 0.033,
+                  "damage": 0.844,
+                  "interval": 1.117,
+                  "quality": 1,
+                  "range": 0.959
+                },
+                "tier": 2,
+                "uid": "18459471:1700404401390",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 3.42613792107537,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 1,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 1
+                  }
+                ],
+                "id": "floss_whip",
+                "invested_coins": 25,
+                "rolls": {
+                  "crit": 0.038,
+                  "damage": 0.903,
+                  "interval": 1.167,
+                  "quality": 1,
+                  "range": 0.938
+                },
+                "tier": 2,
+                "uid": "18498429:1716795743069",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              }
+            ],
+            "gold_earned": 223,
+            "items": {
+              "coin_fraction": 0.0,
+              "cooldowns": {
+                "enchantment_fire": 0.0
+              },
+              "dodge_guard": 0,
+              "kill_burst": 0,
+              "kill_coin": 0,
+              "kill_heal": 0,
+              "overheal_bank": 0.0,
+              "owned": {
+                "damage_1": 1,
+                "health_1": 1
+              },
+              "puddles": [],
+              "sugar_crash": 0.0,
+              "sugar_kills": 0,
+              "sugar_rush": 0.0,
+              "xp_fraction": 0.0
+            },
+            "level": 11,
+            "stats": {
+              "armor": 1.0,
+              "attack_speed": 15.0,
+              "crit_chance": 0.05,
+              "damage_bonus": 5.0,
+              "dash_recovery_bonus": 0.0,
+              "dodge_chance": 0.0,
+              "health": 74.6133914170293,
+              "luck": 0.0,
+              "max_health": 142.0,
+              "melee_damage": 20.0,
+              "ranged_damage": 0.0,
+              "regen": 0.0,
+              "regen_progress": 0.0,
+              "root_capacity": 6,
+              "shield_charges": 0,
+              "speed_bonus": -2.0,
+              "stat_model_version": 3
+            },
+            "upgrade_points": 0,
+            "xp": 31,
+            "xp_earned": 216,
+            "xp_goal": 35
+          }
+        }
+      ],
+      "original_full_run": {
+        "difficulty": "hell",
+        "build": "floss_whip",
+        "strategy": "kite",
+        "seed": 24680,
+        "outcome": "death",
+        "wave": 5,
+        "seconds": 8.41666666666667,
+        "level": 11,
+        "gold_earned": 225,
+        "xp_earned": 219,
+        "wave_start_hp": 74.6133914170293,
+        "wave_start_max_hp": 142.0,
+        "damage_taken": 74.6133914170293,
+        "dashes": 2
+      },
+      "paired_reconstruction": {
+        "reference": {
+          "difficulty": "hell",
+          "build": "floss_whip",
+          "strategy": "kite",
+          "seed": 24680,
+          "outcome": "death",
+          "wave": 5,
+          "seconds": 8.41666666666667,
+          "level": 11,
+          "gold_earned": 2,
+          "xp_earned": 3,
+          "wave_start_hp": 74.6133914170293,
+          "wave_start_max_hp": 142.0,
+          "damage_taken": 74.6133914170293,
+          "dashes": 2
+        },
+        "revised": {
+          "difficulty": "hell",
+          "build": "floss_whip",
+          "strategy": "kite",
+          "seed": 24680,
+          "outcome": "death",
+          "wave": 5,
+          "seconds": 30.8833333333333,
+          "level": 12,
+          "gold_earned": 26,
+          "xp_earned": 25,
+          "wave_start_hp": 74.6133914170293,
+          "wave_start_max_hp": 142.0,
+          "damage_taken": 74.6133914170293,
+          "dashes": 7
+        }
+      }
+    },
+    {
+      "difficulty": "hell",
+      "build": "turbo_drill",
+      "strategy": "boss",
+      "seed": 112233,
+      "skill": "expert",
+      "build_policy": "simple",
+      "waves": [
+        {
+          "wave": 5,
+          "start": {
+            "chests": 6,
+            "coins": 26,
+            "equipment": [
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 6.96211761965652,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 3,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 3
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 23,
+                "rolls": {
+                  "crit": 0.008,
+                  "damage": 1.0,
+                  "interval": 1.0,
+                  "quality": 2,
+                  "range": 1.0
+                },
+                "tier": 2,
+                "uid": "earned_starter",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 6.96211761965652,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 3,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 3
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 26,
+                "rolls": {
+                  "crit": 0.036,
+                  "damage": 0.833,
+                  "interval": 1.188,
+                  "quality": 1,
+                  "range": 0.944
+                },
+                "tier": 2,
+                "uid": "19633179:2320188315247",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 4.97294115689751,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 26,
+                "rolls": {
+                  "crit": 0.023,
+                  "damage": 1.008,
+                  "interval": 1.257,
+                  "quality": 1,
+                  "range": 0.911
+                },
+                "tier": 2,
+                "uid": "19670525:2336663540958",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 3,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 4.97294115689751,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 46,
+                "rolls": {
+                  "crit": 0.098,
+                  "damage": 1.551,
+                  "interval": 0.807,
+                  "quality": 4,
+                  "range": 1.234
+                },
+                "tier": 3,
+                "uid": "20844406:2484705695490",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 2.98376469413851,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 1,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 1
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 51,
+                "rolls": {
+                  "crit": 0.045,
+                  "damage": 1.288,
+                  "interval": 1.142,
+                  "quality": 2,
+                  "range": 1.053
+                },
+                "tier": 3,
+                "uid": "20880888:2499268317286",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 2.98376469413851,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 1,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 1
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 28,
+                "rolls": {
+                  "crit": 0.019,
+                  "damage": 0.775,
+                  "interval": 1.152,
+                  "quality": 1,
+                  "range": 0.916
+                },
+                "tier": 2,
+                "uid": "20938488:2523041635393",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              }
+            ],
+            "gold_earned": 283,
+            "items": {
+              "coin_fraction": 0.0,
+              "cooldowns": {
+                "enchantment_fire": 0.0
+              },
+              "dodge_guard": 0,
+              "kill_burst": 0,
+              "kill_coin": 0,
+              "kill_heal": 0,
+              "overheal_bank": 0.0,
+              "owned": {
+                "damage_1": 1,
+                "health_1": 2,
+                "xp_heal_1": 1
+              },
+              "puddles": [],
+              "sugar_crash": 0.0,
+              "sugar_kills": 0,
+              "sugar_rush": 0.0,
+              "xp_fraction": 0.0
+            },
+            "level": 13,
+            "stats": {
+              "armor": 2.0,
+              "attack_speed": 40.0,
+              "crit_chance": 0.05,
+              "damage_bonus": 6.0,
+              "dash_recovery_bonus": 0.0,
+              "dodge_chance": 0.0,
+              "health": 154.0,
+              "luck": 0.0,
+              "max_health": 154.0,
+              "melee_damage": 10.0,
+              "ranged_damage": 0.0,
+              "regen": 0.0,
+              "regen_progress": 0.0,
+              "root_capacity": 6,
+              "shield_charges": 0,
+              "speed_bonus": -4.0,
+              "stat_model_version": 3
+            },
+            "upgrade_points": 0,
+            "xp": 8,
+            "xp_earned": 266,
+            "xp_goal": 41
+          }
+        }
+      ],
+      "original_full_run": {
+        "difficulty": "hell",
+        "build": "turbo_drill",
+        "strategy": "boss",
+        "seed": 112233,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 19.3333333333333,
+        "level": 13,
+        "gold_earned": 301,
+        "xp_earned": 285,
+        "wave_start_hp": 154.0,
+        "wave_start_max_hp": 154.0,
+        "damage_taken": 139.775499876428,
+        "dashes": 4
+      },
+      "paired_reconstruction": {
+        "reference": {
+          "difficulty": "hell",
+          "build": "turbo_drill",
+          "strategy": "boss",
+          "seed": 112233,
+          "outcome": "boss_killed",
+          "wave": 5,
+          "seconds": 19.3333333333333,
+          "level": 13,
+          "gold_earned": 18,
+          "xp_earned": 19,
+          "wave_start_hp": 154.0,
+          "wave_start_max_hp": 154.0,
+          "damage_taken": 139.775499876428,
+          "dashes": 4
+        },
+        "revised": {
+          "difficulty": "hell",
+          "build": "turbo_drill",
+          "strategy": "boss",
+          "seed": 112233,
+          "outcome": "boss_killed",
+          "wave": 5,
+          "seconds": 19.7166666666667,
+          "level": 13,
+          "gold_earned": 19,
+          "xp_earned": 26,
+          "wave_start_hp": 154.0,
+          "wave_start_max_hp": 154.0,
+          "damage_taken": 27.6639010172097,
+          "dashes": 5
+        }
+      }
+    },
+    {
+      "difficulty": "hell",
+      "build": "turbo_drill",
+      "strategy": "boss",
+      "seed": 13579,
+      "skill": "expert",
+      "build_policy": "simple",
+      "waves": [
+        {
+          "wave": 5,
+          "start": {
+            "chests": 7,
+            "coins": 25,
+            "equipment": [
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 9.94588231379503,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 4,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 4
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 25,
+                "rolls": {
+                  "crit": 0.066,
+                  "damage": 1.0,
+                  "interval": 1.0,
+                  "quality": 2,
+                  "range": 1.031
+                },
+                "tier": 2,
+                "uid": "earned_starter",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 4.97294115689751,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 24,
+                "rolls": {
+                  "crit": 0.058,
+                  "damage": 1.146,
+                  "interval": 1.059,
+                  "quality": 2,
+                  "range": 0.947
+                },
+                "tier": 2,
+                "uid": "5536808:466188506063",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 4.97294115689751,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 26,
+                "rolls": {
+                  "crit": 0.017,
+                  "damage": 0.866,
+                  "interval": 1.317,
+                  "quality": 1,
+                  "range": 0.935
+                },
+                "tier": 2,
+                "uid": "5605666:490783905724",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 4.97294115689751,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 22,
+                "rolls": {
+                  "crit": 0.037,
+                  "damage": 0.691,
+                  "interval": 1.246,
+                  "quality": 1,
+                  "range": 0.859
+                },
+                "tier": 2,
+                "uid": "8226099:825271260322",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 4.97294115689751,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 53,
+                "rolls": {
+                  "crit": 0.036,
+                  "damage": 1.203,
+                  "interval": 0.997,
+                  "quality": 2,
+                  "range": 1.032
+                },
+                "tier": 3,
+                "uid": "8258251:839397674579",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 4.97294115689751,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 22,
+                "rolls": {
+                  "crit": 0.032,
+                  "damage": 0.977,
+                  "interval": 1.239,
+                  "quality": 1,
+                  "range": 0.899
+                },
+                "tier": 2,
+                "uid": "8304382:855587690810",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              }
+            ],
+            "gold_earned": 273,
+            "items": {
+              "coin_fraction": 0.0,
+              "cooldowns": {
+                "enchantment_fire": 0.0
+              },
+              "dodge_guard": 0,
+              "kill_burst": 0,
+              "kill_coin": 0,
+              "kill_heal": 0,
+              "overheal_bank": 0.0,
+              "owned": {
+                "damage_1": 1,
+                "health_1": 1,
+                "regen_1": 1
+              },
+              "puddles": [],
+              "sugar_crash": 0.0,
+              "sugar_kills": 0,
+              "sugar_rush": 0.0,
+              "xp_fraction": 0.0
+            },
+            "level": 12,
+            "stats": {
+              "armor": 5.0,
+              "attack_speed": 20.0,
+              "crit_chance": 0.05,
+              "damage_bonus": 14.0,
+              "dash_recovery_bonus": 0.0,
+              "dodge_chance": 0.0,
+              "health": 107.0,
+              "luck": 0.0,
+              "max_health": 107.0,
+              "melee_damage": 16.0,
+              "ranged_damage": 0.0,
+              "regen": 1.0,
+              "regen_progress": 0.0,
+              "root_capacity": 6,
+              "shield_charges": 0,
+              "speed_bonus": -2.0,
+              "stat_model_version": 3
+            },
+            "upgrade_points": 0,
+            "xp": 24,
+            "xp_earned": 244,
+            "xp_goal": 38
+          }
+        }
+      ],
+      "original_full_run": {
+        "difficulty": "hell",
+        "build": "turbo_drill",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 22.05,
+        "level": 13,
+        "gold_earned": 290,
+        "xp_earned": 267,
+        "wave_start_hp": 107.0,
+        "wave_start_max_hp": 107.0,
+        "damage_taken": 89.1068811712228,
+        "dashes": 5
+      },
+      "paired_reconstruction": {
+        "reference": {
+          "difficulty": "hell",
+          "build": "turbo_drill",
+          "strategy": "boss",
+          "seed": 13579,
+          "outcome": "boss_killed",
+          "wave": 5,
+          "seconds": 22.05,
+          "level": 13,
+          "gold_earned": 17,
+          "xp_earned": 23,
+          "wave_start_hp": 107.0,
+          "wave_start_max_hp": 107.0,
+          "damage_taken": 89.1068811712228,
+          "dashes": 5
+        },
+        "revised": {
+          "difficulty": "hell",
+          "build": "turbo_drill",
+          "strategy": "boss",
+          "seed": 13579,
+          "outcome": "boss_killed",
+          "wave": 5,
+          "seconds": 20.9833333333333,
+          "level": 13,
+          "gold_earned": 17,
+          "xp_earned": 22,
+          "wave_start_hp": 107.0,
+          "wave_start_max_hp": 107.0,
+          "damage_taken": 29.7022937237409,
+          "dashes": 5
+        }
+      }
+    },
+    {
+      "difficulty": "hell",
+      "build": "turbo_drill",
+      "strategy": "boss",
+      "seed": 24680,
+      "skill": "expert",
+      "build_policy": "simple",
+      "waves": [
+        {
+          "wave": 5,
+          "start": {
+            "chests": 2,
+            "coins": 29,
+            "equipment": [
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 2.98376469413851,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 1,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 1
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 23,
+                "rolls": {
+                  "crit": 0.062,
+                  "damage": 1.047,
+                  "interval": 1.0,
+                  "quality": 2,
+                  "range": 1.0
+                },
+                "tier": 2,
+                "uid": "earned_starter",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 2.98376469413851,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 1,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 1
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 24,
+                "rolls": {
+                  "crit": 0.069,
+                  "damage": 1.347,
+                  "interval": 0.813,
+                  "quality": 3,
+                  "range": 1.148
+                },
+                "tier": 2,
+                "uid": "12720570:1410947096082",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 2.98376469413851,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 1,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 1
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 51,
+                "rolls": {
+                  "crit": 0.088,
+                  "damage": 1.394,
+                  "interval": 0.831,
+                  "quality": 3,
+                  "range": 1.138
+                },
+                "tier": 3,
+                "uid": "12747478:1423345457490",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 2.98376469413851,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 1,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 1
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 26,
+                "rolls": {
+                  "crit": 0.053,
+                  "damage": 1.045,
+                  "interval": 0.94,
+                  "quality": 2,
+                  "range": 0.99
+                },
+                "tier": 2,
+                "uid": "13937143:1574088743303",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [],
+                "id": "turbo_drill",
+                "invested_coins": 28,
+                "rolls": {
+                  "crit": 0.002,
+                  "damage": 0.844,
+                  "interval": 1.238,
+                  "quality": 1,
+                  "range": 0.936
+                },
+                "tier": 2,
+                "uid": "13971538:1588819138009",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [],
+                "id": "turbo_drill",
+                "invested_coins": 26,
+                "rolls": {
+                  "crit": 0.04,
+                  "damage": 1.052,
+                  "interval": 1.094,
+                  "quality": 2,
+                  "range": 1.019
+                },
+                "tier": 2,
+                "uid": "14027643:1613196434942",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              }
+            ],
+            "gold_earned": 274,
+            "items": {
+              "coin_fraction": 0.0,
+              "cooldowns": {
+                "enchantment_fire": 0.0
+              },
+              "dodge_guard": 0,
+              "kill_burst": 0,
+              "kill_coin": 0,
+              "kill_heal": 0,
+              "overheal_bank": 0.0,
+              "owned": {
+                "health_1": 1,
+                "xp_heal_1": 1
+              },
+              "puddles": [],
+              "sugar_crash": 0.0,
+              "sugar_kills": 0,
+              "sugar_rush": 0.0,
+              "xp_fraction": 0.0
+            },
+            "level": 13,
+            "stats": {
+              "armor": 0.0,
+              "attack_speed": 50.0,
+              "crit_chance": 0.05,
+              "damage_bonus": 9.0,
+              "dash_recovery_bonus": 0.0,
+              "dodge_chance": 0.0,
+              "health": 130.353239849592,
+              "luck": 0.0,
+              "max_health": 147.0,
+              "melee_damage": 12.0,
+              "ranged_damage": 0.0,
+              "regen": 0.0,
+              "regen_progress": 0.0,
+              "root_capacity": 6,
+              "shield_charges": 0,
+              "speed_bonus": -2.0,
+              "stat_model_version": 3
+            },
+            "upgrade_points": 0,
+            "xp": 2,
+            "xp_earned": 260,
+            "xp_goal": 41
+          }
+        }
+      ],
+      "original_full_run": {
+        "difficulty": "hell",
+        "build": "turbo_drill",
+        "strategy": "boss",
+        "seed": 24680,
+        "outcome": "death",
+        "wave": 5,
+        "seconds": 17.9,
+        "level": 13,
+        "gold_earned": 294,
+        "xp_earned": 280,
+        "wave_start_hp": 130.353239849592,
+        "wave_start_max_hp": 147.0,
+        "damage_taken": 132.353239849592,
+        "dashes": 4
+      },
+      "paired_reconstruction": {
+        "reference": {
+          "difficulty": "hell",
+          "build": "turbo_drill",
+          "strategy": "boss",
+          "seed": 24680,
+          "outcome": "death",
+          "wave": 5,
+          "seconds": 17.9,
+          "level": 13,
+          "gold_earned": 20,
+          "xp_earned": 20,
+          "wave_start_hp": 130.353239849592,
+          "wave_start_max_hp": 147.0,
+          "damage_taken": 132.353239849592,
+          "dashes": 4
+        },
+        "revised": {
+          "difficulty": "hell",
+          "build": "turbo_drill",
+          "strategy": "boss",
+          "seed": 24680,
+          "outcome": "boss_killed",
+          "wave": 5,
+          "seconds": 19.0,
+          "level": 13,
+          "gold_earned": 23,
+          "xp_earned": 19,
+          "wave_start_hp": 130.353239849592,
+          "wave_start_max_hp": 147.0,
+          "damage_taken": 0.0,
+          "dashes": 5
+        }
+      }
+    },
+    {
+      "difficulty": "hell",
+      "build": "turbo_drill",
+      "strategy": "kite",
+      "seed": 112233,
+      "skill": "expert",
+      "build_policy": "simple",
+      "waves": [
+        {
+          "wave": 5,
+          "start": {
+            "chests": 6,
+            "coins": 26,
+            "equipment": [
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 6.96211761965652,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 3,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 3
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 23,
+                "rolls": {
+                  "crit": 0.008,
+                  "damage": 1.0,
+                  "interval": 1.0,
+                  "quality": 2,
+                  "range": 1.0
+                },
+                "tier": 2,
+                "uid": "earned_starter",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 6.96211761965652,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 3,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 3
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 26,
+                "rolls": {
+                  "crit": 0.036,
+                  "damage": 0.833,
+                  "interval": 1.188,
+                  "quality": 1,
+                  "range": 0.944
+                },
+                "tier": 2,
+                "uid": "18836149:2284033413161",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 4.97294115689751,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 26,
+                "rolls": {
+                  "crit": 0.023,
+                  "damage": 1.008,
+                  "interval": 1.257,
+                  "quality": 1,
+                  "range": 0.911
+                },
+                "tier": 2,
+                "uid": "18873000:2300508641291",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 3,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 4.97294115689751,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 46,
+                "rolls": {
+                  "crit": 0.098,
+                  "damage": 1.551,
+                  "interval": 0.807,
+                  "quality": 4,
+                  "range": 1.234
+                },
+                "tier": 3,
+                "uid": "19950913:2448550793803",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 2.98376469413851,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 1,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 1
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 51,
+                "rolls": {
+                  "crit": 0.045,
+                  "damage": 1.288,
+                  "interval": 1.142,
+                  "quality": 2,
+                  "range": 1.053
+                },
+                "tier": 3,
+                "uid": "19988698:2463113416831",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 2.98376469413851,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 1,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 1
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 28,
+                "rolls": {
+                  "crit": 0.019,
+                  "damage": 0.775,
+                  "interval": 1.152,
+                  "quality": 1,
+                  "range": 0.916
+                },
+                "tier": 2,
+                "uid": "20088349:2486886734913",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              }
+            ],
+            "gold_earned": 283,
+            "items": {
+              "coin_fraction": 0.0,
+              "cooldowns": {
+                "enchantment_fire": 0.0
+              },
+              "dodge_guard": 0,
+              "kill_burst": 0,
+              "kill_coin": 0,
+              "kill_heal": 0,
+              "overheal_bank": 0.0,
+              "owned": {
+                "damage_1": 1,
+                "health_1": 2,
+                "xp_heal_1": 1
+              },
+              "puddles": [],
+              "sugar_crash": 0.0,
+              "sugar_kills": 0,
+              "sugar_rush": 0.0,
+              "xp_fraction": 0.0
+            },
+            "level": 13,
+            "stats": {
+              "armor": 2.0,
+              "attack_speed": 40.0,
+              "crit_chance": 0.05,
+              "damage_bonus": 6.0,
+              "dash_recovery_bonus": 0.0,
+              "dodge_chance": 0.0,
+              "health": 154.0,
+              "luck": 0.0,
+              "max_health": 154.0,
+              "melee_damage": 10.0,
+              "ranged_damage": 0.0,
+              "regen": 0.0,
+              "regen_progress": 0.0,
+              "root_capacity": 6,
+              "shield_charges": 0,
+              "speed_bonus": -4.0,
+              "stat_model_version": 3
+            },
+            "upgrade_points": 0,
+            "xp": 8,
+            "xp_earned": 266,
+            "xp_goal": 41
+          }
+        }
+      ],
+      "original_full_run": {
+        "difficulty": "hell",
+        "build": "turbo_drill",
+        "strategy": "kite",
+        "seed": 112233,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 23.65,
+        "level": 13,
+        "gold_earned": 307,
+        "xp_earned": 284,
+        "wave_start_hp": 154.0,
+        "wave_start_max_hp": 154.0,
+        "damage_taken": 104.831624907321,
+        "dashes": 5
+      },
+      "paired_reconstruction": {
+        "reference": {
+          "difficulty": "hell",
+          "build": "turbo_drill",
+          "strategy": "kite",
+          "seed": 112233,
+          "outcome": "boss_killed",
+          "wave": 5,
+          "seconds": 23.65,
+          "level": 13,
+          "gold_earned": 24,
+          "xp_earned": 18,
+          "wave_start_hp": 154.0,
+          "wave_start_max_hp": 154.0,
+          "damage_taken": 104.831624907321,
+          "dashes": 5
+        },
+        "revised": {
+          "difficulty": "hell",
+          "build": "turbo_drill",
+          "strategy": "kite",
+          "seed": 112233,
+          "outcome": "boss_killed",
+          "wave": 5,
+          "seconds": 22.55,
+          "level": 13,
+          "gold_earned": 26,
+          "xp_earned": 31,
+          "wave_start_hp": 154.0,
+          "wave_start_max_hp": 154.0,
+          "damage_taken": 76.4397264949215,
+          "dashes": 5
+        }
+      }
+    },
+    {
+      "difficulty": "hell",
+      "build": "turbo_drill",
+      "strategy": "kite",
+      "seed": 13579,
+      "skill": "expert",
+      "build_policy": "simple",
+      "waves": [
+        {
+          "wave": 5,
+          "start": {
+            "chests": 7,
+            "coins": 25,
+            "equipment": [
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 9.94588231379503,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 4,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 4
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 25,
+                "rolls": {
+                  "crit": 0.066,
+                  "damage": 1.0,
+                  "interval": 1.0,
+                  "quality": 2,
+                  "range": 1.031
+                },
+                "tier": 2,
+                "uid": "earned_starter",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 4.97294115689751,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 24,
+                "rolls": {
+                  "crit": 0.058,
+                  "damage": 1.146,
+                  "interval": 1.059,
+                  "quality": 2,
+                  "range": 0.947
+                },
+                "tier": 2,
+                "uid": "5527864:466188506063",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 4.97294115689751,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 26,
+                "rolls": {
+                  "crit": 0.017,
+                  "damage": 0.866,
+                  "interval": 1.317,
+                  "quality": 1,
+                  "range": 0.935
+                },
+                "tier": 2,
+                "uid": "5592719:490783905724",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 4.97294115689751,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 22,
+                "rolls": {
+                  "crit": 0.037,
+                  "damage": 0.691,
+                  "interval": 1.246,
+                  "quality": 1,
+                  "range": 0.859
+                },
+                "tier": 2,
+                "uid": "8151750:825271260322",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 4.97294115689751,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 53,
+                "rolls": {
+                  "crit": 0.036,
+                  "damage": 1.203,
+                  "interval": 0.997,
+                  "quality": 2,
+                  "range": 1.032
+                },
+                "tier": 3,
+                "uid": "8182421:839397674579",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 4.97294115689751,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 22,
+                "rolls": {
+                  "crit": 0.032,
+                  "damage": 0.977,
+                  "interval": 1.239,
+                  "quality": 1,
+                  "range": 0.899
+                },
+                "tier": 2,
+                "uid": "8225431:855587690810",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              }
+            ],
+            "gold_earned": 273,
+            "items": {
+              "coin_fraction": 0.0,
+              "cooldowns": {
+                "enchantment_fire": 0.0
+              },
+              "dodge_guard": 0,
+              "kill_burst": 0,
+              "kill_coin": 0,
+              "kill_heal": 0,
+              "overheal_bank": 0.0,
+              "owned": {
+                "damage_1": 1,
+                "health_1": 1,
+                "regen_1": 1
+              },
+              "puddles": [],
+              "sugar_crash": 0.0,
+              "sugar_kills": 0,
+              "sugar_rush": 0.0,
+              "xp_fraction": 0.0
+            },
+            "level": 12,
+            "stats": {
+              "armor": 5.0,
+              "attack_speed": 20.0,
+              "crit_chance": 0.05,
+              "damage_bonus": 14.0,
+              "dash_recovery_bonus": 0.0,
+              "dodge_chance": 0.0,
+              "health": 107.0,
+              "luck": 0.0,
+              "max_health": 107.0,
+              "melee_damage": 16.0,
+              "ranged_damage": 0.0,
+              "regen": 1.0,
+              "regen_progress": 0.0,
+              "root_capacity": 6,
+              "shield_charges": 0,
+              "speed_bonus": -2.0,
+              "stat_model_version": 3
+            },
+            "upgrade_points": 0,
+            "xp": 24,
+            "xp_earned": 244,
+            "xp_goal": 38
+          }
+        }
+      ],
+      "original_full_run": {
+        "difficulty": "hell",
+        "build": "turbo_drill",
+        "strategy": "kite",
+        "seed": 13579,
+        "outcome": "death",
+        "wave": 5,
+        "seconds": 18.35,
+        "level": 12,
+        "gold_earned": 286,
+        "xp_earned": 255,
+        "wave_start_hp": 107.0,
+        "wave_start_max_hp": 107.0,
+        "damage_taken": 114.0,
+        "dashes": 4
+      },
+      "paired_reconstruction": {
+        "reference": {
+          "difficulty": "hell",
+          "build": "turbo_drill",
+          "strategy": "kite",
+          "seed": 13579,
+          "outcome": "death",
+          "wave": 5,
+          "seconds": 18.35,
+          "level": 12,
+          "gold_earned": 13,
+          "xp_earned": 11,
+          "wave_start_hp": 107.0,
+          "wave_start_max_hp": 107.0,
+          "damage_taken": 114.0,
+          "dashes": 4
+        },
+        "revised": {
+          "difficulty": "hell",
+          "build": "turbo_drill",
+          "strategy": "kite",
+          "seed": 13579,
+          "outcome": "boss_killed",
+          "wave": 5,
+          "seconds": 26.4333333333333,
+          "level": 13,
+          "gold_earned": 39,
+          "xp_earned": 35,
+          "wave_start_hp": 107.0,
+          "wave_start_max_hp": 107.0,
+          "damage_taken": 29.7022937237409,
+          "dashes": 6
+        }
+      }
+    },
+    {
+      "difficulty": "hell",
+      "build": "turbo_drill",
+      "strategy": "kite",
+      "seed": 24680,
+      "skill": "expert",
+      "build_policy": "simple",
+      "waves": [
+        {
+          "wave": 5,
+          "start": {
+            "chests": 2,
+            "coins": 29,
+            "equipment": [
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 2.98376469413851,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 1,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 1
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 23,
+                "rolls": {
+                  "crit": 0.062,
+                  "damage": 1.047,
+                  "interval": 1.0,
+                  "quality": 2,
+                  "range": 1.0
+                },
+                "tier": 2,
+                "uid": "earned_starter",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 2.98376469413851,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 1,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 1
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 24,
+                "rolls": {
+                  "crit": 0.069,
+                  "damage": 1.347,
+                  "interval": 0.813,
+                  "quality": 3,
+                  "range": 1.148
+                },
+                "tier": 2,
+                "uid": "12332712:1398817166513",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 2.98376469413851,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 1,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 1
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 51,
+                "rolls": {
+                  "crit": 0.088,
+                  "damage": 1.394,
+                  "interval": 0.831,
+                  "quality": 3,
+                  "range": 1.138
+                },
+                "tier": 3,
+                "uid": "12361121:1411215530322",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 2.98376469413851,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 1,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 1
+                  }
+                ],
+                "id": "turbo_drill",
+                "invested_coins": 26,
+                "rolls": {
+                  "crit": 0.053,
+                  "damage": 1.045,
+                  "interval": 0.94,
+                  "quality": 2,
+                  "range": 0.99
+                },
+                "tier": 2,
+                "uid": "13536960:1561958816135",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [],
+                "id": "turbo_drill",
+                "invested_coins": 28,
+                "rolls": {
+                  "crit": 0.002,
+                  "damage": 0.844,
+                  "interval": 1.238,
+                  "quality": 1,
+                  "range": 0.936
+                },
+                "tier": 2,
+                "uid": "13571576:1576689210843",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [],
+                "id": "turbo_drill",
+                "invested_coins": 26,
+                "rolls": {
+                  "crit": 0.04,
+                  "damage": 1.052,
+                  "interval": 1.094,
+                  "quality": 2,
+                  "range": 1.019
+                },
+                "tier": 2,
+                "uid": "13627323:1601066507774",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              }
+            ],
+            "gold_earned": 274,
+            "items": {
+              "coin_fraction": 0.0,
+              "cooldowns": {
+                "enchantment_fire": 0.0
+              },
+              "dodge_guard": 0,
+              "kill_burst": 0,
+              "kill_coin": 0,
+              "kill_heal": 0,
+              "overheal_bank": 0.0,
+              "owned": {
+                "health_1": 1,
+                "xp_heal_1": 1
+              },
+              "puddles": [],
+              "sugar_crash": 0.0,
+              "sugar_kills": 0,
+              "sugar_rush": 0.0,
+              "xp_fraction": 0.0
+            },
+            "level": 13,
+            "stats": {
+              "armor": 0.0,
+              "attack_speed": 50.0,
+              "crit_chance": 0.05,
+              "damage_bonus": 9.0,
+              "dash_recovery_bonus": 0.0,
+              "dodge_chance": 0.0,
+              "health": 130.353239849592,
+              "luck": 0.0,
+              "max_health": 147.0,
+              "melee_damage": 12.0,
+              "ranged_damage": 0.0,
+              "regen": 0.0,
+              "regen_progress": 0.0,
+              "root_capacity": 6,
+              "shield_charges": 0,
+              "speed_bonus": -2.0,
+              "stat_model_version": 3
+            },
+            "upgrade_points": 0,
+            "xp": 2,
+            "xp_earned": 260,
+            "xp_goal": 41
+          }
+        }
+      ],
+      "original_full_run": {
+        "difficulty": "hell",
+        "build": "turbo_drill",
+        "strategy": "kite",
+        "seed": 24680,
+        "outcome": "death",
+        "wave": 5,
+        "seconds": 11.1166666666667,
+        "level": 13,
+        "gold_earned": 279,
+        "xp_earned": 264,
+        "wave_start_hp": 130.353239849592,
+        "wave_start_max_hp": 147.0,
+        "damage_taken": 130.753239849592,
+        "dashes": 3
+      },
+      "paired_reconstruction": {
+        "reference": {
+          "difficulty": "hell",
+          "build": "turbo_drill",
+          "strategy": "kite",
+          "seed": 24680,
+          "outcome": "death",
+          "wave": 5,
+          "seconds": 11.1166666666667,
+          "level": 13,
+          "gold_earned": 5,
+          "xp_earned": 4,
+          "wave_start_hp": 130.353239849592,
+          "wave_start_max_hp": 147.0,
+          "damage_taken": 130.753239849592,
+          "dashes": 3
+        },
+        "revised": {
+          "difficulty": "hell",
+          "build": "turbo_drill",
+          "strategy": "kite",
+          "seed": 24680,
+          "outcome": "boss_killed",
+          "wave": 5,
+          "seconds": 23.1333333333333,
+          "level": 13,
+          "gold_earned": 28,
+          "xp_earned": 26,
+          "wave_start_hp": 130.353239849592,
+          "wave_start_max_hp": 147.0,
+          "damage_taken": 0.0,
+          "dashes": 5
+        }
+      }
+    },
+    {
+      "difficulty": "hell",
+      "build": "uv_lamp",
+      "strategy": "boss",
+      "seed": 112233,
+      "skill": "expert",
+      "build_policy": "simple",
+      "waves": [
+        {
+          "wave": 5,
+          "start": {
+            "chests": 7,
+            "coins": 3,
+            "equipment": [
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 18.760322571732,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 3,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 3
+                  }
+                ],
+                "id": "uv_lamp",
+                "invested_coins": 82,
+                "rolls": {
+                  "crit": 0.074,
+                  "damage": 1.334,
+                  "interval": 0.989,
+                  "quality": 3,
+                  "range": 1.131
+                },
+                "tier": 3,
+                "uid": "earned_starter",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 13.40023040838,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "uv_lamp",
+                "invested_coins": 87,
+                "rolls": {
+                  "crit": 0.026,
+                  "damage": 0.967,
+                  "interval": 1.186,
+                  "quality": 1,
+                  "range": 0.944
+                },
+                "tier": 3,
+                "uid": "15509895:2135722825318",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 3,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 13.40023040838,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "uv_lamp",
+                "invested_coins": 83,
+                "rolls": {
+                  "crit": 0.098,
+                  "damage": 1.551,
+                  "interval": 0.807,
+                  "quality": 4,
+                  "range": 1.234
+                },
+                "tier": 3,
+                "uid": "16458082:2287506298351",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              }
+            ],
+            "gold_earned": 289,
+            "items": {
+              "coin_fraction": 0.0,
+              "cooldowns": {
+                "enchantment_fire": 0.0,
+                "xp_heal_feedback": 0.7
+              },
+              "dodge_guard": 0,
+              "kill_burst": 0,
+              "kill_coin": 0,
+              "kill_heal": 0,
+              "overheal_bank": 0.0,
+              "owned": {
+                "damage_1": 1,
+                "health_1": 1,
+                "xp_heal_1": 2
+              },
+              "puddles": [],
+              "sugar_crash": 0.0,
+              "sugar_kills": 0,
+              "sugar_rush": 0.0,
+              "xp_fraction": 0.0
+            },
+            "level": 13,
+            "stats": {
+              "armor": 2.0,
+              "attack_speed": 40.0,
+              "crit_chance": 0.05,
+              "damage_bonus": 3.0,
+              "dash_recovery_bonus": 0.0,
+              "dodge_chance": 0.0,
+              "health": 169.622177279805,
+              "luck": 0.0,
+              "max_health": 177.0,
+              "melee_damage": 0.0,
+              "ranged_damage": 4.0,
+              "regen": 0.0,
+              "regen_progress": 0.0,
+              "root_capacity": 6,
+              "shield_charges": 0,
+              "speed_bonus": -2.0,
+              "stat_model_version": 3
+            },
+            "upgrade_points": 0,
+            "xp": 18,
+            "xp_earned": 276,
+            "xp_goal": 41
+          }
+        }
+      ],
+      "original_full_run": {
+        "difficulty": "hell",
+        "build": "uv_lamp",
+        "strategy": "boss",
+        "seed": 112233,
+        "outcome": "death",
+        "wave": 5,
+        "seconds": 16.9,
+        "level": 13,
+        "gold_earned": 295,
+        "xp_earned": 280,
+        "wave_start_hp": 169.622177279805,
+        "wave_start_max_hp": 177.0,
+        "damage_taken": 170.422177279805,
+        "dashes": 3
+      },
+      "paired_reconstruction": {
+        "reference": {
+          "difficulty": "hell",
+          "build": "uv_lamp",
+          "strategy": "boss",
+          "seed": 112233,
+          "outcome": "death",
+          "wave": 5,
+          "seconds": 16.9,
+          "level": 13,
+          "gold_earned": 6,
+          "xp_earned": 4,
+          "wave_start_hp": 169.622177279805,
+          "wave_start_max_hp": 177.0,
+          "damage_taken": 170.422177279805,
+          "dashes": 3
+        },
+        "revised": {
+          "difficulty": "hell",
+          "build": "uv_lamp",
+          "strategy": "boss",
+          "seed": 112233,
+          "outcome": "boss_killed",
+          "wave": 5,
+          "seconds": 19.9666666666667,
+          "level": 13,
+          "gold_earned": 9,
+          "xp_earned": 6,
+          "wave_start_hp": 169.622177279805,
+          "wave_start_max_hp": 177.0,
+          "damage_taken": 0.0,
+          "dashes": 4
+        }
+      }
+    },
+    {
+      "difficulty": "hell",
+      "build": "uv_lamp",
+      "strategy": "boss",
+      "seed": 13579,
+      "skill": "expert",
+      "build_policy": "simple",
+      "waves": [
+        {
+          "wave": 5,
+          "start": {
+            "chests": 8,
+            "coins": 51,
+            "equipment": [
+              {
+                "affix_slots": 3,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 18.760322571732,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 3,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 3
+                  }
+                ],
+                "id": "uv_lamp",
+                "invested_coins": 78,
+                "rolls": {
+                  "crit": 0.071,
+                  "damage": 1.334,
+                  "interval": 0.931,
+                  "quality": 3,
+                  "range": 1.155
+                },
+                "tier": 3,
+                "uid": "earned_starter",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 18.760322571732,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 3,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 3
+                  }
+                ],
+                "id": "uv_lamp",
+                "invested_coins": 84,
+                "rolls": {
+                  "crit": 0.058,
+                  "damage": 1.146,
+                  "interval": 0.997,
+                  "quality": 2,
+                  "range": 1.032
+                },
+                "tier": 3,
+                "uid": "5440955:469057410073",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 13.40023040838,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "uv_lamp",
+                "invested_coins": 41,
+                "rolls": {
+                  "crit": 0.043,
+                  "damage": 1.129,
+                  "interval": 1.064,
+                  "quality": 2,
+                  "range": 0.948
+                },
+                "tier": 2,
+                "uid": "5489866:480767907310",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              }
+            ],
+            "gold_earned": 292,
+            "items": {
+              "coin_fraction": 0.0,
+              "cooldowns": {
+                "enchantment_fire": 0.0
+              },
+              "dodge_guard": 0,
+              "kill_burst": 0,
+              "kill_coin": 0,
+              "kill_heal": 0,
+              "overheal_bank": 0.0,
+              "owned": {
+                "health_1": 2
+              },
+              "puddles": [],
+              "sugar_crash": 0.0,
+              "sugar_kills": 0,
+              "sugar_rush": 0.0,
+              "xp_fraction": 0.0
+            },
+            "level": 13,
+            "stats": {
+              "armor": 5.0,
+              "attack_speed": 30.0,
+              "crit_chance": 0.05,
+              "damage_bonus": 12.0,
+              "dash_recovery_bonus": 0.0,
+              "dodge_chance": 0.0,
+              "health": 124.0,
+              "luck": 0.0,
+              "max_health": 124.0,
+              "melee_damage": 0.0,
+              "ranged_damage": 8.0,
+              "regen": 0.0,
+              "regen_progress": 0.0,
+              "root_capacity": 6,
+              "shield_charges": 0,
+              "speed_bonus": -4.0,
+              "stat_model_version": 3
+            },
+            "upgrade_points": 0,
+            "xp": 28,
+            "xp_earned": 286,
+            "xp_goal": 41
+          }
+        }
+      ],
+      "original_full_run": {
+        "difficulty": "hell",
+        "build": "uv_lamp",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 20.9166666666667,
+        "level": 13,
+        "gold_earned": 298,
+        "xp_earned": 290,
+        "wave_start_hp": 124.0,
+        "wave_start_max_hp": 124.0,
+        "damage_taken": 29.7022937237409,
+        "dashes": 3
+      },
+      "paired_reconstruction": {
+        "reference": {
+          "difficulty": "hell",
+          "build": "uv_lamp",
+          "strategy": "boss",
+          "seed": 13579,
+          "outcome": "boss_killed",
+          "wave": 5,
+          "seconds": 20.9166666666667,
+          "level": 13,
+          "gold_earned": 6,
+          "xp_earned": 4,
+          "wave_start_hp": 124.0,
+          "wave_start_max_hp": 124.0,
+          "damage_taken": 29.7022937237409,
+          "dashes": 3
+        },
+        "revised": {
+          "difficulty": "hell",
+          "build": "uv_lamp",
+          "strategy": "boss",
+          "seed": 13579,
+          "outcome": "boss_killed",
+          "wave": 5,
+          "seconds": 20.4333333333333,
+          "level": 13,
+          "gold_earned": 10,
+          "xp_earned": 10,
+          "wave_start_hp": 124.0,
+          "wave_start_max_hp": 124.0,
+          "damage_taken": 29.7022937237409,
+          "dashes": 3
+        }
+      }
+    },
+    {
+      "difficulty": "hell",
+      "build": "uv_lamp",
+      "strategy": "boss",
+      "seed": 24680,
+      "skill": "expert",
+      "build_policy": "simple",
+      "waves": [
+        {
+          "wave": 5,
+          "start": {
+            "chests": 6,
+            "coins": 40,
+            "equipment": [
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 13.40023040838,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "uv_lamp",
+                "invested_coins": 82,
+                "rolls": {
+                  "crit": 0.032,
+                  "damage": 1.0,
+                  "interval": 1.0,
+                  "quality": 2,
+                  "range": 1.0
+                },
+                "tier": 3,
+                "uid": "earned_starter",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 13.40023040838,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "uv_lamp",
+                "invested_coins": 44,
+                "rolls": {
+                  "crit": 0.033,
+                  "damage": 0.944,
+                  "interval": 1.124,
+                  "quality": 1,
+                  "range": 0.9
+                },
+                "tier": 2,
+                "uid": "10414149:1297164012555",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 13.40023040838,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "uv_lamp",
+                "invested_coins": 84,
+                "rolls": {
+                  "crit": 0.062,
+                  "damage": 1.016,
+                  "interval": 1.008,
+                  "quality": 2,
+                  "range": 1.096
+                },
+                "tier": 3,
+                "uid": "10458169:1315182745751",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              }
+            ],
+            "gold_earned": 304,
+            "items": {
+              "coin_fraction": 0.0,
+              "cooldowns": {
+                "enchantment_fire": 0.0
+              },
+              "dodge_guard": 0,
+              "kill_burst": 0,
+              "kill_coin": 0,
+              "kill_heal": 0,
+              "overheal_bank": 0.0,
+              "owned": {
+                "damage_1": 1,
+                "health_1": 2
+              },
+              "puddles": [],
+              "sugar_crash": 0.0,
+              "sugar_kills": 0,
+              "sugar_rush": 0.0,
+              "xp_fraction": 0.0
+            },
+            "level": 13,
+            "stats": {
+              "armor": 0.0,
+              "attack_speed": 50.0,
+              "crit_chance": 0.05,
+              "damage_bonus": 17.0,
+              "dash_recovery_bonus": 0.0,
+              "dodge_chance": 0.0,
+              "health": 116.473239849592,
+              "luck": 0.0,
+              "max_health": 154.0,
+              "melee_damage": 0.0,
+              "ranged_damage": 8.0,
+              "regen": 0.0,
+              "regen_progress": 0.0,
+              "root_capacity": 6,
+              "shield_charges": 0,
+              "speed_bonus": -4.0,
+              "stat_model_version": 3
+            },
+            "upgrade_points": 0,
+            "xp": 14,
+            "xp_earned": 272,
+            "xp_goal": 41
+          }
+        }
+      ],
+      "original_full_run": {
+        "difficulty": "hell",
+        "build": "uv_lamp",
+        "strategy": "boss",
+        "seed": 24680,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 20.5833333333333,
+        "level": 13,
+        "gold_earned": 312,
+        "xp_earned": 279,
+        "wave_start_hp": 116.473239849592,
+        "wave_start_max_hp": 154.0,
+        "damage_taken": 0.0,
+        "dashes": 4
+      },
+      "paired_reconstruction": {
+        "reference": {
+          "difficulty": "hell",
+          "build": "uv_lamp",
+          "strategy": "boss",
+          "seed": 24680,
+          "outcome": "boss_killed",
+          "wave": 5,
+          "seconds": 19.8166666666667,
+          "level": 13,
+          "gold_earned": 5,
+          "xp_earned": 7,
+          "wave_start_hp": 116.473239849592,
+          "wave_start_max_hp": 154.0,
+          "damage_taken": 0.0,
+          "dashes": 3
+        },
+        "revised": {
+          "difficulty": "hell",
+          "build": "uv_lamp",
+          "strategy": "boss",
+          "seed": 24680,
+          "outcome": "boss_killed",
+          "wave": 5,
+          "seconds": 21.1666666666667,
+          "level": 13,
+          "gold_earned": 9,
+          "xp_earned": 15,
+          "wave_start_hp": 116.473239849592,
+          "wave_start_max_hp": 154.0,
+          "damage_taken": 0.0,
+          "dashes": 4
+        }
+      }
+    },
+    {
+      "difficulty": "hell",
+      "build": "uv_lamp",
+      "strategy": "kite",
+      "seed": 112233,
+      "skill": "expert",
+      "build_policy": "simple",
+      "waves": [
+        {
+          "wave": 5,
+          "start": {
+            "chests": 7,
+            "coins": 3,
+            "equipment": [
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 18.760322571732,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 3,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 3
+                  }
+                ],
+                "id": "uv_lamp",
+                "invested_coins": 82,
+                "rolls": {
+                  "crit": 0.074,
+                  "damage": 1.334,
+                  "interval": 0.989,
+                  "quality": 3,
+                  "range": 1.131
+                },
+                "tier": 3,
+                "uid": "earned_starter",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 13.40023040838,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "uv_lamp",
+                "invested_coins": 87,
+                "rolls": {
+                  "crit": 0.026,
+                  "damage": 0.967,
+                  "interval": 1.186,
+                  "quality": 1,
+                  "range": 0.944
+                },
+                "tier": 3,
+                "uid": "15437022:2133910885999",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 3,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 13.40023040838,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "uv_lamp",
+                "invested_coins": 83,
+                "rolls": {
+                  "crit": 0.098,
+                  "damage": 1.551,
+                  "interval": 0.807,
+                  "quality": 4,
+                  "range": 1.234
+                },
+                "tier": 3,
+                "uid": "16366265:2285694358079",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              }
+            ],
+            "gold_earned": 289,
+            "items": {
+              "coin_fraction": 0.0,
+              "cooldowns": {
+                "enchantment_fire": 0.0,
+                "xp_heal_feedback": 0.7
+              },
+              "dodge_guard": 0,
+              "kill_burst": 0,
+              "kill_coin": 0,
+              "kill_heal": 0,
+              "overheal_bank": 0.0,
+              "owned": {
+                "damage_1": 1,
+                "health_1": 1,
+                "xp_heal_1": 2
+              },
+              "puddles": [],
+              "sugar_crash": 0.0,
+              "sugar_kills": 0,
+              "sugar_rush": 0.0,
+              "xp_fraction": 0.0
+            },
+            "level": 13,
+            "stats": {
+              "armor": 2.0,
+              "attack_speed": 40.0,
+              "crit_chance": 0.05,
+              "damage_bonus": 3.0,
+              "dash_recovery_bonus": 0.0,
+              "dodge_chance": 0.0,
+              "health": 169.622177279805,
+              "luck": 0.0,
+              "max_health": 177.0,
+              "melee_damage": 0.0,
+              "ranged_damage": 4.0,
+              "regen": 0.0,
+              "regen_progress": 0.0,
+              "root_capacity": 6,
+              "shield_charges": 0,
+              "speed_bonus": -2.0,
+              "stat_model_version": 3
+            },
+            "upgrade_points": 0,
+            "xp": 18,
+            "xp_earned": 276,
+            "xp_goal": 41
+          }
+        }
+      ],
+      "original_full_run": {
+        "difficulty": "hell",
+        "build": "uv_lamp",
+        "strategy": "kite",
+        "seed": 112233,
+        "outcome": "death",
+        "wave": 5,
+        "seconds": 14.7,
+        "level": 13,
+        "gold_earned": 290,
+        "xp_earned": 277,
+        "wave_start_hp": 169.622177279805,
+        "wave_start_max_hp": 177.0,
+        "damage_taken": 169.822177279805,
+        "dashes": 2
+      },
+      "paired_reconstruction": {
+        "reference": {
+          "difficulty": "hell",
+          "build": "uv_lamp",
+          "strategy": "kite",
+          "seed": 112233,
+          "outcome": "death",
+          "wave": 5,
+          "seconds": 14.7,
+          "level": 13,
+          "gold_earned": 1,
+          "xp_earned": 1,
+          "wave_start_hp": 169.622177279805,
+          "wave_start_max_hp": 177.0,
+          "damage_taken": 169.822177279805,
+          "dashes": 2
+        },
+        "revised": {
+          "difficulty": "hell",
+          "build": "uv_lamp",
+          "strategy": "kite",
+          "seed": 112233,
+          "outcome": "boss_killed",
+          "wave": 5,
+          "seconds": 19.7166666666667,
+          "level": 14,
+          "gold_earned": 27,
+          "xp_earned": 26,
+          "wave_start_hp": 169.622177279805,
+          "wave_start_max_hp": 177.0,
+          "damage_taken": 0.0,
+          "dashes": 3
+        }
+      }
+    },
+    {
+      "difficulty": "hell",
+      "build": "uv_lamp",
+      "strategy": "kite",
+      "seed": 13579,
+      "skill": "expert",
+      "build_policy": "simple",
+      "waves": [
+        {
+          "wave": 5,
+          "start": {
+            "chests": 8,
+            "coins": 51,
+            "equipment": [
+              {
+                "affix_slots": 3,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 18.760322571732,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 3,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 3
+                  }
+                ],
+                "id": "uv_lamp",
+                "invested_coins": 78,
+                "rolls": {
+                  "crit": 0.071,
+                  "damage": 1.334,
+                  "interval": 0.931,
+                  "quality": 3,
+                  "range": 1.155
+                },
+                "tier": 3,
+                "uid": "earned_starter",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 18.760322571732,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 3,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 3
+                  }
+                ],
+                "id": "uv_lamp",
+                "invested_coins": 84,
+                "rolls": {
+                  "crit": 0.058,
+                  "damage": 1.146,
+                  "interval": 0.997,
+                  "quality": 2,
+                  "range": 1.032
+                },
+                "tier": 3,
+                "uid": "5434675:469057410073",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 13.40023040838,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "uv_lamp",
+                "invested_coins": 41,
+                "rolls": {
+                  "crit": 0.043,
+                  "damage": 1.129,
+                  "interval": 1.064,
+                  "quality": 2,
+                  "range": 0.948
+                },
+                "tier": 2,
+                "uid": "5487773:480767907310",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              }
+            ],
+            "gold_earned": 292,
+            "items": {
+              "coin_fraction": 0.0,
+              "cooldowns": {
+                "enchantment_fire": 0.0
+              },
+              "dodge_guard": 0,
+              "kill_burst": 0,
+              "kill_coin": 0,
+              "kill_heal": 0,
+              "overheal_bank": 0.0,
+              "owned": {
+                "health_1": 2
+              },
+              "puddles": [],
+              "sugar_crash": 0.0,
+              "sugar_kills": 0,
+              "sugar_rush": 0.0,
+              "xp_fraction": 0.0
+            },
+            "level": 13,
+            "stats": {
+              "armor": 5.0,
+              "attack_speed": 30.0,
+              "crit_chance": 0.05,
+              "damage_bonus": 12.0,
+              "dash_recovery_bonus": 0.0,
+              "dodge_chance": 0.0,
+              "health": 124.0,
+              "luck": 0.0,
+              "max_health": 124.0,
+              "melee_damage": 0.0,
+              "ranged_damage": 8.0,
+              "regen": 0.0,
+              "regen_progress": 0.0,
+              "root_capacity": 6,
+              "shield_charges": 0,
+              "speed_bonus": -4.0,
+              "stat_model_version": 3
+            },
+            "upgrade_points": 0,
+            "xp": 28,
+            "xp_earned": 286,
+            "xp_goal": 41
+          }
+        }
+      ],
+      "original_full_run": {
+        "difficulty": "hell",
+        "build": "uv_lamp",
+        "strategy": "kite",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 22.65,
+        "level": 14,
+        "gold_earned": 310,
+        "xp_earned": 303,
+        "wave_start_hp": 124.0,
+        "wave_start_max_hp": 124.0,
+        "damage_taken": 118.809174894964,
+        "dashes": 3
+      },
+      "paired_reconstruction": {
+        "reference": {
+          "difficulty": "hell",
+          "build": "uv_lamp",
+          "strategy": "kite",
+          "seed": 13579,
+          "outcome": "boss_killed",
+          "wave": 5,
+          "seconds": 22.65,
+          "level": 14,
+          "gold_earned": 18,
+          "xp_earned": 17,
+          "wave_start_hp": 124.0,
+          "wave_start_max_hp": 124.0,
+          "damage_taken": 118.809174894964,
+          "dashes": 3
+        },
+        "revised": {
+          "difficulty": "hell",
+          "build": "uv_lamp",
+          "strategy": "kite",
+          "seed": 13579,
+          "outcome": "boss_killed",
+          "wave": 5,
+          "seconds": 21.8666666666667,
+          "level": 13,
+          "gold_earned": 14,
+          "xp_earned": 11,
+          "wave_start_hp": 124.0,
+          "wave_start_max_hp": 124.0,
+          "damage_taken": 29.7022937237409,
+          "dashes": 4
+        }
+      }
+    },
+    {
+      "difficulty": "hell",
+      "build": "uv_lamp",
+      "strategy": "kite",
+      "seed": 24680,
+      "skill": "expert",
+      "build_policy": "simple",
+      "waves": [
+        {
+          "wave": 5,
+          "start": {
+            "chests": 6,
+            "coins": 40,
+            "equipment": [
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 13.40023040838,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "uv_lamp",
+                "invested_coins": 82,
+                "rolls": {
+                  "crit": 0.032,
+                  "damage": 1.0,
+                  "interval": 1.0,
+                  "quality": 2,
+                  "range": 1.0
+                },
+                "tier": 3,
+                "uid": "earned_starter",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 1,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 13.40023040838,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "uv_lamp",
+                "invested_coins": 44,
+                "rolls": {
+                  "crit": 0.033,
+                  "damage": 0.944,
+                  "interval": 1.124,
+                  "quality": 1,
+                  "range": 0.9
+                },
+                "tier": 2,
+                "uid": "10423371:1302314620945",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              },
+              {
+                "affix_slots": 2,
+                "affixes": [
+                  {
+                    "bonus": 0.0,
+                    "damage": 13.40023040838,
+                    "id": "fire",
+                    "legacy_floor": 0.0,
+                    "level": 2,
+                    "progress": 0.0,
+                    "rank": 1,
+                    "rarity": 1,
+                    "stacks": 2
+                  }
+                ],
+                "id": "uv_lamp",
+                "invested_coins": 84,
+                "rolls": {
+                  "crit": 0.062,
+                  "damage": 1.016,
+                  "interval": 1.008,
+                  "quality": 2,
+                  "range": 1.096
+                },
+                "tier": 3,
+                "uid": "10467871:1320333351063",
+                "upgrades": {
+                  "crit": 0.0,
+                  "crit_damage": 0.0,
+                  "knockback": 0.0,
+                  "mk": 0,
+                  "range": 0.0,
+                  "tempo": 0.0
+                }
+              }
+            ],
+            "gold_earned": 304,
+            "items": {
+              "coin_fraction": 0.0,
+              "cooldowns": {
+                "enchantment_fire": 0.0
+              },
+              "dodge_guard": 0,
+              "kill_burst": 0,
+              "kill_coin": 0,
+              "kill_heal": 0,
+              "overheal_bank": 0.0,
+              "owned": {
+                "damage_1": 1,
+                "health_1": 2
+              },
+              "puddles": [],
+              "sugar_crash": 0.0,
+              "sugar_kills": 0,
+              "sugar_rush": 0.0,
+              "xp_fraction": 0.0
+            },
+            "level": 13,
+            "stats": {
+              "armor": 0.0,
+              "attack_speed": 50.0,
+              "crit_chance": 0.05,
+              "damage_bonus": 17.0,
+              "dash_recovery_bonus": 0.0,
+              "dodge_chance": 0.0,
+              "health": 116.473239849592,
+              "luck": 0.0,
+              "max_health": 154.0,
+              "melee_damage": 0.0,
+              "ranged_damage": 8.0,
+              "regen": 0.0,
+              "regen_progress": 0.0,
+              "root_capacity": 6,
+              "shield_charges": 0,
+              "speed_bonus": -4.0,
+              "stat_model_version": 3
+            },
+            "upgrade_points": 0,
+            "xp": 14,
+            "xp_earned": 272,
+            "xp_goal": 41
+          }
+        }
+      ],
+      "original_full_run": {
+        "difficulty": "hell",
+        "build": "uv_lamp",
+        "strategy": "kite",
+        "seed": 24680,
+        "outcome": "death",
+        "wave": 5,
+        "seconds": 18.4,
+        "level": 13,
+        "gold_earned": 306,
+        "xp_earned": 276,
+        "wave_start_hp": 116.473239849592,
+        "wave_start_max_hp": 154.0,
+        "damage_taken": 116.473239849592,
+        "dashes": 3
+      },
+      "paired_reconstruction": {
+        "reference": {
+          "difficulty": "hell",
+          "build": "uv_lamp",
+          "strategy": "kite",
+          "seed": 24680,
+          "outcome": "death",
+          "wave": 5,
+          "seconds": 15.9,
+          "level": 13,
+          "gold_earned": 1,
+          "xp_earned": 4,
+          "wave_start_hp": 116.473239849592,
+          "wave_start_max_hp": 154.0,
+          "damage_taken": 116.473239849592,
+          "dashes": 3
+        },
+        "revised": {
+          "difficulty": "hell",
+          "build": "uv_lamp",
+          "strategy": "kite",
+          "seed": 24680,
+          "outcome": "boss_killed",
+          "wave": 5,
+          "seconds": 19.8166666666667,
+          "level": 13,
+          "gold_earned": 4,
+          "xp_earned": 3,
+          "wave_start_hp": 116.473239849592,
+          "wave_start_max_hp": 154.0,
+          "damage_taken": 0.0,
+          "dashes": 4
+        }
+      }
+    }
+  ],
+  "development": {
+    "source_sha256": "bc90b02d6f95580d52d8efdb08c95f0f3bd20fd31f4f18957f5222d76228d86f",
+    "samples": [
+      {
+        "difficulty": "hell",
+        "build": "floss_whip",
+        "strategy": "boss",
+        "seed": 101,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 21.1166666666667,
+        "level": 12,
+        "gold_earned": 249,
+        "xp_earned": 226,
+        "wave_start_hp": 114.958463355913,
+        "wave_start_max_hp": 157.0,
+        "damage_taken": 69.8877499382139,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "floss_whip",
+        "strategy": "boss",
+        "seed": 202,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 28.55,
+        "level": 13,
+        "gold_earned": 274,
+        "xp_earned": 277,
+        "wave_start_hp": 189.042925168612,
+        "wave_start_max_hp": 214.0,
+        "damage_taken": 56.7837968247989,
+        "dashes": 6
+      },
+      {
+        "difficulty": "hell",
+        "build": "floss_whip",
+        "strategy": "boss",
+        "seed": 303,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 41.8166666666667,
+        "level": 13,
+        "gold_earned": 302,
+        "xp_earned": 287,
+        "wave_start_hp": 119.353239849592,
+        "wave_start_max_hp": 120.0,
+        "damage_taken": 64.354969734772,
+        "dashes": 9
+      },
+      {
+        "difficulty": "hell",
+        "build": "floss_whip",
+        "strategy": "boss",
+        "seed": 404,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 40.5666666666667,
+        "level": 14,
+        "gold_earned": 310,
+        "xp_earned": 310,
+        "wave_start_hp": 184.433163362893,
+        "wave_start_max_hp": 205.0,
+        "damage_taken": 76.5052564502396,
+        "dashes": 9
+      },
+      {
+        "difficulty": "hell",
+        "build": "floss_whip",
+        "strategy": "boss",
+        "seed": 505,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 23.3166666666667,
+        "level": 13,
+        "gold_earned": 294,
+        "xp_earned": 284,
+        "wave_start_hp": 147.0,
+        "wave_start_max_hp": 147.0,
+        "damage_taken": 42.9901619685724,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "floss_whip",
+        "strategy": "boss",
+        "seed": 606,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 30.1666666666667,
+        "level": 13,
+        "gold_earned": 323,
+        "xp_earned": 276,
+        "wave_start_hp": 175.779999999999,
+        "wave_start_max_hp": 197.0,
+        "damage_taken": 74.2557343093523,
+        "dashes": 6
+      },
+      {
+        "difficulty": "hell",
+        "build": "prophylaxis_polisher",
+        "strategy": "boss",
+        "seed": 101,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 22.25,
+        "level": 13,
+        "gold_earned": 311,
+        "xp_earned": 284,
+        "wave_start_hp": 117.749961756651,
+        "wave_start_max_hp": 147.0,
+        "damage_taken": 59.4045874474819,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "prophylaxis_polisher",
+        "strategy": "boss",
+        "seed": 202,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 26.95,
+        "level": 13,
+        "gold_earned": 298,
+        "xp_earned": 268,
+        "wave_start_hp": 161.266479699183,
+        "wave_start_max_hp": 214.0,
+        "damage_taken": 43.6798437113837,
+        "dashes": 6
+      },
+      {
+        "difficulty": "hell",
+        "build": "prophylaxis_polisher",
+        "strategy": "boss",
+        "seed": 303,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 22.5833333333333,
+        "level": 13,
+        "gold_earned": 299,
+        "xp_earned": 278,
+        "wave_start_hp": 121.713239849591,
+        "wave_start_max_hp": 132.0,
+        "damage_taken": 61.8797785911269,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "prophylaxis_polisher",
+        "strategy": "boss",
+        "seed": 404,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 24.9333333333333,
+        "level": 13,
+        "gold_earned": 293,
+        "xp_earned": 284,
+        "wave_start_hp": 185.0,
+        "wave_start_max_hp": 185.0,
+        "damage_taken": 90.4991761895231,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "prophylaxis_polisher",
+        "strategy": "boss",
+        "seed": 505,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 22.0,
+        "level": 13,
+        "gold_earned": 287,
+        "xp_earned": 264,
+        "wave_start_hp": 200.0,
+        "wave_start_max_hp": 200.0,
+        "damage_taken": 16.4255734309352,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "prophylaxis_polisher",
+        "strategy": "boss",
+        "seed": 606,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 28.45,
+        "level": 13,
+        "gold_earned": 279,
+        "xp_earned": 264,
+        "wave_start_hp": 203.687324717984,
+        "wave_start_max_hp": 225.0,
+        "damage_taken": 9.28196678866905,
+        "dashes": 6
+      },
+      {
+        "difficulty": "hell",
+        "build": "turbo_drill",
+        "strategy": "boss",
+        "seed": 101,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 21.4333333333333,
+        "level": 13,
+        "gold_earned": 286,
+        "xp_earned": 277,
+        "wave_start_hp": 92.9545729492713,
+        "wave_start_max_hp": 164.0,
+        "damage_taken": 29.7022937237409,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "turbo_drill",
+        "strategy": "boss",
+        "seed": 202,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 20.15,
+        "level": 13,
+        "gold_earned": 294,
+        "xp_earned": 278,
+        "wave_start_hp": 214.0,
+        "wave_start_max_hp": 214.0,
+        "damage_taken": 41.4958515258145,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "turbo_drill",
+        "strategy": "boss",
+        "seed": 303,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 22.5333333333333,
+        "level": 13,
+        "gold_earned": 307,
+        "xp_earned": 279,
+        "wave_start_hp": 155.0,
+        "wave_start_max_hp": 155.0,
+        "damage_taken": 9.90076457458031,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "turbo_drill",
+        "strategy": "boss",
+        "seed": 404,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 20.15,
+        "level": 13,
+        "gold_earned": 313,
+        "xp_earned": 278,
+        "wave_start_hp": 217.0,
+        "wave_start_max_hp": 217.0,
+        "damage_taken": 37.1278671546762,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "turbo_drill",
+        "strategy": "boss",
+        "seed": 505,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 19.4,
+        "level": 13,
+        "gold_earned": 312,
+        "xp_earned": 263,
+        "wave_start_hp": 160.0,
+        "wave_start_max_hp": 160.0,
+        "damage_taken": 0.0,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "turbo_drill",
+        "strategy": "boss",
+        "seed": 606,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 22.0666666666667,
+        "level": 13,
+        "gold_earned": 294,
+        "xp_earned": 258,
+        "wave_start_hp": 237.0,
+        "wave_start_max_hp": 237.0,
+        "damage_taken": 0.0,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "uv_lamp",
+        "strategy": "boss",
+        "seed": 101,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 19.85,
+        "level": 13,
+        "gold_earned": 302,
+        "xp_earned": 281,
+        "wave_start_hp": 101.223451371812,
+        "wave_start_max_hp": 159.0,
+        "damage_taken": 0.0,
+        "dashes": 3
+      },
+      {
+        "difficulty": "hell",
+        "build": "uv_lamp",
+        "strategy": "boss",
+        "seed": 202,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 28.3333333333333,
+        "level": 13,
+        "gold_earned": 320,
+        "xp_earned": 276,
+        "wave_start_hp": 281.913239849592,
+        "wave_start_max_hp": 309.0,
+        "damage_taken": 0.0,
+        "dashes": 4
+      },
+      {
+        "difficulty": "hell",
+        "build": "uv_lamp",
+        "strategy": "boss",
+        "seed": 303,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 21.15,
+        "level": 13,
+        "gold_earned": 292,
+        "xp_earned": 277,
+        "wave_start_hp": 128.049808783256,
+        "wave_start_max_hp": 155.0,
+        "damage_taken": 79.2061165966425,
+        "dashes": 4
+      },
+      {
+        "difficulty": "hell",
+        "build": "uv_lamp",
+        "strategy": "boss",
+        "seed": 404,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 20.9166666666667,
+        "level": 13,
+        "gold_earned": 284,
+        "xp_earned": 275,
+        "wave_start_hp": 235.0,
+        "wave_start_max_hp": 235.0,
+        "damage_taken": 37.1278671546762,
+        "dashes": 4
+      },
+      {
+        "difficulty": "hell",
+        "build": "uv_lamp",
+        "strategy": "boss",
+        "seed": 505,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 19.5833333333333,
+        "level": 13,
+        "gold_earned": 303,
+        "xp_earned": 286,
+        "wave_start_hp": 129.026282242676,
+        "wave_start_max_hp": 147.0,
+        "damage_taken": 62.5311446815599,
+        "dashes": 4
+      },
+      {
+        "difficulty": "hell",
+        "build": "uv_lamp",
+        "strategy": "boss",
+        "seed": 606,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 25.6166666666667,
+        "level": 13,
+        "gold_earned": 292,
+        "xp_earned": 269,
+        "wave_start_hp": 216.393662358992,
+        "wave_start_max_hp": 225.0,
+        "damage_taken": 37.1278671546762,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "water_turbine",
+        "strategy": "boss",
+        "seed": 101,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 25.4,
+        "level": 13,
+        "gold_earned": 285,
+        "xp_earned": 285,
+        "wave_start_hp": 147.0,
+        "wave_start_max_hp": 147.0,
+        "damage_taken": 28.2878987845152,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "water_turbine",
+        "strategy": "boss",
+        "seed": 202,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 28.7,
+        "level": 13,
+        "gold_earned": 319,
+        "xp_earned": 294,
+        "wave_start_hp": 220.0,
+        "wave_start_max_hp": 220.0,
+        "damage_taken": 43.6798437113837,
+        "dashes": 6
+      },
+      {
+        "difficulty": "hell",
+        "build": "water_turbine",
+        "strategy": "boss",
+        "seed": 303,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 43.2,
+        "level": 14,
+        "gold_earned": 343,
+        "xp_earned": 315,
+        "wave_start_hp": 155.0,
+        "wave_start_max_hp": 155.0,
+        "damage_taken": 54.4542051601917,
+        "dashes": 9
+      },
+      {
+        "difficulty": "hell",
+        "build": "water_turbine",
+        "strategy": "boss",
+        "seed": 404,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 36.2666666666667,
+        "level": 14,
+        "gold_earned": 330,
+        "xp_earned": 304,
+        "wave_start_hp": 180.0,
+        "wave_start_max_hp": 180.0,
+        "damage_taken": 60.3327841263488,
+        "dashes": 8
+      },
+      {
+        "difficulty": "hell",
+        "build": "water_turbine",
+        "strategy": "boss",
+        "seed": 505,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 21.8166666666667,
+        "level": 13,
+        "gold_earned": 284,
+        "xp_earned": 261,
+        "wave_start_hp": 130.118270092044,
+        "wave_start_max_hp": 147.0,
+        "damage_taken": 31.2655723407799,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "water_turbine",
+        "strategy": "boss",
+        "seed": 606,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 28.45,
+        "level": 13,
+        "gold_earned": 300,
+        "xp_earned": 295,
+        "wave_start_hp": 237.0,
+        "wave_start_max_hp": 237.0,
+        "damage_taken": 58.0122924291815,
+        "dashes": 6
+      }
+    ]
+  },
+  "final_holdout": {
+    "source_sha256": "49cf2ee3cae2446e525d79d90f566a33cdf830382b7721edebbe9475d0aab1dd",
+    "samples": [
+      {
+        "difficulty": "hell",
+        "build": "floss_whip",
+        "strategy": "boss",
+        "seed": 19,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 21.3333333333333,
+        "level": 13,
+        "gold_earned": 288,
+        "xp_earned": 284,
+        "wave_start_hp": 112.0,
+        "wave_start_max_hp": 112.0,
+        "damage_taken": 34.943874969107,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "floss_whip",
+        "strategy": "boss",
+        "seed": 2027,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 26.2666666666667,
+        "level": 12,
+        "gold_earned": 264,
+        "xp_earned": 256,
+        "wave_start_hp": 144.0,
+        "wave_start_max_hp": 144.0,
+        "damage_taken": 99.0076457458031,
+        "dashes": 6
+      },
+      {
+        "difficulty": "hell",
+        "build": "floss_whip",
+        "strategy": "boss",
+        "seed": 7,
+        "outcome": "death",
+        "wave": 4,
+        "seconds": 38.1833333333333,
+        "level": 11,
+        "gold_earned": 209,
+        "xp_earned": 190,
+        "wave_start_hp": 57.36,
+        "wave_start_max_hp": 120.0,
+        "damage_taken": 71.36,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "floss_whip",
+        "strategy": "boss",
+        "seed": 73,
+        "outcome": "death",
+        "wave": 5,
+        "seconds": 13.1166666666667,
+        "level": 12,
+        "gold_earned": 267,
+        "xp_earned": 232,
+        "wave_start_hp": 144.0,
+        "wave_start_max_hp": 144.0,
+        "damage_taken": 145.4,
+        "dashes": 3
+      },
+      {
+        "difficulty": "hell",
+        "build": "floss_whip",
+        "strategy": "boss",
+        "seed": 8191,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 27.1333333333333,
+        "level": 12,
+        "gold_earned": 294,
+        "xp_earned": 254,
+        "wave_start_hp": 126.89272349728,
+        "wave_start_max_hp": 145.0,
+        "damage_taken": 128.709939469544,
+        "dashes": 6
+      },
+      {
+        "difficulty": "hell",
+        "build": "floss_whip",
+        "strategy": "boss",
+        "seed": 997,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 22.9666666666667,
+        "level": 13,
+        "gold_earned": 300,
+        "xp_earned": 271,
+        "wave_start_hp": 107.0,
+        "wave_start_max_hp": 107.0,
+        "damage_taken": 39.6030582983212,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "turbo_drill",
+        "strategy": "boss",
+        "seed": 19,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 21.2333333333333,
+        "level": 13,
+        "gold_earned": 297,
+        "xp_earned": 280,
+        "wave_start_hp": 112.0,
+        "wave_start_max_hp": 112.0,
+        "damage_taken": 61.4158124536605,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "turbo_drill",
+        "strategy": "boss",
+        "seed": 2027,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 18.65,
+        "level": 13,
+        "gold_earned": 266,
+        "xp_earned": 267,
+        "wave_start_hp": 109.753427931967,
+        "wave_start_max_hp": 139.0,
+        "damage_taken": 0.0,
+        "dashes": 4
+      },
+      {
+        "difficulty": "hell",
+        "build": "turbo_drill",
+        "strategy": "boss",
+        "seed": 7,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 20.0,
+        "level": 13,
+        "gold_earned": 298,
+        "xp_earned": 285,
+        "wave_start_hp": 132.0,
+        "wave_start_max_hp": 132.0,
+        "damage_taken": 31.2655723407799,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "turbo_drill",
+        "strategy": "boss",
+        "seed": 73,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 21.45,
+        "level": 13,
+        "gold_earned": 289,
+        "xp_earned": 263,
+        "wave_start_hp": 222.0,
+        "wave_start_max_hp": 222.0,
+        "damage_taken": 0.0,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "turbo_drill",
+        "strategy": "boss",
+        "seed": 8191,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 22.6,
+        "level": 13,
+        "gold_earned": 280,
+        "xp_earned": 284,
+        "wave_start_hp": 90.0,
+        "wave_start_max_hp": 90.0,
+        "damage_taken": 79.2061165966425,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "turbo_drill",
+        "strategy": "boss",
+        "seed": 997,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 20.45,
+        "level": 13,
+        "gold_earned": 296,
+        "xp_earned": 284,
+        "wave_start_hp": 132.0,
+        "wave_start_max_hp": 132.0,
+        "damage_taken": 39.6030582983212,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "uv_lamp",
+        "strategy": "boss",
+        "seed": 19,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 19.8166666666667,
+        "level": 13,
+        "gold_earned": 317,
+        "xp_earned": 264,
+        "wave_start_hp": 112.0,
+        "wave_start_max_hp": 112.0,
+        "damage_taken": 0.0,
+        "dashes": 3
+      },
+      {
+        "difficulty": "hell",
+        "build": "uv_lamp",
+        "strategy": "boss",
+        "seed": 2027,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 24.0666666666667,
+        "level": 13,
+        "gold_earned": 282,
+        "xp_earned": 262,
+        "wave_start_hp": 131.433290840724,
+        "wave_start_max_hp": 139.0,
+        "damage_taken": 0.0,
+        "dashes": 4
+      },
+      {
+        "difficulty": "hell",
+        "build": "uv_lamp",
+        "strategy": "boss",
+        "seed": 7,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 20.2333333333333,
+        "level": 13,
+        "gold_earned": 291,
+        "xp_earned": 282,
+        "wave_start_hp": 124.0,
+        "wave_start_max_hp": 124.0,
+        "damage_taken": 0.0,
+        "dashes": 4
+      },
+      {
+        "difficulty": "hell",
+        "build": "uv_lamp",
+        "strategy": "boss",
+        "seed": 73,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 20.7333333333333,
+        "level": 13,
+        "gold_earned": 303,
+        "xp_earned": 270,
+        "wave_start_hp": 234.0,
+        "wave_start_max_hp": 234.0,
+        "damage_taken": 13.9229501830036,
+        "dashes": 3
+      },
+      {
+        "difficulty": "hell",
+        "build": "uv_lamp",
+        "strategy": "boss",
+        "seed": 8191,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 20.6666666666667,
+        "level": 13,
+        "gold_earned": 303,
+        "xp_earned": 290,
+        "wave_start_hp": 124.0,
+        "wave_start_max_hp": 124.0,
+        "damage_taken": 39.6030582983212,
+        "dashes": 4
+      },
+      {
+        "difficulty": "hell",
+        "build": "uv_lamp",
+        "strategy": "boss",
+        "seed": 997,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 22.3,
+        "level": 13,
+        "gold_earned": 283,
+        "xp_earned": 276,
+        "wave_start_hp": 78.7,
+        "wave_start_max_hp": 132.0,
+        "damage_taken": 0.0,
+        "dashes": 4
+      }
+    ]
+  },
+  "roster": {
+    "source_sha256": "49cf2ee3cae2446e525d79d90f566a33cdf830382b7721edebbe9475d0aab1dd",
+    "samples": [
+      {
+        "difficulty": "hell",
+        "build": "amalgam_slingshot",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 19.75,
+        "level": 12,
+        "gold_earned": 276,
+        "xp_earned": 257,
+        "wave_start_hp": 79.34,
+        "wave_start_max_hp": 95.0,
+        "damage_taken": 59.4045874474819,
+        "dashes": 4
+      },
+      {
+        "difficulty": "hell",
+        "build": "cavity_grinder",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 27.4166666666667,
+        "level": 13,
+        "gold_earned": 304,
+        "xp_earned": 289,
+        "wave_start_hp": 107.0,
+        "wave_start_max_hp": 107.0,
+        "damage_taken": 0.0,
+        "dashes": 6
+      },
+      {
+        "difficulty": "hell",
+        "build": "crown_launcher",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 31.2333333333333,
+        "level": 12,
+        "gold_earned": 283,
+        "xp_earned": 248,
+        "wave_start_hp": 79.2286980337582,
+        "wave_start_max_hp": 107.0,
+        "damage_taken": 29.7022937237409,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "enamel_mirror",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 22.55,
+        "level": 13,
+        "gold_earned": 292,
+        "xp_earned": 269,
+        "wave_start_hp": 115.12,
+        "wave_start_max_hp": 136.0,
+        "damage_taken": 0.0,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "floss_garrote",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "death",
+        "wave": 5,
+        "seconds": 15.75,
+        "level": 13,
+        "gold_earned": 276,
+        "xp_earned": 258,
+        "wave_start_hp": 37.4595917493166,
+        "wave_start_max_hp": 102.0,
+        "damage_taken": 46.4595917493166,
+        "dashes": 4
+      },
+      {
+        "difficulty": "hell",
+        "build": "floss_whip",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 33.45,
+        "level": 14,
+        "gold_earned": 326,
+        "xp_earned": 321,
+        "wave_start_hp": 107.0,
+        "wave_start_max_hp": 107.0,
+        "damage_taken": 0.0,
+        "dashes": 7
+      },
+      {
+        "difficulty": "hell",
+        "build": "fluoride_rocket",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 38.15,
+        "level": 14,
+        "gold_earned": 309,
+        "xp_earned": 316,
+        "wave_start_hp": 107.0,
+        "wave_start_max_hp": 107.0,
+        "damage_taken": 25.9895070082733,
+        "dashes": 8
+      },
+      {
+        "difficulty": "hell",
+        "build": "fluoride_sprayer",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 19.9166666666667,
+        "level": 14,
+        "gold_earned": 309,
+        "xp_earned": 308,
+        "wave_start_hp": 95.0,
+        "wave_start_max_hp": 95.0,
+        "damage_taken": 0.0,
+        "dashes": 4
+      },
+      {
+        "difficulty": "hell",
+        "build": "interdental_brush",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 20.6,
+        "level": 13,
+        "gold_earned": 281,
+        "xp_earned": 277,
+        "wave_start_hp": 100.0,
+        "wave_start_max_hp": 100.0,
+        "damage_taken": 0.0,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "magic_toothbrush",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 23.2166666666667,
+        "level": 13,
+        "gold_earned": 283,
+        "xp_earned": 278,
+        "wave_start_hp": 89.1276998746598,
+        "wave_start_max_hp": 95.0,
+        "damage_taken": 66.8301608784171,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "mouthwash_mortar",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 26.4666666666667,
+        "level": 13,
+        "gold_earned": 303,
+        "xp_earned": 285,
+        "wave_start_hp": 83.5532908407235,
+        "wave_start_max_hp": 90.0,
+        "damage_taken": 29.7022937237409,
+        "dashes": 6
+      },
+      {
+        "difficulty": "hell",
+        "build": "plaque_scaler",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 23.9,
+        "level": 13,
+        "gold_earned": 287,
+        "xp_earned": 288,
+        "wave_start_hp": 98.2228993445861,
+        "wave_start_max_hp": 107.0,
+        "damage_taken": 0.0,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "prophylaxis_polisher",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 23.9833333333333,
+        "level": 13,
+        "gold_earned": 284,
+        "xp_earned": 262,
+        "wave_start_hp": 107.0,
+        "wave_start_max_hp": 107.0,
+        "damage_taken": 35.2714737969424,
+        "dashes": 6
+      },
+      {
+        "difficulty": "hell",
+        "build": "toothpick_spear",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 20.2166666666667,
+        "level": 13,
+        "gold_earned": 284,
+        "xp_earned": 263,
+        "wave_start_hp": 72.6574489538424,
+        "wave_start_max_hp": 107.0,
+        "damage_taken": 29.7022937237409,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "turbo_drill",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 20.9833333333333,
+        "level": 13,
+        "gold_earned": 296,
+        "xp_earned": 276,
+        "wave_start_hp": 107.0,
+        "wave_start_max_hp": 107.0,
+        "damage_taken": 29.7022937237409,
+        "dashes": 5
+      },
+      {
+        "difficulty": "hell",
+        "build": "uv_lamp",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 20.4333333333333,
+        "level": 14,
+        "gold_earned": 309,
+        "xp_earned": 307,
+        "wave_start_hp": 103.12,
+        "wave_start_max_hp": 124.0,
+        "damage_taken": 33.0025485819344,
+        "dashes": 3
+      },
+      {
+        "difficulty": "hell",
+        "build": "water_jet",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 20.1333333333333,
+        "level": 12,
+        "gold_earned": 245,
+        "xp_earned": 236,
+        "wave_start_hp": 75.4332908407235,
+        "wave_start_max_hp": 95.0,
+        "damage_taken": 0.0,
+        "dashes": 4
+      },
+      {
+        "difficulty": "hell",
+        "build": "water_turbine",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 18.9,
+        "level": 13,
+        "gold_earned": 287,
+        "xp_earned": 278,
+        "wave_start_hp": 58.5630470506372,
+        "wave_start_max_hp": 95.0,
+        "damage_taken": 11.1383601464028,
+        "dashes": 4
+      },
+      {
+        "difficulty": "normal",
+        "build": "amalgam_slingshot",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 20.0333333333333,
+        "level": 12,
+        "gold_earned": 264,
+        "xp_earned": 243,
+        "wave_start_hp": 95.0,
+        "wave_start_max_hp": 95.0,
+        "damage_taken": 0.0,
+        "dashes": 3
+      },
+      {
+        "difficulty": "normal",
+        "build": "cavity_grinder",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 20.5833333333333,
+        "level": 13,
+        "gold_earned": 276,
+        "xp_earned": 263,
+        "wave_start_hp": 107.0,
+        "wave_start_max_hp": 107.0,
+        "damage_taken": 48.825,
+        "dashes": 4
+      },
+      {
+        "difficulty": "normal",
+        "build": "crown_launcher",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 22.9833333333333,
+        "level": 12,
+        "gold_earned": 273,
+        "xp_earned": 257,
+        "wave_start_hp": 95.0,
+        "wave_start_max_hp": 95.0,
+        "damage_taken": 0.0,
+        "dashes": 3
+      },
+      {
+        "difficulty": "normal",
+        "build": "enamel_mirror",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 18.4333333333333,
+        "level": 12,
+        "gold_earned": 267,
+        "xp_earned": 247,
+        "wave_start_hp": 136.0,
+        "wave_start_max_hp": 136.0,
+        "damage_taken": 0.0,
+        "dashes": 3
+      },
+      {
+        "difficulty": "normal",
+        "build": "floss_garrote",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 20.1833333333333,
+        "level": 12,
+        "gold_earned": 260,
+        "xp_earned": 242,
+        "wave_start_hp": 102.0,
+        "wave_start_max_hp": 102.0,
+        "damage_taken": 22.32,
+        "dashes": 4
+      },
+      {
+        "difficulty": "normal",
+        "build": "floss_whip",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 25.3333333333333,
+        "level": 12,
+        "gold_earned": 271,
+        "xp_earned": 257,
+        "wave_start_hp": 102.0,
+        "wave_start_max_hp": 102.0,
+        "damage_taken": 22.32,
+        "dashes": 6
+      },
+      {
+        "difficulty": "normal",
+        "build": "fluoride_rocket",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 30.8166666666667,
+        "level": 12,
+        "gold_earned": 273,
+        "xp_earned": 254,
+        "wave_start_hp": 93.5,
+        "wave_start_max_hp": 107.0,
+        "damage_taken": 5.58,
+        "dashes": 6
+      },
+      {
+        "difficulty": "normal",
+        "build": "fluoride_sprayer",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 18.95,
+        "level": 12,
+        "gold_earned": 269,
+        "xp_earned": 252,
+        "wave_start_hp": 95.0,
+        "wave_start_max_hp": 95.0,
+        "damage_taken": 0.0,
+        "dashes": 3
+      },
+      {
+        "difficulty": "normal",
+        "build": "interdental_brush",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 22.85,
+        "level": 13,
+        "gold_earned": 280,
+        "xp_earned": 263,
+        "wave_start_hp": 100.0,
+        "wave_start_max_hp": 100.0,
+        "damage_taken": 0.0,
+        "dashes": 5
+      },
+      {
+        "difficulty": "normal",
+        "build": "magic_toothbrush",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 19.2,
+        "level": 13,
+        "gold_earned": 276,
+        "xp_earned": 259,
+        "wave_start_hp": 90.0,
+        "wave_start_max_hp": 90.0,
+        "damage_taken": 0.0,
+        "dashes": 3
+      },
+      {
+        "difficulty": "normal",
+        "build": "mouthwash_mortar",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 25.1666666666667,
+        "level": 12,
+        "gold_earned": 271,
+        "xp_earned": 252,
+        "wave_start_hp": 90.0,
+        "wave_start_max_hp": 90.0,
+        "damage_taken": 0.0,
+        "dashes": 4
+      },
+      {
+        "difficulty": "normal",
+        "build": "plaque_scaler",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 21.8166666666667,
+        "level": 13,
+        "gold_earned": 280,
+        "xp_earned": 259,
+        "wave_start_hp": 99.1666666666667,
+        "wave_start_max_hp": 107.0,
+        "damage_taken": 0.0,
+        "dashes": 5
+      },
+      {
+        "difficulty": "normal",
+        "build": "prophylaxis_polisher",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 21.9666666666667,
+        "level": 12,
+        "gold_earned": 274,
+        "xp_earned": 250,
+        "wave_start_hp": 89.0,
+        "wave_start_max_hp": 107.0,
+        "damage_taken": 26.505,
+        "dashes": 5
+      },
+      {
+        "difficulty": "normal",
+        "build": "toothpick_spear",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 19.6,
+        "level": 12,
+        "gold_earned": 250,
+        "xp_earned": 238,
+        "wave_start_hp": 95.0,
+        "wave_start_max_hp": 95.0,
+        "damage_taken": 22.32,
+        "dashes": 4
+      },
+      {
+        "difficulty": "normal",
+        "build": "turbo_drill",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 19.8833333333333,
+        "level": 12,
+        "gold_earned": 283,
+        "xp_earned": 255,
+        "wave_start_hp": 107.0,
+        "wave_start_max_hp": 107.0,
+        "damage_taken": 0.0,
+        "dashes": 4
+      },
+      {
+        "difficulty": "normal",
+        "build": "uv_lamp",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 20.4333333333333,
+        "level": 13,
+        "gold_earned": 285,
+        "xp_earned": 268,
+        "wave_start_hp": 124.0,
+        "wave_start_max_hp": 124.0,
+        "damage_taken": 0.0,
+        "dashes": 3
+      },
+      {
+        "difficulty": "normal",
+        "build": "water_jet",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 18.4833333333333,
+        "level": 12,
+        "gold_earned": 254,
+        "xp_earned": 236,
+        "wave_start_hp": 90.0,
+        "wave_start_max_hp": 90.0,
+        "damage_taken": 0.0,
+        "dashes": 3
+      },
+      {
+        "difficulty": "normal",
+        "build": "water_turbine",
+        "strategy": "boss",
+        "seed": 13579,
+        "outcome": "boss_killed",
+        "wave": 5,
+        "seconds": 18.4333333333333,
+        "level": 13,
+        "gold_earned": 287,
+        "xp_earned": 261,
+        "wave_start_hp": 95.0,
+        "wave_start_max_hp": 95.0,
+        "damage_taken": 44.64,
+        "dashes": 3
+      }
+    ]
+  },
+  "native_validation": {
+    "source_sha256": "49cf2ee3cae2446e525d79d90f566a33cdf830382b7721edebbe9475d0aab1dd",
+    "sample": {
+      "difficulty": "hell",
+      "build": "floss_whip",
+      "strategy": "boss",
+      "seed": 13579,
+      "outcome": "boss_killed",
+      "wave": 5,
+      "seconds": 33.45,
+      "level": 14,
+      "gold_earned": 326,
+      "xp_earned": 321,
+      "wave_start_hp": 107.0,
+      "wave_start_max_hp": 107.0,
+      "damage_taken": 0.0,
+      "dashes": 7
+    },
+    "matched_headless": [
+      "outcome",
+      "level",
+      "kills",
+      "gold_earned",
+      "xp_earned",
+      "chests",
+      "pilot"
+    ]
+  }
+}
