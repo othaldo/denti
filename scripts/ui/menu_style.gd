@@ -36,13 +36,21 @@ static func backdrop(parent: Control, overlay: bool = false) -> void:
 static func focus(control: Control, keyboard: bool, radius: int = 12) -> void:
 	# A parked pointer must not suggest a second keyboard/controller selection.
 	if control is BaseButton:
+		var hover := control.get_theme_stylebox("hover")
+		# Reused cards can change rarity while pointer feedback is suppressed.
+		# Keep the newly styled hover instead of restoring the previous reward.
+		if control.has_meta("menu_pointer_hover") and hover != control.get_meta("menu_pointer_suppressed"):
+			control.set_meta("menu_pointer_hover", hover)
 		if keyboard:
 			if not control.has_meta("menu_pointer_hover"):
-				control.set_meta("menu_pointer_hover", control.get_theme_stylebox("hover"))
-			control.add_theme_stylebox_override("hover", control.get_theme_stylebox("normal"))
+				control.set_meta("menu_pointer_hover", hover)
+			var normal := control.get_theme_stylebox("normal")
+			control.set_meta("menu_pointer_suppressed", normal)
+			control.add_theme_stylebox_override("hover", normal)
 		elif control.has_meta("menu_pointer_hover"):
 			control.add_theme_stylebox_override("hover", control.get_meta("menu_pointer_hover"))
 			control.remove_meta("menu_pointer_hover")
+			control.remove_meta("menu_pointer_suppressed")
 	if not keyboard:
 		control.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 		return
