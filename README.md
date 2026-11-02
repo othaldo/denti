@@ -141,7 +141,14 @@ Unter Windows können die Tests mit dem Godot-Konsolenprogramm ausgeführt werde
 python tools/run_tests.py --godot Godot_v4.7.2-stable_win64_console.exe
 ```
 
-Der Runner benötigt Python 3.10+ (keine Zusatzpakete). Standardmäßig laufen 164 Tests für Spielfluss, Spielstände, Kampf, Balance, Shop und bedienbare UI. 19 zusätzliche Grafik-, Debug-, Waffenvergleichs- und umfassende Boss-Routenprüfungen sind mit `--suite extended` gezielt aufrufbar; `--suite all --timeout 300` führt beide Gruppen aus. Normale CI-Builds verwenden die Kernprüfung, Release-Tags die vollständige Suite. Bis zu vier Tests laufen parallel, mit getrennten Godot-Benutzerdaten und unverändertem Simulationsschritt von 1/60 Sekunde. `--jobs 1` läuft seriell; `--filter 'weapon_*'` wählt innerhalb der Suite eine Teilmenge. Fehlercodes, `SCRIPT ERROR:`, Engine-`ERROR:`, Ressourcen-/Objektlecks und Zeitüberschreitungen lassen den Lauf fehlschlagen. Laufzeiten und Logs stehen unter `.godot/test_results.json` und `.godot/test_runs/`. [Auswahl, Befehle und Laufzeitvergleich](docs/TEST_RUNTIME.md).
+Der Runner benötigt Python 3.10+ (keine Zusatzpakete). Standardmäßig laufen 165 Tests für Spielfluss, Spielstände, Kampf, Balance, Shop und bedienbare UI. 20 zusätzliche Grafik-, Debug-, Waffenvergleichs- und umfassende Boss-Routenprüfungen sind mit `--suite extended` gezielt aufrufbar; `--suite all --timeout 300` führt beide Gruppen aus. Normale CI-Builds verwenden die Kernprüfung, Release-Tags die vollständige Suite. Bis zu vier Tests laufen parallel, mit getrennten Godot-Benutzerdaten und unverändertem Simulationsschritt von 1/60 Sekunde. `--jobs 1` läuft seriell; `--filter 'weapon_*'` wählt innerhalb der Suite eine Teilmenge. Fehlercodes, `SCRIPT ERROR:`, Engine-`ERROR:`, Ressourcen-/Objektlecks und Zeitüberschreitungen lassen den Lauf fehlschlagen. Laufzeiten und Logs stehen unter `.godot/test_results.json` und `.godot/test_runs/`. [Auswahl, Befehle und Laufzeitvergleich](docs/TEST_RUNTIME.md).
+
+[Testpiloten und Zeitraffer](docs/BOT_SIMULATION.md) vergleichen Reaktion,
+Kampfstrategie und Buildregel getrennt über den verdienten Einstieg W1–5.
+`python tools/run_bot_comparison.py --visible --speed 8` zeigt einen Botlauf mit
+Pause und Tempowahl; ohne `--visible` werden Vergleichsmatrizen headless und mit
+bis zu vier Workern berechnet. Messdaten landen in einem neuen Verzeichnis
+unter `.godot/bot_runs/`.
 
 Ein reproduzierbarer [Buildvergleich auf Normal](docs/BUILD_COMPARISON.md) prüft ganze Wellen mit vier Waffenrollen, Verzauberungen, Heilung und normaler Spielerbewegung. `python tools/run_build_comparison.py --godot Godot_v4.7.2-stable_win64_console.exe` erzeugt Rohdaten und Vergleichstabellen mit isolierten Benutzerdaten.
 

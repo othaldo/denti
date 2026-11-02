@@ -1,0 +1,14 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+[ext_resource type="Script" path="res://tools/balance/bots/pilot_profile.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"novice"
+display_name = "Anfänger"
+reaction_ticks = 24
+decision_ticks = 12
+prediction_seconds = 0.25
+avoidance_weight = 0.6
+mistake_chance = 0.18
+mistake_angle_degrees = 65.0
+reads_warnings = false
+uses_dash = false

@@ -38,20 +38,15 @@ Ergänzung 02.11.: Der [Kontaktwaffen-Spieltest-Pass](CONTACT_WEAPON_BALANCE.md)
 ergänzt kleine Rückstöße, Kratzer-Folgetreffer und den zielunabhängigen
 Polierer-Crit-Zyklus. Die Hell-Lücke zu sicheren Linienwaffen bleibt offen.
 
-Nächster Ausbau der Diagnose auf Nutzeranregung: mehrere regelbasierte
-Testpiloten. **Spielstärke** (Reaktionszeit, Entscheidungsfehler, Ausweichen und
-Dash-Nutzung) getrennt von **Strategie** (Distanzhalten, offensiver Nahkampf,
-Loot-Routen, Bossfokus) konfigurieren. Auch Shop-/Buildregeln müssen als eigene
-Vergleichsachse sichtbar bleiben. Die bisherigen Piloten beherrschen Kreisroute,
-reichweitenabhängige Zielsuche und Boss-Nachsetzen, aber keine bewusste Reaktion
-auf Gefahren oder Dash. Nicht als menschliche Winrates interpretieren.
-
-Die Diagnose läuft bereits headless ohne Echtzeitsynchronisation mit festem
-1/60-Sekunden-Schritt und parallelen Seeds. Weitere Beschleunigung soll diese
-Schrittweite erhalten; eine höhere Zeitskalierung bei gröberer Kollisionsprüfung
-wäre keine gleichwertige Balanceprobe. Ein sichtbarer Zeitraffer kann zusätzlich
-zum Nachprüfen auffälliger Läufe dienen. Neue Pilotprofile und der sichtbare
-Zeitraffer sind geplant, noch nicht implementiert.
+Auf Nutzeranregung sind nun [mehrere Testpiloten und sichtbarer Zeitraffer](BOT_SIMULATION.md)
+für den verdienten Einstieg W1–5 umgesetzt: drei Reaktions-/Fehlerprofile, vier
+Kampfstrategien und getrennte einfache/heuristische Buildregeln. Wahrnehmung,
+Projektil-/Warnungsreaktion und echter Dash werden getestet. Die bisherigen
+Kreis-/Nachsetzreferenzen bleiben erhalten. Die Diagnose rechnet headless ohne
+Echtzeitbegrenzung und nativ mit Pause sowie 1×/4×/8×/16×; die Physik bleibt bei
+1/60 Sekunde. Noch offen sind menschliche Kalibrierung, weitere Sensoren für
+die späteren Spezialbosse und längere vollständige Runs. Bot-Ergebnisse sind
+keine menschlichen Winrates.
 
 Zurückgestellt: [Waffenfamilien-Setboni](WEAPON_SET_IDEA.md), zunächst höchstens
 eine kleine Nah-/Fernkampf-Schwelle mit Platz für 4+2-Mischbuilds. Fusion,

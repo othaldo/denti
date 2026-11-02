@@ -49,7 +49,7 @@ func make_run(build: String, difficulty: StringName, sample_seed: int):
 	var game = load("res://scenes/game/game.tscn").instantiate()
 	game.set_script(EARNED_GAME)
 	game.probe_seed = sample_seed
-	game.get_node("Player").set_script(PROBE_PLAYER)
+	game.get_node("Player").set_script(probe_player_script())
 	game.get_node("Sound").set_script(PROBE_SOUND)
 	root.add_child(game)
 	current_scene = game
@@ -73,6 +73,7 @@ func make_run(build: String, difficulty: StringName, sample_seed: int):
 func sample_run(build: String, difficulty: StringName, movement: String, sample_seed: int, last_wave: int = 5) -> Dictionary:
 	var game = make_run(build, difficulty, sample_seed)
 	var waves: Array[Dictionary] = []
+	var aborted := false
 	for number in range(1, last_wave + 1):
 		var plan: Dictionary = PROFILES.spawn_plan(number, sample_seed + number * 7919, difficulty)
 		seed(sample_seed + number * 104729)
@@ -92,6 +93,9 @@ func sample_run(build: String, difficulty: StringName, movement: String, sample_
 		var event_index := 0
 		var limit := 90.0 if WaveController.is_boss_wave(number) else float(plan.duration)
 		while frame < roundi(limit * 60):
+			if not await before_combat_step(game, frame):
+				aborted = true
+				break
 			await physics_frame
 			game.player.probe_direction = farm_direction(game, movement, float(frame) / 60)
 			game.wave.remaining = maxf(float(plan.duration) - float(frame) / 60, 0)
@@ -118,8 +122,10 @@ func sample_run(build: String, difficulty: StringName, movement: String, sample_
 		for weapon: WeaponInstance in game.player.loadout.equipped(): weapon.strike.flush()
 		var battle: Dictionary = game.telemetry.current_wave_summary()
 		var outcome := "death" if game.probe_dead else ("boss_killed" if game.probe_boss_killed else ("timeout" if WaveController.is_boss_wave(number) else "wave_complete"))
+		if aborted: outcome = "aborted"
 		if outcome == "wave_complete":
 			await resolve_intermission(game)
+			if run_aborted(): outcome = "aborted"
 		var end := snapshot(game)
 		waves.append({"wave": number, "outcome": outcome, "seconds": float(frame) / 60,
 			"spawn_plan": plan.digest, "start": start, "after_rewards": end,
@@ -146,6 +152,23 @@ func sample_run(build: String, difficulty: StringName, movement: String, sample_
 	return result
 
 
+# Optional tool hooks. Defaults preserve the historical input/reward policy.
+func probe_player_script() -> Script:
+	return PROBE_PLAYER
+
+
+func before_combat_step(_game, _frame: int) -> bool:
+	return true
+
+
+func before_loot_step(_game, _frame: int) -> bool:
+	return true
+
+
+func run_aborted() -> bool:
+	return false
+
+
 func snapshot(game) -> Dictionary:
 	return {"coins": game.coins, "level": game.level, "xp": game.xp, "xp_goal": game.xp_goal,
 		"stats": game.player.stats.to_save_data().duplicate(true), "equipment": game.player.loadout.save_data().duplicate(true),
@@ -158,6 +181,7 @@ func resolve_intermission(game) -> void:
 	# Let the actual loot magnet finish before choosing or buying anything.
 	for frame in 600:
 		if not game.collecting_wave_loot: break
+		if not await before_loot_step(game, frame): return
 		paused = false
 		await process_frame
 	paused = true
@@ -165,28 +189,9 @@ func resolve_intermission(game) -> void:
 		if game.in_shop: return
 		match game.rewards.step:
 			PostWaveRewards.Step.LEVELS:
-				var priority := [&"melee_damage" if game.player.loadout.equipped()[0].data.damage_stat == "melee" else &"ranged_damage", &"attack_speed", &"max_health", &"damage_bonus", &"armor", &"regen", &"crit_chance", &"speed_bonus", &"luck"]
-				var selected: UpgradeData = game.choice_panel.current_upgrades[0]
-				for stat: StringName in priority:
-					var matching: Array = game.choice_panel.current_upgrades.filter(func(upgrade: UpgradeData): return upgrade.stat == stat)
-					if not matching.is_empty():
-						selected = matching[0]
-						break
-				game._on_upgrade_chosen(selected)
+				game._on_upgrade_chosen(level_choice(game))
 			PostWaveRewards.Step.WEAPONS:
-				var state: WeaponUpgradeState = game.rewards.weapon_upgrades
-				for point in 100:
-					var selected: WeaponInstance
-					var lowest := 11
-					for weapon: WeaponInstance in game.player.loadout.equipped():
-						var values := state.preview(weapon)
-						var index := WeaponAffixes.find(values, &"fire")
-						var rank := WeaponUpgrades.level(values[index]) if index >= 0 else 0
-						if state.remaining() >= WeaponUpgrades.cost(weapon.data) and rank < lowest and rank < 10:
-							selected = weapon
-							lowest = rank
-					if selected == null or not state.plan(game.player.loadout, selected.instance_uid, &"fire"): break
-				game._on_weapon_upgrades_completed()
+				spend_upgrade_points(game)
 			PostWaveRewards.Step.CHESTS:
 				if game.weapon_chest_panel.visible: game._on_affix_scrapped()
 				else: game._on_chest_resolved(true)
@@ -196,6 +201,30 @@ func resolve_intermission(game) -> void:
 				return
 	push_error("Earned progression did not finish its actual reward queue")
 	failures += 1
+
+
+func level_choice(game) -> UpgradeData:
+	var priority := [&"melee_damage" if game.player.loadout.equipped()[0].data.damage_stat == "melee" else &"ranged_damage", &"attack_speed", &"max_health", &"damage_bonus", &"armor", &"regen", &"crit_chance", &"speed_bonus", &"luck"]
+	for stat: StringName in priority:
+		var matching: Array = game.choice_panel.current_upgrades.filter(func(upgrade: UpgradeData): return upgrade.stat == stat)
+		if not matching.is_empty(): return matching[0]
+	return game.choice_panel.current_upgrades[0]
+
+
+func spend_upgrade_points(game) -> void:
+	var state: WeaponUpgradeState = game.rewards.weapon_upgrades
+	for point in 100:
+		var selected: WeaponInstance
+		var lowest := 11
+		for weapon: WeaponInstance in game.player.loadout.equipped():
+			var values := state.preview(weapon)
+			var index := WeaponAffixes.find(values, &"fire")
+			var rank := WeaponUpgrades.level(values[index]) if index >= 0 else 0
+			if state.remaining() >= WeaponUpgrades.cost(weapon.data) and rank < lowest and rank < 10:
+				selected = weapon
+				lowest = rank
+		if selected == null or not state.plan(game.player.loadout, selected.instance_uid, &"fire"): break
+	game._on_weapon_upgrades_completed()
 
 
 func shop_policy(game, build: String) -> void:

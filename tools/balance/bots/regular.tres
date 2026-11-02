@@ -1,0 +1,15 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+[ext_resource type="Script" path="res://tools/balance/bots/pilot_profile.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"regular"
+display_name = "Geübt"
+reaction_ticks = 10
+decision_ticks = 6
+prediction_seconds = 0.5
+avoidance_weight = 2.0
+mistake_chance = 0.05
+mistake_angle_degrees = 30.0
+reads_warnings = true
+uses_dash = true
+dash_danger_threshold = 1.8

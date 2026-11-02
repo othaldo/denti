@@ -1,0 +1,15 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+[ext_resource type="Script" path="res://tools/balance/bots/pilot_profile.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"expert"
+display_name = "Erfahren"
+reaction_ticks = 4
+decision_ticks = 3
+prediction_seconds = 0.8
+avoidance_weight = 3.0
+mistake_chance = 0.0
+mistake_angle_degrees = 0.0
+reads_warnings = true
+uses_dash = true
+dash_danger_threshold = 1.1
