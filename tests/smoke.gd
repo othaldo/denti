@@ -194,7 +194,7 @@ func _run() -> void:
 	if paused or game.wave.current_wave != 2 or not game.wave.active or game.get_node("ShopPanel").visible:
 		_fail("shop continue did not start wave two")
 		return
-	if game.get_node("HUD").wave_label.text != "Welle 2" or game.get_node("HUD").timer_label.text != "%d:%02d" % [ceili(game.wave.duration) / 60, ceili(game.wave.duration) % 60]:
+	if game.get_node("HUD").wave_label.text != "Welle 2" or game.get_node("HUD").timer_label.text != str(ceili(game.wave.duration)):
 		_fail("HUD did not show wave number and countdown")
 		return
 	if game.get_node("Enemies").get_child_count() != 0:

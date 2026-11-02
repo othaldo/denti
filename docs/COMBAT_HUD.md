@@ -39,7 +39,9 @@ Grafiken. Der Spielfeldmitte bleibt frei; Spielerressourcen sind unten verankert
   keinen neuen Effekt aus. Pause friert ihn ein, reduzierte Bewegung unterdrückt ihn.
   In der Aufstiegsauswahl erhält die Pille einen kräftigeren, ruhigen Goldrand.
 - Welle und Zeit teilen einen 44-Pixel-Bereich oben mittig, in schmalem Querformat
-  oben links. Die Wellenangabe hat 13 Pixel. Bei Entzündung bilden Flamme und
+  oben links. Die Wellenangabe hat 13 Pixel. Der Countdown zeigt ganze
+  Restsekunden, auch über einer Minute (`90` statt `1:30`). Die Zeitzeile lässt
+  seitlich Platz für Ziffernränder und Schriftkontur. Bei Entzündung bilden Flamme und
   `+n s` eine gemeinsam zentrierte Zeile mit sechs Pixeln Abstand; die Flamme
   wird auf die Ziffernhöhe skaliert. Beutesammlung und Shop verwenden denselben
   Bereich. Nur die innere Ausrichtung folgt der Textbreite.

@@ -75,7 +75,7 @@ func _run() -> void:
 				_check(hud.pending_badge.visible == (count > 0), "pending pill visibility does not follow its real count")
 				_check(hud.pending_label.text == ("99+" if count >= 100 else str(count)), "pending pill is not capped at 99+")
 			var geometry := _geometry(hud)
-			_check(hud.timer_label.text == "0:27", "timer is not formatted as minutes:seconds")
+			_check(hud.timer_label.text == "27", "timer is not displayed in total seconds")
 			for state in ["large", "boss", "two_bosses", "loot", "shop", "normal"]:
 				stats.max_health = 9876543
 				stats.health = 8765432

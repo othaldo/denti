@@ -272,7 +272,7 @@ func update_status(stats: PlayerStats, xp: int, xp_goal: int, level: int, coins:
 	elif collecting_loot:
 		timer_label.text = "Beute sammeln"
 	else:
-		timer_label.text = "Shop-Pause" if in_shop else "%d:%02d" % [seconds / 60, seconds % 60]
+		timer_label.text = "Shop-Pause" if in_shop else str(seconds)
 	timer_label.tooltip_text = "Entzündet " + timer_label.text if inflamed else timer_label.text
 	clock_icon.visible = inflamed
 	var timer_color := Color("ffad66") if boss_pending else DentiUIStyle.GOLD if remaining <= 15 and not in_shop and not collecting_loot else DentiUIStyle.INK
@@ -293,11 +293,13 @@ func fit_timer_text() -> void:
 	var preferred := 24 if wave_info.size.x >= 160 else 22
 	var font_size := preferred
 	var font := timer_label.get_theme_font("font")
-	while font_size > 12 and font.get_string_size(timer_label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x + (font_size + 6 if clock_icon.visible else 0) > wave_info.size.x:
+	# Glyph edges and their outline need room beyond the measured advance.
+	var text_padding := 2.0 * (timer_label.get_theme_constant("outline_size") + 1)
+	while font_size > 12 and font.get_string_size(timer_label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x + text_padding + (font_size + 6 if clock_icon.visible else 0) > wave_info.size.x:
 		font_size -= 1
 	if timer_label.get_theme_font_size("font_size") != font_size:
 		timer_label.add_theme_font_size_override("font_size", font_size)
-	var text_width := ceilf(font.get_string_size(timer_label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x)
+	var text_width := ceilf(font.get_string_size(timer_label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x) + text_padding
 	var icon_space := float(font_size + 6) if clock_icon.visible else 0.0
 	var left := (wave_info.size.x - text_width - icon_space) * 0.5
 	timer_label.position = Vector2(left + icon_space, 16)
