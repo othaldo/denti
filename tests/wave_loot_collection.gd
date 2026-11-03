@@ -67,11 +67,12 @@ func _run() -> void:
 
 	game._on_shop_continue()
 	game.wave.current_wave = 5
+	game.wave.boss_rewards.paid = true # This fixture supplies and counts exact drops itself.
 	game._create_enemy(WaveController.BOSS, game.player.global_position + Vector2(400.0, 0.0))
 	game._spawn_loot(game.player.global_position + Vector2(650.0, 0.0), &"coin", 1)
 	game.wave._process(game.wave.remaining)
-	if not game.boss_pending or game.collecting_wave_loot or game.get_node("Loot").get_child_count() != 1:
-		_fail("boss overtime started collection before the boss was defeated")
+	if not game.wave.active or game.boss_pending or game.boss.overtime_active or game.collecting_wave_loot or game.get_node("Loot").get_child_count() != 1:
+		_fail("untimed boss stage ended/inflamed or collected loot before victory")
 		return
 	game.boss.boss_phase = 2
 	game.boss.boss_damage_budget = game.boss.health
@@ -96,7 +97,9 @@ func _run() -> void:
 		return
 	game._on_shop_continue()
 	game.wave.current_wave = WaveController.MAX_WAVES
+	game.wave.boss_rewards.paid = true
 	game._create_enemy(WaveController.FINAL_BOSS, game.player.global_position + Vector2(400.0, 0.0))
+	game.boss.crown_court_encounter.retinue.used = true # Isolate exact victory/collection flow.
 	game._spawn_loot(game.player.global_position + Vector2(650.0, 0.0), &"coin", 1)
 	game._spawn_loot(game.player.global_position + Vector2(600.0, 0.0), &"xp", game.xp_goal - game.xp)
 	game._spawn_loot(game.player.global_position + Vector2(700.0, 0.0), &"chest", 3, &"metal_crown")

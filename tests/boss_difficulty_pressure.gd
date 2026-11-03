@@ -20,6 +20,8 @@ func _prince(difficulty: DifficultyData) -> Enemy:
 	game._create_enemy(EnemyCatalog.CAVITY_PRINCE, Vector2(740, 650))
 	var boss: Enemy = game.boss
 	boss.set_simulation_enabled(false)
+	# Keep the original attack-route measurements independent of the ritual.
+	boss.caramel_encounter.overload.used = true
 	boss.boss_phase = 1
 	return boss
 

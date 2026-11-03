@@ -21,6 +21,7 @@ func _run() -> void:
 	game.player.global_position = center
 	# The real court encounter must survive a reload before milestone rewards.
 	game._create_enemy(WaveController.CAVITY_EMPEROR, center + Vector2(300, 0))
+	game.boss.crown_court_encounter.retinue.used = true # Isolate original court/relic flow.
 	var boss: Enemy = game.boss
 	boss.crown_court_encounter.begin(CrownCourtEncounter.Attack.PORTAL)
 	var announced_end := boss.crown_court_encounter.portal_b
@@ -45,6 +46,9 @@ func _run() -> void:
 		return
 	game.wave.active = false
 	game.boss_pending = true
+	# Isolate death-animation -> relic ordering. boss_stages covers the new
+	# XP/capsule budget and the complete collection/reward ordering.
+	game.wave.boss_rewards.paid = true
 	boss.boss_phase = 2
 	boss.boss_phase_timer = 0.0
 	boss.boss_damage_budget = boss.health

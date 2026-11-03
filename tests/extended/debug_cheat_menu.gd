@@ -119,6 +119,27 @@ func _run() -> void:
 	if game.player.stats.attack_speed != 100.0 or game.player.stats.speed_bonus != 20.0 or game.player.stats.regen != 10.0 or game.player.stats.melee_damage != 4.0 or game.player.stats.ranged_damage != 2.0:
 		_fail("wave jump reset the configured stat model")
 		return
+	# Real F4 controls restart the chosen wave with matching boss mechanics.
+	menu.open_menu()
+	menu.wave_number.value = 15
+	menu.difficulty_select.select(3)
+	menu.wave_button.pressed.emit()
+	if game.wave.difficulty_id != &"hell" or session.selected_difficulty_id != &"hell" or game.boss.difficulty.id != &"hell" or game.boss.acid_king_encounter.pressure.profile.health_thresholds.size() != 3 or paused or menu.visible:
+		_fail("F4 difficulty selection did not restart the King with all Hell shields")
+		return
+	if game.items.count(item.id) != added or game.coins != 1234 or game.player.stats.damage_bonus != 300 or game.weapon_mastery.eligible:
+		_fail("difficulty restart lost the configured build or granted normal progression")
+		return
+	menu.open_menu()
+	if menu.difficulty_select.selected != 3 or menu.wave_number.value != 15:
+		_fail("F4 reopened with a different difficulty or wave")
+		return
+	menu.difficulty_select.select(1)
+	menu.wave_button.pressed.emit()
+	if game.boss.difficulty.id != &"normal" or game.boss.acid_king_encounter.pressure.profile.health_thresholds.size() != 1 or BossEncounter.remaining(game.get_node("Enemies")).size() != 1:
+		_fail("switching back to Normal retained Hell mechanics or a stale boss")
+		return
+	cheats.start_wave(5, &"hard")
 	var saved: Dictionary = game.RUN_SNAPSHOT.capture(game)
 	game.free()
 	await process_frame
@@ -129,6 +150,9 @@ func _run() -> void:
 	current_scene = game
 	if not game.has_node("DebugCheatMenu") or game.coins != 1234 or game.wave.current_wave != 5 or game.items.count(item.id) != added or game.player.stats.damage_bonus != 300:
 		_fail("modified build or cheat access was lost on resume: coins=%d wave=%d items=%d damage=%s" % [game.coins, game.wave.current_wave, game.items.count(item.id), game.player.stats.damage_bonus])
+		return
+	if game.wave.difficulty_id != &"hard" or session.selected_difficulty_id != &"hard" or game.boss.difficulty.id != &"hard":
+		_fail("difficulty chosen in F4 was lost on save/resume")
 		return
 	session.clear_run()
 	game.free()

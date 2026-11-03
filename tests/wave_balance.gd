@@ -23,12 +23,12 @@ func _run() -> void:
 	spawn_count = 0
 	burst_count = 0
 	burst_types.clear()
-	wave.current_wave = 9
+	wave.current_wave = 8 # W9 is a normal pressure wave; W10 is now an isolated boss.
 	wave.start_next_wave()
 	for frame in ceili(wave.duration * 60.0):
 		wave._process(1.0 / 60.0)
 	var middle_count := spawn_count
-	if early_count < 40 or middle_count < 125 or middle_count < early_count * 2 or early_bursts != 2 or burst_count != 3 or not burst_types.has("Säurespucker"):
+	if early_count < 40 or middle_count < 125 or middle_count < early_count * 2 or early_bursts != 2 or burst_count < 3 or not burst_types.has("Säurespucker"):
 		_fail("early and middle waves lack frequent mixed pressure: %d / %d enemies, %d / %d bursts" % [early_count, middle_count, early_bursts, burst_count])
 		return
 	spawn_count = 0
@@ -60,7 +60,7 @@ func _run() -> void:
 	for frame in ceili(wave.duration * 60.0):
 		wave._process(1.0 / 60.0)
 	var boss_wave_count := spawn_count
-	if burst_count != 3 or boss_wave_count >= late_count:
+	if burst_count != 0 or boss_wave_count != 0:
 		_fail("boss wave inherited the new normal-wave pressure: %d / %d spawns, %d bursts" % [boss_wave_count, late_count, burst_count])
 		return
 	var session: Node = root.get_node("GameSession")
@@ -75,6 +75,7 @@ func _run() -> void:
 	game.player.loadout.acquire(WeaponCatalog.by_id(&"water_jet"))
 	game.player.attack_performed.connect(_record_attack)
 	game.wave.current_wave = 5
+	game.wave.boss_rewards.paid = true # Isolate boss damage/TTK from intermission income.
 	game._create_enemy(WaveController.BOSS, game.player.position + Vector2(90.0, 0.0))
 	var boss: Enemy = game.boss
 	if boss.max_health < 1500.0 or boss.damage_reduction < 0.13:

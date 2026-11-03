@@ -6,7 +6,7 @@ Das nächste Ziel: ein kompakteres Kampf-HUD, eine bewusste Dash-Entscheidung, v
 
 ## Vorhandene Grundlage
 
-- 20 Wellen, anschließend optional Endlos; Bossabschlüsse in Welle 5, 10, 15 und 20. Wellenlängen variieren, Bosswellen dauern vor der Entzündung 45 Sekunden.
+- 20 Wellen, anschließend optional Endlos; Bossabschlüsse in Welle 5, 10, 15 und 20. Normale Wellenlängen variieren; Bosswellen enden ohne Wellentimer mit dem letzten Boss.
 - Vier Story-Areas mit Dialogen und Ortswechseln: **Unter dem Kissen**, **Das süße Verderben**, **Tief im Säurestrom**, **Die letzte Krone**.
 - 18 reguläre Waffen, sechs geheime Evolutionen, 94 Shop-Items, fünf Relikte und zwölf Grundattribute. Alle 18 Standardwaffen sind als Mk-I-Start auswählbar; geheime Evolutionen bleiben ausgeschlossen. Die Wurzelanzahl ist ein gespeicherter Spielerparameter, Standard 6; [Konfiguration](PLAYER_ROOTS.md).
 - Ununterbrochener Kampf; danach Beutesammlung, Levelaufstiege, Upgrade-Kapseln, gegebenenfalls Relikt und Story-Übergang, anschließend Shop. Dieser Ablauf bleibt erhalten.
@@ -164,6 +164,24 @@ Speichern/Fortsetzen erhält Ladung, Cooldown, Erholungspause und bei aktivem Da
 **Abnahme:** Tests für 100-Punkte-Kosten, ausbaubaren Vorrat, feste Auffüllzeit, gespeicherte Dashes, gleichzeitige Sperren, gehaltenes Shift, Diagonalen, Randkontakt, Start innerhalb einer Horde und Kontakt trotz Schild/Dodge/Trefferpause. Streckenprüfungen decken auch Projektile und Schadensflächen bei längeren Frames ab. Dazu Pause/Fortsetzen mitten im Dash und Cooldown, alte Saves, Mehrfingereingabe und Drehung des Displays. Telemetrie erfasst Dashanzahl, Gegnerkontakte und Schaden während des Dashs; normale Spielanzeigen bleiben kompakt.
 
 ## 3. Vier Story-Areas, vier unterschiedliche Bosskämpfe
+
+**Neuer Spielteststand 02.11.2026:** Bossstages laufen ohne normalen Trash und
+enden mit dem letzten Boss-Tod, ohne Wellentimer oder zeitgesteuerte Entzündung.
+Der Prinz führt auf Normal über zwei und auf Hard/Hell über drei Prüfungen:
+schießende Karamellherzen und abzufangende Herzboten brechen seinen Schutz.
+Beim König muss sein eigener fest einrastender Säurestrahl die Schildventile
+zerstören. Easy/Normal haben eine Prüfung, Hard zwei, Hell drei bei 90/60/30 %
+Restleben mit zwei/drei/vier Ventilen. Mehr Rüstung und ein langsameres
+Schadensbudget schützen den normalen Kampf; Schildbrüche öffnen einen
+Gegenangriff ohne Rüstung, mit einem eigenen Schadensbudget. Zwischen den
+Hell-Schilden bleiben im Diagnosekampf rund elf Sekunden normaler Kampf.
+Der Imperator lädt mit zwei eigenen Vasallen auf Normal und drei auf Hard/Hell
+sein Urteil auf. Kronenlanze, Siegelhüter und Reichsrichter besitzen eigene
+Grafiken und Angriffe. Der Siegelhüter ermöglicht begrenzte Heilung; seine
+Zerstörung unterbricht diese. Vollständige Rufabfolgen und Save/Resume sind
+automatisiert prüfbar; die menschliche Spielabnahme bleibt der nächste Schritt.
+Festes XP-/Gold-/Kapselbudget ersetzt
+normale Wellenbeute. [Direkter Teststart, Regeln und offene Balance](BOSS_STAGES.md).
 
 Die Herrschertitel und ihre Storyfunktion bleiben erhalten. Jeder Boss erhält eine eigene Silhouette, ein eigenes Bewegungsverhalten, einen charakteristischen Angriffsablauf und eine andere Antwort des Spielers. Alle vier sind als eigene Encounter spielbar; die folgenden Abnahmeziele erfordern noch echte Build- und vollständige Wellenvergleiche.
 

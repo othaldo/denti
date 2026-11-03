@@ -65,9 +65,9 @@ func _run() -> void:
 	game._on_wave_finished(5)
 	if not _check(game.boss_pending and not game.story_dialogue.visible and game.story.completed_boss_wave == 0, "surviving boss must block story transition"):
 		return
+	game.boss_pending = false
 	game._clear_arena(false)
 	await process_frame
-	game.boss_pending = false
 	game.rewards.earn_level()
 	game.rewards.queue_chest(&"metal_crown", 5)
 	game._begin_loot_collection()

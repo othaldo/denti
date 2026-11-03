@@ -56,12 +56,16 @@ static func draw(encounter: AcidKingEncounter) -> void:
 			var ends := channel_ends(field)
 			WarningEffects.capsule(encounter, ends[0], ends[1], profile.channel_half_width, Color(0.65, 0.92, 0.14, 0.85), progress, base)
 	for row: Dictionary in encounter.rows:
-		var tangent: Vector2 = row.direction.orthogonal() * profile.stomp_half_span
+		var circle: float = row.get("circle_radius", 0)
+		var tangent: Vector2 = row.direction.orthogonal() * encounter.row_half_span(row)
 		if encounter.state == AcidKingEncounter.State.WARN_STOMP or not row.fired:
 			var progress := 1 - encounter.remaining / encounter.stomp_warning_duration() if encounter.state == AcidKingEncounter.State.WARN_STOMP else 1.0
-			WarningEffects.capsule(encounter, row.at - tangent, row.at + tangent, profile.stomp_radius, Color(1, 0.44, 0.25, 0.85), progress, base)
+			if circle > 0: WarningEffects.circle(encounter, row.at, circle, progress, Color(1, 0.44, 0.25, 0.85), base)
+			else: WarningEffects.capsule(encounter, row.at - tangent, row.at + tangent, profile.stomp_radius, Color(1, 0.44, 0.25, 0.85), progress, base)
 		elif row.delay >= -profile.stomp_active_seconds - 0.22:
 			var alpha := clampf(1 + row.delay / (profile.stomp_active_seconds + 0.22), 0, 1)
+			if circle > 0: WarningEffects.circle(encounter, row.at, circle, 1, Color(1, 0.55, 0.25, alpha), base, WarningEffects.BATCH.Phase.ACTIVE)
 			for index in 7:
-				_art(encounter, 7, row.at + tangent * (float(index) / 3 - 1), 48, Color(1, 1, 1, alpha), base)
+				var at: Vector2 = row.at + (Vector2.from_angle(index * TAU / 7) * circle * 0.8 if circle > 0 else tangent * (float(index) / 3 - 1))
+				_art(encounter, 7, at, 48, Color(1, 1, 1, alpha), base)
 	encounter.draw_set_transform_matrix(Transform2D.IDENTITY)

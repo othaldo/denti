@@ -124,7 +124,7 @@ func in_circle(at: Vector2, radius: float, include_radius: bool = true) -> Array
 			if not cells.has(cell):
 				continue
 			for enemy: Enemy in cells[cell]:
-				if enemy.health <= 0 or enemy.is_queued_for_deletion():
+				if not enemy.is_targetable():
 					continue
 				var reach := radius + (enemy.data.radius if include_radius else 0.0)
 				if at.distance_squared_to(enemy.global_position) <= reach * reach:
@@ -144,7 +144,7 @@ func along_segment(start: Vector2, end: Vector2, radius: float, ordered: bool = 
 			if not cells.has(cell):
 				continue
 			for enemy: Enemy in cells[cell]:
-				if enemy.health <= 0 or enemy.is_queued_for_deletion() or excluded_ids.has(enemy.get_instance_id()):
+				if not enemy.is_targetable() or excluded_ids.has(enemy.get_instance_id()):
 					continue
 				var position_world := enemy.global_position
 				var closest_point := Geometry2D.get_closest_point_to_segment(position_world, start, end)
@@ -170,7 +170,7 @@ func closest(at: Vector2, radius: float, include_radius: bool = true, excluded: 
 			if not cells.has(cell):
 				continue
 			for enemy: Enemy in cells[cell]:
-				if enemy == excluded or enemy.health <= 0 or enemy.is_queued_for_deletion():
+				if enemy == excluded or not enemy.is_targetable():
 					continue
 				var position_world := enemy.global_position
 				var reach := radius + (enemy.data.radius if include_radius else 0.0)
@@ -194,7 +194,7 @@ func in_rect(bounds: Rect2, ordered: bool = true) -> Array[Enemy]:
 			if not cells.has(cell):
 				continue
 			for enemy: Enemy in cells[cell]:
-				if enemy.health > 0.0 and not enemy.is_queued_for_deletion():
+				if enemy.is_targetable():
 					result.append(enemy)
 	if ordered:
 		_sort(result)
@@ -244,6 +244,6 @@ static func nearest(tree: SceneTree, index: EnemySpatialIndex, at: Vector2, radi
 static func _fallback(tree: SceneTree) -> Array[Enemy]:
 	var result: Array[Enemy] = []
 	for node in tree.get_nodes_in_group("enemies"):
-		if node is Enemy and node.health > 0.0 and not node.is_queued_for_deletion():
+		if node is Enemy and node.is_targetable():
 			result.append(node)
 	return result

@@ -84,6 +84,8 @@ func _run() -> void:
 				hud.chests_label.text = "99"
 				if state == "two_bosses":
 					hud.update_bosses(bosses)
+				if state in ["boss", "two_bosses"]:
+					_check(hud.timer_label.text.is_empty() and not hud.clock_icon.visible, "boss HUD retained a global clock/flame")
 				await _settle()
 				_check(hud.health_vessel.shield_aura.charges == 5 and hud.health_vessel.shield_aura.visible, "HUD did not read actual shield reserves")
 				_check(geometry == _geometry(hud), "HUD geometry changed at %s / %s / touch=%s" % [extent, state, touch])

@@ -48,6 +48,7 @@ func _run() -> void:
 	game._create_enemy(EnemyCatalog.CAVITY_KING, Vector2(770, 620))
 	boss = game.boss
 	attack = boss.acid_king_encounter
+	attack.pressure.used = true # Isolate existing rivers/stomps; pressure has its own suite.
 	boss.set_simulation_enabled(false)
 	game.get_node("Enemies").set_physics_process(false)
 	paused = true

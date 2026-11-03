@@ -45,12 +45,17 @@ func _run() -> void:
 	paused = true
 	var original := EnemyCatalog.CAVITY_KING.acid_king_profile
 	var results: Array[Dictionary] = []
+	var previous_near_warning := INF
+	var previous_far_warning := INF
 	for difficulty: DifficultyData in DifficultyCatalog.ALL:
 		var boss := _spawn(difficulty)
 		var attack := boss.acid_king_encounter
 		var profile := attack.profile
 		_check(profile != original and profile.shards != original.shards and original.shards.speed == 210, "difficulty modified the shared King resource")
-		_check(profile.warning_seconds == original.warning_seconds and profile.stomp_warning_seconds == original.stomp_warning_seconds and profile.shift_warning_seconds == original.shift_warning_seconds, "difficulty shortened a warned reaction window")
+		_check(profile.warning_seconds == original.warning_seconds and profile.shift_warning_seconds == original.shift_warning_seconds, "difficulty changed unrelated channel warnings")
+		_check(profile.stomp_near_warning_seconds < previous_near_warning and profile.stomp_warning_seconds < previous_far_warning and profile.stomp_near_warning_seconds >= 0.6, "stone wave windup did not scale readably with difficulty")
+		previous_near_warning = profile.stomp_near_warning_seconds
+		previous_far_warning = profile.stomp_warning_seconds
 		_check(profile.rows(2) == 4 + difficulty.boss_volley_bonus and profile.shard_count(2) == 7 + difficulty.boss_volley_bonus * 2, "King action/projectile counts ignore difficulty")
 		_check(is_equal_approx(profile.shards.speed, 210 * difficulty.boss_projectile_speed_multiplier), "King shard speed ignores difficulty")
 		var warnings := [0]
@@ -98,6 +103,9 @@ func _run() -> void:
 						# The new fan needs its own response after the lane dodge.
 						# king_assault_routes covers complete warning-aware combinations.
 						if kind == AcidKingEncounter.Attack.CHANNELS and attack.state in [AcidKingEncounter.State.WARN_SPIT, AcidKingEncounter.State.WARN_STOMP]: break
+						# A retargeted second stomp needs a new response. Complete
+						# warning-aware sequences are covered by king_assault_routes.
+						if kind == AcidKingEncounter.Attack.STOMP and attack.state == AcidKingEncounter.State.WARN_STOMP and attack.stomp_index > 0: break
 						game.player.global_position = game.player.global_position.move_toward(goal, PlayerStats.BASE_MOVE_SPEED * 0.72 / 60)
 						if game.player.global_position.distance_to(boss.global_position) <= boss.data.radius + 20:
 							body = true

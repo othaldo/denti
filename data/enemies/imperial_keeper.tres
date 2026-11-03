@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3]
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/enemies/imperial_vassals/seal_keeper.png" id="2"]
+[ext_resource type="Script" path="res://scripts/enemies/imperial_vassal_data.gd" id="3"]
+[sub_resource type="Resource" id="Keeper"]
+script = ExtResource("3")
+role = 1
+warning_seconds = 1.0
+cooldown_seconds = 1.8
+active_seconds = 0.18
+preferred_distance = 260.0
+[resource]
+script = ExtResource("1")
+display_name = "Siegelhüter"
+max_health = 105.0
+damage_reduction = 0.12
+knockback_resistance = 1.0
+move_speed = 65.0
+contact_damage = 0.0
+attack_damage = 10.0
+radius = 48.0
+xp_drop = 0
+coin_drop = 0
+allow_random_status_trait = false
+sprite = ExtResource("2")
+is_boss_objective = true
+imperial_vassal_profile = SubResource("Keeper")

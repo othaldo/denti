@@ -11,11 +11,12 @@ func _ready() -> void:
 	z_index = 10
 	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 
-func fire(at: Vector2, rays: Array[Vector2], source: StringName) -> void:
+func fire(at: Vector2, rays: Array[Vector2], source: StringName, origin_radius: float = -1.0) -> void:
 	var profile := encounter.profile
+	var radius := encounter.enemy.data.radius + 12 if origin_radius < 0 else origin_radius
 	for ray in rays:
 		if entries.size() >= profile.max_hearts: entries.pop_front()
-		entries.append({"at": at + ray * (encounter.enemy.data.radius + 12), "velocity": ray * profile.heart_speed, "life": profile.heart_lifetime, "damage": encounter.enemy.attack_damage * profile.heart_damage_factor, "source": source})
+		entries.append({"at": at + ray * radius, "velocity": ray * profile.heart_speed, "life": profile.heart_lifetime, "damage": encounter.enemy.attack_damage * profile.heart_damage_factor, "source": source})
 	queue_redraw()
 
 func advance(delta: float, seconds_in_frame: float) -> void:
@@ -41,6 +42,12 @@ func advance(delta: float, seconds_in_frame: float) -> void:
 func clear() -> void:
 	_generation += 1
 	entries.clear()
+	queue_redraw()
+
+func clear_source(source: StringName) -> void:
+	_generation += 1
+	for index in range(entries.size() - 1, -1, -1):
+		if entries[index].source == source: entries.remove_at(index)
 	queue_redraw()
 
 func save_data() -> Array:

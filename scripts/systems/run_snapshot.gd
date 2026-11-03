@@ -10,6 +10,10 @@ static func capture(game) -> Dictionary:
 			continue
 		enemy_indices[enemy.get_instance_id()] = enemies_data.size()
 		enemies_data.append(enemy.save_state())
+	for enemy: Enemy in game.get_node("Enemies").get_children():
+		if enemy_indices.has(enemy.get_instance_id()) and enemy.data.is_boss_objective:
+			enemies_data[enemy_indices[enemy.get_instance_id()]]["boss_objective_owner"] = enemy_indices.get(enemy.boss_objective_owner.get_instance_id(), -1) if is_instance_valid(enemy.boss_objective_owner) else -1
+			enemies_data[enemy_indices[enemy.get_instance_id()]]["boss_objective_slot"] = enemy.boss_objective_slot
 	var weapon_runtime: Array[Dictionary] = []
 	var player_projectiles: Array[Dictionary] = []
 	for projectile in game.get_node("Projectiles").get_children():
@@ -115,6 +119,23 @@ static func restore(game, saved: Dictionary) -> void:
 		game._create_enemy(enemy_data, SnapshotValues.read_vector(entry.get("position", [0.0, 0.0])), bool(entry.get("treasure_carrier", false)))
 		var enemy: Enemy = game.get_node("Enemies").get_child(-1)
 		enemy.restore_state(entry, bool(saved.get("boss_pending", false)))
+	var loaded_enemies: Array[Node] = game.get_node("Enemies").get_children()
+	var saved_enemies: Array = saved.get("enemies", [])
+	for index in mini(loaded_enemies.size(), saved_enemies.size()):
+		var enemy: Enemy = loaded_enemies[index]
+		if not enemy.data.is_boss_objective: continue
+		var owner_index := int(saved_enemies[index].get("boss_objective_owner", -1))
+		if owner_index >= 0 and owner_index < loaded_enemies.size():
+			var owner: Enemy = loaded_enemies[owner_index]
+			if owner.caramel_encounter != null and owner.caramel_encounter.overload != null:
+				enemy.boss_objective_slot = int(saved_enemies[index].get("boss_objective_slot", -1))
+				owner.caramel_encounter.overload.bind_pylon(enemy)
+				continue
+			if owner.crown_court_encounter != null and owner.crown_court_encounter.retinue != null and enemy.imperial_vassal != null:
+				enemy.boss_objective_slot = int(saved_enemies[index].get("boss_objective_slot", -1))
+				owner.crown_court_encounter.retinue.bind(enemy)
+				continue
+		enemy.queue_free()
 	var runtime: Array = saved.get("weapon_runtime", [])
 	var weapons := player.loadout.equipped()
 	var restored_enemies: Array[Node] = game.get_node("Enemies").get_children()

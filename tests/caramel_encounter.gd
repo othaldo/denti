@@ -231,6 +231,9 @@ func _run() -> void:
 	boss.boss_damage_budget = boss.max_health * 10
 	boss.boss_phase = 2
 	boss.boss_phase_timer = 0
+	# The objective phase has its own integration test; this fixture isolates
+	# retaliation cancelling an ordinary in-flight heart volley.
+	attack.overload.used = true
 	game.player.hurt_time = 0
 	game.player.damaged.connect(func(_at: Vector2, _amount: float): boss.take_damage(1e9), CONNECT_ONE_SHOT)
 	attack.hearts.fire(game.player.global_position - Vector2.RIGHT * (boss.data.radius + 12), rays, &"test_retaliation")

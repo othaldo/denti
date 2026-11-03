@@ -68,9 +68,12 @@ func set_stats(values: Dictionary) -> void:
 		changed()
 
 
-func start_wave(number: int) -> bool:
+func start_wave(number: int, difficulty: StringName = &"") -> bool:
 	if not allowed() or game.player.loadout.equipped().is_empty():
 		return false
+	if difficulty != &"":
+		game.wave.difficulty_id = DifficultyCatalog.by_id(difficulty).id
+		game.session.selected_difficulty_id = game.wave.difficulty_id
 	game.debug_start_wave(clampi(number, 1, WaveController.MAX_WAVES))
 	return true
 

@@ -56,6 +56,7 @@ func _run() -> void:
 	game.rewards.begin_wave()
 	game.telemetry.begin_wave(30)
 	game.wave.start_next_wave()
+	game.wave.boss_rewards.paid = true # This scenario supplies its own exact seven-coin reward.
 	var bosses := BossEncounter.remaining(game.get_node("Enemies"))
 	if bosses.size() != 2:
 		_fail("wave 30 did not spawn a double boss")
@@ -131,6 +132,8 @@ func _resume(session: Node) -> Node2D:
 	return current_scene
 
 func _kill_boss(member: Enemy) -> void:
+	if member.crown_court_encounter != null: member.crown_court_encounter.retinue.used = true
+	if member.acid_king_encounter != null: member.acid_king_encounter.pressure.used = true
 	member.boss_phase = 2
 	member.boss_phase_timer = 0.0
 	member.boss_damage_budget = member.max_health

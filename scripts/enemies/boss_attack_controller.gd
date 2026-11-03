@@ -108,7 +108,7 @@ static func start_boss_phase(enemy: Enemy) -> void:
 		enemy.caramel_encounter.cancel(false)
 		enemy.boss_phase_burst_fired = true
 	if enemy.acid_king_encounter != null:
-		enemy.acid_king_encounter.cancel()
+		enemy.acid_king_encounter.begin_health_phase()
 		enemy.boss_phase_burst_fired = true
 	if enemy.crown_court_encounter != null:
 		enemy.crown_court_encounter.cancel()

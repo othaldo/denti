@@ -3,11 +3,12 @@ extends Node2D
 ## One clock owns each locked aim, ballistic flight, impact and expiring floor pool.
 
 enum State { APPROACH, WINDUP, FLIGHT, FOLLOWUP, RECOVERY, HEART_WINDUP, HEART_RELEASE, RUSH_WINDUP, RUSH_ACTIVE, BURST_WINDUP, BURST_RELEASE, BOMB_SEQUENCE }
-const SAVE_VERSION := 3
+const SAVE_VERSION := 4
 var enemy: Enemy
 var profile: CaramelEncounterData
 var rig: PrinceCaramelRig
 var hearts: CaramelHeartVolley
+var overload: CaramelOverload
 var bombs := CaramelBombVolley.new()
 var attack_kind := CaramelEncounterData.Attack.BOMBS
 var salvo_index := 0
@@ -46,9 +47,16 @@ func _ready() -> void:
 	hearts.name = &"CaramelHearts"
 	hearts.encounter = self
 	add_child(hearts)
+	if profile.overload_profile != null:
+		overload = CaramelOverload.new()
+		overload.name = &"CaramelOverload"
+		overload.encounter = self
+		overload.profile = profile.overload_profile
+		add_child(overload)
 	sync_visual()
 
 func cancel(clear_pools := true) -> void:
+	if overload != null: overload.cancel()
 	bombs.clear()
 	state = State.APPROACH
 	remaining = profile.approach_seconds
@@ -105,6 +113,11 @@ func _lock_bomb(seconds_in_frame: float) -> void:
 
 func advance(delta: float) -> void:
 	if enemy.dying or enemy.health <= 0 or enemy.target == null: return
+	if overload != null and overload.advance(delta):
+		elapsed += delta
+		sync_visual()
+		queue_redraw()
+		return
 	var left := maxf(delta, 0)
 	var spent := 0.0
 	# Pools keep expiring during a health phase; no new attacks begin there.
@@ -352,6 +365,10 @@ func _cooking_bounds() -> Rect2:
 
 func sync_visual() -> void:
 	if rig == null: return
+	if overload != null and overload.busy():
+		if overload.state == CaramelOverload.State.RECOVERY: rig.sample(elapsed, 0, 1, false)
+		else: rig.sample_heart(elapsed, 1, 0, true)
+		return
 	var windup := 0.0
 	var release := 0.0
 	if state == State.WINDUP: windup = 1.0 - remaining / profile.windup_seconds
@@ -382,12 +399,12 @@ func save_data() -> Dictionary:
 		fields.append({"position": SnapshotValues.vector_data(pool.at), "life": pool.life})
 	var directions: Array = []
 	for ray in rays: directions.append(SnapshotValues.vector_data(ray))
-	return {"version": SAVE_VERSION, "state": int(state), "remaining": remaining, "elapsed": elapsed, "throw_index": throw_index, "count": count, "cycle": cycle, "origin": SnapshotValues.vector_data(origin), "destination": SnapshotValues.vector_data(destination), "pools": fields, "splash_at": SnapshotValues.vector_data(splash_at), "splash_remaining": splash_remaining, "attack_kind": attack_kind, "salvo_index": salvo_index, "salvo_count": salvo_count, "aim": SnapshotValues.vector_data(aim), "rush_origin": SnapshotValues.vector_data(rush_origin), "rush_end": SnapshotValues.vector_data(rush_end), "rush_hit": rush_hit, "rays": directions, "hearts": hearts.save_data(), "bombs": bombs.save_data()}
+	return {"version": SAVE_VERSION, "state": int(state), "remaining": remaining, "elapsed": elapsed, "throw_index": throw_index, "count": count, "cycle": cycle, "origin": SnapshotValues.vector_data(origin), "destination": SnapshotValues.vector_data(destination), "pools": fields, "splash_at": SnapshotValues.vector_data(splash_at), "splash_remaining": splash_remaining, "attack_kind": attack_kind, "salvo_index": salvo_index, "salvo_count": salvo_count, "aim": SnapshotValues.vector_data(aim), "rush_origin": SnapshotValues.vector_data(rush_origin), "rush_end": SnapshotValues.vector_data(rush_end), "rush_hit": rush_hit, "rays": directions, "hearts": hearts.save_data(), "bombs": bombs.save_data(), "overload": overload.save_data() if overload != null else {}}
 
 func restore(saved: Dictionary) -> void:
 	cancel()
 	var version := int(saved.get("version", 0))
-	if version not in [1, 2, SAVE_VERSION]: return
+	if version not in [1, 2, 3, SAVE_VERSION]: return
 	state = clampi(int(saved.get("state", 0)), 0, 4 if version == 1 else (10 if version == 2 else State.BOMB_SEQUENCE)) as State
 	attack_kind = clampi(int(saved.get("attack_kind", 0)), 0, 2)
 	# Finish already announced longer sequences from pre-pressure saves.
@@ -419,6 +436,12 @@ func restore(saved: Dictionary) -> void:
 			pools.append({"at": SnapshotValues.read_vector(entry.get("position", [0, 0])), "life": life})
 	hearts.restore(saved.get("hearts", []))
 	if state == State.BOMB_SEQUENCE: bombs.restore(saved.get("bombs", []))
+	if overload != null:
+		overload.restore(saved.get("overload", {}))
+		# Existing saves finish their announced encounter without a surprise ritual.
+		if version < SAVE_VERSION and enemy.boss_phase >= overload.profile.trigger_phase:
+			overload.used = true
+			overload.state = CaramelOverload.State.FINISHED
 	enemy.special_phase = Enemy.SpecialPhase.COOLDOWN
 	enemy.boss_radial_volleys_remaining = 0
 	enemy.boss_phase_burst_fired = true

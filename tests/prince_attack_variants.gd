@@ -48,6 +48,7 @@ func _run() -> void:
 	boss = game.boss
 	boss.set_simulation_enabled(false)
 	attack = boss.caramel_encounter
+	attack.overload.used = true # Ordinary repertoire fixture; ritual has its own suite.
 	paused = true
 	_start(CaramelEncounterData.Attack.BOMBS)
 	var seen := {}

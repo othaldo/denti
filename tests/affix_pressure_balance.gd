@@ -19,7 +19,7 @@ func _run() -> void:
 			wave._process(1.0 / 60.0)
 		var ratio := float(counts.total) / float(sample[1])
 		if wave.is_boss_wave(wave.current_wave):
-			assert(ratio > 1.05 and ratio < 1.13, "boss support pressure increased too little or too much")
+			assert(counts.total == 0, "isolated boss stage spawned normal support enemies")
 		else:
 			assert(ratio > 1.12 and ratio < 1.28, "normal waves lack the intended moderate density increase")
 			var loot_ratio := ratio * ChestRewards.drop_chance(0) / 0.02

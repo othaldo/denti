@@ -1,7 +1,7 @@
 class_name RunSaveData
 extends RefCounted
 
-const DICTIONARIES := ["player", "items", "relics", "telemetry", "rewards", "story", "weapon_mastery"]
+const DICTIONARIES := ["player", "items", "relics", "telemetry", "rewards", "story", "weapon_mastery", "boss_stage_rewards"]
 const ARRAYS := ["weapons", "owned_weapons", "enemies", "loot", "acid", "offers", "weapon_runtime", "player_projectiles", "upgrades", "horde_waves", "burst_times", "elite_times", "elite_counts"]
 const RECORD_ARRAYS := ["weapons", "enemies", "loot", "acid", "weapon_runtime", "player_projectiles"]
 
@@ -74,6 +74,11 @@ static func _containers(value: Dictionary, dictionaries: Array, arrays: Array) -
 
 
 static func _valid_structure(value: Dictionary) -> bool:
+	var boss_rewards: Dictionary = value.get("boss_stage_rewards", {})
+	for key in ["version", "phase_mask", "xp_released"]:
+		if boss_rewards.has(key) and not (boss_rewards[key] is int or boss_rewards[key] is float): return false
+	if boss_rewards.has("paid") and not boss_rewards.paid is bool: return false
+	if boss_rewards.has("legacy_credit") and not boss_rewards.legacy_credit is bool: return false
 	# Check container contracts before passing JSON values to typed subsystem APIs.
 	var mastery: Dictionary = value.get("weapon_mastery", {})
 	if not _containers(mastery, [], ["earned", "pending"]): return false
@@ -143,6 +148,8 @@ static func _valid_structure(value: Dictionary) -> bool:
 			for coordinate in motion.primary_contact:
 				if not (coordinate is float or coordinate is int): return false
 	for entry in value.get("enemies", []):
+		if entry.has("boss_objective_owner") and not (entry.boss_objective_owner is int or entry.boss_objective_owner is float): return false
+		if entry.has("boss_objective_slot") and not (entry.boss_objective_slot is int or entry.boss_objective_slot is float): return false
 		if not _containers(entry, ["loot_goblin"], []): return false
 		var goblin: Dictionary = entry.get("loot_goblin", {})
 		if not _containers(goblin, ["capsule"], ["destination"]): return false
@@ -163,7 +170,9 @@ static func _valid_structure(value: Dictionary) -> bool:
 		if not AcidKingSnapshot.valid(entry.get("acid_king", {})): return false
 		if not _containers(entry, ["crown_court"], []): return false
 		if not CrownCourtSnapshot.valid(entry.get("crown_court", {})): return false
+		if not ImperialVassal.valid(entry.get("imperial_vassal", {})): return false
 		var caramel: Dictionary = entry.get("caramel", {})
+		if not CaramelOverload.valid(caramel.get("overload", {})): return false
 		if not CaramelBombVolley.valid(caramel.get("bombs", [])): return false
 		if not _containers(caramel, [], ["origin", "destination", "splash_at", "pools", "aim", "rush_origin", "rush_end", "rays", "hearts"]): return false
 		for key in ["origin", "destination", "splash_at", "aim", "rush_origin", "rush_end"]:

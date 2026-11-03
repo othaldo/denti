@@ -307,6 +307,9 @@ func _start_combat_wave() -> void:
 
 func _process(delta: float) -> void:
 	var combat_active := run_flow.is_combat() and not get_tree().paused and (wave.active or boss_pending)
+	if combat_active and WaveController.is_boss_wave(wave.current_wave) and BossEncounter.remaining($Enemies).is_empty():
+		_resolve_boss_wave()
+		combat_active = false
 	mobile_controls.set_combat_active(combat_active)
 	session.update_graphics_performance(combat_active)
 	if not ended and (wave.active or boss_pending):
@@ -486,6 +489,11 @@ func _create_enemy(data: EnemyData, at: Vector2, treasure: bool = false) -> void
 	if data.is_elite:
 		enemy.elite_guarded.connect(_on_elite_guarded)
 	$Enemies.add_child(enemy)
+	if enemy.acid_king_encounter != null and enemy.acid_king_encounter.pressure != null:
+		enemy.acid_king_encounter.pressure.valve_broken.connect(_on_king_valve_broken)
+		enemy.acid_king_encounter.pressure.shield_broken.connect(_on_king_shield_broken)
+	if enemy.crown_court_encounter != null and enemy.crown_court_encounter.retinue != null:
+		enemy.crown_court_encounter.retinue.court_broken.connect(_on_court_broken)
 	if enemy.loot_goblin != null:
 		enemy.loot_goblin.stolen.connect(_on_goblin_stole.bind(enemy))
 		enemy.loot_goblin.reward_ready.connect(_on_goblin_reward.bind(enemy))
@@ -508,9 +516,9 @@ func _on_enemy_defeated(at: Vector2, data: EnemyData, treasure: bool = false) ->
 	if data.loot_goblin_profile != null: return
 	if data.is_boss:
 		boss = BossEncounter.primary($Enemies)
-		if boss_pending:
-			call_deferred("_resolve_boss_wave")
+		call_deferred("_resolve_boss_wave")
 		return
+	if data.is_boss_objective: return
 	if wave.active and (treasure or rewards.can_drop_chest() and randf() < ChestRewards.drop_chance(player.stats.luck, data.is_elite)):
 		var chest := WeaponUpgrades.capsule(wave.current_wave, treasure)
 		if not treasure:
@@ -570,6 +578,7 @@ func _on_boss_enraged(at: Vector2, source: Enemy = null) -> void:
 
 
 func _on_boss_phase_started(at: Vector2, _phase: int) -> void:
+	wave.boss_rewards.release_phase(self, at, _phase)
 	sound.play_cue(&"boss_warning")
 	_show_item_feedback("ZAHNSCHILD!", at, Color(0.95, 0.32, 0.63))
 	camera_shake_time = 0.18
@@ -579,11 +588,30 @@ func _on_boss_guarded(at: Vector2) -> void:
 	_show_item_feedback("VERSIEGELT", at, Color(0.43, 0.84, 0.94))
 
 
+func _on_king_valve_broken(at: Vector2, _remaining: int) -> void:
+	sound.play_cue(&"boss_break")
+	camera_shake_time = 0.22
+	_show_item_feedback("VENTIL GEBORSTEN!", at, Color("d6f68b"))
+
+
+func _on_king_shield_broken(at: Vector2) -> void:
+	sound.play_cue(&"boss_break")
+	camera_shake_time = 0.45
+	_show_item_feedback("PANZER GEBROCHEN!", at, Color("ffe078"))
+
+func _on_court_broken(at: Vector2) -> void:
+	sound.play_cue(&"boss_break")
+	camera_shake_time = 0.35
+	_show_item_feedback("KRONE GEBROCHEN!", at, Color("ebc3ff"))
+
+
 func _on_elite_guarded(at: Vector2) -> void:
 	_show_item_feedback("SCHMELZSCHILD!", at, Color(0.43, 0.84, 0.94))
 
 
 func _on_boss_reinforcements(count: int) -> void:
+	# Boss-specific objectives/minions belong to their encounter components.
+	if WaveController.is_boss_wave(wave.current_wave): return
 	_spawn_horde(WaveController.ACID_SPITTER if wave.current_wave >= WaveController.MAX_WAVES else WaveController.BACTERIA, count)
 
 
@@ -844,9 +872,11 @@ func _on_wave_finished(wave_number: int) -> void:
 
 
 func _resolve_boss_wave() -> void:
-	if ended or not boss_pending or not BossEncounter.remaining($Enemies).is_empty():
+	if ended or not run_flow.is_combat() or not WaveController.is_boss_wave(wave.current_wave) or not BossEncounter.remaining($Enemies).is_empty():
 		return
+	wave.active = false
 	boss_pending = false
+	wave.boss_rewards.deliver(self, player.global_position)
 	_clear_combat()
 	_sync_music()
 	_begin_loot_collection()
@@ -979,7 +1009,7 @@ func _clear_arena(collect_drops: bool, keep_boss: bool = false) -> void:
 func _clear_combat(keep_boss: bool = false) -> void:
 	element_impacts.clear()
 	for enemy in $Enemies.get_children():
-		if keep_boss and enemy.data.is_boss:
+		if keep_boss and (enemy.data.is_boss or enemy.data.is_boss_objective):
 			continue
 		enemy.queue_free()
 	if not keep_boss:

@@ -34,6 +34,7 @@ var item_list: Array[ShopOfferData] = []
 var owned_rows: VBoxContainer
 var coin_amount: SpinBox
 var wave_number: SpinBox
+var difficulty_select: OptionButton
 var wave_button: Button
 var status: Label
 var stats: Dictionary = {}
@@ -83,6 +84,7 @@ func close_menu() -> void:
 	visible = false
 	weapon_select.get_popup().hide()
 	item_select.get_popup().hide()
+	difficulty_select.get_popup().hide()
 	get_tree().paused = was_paused
 
 
@@ -181,6 +183,15 @@ func _build_ui() -> void:
 	_button(row, "Setzen", func() -> void: controls.set_coins(int(coin_amount.value)); refresh())
 	row = HBoxContainer.new()
 	run.add_child(row)
+	row.add_child(_label("Schwierigkeit"))
+	difficulty_select = OptionButton.new()
+	difficulty_select.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	difficulty_select.fit_to_longest_item = false
+	DentiUIStyle.style_button(difficulty_select, false, true)
+	for difficulty in DifficultyCatalog.ALL: difficulty_select.add_item(difficulty.display_name)
+	row.add_child(difficulty_select)
+	row = HBoxContainer.new()
+	run.add_child(row)
 	row.add_child(_label("Welle"))
 	wave_number = _spin(row, 1, WaveController.MAX_WAVES, 1, 1)
 	wave_button = _button(row, "Starten", _start_wave, true)
@@ -248,6 +259,8 @@ func refresh() -> void:
 	var game: Node2D = controls.game
 	coin_amount.value = game.coins
 	wave_number.value = maxi(game.wave.current_wave, 1)
+	for index in DifficultyCatalog.ALL.size():
+		if DifficultyCatalog.ALL[index].id == game.wave.difficulty_id: difficulty_select.select(index)
 	var saved: Dictionary = game.player.stats.to_save_data()
 	for key in stats:
 		stats[key].value = float(saved[key]) * (100.0 if DentiAttributes.is_fraction(DentiAttributes.from_key(StringName(key))) else 1.0)
@@ -309,6 +322,6 @@ func _apply_stats() -> void:
 
 
 func _start_wave() -> void:
-	if controls.start_wave(int(wave_number.value)):
+	if controls.start_wave(int(wave_number.value), DifficultyCatalog.ALL[difficulty_select.selected].id):
 		was_paused = false
 		close_menu()

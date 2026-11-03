@@ -239,11 +239,13 @@ func _run() -> void:
 				return
 		game.wave._process(game.wave.remaining)
 		if WaveController.is_boss_wave(expected_wave) and expected_wave < WaveController.MAX_WAVES:
-			if not game.boss_pending or not game.boss.overtime_active or game.get_node("ShopPanel").visible:
-				_fail("mini-boss wave ended before the boss was defeated")
+			if not game.wave.active or game.boss_pending or game.boss.overtime_active or game.get_node("ShopPanel").visible:
+				_fail("untimed mini-boss wave ended/inflamed before the boss was defeated")
 				return
 			game.boss.boss_phase = 2
 			game.boss.boss_phase_timer = 0.0
+			if game.boss.caramel_encounter != null: game.boss.caramel_encounter.overload.used = true
+			if game.boss.acid_king_encounter != null: game.boss.acid_king_encounter.pressure.used = true
 			game.boss.boss_damage_budget = game.boss.health
 			game.boss.take_damage(99999.0)
 		if expected_wave < WaveController.MAX_WAVES and not await _complete_intermission(game):
@@ -252,11 +254,12 @@ func _run() -> void:
 		if expected_wave < WaveController.MAX_WAVES and not game.get_node("ShopPanel").visible:
 			_fail("shop missing between waves")
 			return
-	if game.ended or not game.boss_pending or not game.boss.overtime_active or not game.get_node("HUD").timer_label.text.begins_with("+"):
-		_fail("final timer ended the run before the boss was defeated")
+	if game.ended or not game.wave.active or game.boss_pending or game.boss.overtime_active or game.get_node("HUD").timer_label.text != "":
+		_fail("final boss retained its wave timer or timed inflammation")
 		return
 	var boss: Enemy = game.boss
 	boss.boss_phase = 2
+	if boss.crown_court_encounter != null: boss.crown_court_encounter.retinue.used = true
 	boss.boss_phase_timer = 0.0
 	boss.boss_damage_budget = boss.health
 	boss.take_damage(99999.0)

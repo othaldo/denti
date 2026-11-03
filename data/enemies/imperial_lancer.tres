@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3]
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/enemies/imperial_vassals/crown_lancer.png" id="2"]
+[ext_resource type="Script" path="res://scripts/enemies/imperial_vassal_data.gd" id="3"]
+[sub_resource type="Resource" id="Lancer"]
+script = ExtResource("3")
+role = 0
+visual_scale = 1.25
+[resource]
+script = ExtResource("1")
+display_name = "Kronenlanze"
+max_health = 90.0
+damage_reduction = 0.12
+knockback_resistance = 1.0
+move_speed = 90.0
+contact_damage = 0.0
+attack_damage = 12.0
+radius = 48.0
+xp_drop = 0
+coin_drop = 0
+allow_random_status_trait = false
+sprite = ExtResource("2")
+is_boss_objective = true
+imperial_vassal_profile = SubResource("Lancer")

@@ -47,8 +47,8 @@ func _run() -> void:
 		seconds += 0.1
 		if boss.boss_phase == 1 and boss.boss_phase_burst_fired and not phase_saved:
 			var projectile_count: int = game.get_node("EnemyProjectiles").get_child_count()
-			if projectile_count != 0 or boss.cloak_encounter == null or game.get_node("Enemies").get_child_count() < 3:
-				_fail("count phase lacks its own encounter or bounded reinforcements, or still fires generic rings")
+			if projectile_count != 0 or boss.cloak_encounter == null or game.get_node("Enemies").get_child_count() != 1:
+				_fail("count phase lost its own encounter or spawned recycled adds/generic rings")
 				return
 			var phase_time: float = boss.boss_phase_timer
 			game._save_run()
@@ -75,6 +75,7 @@ func _run() -> void:
 	game.wave.current_wave = 20
 	game.telemetry.begin_wave(20)
 	game._create_enemy(WaveController.FINAL_BOSS, game.player.global_position + Vector2(300.0, 0.0))
+	game.boss.crown_court_encounter.retinue.used = true
 	boss = game.boss
 	boss.set_simulation_enabled(false)
 	seconds = 0.0

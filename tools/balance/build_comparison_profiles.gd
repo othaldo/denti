@@ -91,7 +91,7 @@ static func spawn_plan(wave_number: int, sample_seed: int, difficulty_id: String
 	planner.loot_goblin_requested.connect(func(): events.append({"frame": clock.frame, "kind": "goblin", "count": 1}))
 	planner.start_next_wave()
 	# Frame zero includes the first normal spawn, as in the real wave controller.
-	while planner.active:
+	while planner.active and not WaveController.is_boss_wave(wave_number):
 		planner._process(STEP)
 		clock.frame += 1
 	var trace: Array = []

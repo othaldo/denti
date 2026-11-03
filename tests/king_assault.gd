@@ -42,10 +42,51 @@ func _run() -> void:
 		boss.set_simulation_enabled(false)
 		boss.boss_phase = 2
 		var a := boss.acid_king_encounter
+		a.pressure.used = true # Ordinary attack fixture; shield progression has its own suite.
 		var p := a.profile
 		_check(p.spit != EnemyCatalog.CAVITY_KING.acid_king_profile.spit and EnemyCatalog.CAVITY_KING.acid_king_profile.spit.speed == 370, "difficulty mutated the shared spit resource")
 		_check(p.spit_count() == 5 + difficulty.boss_volley_bonus * 2 and is_equal_approx(p.spit.speed, 370 * difficulty.boss_projectile_speed_multiplier), "spit count/speed ignores difficulty")
 		_check(p.stomp_sequences == (2 if difficulty.boss_volley_bonus >= 1 else 1) and p.spit_warning_seconds == 0.75, "stomp pressure or warning scales incorrectly")
+		# The close blind spot was larger than a melee weapon's whole reach.
+		# Circling at the same close range must be punished; moving out must
+		# remain possible at 72% baseline speed, without dash.
+		for distance in [100.0, 135.0]:
+			_place(boss)
+			game.player.global_position = boss.global_position + Vector2(distance, 0)
+			a.begin(a.Attack.STOMP)
+			var plan := a.rows.duplicate(true)
+			var first := EnemySnapshot.capture(boss)
+			a.advance(a.stomp_warning_duration() - 0.001)
+			_check(game.player.stats.health == 100000, "near stone wave hit before its warning")
+			a.advance(0.002 + a._stomp_duration())
+			_check(game.player.stats.health < 100000, "standing in melee range ignored the entire stone wave")
+			EnemySnapshot.restore(boss, first)
+			game.player.stats.health = 100000
+			game.player.hurt_time = 0
+			for tick in ceili((a.stomp_warning_duration() + 0.02) / STEP):
+				game.player.global_position = boss.global_position + Vector2.from_angle(tick * STEP * PlayerStats.BASE_MOVE_SPEED / distance) * distance
+				a.advance(STEP)
+			_check(game.player.stats.health < 100000, "circling in melee still ignored the near stomp")
+			var escaped := false
+			for direction in 32:
+				EnemySnapshot.restore(boss, first)
+				game.player.global_position = boss.global_position + Vector2(distance, 0)
+				game.player.stats.health = 100000
+				game.player.hurt_time = 0
+				var goal: Vector2 = game.player.global_position + Vector2.from_angle(direction * TAU / 32) * 260
+				var clear := true
+				for tick in ceili((a.stomp_warning_duration() + a._stomp_duration()) / STEP):
+					game.player.global_position = game.player.global_position.move_toward(goal, PlayerStats.BASE_MOVE_SPEED * 0.72 * STEP)
+					if game.player.global_position.distance_to(boss.global_position) < boss.data.radius + HazardGeometry.PLAYER_RADIUS - 0.01:
+						clear = false
+						break
+					a.advance(STEP)
+					if game.player.stats.health < 100000: break
+				if clear and game.player.stats.health == 100000:
+					escaped = true
+					break
+			_check(escaped, "%s near stomp at %.0f had no slowed escape without dash" % [difficulty.id, distance])
+			_check(a.rows.is_empty() or a.rows[0].at == plan[0].at, "near stomp moved after showing its warning")
 		_place(boss)
 		a.begin(a.Attack.CHANNELS)
 		a.advance(p.warning_seconds)
@@ -107,6 +148,7 @@ func _run() -> void:
 	# Real save/scene reload with an active aimed warning.
 	game.wave.difficulty_id = &"hell"
 	game._create_enemy(EnemyCatalog.CAVITY_KING, Vector2(770, 620))
+	game.boss.acid_king_encounter.pressure.used = true
 	var boss: Enemy = game.boss
 	boss.set_simulation_enabled(false)
 	_place(boss)

@@ -1,5 +1,10 @@
 # Entzündete Bosse
 
+**Stand 02.11.2026:** Neue Bosswellen laufen ohne Wellentimer und lösen keine
+zeitgesteuerte Entzündung aus. Die folgende Beschreibung dokumentiert die
+weiterhin vorhandene Aura-/Legacy-Mechanik. Aktuelle Regeln:
+[Bossstages](BOSS_STAGES.md).
+
 ![Die vier entzündeten Bosse mit orangefarbener, roter, pinker und violetter Energie-Aura](screenshots/boss_entzuendung.png)
 
 Direkt aus Godot aufgenommen. Für den Farbvergleich sind die Bosse hier gleich

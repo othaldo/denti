@@ -50,9 +50,13 @@ func _route(boss: Enemy, depth: int = 0) -> bool:
 	var at: Vector2 = game.player.global_position
 	var velocity: Vector2 = game.player.velocity
 	var candidates: Array[Dictionary] = []
-	for index in 32:
+	# A legal response may stop on a bank before the second river. A pilot
+	# restricted to 260-unit moves overshoots that bank even when humans can
+	# simply release movement. Keep the same real hazards/body-clearance checks.
+	for index in 64:
 		_reset_trial(boss, saved, at, velocity)
-		var goal: Vector2 = (at + Vector2.from_angle(index * TAU / 32) * 260).clamp(Vector2.ONE * 48, game.arena.arena_size - Vector2.ONE * 48)
+		var distance := 130 if index < 32 else 260
+		var goal: Vector2 = (at + Vector2.from_angle(index * TAU / 32) * distance).clamp(Vector2.ONE * 48, game.arena.arena_size - Vector2.ONE * 48)
 		var result := _travel(boss, goal)
 		if result.is_empty(): continue
 		if result.complete: return true

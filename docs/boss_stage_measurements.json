@@ -1,0 +1,960 @@
+{
+  "date": "2026-11-02",
+  "base_revision": "7e69409fec68d4514480351e7f8c5a0e9ab736b3",
+  "conditions": {
+    "difficulty": "normal",
+    "seed": 13579,
+    "movement": "fixed orbit without attack reactions",
+    "build_profile": "enchanted synthetic checkpoints from tools/balance/build_comparison_profiles.gd",
+    "loot": "collected plus remaining ground pickups",
+    "note": "Seven deaths; diagnostic evidence, not normal-run progression or human difficulty."
+  },
+  "before": [
+    {
+      "build": "melee_area",
+      "earned": {
+        "capsules": 0,
+        "coins": 30,
+        "xp": 27
+      },
+      "outcome": "death",
+      "seconds": 59.4166666666667,
+      "wave": 5
+    },
+    {
+      "build": "ranged_single",
+      "earned": {
+        "capsules": 1,
+        "coins": 29,
+        "xp": 26
+      },
+      "outcome": "boss_killed",
+      "seconds": 22.5833333333333,
+      "wave": 5
+    },
+    {
+      "build": "melee_area",
+      "earned": {
+        "capsules": 3,
+        "coins": 33,
+        "xp": 23
+      },
+      "outcome": "death",
+      "seconds": 65.9166666666667,
+      "wave": 10
+    },
+    {
+      "build": "ranged_single",
+      "earned": {
+        "capsules": 3,
+        "coins": 77,
+        "xp": 61
+      },
+      "outcome": "death",
+      "seconds": 51.0833333333333,
+      "wave": 10
+    },
+    {
+      "build": "melee_area",
+      "earned": {
+        "capsules": 1,
+        "coins": 27,
+        "xp": 20
+      },
+      "outcome": "death",
+      "seconds": 69.5166666666667,
+      "wave": 15
+    },
+    {
+      "build": "ranged_single",
+      "earned": {
+        "capsules": 0,
+        "coins": 47,
+        "xp": 30
+      },
+      "outcome": "death",
+      "seconds": 28.65,
+      "wave": 15
+    },
+    {
+      "build": "melee_area",
+      "earned": {
+        "capsules": 1,
+        "coins": 37,
+        "xp": 34
+      },
+      "outcome": "death",
+      "seconds": 55.0666666666667,
+      "wave": 20
+    },
+    {
+      "build": "ranged_single",
+      "earned": {
+        "capsules": 2,
+        "coins": 37,
+        "xp": 27
+      },
+      "outcome": "death",
+      "seconds": 27.1333333333333,
+      "wave": 20
+    }
+  ],
+  "after_ritual": [
+    {
+      "build": "ranged_single",
+      "damage_taken": 0.0,
+      "deadline": 19.695652173913,
+      "distance": 1043.0,
+      "remaining_hearts": 0,
+      "seconds": 4.55,
+      "speed_bonus": 0,
+      "success": true
+    },
+    {
+      "build": "melee_single",
+      "damage_taken": 0.0,
+      "deadline": 19.695652173913,
+      "distance": 1104.0,
+      "remaining_hearts": 0,
+      "seconds": 4.82,
+      "speed_bonus": 0,
+      "success": true
+    },
+    {
+      "build": "melee_area",
+      "damage_taken": 0.0,
+      "deadline": 19.695652173913,
+      "distance": 1388.0,
+      "remaining_hearts": 0,
+      "seconds": 6.05,
+      "speed_bonus": 0,
+      "success": true
+    },
+    {
+      "build": "melee_single",
+      "damage_taken": 0.0,
+      "deadline": 32.7391304347826,
+      "distance": 902.0,
+      "remaining_hearts": 0,
+      "seconds": 9.82,
+      "speed_bonus": -60,
+      "success": true
+    }
+  ],
+  "after_conditions": {
+    "weapons": "6 roots of tier-II weapons; synthetic basic-stat checkpoints; normal automatic attacks and player movement",
+    "health": 10000,
+    "dash": false,
+    "pilot": "move to nearest live heart, stop at 60 pixels; no hazard reaction",
+    "note": "Tests reachability and weapon compatibility, not survivability or human difficulty."
+  },
+  "validation": {
+    "core_tests": 167,
+    "passed": 167,
+    "seconds": 246.35,
+    "native_viewports": [
+      "1280x720",
+      "320x568",
+      "568x320"
+    ]
+  },
+  "phased_prototype": {
+    "date": "2026-11-02",
+    "trial_counts": {
+      "easy": 1,
+      "normal": 2,
+      "hard": 3,
+      "hell": 3
+    },
+    "source": "tools/measure_caramel_phases.gd",
+    "full_fights": [
+      {
+        "build": "ranged_single",
+        "damage_taken": 78.7049999999981,
+        "difficulty": "normal",
+        "outcome": "boss_killed",
+        "seconds": 21.8333333333333,
+        "trials": [
+          {
+            "kind": "hearts",
+            "objectives": 2,
+            "seconds": 10.3166666666667
+          },
+          {
+            "kind": "hearts",
+            "objectives": 4,
+            "seconds": 15.8333333333333
+          }
+        ]
+      },
+      {
+        "build": "melee_single",
+        "damage_taken": 369.270000000004,
+        "difficulty": "normal",
+        "outcome": "boss_killed",
+        "seconds": 23.4666666666667,
+        "trials": [
+          {
+            "kind": "hearts",
+            "objectives": 2,
+            "seconds": 11.2166666666667
+          },
+          {
+            "kind": "hearts",
+            "objectives": 4,
+            "seconds": 17.1666666666667
+          }
+        ]
+      },
+      {
+        "build": "ranged_single",
+        "damage_taken": 224.589591023439,
+        "difficulty": "hard",
+        "outcome": "boss_killed",
+        "seconds": 23.45,
+        "trials": [
+          {
+            "kind": "couriers",
+            "objectives": 3,
+            "seconds": 8.11666666666667
+          },
+          {
+            "kind": "hearts",
+            "objectives": 2,
+            "seconds": 11.4166666666667
+          },
+          {
+            "kind": "hearts",
+            "objectives": 4,
+            "seconds": 17.15
+          }
+        ]
+      },
+      {
+        "build": "melee_single",
+        "damage_taken": 479.962697418821,
+        "difficulty": "hard",
+        "outcome": "boss_killed",
+        "seconds": 24.6333333333333,
+        "trials": [
+          {
+            "kind": "couriers",
+            "objectives": 3,
+            "seconds": 8.93333333333333
+          },
+          {
+            "kind": "hearts",
+            "objectives": 2,
+            "seconds": 13.1666666666667
+          },
+          {
+            "kind": "hearts",
+            "objectives": 4,
+            "seconds": 18.6666666666667
+          }
+        ]
+      },
+      {
+        "build": "ranged_single",
+        "damage_taken": 265.88493265097,
+        "difficulty": "hell",
+        "outcome": "boss_killed",
+        "seconds": 23.8333333333333,
+        "trials": [
+          {
+            "kind": "couriers",
+            "objectives": 3,
+            "seconds": 8.03333333333333
+          },
+          {
+            "kind": "hearts",
+            "objectives": 2,
+            "seconds": 11.2666666666667
+          },
+          {
+            "kind": "hearts",
+            "objectives": 4,
+            "seconds": 17.0833333333333
+          }
+        ]
+      },
+      {
+        "build": "melee_single",
+        "damage_taken": 594.615394837636,
+        "difficulty": "hell",
+        "outcome": "boss_killed",
+        "seconds": 24.8666666666667,
+        "trials": [
+          {
+            "kind": "couriers",
+            "objectives": 3,
+            "seconds": 8.81666666666667
+          },
+          {
+            "kind": "hearts",
+            "objectives": 2,
+            "seconds": 13.0833333333333
+          },
+          {
+            "kind": "hearts",
+            "objectives": 4,
+            "seconds": 18.7833333333333
+          }
+        ]
+      }
+    ],
+    "objective_combat": [
+      {
+        "build": "ranged_single",
+        "damage_taken": 16.3349999999991,
+        "deadline": 19.695652173913,
+        "difficulty": "normal",
+        "distance": 1043.0,
+        "kind": "hearts",
+        "remaining_hearts": 0,
+        "seconds": 4.55,
+        "speed_bonus": 0,
+        "success": true
+      },
+      {
+        "build": "melee_single",
+        "damage_taken": 16.3349999999991,
+        "deadline": 19.695652173913,
+        "difficulty": "normal",
+        "distance": 1104.0,
+        "kind": "hearts",
+        "remaining_hearts": 0,
+        "seconds": 4.82,
+        "speed_bonus": 0,
+        "success": true
+      },
+      {
+        "build": "melee_area",
+        "damage_taken": 16.3349999999991,
+        "deadline": 19.695652173913,
+        "difficulty": "normal",
+        "distance": 1388.0,
+        "kind": "hearts",
+        "remaining_hearts": 0,
+        "seconds": 6.05,
+        "speed_bonus": 0,
+        "success": true
+      },
+      {
+        "build": "melee_single",
+        "damage_taken": 65.3399999999965,
+        "deadline": 32.7391304347826,
+        "difficulty": "normal",
+        "distance": 902.0,
+        "kind": "hearts",
+        "remaining_hearts": 0,
+        "seconds": 9.82,
+        "speed_bonus": -60,
+        "success": true
+      },
+      {
+        "build": "ranged_single",
+        "damage_taken": 0.0,
+        "deadline": 17.695652173913,
+        "difficulty": "hard",
+        "distance": 514.0,
+        "kind": "couriers",
+        "remaining_hearts": 0,
+        "seconds": 2.25,
+        "speed_bonus": 0,
+        "success": true
+      },
+      {
+        "build": "ranged_single",
+        "damage_taken": 0.0,
+        "deadline": 17.695652173913,
+        "difficulty": "hell",
+        "distance": 510.0,
+        "kind": "couriers",
+        "remaining_hearts": 0,
+        "seconds": 2.23,
+        "speed_bonus": 0,
+        "success": true
+      }
+    ],
+    "conditions": "Synthetic tier-II builds, 10000 diagnostic HP, automatic weapons, ordinary movement towards goals; no hazard reaction. Difficulty and fun still need human playtests.",
+    "validation": {
+      "core_count": 168,
+      "full_run": "20261102-194523-4a9800ef",
+      "full_passed": 167,
+      "full_failed_fixture": "royal_boss_pressure",
+      "fixed_fixture_rerun": "20261102-194741-6fb44eb0",
+      "fixed_fixture_rerun_passed": true
+    }
+  },
+  "king_pressure": {
+    "thresholds": {
+      "easy": [
+        0.6666666666666666
+      ],
+      "normal": [
+        0.6666666666666666
+      ],
+      "hard": [
+        0.8,
+        0.4
+      ],
+      "hell": [
+        0.9,
+        0.6,
+        0.3
+      ]
+    },
+    "current_defense": {
+      "base_hp": 900,
+      "base_reduction": 0.32,
+      "closed_damage_factor": 0.55,
+      "guard_recharge_seconds": 60,
+      "burst_fraction": 0.04
+    },
+    "opening": {
+      "backfire_fraction": 0.04,
+      "weapon_damage_fraction": 0.08,
+      "damage_factor": 1.8,
+      "maximum_seconds": 4,
+      "normal_guard_reset_after_opening": true
+    },
+    "boss_wave_clock": false,
+    "route_probe": [
+      {
+        "damage_taken": 0.0,
+        "difficulty": "easy",
+        "remaining": 0,
+        "seconds": 8.4,
+        "shots": 2,
+        "speed": 230.0,
+        "success": true,
+        "trial": 1,
+        "viewport": [
+          1280,
+          720
+        ]
+      },
+      {
+        "damage_taken": 0.0,
+        "difficulty": "normal",
+        "remaining": 0,
+        "seconds": 11.25,
+        "shots": 3,
+        "speed": 230.0,
+        "success": true,
+        "trial": 1,
+        "viewport": [
+          1280,
+          720
+        ]
+      },
+      {
+        "damage_taken": 0.0,
+        "difficulty": "hard",
+        "remaining": 0,
+        "seconds": 13.7,
+        "shots": 4,
+        "speed": 230.0,
+        "success": true,
+        "trial": 2,
+        "viewport": [
+          1280,
+          720
+        ]
+      },
+      {
+        "damage_taken": 0.0,
+        "difficulty": "hell",
+        "remaining": 0,
+        "seconds": 7.3,
+        "shots": 2,
+        "speed": 230.0,
+        "success": true,
+        "trial": 1,
+        "viewport": [
+          1280,
+          720
+        ]
+      },
+      {
+        "damage_taken": 0.0,
+        "difficulty": "hell",
+        "remaining": 0,
+        "seconds": 10.2,
+        "shots": 3,
+        "speed": 230.0,
+        "success": true,
+        "trial": 2,
+        "viewport": [
+          1280,
+          720
+        ]
+      },
+      {
+        "damage_taken": 0.0,
+        "difficulty": "hell",
+        "remaining": 0,
+        "seconds": 13.1,
+        "shots": 4,
+        "speed": 230.0,
+        "success": true,
+        "trial": 3,
+        "viewport": [
+          1280,
+          720
+        ]
+      },
+      {
+        "damage_taken": 0.0,
+        "difficulty": "normal",
+        "remaining": 0,
+        "seconds": 17.75,
+        "shots": 5,
+        "speed": 80.0,
+        "success": true,
+        "trial": 1,
+        "viewport": [
+          1280,
+          720
+        ]
+      },
+      {
+        "damage_taken": 0.0,
+        "difficulty": "hell",
+        "remaining": 0,
+        "seconds": 21.8,
+        "shots": 7,
+        "speed": 80.0,
+        "success": true,
+        "trial": 3,
+        "viewport": [
+          1280,
+          720
+        ]
+      },
+      {
+        "damage_taken": 0.0,
+        "difficulty": "normal",
+        "remaining": 0,
+        "seconds": 11.25,
+        "shots": 3,
+        "speed": 230.0,
+        "success": true,
+        "trial": 1,
+        "viewport": [
+          320,
+          568
+        ]
+      },
+      {
+        "damage_taken": 0.0,
+        "difficulty": "normal",
+        "remaining": 0,
+        "seconds": 11.25,
+        "shots": 3,
+        "speed": 230.0,
+        "success": true,
+        "trial": 1,
+        "viewport": [
+          568,
+          320
+        ]
+      }
+    ],
+    "full_fights": [
+      {
+        "build": "ranged_single",
+        "damage_taken": 334.649999999998,
+        "defense": "previous",
+        "difficulty": "normal",
+        "max_hp": 4302.0,
+        "normal_seconds": 23.73,
+        "opening_seconds": 0.18,
+        "outcome": "boss_killed",
+        "seconds": 35.85,
+        "shield_seconds": 11.93,
+        "shields": [
+          {
+            "hp": 0.667,
+            "normal_since_opening": 8.32,
+            "seconds": 8.32,
+            "valves": 3
+          }
+        ]
+      },
+      {
+        "build": "melee_single",
+        "damage_taken": 959.100000000008,
+        "defense": "previous",
+        "difficulty": "normal",
+        "max_hp": 4302.0,
+        "normal_seconds": 23.77,
+        "opening_seconds": 0.13,
+        "outcome": "boss_killed",
+        "seconds": 35.83,
+        "shield_seconds": 11.93,
+        "shields": [
+          {
+            "hp": 0.667,
+            "normal_since_opening": 8.43,
+            "seconds": 8.43,
+            "valves": 3
+          }
+        ]
+      },
+      {
+        "build": "ranged_single",
+        "damage_taken": 313.209352346392,
+        "defense": "previous",
+        "difficulty": "hell",
+        "max_hp": 6538.80163385085,
+        "normal_seconds": 19.03,
+        "opening_seconds": 0.8,
+        "outcome": "boss_killed",
+        "seconds": 52.48,
+        "shield_seconds": 32.65,
+        "shields": [
+          {
+            "hp": 0.9,
+            "normal_since_opening": 1.5,
+            "seconds": 1.5,
+            "valves": 2
+          },
+          {
+            "hp": 0.6,
+            "normal_since_opening": 5.93,
+            "seconds": 15.68,
+            "valves": 3
+          },
+          {
+            "hp": 0.3,
+            "normal_since_opening": 6.5,
+            "seconds": 33.33,
+            "valves": 4
+          }
+        ]
+      },
+      {
+        "build": "melee_single",
+        "damage_taken": 1552.12634607213,
+        "defense": "previous",
+        "difficulty": "hell",
+        "max_hp": 6538.80163385085,
+        "normal_seconds": 17.33,
+        "opening_seconds": 0.5,
+        "outcome": "boss_killed",
+        "seconds": 50.48,
+        "shield_seconds": 32.65,
+        "shields": [
+          {
+            "hp": 0.9,
+            "normal_since_opening": 0.82,
+            "seconds": 0.82,
+            "valves": 2
+          },
+          {
+            "hp": 0.6,
+            "normal_since_opening": 5.4,
+            "seconds": 14.38,
+            "valves": 3
+          },
+          {
+            "hp": 0.3,
+            "normal_since_opening": 6.02,
+            "seconds": 31.47,
+            "valves": 4
+          }
+        ]
+      },
+      {
+        "build": "ranged_single",
+        "damage_taken": 665.849999999995,
+        "defense": "armored",
+        "difficulty": "normal",
+        "max_hp": 4302.0,
+        "normal_seconds": 52.33,
+        "opening_seconds": 0.18,
+        "outcome": "boss_killed",
+        "seconds": 64.45,
+        "shield_seconds": 11.93,
+        "shields": [
+          {
+            "hp": 0.667,
+            "normal_since_opening": 19.37,
+            "seconds": 19.37,
+            "valves": 3
+          }
+        ]
+      },
+      {
+        "build": "melee_single",
+        "damage_taken": 2021.70000000002,
+        "defense": "armored",
+        "difficulty": "normal",
+        "max_hp": 4302.0,
+        "normal_seconds": 52.35,
+        "opening_seconds": 0.13,
+        "outcome": "boss_killed",
+        "seconds": 64.42,
+        "shield_seconds": 11.93,
+        "shields": [
+          {
+            "hp": 0.667,
+            "normal_since_opening": 19.52,
+            "seconds": 19.52,
+            "valves": 3
+          }
+        ]
+      },
+      {
+        "build": "ranged_single",
+        "damage_taken": 709.941198651823,
+        "defense": "armored",
+        "difficulty": "hell",
+        "max_hp": 6538.80163385085,
+        "normal_seconds": 37.07,
+        "opening_seconds": 0.8,
+        "outcome": "boss_killed",
+        "seconds": 70.52,
+        "shield_seconds": 32.65,
+        "shields": [
+          {
+            "hp": 0.9,
+            "normal_since_opening": 3.7,
+            "seconds": 3.7,
+            "valves": 2
+          },
+          {
+            "hp": 0.6,
+            "normal_since_opening": 10.88,
+            "seconds": 22.83,
+            "valves": 3
+          },
+          {
+            "hp": 0.3,
+            "normal_since_opening": 11.62,
+            "seconds": 45.6,
+            "valves": 4
+          }
+        ]
+      },
+      {
+        "build": "melee_single",
+        "damage_taken": 3041.61082167499,
+        "defense": "armored",
+        "difficulty": "hell",
+        "max_hp": 6538.80163385085,
+        "normal_seconds": 36.62,
+        "opening_seconds": 0.5,
+        "outcome": "boss_killed",
+        "seconds": 69.77,
+        "shield_seconds": 32.65,
+        "shields": [
+          {
+            "hp": 0.9,
+            "normal_since_opening": 3.8,
+            "seconds": 3.8,
+            "valves": 2
+          },
+          {
+            "hp": 0.6,
+            "normal_since_opening": 10.85,
+            "seconds": 22.77,
+            "valves": 3
+          },
+          {
+            "hp": 0.3,
+            "normal_since_opening": 11.13,
+            "seconds": 44.97,
+            "valves": 4
+          }
+        ]
+      }
+    ],
+    "conditions": "Synthetic tier-III melee/ranged builds, 10000 diagnostic HP. Real movement, no dash; reacts to shield rays only. Previous/current defenses use identical new shield/opening rules. Diagnostic timing, not human survivability.",
+    "targeted_validation": {
+      "run": "20261102-225728-205325f3",
+      "passed": 8,
+      "count": 8
+    },
+    "stone_waves": {
+      "near_start_minimum": 48,
+      "near_start_maximum": 180,
+      "near_first_half_span": 64,
+      "widen_per_row": 40,
+      "near_warning_seconds": 1.4,
+      "near_shard_half_angle_degrees": 60,
+      "checks": "All difficulties at 100/135 distance: standing still and constant close circling take damage; 72% speed can escape without dash. Fixed warnings and snapshots.",
+      "native_previews": [
+        ".godot/king_pressure_preview/stone_near_warning.png",
+        ".godot/king_pressure_preview/stone_near_impact.png"
+      ],
+      "near_circle_radius": 145,
+      "near_single_warnings": [
+        1.1,
+        0.85,
+        0.72,
+        0.6
+      ],
+      "near_combo_warnings": [
+        1.35,
+        1.15,
+        1,
+        0.9
+      ],
+      "far_combo_warning": 1.4,
+      "near_follow_delay": 0.35
+    },
+    "validation": {
+      "core_and_selected_extended_run": "20261103-073210-f489118c",
+      "passed": 170,
+      "count": 172,
+      "fixed_combination_rerun": "20261103-073438-a1674d74",
+      "core_combination_passed": true,
+      "complete_route_run": "20261103-073644-44f9a55f",
+      "complete_route_passed": true,
+      "route_pilot": "Can stop after 130-unit moves instead of always overshooting banks by 260 units. All original damage/body checks retained. Reaction-boundary experiment was reverted to this validated controller."
+    },
+    "updated": "2026-11-03"
+  },
+  "updated": "2026-11-03",
+  "imperial_retinue": {
+    "updated": "2026-11-03",
+    "thresholds": {
+      "easy": [
+        0.5
+      ],
+      "normal": [
+        0.7,
+        0.3
+      ],
+      "hard": [
+        0.8,
+        0.5,
+        0.2
+      ],
+      "hell": [
+        0.85,
+        0.55,
+        0.25
+      ]
+    },
+    "minions_per_call": {
+      "easy": 2,
+      "normal": 2,
+      "hard": 3,
+      "hell": 3
+    },
+    "roles": [
+      "crown_lancer",
+      "seal_keeper",
+      "royal_justiciar"
+    ],
+    "regeneration": {
+      "maximum_fraction_per_call": 0.04,
+      "seconds": 8,
+      "stops_when_keeper_dies": true
+    },
+    "charge_seconds": {
+      "two_vassals": 24,
+      "three_vassals": 30
+    },
+    "opening": {
+      "maximum_seconds": 4,
+      "maximum_damage_fraction": 0.08,
+      "damage_factor_ignoring_armor": 1.65,
+      "normal_guard_reset_after_opening": true
+    },
+    "failure": "Warned projectile ring; boss loses immunity, surviving vassals continue fighting.",
+    "boss_wave_clock": false,
+    "extra_loot": false,
+    "objective_combat": [
+      {
+        "build": "ranged_single",
+        "damage_taken": 53.4760000000006,
+        "difficulty": "normal",
+        "minions": 2,
+        "regeneration_remaining": 0.00478333333333363,
+        "remaining": 0,
+        "seconds": 8.05,
+        "success": true
+      },
+      {
+        "build": "melee_single",
+        "damage_taken": 39.8226666666669,
+        "difficulty": "normal",
+        "minions": 2,
+        "regeneration_remaining": 0.0162833333333336,
+        "remaining": 0,
+        "seconds": 7.62,
+        "success": true
+      },
+      {
+        "build": "melee_area",
+        "damage_taken": 39.8226666666669,
+        "difficulty": "normal",
+        "minions": 2,
+        "regeneration_remaining": 0.0150333333333336,
+        "remaining": 0,
+        "seconds": 7.4,
+        "success": true
+      },
+      {
+        "build": "ranged_single",
+        "damage_taken": 225.424447454187,
+        "difficulty": "hell",
+        "minions": 3,
+        "regeneration_remaining": 0.0,
+        "remaining": 0,
+        "seconds": 9.32,
+        "success": true
+      },
+      {
+        "build": "melee_single",
+        "damage_taken": 213.334447292767,
+        "difficulty": "hell",
+        "minions": 3,
+        "regeneration_remaining": 0.0151166666666668,
+        "remaining": 0,
+        "seconds": 7.47,
+        "success": true
+      }
+    ],
+    "conditions": "Synthetic wave-20 tier-IV melee/ranged/area builds, 10000 diagnostic HP, normal player physics and automatic weapons. Walks towards the keeper first; no dash or hazard reactions. Measures one retinue phase, not a complete fight or human survivability/fun.",
+    "native_previews": [
+      ".godot/imperial_retinue_preview/charge_1280x720.png",
+      ".godot/imperial_retinue_preview/charge_320x568.png",
+      ".godot/imperial_retinue_preview/charge_568x320.png"
+    ],
+    "art": {
+      "mode": "built-in image_gen",
+      "paths": [
+        "assets/enemies/imperial_vassals/crown_lancer.png",
+        "assets/enemies/imperial_vassals/seal_keeper.png",
+        "assets/enemies/imperial_vassals/royal_justiciar.png"
+      ],
+      "prompts": "assets/enemies/imperial_vassals/prompts.json"
+    },
+    "validation": {
+      "core_count": 172,
+      "core_and_debug_menu_run": "20261103-080120-f52e2bf3",
+      "passed": 171,
+      "count": 173,
+      "failed_old_fixtures": [
+        "boss_pressure",
+        "wave_loot_collection"
+      ],
+      "fixture_fix": "Old forced-kill / ordinary court-pressure fixtures skip the new retinue; dedicated retinue tests exercise real guard, complete Hell checkpoints, failure, save/resume and automatic weapons.",
+      "final_targeted_run": "20261103-080511-da5c4203",
+      "final_targeted_tests": [
+        "boss_pressure",
+        "imperial_retinue",
+        "imperial_retinue_combat",
+        "wave_loot_collection"
+      ],
+      "final_targeted_passed": 4,
+      "final_targeted_count": 4
+    }
+  }
+}

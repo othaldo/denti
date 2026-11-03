@@ -4,13 +4,14 @@ extends Node2D
 # Append new states; existing save-state numbers keep their meaning.
 enum State { POSITION, TURN, EDICT_WARN, EDICT_HIT, PORTAL_WARN, PORTAL_FLIGHT, NERVE_WARN, NERVE_RELEASE, OPEN, RECOVERY, REPOSITION }
 enum Attack { EDICT, PORTAL, NERVE }
-const SAVE_VERSION := 2
+const SAVE_VERSION := 3
 var enemy: Enemy
 var profile: CrownCourtData
 var rig: EmperorCourtRig
 var shots: BossPaintedVolley
 var lances: BossPaintedVolley
 var needles: BossPaintedVolley
+var retinue: ImperialRetinue
 var needle_rays: Array[Vector2] = []
 var state := State.POSITION
 var attack_kind := Attack.EDICT
@@ -42,7 +43,7 @@ var floor_damage := 0.0
 var active: bool:
 	get: return state not in [State.POSITION, State.TURN, State.OPEN, State.RECOVERY]
 var exposed: bool:
-	get: return state in [State.NERVE_WARN, State.NERVE_RELEASE, State.OPEN]
+	get: return retinue != null and retinue.state == ImperialRetinue.State.OPEN or state in [State.NERVE_WARN, State.NERVE_RELEASE, State.OPEN]
 
 func _ready() -> void:
 	add_to_group("crown_court_encounters")
@@ -57,6 +58,11 @@ func _ready() -> void:
 	shots = _batch(profile.shots)
 	lances = _batch(profile.lance)
 	needles = _batch(profile.needles)
+	if profile.retinue_profile != null:
+		retinue = ImperialRetinue.new()
+		retinue.encounter = self
+		retinue.profile = profile.retinue_profile
+		add_child(retinue)
 	sync_visual()
 
 func _batch(data: BossProjectileData) -> BossPaintedVolley:
@@ -69,12 +75,14 @@ func _batch(data: BossProjectileData) -> BossPaintedVolley:
 	return batch
 
 func damage_factor(incoming: Vector2, directional: bool = true) -> float:
+	if retinue != null and retinue.state == ImperialRetinue.State.OPEN: return retinue.profile.opening_damage_factor / maxf(1 - enemy.damage_reduction, 0.01)
 	if exposed: return profile.open_damage_factor
 	if not directional: return 1.0
 	var toward := -incoming.normalized() if not incoming.is_zero_approx() else enemy.global_position.direction_to(enemy.target.global_position)
 	return profile.guard_damage_factor if facing.dot(toward) >= cos(deg_to_rad(profile.guard_half_angle)) else 1.0
 
-func cancel() -> void:
+func cancel(clear_retinue: bool = true) -> void:
+	if retinue != null and clear_retinue: retinue.cancel()
 	state = State.POSITION
 	remaining = profile.position_seconds
 	combo = false
@@ -163,6 +171,11 @@ func _nerve(seconds: float = -1) -> void:
 
 func advance(delta: float) -> void:
 	if enemy.dying or enemy.health <= 0 or enemy.target == null: return
+	if retinue != null and retinue.advance(delta):
+		elapsed += delta
+		sync_visual()
+		queue_redraw()
+		return
 	if enemy.boss_phase_timer > 0: return
 	var left := maxf(delta, 0)
 	var spent := 0.0
@@ -360,6 +373,9 @@ func _move(delta: float, speed_factor: float = 1.0) -> void:
 
 func sync_visual() -> void:
 	if rig == null: return
+	if retinue != null and retinue.busy():
+		rig.sample(elapsed, 1.0, int(Attack.NERVE), facing, retinue.state == ImperialRetinue.State.OPEN)
+		return
 	var duration := edict_warning_duration()
 	if state == State.PORTAL_WARN: duration = profile.portal_warning_seconds
 	elif state == State.NERVE_WARN: duration = nerve_warning_duration()

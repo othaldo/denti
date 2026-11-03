@@ -16,6 +16,7 @@ func _spawn(difficulty: DifficultyData) -> Enemy:
 	boss.configure(EnemyCatalog.CAVITY_PRINCE, game.player, 10, difficulty.id)
 	game.get_node("Enemies").add_child(boss)
 	boss.set_simulation_enabled(false)
+	boss.caramel_encounter.overload.used = true # Isolate bomb cadence and in-flight save state.
 	boss.boss_phase = 2
 	boss.global_position = Vector2(750, 650)
 	return boss

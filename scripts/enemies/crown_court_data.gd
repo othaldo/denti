@@ -1,6 +1,8 @@
 class_name CrownCourtData
 extends Resource
 
+@export var retinue_profile: ImperialRetinueData
+
 @export var warning_seconds: float = 1.05
 @export var followup_warning_seconds: float = 0.90
 @export var impact_seconds: float = 0.22
@@ -49,6 +51,7 @@ extends Resource
 
 func for_difficulty(difficulty: DifficultyData) -> CrownCourtData:
 	var result := duplicate(true) as CrownCourtData
+	if retinue_profile != null: result.retinue_profile = retinue_profile.for_difficulty(difficulty)
 	result.shots = shots.duplicate() as BossProjectileData
 	result.lance = lance.duplicate() as BossProjectileData
 	result.needles = needles.duplicate() as BossProjectileData

@@ -1,6 +1,8 @@
 class_name CaramelEncounterData
 extends Resource
 
+@export var overload_profile: CaramelOverloadData
+
 enum Attack { BOMBS, HEART_FAN, SUGAR_RUSH }
 @export var attack_order: Array[int] = [Attack.BOMBS, Attack.HEART_FAN, Attack.SUGAR_RUSH]
 
@@ -59,6 +61,7 @@ enum Attack { BOMBS, HEART_FAN, SUGAR_RUSH }
 
 func for_difficulty(difficulty: DifficultyData) -> CaramelEncounterData:
 	var result := duplicate() as CaramelEncounterData
+	if overload_profile != null: result.overload_profile = overload_profile.for_difficulty(difficulty)
 	result.action_bonus = clampi(difficulty.boss_volley_bonus, -1, 2)
 	result.heart_speed *= difficulty.boss_projectile_speed_multiplier
 	result.recovery_seconds *= difficulty.boss_recovery_multiplier

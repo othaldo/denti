@@ -23,6 +23,10 @@ func _spawn(difficulty: DifficultyData, wave: int) -> Enemy:
 	boss.configure(WaveController.boss_for_wave(wave), game.player, wave, difficulty.id)
 	game.get_node("Enemies").add_child(boss)
 	boss.set_simulation_enabled(false)
+	# This suite isolates ordinary attack combinations, including their phase-2
+	# variants. boss_stages exercises the separate once-per-fight ritual.
+	if boss.caramel_encounter != null: boss.caramel_encounter.overload.used = true
+	if boss.crown_court_encounter != null: boss.crown_court_encounter.retinue.used = true
 	if wave == 20: boss.global_position = Vector2(game.player.global_position) - Vector2(240, 0)
 	return boss
 
@@ -171,6 +175,7 @@ func _actual_reload_tests(session: Node) -> void:
 		var before: Dictionary
 		if stage == 0:
 			var a := boss.caramel_encounter
+			a.overload.used = true # Reload fixture isolates the queued fan, not the trial campaign.
 			a.begin(-1, CaramelEncounterData.Attack.BOMBS)
 			for tick in 600:
 				a.advance(STEP)

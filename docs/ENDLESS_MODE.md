@@ -36,10 +36,12 @@ Die bisherigen Gegnergrundwerte steigen bis Welle 20. Ab Welle 21 dient genau di
 
 Die Faktoren beziehen sich auf denselben Gegnertyp in Welle 20 und gelten vor Schwierigkeitsgrad und Entzündung. Shoppreise verwenden die **abgeschlossene** Welle und werden erst am Ende abgerundet; die Bürste hat Basispreis 9.
 
-- Jede Endloswelle dauert 60 Sekunden. Bosswellen bleiben nach dem Zeitlimit aktiv, bis alle Bosse besiegt sind.
+- Normale Endloswellen dauern 60 Sekunden. Bosswellen haben keinen Wellentimer
+  und keine zeitgesteuerte Entzündung; sie enden mit dem letzten Boss.
 - Alle fünf Wellen erscheint ein Imperator. In Welle 30/50/... kommt ein König hinzu, in Welle 40/60/... ein Prinz. Beide erhalten ihre eigenen Werte, Schutzphasen und zur Größe passenden Entzündungs-Auren.
-- Der HUD-Balken zeigt bei zwei Bossen ihr gemeinsames Leben. Die Bosskampf-Dauer misst bis zum letzten besiegten Boss; die Anzahl besiegter Bosse zählt jeden einzeln.
-- Kürzere Spawnabstände erhöhen den Druck um `min(1 + E * 0,1, 2)`. Bursts und zusätzliche Elite-Gruppen bleiben aktiv. Pro Gruppe erscheinen höchstens vier Eliten, pro Burst höchstens 60 Gegner; die bestehende Obergrenze von 110 gleichzeitig lebenden Gegnern bleibt erhalten. Ganze Hordenwellen gibt es nach Welle 20 nicht.
+- Das HUD zeigt bei zwei Bossen getrennte Lebensleisten. Die Diagnose misst die
+  Bosskampf-Dauer bis zum letzten besiegten Boss; Kills zählen jeden einzeln.
+- In normalen Endloswellen erhöhen kürzere Spawnabstände den Druck um `min(1 + E * 0,1, 2)`. Bursts und zusätzliche Elite-Gruppen bleiben dort aktiv. Pro Gruppe erscheinen höchstens vier Eliten, pro Burst höchstens 60 Gegner; die bestehende Obergrenze von 110 gleichzeitig lebenden Gegnern bleibt erhalten. Bosswellen enthalten nur Bosse und ihre eigenen besonderen Ziele/Minions. Ganze Hordenwellen gibt es nach Welle 20 nicht.
 - Welle 30/40/... bietet ein weiteres noch nicht besessenes Relikt aus dem bestehenden Pool. Sind alle fünf besessen, entfällt diese Auswahl.
 
 ![Zwei Bosse nach Zeitablauf, mit getrennten Auren](screenshots/endless/double_boss_inflamed.png)

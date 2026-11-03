@@ -271,13 +271,42 @@ func update_status(stats: PlayerStats, xp: int, xp_goal: int, level: int, coins:
 		timer_label.text = "+%d s" % boss.overtime_seconds if inflamed else "Boss besiegen!"
 	elif collecting_loot:
 		timer_label.text = "Beute sammeln"
+	elif not in_shop and is_instance_valid(boss):
+		timer_label.text = ""
 	else:
 		timer_label.text = "Shop-Pause" if in_shop else str(seconds)
+	if WaveController.is_boss_wave(wave_number) and not collecting_loot and not in_shop: timer_label.text = ""
 	timer_label.tooltip_text = "Entzündet " + timer_label.text if inflamed else timer_label.text
-	clock_icon.visible = inflamed
+	clock_icon.visible = inflamed and not WaveController.is_boss_wave(wave_number)
 	var timer_color := Color("ffad66") if boss_pending else DentiUIStyle.GOLD if remaining <= 15 and not in_shop and not collecting_loot else DentiUIStyle.INK
 	timer_label.add_theme_color_override("font_color", timer_color)
 	clock_icon.modulate = Color.WHITE
+	if not collecting_loot and not in_shop and is_instance_valid(boss) and boss.caramel_encounter != null:
+		var ritual := boss.caramel_encounter.overload
+		if ritual != null:
+			if ritual.state == CaramelOverload.State.WARNING: timer_label.text = "Herzboten abfangen!" if ritual.trial().kind == CaramelTrialData.Kind.COURIERS else "Herzen aus der Nähe brechen"
+			elif ritual.state == CaramelOverload.State.ACTIVE: timer_label.text = "%s · %d/%d · %d s" % ["Abfangen" if ritual.trial().kind == CaramelTrialData.Kind.COURIERS else "Herzen", ritual.trial().objectives - ritual.live_pylons().size() - ritual.escaped, ritual.trial().objectives, ceili(ritual.remaining)]
+			elif ritual.state == CaramelOverload.State.BLAST: timer_label.text = "Kessel überläuft!"
+			elif ritual.state == CaramelOverload.State.RECOVERY: timer_label.text = "Kessel gebrochen!"
+	if not collecting_loot and not in_shop and is_instance_valid(boss) and boss.acid_king_encounter != null:
+		var trial := boss.acid_king_encounter.pressure
+		if trial != null and trial.busy():
+			match trial.state:
+				KingPressureTrial.State.INTRODUCTION: timer_label.text = "Schild %d/%d · Strahl umlenken" % [trial.trial_index + 1, trial.profile.health_thresholds.size()]
+				KingPressureTrial.State.TRACKING: timer_label.text = "Ausrichten · %d/%d" % [trial.valve_count() - trial.remaining_valves(), trial.valve_count()]
+				KingPressureTrial.State.LOCKED: timer_label.text = "Ausweichen!"
+				KingPressureTrial.State.FIRING: timer_label.text = "Säurestrahl!"
+				KingPressureTrial.State.RECOIL: timer_label.text = "Ventile · %d/%d" % [trial.valve_count() - trial.remaining_valves(), trial.valve_count()]
+				KingPressureTrial.State.SHATTER, KingPressureTrial.State.EXPOSED: timer_label.text = "Panzer gebrochen!"
+				KingPressureTrial.State.BLAST_WARNING: timer_label.text = "Überdruck!"
+	if not collecting_loot and not in_shop and is_instance_valid(boss) and boss.crown_court_encounter != null:
+		var retinue := boss.crown_court_encounter.retinue
+		if retinue != null and retinue.busy():
+			match retinue.state:
+				ImperialRetinue.State.INTRODUCTION: timer_label.text = "Kronenvasallen!"
+				ImperialRetinue.State.CHANNEL: timer_label.text = "Urteil lädt · %d Vasallen" % retinue.live_minions().size()
+				ImperialRetinue.State.FAILURE: timer_label.text = "Urteil fällt!"
+				ImperialRetinue.State.OPEN: timer_label.text = "Krone gebrochen!"
 	fit_timer_text()
 	var bosses: Array[Enemy] = []
 	if is_instance_valid(boss):

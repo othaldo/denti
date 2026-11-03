@@ -29,6 +29,7 @@ const WET_STATUS = preload("res://data/statuses/wet.tres")
 
 var data: EnemyData
 var difficulty: DifficultyData
+var imperial_vassal: ImperialVassal
 var target: Player
 var health: float
 var max_health: float
@@ -94,6 +95,8 @@ var hit_flash_time: float = 0.0
 var spatial_order: int = 0
 var motion_slot: int = -1
 var simulation_enabled: bool = true
+var boss_objective_owner: Enemy
+var boss_objective_slot: int = -1
 var warning_ray_direction := Vector2.INF
 var warning_ray_count := -1
 var warning_rays: Array[Vector2] = []
@@ -111,6 +114,10 @@ func configure(enemy_data: EnemyData, player: Player, wave_number: int = 1, diff
 	active_trigger_range = data.advanced_trigger_range if advanced and data.advanced_trigger_range > 0.0 else data.trigger_range
 	max_health = data.max_health * WaveController.health_multiplier(data, wave_number) * difficulty.health_factor(wave_number)
 	health = max_health
+	if data.is_boss_objective:
+		max_health = data.max_health
+		health = max_health
+		inflicted_statuses.clear()
 	damage_reduction = WaveController.damage_reduction(data, wave_number) + difficulty.defense_bonus(wave_number)
 	contact_damage = data.contact_damage * WaveController.enemy_damage_multiplier(data, wave_number) * difficulty.damage_factor(wave_number)
 	attack_damage = data.attack_damage * WaveController.enemy_damage_multiplier(data, wave_number) * difficulty.damage_factor(wave_number)
@@ -149,7 +156,14 @@ func _ready() -> void:
 	sprite.modulate = ChestRewards.TREASURE_COLOR if treasure_carrier else data.sprite_tint
 	var side := maxf(float(data.sprite.get_width()), float(data.sprite.get_height()))
 	sprite.scale = Vector2.ONE * (data.radius * 2.35 / side)
+	if data.imperial_vassal_profile != null: sprite.scale *= data.imperial_vassal_profile.visual_scale
 	sprite_base_scale = sprite.scale
+	if data.imperial_vassal_profile != null:
+		sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		imperial_vassal = ImperialVassal.new()
+		imperial_vassal.enemy = self
+		imperial_vassal.profile = data.imperial_vassal_profile.for_difficulty(difficulty)
+		add_child(imperial_vassal)
 	animation_time = randf_range(0.0, TAU)
 	if data.loot_goblin_profile != null:
 		loot_goblin = LootGoblin.new()
@@ -284,6 +298,7 @@ func _physics_process(delta: float) -> void:
 	affix_effects.advance(self, delta)
 	if health <= 0.0:
 		return
+	if data.is_boss_objective: return
 	if target == null or target.stats.health <= 0.0:
 		return
 	if loot_goblin != null:
@@ -321,6 +336,10 @@ func _physics_process(delta: float) -> void:
 
 
 func try_contact_hit(during_dash: bool = false) -> void:
+	if data.is_boss_objective: return
+	if caramel_encounter != null and caramel_encounter.overload != null and caramel_encounter.overload.busy(): return
+	if acid_king_encounter != null and acid_king_encounter.pressure != null and acid_king_encounter.pressure.busy(): return
+	if crown_court_encounter != null and crown_court_encounter.retinue != null and crown_court_encounter.retinue.busy(): return
 	if loot_goblin != null: return
 	if contact_timer > 0.0 or health <= 0.0 or is_queued_for_deletion() or target == null:
 		return
@@ -595,6 +614,9 @@ func has_bleeding() -> bool:
 func take_damage(amount: float, weapon: WeaponData = null, critical: bool = false, proc_id: StringName = &"", additions: Array[Dictionary] = [], incoming_direction: Vector2 = Vector2.ZERO) -> float:
 	if health <= 0.0:
 		return 0.0
+	if not is_targetable():
+		if data.is_boss: _guard_boss_hit()
+		return 0.0
 	var direct: Array[Dictionary] = []
 	var delayed: Array[Dictionary] = []
 	var total := amount * (1.0 - data.affix_resistance(&"bleed")) if proc_id == &"bleed" else amount
@@ -621,7 +643,22 @@ func take_damage(amount: float, weapon: WeaponData = null, critical: bool = fals
 	var applied := maxf(total * (1.0 - damage_reduction) / overtime_defense_factor(), 1.0 if amount > 0 else 0.0)
 	if acid_king_encounter != null: applied *= acid_king_encounter.damage_factor()
 	if crown_court_encounter != null: applied *= crown_court_encounter.damage_factor(incoming_direction, proc_id.is_empty())
-	if data.is_boss and data.boss_guard_recharge_seconds > 0.0:
+	var overload_open := caramel_encounter != null and caramel_encounter.overload != null and caramel_encounter.overload.state == CaramelOverload.State.RECOVERY
+	var king_open := acid_king_encounter != null and acid_king_encounter.pressure != null and acid_king_encounter.pressure.state == KingPressureTrial.State.EXPOSED
+	var court_open := crown_court_encounter != null and crown_court_encounter.retinue != null and crown_court_encounter.retinue.state == ImperialRetinue.State.OPEN
+	if overload_open: applied *= caramel_encounter.overload.profile.vulnerability
+	if caramel_encounter != null and caramel_encounter.overload != null:
+		applied = minf(applied, caramel_encounter.overload.damage_limit())
+	if acid_king_encounter != null and acid_king_encounter.pressure != null:
+		applied = minf(applied, acid_king_encounter.pressure.damage_limit(proc_id == &"king_backfire"))
+	if crown_court_encounter != null and crown_court_encounter.retinue != null: applied = minf(applied, crown_court_encounter.retinue.damage_limit())
+	if imperial_vassal != null: applied = imperial_vassal.limit(applied)
+	if (overload_open or king_open or court_open) and boss_phase < 2:
+		applied = minf(applied, maxf(health - _boss_phase_floor(), 0.0))
+	if applied <= 0:
+		if data.is_boss: _guard_boss_hit()
+		return 0.0
+	if data.is_boss and data.boss_guard_recharge_seconds > 0.0 and not (overload_open or king_open or court_open):
 		if boss_phase_timer > 0.0:
 			_guard_boss_hit()
 			return 0.0
@@ -640,6 +677,9 @@ func take_damage(amount: float, weapon: WeaponData = null, critical: bool = fals
 		elite_damage_budget = maxf(elite_damage_budget - applied, 0.0)
 	var counted := minf(applied, health)
 	health -= applied
+	if imperial_vassal != null: imperial_vassal.spend(counted)
+	if court_open: crown_court_encounter.retinue.opening_left = maxf(crown_court_encounter.retinue.opening_left - counted, 0)
+	if king_open and proc_id != &"king_backfire": acid_king_encounter.pressure.spend_opening_damage(counted)
 	if health > 0:
 		for addition in delayed:
 			affix_effects.apply(StringName(addition.id), addition.damage, addition.can_spread, addition.duration)
@@ -683,6 +723,17 @@ func take_damage(amount: float, weapon: WeaponData = null, critical: bool = fals
 			modulate = Color(1.6, 1.6, 1.6)
 		hit_flash_time = 0.12
 	return counted
+
+
+func is_targetable() -> bool:
+	if health <= 0 or dying or is_queued_for_deletion(): return false
+	if caramel_encounter != null and caramel_encounter.overload != null and caramel_encounter.overload.blocks_damage(): return false
+	if acid_king_encounter != null and acid_king_encounter.pressure != null and acid_king_encounter.pressure.blocks_damage(): return false
+	if crown_court_encounter != null and crown_court_encounter.retinue != null and crown_court_encounter.retinue.blocks_damage(): return false
+	if data.is_boss_objective:
+		if imperial_vassal != null: return is_instance_valid(boss_objective_owner) and boss_objective_owner.health > 0
+		return is_instance_valid(boss_objective_owner) and boss_objective_owner.caramel_encounter != null and boss_objective_owner.caramel_encounter.overload.objective_open(self)
+	return true
 
 
 func _finish_death(amount: float, delayed: Array[Dictionary]) -> void:

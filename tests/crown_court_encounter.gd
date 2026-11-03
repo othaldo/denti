@@ -235,6 +235,7 @@ func _run() -> void:
 	_fresh(CrownCourtEncounter.Attack.NERVE, 2)
 	attack.advance(attack.profile.nerve_warning_seconds + 0.1)
 	boss.health = 1
+	attack.retinue.used = true # Death cleanup fixture; retinue has a dedicated suite.
 	boss.boss_damage_budget = boss.max_health
 	boss.take_damage(1000)
 	_check(boss.dying and attack.shots.entries.is_empty() and attack.lances.entries.is_empty(), "dead Emperor retained damaging owned projectiles")

@@ -6,6 +6,7 @@ func _initialize() -> void: call_deferred("_run")
 func _check(ok: bool, message: String) -> void:
 	if not ok: failures.append(message); push_error(message)
 func _place(boss: Enemy) -> void:
+	boss.crown_court_encounter.retinue.used = true # Isolate original court attacks.
 	boss.crown_court_encounter.cancel()
 	boss.boss_phase_timer = 0
 	boss.global_position = Vector2(770, 650)

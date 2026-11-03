@@ -82,6 +82,7 @@ var difficulty_id: StringName = &"normal"
 var endless_enabled: bool = false
 var goblin_profile: LootGoblinData = preload("res://data/encounters/loot_goblin.tres")
 var goblin_checked: bool = false
+var boss_rewards := BossStageRewards.new()
 
 
 func plan_hordes() -> void:
@@ -121,6 +122,7 @@ static func elite_for_wave(wave_number: int) -> EnemyData:
 
 
 static func elite_groups_for_wave(wave_number: int, selected_difficulty_id: StringName = &"normal") -> Array[int]:
+	if is_boss_wave(wave_number): return []
 	var difficulty := DifficultyCatalog.by_id(selected_difficulty_id)
 	if wave_number >= EndlessRules.FIRST_WAVE:
 		var extra := EndlessRules.extra_elites(wave_number) + difficulty.elite_group_bonus
@@ -275,6 +277,7 @@ func start_next_wave() -> void:
 	plan_bursts()
 	plan_elites()
 	active = true
+	boss_rewards = BossStageRewards.new()
 	if is_boss_wave(current_wave):
 		boss_requested.emit(boss_for_wave(current_wave))
 		if current_wave > MAX_WAVES and current_wave % 10 == 0:
@@ -282,7 +285,8 @@ func start_next_wave() -> void:
 
 
 func _process(delta: float) -> void:
-	if not active:
+	# Boss encounters end through the last boss, never through a wave clock.
+	if not active or is_boss_wave(current_wave):
 		return
 	remaining = maxf(remaining - delta, 0.0)
 	if remaining <= 0.0:
@@ -315,6 +319,8 @@ func _process(delta: float) -> void:
 
 func plan_bursts() -> void:
 	burst_times.clear()
+	burst_index = 0
+	if is_boss_wave(current_wave): return
 	var difficulty := DifficultyCatalog.by_id(difficulty_id)
 	if difficulty.extra_burst_first_wave > 0 and current_wave >= difficulty.extra_burst_first_wave:
 		burst_times.append(randf_range(duration * 0.12, duration * 0.18))
@@ -423,10 +429,12 @@ func save_state() -> Dictionary:
 		"elite_times": elite_times.duplicate(), "elite_counts": elite_counts.duplicate(), "elite_index": elite_index,
 		"current_profile_id": str(current_profile_id), "next_profile_id": str(next_profile_id),
 		"goblin_checked": goblin_checked,
+		"boss_stage_rewards": boss_rewards.save_data(),
 	}
 
 
 func restore_state(saved: Dictionary, story_enabled: bool = false) -> void:
+	boss_rewards.restore(saved.get("boss_stage_rewards", {}))
 	difficulty_id = DifficultyCatalog.by_id(StringName(str(saved.get("difficulty_id", "normal")))).id
 	endless_enabled = bool(saved.get("endless_enabled", false))
 	current_wave = maxi(int(saved.get("wave", 1)), 1) if endless_enabled else clampi(int(saved.get("wave", 1)), 1, WaveController.MAX_WAVES)

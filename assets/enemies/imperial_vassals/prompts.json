@@ -1,0 +1,19 @@
+{
+  "mode": "built-in image_gen",
+  "reference": "assets/enemies/emperor_court/portrait.png",
+  "transparent_background": true,
+  "prompts": [
+    {
+      "id": "crown_lancer",
+      "prompt": "Use case: game-asset. Create ONE new full-body enemy sprite for the 2D cartoon dental roguelite Denti. The supplied Emperor portrait is a STYLE/FACTION REFERENCE ONLY, not an edit target. Match its glossy hand-painted ivory tooth, rich purple cloth, ornate warm gold metal, crisp dark outlines and small violet magical accents. Make a smaller distinct royal lieutenant, readable at 100px tall, front-facing slightly three-quarter, grounded pose, whole silhouette and all weapons inside canvas with generous transparent padding. Genuine transparent background, no scenery, no floor, no shadow rectangle, no text, no letters, no watermark. Not a copy of the Emperor and not a generic germ. Subject: KRONENLANZE, a compact fierce ivory molar knight with two chunky tooth roots, a tiny gold crest crown and sweeping purple shoulder cape. Carries one long gold-and-ivory forked dental lance diagonally upright; distinct narrow spear silhouette, one small red gem on breastplate. Determined squinting face, charming rather than horror."
+    },
+    {
+      "id": "seal_keeper",
+      "prompt": "Use case: game-asset. Create ONE new full-body enemy sprite for the 2D cartoon dental roguelite Denti. The supplied Emperor portrait is a STYLE/FACTION REFERENCE ONLY, not an edit target. Match its glossy hand-painted ivory tooth, rich purple cloth, ornate warm gold metal, crisp dark outlines and small violet magical accents. Make a smaller distinct royal lieutenant, readable at 100px tall, front-facing slightly three-quarter, grounded pose, whole silhouette and all weapons inside canvas with generous transparent padding. Genuine transparent background, no scenery, no floor, no shadow rectangle, no text, no letters, no watermark. Not a copy of the Emperor and not a generic germ. Subject: SIEGELHÜTER, a squat floating ivory molar court magician, small gold circlet, purple scholarly robes. Holds an oversized round ornate gold seal-stamp with a bright cyan-purple circular emblem; second arm cradles a small closed purple decree book. Two clear short tooth roots, stern funny face, distinct round shield/seal silhouette, no readable writing."
+    },
+    {
+      "id": "royal_justiciar",
+      "prompt": "Use case: game-asset. Create ONE new full-body enemy sprite for the 2D cartoon dental roguelite Denti. The supplied Emperor portrait is a STYLE/FACTION REFERENCE ONLY, not an edit target. Match its glossy hand-painted ivory tooth, rich purple cloth, ornate warm gold metal, crisp dark outlines and small violet magical accents. Make a smaller distinct royal lieutenant, readable at 100px tall, front-facing slightly three-quarter, grounded pose, whole silhouette and all weapons inside canvas with generous transparent padding. Genuine transparent background, no scenery, no floor, no shadow rectangle, no text, no letters, no watermark. Not a copy of the Emperor and not a generic germ. Subject: REICHSRICHTER, a stocky ivory molar execution judge with two sturdy tooth roots, a short deep-purple hood and gold crown rim. Carries a huge horizontal ivory-and-gold dental gavel with a violet crystal head, chunky blocky silhouette, small purple cape, grumpy comically pompous eyebrows. Clearly distinct from the spear knight and round seal mage."
+    }
+  ]
+}

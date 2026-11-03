@@ -25,6 +25,7 @@ func _spawn(difficulty: DifficultyData) -> Enemy:
 	boss.configure(EnemyCatalog.CAVITY_KING, player, 15, difficulty.id)
 	game.get_node("Enemies").add_child(boss)
 	boss.set_simulation_enabled(false)
+	boss.acid_king_encounter.pressure.used = true # Isolate original pursuit/combined routes.
 	return boss
 
 func _run() -> void:
@@ -112,11 +113,13 @@ func _run() -> void:
 		var combined_releases := [0]
 		capped.attack_performed.connect(func(kind: StringName):
 			if kind == &"boss_pulse" and capped.acid_king_encounter.state == AcidKingEncounter.State.STOMP and not capped.acid_king_encounter.fields.is_empty(): combined_releases[0] += 1)
-		for tick in 2100:
+		# Enough time for the deliberately slower armor budget plus both transitions.
+		var kill_frames := ceili((capped.data.boss_guard_recharge_seconds + 2 * capped.data.boss_phase_duration + 2) / STEP)
+		for tick in kill_frames:
 			capped._physics_process(STEP)
 			if tick % 6 == 0: capped.take_damage(100000)
 			if capped.dying: break
-		_check(capped.dying and combined_releases[0] > 0, "maximum-DPS build skipped every actual combined impact")
+		_check(capped.dying and combined_releases[0] > 0, "%s maximum-DPS probe: dying=%s health=%.2f/%.2f combined_impacts=%d phase=%d state=%d seconds=%.2f" % [difficulty.id, capped.dying, capped.health, capped.max_health, combined_releases[0], capped.boss_phase, capped.acid_king_encounter.state, kill_frames * STEP])
 		capped.free()
 	# Real scene reload must retain the new state, not only its RefCounted snapshot.
 	game.wave.difficulty_id = &"hell"

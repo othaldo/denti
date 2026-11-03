@@ -1,6 +1,8 @@
 class_name AcidKingData
 extends Resource
 
+@export var pressure_profile: KingPressureData
+
 @export var warning_seconds: float = 1.0
 @export var shift_warning_seconds: float = 1.0
 @export var flow_seconds: float = 1.55
@@ -28,10 +30,18 @@ extends Resource
 @export_range(0, 2) var combined_phase: int = 1
 @export var stomp_warning_seconds: float = 1.0
 @export var combined_stomp_warning_seconds: float = 1.4
+@export var combined_near_warning_seconds: float = 1.4
 @export var stomp_row_interval: float = 0.24
 @export var stomp_active_seconds: float = 0.16
 @export var stomp_spacing: float = 105.0
 @export var stomp_start: float = 180.0
+@export var stomp_near_start: float = 48.0
+@export var stomp_near_half_span: float = 64.0
+@export var stomp_widen_per_row: float = 40.0
+@export var stomp_near_warning_seconds: float = 1.4
+@export var stomp_near_radius: float = 145.0
+@export var stomp_near_follow_delay: float = 0.35
+@export var stomp_near_shard_half_angle_degrees: float = 60.0
 @export var stomp_half_span: float = 160.0
 @export var stomp_radius: float = 20.0
 @export var closed_damage_factor: float = 0.85
@@ -51,6 +61,7 @@ extends Resource
 
 func for_difficulty(difficulty: DifficultyData) -> AcidKingData:
 	var result := duplicate(true) as AcidKingData
+	if pressure_profile != null: result.pressure_profile = pressure_profile.for_difficulty(difficulty)
 	# External Resource references are shared even by duplicate(true).
 	result.shards = shards.duplicate() as BossProjectileData
 	result.spit = spit.duplicate() as BossProjectileData
@@ -58,6 +69,10 @@ func for_difficulty(difficulty: DifficultyData) -> AcidKingData:
 	result.channel_count = 1 if result.action_bonus < 0 else 2
 	result.shifts = maxi(1, 1 + result.action_bonus)
 	result.stomp_sequences = 2 if result.action_bonus >= 1 else 1
+	var rank := result.action_bonus + 1
+	result.stomp_warning_seconds = [1.1, 1.05, 1.0, 0.9][rank]
+	result.stomp_near_warning_seconds = [1.1, 0.85, 0.72, 0.60][rank]
+	result.combined_near_warning_seconds = [1.35, 1.15, 1.0, 0.9][rank]
 	result.flow_movement_factor = 0.20 + (result.action_bonus + 1) * 0.14
 	result.pursuit_move_factor *= 0.75 + 0.25 * (result.action_bonus + 1)
 	result.alternate_shift_axis = alternate_shift_axis and result.action_bonus >= 0

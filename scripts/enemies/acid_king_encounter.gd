@@ -5,13 +5,14 @@ extends Node2D
 # Append states so existing save-state numbers retain their meaning.
 enum State { POSITION, WARN_CHANNEL, FLOW, WARN_SHIFT, WARN_STOMP, STOMP, RECALL, OPEN, RECOVERY, PURSUE, WARN_SPIT, CHASE_STOMP }
 enum Attack { CHANNELS, STOMP, TIDE }
-const SAVE_VERSION := 2
+const SAVE_VERSION := 3
 const MAX_FIELDS := 2
 var enemy: Enemy
 var profile: AcidKingData
 var rig: KingAcidRig
 var volley: BossPaintedVolley
 var spit: BossPaintedVolley
+var pressure: KingPressureTrial
 var spit_origin := Vector2.ZERO
 var spit_rays: Array[Vector2] = []
 var stomp_index := 0
@@ -56,12 +57,20 @@ func _ready() -> void:
 	spit.profile = profile.spit
 	spit.texture = KingAcidArt.texture(8)
 	add_child(spit)
+	if profile.pressure_profile != null:
+		pressure = KingPressureTrial.new()
+		pressure.name = &"PressureTrial"
+		pressure.encounter = self
+		pressure.profile = profile.pressure_profile
+		add_child(pressure)
 	sync_visual()
 
 func damage_factor() -> float:
+	if pressure != null and pressure.state == KingPressureTrial.State.EXPOSED: return pressure.profile.exposure_damage_factor / maxf(1 - enemy.damage_reduction, 0.01)
 	return profile.open_damage_factor if state == State.OPEN else profile.closed_damage_factor
 
 func cancel() -> void:
+	if pressure != null: pressure.cancel()
 	state = State.POSITION
 	remaining = profile.approach_seconds
 	pending.clear()
@@ -74,6 +83,12 @@ func cancel() -> void:
 	if spit != null: spit.clear()
 	sync_visual()
 	queue_redraw()
+
+func begin_health_phase() -> void:
+	cancel()
+	# Start each health phase with rivers. A fast build must still meet the
+	# phase's combined river/stomp, rather than killing during a lone stomp.
+	cycle = ceili(float(cycle) / 3.0) * 3
 
 func begin(forced: int = -1, seconds: float = -1) -> void:
 	attack_kind = clampi(forced, 0, 2) as Attack if forced >= 0 else posmod(cycle, 3) as Attack
@@ -90,6 +105,11 @@ func begin(forced: int = -1, seconds: float = -1) -> void:
 
 func advance(delta: float) -> void:
 	if enemy.dying or enemy.health <= 0 or enemy.target == null: return
+	if pressure != null and pressure.advance(delta):
+		elapsed += delta
+		sync_visual()
+		queue_redraw()
+		return
 	if enemy.boss_phase_timer > 0:
 		sync_visual()
 		return
@@ -257,11 +277,20 @@ func _tick_fields(delta: float, first: float) -> void:
 			field.cooldown = profile.field_tick_seconds
 		if field.life <= 0: fields.remove_at(index)
 
-func _stomp_duration() -> float:
-	return (profile.rows(enemy.boss_phase) - 1) * profile.stomp_row_interval + profile.stomp_active_seconds
+func _stomp_duration(announced: Array = []) -> float:
+	var planned: Array = rows if announced.is_empty() else announced
+	var near := not planned.is_empty() and float(planned[0].get("circle_radius", 0)) > 0
+	return (profile.rows(enemy.boss_phase) - 1) * profile.stomp_row_interval + profile.stomp_active_seconds + (profile.stomp_near_follow_delay if near else 0.0)
 
-func stomp_warning_duration() -> float:
-	return profile.combined_stomp_warning_seconds if _combined_stomp() else profile.stomp_warning_seconds
+func stomp_warning_duration(announced: Array = []) -> float:
+	var seconds := profile.combined_stomp_warning_seconds if _combined_stomp() else profile.stomp_warning_seconds
+	var planned: Array = rows if announced.is_empty() else announced
+	if not planned.is_empty() and float(planned[0].get("half_span", profile.stomp_half_span)) < profile.stomp_half_span:
+		seconds = profile.combined_near_warning_seconds if _combined_stomp() else profile.stomp_near_warning_seconds
+	return seconds
+
+func row_half_span(row: Dictionary) -> float:
+	return float(row.get("half_span", profile.stomp_half_span))
 
 func _warn_spit(seconds: float) -> void:
 	state = State.WARN_SPIT
@@ -279,13 +308,20 @@ func _warn_stomp(seconds: float, followup: bool = false) -> void:
 		stomp_index = 0
 		stomp_total = profile.stomp_sequences
 	state = State.WARN_STOMP
-	remaining = stomp_warning_duration()
 	var at := HazardGeometry.player_at(enemy.target, seconds) if seconds >= 0 else enemy.target.global_position
 	aim = enemy.global_position.direction_to(at)
 	if aim.is_zero_approx(): aim = Vector2.DOWN
+	var first := clampf(enemy.global_position.distance_to(at), profile.stomp_near_start, profile.stomp_start)
+	if _combined_stomp():
+		# A close stomp closes the old underfoot refuge. Open the inner bank
+		# before impact so two rivers cannot seal the only route at a wall.
+		for index in range(1, fields.size()): fields[index].life = minf(fields[index].life, profile.old_channel_fade)
 	rows.clear()
 	for index in profile.rows(enemy.boss_phase):
-		rows.append({"at": enemy.global_position + aim * (profile.stomp_start + index * profile.stomp_spacing), "direction": aim, "delay": index * profile.stomp_row_interval, "fired": false, "hit": false})
+		var half_span := minf(profile.stomp_half_span, profile.stomp_near_half_span + index * profile.stomp_widen_per_row) if first < profile.stomp_start else profile.stomp_half_span
+		var close := first < profile.stomp_start
+		rows.append({"at": enemy.global_position if close and index == 0 else enemy.global_position + aim * (first + index * profile.stomp_spacing), "circle_radius": profile.stomp_near_radius if close and index == 0 else 0.0, "half_span": half_span, "direction": aim, "delay": index * profile.stomp_row_interval + (profile.stomp_near_follow_delay if close and index > 0 else 0.0), "fired": false, "hit": false})
+	remaining = stomp_warning_duration()
 	enemy.attack_performed.emit(&"boss_warning")
 
 func _fire_due_rows() -> void:
@@ -293,15 +329,25 @@ func _fire_due_rows() -> void:
 		if not row.fired and row.delay <= 0.000001:
 			row.fired = true
 			rows_fired += 1
-			volley.fire(row.at, EnemyProjectilePatterns.fan_directions(row.direction, profile.shard_count(enemy.boss_phase), deg_to_rad(18)), &"king_shard")
+			if float(row.get("circle_radius", 0)) > 0:
+				enemy.attack_performed.emit(&"boss_pulse")
+				continue
+			var count := profile.shard_count(enemy.boss_phase)
+			var spacing := deg_to_rad(18)
+			# Near-foot waves leave their announced side exit free. Wide Hell
+			# fans must not immediately fire sideways into that earned dodge.
+			if row_half_span(row) < profile.stomp_half_span:
+				spacing = minf(spacing, 2 * deg_to_rad(profile.stomp_near_shard_half_angle_degrees) / maxi(count - 1, 1))
+			volley.fire(row.at, EnemyProjectilePatterns.fan_directions(row.direction, count, spacing), &"king_shard")
 			enemy.attack_performed.emit(&"boss_pulse")
 
 func _tick_rows(delta: float, first: float) -> void:
 	for row in rows:
 		var active_end := minf(delta, profile.stomp_active_seconds + row.delay)
 		if row.fired and not row.hit and active_end >= 0:
-			var tangent: Vector2 = row.direction.orthogonal() * profile.stomp_half_span
-			if HazardGeometry.swept_capsule(enemy.target, row.at - tangent, row.at + tangent, profile.stomp_radius, first, first + active_end):
+			var tangent: Vector2 = row.direction.orthogonal() * row_half_span(row)
+			var circle: float = row.get("circle_radius", 0)
+			if HazardGeometry.swept_capsule(enemy.target, row.at if circle > 0 else row.at - tangent, row.at if circle > 0 else row.at + tangent, circle if circle > 0 else profile.stomp_radius, first, first + active_end):
 				var health := enemy.target.stats.health
 				enemy.target.take_hit(enemy.attack_damage, enemy.inflicted_statuses)
 				damage_by_source.stomp += maxf(health - enemy.target.stats.health, 0)
@@ -316,6 +362,13 @@ func _recall() -> void:
 
 func sync_visual() -> void:
 	if rig == null: return
+	if pressure != null and pressure.busy():
+		var exposed := pressure.state == KingPressureTrial.State.EXPOSED
+		var prep := 1.0 - pressure.remaining / pressure.profile.tracking_seconds if pressure.state == KingPressureTrial.State.TRACKING else 1.0
+		rig.sample(elapsed, clampf(prep, 0, 1), 0, 2, false, exposed)
+		rig.show_acid_level(0.12 if exposed else clampf(0.5 + float(pressure.shots) / (pressure.profile.valves + pressure.profile.extra_attempts) * 0.5, 0, 1))
+		if pressure.state == KingPressureTrial.State.FIRING: rig.bones.Body.position -= pressure.aim * 9
+		return
 	var kind := 1 if state in [State.WARN_STOMP, State.STOMP] else (2 if state in [State.RECALL, State.OPEN] else 0)
 	var prep := 0.0
 	if state == State.WARN_STOMP: prep = 1 - remaining / stomp_warning_duration()

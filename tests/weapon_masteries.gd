@@ -43,6 +43,7 @@ func _run() -> void:
 	# Change all current equipment; the confirmed origin must remain unchanged.
 	game.player.loadout.restore([{"id": "trinity_brush", "tier": 4}])
 	game.wave.current_wave = 5
+	game.wave.boss_rewards.paid = true # Isolate the nonblocking mastery notice/relic flow.
 	game._create_enemy(WaveController.BOSS, game.player.global_position + Vector2(220, 0))
 	var boss: Enemy = game.get_node("Enemies").get_child(-1)
 	boss.set_simulation_enabled(false)

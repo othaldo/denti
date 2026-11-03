@@ -9,6 +9,7 @@ static func _number(value: Variant) -> bool: return (value is float or value is 
 static func _vector(value: Variant) -> bool: return value is Array and value.size() == 2 and _number(value[0]) and _number(value[1])
 
 static func valid(saved: Dictionary) -> bool:
+	if not ImperialRetinue.valid(saved.get("retinue", {})): return false
 	for key in NUMBERS:
 		if saved.has(key) and not _number(saved[key]): return false
 	for key in VECTORS:
@@ -30,6 +31,7 @@ static func valid(saved: Dictionary) -> bool:
 static func capture(encounter: CrownCourtEncounter) -> Dictionary:
 	var saved := {"version": encounter.SAVE_VERSION, "state": int(encounter.state), "attack_kind": int(encounter.attack_kind), "shots": encounter.shots.save_data(), "lances": encounter.lances.save_data()}
 	saved.merge({"needles": encounter.needles.save_data(), "needle_rays": []})
+	saved["retinue"] = encounter.retinue.save_data() if encounter.retinue != null else {}
 	for ray in encounter.needle_rays: saved.needle_rays.append(SnapshotValues.vector_data(ray))
 	for key in NUMBERS:
 		if not saved.has(key): saved[key] = encounter.get(key)
@@ -38,9 +40,9 @@ static func capture(encounter: CrownCourtEncounter) -> Dictionary:
 	return saved
 
 static func restore(encounter: CrownCourtEncounter, saved: Dictionary) -> void:
-	encounter.cancel()
+	encounter.cancel(false)
 	var version := int(saved.get("version", 0))
-	if version not in [1, encounter.SAVE_VERSION]: return
+	if version not in [1, 2, encounter.SAVE_VERSION]: return
 	encounter.state = clampi(int(saved.get("state", 0)), 0, CrownCourtEncounter.State.REPOSITION) as CrownCourtEncounter.State
 	encounter.attack_kind = clampi(int(saved.get("attack_kind", 0)), 0, 2) as CrownCourtEncounter.Attack
 	encounter.cycle = maxi(int(saved.get("cycle", 0)), 0)
@@ -56,6 +58,11 @@ static func restore(encounter: CrownCourtEncounter, saved: Dictionary) -> void:
 	encounter.shots.restore(saved.get("shots", []))
 	encounter.lances.restore(saved.get("lances", []))
 	encounter.needles.restore(saved.get("needles", []))
+	if encounter.retinue != null:
+		encounter.retinue.restore(saved.get("retinue", {}))
+		if version < 3:
+			encounter.retinue.cancel()
+			encounter.retinue.used = true
 	for ray in saved.get("needle_rays", []):
 		if encounter.needle_rays.size() >= encounter.profile.needle_count(): break
 		encounter.needle_rays.append(SnapshotValues.read_vector(ray))
