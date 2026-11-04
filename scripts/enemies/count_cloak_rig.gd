@@ -53,16 +53,6 @@ func sample(seconds: float) -> void:
 	animator.pause()
 	queue_redraw()
 
-func blend_sample(from_seconds: float, to_seconds: float, weight: float) -> void:
-	# Blend a third strike into the two-sided study without snapping the joints.
-	sample(from_seconds)
-	var from: Dictionary[StringName, Transform2D] = {}
-	for key in bones: from[key] = bones[key].transform
-	sample(to_seconds)
-	for key in bones:
-		bones[key].transform = from[key].interpolate_with(bones[key].transform, clampf(weight, 0, 1))
-
-
 func capture_pose() -> Dictionary[StringName, Transform2D]:
 	var pose: Dictionary[StringName, Transform2D] = {}
 	for key in bones: pose[key] = bones[key].transform

@@ -28,12 +28,6 @@ func previous_step() -> bool:
 	step = STEPS[index - 1]
 	return true
 
-func breadcrumb() -> String:
-	var labels := PackedStringArray()
-	for index in STEPS.size():
-		labels.append("%d %s" % [index + 1, LABELS[STEPS[index]]])
-	return "  ›  ".join(labels)
-
 func save_to(path: String) -> void:
 	var error := RunStore.save_run(path, {"step": str(step), "visited_step": str(visited_step), "difficulty": str(difficulty_id),
 		"weapon": str(weapon_id), "story": story_mode, "roots": root_capacity, "resume_pending": resume_pending})

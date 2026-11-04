@@ -7,6 +7,7 @@ var detail_label: Label
 var preview_label: Label
 var card_body: Control
 var stat_header: HBoxContainer
+var affix_header: HBoxContainer
 var _kind: StringName = &"upgrade"
 var _card_width := 260.0
 var _compact := false
@@ -136,28 +137,6 @@ func configure_layout(width: float, compact: bool, tall: bool = true) -> void:
 	_layout_content()
 
 
-func set_mobile_text(enabled: bool) -> void:
-	configure_layout(_card_width, enabled, _tall)
-
-
-func set_upgrade_layout(narrow: bool, compact: bool) -> void:
-	configure_layout(_card_width, narrow or compact, not narrow and not compact)
-
-
-func reset_card_layout() -> void:
-	configure_layout(_card_width, false)
-
-
-func set_chest_layout(card_width: float, compact: bool) -> void:
-	configure_layout(card_width, compact, false)
-
-
-func set_affix_header() -> void:
-	# The card owns a single hierarchy in both layouts; callers never need to
-	# move labels into the legacy UpgradeCard.affix_header container.
-	pass
-
-
 func _ensure_content() -> void:
 	if content_margin != null:
 		return
@@ -249,7 +228,6 @@ func _restore_standard_content() -> void:
 	_wrapped_effect = ""
 	name_label.add_theme_color_override("font_color", DentiUIStyle.INK)
 	effect_label.add_theme_color_override("font_color", DentiUIStyle.INK)
-	chest_layout = false
 	scale = Vector2.ONE
 	DentiUIMotion.reset(icon_rect)
 
@@ -343,11 +321,11 @@ func _layout_content() -> void:
 		name_width = maxf(40, text_width - rarity_width - 8)
 		name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		rarity_label.size_flags_horizontal = Control.SIZE_SHRINK_END
-	_wrap_chest_text(name_label, _name_source, name_width)
-	_wrap_chest_text(effect_label, _effect_source, text_width)
-	_wrap_chest_text(preview_label, _preview_source, text_width)
-	_wrap_chest_text(detail_label, _detail_source, text_width)
-	_wrap_chest_text(keep_label, _keep_source, text_width)
+	DentiUIComponents.wrap_text(name_label, _name_source, name_width)
+	DentiUIComponents.wrap_text(effect_label, _effect_source, text_width)
+	DentiUIComponents.wrap_text(preview_label, _preview_source, text_width)
+	DentiUIComponents.wrap_text(detail_label, _detail_source, text_width)
+	DentiUIComponents.wrap_text(keep_label, _keep_source, text_width)
 	_wrapped_name = name_label.text
 	_wrapped_effect = effect_label.text
 	_wrapped_keep = keep_label.text

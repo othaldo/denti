@@ -311,8 +311,8 @@ func _on_stage_layout(extent: Vector2) -> void:
 		var button := replacement_buttons[index]
 		var effect: Label = button.get_meta("effect_label")
 		var rarity: Label = button.get_meta("rarity_label")
-		buttons[0]._wrap_chest_text(effect, str(button.get_meta("effect_source")), maxf(100, replacement_width - 24))
-		buttons[0]._wrap_chest_text(rarity, str(button.get_meta("rarity_source")), maxf(100, replacement_width - 24))
+		DentiUIComponents.wrap_text(effect, str(button.get_meta("effect_source")), maxf(100, replacement_width - 24))
+		DentiUIComponents.wrap_text(rarity, str(button.get_meta("rarity_source")), maxf(100, replacement_width - 24))
 		button.custom_minimum_size = Vector2(0, maxf(68, _label_height(effect) + _label_height(rarity) + 19))
 	cards.columns = 1 if compact else 3
 	var card_width := (extent.x - (cards.columns - 1) * 16) / cards.columns

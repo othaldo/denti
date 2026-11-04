@@ -5,26 +5,23 @@ const NUMBERS := ["version", "state", "attack_kind", "remaining", "elapsed", "cy
 const FLAGS := ["combo", "portal_combo", "verdict_hit", "portal_followup", "legacy_sequence"]
 const VECTORS := ["facing", "origin", "portal_a", "portal_b"]
 
-static func _number(value: Variant) -> bool: return (value is float or value is int) and is_finite(float(value))
-static func _vector(value: Variant) -> bool: return value is Array and value.size() == 2 and _number(value[0]) and _number(value[1])
-
 static func valid(saved: Dictionary) -> bool:
 	if not ImperialRetinue.valid(saved.get("retinue", {})): return false
 	for key in NUMBERS:
-		if saved.has(key) and not _number(saved[key]): return false
+		if saved.has(key) and not SnapshotValues.is_number(saved[key]): return false
 	for key in VECTORS:
-		if saved.has(key) and not _vector(saved[key]): return false
+		if saved.has(key) and not SnapshotValues.is_vector(saved[key]): return false
 	for key in FLAGS:
 		if saved.has(key) and not saved[key] is bool: return false
 	if saved.has("needle_rays"):
 		if not saved.needle_rays is Array: return false
 		for ray in saved.needle_rays:
-			if not _vector(ray): return false
+			if not SnapshotValues.is_vector(ray): return false
 	for key in ["shots", "lances", "needles"]:
 		if saved.has(key) and not saved[key] is Array: return false
 		for entry in saved.get(key, []):
-			if not entry is Dictionary or not _vector(entry.get("position")) or not _vector(entry.get("velocity")): return false
-			if not _number(entry.get("life")) or not _number(entry.get("damage")): return false
+			if not entry is Dictionary or not SnapshotValues.is_vector(entry.get("position")) or not SnapshotValues.is_vector(entry.get("velocity")): return false
+			if not SnapshotValues.is_number(entry.get("life")) or not SnapshotValues.is_number(entry.get("damage")): return false
 			if entry.has("source") and not entry.source is String: return false
 	return true
 

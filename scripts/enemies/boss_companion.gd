@@ -71,5 +71,5 @@ func restore(saved: Dictionary) -> void:
 static func valid(saved: Variant) -> bool:
 	if not saved is Dictionary: return false
 	for key in ["remaining", "spawned"]:
-		if saved.has(key) and not AcidKingSnapshot._number(saved[key]): return false
+		if saved.has(key) and not SnapshotValues.is_number(saved[key]): return false
 	return not saved.has("legacy") or saved.legacy is bool

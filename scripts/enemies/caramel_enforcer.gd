@@ -121,9 +121,9 @@ func restore(saved: Dictionary) -> void:
 static func valid(saved: Variant) -> bool:
 	if not saved is Dictionary: return false
 	for key in ["state", "remaining", "budget", "punches_left"]:
-		if saved.has(key) and not CrownCourtSnapshot._number(saved[key]): return false
+		if saved.has(key) and not SnapshotValues.is_number(saved[key]): return false
 	for key in ["origin", "destination"]:
-		if saved.has(key) and not CrownCourtSnapshot._vector(saved[key]): return false
+		if saved.has(key) and not SnapshotValues.is_vector(saved[key]): return false
 	return not saved.has("hit") or saved.hit is bool
 
 func _draw() -> void:

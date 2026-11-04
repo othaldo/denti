@@ -107,20 +107,6 @@ static func _circle(image: Image, at: Vector2, radius: float, tint: Color) -> vo
 static func _rect(image: Image, rect: Rect2, tint: Color) -> void:
 	image.fill_rect(Rect2i(rect.position * RESOLUTION, rect.size * RESOLUTION), tint)
 
-static func _line(image: Image, start: Vector2, end: Vector2, width: float, tint: Color) -> void:
-	var bounds := Rect2(start.min(end), (end - start).abs()).grow(width * 0.5 + 1)
-	var direction := start.direction_to(end)
-	var length := start.distance_to(end)
-	for y in range(int(bounds.position.y * RESOLUTION), int(bounds.end.y * RESOLUTION) + 1):
-		for x in range(int(bounds.position.x * RESOLUTION), int(bounds.end.x * RESOLUTION) + 1):
-			var at := Vector2(x + 0.5, y + 0.5) / RESOLUTION
-			var along := (at - start).dot(direction)
-			var edge := minf(width * 0.5 - absf((at - start).dot(direction.orthogonal())), minf(along, length - along))
-			var coverage := clampf(edge * RESOLUTION + 0.5, 0, 1)
-			if coverage > 0:
-				image.set_pixel(x, y, image.get_pixel(x, y).blend(Color(tint, tint.a * coverage)))
-
-
 static func shadow_image() -> Image:
 	var image := _image(16)
 	_circle(image, Vector2(16, 16), 15, Color(0.17, 0.13, 0.17, 0.17))

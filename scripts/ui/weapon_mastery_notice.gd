@@ -65,8 +65,8 @@ func _layout() -> void:
 	panel.scale = Vector2.ONE * factor
 	var width := minf(360, safe.size.x / factor - 24)
 	var text_width := width - 86
-	var title_height := _wrap(heading, source_title, text_width, 17)
-	var weapon_height := _wrap(weapon_label, source_weapon, text_width, 14)
+	var title_height := DentiUIComponents.wrap_text(heading, source_title, text_width, 17)
+	var weapon_height := DentiUIComponents.wrap_text(weapon_label, source_weapon, text_width, 14)
 	panel.size = Vector2(width, maxf(72, title_height + weapon_height + 28))
 	icon.position = Vector2(14, (panel.size.y - 44) / 2)
 	icon.size = Vector2(44, 44)
@@ -75,16 +75,3 @@ func _layout() -> void:
 	weapon_label.position = Vector2(72, 14 + title_height)
 	weapon_label.size = Vector2(text_width, weapon_height)
 	panel.position = Vector2(safe.position.x + (safe.size.x - panel.size.x * factor) / 2, safe.position.y + 12 * factor)
-
-
-func _wrap(label: Label, text: String, width: float, font_size: int) -> float:
-	var paragraph := TextParagraph.new()
-	paragraph.width = width
-	paragraph.break_flags = TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND | TextServer.BREAK_ADAPTIVE
-	paragraph.add_string(text, label.get_theme_font("font"), font_size)
-	var lines := PackedStringArray()
-	for index in paragraph.get_line_count():
-		var span := paragraph.get_line_range(index)
-		lines.append(text.substr(span.x, span.y - span.x).strip_edges())
-	label.text = "\n".join(lines)
-	return ceilf(paragraph.get_size().y)

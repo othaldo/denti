@@ -37,9 +37,6 @@ static func base_texture(data: WeaponData, tier: int, affixes: Array[Dictionary]
 static func visual_radius(data: WeaponData, tier: int) -> float:
 	return 13.0 if data.projectile_shape == &"rocket" else (11.0 if data.splash_at_tier(tier) > 0 or data.pierce_at_tier(tier) > 0 else 7.0)
 
-static func unmanaged(base: Texture2D, values: Array[Dictionary], radius: float) -> Texture2D:
-	return unmanaged_frames(base, values, radius)[0]
-
 static func unmanaged_frames(base: Texture2D, values: Array[Dictionary], radius: float) -> Array[Texture2D]:
 	if values.is_empty():
 		return [base]

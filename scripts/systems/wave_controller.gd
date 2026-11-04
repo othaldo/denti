@@ -222,39 +222,6 @@ static func ranged_interval_multiplier(wave_number: int) -> float:
 	return maxf(1.0 - maxi(wave_number - 1, 0) * RANGED_INTERVAL_WAVE_STEP, RANGED_INTERVAL_MIN)
 
 
-func next_wave_preview() -> String:
-	var next_wave := current_wave + 1
-	var details: Array[String] = []
-	if next_wave == 2:
-		details.append("Bakterium")
-	elif next_wave == 3:
-		details.append("Zuckerstück")
-	elif next_wave == 4:
-		details.append("Säurespucker")
-	var difficulty := DifficultyCatalog.by_id(difficulty_id)
-	if next_wave == difficulty.poison_first_wave:
-		details.append("Giftkeim · Gift")
-	if next_wave == difficulty.bleed_first_wave:
-		details.append("Zahnfleischbeißer · Blutung")
-	if next_wave == difficulty.status_trait_first_wave:
-		details.append("Gegner mit Statuseigenschaften")
-	if is_boss_wave(next_wave):
-		details.append(boss_for_wave(next_wave).display_name)
-	var profile := WaveProfileCatalog.by_id(next_profile_id)
-	if profile != null:
-		details.append("Muster: %s" % profile.display_name)
-	if horde_waves.has(next_wave):
-		details.append("%s-Horde" % _horde_data(next_wave).display_name)
-	var elite_total := 0
-	for count in elite_groups_for_wave(next_wave, difficulty_id):
-		elite_total += count
-	if elite_total == 1:
-		details.append("Elite: %s" % elite_for_wave(next_wave).display_name)
-	elif elite_total > 1:
-		details.append("%d Eliten" % elite_total)
-	return "Welle %d: %s" % [next_wave, " · ".join(details)] if not details.is_empty() else "Nächste Welle: %d" % next_wave
-
-
 func prepare_next_wave_profile() -> StringName:
 	if next_profile_id == &"" and (current_wave + 1 <= MAX_WAVES or endless_enabled) and not is_boss_wave(current_wave + 1):
 		next_profile_id = _roll_profile(current_wave + 1, current_profile_id)

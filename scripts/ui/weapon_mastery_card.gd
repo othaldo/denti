@@ -57,15 +57,7 @@ func _layout() -> void:
 	if artwork == null: return
 	artwork.position = Vector2(14, 10)
 	artwork.size = Vector2(60, 72)
-	var paragraph := TextParagraph.new()
-	paragraph.width = maxf(size.x - 100, 40)
-	paragraph.break_flags = TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND | TextServer.BREAK_ADAPTIVE
-	paragraph.add_string(data.display_name, heading.get_theme_font("font"), 18)
-	var lines := PackedStringArray()
-	for index in paragraph.get_line_count():
-		var span := paragraph.get_line_range(index)
-		lines.append(data.display_name.substr(span.x, span.y - span.x).strip_edges())
-	heading.text = "\n".join(lines)
+	DentiUIComponents.wrap_text(heading, data.display_name, maxf(size.x - 100, 40), 18)
 	heading.position = Vector2(88, 14)
 	heading.size = Vector2(maxf(size.x - 102, 40), 48)
 	progress.position = Vector2(88, 65)

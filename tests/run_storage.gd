@@ -14,6 +14,15 @@ func _check(condition: bool, message: String) -> void:
 
 
 func _run() -> void:
+	for value in [0, -12, 0.25, 1.0e30]:
+		_check(SnapshotValues.is_number(value), "finite snapshot number rejected")
+	for value in [null, true, "12", [], {}, INF, -INF, NAN]:
+		_check(not SnapshotValues.is_number(value), "invalid snapshot number accepted: " + str(value))
+	for value in [[0, 0], [-12, 0.25], SnapshotValues.vector_data(Vector2(3, -4))]:
+		_check(SnapshotValues.is_vector(value), "finite snapshot vector rejected")
+	for value in [null, Vector2.ZERO, [], [1], [1, 2, 3], [true, 2], [1, "2"], [INF, 0], [0, NAN]]:
+		_check(not SnapshotValues.is_vector(value), "invalid snapshot vector accepted: " + str(value))
+	_check(SnapshotValues.read_vector(SnapshotValues.vector_data(Vector2(3, -4))) == Vector2(3, -4), "snapshot vector did not round-trip")
 	var original := {"version": RunStore.VERSION, "wave": 3, "player": {"stats": {"health": 80.0}}, "coins": 42}
 	_check(not RunSaveData.normalize(original).is_empty(), "minimal compatible save rejected")
 	for invalid in [[], {"wave": 1, "player": []}, {"wave": [], "player": {}}, {"wave": 1, "player": {"stats": {"health": []}}}, {"wave": 1, "player": {}, "items": {"cooldowns": []}}, {"wave": 1, "player": {}, "rewards": {"pending_chests": {}}}, {"wave": 1, "player": {}, "weapons": [{"rolls": []}]}, {"wave": 1, "player": {}, "loot": [{"position": [{}, 1]}]}, {"wave": 1, "player": {}, "player_projectiles": [{"id": "water_jet"}]}, {"wave": 1, "player": {}, "coins": INF}]:

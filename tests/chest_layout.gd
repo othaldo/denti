@@ -71,7 +71,7 @@ func _run() -> void:
 	for frame in 4:
 		await process_frame
 	for card: UpgradeCard in panel.buttons:
-		if card.chest_layout or card.keep_label.visible or card.icon != null or not card.focus_neighbor_top.is_empty() or not card.focus_neighbor_bottom.is_empty():
+		if card.keep_label.visible or card.icon != null or not card.focus_neighbor_top.is_empty() or not card.focus_neighbor_bottom.is_empty():
 			_fail("chest layout/focus escaped into the next reward")
 			return
 	panel.show_chest(ShopController.by_id(&"metal_crown"), 5)
@@ -79,7 +79,7 @@ func _run() -> void:
 	for frame in 4:
 		await process_frame
 	for card: UpgradeCard in panel.buttons:
-		if card.visible and (card.chest_layout or card.icon_rect.size.x < 40.0 or not card.get_global_rect().encloses(card.effect_label.get_global_rect())):
+		if card.visible and (card.icon_rect.size.x < 40.0 or not card.get_global_rect().encloses(card.effect_label.get_global_rect())):
 			_fail("chest layout escaped into starter weapons")
 			return
 	panel.show_chest(ShopController.by_id(&"metal_crown"), 5)
@@ -87,7 +87,7 @@ func _run() -> void:
 	for frame in 4:
 		await process_frame
 	for card: UpgradeCard in panel.buttons:
-		if card.visible and (card.chest_layout or card.icon_rect.size.x < 40.0 or not card.get_global_rect().encloses(card.effect_label.get_global_rect())):
+		if card.visible and (card.icon_rect.size.x < 40.0 or not card.get_global_rect().encloses(card.effect_label.get_global_rect())):
 			_fail("chest layout escaped into boss relics")
 			return
 	print("Denti chest layout test passed")

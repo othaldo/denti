@@ -26,7 +26,6 @@ var effect_label: Label
 var price_label: Label
 var buy_caption: Label
 var info_badge: TextureRect
-var hover_tween: Tween
 var catalog_minimum_height := 100.0
 var summary_row: GridContainer
 var category_label: Label

@@ -76,9 +76,9 @@ static func valid(saved: Variant) -> bool:
 	for entry in saved.get("streams", []):
 		if not entry is Dictionary: return false
 		for key in ["from", "to"]:
-			if not AcidKingSnapshot._vector(entry.get(key)): return false
+			if not SnapshotValues.is_vector(entry.get(key)): return false
 		for key in ["age", "life", "cooldown"]:
-			if not AcidKingSnapshot._number(entry.get(key)): return false
+			if not SnapshotValues.is_number(entry.get(key)): return false
 	return true
 
 func _draw() -> void:

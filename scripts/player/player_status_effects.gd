@@ -64,13 +64,6 @@ func clear() -> void:
 	for kind: int in active.keys():
 		_remove(kind)
 
-func hud_text() -> String:
-	var parts: PackedStringArray = []
-	for kind in [DentiStatus.Type.POISON, DentiStatus.Type.BLEED]:
-		if active.has(kind):
-			parts.append("%s %.1f s" % [DentiStatus.NAMES[kind], active[kind]["remaining"]])
-	return " · ".join(parts)
-
 func save_data() -> Dictionary:
 	var result := {}
 	for kind: int in active:

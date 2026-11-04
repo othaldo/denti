@@ -119,11 +119,6 @@ static func values(data: WeaponData, tier: int, player: Player) -> Dictionary:
 		"crit": clampf(crit + data.crit_bonus, 0.0, 1.0), "multiplier": data.crit_multiplier}
 
 
-static func quick_text(data: WeaponData, tier: int, player: Player) -> String:
-	var current := values(data, tier, player)
-	return "%s\n%.1f Treffer · %.2f s · %d Reichweite" % [role(data), current.damage, current.pause, roundi(current.range)]
-
-
 static func card_effect(data: WeaponData, tier: int) -> String:
 	var hints: PackedStringArray = []
 	if data.attack_mode == &"melee" and data.contact_extra_targets > 0:

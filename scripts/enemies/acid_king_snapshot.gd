@@ -1,46 +1,40 @@
 class_name AcidKingSnapshot
 extends RefCounted
 
-static func _number(value: Variant) -> bool:
-	return (value is float or value is int) and is_finite(float(value))
-
-static func _vector(value: Variant) -> bool:
-	return value is Array and value.size() == 2 and _number(value[0]) and _number(value[1])
-
 static func valid(saved: Dictionary) -> bool:
 	if not KingAcidWake.valid(saved.get("acid_wake", {})): return false
 	if not BossCompanion.valid(saved.get("companion", {})): return false
 	if not KingPressureTrial.valid(saved.get("pressure", {})): return false
 	for key in ["version", "state", "remaining", "elapsed", "cycle", "attack_kind", "shift_index", "axis", "stomp_index", "stomp_total"]:
-		if saved.has(key) and not _number(saved[key]): return false
+		if saved.has(key) and not SnapshotValues.is_number(saved[key]): return false
 	for key in ["anchor", "aim", "spit_origin"]:
-		if saved.has(key) and not _vector(saved[key]): return false
+		if saved.has(key) and not SnapshotValues.is_vector(saved[key]): return false
 	if saved.has("spit_rays"):
 		if not saved.spit_rays is Array: return false
 		for ray in saved.spit_rays:
-			if not _vector(ray): return false
+			if not SnapshotValues.is_vector(ray): return false
 	for key in ["pending", "fields", "rows", "projectiles", "spit_projectiles"]:
 		if saved.has(key) and not saved[key] is Array: return false
 		for entry in saved.get(key, []):
 			if not entry is Dictionary: return false
 			if key in ["projectiles", "spit_projectiles"]:
-				if not _vector(entry.get("position")) or not _vector(entry.get("velocity")): return false
+				if not SnapshotValues.is_vector(entry.get("position")) or not SnapshotValues.is_vector(entry.get("velocity")): return false
 				for name in ["life", "damage"]:
-					if not _number(entry.get(name)): return false
+					if not SnapshotValues.is_number(entry.get(name)): return false
 				if entry.has("source") and not entry.source is String: return false
 			else:
-				if not _vector(entry.get("at")): return false
-				if entry.has("half_span") and not _number(entry.half_span): return false
-				if entry.has("circle_radius") and not _number(entry.circle_radius): return false
+				if not SnapshotValues.is_vector(entry.get("at")): return false
+				if entry.has("half_span") and not SnapshotValues.is_number(entry.half_span): return false
+				if entry.has("circle_radius") and not SnapshotValues.is_number(entry.circle_radius): return false
 				if key == "rows":
-					if not _vector(entry.get("direction")) or not _number(entry.get("delay")): return false
+					if not SnapshotValues.is_vector(entry.get("direction")) or not SnapshotValues.is_number(entry.get("delay")): return false
 					if not entry.get("fired") is bool or not entry.get("hit") is bool: return false
 				else:
-					if not _vector(entry.get("half_size")): return false
+					if not SnapshotValues.is_vector(entry.get("half_size")): return false
 					if entry.half_size[0] <= 0 or entry.half_size[1] <= 0: return false
 					if key == "fields":
 						for name in ["life", "duration", "age", "cooldown"]:
-							if not _number(entry.get(name)): return false
+							if not SnapshotValues.is_number(entry.get(name)): return false
 	return true
 
 static func capture(encounter: AcidKingEncounter) -> Dictionary:

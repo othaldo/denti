@@ -29,6 +29,7 @@ func _click(control: Control) -> void:
 	await _settle()
 
 func _run() -> void:
+	_check_text_wrapping()
 	root.content_scale_size = Vector2i(1280, 720)
 	root.size = Vector2i(1280, 720)
 	session = root.get_node("GameSession")
@@ -127,3 +128,28 @@ func _run() -> void:
 	paused = false
 	print("PASS dedicated achievements: main/pause navigation, saved run preservation, totals/filters/search, seven layouts/mobile scaling, readable cards/details, Escape/focus and clean preparation")
 	finish(1 if failures else 0)
+
+
+func _check_text_wrapping() -> void:
+	var label := Label.new()
+	label.theme = DentiUIStyle.make_theme()
+	label.add_theme_font_size_override("font_size", 18)
+	root.add_child(label)
+	var source := "Übergrößenbürste für göttliche Zahnzwischenräume"
+	var font := label.get_theme_font("font")
+	for width in [100.0, 500.0, 100.0]:
+		var height := DentiUIComponents.wrap_text(label, source, width)
+		_check(height > 0 and label.autowrap_mode == TextServer.AUTOWRAP_OFF, "explicit text layout missing")
+		_check(label.text.replace("\n", "").replace(" ", "") == source.replace(" ", ""), "wrapping lost characters")
+		for line in label.text.split("\n"):
+			_check(font.get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1, 18).x <= width + 1, "wrapped text exceeds its width")
+	DentiUIComponents.wrap_text(label, "Erste\n\nZweite", 500)
+	_check(label.text == "Erste\n\nZweite", "intentional blank line lost")
+	DentiUIComponents.wrap_text(label, "Erste\n\nZweite", 500, 18, true)
+	_check(label.text == "Erste\nZweite", "compact weapon title kept a blank line")
+	var small := DentiUIComponents.wrap_text(label, "Zahnprüfung", 500, 14)
+	var large := DentiUIComponents.wrap_text(label, "Zahnprüfung", 500, 24)
+	_check(large > small, "explicit font size did not affect measured height")
+	DentiUIComponents.wrap_text(label, "", 100)
+	_check(label.text.is_empty(), "empty text kept the previous content")
+	label.free()

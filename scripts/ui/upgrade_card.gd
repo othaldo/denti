@@ -8,17 +8,13 @@ var icon_rect: TextureRect
 var name_label: Label
 var rarity_label: Label
 var effect_label: Label
-var hover_tween: Tween
 var upgrade_tier: int = 1
 var upgrade_description: String = ""
 var content_margin: MarginContainer
-var chest_row: HBoxContainer
 var progress_bar: ProgressBar
 var keep_label: Label
 var chest_name: String = ""
 var chest_effect: String = ""
-var chest_layout: bool = false
-var affix_header: HBoxContainer
 
 
 func _ready() -> void:
@@ -131,155 +127,13 @@ func show_action(action_name: String, accent: bool = false) -> void:
 	DentiUIStyle.style_button(self, accent)
 
 
-func set_mobile_text(enabled: bool) -> void:
-	name_label.add_theme_font_size_override("font_size", 21 if enabled else 19)
-	effect_label.add_theme_font_size_override("font_size", 17 if enabled else 14)
-
-
-func set_upgrade_layout(narrow: bool, compact: bool) -> void:
-	_restore_standard_content()
-	custom_minimum_size = Vector2(0, 186 if narrow else (174 if compact else 186))
-	icon_rect.custom_minimum_size.y = 40 if compact else 56
-	icon_rect.custom_minimum_size.x = icon_rect.custom_minimum_size.y
-	icon_rect.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	name_label.custom_minimum_size.y = 34 if narrow else 26
-	name_label.add_theme_font_size_override("font_size", 12 if narrow else 18)
-	effect_label.add_theme_font_size_override("font_size", 15 if narrow else 17)
-	effect_label.text = upgrade_description.replace(" (Waffenskalierung)", "") if compact or narrow else upgrade_description
-	if narrow:
-		effect_label.text = effect_label.text.replace(" (HP) + Heilung", " + Heilung")
-	rarity_label.text = DentiRarity.name_for(upgrade_tier).to_upper()
-	rarity_label.clip_text = true
-	rarity_label.size_flags_horizontal = Control.SIZE_FILL
-	rarity_label.add_theme_font_size_override("font_size", 10 if narrow else 12)
-	content.add_theme_constant_override("separation", 3 if compact else 5)
-
-
-func reset_card_layout() -> void:
-	_restore_standard_content()
-	custom_minimum_size.x = 235
-	icon_rect.custom_minimum_size.y = 56
-	name_label.custom_minimum_size.y = 48
-	rarity_label.clip_text = false
-	rarity_label.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	content.add_theme_constant_override("separation", 5)
-
-
-func set_chest_layout(card_width: float, compact: bool) -> void:
-	if not chest_layout:
-		if chest_row == null:
-			chest_row = HBoxContainer.new()
-			chest_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			chest_row.add_theme_constant_override("separation", 12)
-			content_margin.add_child(chest_row)
-		icon_rect.reparent(chest_row)
-		content.reparent(chest_row)
-		chest_layout = true
-	chest_row.visible = true
-	content.alignment = BoxContainer.ALIGNMENT_CENTER
-	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var art_size := 64.0 if compact else 80.0
-	icon_rect.custom_minimum_size = Vector2(art_size, art_size)
-	icon_rect.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	icon_rect.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	var text_width := maxf(card_width - 28.0 - art_size - 12.0, 120.0)
-	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	name_label.custom_minimum_size.y = 0
-	name_label.max_lines_visible = -1
-	name_label.add_theme_font_size_override("font_size", 18 if compact else 20)
-	rarity_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	rarity_label.clip_text = false
-	rarity_label.size_flags_horizontal = Control.SIZE_FILL
-	rarity_label.add_theme_font_size_override("font_size", 11 if compact else 12)
-	effect_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	effect_label.add_theme_font_size_override("font_size", 14 if compact else 16)
-	# Button does not derive its minimum from child controls. Shape at the final
-	# text width, then size the card from the complete effect rather than a fixed
-	# height which lets wrapped descriptions escape below the card.
-	_wrap_chest_text(name_label, chest_name, text_width)
-	_wrap_chest_text(effect_label, chest_effect, text_width)
-	keep_label.visible = true
-	keep_label.add_theme_font_size_override("font_size", 14 if compact else 16)
-	custom_minimum_size = Vector2(0, maxf(content.get_combined_minimum_size().y, art_size) + 20.0)
-
-
-func _wrap_chest_text(label: Label, source: String, width: float) -> void:
-	label.autowrap_mode = TextServer.AUTOWRAP_OFF
-	var paragraph := TextParagraph.new()
-	paragraph.width = width
-	paragraph.break_flags = TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND | TextServer.BREAK_ADAPTIVE
-	paragraph.add_string(source, label.get_theme_font("font"), label.get_theme_font_size("font_size"))
-	var lines: PackedStringArray = []
-	for index in paragraph.get_line_count():
-		var span := paragraph.get_line_range(index)
-		lines.append(source.substr(span.x, span.y - span.x).strip_edges())
-	label.text = "\n".join(lines)
-
-
 func _restore_standard_content() -> void:
 	if has_meta("controller_action_label"): remove_meta("controller_action_label")
 	progress_bar.hide()
-	if affix_header != null and affix_header.visible:
-		icon_rect.reparent(content)
-		name_label.reparent(content)
-		content.move_child(icon_rect, 0)
-		content.move_child(name_label, 1)
-		affix_header.hide()
-		for edge in ["left", "right"]:
-			content_margin.add_theme_constant_override("margin_" + edge, 14)
-		for label in [name_label, rarity_label, effect_label]:
-			label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			label.remove_theme_constant_override("line_spacing")
-		name_label.max_lines_visible = 2
-		name_label.custom_minimum_size.y = 48
-		name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		effect_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		name_label.size_flags_vertical = Control.SIZE_FILL
-		icon_rect.custom_minimum_size = Vector2(0, 56)
-		icon_rect.size_flags_vertical = Control.SIZE_FILL
-		content.alignment = BoxContainer.ALIGNMENT_CENTER
-		content.add_theme_constant_override("separation", 5)
-		rarity_label.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	content.move_child(keep_label, -1)
 	icon = null
 	focus_neighbor_top = NodePath()
 	focus_neighbor_bottom = NodePath()
-	if not chest_layout:
-		return
-	content.reparent(content_margin)
-	icon_rect.reparent(content)
-	content.move_child(icon_rect, 0)
-	chest_row.visible = false
-	chest_layout = false
-	keep_label.visible = false
-	content.size_flags_horizontal = Control.SIZE_FILL
-	icon_rect.custom_minimum_size = Vector2(0, 56)
-	icon_rect.size_flags_horizontal = Control.SIZE_FILL
-	icon_rect.size_flags_vertical = Control.SIZE_FILL
-	for label in [name_label, rarity_label, effect_label]:
-		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	name_label.max_lines_visible = 2
-	name_label.custom_minimum_size.y = 48
-	rarity_label.remove_theme_font_size_override("font_size")
-	effect_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-
-
-func set_affix_header() -> void:
-	if affix_header == null:
-		affix_header = HBoxContainer.new()
-		affix_header.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		affix_header.add_theme_constant_override("separation", 8)
-		content.add_child(affix_header)
-		content.move_child(affix_header, 0)
-	if not affix_header.visible or icon_rect.get_parent() != affix_header:
-		icon_rect.reparent(affix_header)
-		name_label.reparent(affix_header)
-		affix_header.show()
-	icon_rect.custom_minimum_size = Vector2(26, 26)
-	icon_rect.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	name_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
 
 func _build_content() -> void:

@@ -282,14 +282,14 @@ func restore(saved: Dictionary) -> void:
 static func valid(saved: Variant) -> bool:
 	if not saved is Dictionary: return false
 	for key in ["version", "opening_damage_remaining", "completed_mask", "trial_index", "state", "remaining", "elapsed", "shots", "hit_valve", "flash_remaining"]:
-		if saved.has(key) and not AcidKingSnapshot._number(saved[key]): return false
+		if saved.has(key) and not SnapshotValues.is_number(saved[key]): return false
 	for key in ["used", "beam_hit", "fired"]:
 		if saved.has(key) and not saved[key] is bool: return false
 	for key in ["aim", "origin", "destination", "arrival_origin", "anchor", "frame_center", "flash_at"]:
-		if saved.has(key) and not AcidKingSnapshot._vector(saved[key]): return false
+		if saved.has(key) and not SnapshotValues.is_vector(saved[key]): return false
 	if saved.has("valves") and not saved.valves is Array: return false
 	for valve in saved.get("valves", []):
-		if not valve is Dictionary or not AcidKingSnapshot._vector(valve.get("position")) or not valve.get("broken") is bool: return false
+		if not valve is Dictionary or not SnapshotValues.is_vector(valve.get("position")) or not valve.get("broken") is bool: return false
 	return true
 
 func _draw() -> void:

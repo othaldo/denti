@@ -16,7 +16,6 @@ const GOLD := Color("f4c56b")
 const GOLD_INK := Color("2b202b")
 const MINT := Color("9adfc7")
 const CORAL := Color("ff968e")
-const VIOLET := Color(0.52, 0.36, 0.69)
 
 
 static func make_theme() -> Theme:

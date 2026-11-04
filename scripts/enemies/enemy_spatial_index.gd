@@ -182,24 +182,6 @@ func closest(at: Vector2, radius: float, include_radius: bool = true, excluded: 
 					nearest = enemy
 	return nearest
 
-func in_rect(bounds: Rect2, ordered: bool = true) -> Array[Enemy]:
-	# Store parent-local positions so moving the whole arena cannot stale the grid.
-	var local_bounds := global_transform.affine_inverse() * bounds
-	var first := _cell(local_bounds.position)
-	var last := _cell(local_bounds.end)
-	var result: Array[Enemy] = []
-	for y in range(first.y, last.y + 1):
-		for x in range(first.x, last.x + 1):
-			var cell := Vector2i(x, y)
-			if not cells.has(cell):
-				continue
-			for enemy: Enemy in cells[cell]:
-				if enemy.is_targetable():
-					result.append(enemy)
-	if ordered:
-		_sort(result)
-	return result
-
 func _sort(enemies: Array[Enemy]) -> void:
 	# Preserve spawn order for tied targets and chained item effects.
 	if enemies.size() > 1:

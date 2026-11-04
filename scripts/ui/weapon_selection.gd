@@ -185,17 +185,7 @@ func _layout() -> void:
 func _place_name(rect: Rect2, font_size: int) -> void:
 	# Shape at the final width. Label's deferred autowrap minimum can retain
 	# a narrow column's height across rotations (also in paused/headless saves).
-	var paragraph := TextParagraph.new()
-	paragraph.width = rect.size.x
-	paragraph.break_flags = TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND | TextServer.BREAK_ADAPTIVE
-	var text := selected_weapon().display_name
-	paragraph.add_string(text, weapon_name.get_theme_font("font"), font_size)
-	var lines := PackedStringArray()
-	for index in paragraph.get_line_count():
-		var span := paragraph.get_line_range(index)
-		var line := text.substr(span.x, span.y - span.x).strip_edges()
-		if not line.is_empty(): lines.append(line)
-	weapon_name.text = "\n".join(lines)
+	DentiUIComponents.wrap_text(weapon_name, selected_weapon().display_name, rect.size.x, font_size, true)
 	weapon_name.position = rect.position
 	weapon_name.size = rect.size
 

@@ -112,13 +112,13 @@ func restore(saved: Dictionary) -> void:
 static func valid(saved: Variant) -> bool:
 	if not saved is Dictionary or not saved.get("pools", []) is Array: return false
 	for key in ["state", "remaining", "budget"]:
-		if saved.has(key) and not AcidKingSnapshot._number(saved[key]): return false
+		if saved.has(key) and not SnapshotValues.is_number(saved[key]): return false
 	for key in ["origin", "destination"]:
-		if saved.has(key) and not AcidKingSnapshot._vector(saved[key]): return false
+		if saved.has(key) and not SnapshotValues.is_vector(saved[key]): return false
 	for pool in saved.get("pools", []):
-		if not pool is Dictionary or not AcidKingSnapshot._vector(pool.get("position")): return false
+		if not pool is Dictionary or not SnapshotValues.is_vector(pool.get("position")): return false
 		for key in ["life", "cooldown"]:
-			if not AcidKingSnapshot._number(pool.get(key)): return false
+			if not SnapshotValues.is_number(pool.get(key)): return false
 	return true
 
 func _draw() -> void:

@@ -230,11 +230,11 @@ func restore(saved: Dictionary) -> void:
 static func valid(saved: Variant) -> bool:
 	if not saved is Dictionary: return false
 	for key in ["version", "state", "completed_mask", "trial_index", "remaining", "elapsed", "regeneration_left", "opening_left", "pulse_remaining"]:
-		if saved.has(key) and not CrownCourtSnapshot._number(saved[key]): return false
+		if saved.has(key) and not SnapshotValues.is_number(saved[key]): return false
 	for key in ["used", "pulse_warned"]:
 		if saved.has(key) and not saved[key] is bool: return false
 	for key in ["pulse_aim", "anchor", "arrival", "frame_center"]:
-		if saved.has(key) and not CrownCourtSnapshot._vector(saved[key]): return false
+		if saved.has(key) and not SnapshotValues.is_vector(saved[key]): return false
 	return ImperialVassal.valid({"shots": saved.get("shots", [])})
 
 func _draw() -> void:
