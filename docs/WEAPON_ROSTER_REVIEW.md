@@ -10,6 +10,10 @@ Danach folgt der [Kontaktwaffen-Pass](CONTACT_WEAPON_BALANCE.md) mit begrenzten
 Rückstößen, Kratzer-Folgetreffer und zielunabhängigen Polierer-Crits. Die Zahlen
 dieser historischen Tabelle wurden dadurch nicht rückwirkend verändert.
 
+Der [Bürsten-Pass vom 04.11.](INTERDENTAL_HELL_BUFF.md) ersetzt die damalige
+Empfehlung, weitere Bürsten-Buffs zurückzustellen: Verdiente Hell-Einstiege
+und ein reproduzierbarer Kontaktfehler begründen jetzt einen gezielten Buff.
+
 **Ergänzung 02.11.:** [Verdienter Ausbau auf Hell](EARNED_PROGRESSION.md)
 berücksichtigt jetzt Gold/XP, echte Käufe und mitgenommenen Lebensverlust vor
 dem ersten Boss. Die folgenden Checkpoints gleichen Ausbau und Anfangs-HP an;

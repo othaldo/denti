@@ -68,7 +68,14 @@ func tick(weapon: WeaponInstance, from_progress: float, to_progress: float) -> v
 					ElementImpactBatch.emit_from(enemy, &"bleed", at, outward, 30)
 		return
 	# Sample the rigid blade; the floss arc above uses its exact swept sector.
-	var steps := maxi(ceili((end - start) / 0.025), 1)
+	var sample_step := 0.025
+	if weapon.data.attack_animation == "spin" and weapon.data.spin_grip_radius > 0:
+		# Range upgrades enlarge the visible spin. Keep the arc between samples
+		# shorter than a candidate's hit radius so small enemies cannot fall in it.
+		var hit_radius := INF
+		for enemy in enemies: hit_radius = minf(hit_radius, enemy.data.radius + weapon.data.attack_width * 0.5)
+		sample_step = minf(sample_step, (WeaponMotion.ACTIVE_END - WeaponMotion.ACTIVE_START) * hit_radius / (TAU * maxf(weapon.data.range_at_tier(weapon.tier), 1.0)))
+	var steps := maxi(ceili((end - start) / sample_step), 1)
 	for index in range(steps + 1):
 		var progress := lerpf(start, end, float(index) / float(steps))
 		var pose_data := WeaponMotion.pose(weapon.data, weapon.tier, weapon.home_position, weapon.aim, progress, weapon.idle_time, weapon.aim_distance, weapon.visual_density)

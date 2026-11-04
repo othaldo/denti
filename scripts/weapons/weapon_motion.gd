@@ -54,6 +54,7 @@ static func pose(data: WeaponData, tier: int, home: Vector2, aim: Vector2, progr
 		rotation = 0.0
 	if is_contact(data) and active:
 		var rest_rotation := rotation
+		var rest_scale := scale
 		scale = Vector2.ONE * factor
 		if data.held_style == "staff":
 			scale.x *= -1.0 if home.x < 0.0 else 1.0
@@ -72,7 +73,13 @@ static func pose(data: WeaponData, tier: int, home: Vector2, aim: Vector2, progr
 				extension = sin(action * PI)
 				angle += sin(action * TAU * 3.0) * 0.045
 		var hand_distance := maxf(reach - length, 12.0)
-		if data.attack_animation in ["slash", "spin"]:
+		var centered_spin := data.attack_animation == "spin" and data.spin_grip_radius > 0.0
+		if centered_spin:
+			# Keep the close and outer parts of one sweep visible at the same time.
+			# A nearer target must not pull the whole ring inside the shown range.
+			hand_distance = minf(data.spin_grip_radius, reach)
+			scale *= maxf(reach - hand_distance, 1.0) / maxf(length, 0.001)
+		elif data.attack_animation in ["slash", "spin"]:
 			# A short blade must not orbit outside a nearby target's body.
 			# Distant targets still use the full extension up to the weapon's range.
 			hand_distance = minf(hand_distance, maxf(target_distance - data.attack_width * 0.5, 12.0))
@@ -90,6 +97,7 @@ static func pose(data: WeaponData, tier: int, home: Vector2, aim: Vector2, progr
 		if progress > ACTIVE_END:
 			weight = 1.0 - (progress - ACTIVE_END) / (1.0 - ACTIVE_END)
 		grip = home.lerp(attack_grip, weight)
+		if centered_spin: scale = rest_scale.lerp(scale, weight)
 		# Recover into the upright resting pose without spinning through a full turn.
 		rotation = lerp_angle(rest_rotation, rotation, weight)
 	elif active:

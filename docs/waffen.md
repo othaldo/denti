@@ -37,7 +37,7 @@ die Einschätzung gegenüber reinen Einzelziel-DPS verändern.
 | Mundspülungs-Mörser | 2 | Minzprojektil | Flächenschaden beim Einschlag; Explosionsradius wächst mit der Stufe. |
 | Zahnstocher-Speer | 1 | Stichlinie / Schnitt | Lange, schmale Nahkampflinie trifft mehrere hintereinander stehende Gegner. |
 | Karies-Fräse | 2 | Schneller Bohrungs-Nahkampf | 110 Reichweite und 6 Rückstoß; Fokus wächst um 5 % pro Folgetreffer bis +50 %. Voller Schaden gegen normale Gegner, +40 % gegen Eliten, +35–50 % gegen Bosse. |
-| Interdental-Bürste | 1 | Schneller Rundumschnitt | Sehr schnelle Treffer mit 1,2 Blutungsschaden/s für 2,5 s; 82–102 Reichweite und radialer Rückstoß schaffen Platz. |
+| Interdental-Bürste | 1 | Schneller Rundumschnitt | Sehr schnelle Treffer mit 1,2 Blutungsschaden/s für 2,5 s; 100–130 Reichweite und radialer Rückstoß schaffen Platz. Der sichtbare Schwung deckt nahe und äußere Ziele gleichzeitig ab. |
 | Fluorid-Sprüher | 2 | 65°-Minzkegel | Markiert Gegner für 2 s: +20 % Schaden durch Schmelzwaffen, etwa Zauberbürste und Fluorid-Rakete. Mehrere Sprüher stapeln den Bonus nicht. |
 | Mundduschen-Turbine | 2 | 48°-Wasserkegel | Macht Gruppen 3 s nass, verlangsamt sie und stößt sie kräftig zurück; geringer Rohschaden. |
 | UV-Lampe | 2 | Breite Lichtlinie | Sofortstrahl trifft alle Gegner entlang einer 36 Pixel breiten Linie; +10 Prozentpunkte Waffen-Crit und ×2 Crit-Schaden. |
@@ -52,6 +52,10 @@ Der [Kontaktwaffen-Pass vom 2. November](CONTACT_WEAPON_BALANCE.md) prüft klein
 Rückstöße, begrenzte Kratzerkontakte und den zielunabhängigen Polierer-Crit-Zyklus
 mit verdienter Progression. Die Hell-Lücke zu sicheren Linienwaffen ist damit
 weiter nicht geschlossen; insbesondere der Fräsen-Rückstoß zeigt gemischte Werte.
+
+Der [Bürsten-Pass vom 4. November](INTERDENTAL_HELL_BUFF.md) verbessert gezielt
+Reichweite, Grundschaden und Nahkampfskalierung der Interdental-Bürste und behebt
+verkürzte Rundumschwünge bei nahen Gegnern.
 
 Eine [Vergleichsansicht mit Denti und allen 18 Waffen](WEAPON_SIZE_BALANCE.md) zeigt Ruhehaltung und Angriff bei gleicher Vergrößerung. Der Bohrer ist auf Stufe I 60 Pixel groß, trifft jetzt für 28 Basisschaden alle 0,64 Sekunden und skaliert mit 100 % Nahschaden. Kratzer, Peitsche, Garotte und Speer wurden ebenfalls in ihren Proportionen angepasst; Reichweiten bleiben erhalten.
 
@@ -70,7 +74,7 @@ pro Treffer und Ziel, nicht der Gesamtschaden eines Kegels oder einer Explosion.
 | --- | ---: | ---: | ---: | ---: |
 | Zahnstocher-Speer | 28 | 0,85 s | 205 | 10 |
 | Karies-Fräse | 12 | 0,20 s | 110 | 15 |
-| Interdental-Bürste | 6 | 0,24 s | 82 | 8 |
+| Interdental-Bürste | 8 | 0,24 s | 100 | 8 |
 | Fluorid-Sprüher | 7 | 0,25 s | 155 | 14 |
 | Mundduschen-Turbine | 7 | 0,36 s | 195 | 14 |
 | UV-Lampe | 42 | 1,50 s | 600 | 17 |

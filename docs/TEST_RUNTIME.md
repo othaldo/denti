@@ -1,14 +1,14 @@
 # Schnellere Testausführung
 
-`tools/run_tests.py` startet standardmäßig die 177 Kernprüfungen mit bis zu vier parallelen Prozessen. Spielfluss, Save/Resume und Migration, Schaden/Status, Waffen und Synergien, Belohnungen, Shop/Economy, Schwierigkeitsskalierung und bedienbare UI bleiben Bestandteil jedes normalen CI-Builds. Kurze Ausweichtests und die Verhaltens-/Speichertests aller Bosse bleiben ebenfalls enthalten. Der Simulationsschritt bleibt `--fixed-fps 60`.
+`tools/run_tests.py` startet standardmäßig die 178 Kernprüfungen mit bis zu vier parallelen Prozessen. Spielfluss, Save/Resume und Migration, Schaden/Status, Waffen und Synergien, Belohnungen, Shop/Economy, Schwierigkeitsskalierung und bedienbare UI bleiben Bestandteil jedes normalen CI-Builds. Kurze Ausweichtests und die Verhaltens-/Speichertests aller Bosse bleiben ebenfalls enthalten. Der Simulationsschritt bleibt `--fixed-fps 60`.
 
 ## Auswahl nach Zweck
 
 | Suite | Umfang | Einsatz |
 | --- | --- | --- |
-| `core` (Standard) | 177 Tests direkt unter `tests/` | Lokale Standardprüfung und Push-/PR-Builds |
+| `core` (Standard) | 178 Tests direkt unter `tests/` | Lokale Standardprüfung und Push-/PR-Builds |
 | `extended` | 21 Tests unter `tests/extended/` | Gezielte Grafik-, Diagnose- oder umfangreiche Balanceprüfung |
-| `all` | Beide Gruppen, 198 Tests | Release-Tags und manuell angeforderter vollständiger CI-Lauf |
+| `all` | Beide Gruppen, 199 Tests | Release-Tags und manuell angeforderter vollständiger CI-Lauf |
 
 Im GitHub-Workflow kann beim manuellen Start `test_suite: all` gewählt werden. Release-Tags verwenden immer `all`. Neue Tests direkt unter `tests/` sind automatisch Teil der Kernprüfung; Hilfsskripte unter `tests/support/` werden nie als eigene Tests gestartet. Filter gelten nur innerhalb der ausgewählten Suite. Eine leere Auswahl oder doppelte Testnamen über beide Gruppen hinweg sind Fehler.
 

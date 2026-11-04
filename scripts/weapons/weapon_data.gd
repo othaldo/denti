@@ -73,6 +73,9 @@ var element_skin: StringName = &""
 @export_range(0.1, 2.0) var held_scale: float = 1.0
 @export var held_sprite: Texture2D
 @export var upright_at_rest: bool = false
+## Spin from this radius and size the visible blade to cover the full reach.
+## Zero preserves the ordinary target-dependent orbit used by other weapons.
+@export_range(0.0, 32.0) var spin_grip_radius: float = 0.0
 @export_range(0.08, 0.8) var animation_duration: float = 0.32
 @export_range(0.0, 0.3) var working_head_radius: float = 0.0
 @export var working_head_texture: Texture2D
