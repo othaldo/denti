@@ -37,6 +37,10 @@ func _run() -> void:
 		_scaler_pair(direction)
 	_close_control()
 	_polisher_cycle()
+	for direction in [Vector2.RIGHT, Vector2.LEFT, Vector2.UP, Vector2.DOWN]:
+		_polisher_pair(direction)
+	_polisher_affixes()
+	_polisher_resume()
 	session.clear_run()
 	print("PASS contact balance: visible bounded drill/scaler contacts, scaled affixes/shared healing, resisted push, persistent polishing cycle and JSON resume")
 	finish(1 if failures else 0)
@@ -211,6 +215,87 @@ func _close_control() -> void:
 			_check(target.health < 10000, "contact control fixture did not connect: " + str(id))
 			_check(is_equal_approx(target.global_position.x - at.x, weapon.data.knockback_at_tier(1) * (1.0 - resistance)) and is_equal_approx(target.global_position.y, at.y), "contact push ignored its direction or resistance: " + str(id))
 			_check(resistance > 0 or target.global_position.x > at.x, "short weapon failed to create any space: " + str(id))
+
+
+func _polisher_pair(direction: Vector2) -> void:
+	var weapon := _equip_actual(&"prophylaxis_polisher")
+	weapon.data.crit_bonus = 0
+	var first := _enemy(direction * 80)
+	var second := _enemy(direction * 110)
+	var third := _enemy(direction * 119)
+	var near := _enemy(direction * 40)
+	var side := _enemy(direction * 100 + direction.orthogonal() * 65)
+	weapon._begin_attack([first])
+	weapon._physics_process(weapon.attack_duration * 0.21)
+	_check(first.health == 10000 and second.health == 10000, "polisher pair skipped its windup")
+	weapon._physics_process(weapon.attack_time)
+	var damage := 10000 - first.health
+	_check(is_equal_approx(damage, weapon.data.raw_damage_with_stats(1, game.player.stats)), "polisher changed primary hit damage")
+	_check(is_equal_approx(10000 - second.health, damage * 0.4), "polisher follow-up was not 40 percent")
+	_check(third.health == 10000 and near.health == 10000 and side.health == 10000, "polisher exceeded its forward pair or hit off-axis")
+	weapon.strike.tick(weapon, WeaponMotion.ACTIVE_START, WeaponMotion.ACTIVE_END)
+	_check(weapon.strike.contact_hits == 2 and is_equal_approx(10000 - second.health, damage * 0.4), "polisher repeated its follow-up")
+	weapon = _equip_actual(&"prophylaxis_polisher")
+	weapon.data.crit_bonus = 0
+	weapon.crit_cycle_progress = 2
+	first = _enemy(direction * 80)
+	second = _enemy(direction * 110)
+	weapon._begin_attack([first])
+	weapon._physics_process(weapon.attack_time)
+	_check(weapon.strike.critical and weapon.crit_cycle_progress == 0, "polisher pair advanced the crit cycle more than once")
+	_check(is_equal_approx(10000 - second.health, (10000 - first.health) * 0.4), "polisher critical follow-up ignored its damage share")
+	weapon = _equip_actual(&"prophylaxis_polisher")
+	weapon.data.crit_bonus = 0
+	var boss := _enemy(direction * 120)
+	boss.data = boss.data.duplicate(true)
+	boss.data.is_boss = true
+	weapon._begin_attack([boss])
+	weapon._physics_process(weapon.attack_time)
+	_check(weapon.strike.contact_hits == 1 and is_equal_approx(10000 - boss.health, weapon.strike.damage), "single boss received a second polisher hit")
+
+
+func _polisher_affixes() -> void:
+	var weapon := _equip_actual(&"prophylaxis_polisher")
+	weapon.tier = 2
+	weapon.data.crit_bonus = 0
+	for kind in [&"fire", &"leech"]:
+		for rank in 3: weapon.affixes = WeaponUpgrades.advance(weapon.affixes, kind, weapon.data, 2)
+	weapon.refresh_affix_stats()
+	var first := _enemy(Vector2(80, 0))
+	var second := _enemy(Vector2(110, 0))
+	game.player.stats.health = 50
+	weapon._begin_attack([first])
+	weapon._physics_process(weapon.attack_time)
+	_check(is_equal_approx(10000 - second.health, (10000 - first.health) * 0.4), "polisher elemental follow-up used full power")
+	var leech: Dictionary = weapon.affixes[WeaponAffixes.find(weapon.affixes, &"leech")]
+	_check(game.player.stats.health > 50 and game.player.stats.health <= 50 + WeaponAffixes.utility_value(leech) + 0.001, "polisher pair bypassed the shared healing clock")
+
+
+func _polisher_resume() -> void:
+	var weapon := _equip_actual(&"prophylaxis_polisher")
+	weapon.data.crit_bonus = 0
+	var first := _enemy(Vector2(50, 0), 1)
+	var second := _enemy(Vector2(120, 0))
+	var third := _enemy(Vector2(125, 0))
+	weapon._begin_attack([first])
+	for frame in 60:
+		weapon._physics_process(weapon.attack_duration / 60)
+		if weapon.strike.contact_hits > 0: break
+	_check(weapon.strike.contact_hits == 1 and second.health == 10000, "polisher resume fixture skipped its first contact")
+	if is_instance_valid(first): first.free()
+	var saved: Dictionary = JSON.parse_string(JSON.stringify(weapon.save_motion({second.get_instance_id(): 0, third.get_instance_id(): 1})))
+	weapon.restore_motion(saved, [second, third])
+	weapon._physics_process(weapon.attack_time)
+	_check(is_equal_approx(10000 - second.health, weapon.strike.damage * 0.4) and third.health == 10000, "polisher resume repeated full damage or exceeded its pair")
+	# A pre-buff saved attack still owns its original one-contact budget.
+	var legacy := saved.duplicate(true)
+	legacy.contact_limit = 1
+	second.health = 10000
+	weapon.restore_motion(legacy, [second, third])
+	weapon.strike.tick(weapon, WeaponMotion.ACTIVE_START, WeaponMotion.ACTIVE_END)
+	_check(second.health == 10000 and weapon.strike.contact_hits == 1, "polisher enlarged an already spent legacy attack")
+	weapon._begin_attack([second])
+	_check(weapon.strike.contact_limit == 2, "new polisher attack did not receive the new pair budget")
 
 
 func _polisher_cycle() -> void:

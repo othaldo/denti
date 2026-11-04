@@ -14,6 +14,16 @@ Der [Bürsten-Pass vom 04.11.](INTERDENTAL_HELL_BUFF.md) ersetzt die damalige
 Empfehlung, weitere Bürsten-Buffs zurückzustellen: Verdiente Hell-Einstiege
 und ein reproduzierbarer Kontaktfehler begründen jetzt einen gezielten Buff.
 
+Der [aktuelle Einstiegs-Audit vom 04.11.](WEAPON_AUDIT_2026_11_04.md) prüft alle
+18 Startwaffen auf Normal/Hell samt neun Seeds für auffällige Kandidaten,
+anderem Pilot und einer Zauberbürsten-Ausbaukontrolle. Polierer und früher
+Zauberbürsten-Ausbau sind die nächsten Prüfprioritäten; Spielwerte blieben
+für diesen Audit unverändert.
+
+Die anschließenden [kleinen Buffs vom 04.11.](WEAK_WEAPON_BUFF_2026_11_04.md)
+verbessern gezielt Polierer, Zauberbürste und Schmelzspiegel. Der Audit bleibt
+als unveränderte Vorher-Messung erhalten.
+
 **Ergänzung 02.11.:** [Verdienter Ausbau auf Hell](EARNED_PROGRESSION.md)
 berücksichtigt jetzt Gold/XP, echte Käufe und mitgenommenen Lebensverlust vor
 dem ersten Boss. Die folgenden Checkpoints gleichen Ausbau und Anfangs-HP an;

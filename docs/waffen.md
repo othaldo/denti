@@ -18,7 +18,7 @@ automatisch eine kurze Reichweite oder nur einen getroffenen Gegner. Die
 Zahnseiden-Schneide nutzt **Nahkampf · 150 %**, obwohl ihre langen Fäden mehrere
 Gegner treffen. Licht, Schnitt oder Bohrung sind davon getrennte Schadensarten.
 
-Der aktuelle [DPS-Balancepass vom 4. Oktober 2026](WEAPON_DPS_BALANCE.md) vergleicht alle 18 Waffen auf Stufe I–IV vor und nach den Buffs, einschließlich Blutung, Fokus, Gruppen und DPS pro Wurzel. Nahkampf erhält mehr Schaden für das Risiko; schwächere Fernwaffen erhalten gezielte Verbesserungen. Die Zauberbürste bleibt unverändert.
+Der [DPS-Balancepass vom 4. Oktober 2026](WEAPON_DPS_BALANCE.md) vergleicht alle 18 Waffen auf Stufe I–IV vor und nach den damaligen Buffs, einschließlich Blutung, Fokus, Gruppen und DPS pro Wurzel. Nahkampf erhält dort mehr Schaden für das Risiko; schwächere Fernwaffen erhalten gezielte Verbesserungen. Die Zauberbürste blieb bei diesem damaligen Pass unverändert.
 
 Der [aktuelle Gesamtvergleich vom 1. November](WEAPON_ROSTER_REVIEW.md) ergänzt
 erneuerte Schadensmessungen um volle Wellen, echte Bosse und Mischbuilds.
@@ -27,12 +27,12 @@ die Einschätzung gegenüber reinen Einzelziel-DPS verändern.
 
 | Waffe | Wurzeln | Angriff | Rolle |
 | --- | ---: | --- | --- |
-| Zauberbürste | 2 | Schmelz-Projektil | Verlässliche Reichweite; ab Stufe III zwei, ab IV drei Pastegeschosse mit leichtem Streuwinkel. |
+| Zauberbürste | 2 | Schmelz-Projektil | 22 Grundschaden; ab Stufe III zwei, ab IV drei Pastegeschosse mit leichtem Streuwinkel. |
 | Turbo-Bohrer | 1 | Bohrung im Nahkampf | Schneller Stoß mit 8 Rückstoß; ein weiterer Gegner vorwärts erhält 50 % Schaden. Bossbonus wächst von 25 % auf 40 %. |
 | Zahnseidenpeitsche | 1 | Einzelner Zahnseidenhieb nach vorn | Fester Griff, ausfahrender Faden; trifft Gegner auf seinem Weg. 180–210 Reichweite und Blutung. |
 | Wasserflosser | 1 | Schnelles Wasserprojektil | Macht Ziele nass und verlangsamt sie, hat niedrigen Rohschaden und wachsenden Rückstoß. |
 | Kronenwerfer | 2 | Schweres Metallprojektil | Durchdringt auf Stufe I einen weiteren Gegner, auf Stufe IV drei. |
-| Schmelzspiegel | 1 | Sofortiger Lichtstrahl | Präziser Treffer ohne Flugzeit. |
+| Schmelzspiegel | 1 | Sofortiger Lichtstrahl | Präziser Treffer ohne Flugzeit, 420 Reichweite und 0,90 Sekunden Basispause. |
 | Zahnsteinkratzer | 1 | Schneller Nahkampfschnitt | 110 Reichweite, 6 Rückstoß und Blutung. Ein weiteres Ziel auf der sichtbaren Hiebspur erhält 50 % Trefferschaden; bei totem Ziel ist Ersatzkontakt möglich. |
 | Mundspülungs-Mörser | 2 | Minzprojektil | Flächenschaden beim Einschlag; Explosionsradius wächst mit der Stufe. |
 | Zahnstocher-Speer | 1 | Stichlinie / Schnitt | Lange, schmale Nahkampflinie trifft mehrere hintereinander stehende Gegner. |
@@ -43,7 +43,7 @@ die Einschätzung gegenüber reinen Einzelziel-DPS verändern.
 | UV-Lampe | 2 | Breite Lichtlinie | Sofortstrahl trifft alle Gegner entlang einer 36 Pixel breiten Linie; +10 Prozentpunkte Waffen-Crit und ×2 Crit-Schaden. |
 | Amalgam-Schleuder | 1 | Schweres Metallprojektil | Langsame Kugel, kleiner Splash und hoher Rückstoß, auch bei Explosionen. |
 | Zahnseiden-Schneide | 2 | Doppelter Zahnseidenhieb nach vorn | Zwei feste Griffe, zwei ausfahrende Fäden; 220–270 Reichweite, kurzer Rückstoß und 3,2 Blutungsschaden/s für 3,5 s. |
-| Prophylaxe-Polierer | 1 | Schneller Licht-Nahkampf | 110 Reichweite, 4 Rückstoß und +10 Prozentpunkte Waffen-Crit. Jeder dritte Angriff pro Waffenexemplar ist kritisch, auch nach Zielwechsel und Pausen; Ersatzkontakt bei totem Ziel. |
+| Prophylaxe-Polierer | 1 | Schneller Licht-Nahkampf | 120 Reichweite, 4 Rückstoß und +10 Prozentpunkte Waffen-Crit. Jeder dritte Angriff pro Waffenexemplar ist kritisch; ein weiteres Ziel vorwärts auf der sichtbaren Hiebspur erhält 40 % Schaden. Ersatzkontakt bei totem Ziel. |
 | Fluorid-Rakete | 2 | Schmelz-Rakete | Hoher Flächenschaden, große Explosion und lange Pause; explodiert auch am Reichweitenende. |
 
 Die Waffen haben eigene Sprites unter `assets/weapons/` und werden getrennt von Dentis Körper animiert. Alle Standardwaffen und Evolutionen verwenden ihre [Normal- und Elementformen](WEAPON_SKINS.md). Projektilfarbe, Tempo, Reichweite und Trefferform liegen in den jeweiligen `WeaponData`-Ressourcen unter `data/weapons/`.
@@ -56,6 +56,11 @@ weiter nicht geschlossen; insbesondere der Fräsen-Rückstoß zeigt gemischte We
 Der [Bürsten-Pass vom 4. November](INTERDENTAL_HELL_BUFF.md) verbessert gezielt
 Reichweite, Grundschaden und Nahkampfskalierung der Interdental-Bürste und behebt
 verkürzte Rundumschwünge bei nahen Gegnern.
+
+Der anschließende [kleine Waffen-Buff](WEAK_WEAPON_BUFF_2026_11_04.md) folgt dem
+Audit mit verdientem Ausbau: Polierer mit begrenztem zweitem Kontakt,
+Zauberbürste mit 10 % mehr Grundschaden und Schmelzspiegel mit etwas mehr Tempo
+und Reichweite. Einzelheiten und gleiche Vorher-/Nachher-Seeds stehen im Bericht.
 
 Eine [Vergleichsansicht mit Denti und allen 18 Waffen](WEAPON_SIZE_BALANCE.md) zeigt Ruhehaltung und Angriff bei gleicher Vergrößerung. Der Bohrer ist auf Stufe I 60 Pixel groß, trifft jetzt für 28 Basisschaden alle 0,64 Sekunden und skaliert mit 100 % Nahschaden. Kratzer, Peitsche, Garotte und Speer wurden ebenfalls in ihren Proportionen angepasst; Reichweiten bleiben erhalten.
 
@@ -80,7 +85,7 @@ pro Treffer und Ziel, nicht der Gesamtschaden eines Kegels oder einer Explosion.
 | UV-Lampe | 42 | 1,50 s | 600 | 17 |
 | Amalgam-Schleuder | 28 | 1,15 s | 370 | 10 |
 | Zahnseiden-Schneide | 44 | 1,20 s | 220 | 15 |
-| Prophylaxe-Polierer | 10 | 0,28 s | 85 | 10 |
+| Prophylaxe-Polierer | 10 | 0,28 s | 120 | 10 |
 | Fluorid-Rakete | 70 | 2,40 s | 550 | 18 |
 
 Alle zehn Waffen sind im normalen Shop erhältlich und unterstützen vier Stufen,

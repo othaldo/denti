@@ -37,7 +37,7 @@ func _run() -> void:
 	if water.base_damage != 11.0 or water.knockback_at_tier(4) != 30.0 or scaler.base_damage != 16.0 or mirror.base_damage != 26.0:
 		_fail("single-target balance values were not loaded")
 		return
-	if not is_equal_approx(brush.damage_at_tier(4), 36.0) or not is_equal_approx(mortar.damage_at_tier(4), 97.2):
+	if not is_equal_approx(brush.damage_at_tier(4), 39.6) or not is_equal_approx(mortar.damage_at_tier(4), 97.2):
 		_fail("weapon-specific damage tiers were not applied")
 		return
 	var boss: Enemy = load("res://scenes/enemies/enemy.tscn").instantiate()

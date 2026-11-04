@@ -37,7 +37,7 @@ func _run() -> void:
 		&"turbo_drill": [Vector2(80, 0), Vector2(125, 0), Vector2(160, 0), Vector2(105, 70)],
 		&"cavity_grinder": [Vector2(100, 0)],
 		&"plaque_scaler": [Vector2(70, 0), Vector2.RIGHT.rotated(deg_to_rad(20)) * 95, Vector2.RIGHT.rotated(deg_to_rad(28)) * 100, Vector2(70, 90)],
-		&"prophylaxis_polisher": [Vector2(108, 0)],
+		&"prophylaxis_polisher": [Vector2(80, 0), Vector2(110, 0), Vector2(119, 0), Vector2(100, 65)],
 	}
 	for id in offsets:
 		for enemy in game.get_node("Enemies").get_children(): enemy.free()

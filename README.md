@@ -180,6 +180,11 @@ Polierer-Crit-Zyklus über Zielwechsel hinweg. 78 neue verdiente Einstiegsproben
 zeigen bessere Bossankünfte auf Hell, aber weiterhin eine deutliche Lücke zu
 sicheren Linienwaffen und gemischte Werte beim Fräsen-Rückstoß.
 
+Die [kleinen Waffen-Buffs vom 4. November](docs/WEAK_WEAPON_BUFF_2026_11_04.md)
+geben dem Polierer einen begrenzten zweiten Kontakt, der Zauberbürste 10 % mehr
+Grundschaden und dem Schmelzspiegel etwas mehr Tempo und Reichweite. Gleiche
+Hell-Seeds prüfen den tatsächlich verdienten Einstieg vor und nach dem Patch.
+
 Der anschließende [Vergleich aller 18 Standardwaffen und sechs Evolutionen](docs/WEAPON_ROSTER_REVIEW.md) trennt Rohschaden, tatsächliche Kampfleistung und den Wert einer Unterstützungswaffe; einschließlich gezielter Turbinen-/Wasserflosser-Vergleiche.
 
 Der [verdiente Einstieg auf Hell](docs/EARNED_PROGRESSION.md) ergänzt echte Startwaffen, verdientes Gold/XP, bezahlte Angebote und mitgenommenes Leben über die Wellen 1–5. `python tools/run_earned_progression.py` prüft den Weg zum ersten Boss ohne vorgegebene Ausbau-Budgets.
