@@ -86,6 +86,7 @@ static func apply(hud: GameHUD, extent: Vector2, pause_button: Button = null, da
 		_place(hud.boss_labels[index], Rect2(inset + 2, text_top, width - inset * 2 - 52, 18))
 		_place(hud.boss_percentages[index], Rect2(width - inset - 46, text_top, 42, 18))
 		hud.boss_labels[index].add_theme_font_size_override("font_size", 13)
+	var boss_rows_height := 48.0 if hud.boss_count > 1 and not side_by_side else BOSS_HEIGHT
 	_place(hud.get_node("Root/Progression"), Rect2(Vector2.ZERO, extent))
 	_place(hud.xp_bar, Rect2(safe.position.x + 8, safe.end.y - 8, safe.size.x - 16, 5))
 	var level_position := Vector2(safe.get_center().x - 24, safe.end.y - 44)
@@ -98,6 +99,16 @@ static func apply(hud: GameHUD, extent: Vector2, pause_button: Button = null, da
 		pause_button.custom_minimum_size = Vector2(44, 44)
 		_place(pause_button, Rect2(bounds.end.x - 44, bounds.position.y, 44, 44))
 	_place(hud.fps_panel, Rect2(bounds.end.x - 66, bounds.position.y + (48 if touch else 0), 66, 20))
+	var retinue_left := boss_left
+	var retinue_top := boss_top + boss_rows_height + 6
+	var retinue_width := boss_area_width
+	if not portrait and extent.y < 480:
+		# Keep the centre free for the Emperor's silhouette on short screens.
+		retinue_width = minf(180, boss_area_width)
+		retinue_left = bounds.end.x - retinue_width
+		if touch: retinue_top = maxf(retinue_top, bounds.position.y + 50)
+		if hud.fps_panel.visible: retinue_top = maxf(retinue_top, hud.fps_panel.get_rect().end.y + 6)
+	_place(hud.retinue_display, Rect2(retinue_left, retinue_top, retinue_width, hud.retinue_display.size.y))
 	_place(hud.telemetry_panel, Rect2(maxf(bounds.position.x, bounds.end.x - 305), boss_top + 80, minf(305, bounds.size.x), hud.telemetry_panel.size.y))
 
 

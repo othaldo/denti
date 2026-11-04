@@ -34,6 +34,7 @@ var boss_bars: Array[ProgressBar] = []
 var boss_labels: Array[Label] = []
 var boss_percentages: Array[Label] = []
 var boss_count: int = 0
+var retinue_display: HUDRetinue
 # First-boss aliases also used by the debug test arena.
 var boss_label: Label
 var boss_bar: ProgressBar
@@ -58,6 +59,9 @@ func _ready() -> void:
 	_build_progression()
 	_build_economy()
 	_build_bosses()
+	retinue_display = HUDRetinue.new()
+	retinue_display.name = "Retinue"
+	$Root.add_child(retinue_display)
 	dash_indicator = DashButton.new()
 	dash_indicator.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	$Root.add_child(dash_indicator)
@@ -353,9 +357,20 @@ func update_bosses(bosses: Array[Enemy]) -> void:
 			boss_bars[index].max_value = boss.max_health
 			boss_bars[index].value = boss.health
 			boss_frames[index].show_health(boss_bars[index].ratio)
-			boss_labels[index].text = boss.data.display_name
+			boss_labels[index].text = boss.data.hud_name if not boss.data.hud_name.is_empty() else boss.data.display_name
 			boss_percentages[index].text = "%d %%" % ceili(100.0 * boss.health / maxf(boss.max_health, 1))
 			boss_labels[index].tooltip_text = "%s · %d / %d" % [boss.data.display_name, ceili(boss.health), ceili(boss.max_health)]
+	var minions: Array[Enemy] = []
+	for boss in bosses:
+		if not is_instance_valid(boss) or boss.health <= 0: continue
+		if boss.caramel_encounter != null and boss.caramel_encounter.bodyguard != null:
+			minions.append_array(boss.caramel_encounter.bodyguard.live_minions())
+		if boss.acid_king_encounter != null and boss.acid_king_encounter.companion != null:
+			minions.append_array(boss.acid_king_encounter.companion.live_minions())
+		if boss.crown_court_encounter != null:
+			var retinue := boss.crown_court_encounter.retinue
+			if retinue != null: minions.append_array(retinue.live_minions())
+	retinue_display.show_members(minions)
 
 
 static func compact_number(value: int) -> String:

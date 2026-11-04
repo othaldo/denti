@@ -10,9 +10,9 @@ Er sammelt vier Portalfragmente, um sie zu befreien und nach Hause zu kommen.
 
 | Kapitel | Wellen | Abschluss | Arena |
 | --- | --- | --- | --- |
-| Unter dem Kissen | 1–5 | Karies-Graf | `assets/environment/story/pillow.png` |
-| Das süße Verderben | 6–10 | Karies-Prinz | `assets/environment/story/sugar.png` |
-| Tief im Säurestrom | 11–15 | Karies-König | `assets/environment/story/acid.png` |
+| Unter dem Kissen | 1–5 | Plaquula | `assets/environment/story/pillow.png` |
+| Das süße Verderben | 6–10 | Don Karamello | `assets/environment/story/sugar.png` |
+| Tief im Säurestrom | 11–15 | Korrodon, der Ätzkoloss | `assets/environment/story/acid.png` |
 | Die letzte Krone | 16–20 | Karies-Imperator | `assets/environment/story/palace.png` |
 
 Die Kapitel verwenden die bestehende Gegner- und Bossmechanik. Geometrie, Kollisionen,
@@ -124,7 +124,7 @@ mitten im Dialog und während des Bosskampfes. Die vollständige Bosswelle start
   genau einmal; freie Runs und Endlos behalten ihren bisherigen direkten Wellenstart.
 Mit `--capture` entstehen native Aufnahmen unter `.godot/story-boss-preview/`.
 
-![Denti und der Karies-Graf vor Welle 5](screenshots/story-mode-boss-dialogue.png)
+![Denti und der Plaquula vor Welle 5](screenshots/story-mode-boss-dialogue.png)
 
 `tests/story_travel.gd` prüft alle drei Reisen, verdeckte Ziele, Fortsetzen
 vor/nach Ankunft und während der Enthüllung, reduzierte Bewegung, das Hauptmenülogo

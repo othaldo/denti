@@ -165,6 +165,7 @@ func _run() -> void:
 	await process_frame
 	await process_frame
 	_check(attack.save_data() == frozen, "paused heart/rush continued advancing")
+	attack.profile.bomb_frequency = 1.0 # Construct the original serial v1 flight.
 	_start(CaramelEncounterData.Attack.BOMBS)
 	attack.advance(0.7)
 	var legacy := attack.save_data()

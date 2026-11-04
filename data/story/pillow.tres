@@ -7,9 +7,9 @@
 [resource]
 script = ExtResource("1")
 boss = ExtResource("3")
-boss_dialogue = Array[Dictionary]([{"speaker":"Karies-Graf","text":"Unter diesem Kissen gehört alles mir. Die Münzen, die Krümel — und jetzt auch du."},
+boss_dialogue = Array[Dictionary]([{"speaker":"Plaquula","text":"Unter diesem Kissen gehört alles mir. Die Münzen, die Krümel — und jetzt auch du."},
 {"speaker":"Denti","text":"Ich bin kein Wechselgeld. Gib das Portalfragment her."},
-{"speaker":"Karies-Graf","text":"Ein Zahn ohne Mund. Wer soll vor dir Angst haben?"},
+{"speaker":"Plaquula","text":"Ein Zahn ohne Mund. Wer soll vor dir Angst haben?"},
 {"speaker":"Denti","text":"Jeder, der seit Jahren keinen Bohrer gesehen hat.","action":"Kämpfen"}])
 id = &"pillow"
 title = "Unter dem Kissen"

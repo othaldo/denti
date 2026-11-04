@@ -5,7 +5,7 @@ extends Node2D
 # Append states so existing save-state numbers retain their meaning.
 enum State { POSITION, WARN_CHANNEL, FLOW, WARN_SHIFT, WARN_STOMP, STOMP, RECALL, OPEN, RECOVERY, PURSUE, WARN_SPIT, CHASE_STOMP }
 enum Attack { CHANNELS, STOMP, TIDE }
-const SAVE_VERSION := 3
+const SAVE_VERSION := 4
 const MAX_FIELDS := 2
 var enemy: Enemy
 var profile: AcidKingData
@@ -13,6 +13,8 @@ var rig: KingAcidRig
 var volley: BossPaintedVolley
 var spit: BossPaintedVolley
 var pressure: KingPressureTrial
+var acid_wake: KingAcidWake
+var companion: BossCompanion
 var spit_origin := Vector2.ZERO
 var spit_rays: Array[Vector2] = []
 var stomp_index := 0
@@ -63,13 +65,26 @@ func _ready() -> void:
 		pressure.encounter = self
 		pressure.profile = profile.pressure_profile
 		add_child(pressure)
+		acid_wake = KingAcidWake.new()
+		acid_wake.encounter = self
+		add_child(acid_wake)
+	if profile.collector != null:
+		companion = BossCompanion.new()
+		companion.setup(enemy, profile.collector, &"acid_collector", _visible_bounds, companion_suspended)
+		add_child(companion)
 	sync_visual()
+
+func companion_suspended() -> bool:
+	return enemy.health <= 0 or enemy.dying
 
 func damage_factor() -> float:
 	if pressure != null and pressure.state == KingPressureTrial.State.EXPOSED: return pressure.profile.exposure_damage_factor / maxf(1 - enemy.damage_reduction, 0.01)
 	return profile.open_damage_factor if state == State.OPEN else profile.closed_damage_factor
 
 func cancel() -> void:
+	if acid_wake != null: acid_wake.clear()
+	if companion != null:
+		if enemy.health <= 0 or enemy.dying: companion.clear()
 	if pressure != null: pressure.cancel()
 	state = State.POSITION
 	remaining = profile.approach_seconds
@@ -105,6 +120,7 @@ func begin(forced: int = -1, seconds: float = -1) -> void:
 
 func advance(delta: float) -> void:
 	if enemy.dying or enemy.health <= 0 or enemy.target == null: return
+	if companion != null: companion.advance(delta)
 	if pressure != null and pressure.advance(delta):
 		elapsed += delta
 		sync_visual()
@@ -123,6 +139,7 @@ func advance(delta: float) -> void:
 			for row in rows:
 				if not row.fired and row.delay > 0.000001: step = minf(step, row.delay)
 		_tick_fields(step, spent)
+		if acid_wake != null: acid_wake.advance(step, spent)
 		volley.advance(step, spent)
 		spit.advance(step, spent)
 		if state == State.STOMP: _tick_rows(step, spent)

@@ -20,6 +20,7 @@ func _spawn(difficulty: DifficultyData) -> Enemy:
 	game._create_enemy(EnemyCatalog.CAVITY_KING, Vector2(770, 620))
 	var boss: Enemy = game.boss
 	boss.set_simulation_enabled(false)
+	boss.acid_king_encounter.companion.legacy = true # Isolate the King's own warning/attack geometry.
 	boss.boss_phase = 2
 	return boss
 

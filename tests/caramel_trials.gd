@@ -23,7 +23,7 @@ func _run() -> void:
 		var count := 0
 		for index in ritual.profile.trials.size():
 			var definition := ritual.profile.trials[index]
-			if ritual.profile.rank < definition.minimum_rank: continue
+			if not definition.enabled_for_rank(ritual.profile.rank): continue
 			boss.health = boss.max_health * definition.health_fraction
 			boss.boss_phase = 2 if definition.health_fraction < 0.34 else 1
 			boss.boss_phase_timer = 0
@@ -39,25 +39,30 @@ func _run() -> void:
 				pylon.take_damage(10000)
 			attack.advance(0.01)
 			_check(ritual.state == CaramelOverload.State.RECOVERY and ritual.completed_mask & (1 << index), "successful trial did not mark only its checkpoint complete")
+			var opening_before := ritual.opening_left
+			var counterattack := boss.take_damage(10)
+			_check(counterattack > 0 and is_equal_approx(ritual.opening_left, opening_before - counterattack), "counterattack did not spend the bounded opening")
 			if index < ritual.profile.trials.size() - 1:
 				# Strong burst damage can reach the next check, but cannot skip it
 				# through the reward window or kill the boss across phase floors.
 				boss.boss_damage_budget = boss.max_health
-				boss.take_damage(1e9)
+				var burst := boss.take_damage(1e9)
+				_check(burst + counterattack <= boss.max_health * ritual.profile.opening_damage_fraction + 0.01, "opening exceeded its damage budget")
 				_check(not boss.dying and boss.health > 0, "vulnerability burst skipped a later mandatory trial")
 			var checkpoint := EnemySnapshot.capture(boss)
 			var expected := ritual.save_data()
 			EnemySnapshot.restore(boss, checkpoint)
 			_check(ritual.save_data() == expected, "trial progress or per-heart clocks changed on snapshot restore")
 			attack.advance(ritual.profile.recovery_seconds + boss.boss_phase_timer + 0.1)
+			_check(boss.boss_damage_budget == 0 and not ritual.blocks_damage(), "opening failed to resume targetable normal combat with a reset guard")
 			# Manually sampled tests may already have entered the next warning
 			# after the forced burst. Keep that checkpoint and inspect it next.
 			if ritual.busy():
 				attack.cancel()
 			count += 1
 		counts.append(count)
-		_check(ritual.used and count == (1 if difficulty == &"easy" else (2 if difficulty == &"normal" else 3)), "difficulty trial plan did not finish exactly once")
-	_check(counts == [1, 2, 3, 3], "hard difficulties did not add the courier examination")
+		_check(ritual.used and count == (1 if difficulty in [&"easy", &"normal"] else 2), "difficulty trial plan did not finish exactly once")
+	_check(counts == [1, 1, 2, 2], "reduced examination plan lost the hard-tier courier challenge")
 	# A surviving heart owns its volley: breaking another opens a clean route.
 	game.wave.difficulty_id = &"normal"
 	await _fresh(10)
@@ -109,8 +114,21 @@ func _run() -> void:
 	attack.advance(0.01)
 	attack.advance(ritual.profile.warning_seconds + ritual.duration + 2)
 	_check(ritual.escaped > 0 and ritual.missed > 0 and not ritual.blocks_damage() and not ritual.used, "courier leakage stalled the campaign or skipped remaining trials")
-	for bad in [{"pressure": {"shots": "bad"}}, {"pressure": {"shots": [{"position": [1]}]}}, {"completed_mask": "bad"}]:
+	# An old saved middle opening finishes safely; its stable definition/index
+	# remains loadable even though new fights no longer schedule that lesson.
+	await _fresh(10)
+	boss = game.boss
+	attack = boss.caramel_encounter
+	ritual = attack.overload
+	boss.boss_phase = 1
+	boss.boss_phase_timer = 0
+	boss.health = boss.max_health * 0.5
+	ritual.restore({"version": 2, "state": CaramelOverload.State.RECOVERY, "trial_index": 1, "completed_mask": 3, "remaining": 1.0})
+	_check(ritual.trial().objectives == 2 and ritual.opening_left > 0 and not ritual.trial().enabled, "old middle-trial save lost its definition or usable opening")
+	attack.advance(1.1)
+	_check(not ritual.busy() and not ritual.blocks_damage() and not ritual.used, "old opening replayed a removed trial or lost the final examination")
+	for bad in [{"pressure": {"shots": "bad"}}, {"pressure": {"shots": [{"position": [1]}]}}, {"completed_mask": "bad"}, {"opening_left": NAN}, {"opening_left": "bad"}]:
 		_check(not CaramelOverload.valid(bad), "malformed trial-pressure snapshot was accepted")
 	session.clear_run()
-	if failures.is_empty(): print("PASS caramel_trials: 1/2/3/3 trials, burst-proof milestones, independent heart pressure, courier movement/leaks, stable save identities and completed-checkpoint persistence")
+	if failures.is_empty(): print("PASS caramel_trials: 1/1/2/2 trials, bounded openings and reset guard, independent heart pressure, courier movement/leaks, current and legacy save persistence")
 	finish(0 if failures.is_empty() else 1)

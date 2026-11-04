@@ -6,6 +6,7 @@ enum BossSignature { AIMED_FAN, TRAIL_FAN, LANE, SPACE_ORB }
 enum SpriteFacing { FRONT, RIGHT, LEFT }
 
 @export var display_name: String
+@export var hud_name: String = ""
 @export var max_health: float = 25.0
 @export var health_per_wave: float = 0.0
 @export var late_health_acceleration: float = 0.0
@@ -33,6 +34,8 @@ enum SpriteFacing { FRONT, RIGHT, LEFT }
 @export var is_elite: bool = false
 @export var is_boss_objective: bool = false
 @export var imperial_vassal_profile: ImperialVassalData
+@export var caramel_enforcer_profile: CaramelEnforcerData
+@export var acid_collector_profile: AcidCollectorData
 @export var loot_goblin_profile: LootGoblinData
 @export var pillow_profile: PillowEncounterData
 @export var cloak_profile: CloakEncounterData

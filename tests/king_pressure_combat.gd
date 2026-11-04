@@ -2,6 +2,7 @@ extends "res://tests/support/test_runtime.gd"
 ## Real movement at baseline/minimum speed; no dash, weapons or teleports.
 
 const PROBE_PLAYER = preload("res://tools/balance/comparison_player.gd")
+const PILOT = preload("res://tools/balance/king_pressure_pilot.gd")
 var failures: Array[String] = []
 
 func _initialize() -> void: call_deferred("_run")
@@ -34,6 +35,9 @@ func _run() -> void:
 		paused = true
 		await process_frame
 		var boss: Enemy = game.boss
+		# This weaponless pilot isolates the ray/stream route. Live, attackable
+		# Schlacko is exercised by acid_collector and full automatic-weapon duels.
+		boss.acid_king_encounter.companion.legacy = true
 		var trial := boss.acid_king_encounter.pressure
 		trial.completed_mask = (1 << int(setup[4])) - 1
 		var threshold: float = trial.profile.health_thresholds[setup[4]]
@@ -41,28 +45,12 @@ func _run() -> void:
 		boss.boss_phase = 0 if threshold > 0.7 else (2 if threshold < 0.34 else 1)
 		boss.boss_phase_timer = 0
 		boss.acid_king_encounter.advance(0.01)
-		var goal := -1
-		var previous_state := -1
-		var escape := Vector2.ZERO
+		var pilot := PILOT.new()
 		var frames := 0
 		var damage_start: float = game.player.stats.health
 		while frames < 3600 and trial.state not in [KingPressureTrial.State.SHATTER, KingPressureTrial.State.BLAST_WARNING, KingPressureTrial.State.FINISHED]:
-			if goal < 0 or trial.valves[goal].broken:
-				goal = -1
-				for index in trial.valves.size():
-					if trial.valves[index].broken: continue
-					if goal < 0 or game.player.position.distance_to(trial.stance(index)) < game.player.position.distance_to(trial.stance(goal)): goal = index
-			var destination: Vector2 = trial.stance(goal) if goal >= 0 else game.player.position
-			if trial.state in [KingPressureTrial.State.LOCKED, KingPressureTrial.State.FIRING]:
-				if previous_state not in [KingPressureTrial.State.LOCKED, KingPressureTrial.State.FIRING]:
-					var sideways := trial.aim.orthogonal()
-					var side := signf((destination - trial.origin).dot(sideways))
-					if is_zero_approx(side): side = 1
-					var near := Geometry2D.get_closest_point_to_segment(game.player.position, trial.origin, trial.destination)
-					escape = near + sideways * side * 70
-				destination = escape
+			var destination: Vector2 = pilot.destination(trial)
 			game.player.probe_direction = game.player.position.direction_to(destination) if game.player.position.distance_to(destination) > 4 else Vector2.ZERO
-			previous_state = trial.state
 			paused = false
 			await physics_frame
 			await process_frame

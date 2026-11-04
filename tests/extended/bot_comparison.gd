@@ -109,7 +109,7 @@ func _run() -> void:
 	_check(continued.waves.size() == 6 and continued.outcome == "wave_complete", "full-flow probe did not continue after the first boss")
 	if continued.waves.size() == 6:
 		var boss_wave: Dictionary = continued.waves[4]
-		_check(boss_wave.combat.boss_ttk > 0 and boss_wave.seconds >= WaveController.DURATION, "full-flow boss kill skipped the remaining combat timer")
+		_check(boss_wave.combat.boss_ttk > 0 and boss_wave.seconds >= boss_wave.combat.boss_ttk and boss_wave.seconds < WaveController.DURATION, "full-flow boss stage did not end after the boss death without waiting for the old timer")
 		_check(boss_wave.after_rewards.relics.owned.size() == 1, "full-flow probe skipped its real offered boss relic")
 		var carried: Dictionary = continued.waves[5].start
 		for key in ["coins", "level", "xp", "xp_goal", "equipment", "upgrade_points", "gold_earned", "xp_earned", "chests"]:
@@ -129,7 +129,7 @@ func _run() -> void:
 	_pilot("expert", "element_leech")
 	final_flow_fixture = true
 	var final_flow := await sample_run("uv_lamp", &"normal", "kite", 101, 20, 20)
-	_check(final_flow.outcome == "victory" and final_flow.waves.size() == 1 and final_flow.waves[0].seconds >= WaveController.DURATION, "W20 probe did not wait for the real final reward queue and victory")
+	_check(final_flow.outcome == "victory" and final_flow.waves.size() == 1 and final_flow.waves[0].combat.boss_ttk > 0 and final_flow.waves[0].seconds >= final_flow.waves[0].combat.boss_ttk, "W20 probe did not wait for the boss death, real final reward queue and victory")
 	final_flow_fixture = false
 	_check(not root.get_node("GameSession").has_run(), "bot wrote a real player save")
 	print("PASS bot integration: bounded current-world perception, real projectile avoidance/dash costs, earned purchases/persistence and repeated deterministic inputs")

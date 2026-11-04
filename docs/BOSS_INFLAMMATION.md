@@ -22,9 +22,9 @@ Warnzeiten werden nicht verkürzt.
 
 | Boss | Aura | Grundintensität | Aura-Breite / Radius |
 | --- | --- | ---: | ---: |
-| Karies-Graf, Welle 5 | Orange | 0,65 | 3,2 |
-| Karies-Prinz, Welle 10 | Rot | 0,75 | 3,4 |
-| Karies-König, Welle 15 | Pink | 0,85 | 3,6 |
+| Plaquula, Welle 5 | Orange | 0,65 | 3,2 |
+| Don Karamello, Welle 10 | Rot | 0,75 | 3,4 |
+| Korrodon, der Ätzkoloss, Welle 15 | Pink | 0,85 | 3,6 |
 | Karies-Imperator, Welle 20 | Violett | 0,95 | 3,8 |
 
 Die Werte stehen in den vier EnemyData-Ressourcen. Der separate Baustein

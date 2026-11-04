@@ -44,7 +44,7 @@ func _run() -> void:
 	var bosses := BossEncounter.remaining(game.get_node("Enemies"))
 	_check(bosses.size() == 2, "test setup did not spawn two bosses")
 	bosses[0].data = bosses[0].data.duplicate()
-	bosses[0].data.display_name = "Karies-Graf mit einem besonders langen Herrschertitel"
+	bosses[0].data.display_name = "Plaquula mit einem besonders langen Herrschertitel"
 	bosses[0].overtime_active = true
 	bosses[0].overtime_seconds = 123
 	var attacks: Array[Dictionary] = [
@@ -132,6 +132,10 @@ func _run() -> void:
 				full_name_found = true
 		_check(full_name_found, "boss details do not expose the full boss name without hover")
 		_check(Rect2(Vector2.ZERO, Vector2(extent)).encloses(game.game_menu.build_panel.get_global_rect()), "boss details exceed viewport at %s" % extent)
+	game._spawn_enemy(EnemyCatalog.CAVITY_KING)
+	var korrodon: Enemy = game.get_node("Enemies").get_child(-1)
+	hud.update_bosses([korrodon])
+	_check(hud.boss_label.text == "Korrodon" and hud.boss_label.tooltip_text.contains("der Ätzkoloss"), "boss HUD lost the short name or full epithet")
 	paused = false
 	session.clear_run()
 	if failures.is_empty():

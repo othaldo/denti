@@ -7,9 +7,9 @@ const MIN_GAP := 0.075
 const PROFILES := {
 	"Denti": {"frequency": 300.0, "rate": 38.0, "body": 0.20, "volume": -19.0},
 	"Zahnfee": {"frequency": 530.0, "rate": 43.0, "body": 0.08, "volume": -23.0},
-	"Karies-Graf": {"frequency": 220.0, "rate": 35.0, "body": 0.38, "volume": -20.0},
-	"Karies-Prinz": {"frequency": 360.0, "rate": 40.0, "body": 0.26, "volume": -21.0},
-	"Karies-König": {"frequency": 170.0, "rate": 32.0, "body": 0.52, "volume": -20.0},
+	"Plaquula": {"frequency": 220.0, "rate": 35.0, "body": 0.38, "volume": -20.0},
+	"Don Karamello": {"frequency": 360.0, "rate": 40.0, "body": 0.26, "volume": -21.0},
+	"Korrodon, der Ätzkoloss": {"frequency": 170.0, "rate": 32.0, "body": 0.52, "volume": -20.0},
 	"Karies-Imperator": {"frequency": 130.0, "rate": 30.0, "body": 0.62, "volume": -20.0},
 }
 static var _streams: Dictionary = {}

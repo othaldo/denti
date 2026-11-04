@@ -58,6 +58,7 @@ func _run() -> void:
 		boss.boss_phase = 2
 		var a := boss.caramel_encounter
 		a.overload.used = true # Measure bomb routes independently of the objective phase.
+		a.bodyguard.legacy = true # This pilot reads only the bomb warning geometry.
 		for extent in [Vector2i(1280, 720), Vector2i(320, 568), Vector2i(568, 320)]:
 			root.size = extent
 			root.content_scale_size = extent

@@ -64,6 +64,7 @@ func _run() -> void:
 		var expected := 2 if difficulty in [&"easy", &"normal"] else 3
 		_check(retinue.state == ImperialRetinue.State.CHANNEL and retinue.live_minions().size() == expected, "Emperor summoned wrong unique lieutenant count")
 		_check(retinue.profile.thresholds.size() == (1 if difficulty == &"easy" else (2 if difficulty == &"normal" else 3)), "wrong difficulty-specific retinue plan")
+		await _check_hud(expected)
 		var before := boss.health
 		_check(boss.take_damage(1e9) == 0 and boss.health == before and not boss.is_targetable(), "Emperor could be killed through his lieutenants")
 		for minion in retinue.live_minions():
@@ -72,6 +73,9 @@ func _run() -> void:
 			var health := minion.health
 			minion.take_damage(1e9)
 			_check(minion.health > 0 and minion.health < health, "a lieutenant was a one-hit objective")
+			game._refresh_hud()
+			var slot: int = game.hud.retinue_display.members.find(minion)
+			_check(slot >= 0 and is_equal_approx(game.hud.retinue_display.frames[slot].material.get_shader_parameter("health_fill"), minion.health / minion.max_health), "damaging a lieutenant did not update its named bar")
 		court.advance(2)
 		_check(boss.health > before and boss.health - before <= boss.max_health * retinue.profile.regeneration_fraction, "keeper omitted or exceeded bounded regeneration")
 		var keeper: Enemy
@@ -81,6 +85,8 @@ func _run() -> void:
 		var after_keeper := boss.health
 		court.advance(3)
 		_check(boss.health == after_keeper and retinue.live_minions().size() == expected - 1, "killing the keeper did not stop regeneration")
+		game._refresh_hud()
+		_check(game.hud.retinue_display.members.size() == expected - 1, "dead keeper retained a named HUD bar")
 		_check(game.get_node("Loot").get_child_count() == 0 and BossEncounter.remaining(game.get_node("Enemies")).size() == 1, "vassal death generated stage loot or counted as a milestone boss")
 	# Actual scene reload preserves ownership, depleted guard and a fixed lance.
 	await _fresh()
@@ -117,6 +123,8 @@ func _run() -> void:
 	# Earned opening is finite and cannot skip directly to the next summon.
 	for minion in retinue.live_minions(): _kill(minion)
 	court.advance(0.01)
+	game._refresh_hud()
+	_check(not game.hud.retinue_display.visible, "cleared retinue retained HUD bars")
 	_check(retinue.state == ImperialRetinue.State.OPEN and boss.is_targetable(), "last lieutenant did not break the court shield")
 	boss.boss_damage_budget = 0
 	_check(is_equal_approx(boss.take_damage(10), 16.5), "court opening retained armor or the normal burst limit")
@@ -159,6 +167,8 @@ func _run() -> void:
 	_check(retinue.state == ImperialRetinue.State.FAILURE and retinue.shots.entries.is_empty(), "charge expired without a finisher warning")
 	court.advance(retinue.remaining + 0.01)
 	_check(not retinue.blocks_damage() and retinue.live_minions().size() == 3 and not retinue.shots.entries.is_empty(), "failed charge removed the challenge or left permanent immunity")
+	game._refresh_hud()
+	_check(game.hud.retinue_display.visible and game.hud.retinue_display.members.size() == 3, "failed charge hid the surviving lieutenants' health")
 	var survivor := retinue.live_minions()[0]
 	var elapsed := survivor.imperial_vassal.elapsed
 	court.advance(0.2)
@@ -173,3 +183,30 @@ func _run() -> void:
 	session.clear_run()
 	if failures.is_empty(): print("PASS imperial_retinue: unique lieutenants, burst protection, keeper regeneration, fixed warnings, finite openings, no extra stage loot, failure, real reload, pause and legacy")
 	finish(0 if failures.is_empty() else 1)
+
+func _check_hud(expected: int) -> void:
+	var display: HUDRetinue = game.hud.retinue_display
+	for extent in [Vector2i(1280, 720), Vector2i(320, 568), Vector2i(568, 320), Vector2i(1920, 1080)]:
+		root.content_scale_size = extent
+		root.size = extent
+		await process_frame
+		await process_frame
+		game._refresh_hud()
+		_check(display.visible and display.members.size() == expected, "retinue HUD omitted a live lieutenant")
+		var screen := Rect2(Vector2.ZERO, Vector2(extent))
+		_check(screen.encloses(display.get_global_rect()), "retinue HUD exceeds viewport at %s" % extent)
+		_check(not display.get_global_rect().intersects(game.hud.boss_rows[0].get_global_rect()), "retinue covers the Emperor's bar")
+		for index in expected:
+			var member := display.members[index]
+			var label := display.labels[index]
+			_check(label.text == member.data.display_name, "lieutenant HUD label names the wrong actor")
+			_check(label.get_theme_font("font").get_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, label.get_theme_font_size("font_size")).x <= label.size.x, "lieutenant name is clipped at %s: %s" % [extent, label.text])
+			_check(display.frames[index].material.get_shader_parameter("fill_shadow") == HUDRetinue.SHADOW, "lieutenant reused the red main-boss fill")
+			_check(is_equal_approx(display.frames[index].material.get_shader_parameter("health_fill"), member.health / member.max_health), "lieutenant bar displays the wrong health")
+			_check(display.rows[index].mouse_filter == Control.MOUSE_FILTER_IGNORE, "lieutenant HUD blocks movement input")
+			for other in range(index + 1, expected):
+				_check(not display.rows[index].get_global_rect().intersects(display.rows[other].get_global_rect()), "lieutenant HUD bars overlap")
+	root.content_scale_size = Vector2i(1280, 720)
+	root.size = Vector2i(1280, 720)
+	await process_frame
+	await process_frame

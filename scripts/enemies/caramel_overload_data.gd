@@ -12,6 +12,7 @@ extends Resource
 @export var layout_extent := Vector2(640, 360)
 @export var recovery_seconds: float = 4.0
 @export var vulnerability: float = 1.75
+@export_range(0.01, 0.25) var opening_damage_fraction: float = 0.08
 @export var lane_warning_seconds: float = 1.0
 @export var lane_active_seconds: float = 0.25
 @export var lane_pause_seconds: float = 1.5
@@ -33,6 +34,6 @@ func for_difficulty(difficulty: DifficultyData) -> CaramelOverloadData:
 func enabled_mask() -> int:
 	var mask := 0
 	for index in trials.size():
-		if rank >= trials[index].minimum_rank: mask |= 1 << index
+		if trials[index].enabled_for_rank(rank): mask |= 1 << index
 	return mask
 

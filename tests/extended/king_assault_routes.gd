@@ -100,6 +100,7 @@ func _run() -> void:
 		boss.set_simulation_enabled(false)
 		boss.boss_phase = 2
 		var a := boss.acid_king_encounter
+		a.companion.legacy = true # Original boss-only routes; full minion duels have a separate probe.
 		for extent in [Vector2i(1280, 720), Vector2i(320, 568), Vector2i(568, 320)]:
 			root.size = extent
 			root.content_scale_size = extent

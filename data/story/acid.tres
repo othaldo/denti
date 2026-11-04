@@ -7,9 +7,9 @@
 [resource]
 script = ExtResource("1")
 boss = ExtResource("3")
-boss_dialogue = Array[Dictionary]([{"speaker":"Karies-König","text":"Ein unbeschädigter Backenzahn. Selten. Dich stelle ich zu meinen besten Stücken."},
+boss_dialogue = Array[Dictionary]([{"speaker":"Korrodon, der Ätzkoloss","text":"Ein unbeschädigter Backenzahn. Selten. Dich stelle ich zu meinen besten Stücken."},
 {"speaker":"Denti","text":"Du sammelst Zähne? Ich sammle Portalfragmente. Deins fehlt noch."},
-{"speaker":"Karies-König","text":"Dafür müsste von dir erst etwas übrig bleiben."},
+{"speaker":"Korrodon, der Ätzkoloss","text":"Dafür müsste von dir erst etwas übrig bleiben."},
 {"speaker":"Denti","text":"Schmelz ist das härteste Material im Körper. Du bist nur Säure mit Selbstbewusstsein.","action":"Kämpfen"}])
 id = &"acid"
 title = "Tief im Säurestrom"

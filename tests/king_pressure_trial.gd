@@ -35,6 +35,7 @@ func _fresh(difficulty: StringName = &"normal") -> void:
 	game._create_enemy(EnemyCatalog.CAVITY_KING, game.player.global_position + Vector2(-200, -100))
 	boss = game.boss
 	attack = boss.acid_king_encounter
+	attack.companion.legacy = true # Isolate valve/ray geometry; live minion phases have separate tests.
 	trial = attack.pressure
 	boss.health = boss.max_health * trial.profile.health_thresholds[0]
 	boss.boss_phase = 1 if trial.profile.health_thresholds[0] < 0.7 else 0

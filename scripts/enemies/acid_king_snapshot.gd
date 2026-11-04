@@ -8,6 +8,8 @@ static func _vector(value: Variant) -> bool:
 	return value is Array and value.size() == 2 and _number(value[0]) and _number(value[1])
 
 static func valid(saved: Dictionary) -> bool:
+	if not KingAcidWake.valid(saved.get("acid_wake", {})): return false
+	if not BossCompanion.valid(saved.get("companion", {})): return false
 	if not KingPressureTrial.valid(saved.get("pressure", {})): return false
 	for key in ["version", "state", "remaining", "elapsed", "cycle", "attack_kind", "shift_index", "axis", "stomp_index", "stomp_total"]:
 		if saved.has(key) and not _number(saved[key]): return false
@@ -45,6 +47,8 @@ static func capture(encounter: AcidKingEncounter) -> Dictionary:
 	var saved := {"version": encounter.SAVE_VERSION, "state": int(encounter.state), "remaining": encounter.remaining, "elapsed": encounter.elapsed, "cycle": encounter.cycle, "attack_kind": int(encounter.attack_kind), "shift_index": encounter.shift_index, "axis": encounter.axis, "anchor": SnapshotValues.vector_data(encounter.anchor), "aim": SnapshotValues.vector_data(encounter.aim), "pending": [], "fields": [], "rows": [], "projectiles": encounter.volley.save_data()}
 	saved.merge({"spit_origin": SnapshotValues.vector_data(encounter.spit_origin), "spit_rays": [], "spit_projectiles": encounter.spit.save_data(), "stomp_index": encounter.stomp_index, "stomp_total": encounter.stomp_total})
 	saved["pressure"] = encounter.pressure.save_data() if encounter.pressure != null else {}
+	saved["acid_wake"] = encounter.acid_wake.save_data() if encounter.acid_wake != null else {}
+	saved["companion"] = encounter.companion.save_data() if encounter.companion != null else {}
 	for ray in encounter.spit_rays: saved.spit_rays.append(SnapshotValues.vector_data(ray))
 	for key in ["pending", "fields", "rows"]:
 		for raw: Dictionary in encounter.get(key):
@@ -57,7 +61,7 @@ static func capture(encounter: AcidKingEncounter) -> Dictionary:
 static func restore(encounter: AcidKingEncounter, saved: Dictionary) -> void:
 	encounter.cancel()
 	var version := int(saved.get("version", 0))
-	if version not in [1, 2, encounter.SAVE_VERSION]: return
+	if version not in [1, 2, 3, encounter.SAVE_VERSION]: return
 	encounter.state = clampi(int(saved.get("state", 0)), 0, AcidKingEncounter.State.PURSUE if version == 1 else AcidKingEncounter.State.CHASE_STOMP) as AcidKingEncounter.State
 	encounter.cycle = maxi(int(saved.get("cycle", 0)), 0)
 	encounter.attack_kind = clampi(int(saved.get("attack_kind", 0)), 0, 2) as AcidKingEncounter.Attack
@@ -99,6 +103,12 @@ static func restore(encounter: AcidKingEncounter, saved: Dictionary) -> void:
 		if version < 3:
 			encounter.pressure.used = true
 			encounter.pressure.state = KingPressureTrial.State.FINISHED
+	if encounter.acid_wake != null:
+		encounter.acid_wake.restore(saved.get("acid_wake", {}))
+		if version < 4: encounter.acid_wake.legacy = true
+	if encounter.companion != null:
+		encounter.companion.restore(saved.get("companion", {}))
+		if version < 4: encounter.companion.legacy = true
 	encounter.enemy.special_phase = Enemy.SpecialPhase.COOLDOWN
 	encounter.enemy.boss_radial_volleys_remaining = 0
 	encounter.enemy.boss_phase_burst_fired = true

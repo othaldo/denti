@@ -20,6 +20,7 @@ var missed := 0
 var escaped := 0
 var trial_index := 2
 var completed_mask := 0
+var opening_left := 0.0
 var anchor := Vector2.ZERO
 var pylons: Array[Enemy] = []
 var pressure := CaramelRitualPressure.new()
@@ -36,7 +37,7 @@ func next_trial() -> int:
 	var enemy := encounter.enemy
 	for index in range(profile.trials.size() - 1, -1, -1):
 		var definition := profile.trials[index]
-		if profile.rank < definition.minimum_rank or completed_mask & (1 << index): continue
+		if not definition.enabled_for_rank(profile.rank) or completed_mask & (1 << index): continue
 		if enemy.health <= enemy.max_health * definition.health_fraction + 0.01 or enemy.boss_phase >= 2:
 			return index
 		if definition.health_fraction >= 0.66 and enemy.boss_phase >= 1: return index
@@ -44,12 +45,21 @@ func next_trial() -> int:
 
 func damage_limit() -> float:
 	var enemy := encounter.enemy
-	var limit := enemy.health
+	var limit := minf(enemy.health, opening_left) if state == State.RECOVERY else enemy.health
 	if used or profile == null: return limit
 	for index in profile.trials.size():
-		if profile.rank < profile.trials[index].minimum_rank or completed_mask & (1 << index): continue
+		if not profile.trials[index].enabled_for_rank(profile.rank) or completed_mask & (1 << index): continue
 		limit = minf(limit, maxf(enemy.health - enemy.max_health * profile.trials[index].health_fraction, 0))
 	return limit
+
+func spend_opening_damage(amount: float) -> void:
+	opening_left = maxf(opening_left - amount, 0)
+
+func _finish_opening() -> void:
+	state = State.FINISHED
+	opening_left = 0
+	encounter.enemy.boss_damage_budget = 0
+	encounter._recover()
 
 func pending() -> bool:
 	return next_trial() >= 0
@@ -128,10 +138,9 @@ func bind_pylon(pylon: Enemy) -> void:
 		pylon.add_child(visual)
 
 func advance(delta: float) -> bool:
-	# A strong counterattack can reach the next checkpoint early. End the gold
-	# opening there instead of showing vulnerability while swallowing damage.
-	if state == State.RECOVERY and not used and damage_limit() <= 0.01:
-		state = State.FINISHED
+	# Spend a bounded counterattack, then resume normal attacks immediately.
+	# Resetting the guard makes room for combat between the two examinations.
+	if state == State.RECOVERY and damage_limit() <= 0.01: _finish_opening()
 	if pending() and encounter.enemy.boss_phase_timer <= 0:
 		if not available(): return true
 		begin()
@@ -189,8 +198,7 @@ func _next() -> void:
 			encounter._recover()
 			encounter.enemy.attack_performed.emit(&"boss_pulse")
 		State.RECOVERY:
-			state = State.FINISHED
-			encounter._recover()
+			_finish_opening()
 
 func _success() -> void:
 	_complete_trial()
@@ -199,7 +207,8 @@ func _success() -> void:
 	encounter.hearts.clear()
 	state = State.RECOVERY
 	remaining = profile.recovery_seconds
-	encounter.enemy.boss_damage_budget = encounter.enemy.max_health * encounter.enemy.data.boss_guard_burst_fraction
+	opening_left = encounter.enemy.max_health * profile.opening_damage_fraction
+	encounter.enemy.boss_damage_budget = 0
 	encounter.enemy.attack_performed.emit(&"boss_break")
 
 func _complete_trial() -> void:
@@ -224,11 +233,12 @@ func _clear_pylons() -> void:
 func cancel() -> void:
 	_clear_pylons()
 	pressure.clear()
+	opening_left = 0
 	state = State.FINISHED if used else State.IDLE
 	queue_redraw()
 
 func save_data() -> Dictionary:
-	return {"version": 2, "state": int(state), "used": used, "remaining": remaining, "duration": duration, "opening_distance": opening_distance, "elapsed": elapsed, "lane_state": lane_state, "lane_remaining": lane_remaining, "lane_angle": lane_angle, "lane_index": lane_index, "missed": missed, "anchor": SnapshotValues.vector_data(anchor), "trial_index": trial_index, "completed_mask": completed_mask, "escaped": escaped, "pressure": pressure.save_data()}
+	return {"version": 3, "state": int(state), "used": used, "remaining": remaining, "duration": duration, "opening_distance": opening_distance, "elapsed": elapsed, "lane_state": lane_state, "lane_remaining": lane_remaining, "lane_angle": lane_angle, "lane_index": lane_index, "missed": missed, "anchor": SnapshotValues.vector_data(anchor), "trial_index": trial_index, "completed_mask": completed_mask, "opening_left": opening_left, "escaped": escaped, "pressure": pressure.save_data()}
 
 func restore(saved: Dictionary) -> void:
 	_clear_pylons()
@@ -236,6 +246,7 @@ func restore(saved: Dictionary) -> void:
 	used = bool(saved.get("used", false))
 	trial_index = clampi(int(saved.get("trial_index", 2)), 0, maxi(profile.trials.size() - 1, 0))
 	completed_mask = clampi(int(saved.get("completed_mask", 0)), 0, 7)
+	opening_left = clampf(float(saved.get("opening_left", encounter.enemy.max_health * profile.opening_damage_fraction if state == State.RECOVERY else 0)), 0, encounter.enemy.max_health * profile.opening_damage_fraction)
 	escaped = clampi(int(saved.get("escaped", 0)), 0, 4)
 	duration = clampf(float(saved.get("duration", 0)), 0, profile.maximum_seconds)
 	opening_distance = clampf(float(saved.get("opening_distance", profile.opening_distance)), 32, profile.opening_distance)
@@ -256,8 +267,9 @@ func restore(saved: Dictionary) -> void:
 
 static func valid(saved: Variant) -> bool:
 	if not saved is Dictionary: return false
-	for key in ["version", "state", "remaining", "duration", "opening_distance", "elapsed", "lane_state", "lane_remaining", "lane_angle", "lane_index", "missed", "trial_index", "completed_mask", "escaped"]:
+	for key in ["version", "state", "remaining", "duration", "opening_distance", "elapsed", "lane_state", "lane_remaining", "lane_angle", "lane_index", "missed", "trial_index", "completed_mask", "escaped", "opening_left"]:
 		if saved.has(key) and not (saved[key] is int or saved[key] is float): return false
+		if saved.has(key) and not is_finite(float(saved[key])): return false
 	if saved.has("used") and not saved.used is bool: return false
 	if saved.has("anchor"):
 		if not saved.anchor is Array or saved.anchor.size() != 2: return false

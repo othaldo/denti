@@ -36,6 +36,8 @@ static func capture(enemy: Enemy) -> Dictionary:
 		"crown_court": enemy.crown_court_encounter.save_data() if enemy.crown_court_encounter != null else {},
 		"loot_goblin": enemy.loot_goblin.save_data() if enemy.loot_goblin != null else {},
 		"imperial_vassal": enemy.imperial_vassal.save_data() if enemy.imperial_vassal != null else {},
+		"caramel_enforcer": enemy.caramel_enforcer.save_data() if enemy.caramel_enforcer != null else {},
+		"acid_collector": enemy.acid_collector.save_data() if enemy.acid_collector != null else {},
 	}
 
 
@@ -102,4 +104,6 @@ static func restore(enemy: Enemy, entry: Dictionary, boss_pending: bool = false)
 	if enemy.loot_goblin != null:
 		enemy.loot_goblin.restore(entry.get("loot_goblin", {}))
 	if enemy.imperial_vassal != null: enemy.imperial_vassal.restore(entry.get("imperial_vassal", {}))
+	if enemy.caramel_enforcer != null: enemy.caramel_enforcer.restore(entry.get("caramel_enforcer", {}))
+	if enemy.acid_collector != null: enemy.acid_collector.restore(entry.get("acid_collector", {}))
 	enemy.queue_redraw()

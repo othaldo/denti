@@ -1,0 +1,632 @@
+{
+	"arguments": [
+		"--waves=20",
+		"--difficulties=hell",
+		"--builds=ranged_single",
+		"--policies=reactive",
+		"--seeds=13579,13579,13579",
+		"--output=res://.godot/boss_pressure_determinism.json"
+	],
+	"engine": "4.7.2-stable (official)",
+	"hz": 60,
+	"method": "Full real encounters; six stage-tier weapons, base profile, no items/affixes, armor retained. Open arena, 280-unit start. Diagnostic 100000 HP reserve with reference max HP used for normal hit protection. No dash. Real-time SFX callbacks suppressed to keep their throttling out of global combat RNG. Objective knowledge explicit; King beam uses a dedicated route pilot in every policy. Seeker does not dodge outside that puzzle; circle only orbits; reactive reads visible warnings with regular-profile delay. Gross damage is not a human survival rate. Threatened fraction is the regular pilot's standing risk >= 1 sampled at 10 Hz; a bot-specific proxy, not an objective difficulty score.",
+	"samples": [
+		{
+			"boss": "Karies-Imperator",
+			"boss_health_phases": 3,
+			"boss_hp": 20841.9998538494,
+			"boss_hp_remaining": 0.0,
+			"build": "ranged_single",
+			"build_setup": {
+				"build": "ranged_single",
+				"capsules": 0,
+				"equipment": [
+					{
+						"affix_slots": 4,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 123,
+						"rolls": {},
+						"tier": 4,
+						"uid": "probe_0"
+					},
+					{
+						"affix_slots": 4,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 123,
+						"rolls": {},
+						"tier": 4,
+						"uid": "probe_1"
+					},
+					{
+						"affix_slots": 4,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 123,
+						"rolls": {},
+						"tier": 4,
+						"uid": "probe_2"
+					},
+					{
+						"affix_slots": 4,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 123,
+						"rolls": {},
+						"tier": 4,
+						"uid": "probe_3"
+					},
+					{
+						"affix_slots": 4,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 123,
+						"rolls": {},
+						"tier": 4,
+						"uid": "probe_4"
+					},
+					{
+						"affix_slots": 4,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 123,
+						"rolls": {},
+						"tier": 4,
+						"uid": "probe_5"
+					}
+				],
+				"gold_budget": 2200,
+				"gold_unspent": 1462,
+				"item_gold": 0,
+				"items": [],
+				"mode": "base",
+				"roots": 6,
+				"stats": {
+					"armor": 12.0,
+					"attack_speed": 40.0,
+					"crit_chance": 0.15,
+					"damage_bonus": 40.0,
+					"max_health": 160.0,
+					"melee_damage": 0.0,
+					"ranged_damage": 16.0
+				},
+				"tier": 4,
+				"upgrade_points": 0,
+				"wave": 20,
+				"weapon_gold": 738
+			},
+			"damage": 788.981121645193,
+			"damage_by_source": {
+				"emperor": 761.958899062185,
+				"retinue": 27.0222225830075
+			},
+			"damage_per_second": 12.9305838018879,
+			"difficulty": "hell",
+			"hits": [
+				{
+					"damage": 70.7388898333593,
+					"seconds": 1.26666666666667,
+					"source": "emperor"
+				},
+				{
+					"damage": 70.7388898333593,
+					"seconds": 2.7,
+					"source": "emperor"
+				},
+				{
+					"damage": 70.7388898333593,
+					"seconds": 4.15,
+					"source": "emperor"
+				},
+				{
+					"damage": 38.4011116238253,
+					"seconds": 10.6666666666667,
+					"source": "emperor"
+				},
+				{
+					"damage": 80.844445523835,
+					"seconds": 16.9166666666667,
+					"source": "emperor"
+				},
+				{
+					"damage": 32.337778209534,
+					"seconds": 22.9666666666667,
+					"source": "emperor"
+				},
+				{
+					"damage": 13.5111112915038,
+					"seconds": 27.3,
+					"source": "retinue"
+				},
+				{
+					"damage": 38.4011116238253,
+					"seconds": 28.95,
+					"source": "emperor"
+				},
+				{
+					"damage": 13.5111112915038,
+					"seconds": 30.0166666666667,
+					"source": "retinue"
+				},
+				{
+					"damage": 70.7388898333593,
+					"seconds": 34.0833333333333,
+					"source": "emperor"
+				},
+				{
+					"damage": 70.7388898333593,
+					"seconds": 36.9666666666667,
+					"source": "emperor"
+				},
+				{
+					"damage": 70.7388898333593,
+					"seconds": 38.4,
+					"source": "emperor"
+				},
+				{
+					"damage": 38.4011116238253,
+					"seconds": 55.4333333333333,
+					"source": "emperor"
+				},
+				{
+					"damage": 38.4011116238253,
+					"seconds": 56.9,
+					"source": "emperor"
+				},
+				{
+					"damage": 32.337778209534,
+					"seconds": 58.2166666666667,
+					"source": "emperor"
+				},
+				{
+					"damage": 38.4011116238253,
+					"seconds": 60.3333333333333,
+					"source": "emperor"
+				}
+			],
+			"hp_bars_lost": 4.93113201028245,
+			"immune_seconds": 22.1333333333333,
+			"minion_seconds": 22.0333333333333,
+			"minion_task_seconds": 22.0333333333333,
+			"moving_fraction": 0.67112810707457,
+			"outcome": "boss_killed",
+			"policy": "reactive",
+			"reference_player_hp": 160.0,
+			"seconds": 61.0166666666667,
+			"seed": 13579,
+			"task_seconds": 24.2666666666667,
+			"threatened_fraction": 0.352362742420104,
+			"tier": 4,
+			"trial_failures": 0,
+			"trials": {
+				"0": {
+					"seconds": 7.84999999999998,
+					"start": 5.5
+				},
+				"1": {
+					"seconds": 8.41666666666666,
+					"start": 24.2
+				},
+				"2": {
+					"seconds": 7.99999999999998,
+					"start": 44.8833333333333
+				}
+			},
+			"warning_count": 54,
+			"wave": 20
+		},
+		{
+			"boss": "Karies-Imperator",
+			"boss_health_phases": 3,
+			"boss_hp": 20841.9998538494,
+			"boss_hp_remaining": 0.0,
+			"build": "ranged_single",
+			"build_setup": {
+				"build": "ranged_single",
+				"capsules": 0,
+				"equipment": [
+					{
+						"affix_slots": 4,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 123,
+						"rolls": {},
+						"tier": 4,
+						"uid": "probe_0"
+					},
+					{
+						"affix_slots": 4,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 123,
+						"rolls": {},
+						"tier": 4,
+						"uid": "probe_1"
+					},
+					{
+						"affix_slots": 4,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 123,
+						"rolls": {},
+						"tier": 4,
+						"uid": "probe_2"
+					},
+					{
+						"affix_slots": 4,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 123,
+						"rolls": {},
+						"tier": 4,
+						"uid": "probe_3"
+					},
+					{
+						"affix_slots": 4,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 123,
+						"rolls": {},
+						"tier": 4,
+						"uid": "probe_4"
+					},
+					{
+						"affix_slots": 4,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 123,
+						"rolls": {},
+						"tier": 4,
+						"uid": "probe_5"
+					}
+				],
+				"gold_budget": 2200,
+				"gold_unspent": 1462,
+				"item_gold": 0,
+				"items": [],
+				"mode": "base",
+				"roots": 6,
+				"stats": {
+					"armor": 12.0,
+					"attack_speed": 40.0,
+					"crit_chance": 0.15,
+					"damage_bonus": 40.0,
+					"max_health": 160.0,
+					"melee_damage": 0.0,
+					"ranged_damage": 16.0
+				},
+				"tier": 4,
+				"upgrade_points": 0,
+				"wave": 20,
+				"weapon_gold": 738
+			},
+			"damage": 788.981121645193,
+			"damage_by_source": {
+				"emperor": 761.958899062185,
+				"retinue": 27.0222225830075
+			},
+			"damage_per_second": 12.9305838018879,
+			"difficulty": "hell",
+			"hits": [
+				{
+					"damage": 70.7388898333593,
+					"seconds": 1.26666666666667,
+					"source": "emperor"
+				},
+				{
+					"damage": 70.7388898333593,
+					"seconds": 2.7,
+					"source": "emperor"
+				},
+				{
+					"damage": 70.7388898333593,
+					"seconds": 4.15,
+					"source": "emperor"
+				},
+				{
+					"damage": 38.4011116238253,
+					"seconds": 10.6666666666667,
+					"source": "emperor"
+				},
+				{
+					"damage": 80.844445523835,
+					"seconds": 16.9166666666667,
+					"source": "emperor"
+				},
+				{
+					"damage": 32.337778209534,
+					"seconds": 22.9666666666667,
+					"source": "emperor"
+				},
+				{
+					"damage": 13.5111112915038,
+					"seconds": 27.3,
+					"source": "retinue"
+				},
+				{
+					"damage": 38.4011116238253,
+					"seconds": 28.95,
+					"source": "emperor"
+				},
+				{
+					"damage": 13.5111112915038,
+					"seconds": 30.0166666666667,
+					"source": "retinue"
+				},
+				{
+					"damage": 70.7388898333593,
+					"seconds": 34.0833333333333,
+					"source": "emperor"
+				},
+				{
+					"damage": 70.7388898333593,
+					"seconds": 36.9666666666667,
+					"source": "emperor"
+				},
+				{
+					"damage": 70.7388898333593,
+					"seconds": 38.4,
+					"source": "emperor"
+				},
+				{
+					"damage": 38.4011116238253,
+					"seconds": 55.4333333333333,
+					"source": "emperor"
+				},
+				{
+					"damage": 38.4011116238253,
+					"seconds": 56.9,
+					"source": "emperor"
+				},
+				{
+					"damage": 32.337778209534,
+					"seconds": 58.2166666666667,
+					"source": "emperor"
+				},
+				{
+					"damage": 38.4011116238253,
+					"seconds": 60.3333333333333,
+					"source": "emperor"
+				}
+			],
+			"hp_bars_lost": 4.93113201028245,
+			"immune_seconds": 22.1333333333333,
+			"minion_seconds": 22.0333333333333,
+			"minion_task_seconds": 22.0333333333333,
+			"moving_fraction": 0.67112810707457,
+			"outcome": "boss_killed",
+			"policy": "reactive",
+			"reference_player_hp": 160.0,
+			"seconds": 61.0166666666667,
+			"seed": 13579,
+			"task_seconds": 24.2666666666667,
+			"threatened_fraction": 0.352362742420104,
+			"tier": 4,
+			"trial_failures": 0,
+			"trials": {
+				"0": {
+					"seconds": 7.84999999999998,
+					"start": 5.5
+				},
+				"1": {
+					"seconds": 8.41666666666666,
+					"start": 24.2
+				},
+				"2": {
+					"seconds": 7.99999999999998,
+					"start": 44.8833333333333
+				}
+			},
+			"warning_count": 54,
+			"wave": 20
+		},
+		{
+			"boss": "Karies-Imperator",
+			"boss_health_phases": 3,
+			"boss_hp": 20841.9998538494,
+			"boss_hp_remaining": 0.0,
+			"build": "ranged_single",
+			"build_setup": {
+				"build": "ranged_single",
+				"capsules": 0,
+				"equipment": [
+					{
+						"affix_slots": 4,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 123,
+						"rolls": {},
+						"tier": 4,
+						"uid": "probe_0"
+					},
+					{
+						"affix_slots": 4,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 123,
+						"rolls": {},
+						"tier": 4,
+						"uid": "probe_1"
+					},
+					{
+						"affix_slots": 4,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 123,
+						"rolls": {},
+						"tier": 4,
+						"uid": "probe_2"
+					},
+					{
+						"affix_slots": 4,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 123,
+						"rolls": {},
+						"tier": 4,
+						"uid": "probe_3"
+					},
+					{
+						"affix_slots": 4,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 123,
+						"rolls": {},
+						"tier": 4,
+						"uid": "probe_4"
+					},
+					{
+						"affix_slots": 4,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 123,
+						"rolls": {},
+						"tier": 4,
+						"uid": "probe_5"
+					}
+				],
+				"gold_budget": 2200,
+				"gold_unspent": 1462,
+				"item_gold": 0,
+				"items": [],
+				"mode": "base",
+				"roots": 6,
+				"stats": {
+					"armor": 12.0,
+					"attack_speed": 40.0,
+					"crit_chance": 0.15,
+					"damage_bonus": 40.0,
+					"max_health": 160.0,
+					"melee_damage": 0.0,
+					"ranged_damage": 16.0
+				},
+				"tier": 4,
+				"upgrade_points": 0,
+				"wave": 20,
+				"weapon_gold": 738
+			},
+			"damage": 788.981121645193,
+			"damage_by_source": {
+				"emperor": 761.958899062185,
+				"retinue": 27.0222225830075
+			},
+			"damage_per_second": 12.9305838018879,
+			"difficulty": "hell",
+			"hits": [
+				{
+					"damage": 70.7388898333593,
+					"seconds": 1.26666666666667,
+					"source": "emperor"
+				},
+				{
+					"damage": 70.7388898333593,
+					"seconds": 2.7,
+					"source": "emperor"
+				},
+				{
+					"damage": 70.7388898333593,
+					"seconds": 4.15,
+					"source": "emperor"
+				},
+				{
+					"damage": 38.4011116238253,
+					"seconds": 10.6666666666667,
+					"source": "emperor"
+				},
+				{
+					"damage": 80.844445523835,
+					"seconds": 16.9166666666667,
+					"source": "emperor"
+				},
+				{
+					"damage": 32.337778209534,
+					"seconds": 22.9666666666667,
+					"source": "emperor"
+				},
+				{
+					"damage": 13.5111112915038,
+					"seconds": 27.3,
+					"source": "retinue"
+				},
+				{
+					"damage": 38.4011116238253,
+					"seconds": 28.95,
+					"source": "emperor"
+				},
+				{
+					"damage": 13.5111112915038,
+					"seconds": 30.0166666666667,
+					"source": "retinue"
+				},
+				{
+					"damage": 70.7388898333593,
+					"seconds": 34.0833333333333,
+					"source": "emperor"
+				},
+				{
+					"damage": 70.7388898333593,
+					"seconds": 36.9666666666667,
+					"source": "emperor"
+				},
+				{
+					"damage": 70.7388898333593,
+					"seconds": 38.4,
+					"source": "emperor"
+				},
+				{
+					"damage": 38.4011116238253,
+					"seconds": 55.4333333333333,
+					"source": "emperor"
+				},
+				{
+					"damage": 38.4011116238253,
+					"seconds": 56.9,
+					"source": "emperor"
+				},
+				{
+					"damage": 32.337778209534,
+					"seconds": 58.2166666666667,
+					"source": "emperor"
+				},
+				{
+					"damage": 38.4011116238253,
+					"seconds": 60.3333333333333,
+					"source": "emperor"
+				}
+			],
+			"hp_bars_lost": 4.93113201028245,
+			"immune_seconds": 22.1333333333333,
+			"minion_seconds": 22.0333333333333,
+			"minion_task_seconds": 22.0333333333333,
+			"moving_fraction": 0.67112810707457,
+			"outcome": "boss_killed",
+			"policy": "reactive",
+			"reference_player_hp": 160.0,
+			"seconds": 61.0166666666667,
+			"seed": 13579,
+			"task_seconds": 24.2666666666667,
+			"threatened_fraction": 0.352362742420104,
+			"tier": 4,
+			"trial_failures": 0,
+			"trials": {
+				"0": {
+					"seconds": 7.84999999999998,
+					"start": 5.5
+				},
+				"1": {
+					"seconds": 8.41666666666666,
+					"start": 24.2
+				},
+				"2": {
+					"seconds": 7.99999999999998,
+					"start": 44.8833333333333
+				}
+			},
+			"warning_count": 54,
+			"wave": 20
+		}
+	],
+	"schema": 1,
+	"time_scale": 1.0
+}

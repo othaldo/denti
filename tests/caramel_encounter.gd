@@ -49,6 +49,9 @@ func _run() -> void:
 	boss = game.boss
 	boss.set_simulation_enabled(false)
 	attack = boss.caramel_encounter
+	# Serial windup/flight and legacy saves remain supported independently of
+	# the live profile's overlapping volleys (covered by prince_bomb_frequency).
+	attack.profile.bomb_frequency = 1.0
 	paused = true
 	_check(attack != null and attack.rig.bones.size() == 5, "Prince did not replace generic attacks with a skeletal caramel encounter")
 	_check(attack.profile.throws_for_phase(0) == 2 and attack.profile.throws_for_phase(1) == 3, "Prince does not progress from two to three throws")

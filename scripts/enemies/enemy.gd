@@ -30,6 +30,8 @@ const WET_STATUS = preload("res://data/statuses/wet.tres")
 var data: EnemyData
 var difficulty: DifficultyData
 var imperial_vassal: ImperialVassal
+var caramel_enforcer: CaramelEnforcer
+var acid_collector: AcidCollector
 var target: Player
 var health: float
 var max_health: float
@@ -164,6 +166,18 @@ func _ready() -> void:
 		imperial_vassal.enemy = self
 		imperial_vassal.profile = data.imperial_vassal_profile.for_difficulty(difficulty)
 		add_child(imperial_vassal)
+	if data.caramel_enforcer_profile != null:
+		sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		caramel_enforcer = CaramelEnforcer.new()
+		caramel_enforcer.enemy = self
+		caramel_enforcer.profile = data.caramel_enforcer_profile.for_difficulty(difficulty)
+		add_child(caramel_enforcer)
+	if data.acid_collector_profile != null:
+		sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		acid_collector = AcidCollector.new()
+		acid_collector.enemy = self
+		acid_collector.profile = data.acid_collector_profile.for_difficulty(difficulty)
+		add_child(acid_collector)
 	animation_time = randf_range(0.0, TAU)
 	if data.loot_goblin_profile != null:
 		loot_goblin = LootGoblin.new()
@@ -266,7 +280,9 @@ func _physics_process(delta: float) -> void:
 			queue_redraw()
 	if data.is_boss and data.boss_guard_recharge_seconds > 0.0:
 		var was_low_guard := boss_damage_budget <= max_health * 0.01
-		boss_damage_budget = minf(boss_damage_budget + max_health * delta / data.boss_guard_recharge_seconds, max_health * data.boss_guard_burst_fraction)
+		var guard_seconds := data.boss_guard_recharge_seconds
+		if caramel_encounter != null: guard_seconds *= caramel_encounter.profile.guard_recharge_multiplier
+		boss_damage_budget = minf(boss_damage_budget + max_health * delta / guard_seconds, max_health * data.boss_guard_burst_fraction)
 		if was_low_guard != (boss_damage_budget <= max_health * 0.01):
 			queue_redraw()
 		if boss_phase_timer > 0.0:
@@ -653,6 +669,8 @@ func take_damage(amount: float, weapon: WeaponData = null, critical: bool = fals
 		applied = minf(applied, acid_king_encounter.pressure.damage_limit(proc_id == &"king_backfire"))
 	if crown_court_encounter != null and crown_court_encounter.retinue != null: applied = minf(applied, crown_court_encounter.retinue.damage_limit())
 	if imperial_vassal != null: applied = imperial_vassal.limit(applied)
+	if caramel_enforcer != null: applied = caramel_enforcer.limit(applied)
+	if acid_collector != null: applied = acid_collector.limit(applied)
 	if (overload_open or king_open or court_open) and boss_phase < 2:
 		applied = minf(applied, maxf(health - _boss_phase_floor(), 0.0))
 	if applied <= 0:
@@ -678,6 +696,9 @@ func take_damage(amount: float, weapon: WeaponData = null, critical: bool = fals
 	var counted := minf(applied, health)
 	health -= applied
 	if imperial_vassal != null: imperial_vassal.spend(counted)
+	if caramel_enforcer != null: caramel_enforcer.spend(counted)
+	if acid_collector != null: acid_collector.spend(counted)
+	if overload_open: caramel_encounter.overload.spend_opening_damage(counted)
 	if court_open: crown_court_encounter.retinue.opening_left = maxf(crown_court_encounter.retinue.opening_left - counted, 0)
 	if king_open and proc_id != &"king_backfire": acid_king_encounter.pressure.spend_opening_damage(counted)
 	if health > 0:
@@ -731,6 +752,8 @@ func is_targetable() -> bool:
 	if acid_king_encounter != null and acid_king_encounter.pressure != null and acid_king_encounter.pressure.blocks_damage(): return false
 	if crown_court_encounter != null and crown_court_encounter.retinue != null and crown_court_encounter.retinue.blocks_damage(): return false
 	if data.is_boss_objective:
+		if acid_collector != null: return not acid_collector.suspended()
+		if caramel_enforcer != null: return not caramel_enforcer.suspended() and is_instance_valid(boss_objective_owner) and boss_objective_owner.health > 0
 		if imperial_vassal != null: return is_instance_valid(boss_objective_owner) and boss_objective_owner.health > 0
 		return is_instance_valid(boss_objective_owner) and boss_objective_owner.caramel_encounter != null and boss_objective_owner.caramel_encounter.overload.objective_open(self)
 	return true

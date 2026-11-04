@@ -24,13 +24,13 @@ Aktueller implementierter Stand. Alle Dialogtexte sind unverändert aus den Spie
 
 Wellen 1–5. Ziel: Hol das erste Portalfragment.
 
-[Vor Welle 5, nach dem Shop: Begegnung mit dem Karies-Grafen.]
+[Vor Welle 5, nach dem Shop: Begegnung mit dem Plaquulaen.]
 
-**Karies-Graf:** Unter diesem Kissen gehört alles mir. Die Münzen, die Krümel — und jetzt auch du.
+**Plaquula:** Unter diesem Kissen gehört alles mir. Die Münzen, die Krümel — und jetzt auch du.
 
 **Denti:** Ich bin kein Wechselgeld. Gib das Portalfragment her.
 
-**Karies-Graf:** Ein Zahn ohne Mund. Wer soll vor dir Angst haben?
+**Plaquula:** Ein Zahn ohne Mund. Wer soll vor dir Angst haben?
 
 **Denti:** Jeder, der seit Jahren keinen Bohrer gesehen hat.
 
@@ -54,13 +54,13 @@ Wellen 1–5. Ziel: Hol das erste Portalfragment.
 
 Wellen 6–10. Ziel: Finde das zweite Portalfragment.
 
-[Vor Welle 10, nach dem Shop: Begegnung mit dem Karies-Prinzen.]
+[Vor Welle 10, nach dem Shop: Begegnung mit dem Don Karamelloen.]
 
-**Karies-Prinz:** Willkommen in meinem Reich! Möchtest du in Karamell oder Zuckerguss untergehen?
+**Don Karamello:** Willkommen in meinem Reich! Möchtest du in Karamell oder Zuckerguss untergehen?
 
 **Denti:** Ich kaue Brotkrusten. Deinen Zuckerguss bekomme ich auch klein.
 
-**Karies-Prinz:** Schade. Hier bleibt jeder kleben.
+**Don Karamello:** Schade. Hier bleibt jeder kleben.
 
 **Denti:** Zucker ist nur Karies im Kostüm. Ich seh durch.
 
@@ -84,13 +84,13 @@ Wellen 6–10. Ziel: Finde das zweite Portalfragment.
 
 Wellen 11–15. Ziel: Befreie das dritte Portalfragment.
 
-[Vor Welle 15, nach dem Shop: Begegnung mit dem Karies-König.]
+[Vor Welle 15, nach dem Shop: Begegnung mit dem Korrodon, der Ätzkoloss.]
 
-**Karies-König:** Ein unbeschädigter Backenzahn. Selten. Dich stelle ich zu meinen besten Stücken.
+**Korrodon, der Ätzkoloss:** Ein unbeschädigter Backenzahn. Selten. Dich stelle ich zu meinen besten Stücken.
 
 **Denti:** Du sammelst Zähne? Ich sammle Portalfragmente. Deins fehlt noch.
 
-**Karies-König:** Dafür müsste von dir erst etwas übrig bleiben.
+**Korrodon, der Ätzkoloss:** Dafür müsste von dir erst etwas übrig bleiben.
 
 **Denti:** Schmelz ist das härteste Material im Körper. Du bist nur Säure mit Selbstbewusstsein.
 

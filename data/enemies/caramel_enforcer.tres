@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3]
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/enemies/caramel_enforcer/broesel.png" id="2"]
+[ext_resource type="Script" path="res://scripts/enemies/caramel_enforcer_data.gd" id="3"]
+[sub_resource type="Resource" id="Enforcer"]
+script = ExtResource("3")
+[resource]
+script = ExtResource("1")
+display_name = "Brösel"
+max_health = 120.0
+damage_reduction = 0.16
+knockback_resistance = 1.0
+move_speed = 135.0
+contact_damage = 0.0
+attack_damage = 18.0
+radius = 48.0
+xp_drop = 0
+coin_drop = 0
+allow_random_status_trait = false
+sprite = ExtResource("2")
+is_boss_objective = true
+caramel_enforcer_profile = SubResource("Enforcer")

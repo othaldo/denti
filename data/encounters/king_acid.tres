@@ -1,7 +1,9 @@
-[gd_resource type="Resource" script_class="AcidKingData" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="AcidKingData" load_steps=4 format=3]
 [ext_resource type="Script" path="res://scripts/enemies/acid_king_data.gd" id="1"]
 [ext_resource type="Resource" path="res://data/encounters/king_overpressure.tres" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/acid_collector.tres" id="3"]
 [resource]
 script = ExtResource("1")
 pressure_profile = ExtResource("2")
+collector = ExtResource("3")
 closed_damage_factor = 0.55

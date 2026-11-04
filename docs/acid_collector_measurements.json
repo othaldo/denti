@@ -1,0 +1,330 @@
+{
+  "date": "2026-11-03",
+  "conditions": "Paired full Hell fights, synthetic wave-15 tier-III melee/ranged builds, seed 0, real automatic weapons and player physics. Pilot moves towards the boss in normal combat and reacts to shield rays/acid trails only. 10000 diagnostic HP; timing/pressure evidence, not human difficulty or fun. Baseline disables the new collector and ray remnants; boss defenses and attack data are otherwise identical.",
+  "full_fights": [
+    {
+      "build": "ranged_single",
+      "collector_combat_seconds": 0.0,
+      "collector_trial_seconds": 0.0,
+      "damage_taken": 643.819224267583,
+      "difficulty": "hell",
+      "max_streams": 0,
+      "new_mechanics": false,
+      "outcome": "boss_killed",
+      "seconds": 70.88,
+      "shields": 3,
+      "summons": 0
+    },
+    {
+      "build": "melee_single",
+      "collector_combat_seconds": 0.0,
+      "collector_trial_seconds": 0.0,
+      "damage_taken": 4043.88074918346,
+      "difficulty": "hell",
+      "max_streams": 0,
+      "new_mechanics": false,
+      "outcome": "boss_killed",
+      "seconds": 96.23,
+      "shields": 3,
+      "summons": 0
+    },
+    {
+      "build": "ranged_single",
+      "collector_combat_seconds": 17.27,
+      "collector_trial_seconds": 17.27,
+      "damage_taken": 643.819224267583,
+      "difficulty": "hell",
+      "max_streams": 3,
+      "new_mechanics": true,
+      "outcome": "boss_killed",
+      "seconds": 70.8,
+      "shields": 3,
+      "summons": 3
+    },
+    {
+      "build": "melee_single",
+      "collector_combat_seconds": 76.38,
+      "collector_trial_seconds": 30.67,
+      "damage_taken": 3827.91256130145,
+      "difficulty": "hell",
+      "max_streams": 3,
+      "new_mechanics": true,
+      "outcome": "boss_killed",
+      "seconds": 96.4,
+      "shields": 3,
+      "summons": 2
+    }
+  ],
+  "shield_routes": [
+    {
+      "damage_taken": 0.0,
+      "difficulty": "easy",
+      "remaining": 0,
+      "seconds": 8.4,
+      "shots": 2,
+      "speed": 230.0,
+      "success": true,
+      "trial": 1,
+      "viewport": [
+        1280,
+        720
+      ]
+    },
+    {
+      "damage_taken": 0.0,
+      "difficulty": "normal",
+      "remaining": 0,
+      "seconds": 11.25,
+      "shots": 3,
+      "speed": 230.0,
+      "success": true,
+      "trial": 1,
+      "viewport": [
+        1280,
+        720
+      ]
+    },
+    {
+      "damage_taken": 0.0,
+      "difficulty": "hard",
+      "remaining": 0,
+      "seconds": 13.7,
+      "shots": 4,
+      "speed": 230.0,
+      "success": true,
+      "trial": 2,
+      "viewport": [
+        1280,
+        720
+      ]
+    },
+    {
+      "damage_taken": 0.0,
+      "difficulty": "hell",
+      "remaining": 0,
+      "seconds": 7.3,
+      "shots": 2,
+      "speed": 230.0,
+      "success": true,
+      "trial": 1,
+      "viewport": [
+        1280,
+        720
+      ]
+    },
+    {
+      "damage_taken": 0.0,
+      "difficulty": "hell",
+      "remaining": 0,
+      "seconds": 10.2,
+      "shots": 3,
+      "speed": 230.0,
+      "success": true,
+      "trial": 2,
+      "viewport": [
+        1280,
+        720
+      ]
+    },
+    {
+      "damage_taken": 0.0,
+      "difficulty": "hell",
+      "remaining": 0,
+      "seconds": 13.1,
+      "shots": 4,
+      "speed": 230.0,
+      "success": true,
+      "trial": 3,
+      "viewport": [
+        1280,
+        720
+      ]
+    },
+    {
+      "damage_taken": 0.0,
+      "difficulty": "normal",
+      "remaining": 0,
+      "seconds": 14.5,
+      "shots": 4,
+      "speed": 80.0,
+      "success": true,
+      "trial": 1,
+      "viewport": [
+        1280,
+        720
+      ]
+    },
+    {
+      "damage_taken": 0.0,
+      "difficulty": "hell",
+      "remaining": 0,
+      "seconds": 18.9,
+      "shots": 6,
+      "speed": 80.0,
+      "success": true,
+      "trial": 3,
+      "viewport": [
+        1280,
+        720
+      ]
+    },
+    {
+      "damage_taken": 0.0,
+      "difficulty": "normal",
+      "remaining": 0,
+      "seconds": 11.25,
+      "shots": 3,
+      "speed": 230.0,
+      "success": true,
+      "trial": 1,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "damage_taken": 0.0,
+      "difficulty": "normal",
+      "remaining": 0,
+      "seconds": 11.25,
+      "shots": 3,
+      "speed": 230.0,
+      "success": true,
+      "trial": 1,
+      "viewport": [
+        568,
+        320
+      ]
+    }
+  ],
+  "acid_lifetime_seconds": {
+    "easy": 3,
+    "normal": 4,
+    "hard": 5,
+    "hell": 6
+  },
+  "acid_max_streams": 3,
+  "acid_inner_gap": 180,
+  "acid_arming_seconds": 0.3,
+  "acid_tick_seconds": 0.65,
+  "acid_damage_factor": 0.4,
+  "collector": {
+    "max_simultaneous_per_boss": 1,
+    "summons": {
+      "easy": 0,
+      "normal": 0,
+      "hard": 2,
+      "hell": 3
+    },
+    "first_summon_combat_seconds": 5,
+    "reinforcement_combat_seconds": 15,
+    "pool_life_seconds": 3,
+    "max_pools": 2,
+    "minimum_budget_recharge_combat_seconds": 7,
+    "initial_burst_fraction": 0.2,
+    "rests_during_valve_trial": false,
+    "extra_loot": false
+  },
+  "validation": {
+    "combat_and_flow_run": "20261103-144449-a2971060",
+    "passed_tests": [
+      "combat_hud",
+      "acid_collector",
+      "king_pressure_combat",
+      "boss_stages",
+      "caramel_enforcer",
+      "caramel_trials",
+      "acid_collector_combat",
+      "caramel_enforcer_combat"
+    ],
+    "final_phase_run": "20261103-144743-297fb016",
+    "final_phase_passed": [
+      "king_acid_wake",
+      "king_pressure_trial",
+      "acid_collector",
+      "caramel_enforcer"
+    ],
+    "scope": "Brösel and Schlacko stay targetable and advance through all owner phases. Phase cancellation preserves their attacks/pools; tree pause still freezes them. Weaponless valve tests isolate ray/stream geometry; live companions are validated in full weapon duels."
+  },
+  "art": {
+    "mode": "built-in image_gen",
+    "sprite": "assets/enemies/acid_collector/schlacko.png",
+    "prompt": "assets/enemies/acid_collector/prompts.json"
+  },
+  "native_previews": ".godot/acid_collector_preview/",
+  "before_continuous_pressure": [
+    {
+      "build": "ranged_single",
+      "collector_combat_seconds": 0.0,
+      "damage_taken": 643.819224267583,
+      "difficulty": "hell",
+      "max_streams": 0,
+      "new_mechanics": false,
+      "outcome": "boss_killed",
+      "seconds": 70.8,
+      "shields": 3,
+      "summons": 0
+    },
+    {
+      "build": "melee_single",
+      "collector_combat_seconds": 0.0,
+      "damage_taken": 4099.56241182282,
+      "difficulty": "hell",
+      "max_streams": 0,
+      "new_mechanics": false,
+      "outcome": "boss_killed",
+      "seconds": 96.4,
+      "shields": 3,
+      "summons": 0
+    },
+    {
+      "build": "ranged_single",
+      "collector_combat_seconds": 13.95,
+      "damage_taken": 791.315106715541,
+      "difficulty": "hell",
+      "max_streams": 3,
+      "new_mechanics": true,
+      "outcome": "boss_killed",
+      "seconds": 70.88,
+      "shields": 3,
+      "summons": 2
+    },
+    {
+      "build": "melee_single",
+      "collector_combat_seconds": 28.22,
+      "damage_taken": 4153.76124757667,
+      "difficulty": "hell",
+      "max_streams": 3,
+      "new_mechanics": true,
+      "outcome": "boss_killed",
+      "seconds": 96.35,
+      "shields": 3,
+      "summons": 2
+    }
+  ],
+  "updated": "2026-11-03",
+  "continuous_special_phase_pressure": true,
+  "validation_before_continuous_pressure": {
+    "full_core_run": "20261103-141447-ca2e70f4",
+    "count": 177,
+    "passed": 175,
+    "failed_old_boss_only_fixtures": [
+      "acid_king_pressure",
+      "acid_king_difficulty"
+    ],
+    "fixture_isolation": "Old branch searches snapshot only the main boss, so their single-boss warning tests disable the new companion. Actual combined collector/stomp routes and full live fights are checked separately. No contact/hit assertions were removed.",
+    "fixed_fixture_rerun": "20261103-141912-aebac51b",
+    "fixed_fixture_passed": [
+      "acid_king_pressure",
+      "acid_king_difficulty"
+    ],
+    "final_mechanics_rerun": "20261103-142910-575be5c3",
+    "final_mechanics_passed": [
+      "king_acid_wake",
+      "acid_collector",
+      "caramel_enforcer",
+      "king_pressure_combat"
+    ]
+  },
+  "shield_route_conditions": "Weaponless isolated ray/stream navigation including minimum speed. Companions are disabled for this component check; full-fight rows include live, attackable Schlacko during every shield phase."
+}

@@ -171,7 +171,10 @@ static func _valid_structure(value: Dictionary) -> bool:
 		if not _containers(entry, ["crown_court"], []): return false
 		if not CrownCourtSnapshot.valid(entry.get("crown_court", {})): return false
 		if not ImperialVassal.valid(entry.get("imperial_vassal", {})): return false
+		if not CaramelEnforcer.valid(entry.get("caramel_enforcer", {})): return false
+		if not AcidCollector.valid(entry.get("acid_collector", {})): return false
 		var caramel: Dictionary = entry.get("caramel", {})
+		if not CaramelBodyguard.valid(caramel.get("bodyguard", {})): return false
 		if not CaramelOverload.valid(caramel.get("overload", {})): return false
 		if not CaramelBombVolley.valid(caramel.get("bombs", [])): return false
 		if not _containers(caramel, [], ["origin", "destination", "splash_at", "pools", "aim", "rush_origin", "rush_end", "rays", "hearts"]): return false

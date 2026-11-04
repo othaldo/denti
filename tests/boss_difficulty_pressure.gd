@@ -78,7 +78,10 @@ func _run() -> void:
 		var attack := boss.caramel_encounter
 		var profile := attack.profile
 		_check(profile != original and original.action_bonus == 0 and original.heart_speed == 245, "difficulty mutated shared boss resources")
-		_check(profile.windup_seconds == normal.windup_seconds and profile.heart_warning_seconds == normal.heart_warning_seconds and profile.heart_followup_warning == normal.heart_followup_warning and profile.rush_warning_seconds == normal.rush_warning_seconds and profile.burst_warning_seconds == normal.burst_warning_seconds, "difficulty shortened a warned reaction window")
+		_check(profile.windup_seconds == normal.windup_seconds and profile.heart_warning_seconds == normal.heart_warning_seconds and profile.rush_warning_seconds == normal.rush_warning_seconds and profile.burst_warning_seconds == normal.burst_warning_seconds, "difficulty shortened an initial reaction window")
+		# Don's pressure pass intentionally shortens only the repeated fan warning.
+		var followup_warnings := {&"easy": 0.75, &"normal": 0.75, &"hard": 0.72, &"hell": 0.69}
+		_check(is_equal_approx(profile.heart_followup_warning, followup_warnings[difficulty.id]), "follow-up fan warning differs from the agreed reaction window")
 		var bonus := difficulty.boss_volley_bonus
 		_check(profile.throws_for_phase(1) == mini(3 + bonus, profile.max_bomb_throws) and profile.fan_count(2) == 9 + bonus * 2 and profile.salvos_for_phase(1) == mini(2 + bonus, profile.max_fan_salvos), "difficulty does not scale capped attack counts")
 		attack.begin(-1, CaramelEncounterData.Attack.HEART_FAN)

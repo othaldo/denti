@@ -64,7 +64,7 @@ func _run() -> void:
 		measured.append({"difficulty": str(difficulty.id), "interval": a.profile.bomb_interval(), "frequency": a.profile.bomb_frequency, "warning": a.profile.windup_seconds + a.profile.flight_seconds, "peak": peak})
 		boss.free()
 	print("PRINCE BOMB FREQUENCY: ", JSON.stringify(measured))
-	_check(is_equal_approx(measured[0].frequency, 0.75) and is_equal_approx(measured[1].frequency, 1) and is_equal_approx(measured[2].frequency, 1.5) and is_equal_approx(measured[3].frequency, 2), "bomb frequency is not Easy/Normal/Hard/Hell 0.75/1/1.5/2")
+	_check(is_equal_approx(measured[0].frequency, 0.75) and is_equal_approx(measured[1].frequency, 1.2) and is_equal_approx(measured[2].frequency, 1.8) and is_equal_approx(measured[3].frequency, 2.4), "bomb frequency is not Easy/Normal/Hard/Hell 0.75/1.2/1.8/2.4")
 	var boss := _spawn(DifficultyCatalog.HELL)
 	var a := boss.caramel_encounter
 	a.begin(-1, CaramelEncounterData.Attack.BOMBS)

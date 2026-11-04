@@ -14,6 +14,12 @@ extends Resource
 @export var valve_radius: float = 31.0
 @export var beam_half_width: float = 19.0
 @export var beam_damage_factor: float = 1.0
+@export var acid_seconds: float = 4.0
+@export var acid_arm_seconds: float = 0.3
+@export var acid_inner_gap: float = 180.0
+@export var acid_damage_factor: float = 0.4
+@export var acid_tick_seconds: float = 0.65
+@export var acid_max_streams: int = 3
 @export var backfire_fraction: float = 0.04
 @export var opening_damage_fraction: float = 0.08
 @export var exposure_damage_factor: float = 1.8
@@ -23,6 +29,7 @@ extends Resource
 func for_difficulty(difficulty: DifficultyData) -> KingPressureData:
 	var result := duplicate() as KingPressureData
 	var rank := clampi(difficulty.boss_volley_bonus, -1, 2)
+	result.acid_seconds = 3.0 + rank + 1
 	result.valves = 2 if rank < 0 else (4 if rank > 0 else 3)
 	if rank == 1: result.health_thresholds = PackedFloat32Array([0.8, 0.4])
 	elif rank == 2: result.health_thresholds = PackedFloat32Array([0.9, 0.6, 0.3])

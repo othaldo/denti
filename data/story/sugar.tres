@@ -7,9 +7,9 @@
 [resource]
 script = ExtResource("1")
 boss = ExtResource("3")
-boss_dialogue = Array[Dictionary]([{"speaker":"Karies-Prinz","text":"Willkommen in meinem Reich! Möchtest du in Karamell oder Zuckerguss untergehen?"},
+boss_dialogue = Array[Dictionary]([{"speaker":"Don Karamello","text":"Willkommen in meinem Reich! Möchtest du in Karamell oder Zuckerguss untergehen?"},
 {"speaker":"Denti","text":"Ich kaue Brotkrusten. Deinen Zuckerguss bekomme ich auch klein."},
-{"speaker":"Karies-Prinz","text":"Schade. Hier bleibt jeder kleben."},
+{"speaker":"Don Karamello","text":"Schade. Hier bleibt jeder kleben."},
 {"speaker":"Denti","text":"Zucker ist nur Karies im Kostüm. Ich seh durch.","action":"Kämpfen"}])
 id = &"sugar"
 title = "Das süße Verderben"

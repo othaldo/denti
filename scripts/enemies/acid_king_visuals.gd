@@ -24,6 +24,17 @@ static func _art(canvas: CanvasItem, index: int, at: Vector2, extent: float, tin
 	canvas.draw_set_transform_matrix(base * Transform2D(rotation, at))
 	canvas.draw_texture_rect(texture, Rect2(-size * 0.5, size), false, tint)
 
+static func draw_stream(canvas: Node2D, from: Vector2, to: Vector2, width: float, alpha: float, seconds: float, base: Transform2D) -> void:
+	WarningEffects.capsule(canvas, from, to, width * 0.5, Color(0.65, 0.92, 0.14, 0.6 * alpha), fposmod(seconds * 0.5, 1), base, WarningEffects.BATCH.Phase.ACTIVE)
+	var direction := from.direction_to(to)
+	var tile_length := width * STREAM_CONTENT.size.x / STREAM_CONTENT.size.y
+	var points := _contour(from.distance_to(to), width * 0.5)
+	var uvs := PackedVector2Array()
+	for point in points:
+		uvs.append(Vector2(point.x / tile_length + seconds * 45 / tile_length, (STREAM_CONTENT.position.y + (point.y / width + 0.5) * STREAM_CONTENT.size.y) / KingAcidArt.STREAM.get_height()))
+	canvas.draw_set_transform_matrix(base * Transform2D(direction.angle(), from))
+	canvas.draw_polygon(points, PackedColorArray([Color(1, 1, 1, 0.9 * alpha)]), uvs, KingAcidArt.STREAM)
+
 static func draw(encounter: AcidKingEncounter) -> void:
 	var base := encounter.global_transform.affine_inverse()
 	var profile := encounter.profile

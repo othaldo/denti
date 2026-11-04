@@ -6,7 +6,7 @@
 
 [resource]
 script = ExtResource("1")
-display_name = "Karies-Graf"
+display_name = "Plaquula"
 max_health = 750.0
 damage_reduction = 0.12
 knockback_resistance = 0.75

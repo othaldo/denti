@@ -2,6 +2,8 @@ class_name CaramelEncounterData
 extends Resource
 
 @export var overload_profile: CaramelOverloadData
+@export var enforcer: EnemyData
+@export var guard_recharge_multiplier: float = 1.0
 
 enum Attack { BOMBS, HEART_FAN, SUGAR_RUSH }
 @export var attack_order: Array[int] = [Attack.BOMBS, Attack.HEART_FAN, Attack.SUGAR_RUSH]
@@ -63,8 +65,12 @@ func for_difficulty(difficulty: DifficultyData) -> CaramelEncounterData:
 	var result := duplicate() as CaramelEncounterData
 	if overload_profile != null: result.overload_profile = overload_profile.for_difficulty(difficulty)
 	result.action_bonus = clampi(difficulty.boss_volley_bonus, -1, 2)
+	result.guard_recharge_multiplier = 1.7 if result.action_bonus >= 2 else (1.25 if result.action_bonus == 1 else 1.0)
 	result.heart_speed *= difficulty.boss_projectile_speed_multiplier
+	result.heart_speed *= 1.0 + maxi(result.action_bonus, 0) * 0.03
+	result.heart_followup_warning *= 1.0 - maxi(result.action_bonus, 0) * 0.04
 	result.recovery_seconds *= difficulty.boss_recovery_multiplier
+	result.recovery_seconds *= 0.85
 	result.approach_seconds *= difficulty.boss_recovery_multiplier
 	result.rush_distance *= difficulty.boss_movement_multiplier
 	result.rush_overshoot *= difficulty.boss_movement_multiplier
@@ -78,7 +84,7 @@ func for_difficulty(difficulty: DifficultyData) -> CaramelEncounterData:
 	# Moving between salvos is visible; every subsequent aim is warned afresh.
 	result.heart_release_seconds += maxi(result.action_bonus, 0) * 0.10
 	result.followup_seconds += maxi(result.action_bonus, 0) * 0.04
-	result.bomb_frequency *= 0.75 if result.action_bonus < 0 else 1.0 + result.action_bonus * 0.5
+	result.bomb_frequency *= 0.75 if result.action_bonus < 0 else 1.2 + result.action_bonus * 0.6
 	return result
 
 func bomb_interval() -> float:

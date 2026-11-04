@@ -1,21 +1,23 @@
 # Prinz: schnellerer Bombentakt
 
-Stand: 31.10.2026. Nach dem [Aggressivitätsumbau](BOSS_AGGRESSION.md).
+Stand: 03.11.2026. Nach dem [Aggressivitätsumbau](BOSS_AGGRESSION.md) und der
+[Reduktion der Herzprüfungen](DON_PRESSURE_REWORK.md).
 
-Hell verdoppelt die Wurffrequenz innerhalb einer Bombenserie gegenüber dem bisherigen Hell-Takt. Easy wirft langsamer, Normal behält seinen bisherigen Takt, Hard liegt dazwischen.
+Normal, Hard und Hell werfen innerhalb einer Serie seit der Druckmessung
+jeweils 20 % häufiger als zuvor. Easy behält seinen langsameren Takt.
 
 | Schwierigkeit | Frequenz relativ zum bisherigen eigenen Takt | Bisheriger Wurfabstand | Neuer Wurfabstand | Vorwarnung pro Landestelle |
 | --- | ---: | ---: | ---: | ---: |
 | Easy | ×0,75 | 1,28 s | 1,707 s | 1,10 s |
-| Normal | ×1,00 | 1,28 s | 1,280 s | 1,10 s |
-| Hard | ×1,50 | 1,32 s | 0,880 s | 1,10 s |
-| Hell | ×2,00 | 1,36 s | 0,680 s | 1,10 s |
+| Normal | ×1,20 | 1,28 s | 1,067 s | 1,10 s |
+| Hard | ×1,80 | 1,32 s | 0,733 s | 1,10 s |
+| Hell | ×2,40 | 1,36 s | 0,567 s | 1,10 s |
 
 Der Abstand bezieht sich auf aufeinanderfolgende Bomben innerhalb derselben Serie. Andere Angriffsarten und die Übergänge zwischen Serien besitzen weiterhin eigene Takte; Bomben pro Minute über das gesamte Repertoire steigen deshalb nicht pauschal um denselben Faktor.
 
 ## Überlappung und Lesbarkeit
 
-Ausholen (0,50 s) und Flug (0,60 s) bleiben gleich. Auf Hard/Hell beginnt die nächste vollständige Warnung bereits vor der Landung der vorherigen Bombe. Jede Bombe erhält einen eigenen Startpunkt, ein festgelegtes Ziel und einen eigenen Fortschritt. Der vorhandene begrenzte Vorhalt beim zweiten Wurf bleibt wirksam. Die Warnung verfolgt Denti danach nicht weiter.
+Ausholen (0,50 s) und Flug (0,60 s) bleiben gleich. Auf Normal/Hard/Hell beginnt die nächste vollständige Warnung bereits vor der Landung der vorherigen Bombe. Jede Bombe erhält einen eigenen Startpunkt, ein festgelegtes Ziel und einen eigenen Fortschritt. Der vorhandene begrenzte Vorhalt beim zweiten Wurf bleibt wirksam. Die Warnung verfolgt Denti danach nicht weiter.
 
 Es werden im regulären Ablauf höchstens zwei Bomben gleichzeitig angekündigt/gezeichnet. CaramelBombVolley verwendet eine begrenzte Liste mit harter Obergrenze drei und keinen Node pro Bombe. Die vier gemeinsamen Karamellpfützen bleiben ebenfalls begrenzt. Es entstehen keine zusätzlichen Vollbildeffekte oder Texturen.
 

@@ -26,6 +26,7 @@ func _spawn(difficulty: DifficultyData) -> Enemy:
 	game.get_node("Enemies").add_child(boss)
 	boss.set_simulation_enabled(false)
 	boss.acid_king_encounter.pressure.used = true # Isolate original pursuit/combined routes.
+	boss.acid_king_encounter.companion.legacy = true # This branch search snapshots only the main boss.
 	return boss
 
 func _run() -> void:

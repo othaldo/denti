@@ -1,4 +1,62 @@
-# Karies-König: der Säuresammler
+# Korrodon, der Ätzkoloss: der Säuresammler
+
+## Aktuell: Schlacko und bleibende Säureströme
+
+Seit 03.11.2026 hinterlassen die Strahlen der Ventilprüfung feste Säureströme.
+Easy/Normal/Hard/Hell halten sie 3/4/5/6 Sekunden. Die Spur bleibt auf der vorher
+angekündigten Schusslinie und wird nach 0,3 Sekunden aktiv. Sie trifft in einem
+0,65-Sekunden-Takt mit 40 % von Korrodons Angriffsschaden; höchstens drei Spuren
+bleiben gleichzeitig liegen. An Korrodon bleibt ein innerer Abstand von 180
+Welteinheiten frei. Schildbruch, Phasenabbruch und Bossende entfernen die Spuren,
+damit das verdiente Gegenangriffsfenster frei bleibt. Die Darstellung verwendet
+die vorhandene gemalte Säurestrom-Textur.
+
+Auf Hard/Hell hilft **Schlacko**, ein eigener vierbeiniger Stein-Säurespucker.
+Er hält Abstand und wirft nach einer festen Kreiswarnung einen Säureklumpen in
+einem sichtbaren Bogen. Der Einschlag hinterlässt eine kleine, drei Sekunden
+bestehende Pfütze; höchstens zwei pro Minion. Seine eigenen Pfützen verschwinden
+bei seinem Tod. Während Ventilprüfung, Schildstrahl und Gegenangriffsfenster
+bleibt Schlacko aktiv und verwundbar. Seine Würfe und Pfützen laufen durch
+Phasenwechsel hindurch weiter. Die violette Namensleiste bleibt normal sichtbar;
+sein Burstbudget lädt auch während dieser Abschnitte nach.
+
+Es lebt höchstens ein Schlacko pro Korrodon gleichzeitig. Der erste Ruf folgt
+nach fünf Sekunden Kampfzeit. Nach einem Kill sind mindestens 15 weitere
+Kampfsekunden nötig; insgesamt gibt es höchstens zwei Rufe auf Hard und
+drei auf Hell. Easy/Normal erhalten zunächst keinen Minion. Zusätzliche
+XP-/Münz-/Kapseldrops entstehen nicht, und Schlacko hält den Wellenabschluss
+nach Korrodons Tod nicht auf. Die eigene PNG-Grafik und der vollständige finale
+Imagegen-Prompt liegen in `assets/enemies/acid_collector/`.
+
+Speichern/Fortsetzen bewahrt Besitzer, Pfützen, Zielpunkte, Bodenströme, Restleben
+und Schadenstakte. Alte Version-3-Encounter behalten ihren angekündigten Kampf
+ohne nachträglich eingefügte Minions oder Säureströme. Die gemeinsam genutzte
+`BossCompanion`-Komponente koordiniert die begrenzten Einzelbegleiter von
+Korrodon und Don Karamello; ihre Angriffe bleiben eigene Komponenten.
+
+`tests/king_acid_wake.gd` prüft echten Strahl-Nachlauf, verzögerten und periodischen
+Schaden, inneren Durchgang, begrenzte Lebensdauer, Save/Resume und Aufräumen.
+Die zehn Fälle in `tests/king_pressure_combat.gd` lösen die Ventilprüfung mit
+echter Spielerbewegung ohne Treffer, auch bei Minimaltempo und in kleinen
+Fenstern. Diese waffenlosen Fälle isolieren Strahl und Bodenstrom;
+Schlacko wird in den separaten vollständigen Kämpfen mitgeprüft. Der Pilot weicht zu einer sinnvollen Strahlseite aus und kann alte
+Spuren über freie Wege am inneren Rand umgehen.
+
+`tests/acid_collector.gd` prüft Minionbesitz, Würfe, Pfützen, Burstschutz,
+Namensleiste, aktive Schildphasen, begrenzte Rufe und echte Speicherstände. Die
+Kombinationsprüfung enthält Nahstampf in freier Arena und Fernstampf an allen
+vier Ecken mit 72 % Tempo, Richtungswechseln und ohne Dash oder Bossdurchquerung.
+Die älteren Hauptboss-Routentests isolieren weiterhin seine eigenen Warnungen.
+
+`tests/acid_collector_combat.gd` vergleicht vollständige Hell-Kämpfe mit realen
+automatischen Waffen und Spielerphysik. Der Pilot reagiert auf Schildstrahlen
+und alte Säurespuren sowie Schlackos angekündigte Klumpen. Auf Korrodons
+normalen Kampf reagiert er nicht. Seine 10000 diagnostischen
+HP erlauben Zeit-/Druckmessungen, keine Aussage über menschliche Schwierigkeit.
+[Messwerte und genaue Bedingungen](acid_collector_measurements.json).
+Native Aufnahmen: `.godot/acid_collector_preview/`.
+
+Die folgenden Abschnitte und Messungen dokumentieren frühere Ausbaustufen.
 
 Aktuell seit 31.10.: gezielte Säurefächer während der Bahnen und doppelte Stampffolgen auf Hard/Hell. Verhalten, Skalierung und Vergleich stehen in [KING_ASSAULT.md](KING_ASSAULT.md). Der vorherige Lebens-/Bewegungsabgleich steht in [BOSS_AGGRESSION.md](BOSS_AGGRESSION.md). Die folgenden Detailwerte und älteren Aufnahmen dokumentieren den vorherigen Ausbau.
 

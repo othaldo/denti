@@ -2,6 +2,7 @@ class_name AcidKingData
 extends Resource
 
 @export var pressure_profile: KingPressureData
+@export var collector: EnemyData
 
 @export var warning_seconds: float = 1.0
 @export var shift_warning_seconds: float = 1.0
@@ -61,6 +62,7 @@ extends Resource
 
 func for_difficulty(difficulty: DifficultyData) -> AcidKingData:
 	var result := duplicate(true) as AcidKingData
+	result.collector = collector
 	if pressure_profile != null: result.pressure_profile = pressure_profile.for_difficulty(difficulty)
 	# External Resource references are shared even by duplicate(true).
 	result.shards = shards.duplicate() as BossProjectileData

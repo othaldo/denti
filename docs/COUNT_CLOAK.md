@@ -1,4 +1,4 @@
-# Karies-Graf: der Umhang-Graf
+# Plaquula: der Umhang-Graf
 
 Stand: 20.10.2026. **Im regulären Kampf, Story und Endlos aktiv.** Der Graf
 verwendet weiterhin `data/enemies/cavity_count.tres`; die alten Kissenbahnen

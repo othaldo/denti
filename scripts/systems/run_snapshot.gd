@@ -127,6 +127,12 @@ static func restore(game, saved: Dictionary) -> void:
 		var owner_index := int(saved_enemies[index].get("boss_objective_owner", -1))
 		if owner_index >= 0 and owner_index < loaded_enemies.size():
 			var owner: Enemy = loaded_enemies[owner_index]
+			if owner.acid_king_encounter != null and owner.acid_king_encounter.companion != null and enemy.acid_collector != null:
+				owner.acid_king_encounter.companion.bind(enemy)
+				continue
+			if owner.caramel_encounter != null and owner.caramel_encounter.bodyguard != null and enemy.caramel_enforcer != null:
+				owner.caramel_encounter.bodyguard.bind(enemy)
+				continue
 			if owner.caramel_encounter != null and owner.caramel_encounter.overload != null:
 				enemy.boss_objective_slot = int(saved_enemies[index].get("boss_objective_slot", -1))
 				owner.caramel_encounter.overload.bind_pylon(enemy)

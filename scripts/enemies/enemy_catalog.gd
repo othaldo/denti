@@ -11,6 +11,8 @@ const ACID_CROWN: EnemyData = preload("res://data/enemies/acid_crown.tres")
 const HUNT_GERM: EnemyData = preload("res://data/enemies/hunt_germ.tres")
 const LOOT_GOBLIN: EnemyData = preload("res://data/enemies/loot_goblin.tres")
 const CARAMEL_HEART: EnemyData = preload("res://data/enemies/caramel_heart.tres")
+const CARAMEL_ENFORCER: EnemyData = preload("res://data/enemies/caramel_enforcer.tres")
+const ACID_COLLECTOR: EnemyData = preload("res://data/enemies/acid_collector.tres")
 const IMPERIAL_LANCER: EnemyData = preload("res://data/enemies/imperial_lancer.tres")
 const IMPERIAL_KEEPER: EnemyData = preload("res://data/enemies/imperial_keeper.tres")
 const IMPERIAL_JUSTICIAR: EnemyData = preload("res://data/enemies/imperial_justiciar.tres")
@@ -19,7 +21,7 @@ const CAVITY_PRINCE: EnemyData = preload("res://data/enemies/cavity_prince.tres"
 const CAVITY_KING: EnemyData = preload("res://data/enemies/cavity_king.tres")
 const CAVITY_EMPEROR: EnemyData = preload("res://data/enemies/cavity_emperor.tres")
 
-const ALL: Array[EnemyData] = [PLAQUE, BACTERIA, SUGAR, ACID_SPITTER, POISON_GERM, GUM_BITER, ACID_CROWN, HUNT_GERM, CAVITY_COUNT, CAVITY_PRINCE, CAVITY_KING, CAVITY_EMPEROR, LOOT_GOBLIN, CARAMEL_HEART, IMPERIAL_LANCER, IMPERIAL_KEEPER, IMPERIAL_JUSTICIAR]
+const ALL: Array[EnemyData] = [PLAQUE, BACTERIA, SUGAR, ACID_SPITTER, POISON_GERM, GUM_BITER, ACID_CROWN, HUNT_GERM, CAVITY_COUNT, CAVITY_PRINCE, CAVITY_KING, CAVITY_EMPEROR, LOOT_GOBLIN, CARAMEL_HEART, CARAMEL_ENFORCER, ACID_COLLECTOR, IMPERIAL_LANCER, IMPERIAL_KEEPER, IMPERIAL_JUSTICIAR]
 
 
 static func by_path(path: String) -> EnemyData:

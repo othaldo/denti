@@ -187,12 +187,12 @@ Die Herrschertitel und ihre Storyfunktion bleiben erhalten. Jeder Boss erhält e
 
 | Area / Boss | Kampfidee | Typische Antwort |
 | --- | --- | --- |
-| Unter dem Kissen / Karies-Graf | Neu zielende Umhangschläge mit Knochenanimation | Warnsektoren verlassen, jeden Nachschlag neu lesen |
-| Das süße Verderben / Karies-Prinz | Bomben, Karamellherzfächer, Zuckerrausch mit Herzkranz | Boden freihalten, Schussrichtungen lesen, Ansturm und Gasse beantworten |
-| Tief im Säurestrom / Karies-König | Säurerinnen, Pegelwechsel, Splitterstampf und Sammlerzug | Ufer und Übergänge vorausplanen, Öffnung nach dem Entleeren nutzen |
+| Unter dem Kissen / Plaquula | Neu zielende Umhangschläge mit Knochenanimation | Warnsektoren verlassen, jeden Nachschlag neu lesen |
+| Das süße Verderben / Don Karamello | Bomben, Karamellherzfächer, Zuckerrausch mit Herzkranz | Boden freihalten, Schussrichtungen lesen, Ansturm und Gasse beantworten |
+| Tief im Säurestrom / Korrodon, der Ätzkoloss | Säurerinnen, Pegelwechsel, Splitterstampf und Sammlerzug | Ufer und Übergänge vorausplanen, Öffnung nach dem Entleeren nutzen |
 | Die letzte Krone / Karies-Imperator | Kronenwache, Hofurteil, Portalstich und Nerventakt | Orientierung, Sektoren und feste Rhythmen kombinieren |
 
-### Karies-Graf: der Umhang-Graf
+### Plaquula: der Umhang-Graf
 
 **Im Kampf integriert:** Der vom Spieler ausgewählte Bettwanzen-Vampir C
 verwendet zwölf Knochen und zwei gewichtete Stoffnetze. Die zu langsamen
@@ -215,7 +215,7 @@ synchronisiert Animation, Warnfläche und tatsächliches Trefferfenster.
 bei knapp 19 s. Menschlicher Vergleich der vollen Welle, langsame Builds,
 Touch und Web-Performance bleiben offen; das ist noch keine Balancefreigabe.
 
-### Karies-Prinz: Die Karamellküche
+### Don Karamello: Die Karamellküche
 
 **Nach dem Varianten-Feedback erweitert:** Drei eigene Angriffsabläufe bereits ab Phase 1: Bombenfolge, Herzfächer und Zuckerrausch mit gesondert angekündigtem Herzkranz. Das generierte Herzmotiv ist ein echtes Projektil. Spätere Phasen verändern Strahlzahl und Folgesalven; neue Vorwarnungen bleiben erhalten. [Gemeinsam überarbeitete und inzwischen umgesetzte Repertoires für Prinz, König und Imperator](BOSS_ATTACK_DIRECTION.md).
 
@@ -229,7 +229,7 @@ Touch und Web-Performance bleiben offen; das ist noch keine Balancefreigabe.
 
 **Abnahme:** Feldobergrenze und Ablauf verhindern Sackgassen. Keine Fläche erscheint sofort aktiv unter Denti. Der Kampf lässt sich auch ohne Kernzerstörung gewinnen; gezieltes Freihalten von Boden lohnt sich sichtbar.
 
-### Karies-König: Der Säuresammler
+### Korrodon, der Ätzkoloss: Der Säuresammler
 
 **Im Spiel umgesetzt:** Säurerinnen, Pegelwechsel, versetzter Splitterstampf mit echten Projektilen und Sammlerzug mit verwundbarer Brust. Generierter gepanzerter König mit sechs Gelenken und animierten Behältern; alle vier Schwierigkeiten skalieren Bewegung, Aktionsmenge und Splitter. Feste runde Bahnenden und zugehörige Trefferflächen bleiben beim Kameranachlaufen unverändert. [Umsetzung, Werte, Aufnahmen, Messung und offene Abnahme](KING_ACID.md).
 
@@ -320,7 +320,7 @@ ersetzen. Die Schrittreihenfolge erlaubt später eine Klassenauswahl dazwischen.
 | 1 · umgesetzt | Animiertes Zahngefäß, XP-Randlinie, kompakter Timer, getrennte Bossanzeigen | Größen, Textgrenzen, Statusanzeigen, sechs Auflösungen und native Bilder; [Nachweis](COMBAT_HUD.md) |
 | 2 · umgesetzt | Dash-Basis inklusive Touchbutton, Durchdashen und Save/Resume | Kontaktschaden +50 %, beide Sperren, keine neuen Schutzframes, Streckenprüfung und native Darstellung geprüft |
 | 3 · Prototyp umgesetzt | Wurzelkraft-Attribut, wenige passende Angebote und Telemetrie | Wartezeiten, Stat-/Save-Kompatibilität und Limit geprüft; Druck-/Balance-Playtest noch offen |
-| 4 · Prototyp umgesetzt | Karies-Graf als erster eigener Encounter | Umhang-Rig, Warnsektoren, Nachschläge, Dash-Streckenprüfung, Fortsetzen und nativer Nah-/Fernvergleich; menschliche Abnahme offen |
+| 4 · Prototyp umgesetzt | Plaquula als erster eigener Encounter | Umhang-Rig, Warnsektoren, Nachschläge, Dash-Streckenprüfung, Fortsetzen und nativer Nah-/Fernvergleich; menschliche Abnahme offen |
 | 5 | Vier Boss-Encounter als Prototyp umgesetzt; Build-Abnahme folgt | Eigene Abläufe samt Grenzen und Tests vorhanden; Nah-/Fernkampf, Kernfenster, vollständige Wellen und mobile Performance vergleichen |
 | 6 · umgesetzt | Alle 18 Standardwaffen im Iconraster mit Details und Bestätigung | Katalog, Vorschau, einmaliger Start, Fortsetzen und sechs Layoutgrößen geprüft; frühe Wellen-/Build-Balance bleibt offen |
 | 7 | Balance aller Starts und gegebenenfalls Dash-Cooldown-Items | Endlos-/Schwierigkeitsvergleich wiederholen |

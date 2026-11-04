@@ -48,6 +48,11 @@ func show_health(ratio: float) -> void:
 	material.set_shader_parameter("health_fill", clampf(ratio, 0, 1))
 
 
+func set_health_colors(shadow: Color, highlight: Color) -> void:
+	material.set_shader_parameter("fill_shadow", shadow)
+	material.set_shader_parameter("fill_highlight", highlight)
+
+
 func cap_width() -> float:
 	return _region.size.x * CAP_FRACTION * size.y / _region.size.y
 

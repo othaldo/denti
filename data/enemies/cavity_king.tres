@@ -7,7 +7,8 @@
 
 [resource]
 script = ExtResource("1")
-display_name = "Karies-König"
+display_name = "Korrodon, der Ätzkoloss"
+hud_name = "Korrodon"
 max_health = 900.0
 damage_reduction = 0.32
 knockback_resistance = 0.82

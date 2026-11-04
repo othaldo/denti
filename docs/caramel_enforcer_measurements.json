@@ -1,0 +1,174 @@
+{
+  "date": "2026-11-03",
+  "difficulty": "hell",
+  "conditions": "Paired full fights, seed 0, synthetic wave-10 tier-II builds, real automatic weapons and normal player physics. Pilot hugs Don Karamello at 75 units and only moves towards trial hearts. No dash or reaction to enemy warnings. 10000 diagnostic HP; this measures pressure and reachability, not human survivability or fun. Before disables the bodyguard and restores guard-recharge multiplier 1.0.",
+  "rows": [
+    {
+      "bodyguard": false,
+      "build": "ranged_single",
+      "damage_taken": 466.507200014896,
+      "difficulty": "hell",
+      "guard_combat_seconds": 0.0,
+      "guard_trial_seconds": 0.0,
+      "outcome": "boss_killed",
+      "seconds": 23.18,
+      "summons": 0,
+      "trials": 3
+    },
+    {
+      "bodyguard": false,
+      "build": "melee_single",
+      "damage_taken": 519.952757184134,
+      "difficulty": "hell",
+      "guard_combat_seconds": 0.0,
+      "guard_trial_seconds": 0.0,
+      "outcome": "boss_killed",
+      "seconds": 24.72,
+      "summons": 0,
+      "trials": 3
+    },
+    {
+      "bodyguard": true,
+      "build": "ranged_single",
+      "damage_taken": 698.810338994565,
+      "difficulty": "hell",
+      "guard_combat_seconds": 11.93,
+      "guard_trial_seconds": 4.4,
+      "outcome": "boss_killed",
+      "seconds": 27.95,
+      "summons": 2,
+      "trials": 3
+    },
+    {
+      "bodyguard": true,
+      "build": "melee_single",
+      "damage_taken": 780.04772540902,
+      "difficulty": "hell",
+      "guard_combat_seconds": 12.65,
+      "guard_trial_seconds": 4.2,
+      "outcome": "boss_killed",
+      "seconds": 28.67,
+      "summons": 2,
+      "trials": 3
+    }
+  ],
+  "normal_guard_recharge_multipliers": {
+    "easy": 1.0,
+    "normal": 1.0,
+    "hard": 1.25,
+    "hell": 1.7
+  },
+  "max_summons": {
+    "easy": 0,
+    "normal": 0,
+    "hard": 2,
+    "hell": 3
+  },
+  "max_simultaneous_per_don": 1,
+  "reinforcement_delay_normal_combat_seconds": 12,
+  "first_summon_normal_combat_seconds": 4,
+  "punches": {
+    "hard": 1,
+    "hell": 2
+  },
+  "punch_radius": 90,
+  "punch_warnings": {
+    "hard": 0.95,
+    "hell": 0.9
+  },
+  "active_budget_recharge_seconds": 8,
+  "initial_burst_fraction": 0.18,
+  "rests_during_heart_trials": false,
+  "extra_loot": false,
+  "validation": {
+    "combat_and_flow_run": "20261103-144449-a2971060",
+    "passed_tests": [
+      "combat_hud",
+      "acid_collector",
+      "king_pressure_combat",
+      "boss_stages",
+      "caramel_enforcer",
+      "caramel_trials",
+      "acid_collector_combat",
+      "caramel_enforcer_combat"
+    ],
+    "final_phase_run": "20261103-144743-297fb016",
+    "final_phase_passed": [
+      "king_acid_wake",
+      "king_pressure_trial",
+      "acid_collector",
+      "caramel_enforcer"
+    ],
+    "scope": "Brösel and Schlacko stay targetable and advance through all owner phases. Phase cancellation preserves their attacks/pools; tree pause still freezes them. Weaponless valve tests isolate ray/stream geometry; live companions are validated in full weapon duels."
+  },
+  "art": {
+    "mode": "built-in image_gen",
+    "sprite": "assets/enemies/caramel_enforcer/broesel.png",
+    "prompt": "assets/enemies/caramel_enforcer/prompts.json"
+  },
+  "native_previews": [
+    ".godot/caramel_enforcer_preview/punch_1280x720.png",
+    ".godot/caramel_enforcer_preview/punch_320x568.png",
+    ".godot/caramel_enforcer_preview/punch_568x320.png"
+  ],
+  "before_continuous_pressure": [
+    {
+      "bodyguard": false,
+      "build": "ranged_single",
+      "damage_taken": 466.507200014896,
+      "difficulty": "hell",
+      "guard_combat_seconds": 0.0,
+      "outcome": "boss_killed",
+      "seconds": 23.27,
+      "summons": 0,
+      "trials": 3
+    },
+    {
+      "bodyguard": false,
+      "build": "melee_single",
+      "damage_taken": 519.952757184134,
+      "difficulty": "hell",
+      "guard_combat_seconds": 0.0,
+      "outcome": "boss_killed",
+      "seconds": 25.03,
+      "summons": 0,
+      "trials": 3
+    },
+    {
+      "bodyguard": true,
+      "build": "ranged_single",
+      "damage_taken": 680.826569969924,
+      "difficulty": "hell",
+      "guard_combat_seconds": 5.92,
+      "outcome": "boss_killed",
+      "seconds": 27.12,
+      "summons": 1,
+      "trials": 3
+    },
+    {
+      "bodyguard": true,
+      "build": "melee_single",
+      "damage_taken": 780.04772540902,
+      "difficulty": "hell",
+      "guard_combat_seconds": 6.83,
+      "outcome": "boss_killed",
+      "seconds": 28.53,
+      "summons": 1,
+      "trials": 3
+    }
+  ],
+  "updated": "2026-11-03",
+  "continuous_special_phase_pressure": true,
+  "validation_before_continuous_pressure": {
+    "full_core_run": "20261103-134610-9fcc81ec",
+    "passed": 174,
+    "count": 174,
+    "combined_routes": "Hard/Hell, four corners, close punch and distant charge, 72% speed, no dash and no boss-body crossing. Warning-aware pilot observes bombs, punches, charge lanes and hearts for five seconds.",
+    "final_targeted_run": "20261103-135133-0b28e704",
+    "final_targeted_passed": [
+      "caramel_enforcer",
+      "combat_hud",
+      "imperial_retinue"
+    ]
+  }
+}

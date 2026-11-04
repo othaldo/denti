@@ -12,6 +12,7 @@ shots_per_heart = 1
 courier_arrival_seconds = 11.0
 [sub_resource type="Resource" id="lesson"]
 script = ExtResource("3")
+enabled = false
 health_fraction = 0.5
 minimum_rank = 0
 objectives = 2

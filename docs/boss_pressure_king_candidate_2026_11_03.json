@@ -1,0 +1,2282 @@
+{
+	"arguments": [
+		"--waves=15",
+		"--difficulties=normal",
+		"--policies=seeker,reactive",
+		"--king-guard-seconds=45",
+		"--output=res://docs/boss_pressure_king_candidate_2026_11_03.json"
+	],
+	"engine": "4.7.2-stable (official)",
+	"hz": 60,
+	"method": "Full real encounters; six stage-tier weapons, base profile, no items/affixes, armor retained. Open arena, 280-unit start. Diagnostic 100000 HP reserve with reference max HP used for normal hit protection. No dash. Real-time SFX callbacks suppressed to keep their throttling out of global combat RNG. Objective knowledge explicit; King beam uses a dedicated route pilot in every policy. Seeker does not dodge outside that puzzle; circle only orbits; reactive reads visible warnings with regular-profile delay. Gross damage is not a human survival rate. Threatened fraction is the regular pilot's standing risk >= 1 sampled at 10 Hz; a bot-specific proxy, not an objective difficulty score.",
+	"samples": [
+		{
+			"boss": "Korrodon, der Ätzkoloss",
+			"boss_health_phases": 3,
+			"boss_hp": 4302.0,
+			"boss_hp_remaining": 0.0,
+			"build": "melee_single",
+			"build_setup": {
+				"build": "melee_single",
+				"capsules": 0,
+				"equipment": [
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_0"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_1"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_2"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_3"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_4"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_5"
+					}
+				],
+				"gold_budget": 1300,
+				"gold_unspent": 904,
+				"item_gold": 0,
+				"items": [],
+				"mode": "base",
+				"roots": 6,
+				"stats": {
+					"armor": 9.0,
+					"attack_speed": 30.0,
+					"crit_chance": 0.125,
+					"damage_bonus": 30.0,
+					"max_health": 145.0,
+					"melee_damage": 12.0,
+					"ranged_damage": 0.0
+				},
+				"tier": 3,
+				"upgrade_points": 0,
+				"wave": 15,
+				"weapon_gold": 396
+			},
+			"damage": 469.200000000012,
+			"damage_by_source": {
+				"acid_king": 469.200000000012
+			},
+			"damage_per_second": 9.04336652746569,
+			"difficulty": "normal",
+			"hits": [
+				{
+					"damage": 17.25,
+					"seconds": 1.45,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 2.1,
+					"source": "acid_king"
+				},
+				{
+					"damage": 13.8000000000029,
+					"seconds": 2.43333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 34.5,
+					"seconds": 6.55,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 11.2333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 11.8833333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 13.8000000000029,
+					"seconds": 12.2333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 29.1,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 29.75,
+					"source": "acid_king"
+				},
+				{
+					"damage": 13.8000000000029,
+					"seconds": 30.0833333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 30.4166666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 31.0833333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 31.7333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 32.4,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 33.05,
+					"source": "acid_king"
+				},
+				{
+					"damage": 34.5,
+					"seconds": 36.5666666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 39.9666666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 40.6166666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 13.8000000000029,
+					"seconds": 40.95,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 41.2833333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 41.95,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 42.6,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 43.2666666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 43.9166666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 34.5,
+					"seconds": 47.4333333333333,
+					"source": "acid_king"
+				}
+			],
+			"hp_bars_lost": 3.2358620689656,
+			"immune_seconds": 13.65,
+			"minion_seconds": 0.0,
+			"minion_task_seconds": 0.0,
+			"moving_fraction": 0.556055252168326,
+			"outcome": "boss_killed",
+			"policy": "seeker",
+			"reference_player_hp": 145.0,
+			"seconds": 51.8833333333333,
+			"seed": 13579,
+			"task_seconds": 12.0666666666667,
+			"threatened_fraction": 0.289110183103116,
+			"tier": 3,
+			"trial_failures": 0,
+			"trials": {
+				"0": {
+					"seconds": 12.0666666666668,
+					"start": 15.15
+				}
+			},
+			"warning_count": 22,
+			"wave": 15
+		},
+		{
+			"boss": "Korrodon, der Ätzkoloss",
+			"boss_health_phases": 3,
+			"boss_hp": 4302.0,
+			"boss_hp_remaining": 0.0,
+			"build": "melee_single",
+			"build_setup": {
+				"build": "melee_single",
+				"capsules": 0,
+				"equipment": [
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_0"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_1"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_2"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_3"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_4"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_5"
+					}
+				],
+				"gold_budget": 1300,
+				"gold_unspent": 904,
+				"item_gold": 0,
+				"items": [],
+				"mode": "base",
+				"roots": 6,
+				"stats": {
+					"armor": 9.0,
+					"attack_speed": 30.0,
+					"crit_chance": 0.125,
+					"damage_bonus": 30.0,
+					"max_health": 145.0,
+					"melee_damage": 12.0,
+					"ranged_damage": 0.0
+				},
+				"tier": 3,
+				"upgrade_points": 0,
+				"wave": 15,
+				"weapon_gold": 396
+			},
+			"damage": 469.200000000012,
+			"damage_by_source": {
+				"acid_king": 469.200000000012
+			},
+			"damage_per_second": 9.04336652746569,
+			"difficulty": "normal",
+			"hits": [
+				{
+					"damage": 17.25,
+					"seconds": 1.45,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 2.1,
+					"source": "acid_king"
+				},
+				{
+					"damage": 13.8000000000029,
+					"seconds": 2.43333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 34.5,
+					"seconds": 6.55,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 11.2333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 11.8833333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 13.8000000000029,
+					"seconds": 12.2333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 29.1,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 29.75,
+					"source": "acid_king"
+				},
+				{
+					"damage": 13.8000000000029,
+					"seconds": 30.0833333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 30.4166666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 31.0833333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 31.7333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 32.4,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 33.05,
+					"source": "acid_king"
+				},
+				{
+					"damage": 34.5,
+					"seconds": 36.5666666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 39.9666666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 40.6166666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 13.8000000000029,
+					"seconds": 40.95,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 41.2833333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 41.95,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 42.6,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 43.2666666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 43.9166666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 34.5,
+					"seconds": 47.4333333333333,
+					"source": "acid_king"
+				}
+			],
+			"hp_bars_lost": 3.2358620689656,
+			"immune_seconds": 13.65,
+			"minion_seconds": 0.0,
+			"minion_task_seconds": 0.0,
+			"moving_fraction": 0.556055252168326,
+			"outcome": "boss_killed",
+			"policy": "seeker",
+			"reference_player_hp": 145.0,
+			"seconds": 51.8833333333333,
+			"seed": 24680,
+			"task_seconds": 12.0666666666667,
+			"threatened_fraction": 0.289110183103116,
+			"tier": 3,
+			"trial_failures": 0,
+			"trials": {
+				"0": {
+					"seconds": 12.0666666666668,
+					"start": 15.15
+				}
+			},
+			"warning_count": 22,
+			"wave": 15
+		},
+		{
+			"boss": "Korrodon, der Ätzkoloss",
+			"boss_health_phases": 3,
+			"boss_hp": 4302.0,
+			"boss_hp_remaining": 0.0,
+			"build": "melee_single",
+			"build_setup": {
+				"build": "melee_single",
+				"capsules": 0,
+				"equipment": [
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_0"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_1"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_2"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_3"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_4"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_5"
+					}
+				],
+				"gold_budget": 1300,
+				"gold_unspent": 904,
+				"item_gold": 0,
+				"items": [],
+				"mode": "base",
+				"roots": 6,
+				"stats": {
+					"armor": 9.0,
+					"attack_speed": 30.0,
+					"crit_chance": 0.125,
+					"damage_bonus": 30.0,
+					"max_health": 145.0,
+					"melee_damage": 12.0,
+					"ranged_damage": 0.0
+				},
+				"tier": 3,
+				"upgrade_points": 0,
+				"wave": 15,
+				"weapon_gold": 396
+			},
+			"damage": 469.200000000012,
+			"damage_by_source": {
+				"acid_king": 469.200000000012
+			},
+			"damage_per_second": 9.04336652746569,
+			"difficulty": "normal",
+			"hits": [
+				{
+					"damage": 17.25,
+					"seconds": 1.45,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 2.1,
+					"source": "acid_king"
+				},
+				{
+					"damage": 13.8000000000029,
+					"seconds": 2.43333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 34.5,
+					"seconds": 6.55,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 11.2333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 11.8833333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 13.8000000000029,
+					"seconds": 12.2333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 29.1,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 29.75,
+					"source": "acid_king"
+				},
+				{
+					"damage": 13.8000000000029,
+					"seconds": 30.0833333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 30.4166666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 31.0833333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 31.7333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 32.4,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 33.05,
+					"source": "acid_king"
+				},
+				{
+					"damage": 34.5,
+					"seconds": 36.5666666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 39.9666666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 40.6166666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 13.8000000000029,
+					"seconds": 40.95,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 41.2833333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 41.95,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 42.6,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 43.2666666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 43.9166666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 34.5,
+					"seconds": 47.4333333333333,
+					"source": "acid_king"
+				}
+			],
+			"hp_bars_lost": 3.2358620689656,
+			"immune_seconds": 13.65,
+			"minion_seconds": 0.0,
+			"minion_task_seconds": 0.0,
+			"moving_fraction": 0.556055252168326,
+			"outcome": "boss_killed",
+			"policy": "seeker",
+			"reference_player_hp": 145.0,
+			"seconds": 51.8833333333333,
+			"seed": 112233,
+			"task_seconds": 12.0666666666667,
+			"threatened_fraction": 0.289110183103116,
+			"tier": 3,
+			"trial_failures": 0,
+			"trials": {
+				"0": {
+					"seconds": 12.0666666666668,
+					"start": 15.15
+				}
+			},
+			"warning_count": 22,
+			"wave": 15
+		},
+		{
+			"boss": "Korrodon, der Ätzkoloss",
+			"boss_health_phases": 3,
+			"boss_hp": 4302.0,
+			"boss_hp_remaining": 0.0,
+			"build": "melee_single",
+			"build_setup": {
+				"build": "melee_single",
+				"capsules": 0,
+				"equipment": [
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_0"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_1"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_2"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_3"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_4"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_5"
+					}
+				],
+				"gold_budget": 1300,
+				"gold_unspent": 904,
+				"item_gold": 0,
+				"items": [],
+				"mode": "base",
+				"roots": 6,
+				"stats": {
+					"armor": 9.0,
+					"attack_speed": 30.0,
+					"crit_chance": 0.125,
+					"damage_bonus": 30.0,
+					"max_health": 145.0,
+					"melee_damage": 12.0,
+					"ranged_damage": 0.0
+				},
+				"tier": 3,
+				"upgrade_points": 0,
+				"wave": 15,
+				"weapon_gold": 396
+			},
+			"damage": 193.200000000012,
+			"damage_by_source": {
+				"acid_king": 144.900000000009,
+				"acid_wake": 13.8000000000029,
+				"shield_beam": 34.5
+			},
+			"damage_per_second": 3.72254335260138,
+			"difficulty": "normal",
+			"hits": [
+				{
+					"damage": 13.8000000000029,
+					"seconds": 2.85,
+					"source": "acid_king"
+				},
+				{
+					"damage": 34.5,
+					"seconds": 6.55,
+					"source": "acid_king"
+				},
+				{
+					"damage": 34.5,
+					"seconds": 25.6833333333333,
+					"source": "shield_beam"
+				},
+				{
+					"damage": 13.8000000000029,
+					"seconds": 26.1833333333333,
+					"source": "acid_wake"
+				},
+				{
+					"damage": 13.8000000000029,
+					"seconds": 30.35,
+					"source": "acid_king"
+				},
+				{
+					"damage": 34.5,
+					"seconds": 36.5166666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 13.8000000000029,
+					"seconds": 41.5,
+					"source": "acid_king"
+				},
+				{
+					"damage": 34.5,
+					"seconds": 47.3833333333333,
+					"source": "acid_king"
+				}
+			],
+			"hp_bars_lost": 1.33241379310353,
+			"immune_seconds": 13.65,
+			"minion_seconds": 0.0,
+			"minion_task_seconds": 0.0,
+			"moving_fraction": 0.552665382145151,
+			"outcome": "boss_killed",
+			"policy": "reactive",
+			"reference_player_hp": 145.0,
+			"seconds": 51.9,
+			"seed": 13579,
+			"task_seconds": 12.0666666666667,
+			"threatened_fraction": 0.123314065510597,
+			"tier": 3,
+			"trial_failures": 0,
+			"trials": {
+				"0": {
+					"seconds": 12.0666666666668,
+					"start": 15.2
+				}
+			},
+			"warning_count": 22,
+			"wave": 15
+		},
+		{
+			"boss": "Korrodon, der Ätzkoloss",
+			"boss_health_phases": 3,
+			"boss_hp": 4302.0,
+			"boss_hp_remaining": 0.0,
+			"build": "melee_single",
+			"build_setup": {
+				"build": "melee_single",
+				"capsules": 0,
+				"equipment": [
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_0"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_1"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_2"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_3"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_4"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_5"
+					}
+				],
+				"gold_budget": 1300,
+				"gold_unspent": 904,
+				"item_gold": 0,
+				"items": [],
+				"mode": "base",
+				"roots": 6,
+				"stats": {
+					"armor": 9.0,
+					"attack_speed": 30.0,
+					"crit_chance": 0.125,
+					"damage_bonus": 30.0,
+					"max_health": 145.0,
+					"melee_damage": 12.0,
+					"ranged_damage": 0.0
+				},
+				"tier": 3,
+				"upgrade_points": 0,
+				"wave": 15,
+				"weapon_gold": 396
+			},
+			"damage": 196.650000000009,
+			"damage_by_source": {
+				"acid_king": 148.350000000006,
+				"acid_wake": 13.8000000000029,
+				"shield_beam": 34.5
+			},
+			"damage_per_second": 3.78658536585383,
+			"difficulty": "normal",
+			"hits": [
+				{
+					"damage": 13.8000000000029,
+					"seconds": 2.76666666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 3.48333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 34.5,
+					"seconds": 6.55,
+					"source": "acid_king"
+				},
+				{
+					"damage": 34.5,
+					"seconds": 25.7333333333333,
+					"source": "shield_beam"
+				},
+				{
+					"damage": 13.8000000000029,
+					"seconds": 26.2333333333333,
+					"source": "acid_wake"
+				},
+				{
+					"damage": 34.5,
+					"seconds": 36.5666666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 13.8000000000029,
+					"seconds": 41.5,
+					"source": "acid_king"
+				},
+				{
+					"damage": 34.5,
+					"seconds": 47.4333333333333,
+					"source": "acid_king"
+				}
+			],
+			"hp_bars_lost": 1.35620689655178,
+			"immune_seconds": 13.65,
+			"minion_seconds": 0.0,
+			"minion_task_seconds": 0.0,
+			"moving_fraction": 0.532734274711168,
+			"outcome": "boss_killed",
+			"policy": "reactive",
+			"reference_player_hp": 145.0,
+			"seconds": 51.9333333333333,
+			"seed": 24680,
+			"task_seconds": 12.0666666666667,
+			"threatened_fraction": 0.140564826700899,
+			"tier": 3,
+			"trial_failures": 0,
+			"trials": {
+				"0": {
+					"seconds": 12.0666666666668,
+					"start": 15.25
+				}
+			},
+			"warning_count": 22,
+			"wave": 15
+		},
+		{
+			"boss": "Korrodon, der Ätzkoloss",
+			"boss_health_phases": 3,
+			"boss_hp": 4302.0,
+			"boss_hp_remaining": 0.0,
+			"build": "melee_single",
+			"build_setup": {
+				"build": "melee_single",
+				"capsules": 0,
+				"equipment": [
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_0"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_1"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_2"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_3"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_4"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "turbo_drill",
+						"invested_coins": 66,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_5"
+					}
+				],
+				"gold_budget": 1300,
+				"gold_unspent": 904,
+				"item_gold": 0,
+				"items": [],
+				"mode": "base",
+				"roots": 6,
+				"stats": {
+					"armor": 9.0,
+					"attack_speed": 30.0,
+					"crit_chance": 0.125,
+					"damage_bonus": 30.0,
+					"max_health": 145.0,
+					"melee_damage": 12.0,
+					"ranged_damage": 0.0
+				},
+				"tier": 3,
+				"upgrade_points": 0,
+				"wave": 15,
+				"weapon_gold": 396
+			},
+			"damage": 244.950000000012,
+			"damage_by_source": {
+				"acid_king": 196.650000000009,
+				"acid_wake": 13.8000000000029,
+				"shield_beam": 34.5
+			},
+			"damage_per_second": 4.7151106833496,
+			"difficulty": "normal",
+			"hits": [
+				{
+					"damage": 13.8000000000029,
+					"seconds": 2.8,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 3.48333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 34.5,
+					"seconds": 6.55,
+					"source": "acid_king"
+				},
+				{
+					"damage": 34.5,
+					"seconds": 25.7,
+					"source": "shield_beam"
+				},
+				{
+					"damage": 13.8000000000029,
+					"seconds": 26.2,
+					"source": "acid_wake"
+				},
+				{
+					"damage": 13.8000000000029,
+					"seconds": 30.2833333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 34.5,
+					"seconds": 31.8666666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 34.5,
+					"seconds": 36.6333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 13.8000000000029,
+					"seconds": 41.4166666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 34.5,
+					"seconds": 47.4,
+					"source": "acid_king"
+				}
+			],
+			"hp_bars_lost": 1.68931034482767,
+			"immune_seconds": 13.65,
+			"minion_seconds": 0.0,
+			"minion_task_seconds": 0.0,
+			"moving_fraction": 0.566249598973372,
+			"outcome": "boss_killed",
+			"policy": "reactive",
+			"reference_player_hp": 145.0,
+			"seconds": 51.95,
+			"seed": 112233,
+			"task_seconds": 12.0666666666667,
+			"threatened_fraction": 0.130895091434071,
+			"tier": 3,
+			"trial_failures": 0,
+			"trials": {
+				"0": {
+					"seconds": 12.0666666666668,
+					"start": 15.2166666666667
+				}
+			},
+			"warning_count": 22,
+			"wave": 15
+		},
+		{
+			"boss": "Korrodon, der Ätzkoloss",
+			"boss_health_phases": 3,
+			"boss_hp": 4302.0,
+			"boss_hp_remaining": 0.0,
+			"build": "ranged_single",
+			"build_setup": {
+				"build": "ranged_single",
+				"capsules": 0,
+				"equipment": [
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_0"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_1"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_2"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_3"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_4"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_5"
+					}
+				],
+				"gold_budget": 1300,
+				"gold_unspent": 844,
+				"item_gold": 0,
+				"items": [],
+				"mode": "base",
+				"roots": 6,
+				"stats": {
+					"armor": 9.0,
+					"attack_speed": 30.0,
+					"crit_chance": 0.125,
+					"damage_bonus": 30.0,
+					"max_health": 145.0,
+					"melee_damage": 0.0,
+					"ranged_damage": 12.0
+				},
+				"tier": 3,
+				"upgrade_points": 0,
+				"wave": 15,
+				"weapon_gold": 456
+			},
+			"damage": 341.549999999988,
+			"damage_by_source": {
+				"acid_king": 341.549999999988
+			},
+			"damage_per_second": 6.58515424164502,
+			"difficulty": "normal",
+			"hits": [
+				{
+					"damage": 17.25,
+					"seconds": 1.45,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 2.1,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 2.76666666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 12.0749999999971,
+					"seconds": 6.93333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 11.0833333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 11.7333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 28.9833333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 29.6333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 30.3,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 30.9666666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 31.6166666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 12.0749999999971,
+					"seconds": 32.1333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 32.9166666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 39.9,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 40.55,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 41.2166666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 41.8833333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 42.5333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 12.0749999999971,
+					"seconds": 43.0333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 43.8333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 12.0749999999971,
+					"seconds": 47.6666666666667,
+					"source": "acid_king"
+				}
+			],
+			"hp_bars_lost": 2.35551724137923,
+			"immune_seconds": 13.65,
+			"minion_seconds": 0.0,
+			"minion_task_seconds": 0.0,
+			"moving_fraction": 0.417737789203085,
+			"outcome": "boss_killed",
+			"policy": "seeker",
+			"reference_player_hp": 145.0,
+			"seconds": 51.8666666666667,
+			"seed": 13579,
+			"task_seconds": 12.1166666666667,
+			"threatened_fraction": 0.323907455012853,
+			"tier": 3,
+			"trial_failures": 0,
+			"trials": {
+				"0": {
+					"seconds": 12.1166666666668,
+					"start": 14.9833333333333
+				}
+			},
+			"warning_count": 22,
+			"wave": 15
+		},
+		{
+			"boss": "Korrodon, der Ätzkoloss",
+			"boss_health_phases": 3,
+			"boss_hp": 4302.0,
+			"boss_hp_remaining": 0.0,
+			"build": "ranged_single",
+			"build_setup": {
+				"build": "ranged_single",
+				"capsules": 0,
+				"equipment": [
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_0"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_1"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_2"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_3"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_4"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_5"
+					}
+				],
+				"gold_budget": 1300,
+				"gold_unspent": 844,
+				"item_gold": 0,
+				"items": [],
+				"mode": "base",
+				"roots": 6,
+				"stats": {
+					"armor": 9.0,
+					"attack_speed": 30.0,
+					"crit_chance": 0.125,
+					"damage_bonus": 30.0,
+					"max_health": 145.0,
+					"melee_damage": 0.0,
+					"ranged_damage": 12.0
+				},
+				"tier": 3,
+				"upgrade_points": 0,
+				"wave": 15,
+				"weapon_gold": 456
+			},
+			"damage": 341.549999999988,
+			"damage_by_source": {
+				"acid_king": 341.549999999988
+			},
+			"damage_per_second": 6.58515424164502,
+			"difficulty": "normal",
+			"hits": [
+				{
+					"damage": 17.25,
+					"seconds": 1.45,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 2.1,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 2.76666666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 12.0749999999971,
+					"seconds": 6.93333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 11.0833333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 11.7333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 28.9833333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 29.6333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 30.3,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 30.9666666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 31.6166666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 12.0749999999971,
+					"seconds": 32.1333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 32.9166666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 39.9,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 40.55,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 41.2166666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 41.8833333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 42.5333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 12.0749999999971,
+					"seconds": 43.0333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 43.8333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 12.0749999999971,
+					"seconds": 47.6666666666667,
+					"source": "acid_king"
+				}
+			],
+			"hp_bars_lost": 2.35551724137923,
+			"immune_seconds": 13.65,
+			"minion_seconds": 0.0,
+			"minion_task_seconds": 0.0,
+			"moving_fraction": 0.417737789203085,
+			"outcome": "boss_killed",
+			"policy": "seeker",
+			"reference_player_hp": 145.0,
+			"seconds": 51.8666666666667,
+			"seed": 24680,
+			"task_seconds": 12.1166666666667,
+			"threatened_fraction": 0.323907455012853,
+			"tier": 3,
+			"trial_failures": 0,
+			"trials": {
+				"0": {
+					"seconds": 12.1166666666668,
+					"start": 14.9833333333333
+				}
+			},
+			"warning_count": 22,
+			"wave": 15
+		},
+		{
+			"boss": "Korrodon, der Ätzkoloss",
+			"boss_health_phases": 3,
+			"boss_hp": 4302.0,
+			"boss_hp_remaining": 0.0,
+			"build": "ranged_single",
+			"build_setup": {
+				"build": "ranged_single",
+				"capsules": 0,
+				"equipment": [
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_0"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_1"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_2"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_3"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_4"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_5"
+					}
+				],
+				"gold_budget": 1300,
+				"gold_unspent": 844,
+				"item_gold": 0,
+				"items": [],
+				"mode": "base",
+				"roots": 6,
+				"stats": {
+					"armor": 9.0,
+					"attack_speed": 30.0,
+					"crit_chance": 0.125,
+					"damage_bonus": 30.0,
+					"max_health": 145.0,
+					"melee_damage": 0.0,
+					"ranged_damage": 12.0
+				},
+				"tier": 3,
+				"upgrade_points": 0,
+				"wave": 15,
+				"weapon_gold": 456
+			},
+			"damage": 341.549999999988,
+			"damage_by_source": {
+				"acid_king": 341.549999999988
+			},
+			"damage_per_second": 6.58515424164502,
+			"difficulty": "normal",
+			"hits": [
+				{
+					"damage": 17.25,
+					"seconds": 1.45,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 2.1,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 2.76666666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 12.0749999999971,
+					"seconds": 6.93333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 11.0833333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 11.7333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 28.9833333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 29.6333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 30.3,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 30.9666666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 31.6166666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 12.0749999999971,
+					"seconds": 32.1333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 32.9166666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 39.9,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 40.55,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 41.2166666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 41.8833333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 42.5333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 12.0749999999971,
+					"seconds": 43.0333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 17.25,
+					"seconds": 43.8333333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 12.0749999999971,
+					"seconds": 47.6666666666667,
+					"source": "acid_king"
+				}
+			],
+			"hp_bars_lost": 2.35551724137923,
+			"immune_seconds": 13.65,
+			"minion_seconds": 0.0,
+			"minion_task_seconds": 0.0,
+			"moving_fraction": 0.417737789203085,
+			"outcome": "boss_killed",
+			"policy": "seeker",
+			"reference_player_hp": 145.0,
+			"seconds": 51.8666666666667,
+			"seed": 112233,
+			"task_seconds": 12.1166666666667,
+			"threatened_fraction": 0.323907455012853,
+			"tier": 3,
+			"trial_failures": 0,
+			"trials": {
+				"0": {
+					"seconds": 12.1166666666668,
+					"start": 14.9833333333333
+				}
+			},
+			"warning_count": 22,
+			"wave": 15
+		},
+		{
+			"boss": "Korrodon, der Ätzkoloss",
+			"boss_health_phases": 3,
+			"boss_hp": 4302.0,
+			"boss_hp_remaining": 0.0,
+			"build": "ranged_single",
+			"build_setup": {
+				"build": "ranged_single",
+				"capsules": 0,
+				"equipment": [
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_0"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_1"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_2"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_3"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_4"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_5"
+					}
+				],
+				"gold_budget": 1300,
+				"gold_unspent": 844,
+				"item_gold": 0,
+				"items": [],
+				"mode": "base",
+				"roots": 6,
+				"stats": {
+					"armor": 9.0,
+					"attack_speed": 30.0,
+					"crit_chance": 0.125,
+					"damage_bonus": 30.0,
+					"max_health": 145.0,
+					"melee_damage": 0.0,
+					"ranged_damage": 12.0
+				},
+				"tier": 3,
+				"upgrade_points": 0,
+				"wave": 15,
+				"weapon_gold": 456
+			},
+			"damage": 13.8000000000029,
+			"damage_by_source": {
+				"acid_king": 13.8000000000029
+			},
+			"damage_per_second": 0.266924564796962,
+			"difficulty": "normal",
+			"hits": [
+				{
+					"damage": 13.8000000000029,
+					"seconds": 3.03333333333333,
+					"source": "acid_king"
+				}
+			],
+			"hp_bars_lost": 0.0951724137931235,
+			"immune_seconds": 13.65,
+			"minion_seconds": 0.0,
+			"minion_task_seconds": 0.0,
+			"moving_fraction": 0.665377176015474,
+			"outcome": "boss_killed",
+			"policy": "reactive",
+			"reference_player_hp": 145.0,
+			"seconds": 51.7,
+			"seed": 13579,
+			"task_seconds": 12.0333333333333,
+			"threatened_fraction": 0.131528046421663,
+			"tier": 3,
+			"trial_failures": 0,
+			"trials": {
+				"0": {
+					"seconds": 12.0333333333335,
+					"start": 14.9833333333333
+				}
+			},
+			"warning_count": 22,
+			"wave": 15
+		},
+		{
+			"boss": "Korrodon, der Ätzkoloss",
+			"boss_health_phases": 3,
+			"boss_hp": 4302.0,
+			"boss_hp_remaining": 0.0,
+			"build": "ranged_single",
+			"build_setup": {
+				"build": "ranged_single",
+				"capsules": 0,
+				"equipment": [
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_0"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_1"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_2"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_3"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_4"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_5"
+					}
+				],
+				"gold_budget": 1300,
+				"gold_unspent": 844,
+				"item_gold": 0,
+				"items": [],
+				"mode": "base",
+				"roots": 6,
+				"stats": {
+					"armor": 9.0,
+					"attack_speed": 30.0,
+					"crit_chance": 0.125,
+					"damage_bonus": 30.0,
+					"max_health": 145.0,
+					"melee_damage": 0.0,
+					"ranged_damage": 12.0
+				},
+				"tier": 3,
+				"upgrade_points": 0,
+				"wave": 15,
+				"weapon_gold": 456
+			},
+			"damage": 75.9000000000087,
+			"damage_by_source": {
+				"acid_king": 27.6000000000058,
+				"acid_wake": 13.8000000000029,
+				"shield_beam": 34.5
+			},
+			"damage_per_second": 1.46808510638315,
+			"difficulty": "normal",
+			"hits": [
+				{
+					"damage": 13.8000000000029,
+					"seconds": 3.05,
+					"source": "acid_king"
+				},
+				{
+					"damage": 13.8000000000029,
+					"seconds": 12.7833333333333,
+					"source": "acid_king"
+				},
+				{
+					"damage": 34.5,
+					"seconds": 25.4666666666667,
+					"source": "shield_beam"
+				},
+				{
+					"damage": 13.8000000000029,
+					"seconds": 25.9666666666667,
+					"source": "acid_wake"
+				}
+			],
+			"hp_bars_lost": 0.523448275862129,
+			"immune_seconds": 13.65,
+			"minion_seconds": 0.0,
+			"minion_task_seconds": 0.0,
+			"moving_fraction": 0.654094132817537,
+			"outcome": "boss_killed",
+			"policy": "reactive",
+			"reference_player_hp": 145.0,
+			"seconds": 51.7,
+			"seed": 24680,
+			"task_seconds": 12.0333333333333,
+			"threatened_fraction": 0.147001934235977,
+			"tier": 3,
+			"trial_failures": 0,
+			"trials": {
+				"0": {
+					"seconds": 12.0333333333335,
+					"start": 14.9833333333333
+				}
+			},
+			"warning_count": 22,
+			"wave": 15
+		},
+		{
+			"boss": "Korrodon, der Ätzkoloss",
+			"boss_health_phases": 3,
+			"boss_hp": 4302.0,
+			"boss_hp_remaining": 0.0,
+			"build": "ranged_single",
+			"build_setup": {
+				"build": "ranged_single",
+				"capsules": 0,
+				"equipment": [
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_0"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_1"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_2"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_3"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_4"
+					},
+					{
+						"affix_slots": 3,
+						"affixes": [],
+						"id": "enamel_mirror",
+						"invested_coins": 76,
+						"rolls": {},
+						"tier": 3,
+						"uid": "probe_5"
+					}
+				],
+				"gold_budget": 1300,
+				"gold_unspent": 844,
+				"item_gold": 0,
+				"items": [],
+				"mode": "base",
+				"roots": 6,
+				"stats": {
+					"armor": 9.0,
+					"attack_speed": 30.0,
+					"crit_chance": 0.125,
+					"damage_bonus": 30.0,
+					"max_health": 145.0,
+					"melee_damage": 0.0,
+					"ranged_damage": 12.0
+				},
+				"tier": 3,
+				"upgrade_points": 0,
+				"wave": 15,
+				"weapon_gold": 456
+			},
+			"damage": 75.9000000000087,
+			"damage_by_source": {
+				"acid_king": 41.4000000000087,
+				"shield_beam": 34.5
+			},
+			"damage_per_second": 1.46336760925467,
+			"difficulty": "normal",
+			"hits": [
+				{
+					"damage": 13.8000000000029,
+					"seconds": 3.01666666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 13.8000000000029,
+					"seconds": 12.7666666666667,
+					"source": "acid_king"
+				},
+				{
+					"damage": 34.5,
+					"seconds": 25.5333333333333,
+					"source": "shield_beam"
+				},
+				{
+					"damage": 13.8000000000029,
+					"seconds": 41.4833333333333,
+					"source": "acid_king"
+				}
+			],
+			"hp_bars_lost": 0.523448275862129,
+			"immune_seconds": 13.65,
+			"minion_seconds": 0.0,
+			"minion_task_seconds": 0.0,
+			"moving_fraction": 0.674807197943445,
+			"outcome": "boss_killed",
+			"policy": "reactive",
+			"reference_player_hp": 145.0,
+			"seconds": 51.8666666666667,
+			"seed": 112233,
+			"task_seconds": 12.1166666666667,
+			"threatened_fraction": 0.152313624678663,
+			"tier": 3,
+			"trial_failures": 0,
+			"trials": {
+				"0": {
+					"seconds": 12.1166666666668,
+					"start": 14.9833333333333
+				}
+			},
+			"warning_count": 22,
+			"wave": 15
+		}
+	],
+	"schema": 1,
+	"time_scale": 1.0
+}

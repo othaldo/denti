@@ -1,20 +1,21 @@
 # Schnellere Testausführung
 
-`tools/run_tests.py` startet standardmäßig die 160 Kernprüfungen mit bis zu vier parallelen Prozessen. Spielfluss, Save/Resume und Migration, Schaden/Status, Waffen und Synergien, Belohnungen, Shop/Economy, Schwierigkeitsskalierung und bedienbare UI bleiben Bestandteil jedes normalen CI-Builds. Kurze Ausweichtests und die Verhaltens-/Speichertests aller Bosse bleiben ebenfalls enthalten. Der Simulationsschritt bleibt `--fixed-fps 60`.
+`tools/run_tests.py` startet standardmäßig die 177 Kernprüfungen mit bis zu vier parallelen Prozessen. Spielfluss, Save/Resume und Migration, Schaden/Status, Waffen und Synergien, Belohnungen, Shop/Economy, Schwierigkeitsskalierung und bedienbare UI bleiben Bestandteil jedes normalen CI-Builds. Kurze Ausweichtests und die Verhaltens-/Speichertests aller Bosse bleiben ebenfalls enthalten. Der Simulationsschritt bleibt `--fixed-fps 60`.
 
 ## Auswahl nach Zweck
 
 | Suite | Umfang | Einsatz |
 | --- | --- | --- |
-| `core` (Standard) | 160 Tests direkt unter `tests/` | Lokale Standardprüfung und Push-/PR-Builds |
-| `extended` | 15 Tests unter `tests/extended/` | Gezielte Grafik-, Diagnose- oder umfangreiche Balanceprüfung |
-| `all` | Beide Gruppen, 175 Tests | Release-Tags und manuell angeforderter vollständiger CI-Lauf |
+| `core` (Standard) | 177 Tests direkt unter `tests/` | Lokale Standardprüfung und Push-/PR-Builds |
+| `extended` | 21 Tests unter `tests/extended/` | Gezielte Grafik-, Diagnose- oder umfangreiche Balanceprüfung |
+| `all` | Beide Gruppen, 198 Tests | Release-Tags und manuell angeforderter vollständiger CI-Lauf |
 
 Im GitHub-Workflow kann beim manuellen Start `test_suite: all` gewählt werden. Release-Tags verwenden immer `all`. Neue Tests direkt unter `tests/` sind automatisch Teil der Kernprüfung; Hilfsskripte unter `tests/support/` werden nie als eigene Tests gestartet. Filter gelten nur innerhalb der ausgewählten Suite. Eine leere Auswahl oder doppelte Testnamen über beide Gruppen hinweg sind Fehler.
 
 Die zusätzlichen Prüfungen wurden nach ihrem tatsächlichen Inhalt ausgewählt:
 
 - `emperor_final_routes`, `king_assault_routes`: vollständige Angriffsfolgen samt auslaufenden Geschossen, vier Schwierigkeitsgrade, vier Ecken und drei Bildschirmformate. Diese umfassende Suchmatrix bleibt für Bossänderungen erhalten; Warnzeiten, Zielverfolgung, kürzere Ausweichprüfungen, komplette Mechaniken und kompatibles Fortsetzen bleiben im Kern.
+- `boss_pressure_probe`: identische Treffer-Schutzzeiten mit Messreserve, RNG-isolierte Mess-SFX und aktuelle Minion-/Aufgabenwarnungen.
 - `debug_cheat_menu`, `test_arenas`, `combat_diagnostics`, `run_telemetry`: Entwicklerzugänge, Vergleichsarenen, Messberichte und Diagnoseinstrumentierung. Die Integritätsprüfungen für normale Spielstände sowie wirtschaftliche und kampfrelevante Telemetrie in den Gameplay-Tests bleiben im Kern.
 - `prepared_combat_textures`, `prepared_projectile_atlas`, `enemy_sprite_atlas`, `item_icon_regions`, `stat_icons`, `attack_effects`: pixelgenaue Raster-/Atlasvergleiche, Rahmen und Quellbildzuschnitt. Nach Grafik- oder Bake-Änderungen gezielt ausführen.
 - `count_rig`, `weapon_art_layers`, `denti_expressions`: detaillierte Animations-, Mesh- und Darstellungskontrollen. Angriffsgeometrie, Projektilausrichtung, Waffenverhalten und Spielerstatus bleiben im Kern.
@@ -29,7 +30,24 @@ Die Dateinamen allein waren kein Ausschlusskriterium: Beispielsweise prüft `atl
 
 Damit entfallen drei eigene Testprozesse. Die übrigen wichtigen Aussagen bleiben erhalten; die 15 Zusatzprüfungen sind ausdrücklich aufrufbar.
 
-## Aktueller Kernlauf
+## Abschlussregression der Bossänderungen, 4. November 2026
+
+Die vollständige Suite mit 198 Tests lief unter Windows/Godot 4.7.2 mit vier
+Workern in 740,22 Sekunden. 195 Tests bestanden direkt, einschließlich der
+vollständigen König-/Imperator-Routen. Drei Befunde wurden anschließend behoben:
+Die Bossdruck-Prüfung verwendet die dokumentierten Folgefächer-Warnzeiten,
+der Bot-Test erwartet den Bossabschluss statt des früheren Wellentimers, und
+der neu gebaute Glyphenatlas enthält die fehlenden Markierungen für Karamellherz
+und Reichsrichter. Der anschließende Lauf dieser drei Tests sowie
+`weapon_evolutions` und `warning_effects` bestand mit **5/5 in 30,24 Sekunden**.
+Damit sind alle 198 Tests einschließlich der korrigierten Nachläufe geprüft.
+Zusätzlich bestanden **50/50 Python-Tests** für die Build- und Testwerkzeuge.
+
+Die unveränderten Erstlauf- und Nachlaufberichte liegen unter
+`.godot/test_runs/20261103-223342-6d32a0b5/results.json` und
+`.godot/test_runs/20261104-060439-0ba8b13f/results.json`.
+
+## Kernlauf vom 31. Oktober 2026
 
 Am 31. Oktober 2026: **150/150 bestanden in 220,93 Sekunden**, Windows, Godot 4.7.2, vier parallele Prozesse. Zusätzlich bestanden alle zehn Runner-Tests und der zusammengefasste Boden-/Angriffsatlastest über den echten `extended`-Aufruf. Die lediglich verschobenen Tests behielten ihre Inhalte und UIDs; die umfangreichen Suchmatrizen wurden für die Umordnung nicht erneut ausgeführt.
 

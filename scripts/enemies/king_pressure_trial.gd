@@ -151,6 +151,7 @@ func advance(delta: float) -> bool:
 	var spent := 0.0
 	while left > 0.000001 and busy():
 		var step := minf(left, maxf(remaining, 0))
+		if encounter.acid_wake != null: encounter.acid_wake.advance(step, spent)
 		flash_remaining = maxf(flash_remaining - step, 0)
 		if state == State.INTRODUCTION:
 			encounter.enemy.global_position = arrival_origin.lerp(anchor, clampf(1 - (remaining - step) / profile.introduction_seconds, 0, 1))
@@ -206,10 +207,12 @@ func _next(_seconds_in_frame: float) -> void:
 			beam_hit = false
 			fired = false
 		State.FIRING:
+			if encounter.acid_wake != null: encounter.acid_wake.add_beam(origin, destination)
 			state = State.RECOIL
 			remaining = profile.recoil_seconds
 		State.RECOIL:
 			if remaining_valves() == 0:
+				if encounter.acid_wake != null: encounter.acid_wake.clear()
 				state = State.SHATTER
 				remaining = profile.shatter_seconds
 				shield_broken.emit(anchor)
@@ -227,6 +230,7 @@ func _next(_seconds_in_frame: float) -> void:
 		State.EXPOSED:
 			_finish_opening()
 		State.BLAST_WARNING:
+			if encounter.acid_wake != null: encounter.acid_wake.clear()
 			encounter.spit.fire(anchor, EnemyProjectilePatterns.circle_directions(8 + remaining_valves() * 4, 0), &"king_overpressure")
 			state = State.FINISHED
 			encounter.state = AcidKingEncounter.State.RECOVERY

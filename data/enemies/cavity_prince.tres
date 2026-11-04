@@ -6,7 +6,7 @@
 
 [resource]
 script = ExtResource("1")
-display_name = "Karies-Prinz"
+display_name = "Don Karamello"
 max_health = 750.0
 damage_reduction = 0.15
 knockback_resistance = 0.79

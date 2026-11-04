@@ -1,6 +1,74 @@
-# Karies-Prinz: die Karamellküche
+# Don Karamello: die Karamellküche
 
-Neuester Prinzenstand: [Bombenfrequenz nach Schwierigkeit](PRINCE_BOMB_FREQUENCY.md) – Hell mit doppeltem Wurftakt innerhalb der Serie, weiterhin 1,1 s Vorwarnung je Bombe. Die älteren Messungen unten liegen vor dieser Taktänderung.
+## Aktuell: weniger Prüfungen, längere normale Kampfabschnitte
+
+Nach der Druckmessung vom 03.11.2026 hat Don auf Easy/Normal **eine Prüfung**
+im letzten Drittel. Hard/Hell erhalten **zwei**: Herzboten bei 2/3 Leben und
+die vier Herzen bei 1/3. Die mittlere Zwei-Herzen-Prüfung wird für neue Kämpfe
+nicht mehr geplant. Ihre Definition und Slotnummer bleiben für alte
+Spielstände erhalten; eine bereits laufende alte Prüfung kann fertig werden.
+
+Ein Erfolg öffnet bis zu vier Sekunden mit Faktor 1,75 Schaden. Das Fenster
+nimmt höchstens **8 % Bossleben** als Waffenschaden auf und endet sofort,
+sobald dieses Budget verbraucht ist. Danach beginnt das normale Schadensbudget
+bei null und lädt wie bisher nach. Don bleibt anvisierbar und nimmt seine
+normalen Attacken wieder auf. Brösel läuft durchgehend weiter.
+
+Normale Bomben starten auf Normal/Hard/Hell im 1,067/0,733/0,567-Sekunden-Takt
+innerhalb einer Serie. Jede Landestelle erhält weiterhin volle **1,1 Sekunden**
+Warnung. Die Erholung zwischen Angriffsfolgen ist um 15 % kürzer; Hard-/Hell-
+Herzgeschosse sind zusätzlich 3/6 % schneller, nachfolgende Fächer warnen
+0,72/0,69 Sekunden. Die erste Herzsalve warnt weiterhin 0,85 Sekunden.
+Schaden, Bossleben und der begrenzte Brösel-Nachschub wurden dafür nicht erhöht.
+
+Die Vergleichsbuilds erhalten auf Hell nun rund **11,6 Sekunden normalen
+Kampf zwischen beiden Prüfungen**. Das Duell dauert etwa 45–47 Sekunden,
+auf Normal mit einer Prüfung etwa 26 Sekunden. Der Immunanteil sinkt auf
+Hell von etwa 45–56 % auf 28–30 %. Das sind Diagnosewerte, keine menschlichen
+Überlebensraten. [Messbedingungen und Vorher/Nachher-Daten](DON_PRESSURE_REWORK.md).
+
+## Aktuell: Brösel auf Hard und Hell
+
+Seit 03.11.2026 ergänzt ein eigener Keks-Leibwächter den normalen Kampf:
+**Brösel** verfolgt Denti, kündigt einen festen Vorstoß an und schlägt danach
+auf eine ebenfalls fest angekündigte Fläche. Auf Hard gibt es einen Schlag,
+auf Hell zwei einzeln gewarnte Schläge. Es bleibt höchstens ein Brösel pro Don
+gleichzeitig aktiv; maximal zwei auf Hard bzw. drei auf Hell im gesamten Kampf.
+Der erste Ruf folgt nach vier Sekunden Kampfzeit, Ersatz frühestens
+nach zwölf weiteren Kampfsekunden ohne lebenden Leibwächter.
+
+Brösel bleibt während Gesundheitswechseln, Herzprüfungen und dem
+Gegenangriffsfenster aktiv und angreifbar. Bereits angekündigte Vorstöße und
+Schläge laufen weiter; der Phasenwechsel des Dons setzt sie nicht zurück.
+Seine Namensleiste bleibt normal sichtbar. Erst beim Tod des Dons verschwindet
+er. Es gibt keine zusätzlichen Beutedrops und keinen zweiten für den
+Wellenabschluss nötigen Hauptboss. Die Ruf- und Ersatzzeiten laufen auch
+während der Spezialphasen weiter.
+
+Sein Burstbudget verhindert sofortige Kills und lädt während des gesamten
+Kampfes nach. Die violette Namensleiste verwendet die Miniboss-
+Anzeige. Die neue eigene gemalte Grafik und der finale Prompt liegen unter
+`assets/enemies/caramel_enforcer/` (eingebautes Imagegen).
+
+Zusätzlich lädt Don Karamellos normales Schadensbudget auf Hard um Faktor 1,25,
+auf Hell um Faktor 1,7 langsamer nach. Easy und Normal kommen weiterhin
+ohne Brösel aus. Die Zahl und der Abstand der Herzprüfungen stehen oben.
+Version-4-Spielstände behalten ihre Herzprüfungen, erhalten während eines
+laufenden alten Kampfes aber keinen unangekündigten Leibwächter.
+
+`tests/caramel_enforcer.gd` prüft Einzel-/Doppelschläge, feste Warnungen,
+verlangsamte Fluchtwege gegen die Kombination mit Bomben/Fächern in allen vier
+Ecken, aktive Ritualphasen, begrenzte Verstärkungen, echtes Save/Resume und Aufräumen.
+`tests/caramel_enforcer_combat.gd` vergleicht vollständige Hell-Kämpfe mit realen
+automatischen Nah-/Fernwaffen und Spielerphysik. Der Pilot bleibt am Don und
+reagiert nur auf Herzaufgaben. Mit 10000 diagnostischen HP misst er Druck,
+keine menschliche Überlebensbalance. Messwerte:
+`.godot/caramel_enforcer_combat.json`; native Vorschauen:
+`.godot/caramel_enforcer_preview/`.
+
+Die folgenden Abschnitte und Messungen dokumentieren frühere Ausbaustufen.
+
+Früherer Prinzenstand: [Bombenfrequenz nach Schwierigkeit](PRINCE_BOMB_FREQUENCY.md) – Hell mit doppeltem Wurftakt innerhalb der Serie, weiterhin 1,1 s Vorwarnung je Bombe. Die älteren Messungen unten liegen vor dieser Taktänderung.
 
 Aktuell seit 31.10.: weniger Basisleben, kürzere Pausen und stärkeres Nachsetzen. Die gültigen Änderungen, alle vier Schwierigkeiten und der neue Vergleich stehen in [BOSS_AGGRESSION.md](BOSS_AGGRESSION.md). Die folgenden Detailwerte und älteren Aufnahmen dokumentieren den vorherigen Ausbau.
 

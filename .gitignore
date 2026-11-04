@@ -27,6 +27,9 @@ __pycache__/
 !assets/enemies/king_acid/portrait.png.import
 !assets/enemies/emperor_court/parts.png.import
 !assets/enemies/emperor_court/portrait.png.import
+!assets/enemies/imperial_vassals/*.png.import
+!assets/enemies/caramel_enforcer/*.png.import
+!assets/enemies/acid_collector/*.png.import
 
 # Painted run-preparation motifs stay smooth at small card sizes.
 !assets/ui/run_setup/*.png.import

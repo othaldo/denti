@@ -7,6 +7,20 @@ Der Graf bleibt zunächst ein Duell. Prinz, König und Imperator besitzen eigene
 Aufgaben, die nach Schwierigkeit aufeinander aufbauen. Das Kronengericht des
 Imperators wird durch drei eigene Vasallenrollen ergänzt.
 
+## Bossnamen
+
+| Welle | Name | Bisheriger Entwicklungsname |
+| --- | --- | --- |
+| 5 | Plaquula | Karies-Graf |
+| 10 | Don Karamello | Karies-Prinz |
+| 15 | Korrodon, der Ätzkoloss | Karies-König |
+| 20 | Karies-Imperator | Karies-Imperator |
+
+Korrodons Lebensleiste zeigt den Kurznamen; Ankündigungen, Storydialoge und
+Bossdetails behalten den vollständigen Namen. Interne Ressourcenpfade und
+Speicherkennungen bleiben stabil. Ältere Kurzbezeichnungen in den technischen
+Ablaufbeschreibungen beziehen sich auf dieselben Bosse.
+
 ## Direkt testspielen
 
 Im Projektordner unter PowerShell:
@@ -53,19 +67,26 @@ Entscheidungen auflösen, Shop beziehungsweise Sieg. Bei zwei Endlosbossen
 beginnen Sammlung und Auszahlung erst nach dem letzten Boss; das Budget ist
 einmal pro Stage verfügbar.
 
-## Prinz: Karamell-Katastrophe
+## Don Karamello: Karamell-Katastrophe
+
+Auf Hard/Hell kämpft außerdem der eigene Keks-Leibwächter **Brösel** mit
+angekündigten Vorstößen und Bodenhieben. Er bleibt auch während der
+Herzprüfungen aktiv und angreifbar. Auf Hell folgen zwei einzeln gewarnte Hiebe.
+Es bleibt höchstens ein Brösel pro Don gleichzeitig aktiv, seine Namensleiste
+ist violett. Nach dem letzten Hauptboss bleibt kein weiterer Pflichtgegner
+zurück. [Abwehr, Verstärkungsgrenzen und Prüfungen](PRINCE_CARAMEL.md).
 
 Der Kampf beginnt mit dem normalen Repertoire aus Bomben, Herzfächern und
-Zuckerrausch. Erst danach kommen die Prüfungen. Auf Normal lernt Denti bei
-50 % Bossleben zunächst zwei schießende Herzen kennen. Im letzten Drittel
-folgen vier Herzen, breitere Salven und gezielt angekündigte Karamellbahnen.
+Zuckerrausch. Erst danach kommen die Prüfungen. Normal erhält einmal vier
+Herzen im letzten Drittel; Hard/Hell zusätzlich Herzboten bei 2/3 Leben.
+Die mittlere Prüfung entfällt, damit Don mehr normale Angriffsfolgen zeigt.
 
 | Schwierigkeit | Prüfungen | Staffelung |
 | --- | ---: | --- |
 | Easy | 1 | Vier Herzen im letzten Drittel; einzelne Herzgeschosse |
-| Normal | 2 | Zwei Herzen bei 50 %, danach vier Herzen mit Dreierfächern und Karamellbahnen |
-| Hard | 3 | Drei Herzboten bei 2/3 Leben abfangen, zwei Herzen bei 50 %, vier Herzen mit Fünferfächern im letzten Drittel |
-| Hell | 3 | Dieselben drei Aufgaben; schnellere Herzboten, kürzere Salvenpausen, größere Fächer bis sieben Geschosse |
+| Normal | 1 | Vier Herzen mit Dreierfächern und Karamellbahnen im letzten Drittel |
+| Hard | 2 | Drei Herzboten bei 2/3 Leben abfangen, vier Herzen mit Fünferfächern im letzten Drittel |
+| Hell | 2 | Dieselben zwei Aufgaben; schnellere Herzboten, kürzere Salvenpausen, größere Fächer bis sieben Geschosse |
 
 Die Herzboten sind eigene bewegliche Bossziele: Sie hüpfen zum Kessel,
 bleiben für ihre angekündigten Salven kurz stehen und können auf dem Weg
@@ -89,7 +110,10 @@ mehr Prüfungen und Druck kommen aus Verhalten und Abfolge.
   erhalten ein anteiliges Zeitbudget. Keine Dash- oder Tempo-Investition ist Pflicht.
 - Alle Ziele einer Prüfung abzufangen beziehungsweise zu zerstören bricht das Ritual sofort ab. Der Prinz bleibt bis zu vier
   Sekunden stehen und nimmt 75 % zusätzlichen Schaden; sein normaler
-  Schadensbudget-Schutz greift in diesem Fenster nicht.
+  Schadensbudget-Schutz greift in diesem Fenster nicht. Ein eigenes Budget
+  begrenzt den Gegenschlag auf 8 % Bossleben; danach endet das Fenster sofort
+  und das normale Budget beginnt bei null. So folgen wieder normale Attacken,
+  bevor der nächste Gesundheitspunkt eine Prüfung auslöst.
 - Beim Fehlschlag folgt eine weitere sichtbare Vorwarnung. Je verbliebenem Herz
   entstehen vier zusätzliche Geschosse im anschließenden Ring. Danach endet die
   Immunität und der reguläre Kampf geht weiter. Kein erzwungener Soforttod und
@@ -104,7 +128,15 @@ Angriffsfenster werden gespeichert. Ältere gespeicherte Ritualfassungen erhalte
 keine nachträglichen früheren Prüfungen und keine überraschenden neuen Salven. Vor Version 4 gespeicherte Prinzenkämpfe,
 die bereits das letzte Drittel erreicht haben, erhalten kein nachträgliches Ritual.
 
-## König: Säureschild und Strahlumlenkung
+## Korrodon: Säureschild und Strahlumlenkung
+
+Die abgefeuerten Schildstrahlen lassen jetzt eine 3/4/5/6 Sekunden bestehende
+Säurespur auf Easy/Normal/Hard/Hell zurück. Höchstens drei liegen gleichzeitig;
+ein freier innerer Übergang und das Räumen beim Schildbruch erhalten Laufwege.
+Auf Hard/Hell unterstützt der eigene Miniboss **Schlacko** den normalen Kampf
+mit angekündigten Säureklumpen und kleinen Pfützen. Auch während der
+Ventilprüfung greift er weiter an und bleibt mit violetter Namensleiste angreifbar.
+[Details, Grenzen und Messungen](KING_ACID.md).
 
 Die Schildphase prüft Positionierung: Denti stellt sich zwischen den König und
 ein Ventil. Der Strahl folgt zunächst, rastet orange ein und feuert erst nach
@@ -196,6 +228,12 @@ es keinen normalen Spawnstrom. Den Siegelhüter zuerst zu besiegen stoppt die
 Heilung unmittelbar; insgesamt kann der Imperator pro Ruf höchstens 4 % seines
 Maximallebens regenerieren. Er erhöht dabei nicht seine maximalen HP.
 
+Unter der roten Imperator-Leiste erscheinen kleinere goldgerahmte, violette
+Lebensleisten mit den Namen der lebenden Vasallen. In breiten Ansichten stehen
+sie nebeneinander, in schmalen Hochformaten untereinander. Die Anzeigen folgen
+den einzelnen Gegnern auch nach einer fehlgeschlagenen Aufladung und verschwinden
+bei ihrem Tod oder beim Abschluss des Bosskampfes.
+
 Alle Vasallen vor Ende der Aufladung zu besiegen unterbricht das Urteil und
 öffnet bis zu vier Sekunden Gegenangriff mit Faktor 1,65 ohne Rüstung. Ein
 eigenes Budget von 8 % Bossleben begrenzt dieses Fenster; danach ist das normale
@@ -255,7 +293,11 @@ Minions oder gezielte Item-Anpassungen sind eigene nächste Spieltestschritte.
 
 ## Prüfung
 
-Der Runner enthält **172 Kernprüfungen**. Native Aufnahmen wurden bei 1280×720, 320×568
+Die [aktuelle Bossdruck-Messung vom 3. November 2026](BOSS_PRESSURE_2026_11_03.md)
+vergleicht vollständige Duelle auf Normal und Hell einschließlich der Minions.
+Sie trennt Kampflänge, tatsächlichen Schaden und den Abstand zwischen Prüfungen.
+
+Der Runner enthält **177 Kernprüfungen**. Native Aufnahmen wurden bei 1280×720, 320×568
 und 568×320 geprüft. [Vorher-/Nachher-Messungen](boss_stage_measurements.json)
 enthalten die diagnostischen Bedingungen und ihre Grenzen.
 
@@ -265,7 +307,8 @@ Erfolg/Fehlschlag, automatische Zielabfragen, Pause und echtes Save/Resume.
 `tests/caramel_overload_combat.gd` lässt reale Nah-, Fern- und Flächenwaffen mit
 normaler Spielerphysik die vier Ziele angreifen, zusätzlich mit -60 % Bewegung.
 Auch echte automatische Fernwaffen fangen auf Hard und Hell Herzboten ab.
-`tests/caramel_trials.gd` prüft die komplette 1/2/3/3-Abfolge, nicht überspringbare
+`tests/caramel_trials.gd` prüft die komplette 1/1/2/2-Abfolge, begrenzte
+Gegenschläge, normale Kampfabschnitte und nicht überspringbare
 Lebensschwellen, zerstörbare Salvenquellen, durchgekommene Boten und Save/Resume
 nach einem teilweise abgeschlossenen Ritual.
 Die Messung schreibt `.godot/caramel_overload_combat.json`. Das stark erhöhte
@@ -285,8 +328,9 @@ verwendet die Kronenvasallen während der Aufladung und Regeneration.
 
 `tools/measure_caramel_phases.gd` misst zusätzlich vollständige Kämpfe mit zwei
 synthetischen Tier-II-Builds und einem Piloten ohne Reaktion auf Gefahren.
-Die Normal-Stichprobe erreicht die erste Aufgabe nach ungefähr 10–11 s und
-endet nach ungefähr 22–24 s; Hard/Hell durchlaufen alle drei Prüfungen.
+Die älteren Normal-Stichproben mit zwei Prüfungen endeten nach ungefähr 22–24 s;
+die damaligen Hard/Hell-Fassungen durchliefen drei Prüfungen. Die aktuelle
+[Don-Messung](DON_PRESSURE_REWORK.md) dokumentiert die reduzierte Folge.
 Das erhöhte Testleben macht diese Messung ausdrücklich nicht zum Nachweis
 menschlicher Überlebensbalance oder Spaß. Der direkte Spieltest entscheidet,
 ob die Lernfolge genügend Zeit und Abwechslung bietet.

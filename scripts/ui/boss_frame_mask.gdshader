@@ -5,6 +5,8 @@ uniform vec4 artwork_region;
 uniform float frame_width = 1.0;
 uniform float edge_inset = 0.0;
 uniform float health_fill : hint_range(0.0, 1.0) = 1.0;
+uniform vec4 fill_shadow : source_color = vec4(0.22, 0.02, 0.045, 1.0);
+uniform vec4 fill_highlight : source_color = vec4(0.65, 0.14, 0.21, 1.0);
 varying vec2 frame_position;
 
 void vertex() {
@@ -26,7 +28,7 @@ void fragment() {
 	filled = max(filled, step(0.9999, health_fill));
 	float height = clamp((art.y - 0.26) / 0.62, 0.0, 1.0);
 	float shine = smoothstep(0.0, 0.25, height) * (1.0 - smoothstep(0.35, 1.0, height));
-	vec3 red = mix(vec3(0.22, 0.02, 0.045), vec3(0.65, 0.14, 0.21), shine);
-	vec3 resource = mix(vec3(0.025, 0.015, 0.03), red, filled);
+	vec3 fill = mix(fill_shadow.rgb, fill_highlight.rgb, shine);
+	vec3 resource = mix(vec3(0.025, 0.015, 0.03), fill, filled);
 	COLOR = vec4(mix(source.rgb, resource, plum * face), source.a);
 }
