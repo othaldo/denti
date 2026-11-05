@@ -203,7 +203,8 @@ class ReleaseTests(unittest.TestCase):
         return (release, payload), artifact.getvalue()
 
     def preview_run(self, run_id=1, branch="feat/element-reactions", **overrides):
-        return {"id": run_id, "head_branch": branch, "event": "push", "head_sha": SHA,
+        return {"id": run_id, "run_number": run_id, "head_branch": branch, "event": "push", "head_sha": SHA,
+                "status": "completed", "conclusion": "success",
                 "head_repository": {"full_name": "othaldo/denti"},
                 "repository": {"full_name": "othaldo/denti"}, **overrides}
 
@@ -303,11 +304,75 @@ class ReleaseTests(unittest.TestCase):
         client = self.preview_client([self.preview_run()], payload)
         original = client.read
         def read(path, **kwargs):
-            if path == "actions/workflows/build.yml/runs?status=success&per_page=100&page=1":
+            if path == "actions/workflows/build.yml/runs?per_page=100&page=1":
                 return {"workflow_runs": [self.preview_run(branch="main")] * 100}
             return original(path, **kwargs)
         client.read = read
         self.assertEqual(set(pages.latest_previews(client)), {"feat/element-reactions"})
+
+    def test_triggering_build_is_used_when_the_run_listing_has_not_updated(self):
+        _, payload = self.preview_fixture()
+        client = self.preview_client([self.preview_run(1)], payload)
+        original = client.read
+        def read(path, **kwargs):
+            if path == "actions/runs/2":
+                return self.preview_run(2)
+            return original(path, **kwargs)
+        with patch.object(client, "read", side_effect=read) as requests:
+            self.assertEqual(set(pages.latest_previews(client, 2)), {"feat/element-reactions"})
+        paths = [call.args[0] for call in requests.call_args_list]
+        self.assertIn("actions/runs/2/artifacts?per_page=100&page=1", paths)
+        self.assertNotIn("actions/runs/1/artifacts?per_page=100&page=1", paths)
+        self.assertFalse(any("status=" in path for path in paths))
+
+    def test_delayed_trigger_does_not_replace_a_newer_successful_build(self):
+        _, payload = self.preview_fixture()
+        client = self.preview_client([self.preview_run(2)], payload)
+        original = client.read
+        def read(path, **kwargs):
+            if path == "actions/runs/1":
+                return self.preview_run(1)
+            return original(path, **kwargs)
+        with patch.object(client, "read", side_effect=read) as requests:
+            pages.latest_previews(client, 1)
+        paths = [call.args[0] for call in requests.call_args_list]
+        self.assertIn("actions/runs/2/artifacts?per_page=100&page=1", paths)
+        self.assertNotIn("actions/runs/1/artifacts?per_page=100&page=1", paths)
+
+    def test_unfiltered_listing_publishes_only_completed_successful_builds(self):
+        _, payload = self.preview_fixture()
+        runs = [self.preview_run(4, status="in_progress", conclusion=None),
+                self.preview_run(3, conclusion="failure"), self.preview_run(2)]
+        client = self.preview_client(runs, payload)
+        with patch.object(client, "read", wraps=client.read) as requests:
+            pages.latest_previews(client)
+        paths = [call.args[0] for call in requests.call_args_list]
+        self.assertIn("actions/runs/2/artifacts?per_page=100&page=1", paths)
+        self.assertNotIn("actions/runs/3/artifacts?per_page=100&page=1", paths)
+        self.assertNotIn("actions/runs/4/artifacts?per_page=100&page=1", paths)
+
+    def test_unsuccessful_trigger_cannot_publish_a_preview(self):
+        client = self.preview_client([], None)
+        original = client.read
+        def read(path, **kwargs):
+            if path == "actions/runs/2":
+                return self.preview_run(2, conclusion="failure")
+            return original(path, **kwargs)
+        client.read = read
+        with self.assertRaises(ValueError):
+            pages.latest_previews(client, 2)
+
+    def test_main_discovery_skips_failed_running_and_feature_builds(self):
+        _, payload = self.preview_fixture()
+        runs = [self.preview_run(10), self.preview_run(9, "main", status="in_progress", conclusion=None)]
+        runs.extend(self.preview_run(run_id, "main", conclusion="failure") for run_id in range(8, 1, -1))
+        runs.append(self.preview_run(1, "main"))
+        client = self.preview_client(runs, payload)
+        with patch.object(client, "read", wraps=client.read) as requests:
+            self.assertIsNotNone(pages.latest_dev(client))
+        paths = [call.args[0] for call in requests.call_args_list]
+        self.assertIn("actions/runs/1/artifacts?per_page=100&page=1", paths)
+        self.assertFalse(any("status=" in path for path in paths))
 
     def test_preview_names_cannot_collide_or_escape_and_labels_are_escaped(self):
         branches = ["feat/a-b", "feat-a/b", "feat/A-B", "feat/../../escape", "feat/" + "a" * 100,

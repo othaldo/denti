@@ -1,4 +1,5 @@
 name: Publish Denti branch previews
+run-name: ${{ github.event.workflow_run.head_branch && format('Preview {0} · Build {1}', github.event.workflow_run.head_branch, github.event.workflow_run.run_number) || 'Refresh Denti branch previews' }}
 
 on:
   workflow_run:
@@ -44,7 +45,13 @@ jobs:
       - name: Compose stable, main and feature builds
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python3 tools/prepare_pages.py
+          PREVIEW_RUN: ${{ github.event.workflow_run.id }}
+        run: |
+          if [ -n "$PREVIEW_RUN" ]; then
+            python3 tools/prepare_pages.py --preview-run "$PREVIEW_RUN"
+          else
+            python3 tools/prepare_pages.py
+          fi
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
