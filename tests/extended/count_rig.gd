@@ -13,7 +13,8 @@ func _check(condition: bool, message: String) -> void:
 func _run() -> void:
 	var scene := load("res://scenes/enemies/count_cloak_rig.tscn") as PackedScene
 	var rig := scene.instantiate() as CountCloakRig
-	var other := scene.instantiate() as CountCloakRig
+	# Also cover the procedural definition used when rebuilding the saved scene.
+	var other := CountCloakRig.new()
 	root.add_child(rig)
 	root.add_child(other)
 	await process_frame
@@ -34,10 +35,12 @@ func _run() -> void:
 	for frame in 615:
 		var style := frame / 205
 		var moment := frame % 205
-		if style == 0:
-			rig.sample(float(moment) / 60.0)
-		else:
-			rig.sample_strike(style, minf(moment / 100.0, 1), maxf((moment - 100) / 104.0, 0))
+		for actor: CountCloakRig in [rig, other]:
+			if style == 0:
+				actor.sample(float(moment) / 60.0)
+			else:
+				actor.sample_strike(style, minf(moment / 100.0, 1), maxf((moment - 100) / 104.0, 0))
+			_check_layering(actor)
 		for panel in rig.cloth:
 			var vertices := _project(rig, panel)
 			for face: PackedInt32Array in panel.polygons:
@@ -47,6 +50,12 @@ func _run() -> void:
 		var head: Sprite2D = rig.get_node("Skeleton2D/Torso/Head/Part1")
 		_check(is_equal_approx(head.global_transform.x.length(), head.global_transform.y.length()) and absf(head.global_transform.x.dot(head.global_transform.y)) < 0.001, "face was stretched or sheared")
 	_check(smallest_ratio > 0.08, "cloth mesh collapses/inverts in a transition: %f" % smallest_ratio)
+	# Idle plus a full second of walking must retain the same depth separation.
+	for frame in 61:
+		for actor: CountCloakRig in [rig, other]:
+			actor.sample(0)
+			actor.apply_stride(float(frame) / 60.0, 1)
+			_check_layering(actor)
 	# Two actors share artwork, never their bone poses or playback state.
 	other.sample(0)
 	var resting := other.bones[&"LeftShoulder"].rotation
@@ -82,6 +91,26 @@ func _run() -> void:
 	print("COUNT_RIG smallest cloth area ratio=", smallest_ratio)
 	if failures.is_empty(): print("PASS count_rig")
 	finish(0 if failures.is_empty() else 1)
+
+func _check_layering(rig: CountCloakRig) -> void:
+	# BOTH flaps must be hidden by the torso, regardless of which one attacks.
+	var body: Sprite2D = rig.get_node("Skeleton2D/Torso/Part0")
+	var collar: Sprite2D = rig.get_node("Skeleton2D/Torso/Part8")
+	var head: Sprite2D = rig.get_node("Skeleton2D/Torso/Head/Part1")
+	for panel: Polygon2D in rig.cloth:
+		_check(_effective_z(panel) >= _effective_z(rig), "%s fell behind the arena background" % panel.name)
+		_check(_effective_z(panel) < _effective_z(body), "%s crossed in front of the body" % panel.name)
+		for path: String in ["Skeleton2D/LeftFoot/Part6", "Skeleton2D/RightFoot/Part7"]:
+			var foot := rig.get_node(path) as Sprite2D
+			_check(_effective_z(panel) < _effective_z(foot) and _effective_z(foot) < _effective_z(body), "%s or body overlaps the feet incorrectly" % panel.name)
+	_check(_effective_z(body) < _effective_z(collar) and _effective_z(collar) < _effective_z(head), "body obscured the collar or face")
+
+func _effective_z(item: CanvasItem) -> int:
+	var layer := item.z_index
+	var parent := item.get_parent() as CanvasItem
+	if item.z_as_relative and parent != null:
+		layer += _effective_z(parent)
+	return layer
 
 func _project(rig: CountCloakRig, panel: Polygon2D) -> PackedVector2Array:
 	var vertices := PackedVector2Array()

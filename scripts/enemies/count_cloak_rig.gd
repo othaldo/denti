@@ -136,12 +136,12 @@ func _build() -> void:
 		var middle := _bone(shoulder, StringName(prefix + "Middle"), Vector2(side * 27, 18), 27)
 		_bone(middle, StringName(prefix + "Tip"), Vector2(side * 24, 15), 23)
 		_cloth(side, shoulder)
-	_piece(torso, 0, 70, Vector2.ZERO, 1)
+	_piece(torso, 0, 70, Vector2.ZERO, 2)
 	_piece(head, 1, 76, Vector2.ZERO, 8)
 	_piece(bones[&"LeftAntenna"], 4, 24, Vector2.ZERO, 7, Vector2(0.77, 0.94))
 	_piece(bones[&"RightAntenna"], 5, 24, Vector2.ZERO, 7, Vector2(0.23, 0.94))
-	_piece(bones[&"LeftFoot"], 6, 17, Vector2(0, 9), 0, Vector2(0.60, 0.08))
-	_piece(bones[&"RightFoot"], 7, 17, Vector2(0, 9), 0, Vector2(0.40, 0.08))
+	_piece(bones[&"LeftFoot"], 6, 17, Vector2(0, 9), 1, Vector2(0.60, 0.08))
+	_piece(bones[&"RightFoot"], 7, 17, Vector2(0, 9), 1, Vector2(0.40, 0.08))
 	_piece(torso, 8, 88, Vector2(0, -30), 6)
 	animator = AnimationPlayer.new()
 	_put(self, animator, &"AnimationPlayer")
@@ -156,7 +156,9 @@ func _cloth(side: int, shoulder: Bone2D) -> void:
 	_put(self, panel, StringName(prefix + "Cloth"))
 	panel.texture = ART
 	panel.skeleton = panel.get_path_to(skeleton)
-	panel.z_index = 3
+	# BOTH flaps stay behind the feet/body in idle, walking and every attack.
+	# Nonnegative local depth keeps them above the arena background.
+	panel.z_index = 0
 	var region := REGIONS[2 if side < 0 else 3]
 	var pixel_pivot := Vector2(region.size.x * (0.93 if side < 0 else 0.07), region.size.y * 0.10)
 	var source_scale := 76.0 / region.size.x

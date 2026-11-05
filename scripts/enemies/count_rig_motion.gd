@@ -23,9 +23,7 @@ static func combo() -> Animation:
 	_rotation(animation, "Torso/Head/RightAntenna", [0, 3, -6, -8, 16, -10, 5, 8, -16, 10, -2, 0], 0.055)
 	_rotation(animation, "LeftFoot", [0, 0, -5, -7, 10, 0, 2, 4, -7, 0, 0, 0])
 	_rotation(animation, "RightFoot", [0, 0, -2, -4, 7, 0, 5, 7, -10, 0, 0, 0])
-	# A slap passes in front of the torso/collar, while the face stays readable.
-	_track(animation, "LeftCloth:z_index", [0.0, 1.04, 1.30, DURATION], [3, 7, 3, 3], true)
-	_track(animation, "RightCloth:z_index", [0.0, 1.92, 2.25, DURATION], [3, 7, 3, 3], true)
+	# Cloth depth belongs to the rig: both flaps stay behind the body during attacks.
 	return animation
 
 

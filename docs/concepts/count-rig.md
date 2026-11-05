@@ -25,8 +25,10 @@ zeigt weiterhin die isolierte Rig-Studie.
 Die Figur öffnet den Umhang aus getrennten Flächen. Das erhält die Identität
 von Entwurf C, ist aber eine neu gemalte modulare Fassung; die Ruhepose und
 die Überdeckung beim schnellen Schlag brauchen weiterhin gestalterische
-Abnahme. Der Stoff schlägt vor dem Körper vorbei; das Gesicht bleibt für die Lesbarkeit
-auch beim Schlag davor sichtbar. Noch nicht
+Abnahme. Beide Mantelteile (`LeftCloth` und `RightCloth`, `z_index = 0`)
+liegen hinter Füßen (`1`) und Körper (`2`); Kragen (`6`) und Gesicht (`8`)
+bleiben darüber. Die unterschiedlichen gemalten Formen und Bewegungen bleiben erhalten.
+Animationsspuren verändern diese Reihenfolge auch beim Schlag nicht. Noch nicht
 enthalten sind vollständige Lauf-/Treffer-/Todesanimationen oder ein neuer
 Schadensablauf. Die aktive Kampfkomponente taktet Warnung, Trefferzeit und
 Rig-Darstellung gemeinsam; das Rig entscheidet nicht selbst über Schaden.
@@ -64,9 +66,11 @@ Farbsatz vermeidet wechselnde Farben. Die Ausgangsgrafik wurde nicht nachbearbei
 
 ## Prüfung
 
-`tests/count_rig.gd` prüft gültige Knochenbindungen und Gewichtssummen, die
+`tests/extended/count_rig.gd` prüft gültige Knochenbindungen und Gewichtssummen, die
 Stoffgeometrie über 205 Zeitpunkte, unverzerrte Gesichtsachsen, unabhängige
-Instanzen, bewegliche Spitzen sowie Scrubbing und Pause. Kleinste gemessene
+Instanzen, bewegliche Spitzen sowie Scrubbing und Pause. Die gespeicherte Szene
+und der prozedurale Aufbau werden außerdem auf konstante Tiefenstaffelung bei
+Idle, Schritten, beiden Fächerschlägen, Stoß und Ring geprüft. Kleinste gemessene
 Dreiecksfläche: rund **65 %** ihrer Ausgangsfläche; kein Dreieck klappt um
 oder kollabiert in der untersuchten Folge.
 
