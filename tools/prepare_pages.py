@@ -27,8 +27,11 @@ class GitHub:
 
     def read(self, path, binary=False, missing=False):
         url = self.base + path
+        # Actions downloads negotiate a JSON API redirect, even though the
+        # redirected response is ZIP bytes. Only release assets use octet-stream.
+        accept = "application/octet-stream" if binary and path.startswith("releases/assets/") else "application/vnd.github+json"
         request = urllib.request.Request(url, headers={
-            "User-Agent": "Denti-Pages", "Accept": "application/octet-stream" if binary else "application/vnd.github+json"})
+            "User-Agent": "Denti-Pages", "Accept": accept})
         # A redirect to GitHub's download host must not carry the API credential.
         if self.token:
             request.add_unredirected_header("Authorization", "Bearer " + self.token)

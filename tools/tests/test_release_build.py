@@ -1,11 +1,13 @@
 """Release identity, runnable archive layout, and stable/dev separation."""
 
 import hashlib
+from http.server import BaseHTTPRequestHandler, HTTPServer
 import importlib.util
 import io
 import json
 from pathlib import Path
 import tempfile
+import threading
 import unittest
 from unittest.mock import patch
 import zipfile
@@ -38,6 +40,45 @@ class ReleaseTests(unittest.TestCase):
 
     def tearDown(self):
         self.temporary.cleanup()
+
+    def test_github_artifact_redirect_and_release_asset_negotiate_correct_media_types(self):
+        requests = []
+        class Handler(BaseHTTPRequestHandler):
+            def log_message(self, *args):
+                pass
+
+            def do_GET(self):
+                requests.append((self.path, self.headers.get("Accept"), self.headers.get("Authorization")))
+                expected = "application/octet-stream" if self.path.startswith("/releases/assets/") else "application/vnd.github+json"
+                if self.headers.get("Accept") != expected:
+                    self.send_error(415)
+                elif self.path == "/actions/artifacts/7/zip":
+                    self.send_response(302)
+                    self.send_header("Location", "/download/artifact.zip")
+                    self.end_headers()
+                else:
+                    self.send_response(200)
+                    self.end_headers()
+                    self.wfile.write(b"PK-fixture" if self.path == "/download/artifact.zip" else b'{"id": 7}')
+
+        with HTTPServer(("127.0.0.1", 0), Handler) as server:
+            worker = threading.Thread(target=server.serve_forever, daemon=True)
+            worker.start()
+            try:
+                client = pages.GitHub("othaldo/denti", "fixture-token")
+                client.base = "http://127.0.0.1:" + str(server.server_port) + "/"
+                self.assertEqual(client.read("actions/artifacts/7/zip", binary=True), b"PK-fixture")
+                self.assertEqual(client.read("releases/assets/7", binary=True), b'{"id": 7}')
+                self.assertEqual(client.read("actions/artifacts/7"), {"id": 7})
+            finally:
+                server.shutdown()
+                worker.join()
+        self.assertEqual(requests, [
+            ("/actions/artifacts/7/zip", "application/vnd.github+json", "Bearer fixture-token"),
+            ("/download/artifact.zip", "application/vnd.github+json", None),
+            ("/releases/assets/7", "application/octet-stream", "Bearer fixture-token"),
+            ("/actions/artifacts/7", "application/vnd.github+json", "Bearer fixture-token"),
+        ])
 
     def info(self, ref="refs/heads/main"):
         return build.metadata(self.root, SHA, ref, "123", "othaldo/denti")
