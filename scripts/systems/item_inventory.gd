@@ -46,6 +46,7 @@ var cached_pickup_range: float = Loot.MAGNET_DISTANCE
 
 func _ready() -> void:
 	effect_context.player = player
+	effect_context.relics = relics
 	effect_context.inventory_data = inventory_data
 	effect_context.feedback.connect(feedback.emit)
 	effect_context.enchantment_support.connect(enchantment_support.emit)
@@ -55,6 +56,7 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	effect_context.poison_build.advance(delta)
 	for key in cooldowns.keys():
 		cooldowns[key] = maxf(float(cooldowns[key]) - delta, 0.0)
 		if str(key).begins_with("enchantment_leech:") and float(cooldowns[key]) <= 0:
@@ -133,6 +135,7 @@ func preferred_tags(loadout: WeaponLoadout) -> Array[StringName]:
 				if not result.has(tag):
 					result.append(tag)
 	for weapon in loadout.equipped():
+		if weapon.data.damage_type == "Wasser" and not result.has(&"water"): result.append(&"water")
 		var tag: StringName = &"ranged" if weapon.data.attack_mode in [&"projectile", &"beam", &"beam_line", &"cone"] else &"melee"
 		if not result.has(tag):
 			result.append(tag)
@@ -142,6 +145,8 @@ func preferred_tags(loadout: WeaponLoadout) -> Array[StringName]:
 			for build_tag in WeaponAffixes.by_id(StringName(affix.id)).build_tags:
 				if not result.has(build_tag):
 					result.append(build_tag)
+	if is_instance_valid(loadout.stats) and loadout.stats.crit_chance >= 0.15 and not result.has(&"crit"): result.append(&"crit")
+	if (power(&"wave_shield") > 0 or is_instance_valid(loadout.stats) and loadout.stats.shield_charges > 0) and not result.has(&"shield"): result.append(&"shield")
 	return result
 
 
@@ -186,6 +191,7 @@ func attack_interval_factor() -> float:
 
 
 func on_wave_start() -> void:
+	effect_context.poison_build.clear()
 	puddles.clear()
 	sugar_kills_progress = 0
 	sugar_rush_time = 0.0
@@ -328,6 +334,7 @@ func create_puddle(at: Vector2) -> void:
 
 
 func on_enemy_died(enemy: Enemy, _amount: float) -> void:
+	effect_context.poison_build.on_enemy_died(effect_context, enemy)
 	WeaponEnchantmentEffects.on_enemy_died(effect_context, enemy)
 	if not enemy.has_bleeding() or power(&"bleed_spread") <= 0.0:
 		return
@@ -398,6 +405,7 @@ func save_data() -> Dictionary:
 
 
 func restore(saved: Dictionary) -> void:
+	effect_context.poison_build.clear()
 	owned.clear()
 	for key in saved.get("owned", {}):
 		var template := ItemCatalog.by_id(StringName(str(key)))

@@ -13,6 +13,7 @@ const ITEM_FAMILIES: Array[Texture2D] = [
 const ITEM_MYTHIC: Texture2D = preload("res://assets/items/item_icons_mythic_packed.png")
 const DODGE_ATLAS: Texture2D = preload("res://assets/items/item_icons_dodge_packed.png")
 const RELIC_ATLAS: Texture2D = preload("res://assets/relics/relic_icons_atlas.png")
+const POISON_ATLAS: Texture2D = preload("res://assets/items/item_icons_poison.png")
 const HUD_ATLAS: Texture2D = preload("res://assets/ui/hud_icons_atlas.png")
 const STAT_ATLAS: Texture2D = preload("res://assets/ui/stat_icons_atlas.png")
 const RANGE: Texture2D = preload("res://assets/ui/range.svg")
@@ -70,6 +71,8 @@ const HUD_ROWS := 2
 
 
 static func item(index: int) -> Texture2D:
+	if index >= 103 and index <= 104:
+		return _poison_icon(index - 103)
 	if index >= SUPPORT_ICON_START and index < SUPPORT_ICON_START + SUPPORT_REGIONS.size():
 		var region := SUPPORT_REGIONS[index - SUPPORT_ICON_START]
 		# Equal visible length for wide arrows, round targets and diagonal slashes.
@@ -107,7 +110,14 @@ static func stat(index: int) -> Texture2D:
 
 
 static func relic(index: int) -> Texture2D:
+	if index == 5: return _poison_icon(2)
 	return _region(RELIC_ATLAS, clampi(index, 0, 4), 3, 2)
+
+
+static func _poison_icon(index: int) -> Texture2D:
+	var size := POISON_ATLAS.get_size()
+	var cell := Vector2(size.x / 3.0, size.y)
+	return _framed_region(POISON_ATLAS, Rect2(Vector2(cell.x * index, 0), cell), Vector2.ONE * maxf(cell.x, cell.y))
 
 
 static func _region(atlas: Texture2D, index: int, columns: int, rows: int) -> Texture2D:

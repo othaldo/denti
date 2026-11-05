@@ -924,7 +924,7 @@ func _finish_loot_collection() -> void:
 	coins += interest
 	telemetry.record_loot(&"coin", interest, &"interest")
 	if (wave.current_wave < WaveController.MAX_WAVES or wave.current_wave > WaveController.MAX_WAVES and wave.current_wave % 10 == 0) and WaveController.is_boss_wave(wave.current_wave) and rewards.pending_relics.is_empty():
-		rewards.queue_relics(RelicCatalog.choices(relics.owned))
+		rewards.queue_relics(RelicCatalog.choices(relics.owned, items.preferred_tags(player.loadout)))
 	if story.enabled and wave.current_wave > story.completed_boss_wave:
 		var dialogue_id := StoryCatalog.after_boss(wave.current_wave)
 		if dialogue_id != &"":

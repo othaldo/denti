@@ -113,4 +113,6 @@ Native Aufnahmen im tatsächlichen Godot-Renderer:
 [Vorbereitung Mobil](screenshots/class_foundation/class_setup_320x568.png),
 [Build-Menü Mobil](screenshots/class_foundation/class_build_mobile.png).
 
-Nächster Inhaltsschnitt: das unabhängig von Spezialklassen spielbare Giftpaket.
+Das unabhängig von Spezialklassen spielbare [Giftpaket](POISON_PACKAGE.md) ist
+inzwischen implementiert. Sein menschlicher Spielstiltest bleibt vor der
+Balancefreigabe offen. Danach folgt der Assassine mit gemeinsamer Talentgrundlage.

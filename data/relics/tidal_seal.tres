@@ -8,3 +8,4 @@ id = &"tidal_seal"
 display_name = "Gezeiten-Siegel"
 description = "Jeder fünfte Wassertreffer löst eine Welle aus, die Gegner im Umkreis trifft und durchnässt."
 icon_index = 1
+tags = Array[StringName]([&"water"])

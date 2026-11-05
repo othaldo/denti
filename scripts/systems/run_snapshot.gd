@@ -44,6 +44,7 @@ static func capture(game) -> Dictionary:
 		"weapon_runtime": weapon_runtime,
 		"player_projectiles": player_projectiles,
 		"items": game.items.save_data(),
+		"poison_build": game.items.effect_context.poison_build.save_data(enemy_indices),
 		"relics": game.relics.save_data(),
 		"telemetry": game.telemetry.save_data(),
 		"rewards": game.rewards.save_data(),
@@ -146,6 +147,7 @@ static func restore(game, saved: Dictionary) -> void:
 	var runtime: Array = saved.get("weapon_runtime", [])
 	var weapons := player.loadout.equipped()
 	var restored_enemies: Array[Node] = game.get_node("Enemies").get_children()
+	game.items.effect_context.poison_build.restore(saved.get("poison_build", {}), restored_enemies)
 	var projectiles := game.get_node("Projectiles") as PlayerProjectilePool
 	for entry in saved.get("player_projectiles", []):
 		if not entry is Dictionary:

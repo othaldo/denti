@@ -1,7 +1,7 @@
 class_name RunSaveData
 extends RefCounted
 
-const DICTIONARIES := ["player", "items", "relics", "telemetry", "rewards", "story", "weapon_mastery", "boss_stage_rewards"]
+const DICTIONARIES := ["player", "items", "relics", "telemetry", "rewards", "story", "weapon_mastery", "boss_stage_rewards", "poison_build"]
 const ARRAYS := ["weapons", "owned_weapons", "enemies", "loot", "acid", "offers", "weapon_runtime", "player_projectiles", "upgrades", "horde_waves", "burst_times", "elite_times", "elite_counts"]
 const RECORD_ARRAYS := ["weapons", "enemies", "loot", "acid", "weapon_runtime", "player_projectiles"]
 
@@ -74,6 +74,12 @@ static func _containers(value: Dictionary, dictionaries: Array, arrays: Array) -
 
 
 static func _valid_structure(value: Dictionary) -> bool:
+	var poison_build: Dictionary = value.get("poison_build", {})
+	if not _containers(poison_build, [], ["depots"]): return false
+	for index in poison_build.get("depots", []):
+		if not (index is int or index is float): return false
+	for key in ["previous", "window"]:
+		if poison_build.has(key) and not (poison_build[key] is int or poison_build[key] is float): return false
 	var boss_rewards: Dictionary = value.get("boss_stage_rewards", {})
 	for key in ["version", "phase_mask", "xp_released"]:
 		if boss_rewards.has(key) and not (boss_rewards[key] is int or boss_rewards[key] is float): return false
@@ -233,6 +239,14 @@ static func _valid_structure(value: Dictionary) -> bool:
 		if pillow.has("active") and not pillow.active is bool: return false
 		if not _containers(entry, ["affix_effects"], ["position", "direction", "boss_dash_end", "boss_dash_origin", "inflicted_statuses"]):
 			return false
+		var affix: Dictionary = entry.get("affix_effects", {})
+		if not _containers(affix, ["depot"], []): return false
+		var depot: Dictionary = affix.get("depot", {})
+		if not _containers(depot, [], ["ticks"]): return false
+		for amount in depot.get("ticks", []):
+			if not (amount is float or amount is int): return false
+		for key in ["remaining", "target_lock", "nerve_time", "nerve_lock", "origin_range"]:
+			if depot.has(key) and not (depot[key] is float or depot[key] is int): return false
 	for entry in value.get("loot", []):
 		if not _containers(entry, ["reward_data"], ["position"]):
 			return false

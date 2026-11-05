@@ -2,7 +2,8 @@
 
 Arbeitsplan vom **05.11.2026**, auf Basis des aktuellen Checkouts.
 **P1 ist umgesetzt:** [Klassenfundament und Prüfungen](CLASS_FOUNDATION.md).
-Giftpaket, Spezialklassen und Skilltree folgen. Dieser Plan bündelt die bisherigen Entwürfe; bei abweichenden
+**P2 ist spielbar implementiert:** [Giftpaket, Messungen und offene Balancepunkte](POISON_PACKAGE.md).
+Die menschliche Spielstilabnahme bleibt offen; Spezialklassen und Skilltree folgen. Dieser Plan bündelt die bisherigen Entwürfe; bei abweichenden
 Reihenfolgen oder Beispielwerten ist er die aktuelle Arbeitsgrundlage.
 
 ## Ziel und Umfang
@@ -347,8 +348,11 @@ Dichte-, Boss- und Wirtschaftswerte.
 
 ## Nächster konkreter Arbeitsschnitt
 
-**P1: Good Old Molar plus zentrale Klassen-/Stat-/Waffenregeln.**
-Danach **P2: das Giftpaket als erster vollständig spielbarer Synergieausbau**.
-So erhält das Projekt zunächst ein belastbares Fundament und anschließend
-sichtbaren Inhalt. Der Klassenbaum wird am ersten funktionierenden Beispiel
-entwickelt, bevor alle weiteren Klassen und Pakete produziert werden.
+**P1 und die technische Umsetzung von P2 sind vorhanden.** Vor der Balancefreigabe
+des Giftläufers gezielt mit Depotfüllung/Nervensonde spielen: wenige Treffer,
+Zielwechsel, Rückzug; anschließend isolierter Boss und späte Horden. Die erste
+Fernkampf-Wechselroute des Diagnosepiloten verliert zu viel Angriffszeit.
+Das ist keine bestätigte Verbesserung gegenüber Fokussieren.
+
+Danach **P3: Assassine und gemeinsamer Talentbaum**, zunächst zwei Wege und
+ein gemeinsames XP-Punktebudget. Kein paralleler Neubau aller Klassen.

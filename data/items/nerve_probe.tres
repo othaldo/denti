@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"nerve_probe"
+display_name = "Nervensonde"
+description = "Waffentreffer auf vergiftete Ziele bremsen sie 1.4 s um 25 %. Pro Ziel alle 3 s; halbe Wirkung auf Eliten, Viertelwirkung auf Bosse. Stärkste Verlangsamung zählt."
+rarity_tier = 2
+price = 9
+icon_index = 104
+effect_kind = &"poison_nerve"
+effect_value = 1.0
+max_stacks = 1
+tags = Array[StringName]([&"poison", &"control", &"mobility"])

@@ -114,7 +114,7 @@ static func mechanics_text(kind: StringName) -> String:
 		&"ice":
 			return "Krits auf gekühlte Ziele: Eissplitter mit %.0f %% Eisschaden an bis zu %d andere Ziele. Gemeinsames Intervall %.1f s." % [data.proc_factor * 100, data.proc_targets, data.proc_cooldown]
 		&"poison":
-			return "Bis zu %d Giftstufen, höchstens eine je %.1f s. Jede weitere Stufe: +%.0f %% Schaden neuer Giftanwendungen. Verfällt ohne Gift nach %.0f s." % [data.buildup_limit, data.buildup_interval, data.buildup_bonus * 100, data.dot_duration]
+			return "Bis zu %d Giftstufen, höchstens eine je %.1f s. Jede weitere Stufe: +%.0f %% Schaden neuer Giftanwendungen. Verfällt ohne Gift nach %.0f s. Depotfüllung ergänzt Zielwechsel; Nervensonde bremst, Giftzahn zieht Restgift beim Wechsel vor." % [data.buildup_limit, data.buildup_interval, data.buildup_bonus * 100, data.dot_duration]
 		&"bleed":
 			return "Zahnseide ergänzt begrenzte Blutungsstapel. Sanduhr verlängert den Effekt; Skalpellwachs, Ansteckende Zahnseide und Blutmond erkennen diese Blutung."
 		&"electric":

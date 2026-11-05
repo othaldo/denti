@@ -485,7 +485,8 @@ func status_speed_factor() -> float:
 	var wet_factor: float = WET_STATUS.speed_factor(data) if wet_time > 0.0 else 1.0
 	var ice := WeaponAffixes.by_id(&"ice")
 	var resistance := 0.25 if data.is_boss else (0.5 if data.is_elite else 1.0)
-	return minf(wet_factor, 1.0 - ice.slow_fraction * resistance if chill_time > 0.0 else 1.0)
+	var nerve_factor := 1.0 - PoisonDepotState.RULES.nerve_slow * resistance if affix_effects.depot.nerve_time > 0 else 1.0
+	return minf(nerve_factor, minf(wet_factor, 1.0 - ice.slow_fraction * resistance if chill_time > 0.0 else 1.0))
 
 
 func apply_haste(bonus: float, duration: float) -> void:

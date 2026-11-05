@@ -8,6 +8,8 @@ signal ring_requested(at: Vector2, radius: float, color: Color)
 signal puddle_requested(at: Vector2)
 
 var player: Player
+var relics: RelicInventory
+var poison_build := PoisonBuildEffects.new()
 var inventory_data: ItemInventoryData
 var cooldowns: Dictionary = {}
 

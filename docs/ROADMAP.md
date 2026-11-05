@@ -8,7 +8,7 @@ Das nächste Ziel: ein kompakteres Kampf-HUD, eine bewusste Dash-Entscheidung, v
 
 - 20 Wellen, anschließend optional Endlos; Bossabschlüsse in Welle 5, 10, 15 und 20. Normale Wellenlängen variieren; Bosswellen enden ohne Wellentimer mit dem letzten Boss.
 - Vier Story-Areas mit Dialogen und Ortswechseln: **Unter dem Kissen**, **Das süße Verderben**, **Tief im Säurestrom**, **Die letzte Krone**.
-- 18 reguläre Waffen, sechs geheime Evolutionen, 94 Shop-Items, fünf Relikte und zwölf Grundattribute. Alle 18 Standardwaffen sind als Mk-I-Start auswählbar; geheime Evolutionen bleiben ausgeschlossen. Die Wurzelanzahl ist ein gespeicherter Spielerparameter, Standard 6; [Konfiguration](PLAYER_ROOTS.md).
+- 18 reguläre Waffen, sechs geheime Evolutionen, 96 Shop-Items, sechs Relikte und zwölf Grundattribute. Alle 18 Standardwaffen sind als Mk-I-Start auswählbar; geheime Evolutionen bleiben ausgeschlossen. Die Wurzelanzahl ist ein gespeicherter Spielerparameter, Standard 6; [Konfiguration](PLAYER_ROOTS.md).
 - Ununterbrochener Kampf; danach Beutesammlung, Levelaufstiege, Upgrade-Kapseln, gegebenenfalls Relikt und Story-Übergang, anschließend Shop. Dieser Ablauf bleibt erhalten.
 - Gegnerdruck, Projektilmuster, Bossphasen und Entzündung sind vorhanden. Der Graf besitzt einen Umhang-/Sektorenablauf, der Prinz eine Karamellküche, der König Säurerinnen/Pegelwechsel/Splitterstampf und der Imperator Kronenwache/Hofurteile/Portalstiche/Nerventakt. Eigene Abläufe, alle vier Schwierigkeitsgrade, Speicherung und native Vergleichsaufnahmen sind vorhanden; vollständige Build-Abnahme bleibt offen.
 - Telemetrie, Run-Rückblick, Speichern/Fortsetzen und automatisierte Tests bilden die Grundlage für weitere Änderungen. Shopgrößen und Atlas-Ausschnitte wurden zuletzt korrigiert; entsprechende Layoutgrenzen sollen auch im Kampf gelten.
@@ -25,8 +25,11 @@ Giftpaket, Assassine mit Run-Skilltree, getrennte Eis-/Feuerpakete, danach Hüte
 und Spültechniker sowie Gesamtbalance. Das
 [Klassenfundament mit Good Old Molar](CLASS_FOUNDATION.md) ist jetzt umgesetzt:
 zentrale Attributregeln, Waffenrollen/Eignung und kompatible Speicherung.
-Giftpaket, Spezialklassen und Skilltree folgen. Bestehende
-Blutungs- und Wasserbuilds dienen als Kontrollen.
+Das [Giftpaket](POISON_PACKAGE.md) ergänzt jetzt Depotfüllung, Nervensonde und
+Giftzahn einschließlich Tags, gespeicherten Zielzuständen und relevanter
+Reliktauswahl. Technische Prüfungen und erste Wellenproben sind vorhanden;
+die menschliche Spielstil-/Balanceabnahme bleibt offen. Spezialklassen und
+Skilltree folgen. Bestehende Blutungs- und Wasserbuilds dienen als Kontrollen.
 
 Ergänzung 01.11.2026: Der [Buildvergleich auf Normal](BUILD_COMPARISON.md) ergänzt
 die stationären Waffenmessungen um vollständige Wellen, Verzauberungen, Heilung
