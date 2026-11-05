@@ -1,7 +1,8 @@
-"""Compose stable and development Pages content from verified build archives."""
+"""Compose stable, development and branch previews from verified build archives."""
 
 import argparse
 import hashlib
+import html
 import io
 import json
 import os
@@ -9,6 +10,7 @@ from pathlib import Path, PurePosixPath
 import re
 import stat
 import urllib.error
+import urllib.parse
 import urllib.request
 import zipfile
 
@@ -34,7 +36,7 @@ class GitHub:
             with urllib.request.urlopen(request, timeout=120) as response:
                 content = response.read()
         except urllib.error.HTTPError as error:
-            if missing and error.code == 404:
+            if missing and error.code in [404, 410]:
                 return None
             raise
         return content if binary else json.loads(content)
@@ -84,20 +86,72 @@ def stable_release(client):
     return web_package(manifest, client.read("releases/assets/" + str(asset["id"]), binary=True))
 
 
-def latest_dev(client):
-    runs = client.read("actions/workflows/build.yml/runs?branch=main&event=push&status=success&per_page=5")
-    for run in runs["workflow_runs"]:
-        artifacts = client.read("actions/runs/" + str(run["id"]) + "/artifacts?per_page=100")
+def run_package(client, run):
+    page = 1
+    while True:
+        artifacts = client.read("actions/runs/" + str(run["id"]) + "/artifacts?per_page=100&page=" + str(page))
         for artifact in artifacts["artifacts"]:
             if artifact["expired"] or not artifact["name"].startswith("denti-"):
                 continue
-            payload = client.read("actions/artifacts/" + str(artifact["id"]) + "/zip", binary=True)
+            payload = client.read("actions/artifacts/" + str(artifact["id"]) + "/zip", binary=True, missing=True)
+            if payload is None:
+                continue
             with zipfile.ZipFile(io.BytesIO(payload)) as archive:
                 manifest = json.loads(archive.read("release.json"))
                 if manifest.get("channel") != "dev" or manifest.get("commit") != run["head_sha"]:
                     raise ValueError("development artifact identity differs from its workflow run")
+                if "repository" in run and manifest.get("repository") != run["repository"]["full_name"]:
+                    raise ValueError("development artifact belongs to a different repository")
                 return web_package(manifest, archive.read(manifest["assets"]["web"]["name"]))
+        if len(artifacts["artifacts"]) < 100:
+            return None
+        page += 1
+
+
+def latest_dev(client):
+    runs = client.read("actions/workflows/build.yml/runs?branch=main&event=push&status=success&per_page=5")
+    for run in runs["workflow_runs"]:
+        package = run_package(client, run)
+        if package is not None:
+            return package
     return None
+
+
+def is_feature_branch(branch):
+    return branch == "feat" or branch.startswith(("feat/", "feat-"))
+
+
+def preview_slug(branch):
+    # The hash keeps names distinct after case folding, slash removal or truncation.
+    readable = re.sub(r"[^a-z0-9]+", "-", branch.lower()).strip("-")[:60]
+    return readable + "-" + hashlib.sha256(branch.encode("utf-8")).hexdigest()[:8]
+
+
+def latest_previews(client):
+    previews = {}
+    seen = set()
+    page = 1
+    while True:
+        runs = client.read("actions/workflows/build.yml/runs?status=success&per_page=100&page=" + str(page))
+        for run in runs["workflow_runs"]:
+            branch = run.get("head_branch") or ""
+            if (not is_feature_branch(branch) or branch in seen or
+                    run["event"] not in ["push", "workflow_dispatch"]):
+                continue
+            # PRs/forks must never supply content to this privileged deployment.
+            if run["head_repository"]["full_name"] != run["repository"]["full_name"]:
+                continue
+            # Deleted branches disappear on the next deployment.
+            ref = client.read("git/ref/heads/" + urllib.parse.quote(branch, safe="/"), missing=True)
+            seen.add(branch)
+            if ref is None:
+                continue
+            package = run_package(client, run)
+            if package is not None:
+                previews[branch] = package
+        if len(runs["workflow_runs"]) < 100:
+            return previews
+        page += 1
 
 
 def extract_web(package, target):
@@ -108,7 +162,7 @@ def extract_web(package, target):
         seen = set()
         for entry in archive.infolist():
             name = PurePosixPath(entry.filename)
-            if name.is_absolute() or ".." in name.parts or "\\" in entry.filename or ":" in entry.filename or not name.parts or name.parts[0] in ["dev", ".git"]:
+            if name.is_absolute() or ".." in name.parts or "\\" in entry.filename or ":" in entry.filename or not name.parts or name.parts[0] in ["dev", "preview", ".git"]:
                 raise ValueError("unsafe or reserved archive path")
             if stat.S_ISLNK(entry.external_attr >> 16) or entry.filename in seen:
                 raise ValueError("symlink or duplicate archive entry")
@@ -117,7 +171,7 @@ def extract_web(package, target):
     (target / "release.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
 
 
-def compose(output, stable, dev):
+def compose(output, stable, dev, previews=None):
     if stable is None and dev is None:
         raise ValueError("there is no build to deploy")
     # Always create a new site. Never merge old, possibly stale exported files.
@@ -132,8 +186,32 @@ def compose(output, stable, dev):
             '<!doctype html><html lang="de"><meta charset="utf-8"><title>Denti</title>'
             '<h1>Denti</h1><p>Zurzeit ist kein Testbuild verfügbar.</p>'
             '<a href="../">Veröffentlichte Version spielen</a></html>', encoding="utf-8")
+    preview_root = output / "preview"
+    preview_root.mkdir()
+    links = []
+    for branch, package in sorted((previews or {}).items()):
+        slug = preview_slug(branch)
+        target = preview_root / slug
+        target.mkdir()
+        extract_web(package, target)
+        manifest = package[0]
+        links.append('<li><a href="' + slug + '/">' + html.escape(branch) + '</a> · ' +
+                     html.escape(manifest["version"]) + ' · <code>' + html.escape(manifest["commit"][:7]) + '</code></li>')
+    preview_root.joinpath("index.html").write_text(
+        '<!doctype html><html lang="de"><meta charset="utf-8">'
+        '<meta name="viewport" content="width=device-width,initial-scale=1">'
+        '<title>Denti · Branch-Testbuilds</title><h1>Branch-Testbuilds</h1>' +
+        ('<ul>' + ''.join(links) + '</ul>' if links else '<p>Zurzeit sind keine Branch-Testbuilds verfügbar.</p>') +
+        '<a href="../">Veröffentlichte Version</a> · <a href="../dev/">Main-Testbuild</a></html>', encoding="utf-8")
     (output / ".nojekyll").touch()
     print("Pages root:", (stable or dev)[0]["version"], "| /dev/:", dev[0]["version"] if dev else "unavailable")
+    if os.environ.get("GITHUB_STEP_SUMMARY"):
+        with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as summary:
+            summary.write("### Branch-Testbuilds\n\n")
+            for branch in sorted(previews or {}):
+                summary.write("- [" + html.escape(branch) + "](" +
+                              "https://" + os.environ["GITHUB_REPOSITORY"].split("/")[0] + ".github.io/" +
+                              os.environ["GITHUB_REPOSITORY"].split("/")[1] + "/preview/" + preview_slug(branch) + "/)\n")
 
 
 def main():
@@ -146,7 +224,7 @@ def main():
     if args.require_stable and stable is None:
         raise ValueError("publish a stable GitHub release before deploying it")
     dev = local_dev(args.dev_dist) if args.dev_dist else latest_dev(client)
-    compose(ROOT / "build/site", stable, dev)
+    compose(ROOT / "build/site", stable, dev, latest_previews(client))
 
 
 if __name__ == "__main__":

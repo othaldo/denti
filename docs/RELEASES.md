@@ -11,6 +11,7 @@ Updates direkt im Hauptmenü laden und nach einem bewussten Neustart installiere
 | --- | --- |
 | Pull Request nach `main` | Tests, Web- und Windows-Releaseexport, herunterladbares Actions-Artefakt; keine Veröffentlichung |
 | Push auf `main` | Dieselben Prüfungen und Pakete; Testversion auf `/dev/` |
+| Push auf `feat`, `feat/...` oder `feat-...` | Dieselben Prüfungen und Pakete; eigene Branch-Vorschau unter `/preview/` |
 | Tag `vX.Y.Z` | Geprüfte Pakete und GitHub-Release-Entwurf; stabile Website bleibt unverändert |
 | Tag `vX.Y.Z-beta.N` | Release-Entwurf als Vorabversion; stabile Website bleibt unverändert |
 | Stabiles Release veröffentlichen | Veröffentlichte Webdateien werden am bisherigen Spiellink bereitgestellt; `/dev/` bleibt separat |
@@ -25,6 +26,37 @@ Die Testversion liegt unter `https://othaldo.github.io/denti/dev/`.
 **Solange noch kein stabiles GitHub Release veröffentlicht wurde, zeigen beide
 Adressen den aktuellen Testbuild.** Danach bleibt der Hauptlink auf der neuesten
 stabilen Veröffentlichung, auch wenn `main` weiterentwickelt wird.
+
+## Einen Feature-Branch im Browser testen
+
+1. Die Workflow-Änderungen müssen zuerst auf `main` liegen. Der Feature-Branch
+   braucht ebenfalls den aktualisierten `build.yml`-Workflow (bei älteren Branches
+   einmal `main` hineinmergen).
+2. Einen Branch wie `feat/element-reactions` pushen. Jeder weitere Push baut
+   die Vorschau automatisch neu. Alternativ unter **Actions → Build Denti →
+   Run workflow** diesen Branch auswählen und den Build manuell starten.
+3. Nach dem erfolgreichen Build läuft **Publish Denti branch previews**. Unter
+   `https://othaldo.github.io/denti/preview/` steht der Link zum Branch-Testbuild,
+   zusammen mit Version und Commit. Der Deployment-Lauf zeigt die Links auch
+   in seiner Zusammenfassung.
+
+Jeder Branch erhält eine feste URL mit Branchname und kurzem Hash. Mehrere
+Feature-Branches können gleichzeitig getestet werden; ein fehlgeschlagener Build
+ersetzt die letzte erfolgreiche Vorschau nicht. Main- und Release-Deployments
+binden die Vorschauen wieder ein. Der Hauptlink und `/dev/` beziehen weiterhin
+ausschließlich ihre bisherigen Stable-/Main-Builds.
+
+Die Vorschaupakete bleiben 90 Tage erhalten (höchstens so lange wie die
+Repository-Einstellung erlaubt). Nach Ablauf oder manuellem Löschen des neuesten
+erfolgreichen Build-Artefakts entfällt die Vorschau beim nächsten Deployment.
+Ein erneuter Build stellt sie wieder her. Auch gelöschte Branches verschwinden
+beim nächsten Deployment aus der Übersicht. **Publish Denti branch previews**
+kann dafür auf `main` manuell gestartet werden. Es muss bereits ein Stable-
+oder Main-Build vorhanden sein, um die gemeinsame Website zusammenzusetzen.
+
+Die Pages-Veröffentlichung läuft mit dem Workflow und den Skripten von `main`;
+die bestehende auf `main` beschränkte Pages-Umgebung kann unverändert bleiben.
+Die Vorschauen sind wie die übrige Pages-Website öffentlich erreichbar.
 
 ## Downloadpakete
 
@@ -44,7 +76,7 @@ Windows-Dateiversion bleibt numerisch, auch wenn die Spielversion etwa
 in Godots `user://` außerhalb des entpackten Spielordners.
 
 Testpakete sind in einem Actions-Lauf unter **Artifacts → denti-…** erhältlich
-und werden 14 Tage aufbewahrt. Dafür ist eine GitHub-Anmeldung erforderlich.
+und werden 14 Tage aufbewahrt, bei Feature-Branches 90 Tage. Dafür ist eine GitHub-Anmeldung erforderlich.
 Veröffentlichte Release-Dateien sind die dauerhaften Downloadadressen.
 Testlogs bleiben sieben Tage erhalten.
 
@@ -77,8 +109,8 @@ die aktuelle stabile Veröffentlichung erneut bereit.
 
 ## Pages und Wiederherstellung
 
-Jede Bereitstellung setzt eine neue komplette Website aus zwei geprüften
-Archiven zusammen. Es werden keine alten Exportdateien über neue Dateien
+Jede Bereitstellung setzt eine neue komplette Website aus geprüften Stable-,
+Main- und verfügbaren Feature-Archiven zusammen. Es werden keine alten Exportdateien über neue Dateien
 kopiert. Das stabile Webpaket kommt aus dem neuesten veröffentlichten stabilen
 Release, der Dev-Build aus dem aktuellen Lauf beziehungsweise dem letzten
 erfolgreichen `main`-Build.

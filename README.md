@@ -10,6 +10,8 @@ Versionstags erzeugen Release-Entwürfe. Veröffentlichte Versionen stehen unter
 [Releases](https://github.com/othaldo/denti/releases). Portable Windows-Builds
 prüfen veröffentlichte Stable-/Beta-Updates im Hauptmenü und installieren sie
 auf Wunsch mit Neustart und Rückfallkopie. [Builds, Releases und Updater](docs/RELEASES.md).
+Pushes auf `feat/...` veröffentlichen nach erfolgreichen Tests einen eigenen
+[Branch-Testbuild](https://othaldo.github.io/denti/preview/).
 
 ![Denti kämpft in Welle 4 gegen Plaque, Bakterien, Zucker und Säurespucker](docs/screenshots/kampf.png)
 

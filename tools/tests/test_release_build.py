@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 import zipfile
 
 TOOLS = Path(__file__).resolve().parents[1]
@@ -134,7 +135,7 @@ class ReleaseTests(unittest.TestCase):
     def test_archive_cannot_escape_site_or_replace_development_route(self):
         release = self.packaged()
         path = self.root / "dist" / release["assets"]["web"]["name"]
-        for unsafe in ["../outside.txt", "/absolute.txt", "dev/index.html", "C:\\outside.txt", ".git/config"]:
+        for unsafe in ["../outside.txt", "/absolute.txt", "dev/index.html", "preview/index.html", "C:\\outside.txt", ".git/config"]:
             payload = io.BytesIO(path.read_bytes())
             with zipfile.ZipFile(payload, "a") as archive:
                 archive.writestr(unsafe, "unsafe")
@@ -150,6 +151,114 @@ class ReleaseTests(unittest.TestCase):
                 return {"draft": False, "prerelease": True}
         with self.assertRaises(ValueError):
             pages.stable_release(FakeGitHub())
+
+    def preview_fixture(self):
+        release = self.packaged("refs/heads/feat/element-reactions")
+        payload = (self.root / "dist" / release["assets"]["web"]["name"]).read_bytes()
+        artifact = io.BytesIO()
+        with zipfile.ZipFile(artifact, "w") as archive:
+            archive.writestr("release.json", json.dumps(release))
+            archive.writestr(release["assets"]["web"]["name"], payload)
+        return (release, payload), artifact.getvalue()
+
+    def preview_run(self, run_id=1, branch="feat/element-reactions", **overrides):
+        return {"id": run_id, "head_branch": branch, "event": "push", "head_sha": SHA,
+                "head_repository": {"full_name": "othaldo/denti"},
+                "repository": {"full_name": "othaldo/denti"}, **overrides}
+
+    def preview_client(self, runs, payload, expired=False, deleted=False):
+        class FakeGitHub:
+            def read(self, path, **kwargs):
+                if path.startswith("actions/workflows/"):
+                    return {"workflow_runs": runs}
+                if path.startswith("git/ref/heads/"):
+                    return None if deleted else {"ref": "refs/heads/feat/element-reactions"}
+                if path.startswith("actions/runs/"):
+                    return {"artifacts": [{"id": 7, "name": "denti-preview", "expired": expired}]}
+                if path == "actions/artifacts/7/zip":
+                    return payload
+                raise AssertionError("Unexpected request: " + path)
+        return FakeGitHub()
+
+    def test_branch_previews_leave_stable_and_main_content_intact(self):
+        self.packaged("refs/tags/v0.5.0")
+        stable_manifest = json.loads((self.root / "dist/release.json").read_text())
+        stable = pages.web_package(stable_manifest, (self.root / "dist" / stable_manifest["assets"]["web"]["name"]).read_bytes())
+        preview, payload = self.preview_fixture()
+        previews = pages.latest_previews(self.preview_client([self.preview_run()], payload))
+        output = self.root / "site"
+        pages.compose(output, stable, preview, previews)
+        self.assertEqual(json.loads((output / "release.json").read_text())["channel"], "stable")
+        self.assertEqual(json.loads((output / "dev/release.json").read_text())["commit"], SHA)
+        slug = pages.preview_slug("feat/element-reactions")
+        self.assertEqual((output / "preview" / slug / "index.wasm").read_bytes(), b"fixture export index.wasm")
+        self.assertIn(slug + "/", (output / "preview/index.html").read_text())
+        self.assertIn("feat/element-reactions", (output / "preview/index.html").read_text())
+
+    def test_latest_success_per_branch_and_only_same_repository_builds_are_used(self):
+        _, payload = self.preview_fixture()
+        runs = [self.preview_run(branch="feat/pr", event="pull_request"),
+                self.preview_run(branch="feat/fork", head_repository={"full_name": "fork/denti"}),
+                self.preview_run(branch="main"), self.preview_run(branch="v0.5.0"),
+                self.preview_run(2), self.preview_run(1),
+                self.preview_run(3, branch="feat-other", event="workflow_dispatch"),
+                self.preview_run(4, branch="feat")]
+        client = self.preview_client(runs, payload)
+        with patch.object(client, "read", wraps=client.read) as read:
+            self.assertEqual(set(pages.latest_previews(client)), {"feat/element-reactions", "feat-other", "feat"})
+        calls = [call.args[0] for call in read.call_args_list]
+        self.assertNotIn("actions/runs/1/artifacts?per_page=100&page=1", calls)
+        self.assertNotIn("git/ref/heads/feat/pr", calls)
+        self.assertNotIn("git/ref/heads/feat/fork", calls)
+
+    def test_expired_missing_or_deleted_preview_is_omitted(self):
+        package, payload = self.preview_fixture()
+        for kwargs in [{"expired": True}, {"deleted": True}, {"payload": None}]:
+            values = {"payload": payload, **kwargs}
+            with self.subTest(kwargs=kwargs):
+                client = self.preview_client([self.preview_run()], **values)
+                self.assertEqual(pages.latest_previews(client), {})
+        output = self.root / "site"
+        pages.compose(output, package, None, {})
+        self.assertIn("keine Branch-Testbuilds", (output / "preview/index.html").read_text(encoding="utf-8"))
+
+    def test_preview_with_wrong_commit_or_repository_cannot_be_published(self):
+        _, payload = self.preview_fixture()
+        for overrides in [{"head_sha": "b" * 40},
+                          {"repository": {"full_name": "other/denti"}, "head_repository": {"full_name": "other/denti"}}]:
+            with self.subTest(overrides=overrides), self.assertRaises(ValueError):
+                pages.latest_previews(self.preview_client([self.preview_run(**overrides)], payload))
+
+    def test_preview_discovery_paginates_past_main_builds(self):
+        _, payload = self.preview_fixture()
+        client = self.preview_client([self.preview_run()], payload)
+        original = client.read
+        def read(path, **kwargs):
+            if path == "actions/workflows/build.yml/runs?status=success&per_page=100&page=1":
+                return {"workflow_runs": [self.preview_run(branch="main")] * 100}
+            return original(path, **kwargs)
+        client.read = read
+        self.assertEqual(set(pages.latest_previews(client)), {"feat/element-reactions"})
+
+    def test_preview_names_cannot_collide_or_escape_and_labels_are_escaped(self):
+        branches = ["feat/a-b", "feat-a/b", "feat/A-B", "feat/../../escape", "feat/" + "a" * 100,
+                    "feat/" + "a" * 100 + "b", "feat/<script>"]
+        slugs = [pages.preview_slug(branch) for branch in branches]
+        self.assertEqual(len(set(slugs)), len(slugs))
+        for slug in slugs:
+            self.assertRegex(slug, r"^[a-z0-9-]+$")
+            self.assertLessEqual(len(slug), 69)
+        package, _ = self.preview_fixture()
+        output = self.root / "site"
+        pages.compose(output, None, package, {"feat/<script>": package})
+        index = (output / "preview/index.html").read_text()
+        self.assertIn("feat/&lt;script&gt;", index)
+        self.assertNotIn("feat/<script>", index)
+
+    def test_preview_alone_cannot_become_the_stable_or_main_build(self):
+        package, _ = self.preview_fixture()
+        with self.assertRaises(ValueError):
+            pages.compose(self.root / "site", None, None, {"feat/example": package})
 
 
 if __name__ == "__main__":

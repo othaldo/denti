@@ -84,7 +84,7 @@ Pro Test bleiben Ausgabe- und Engine-Logs erhalten. `.godot/test_results.json` e
 
 Szenen können während eines Resume-Tests weiterhin bewusst ersetzt werden. Der letzte noch aktive Szenenbaum wird vom gemeinsamen Abschluss bereinigt. Isolierte Regeltests wie `run_storage` und `catalogs` benötigen keine Spielszene. Die bisherigen Kampf-, Layout- und JSON-Roundtrip-Prüfungen bleiben erhalten.
 
-Pull Requests gegen `main` durchlaufen Tests und Web-Export. Nur Pushes auf `main` und manuelle Workflow-Aufrufe veröffentlichen die Pages-Artefakte; die Schreibrechte für Pages liegen im Deployment-Job.
+Pull Requests gegen `main` durchlaufen Tests und Web-Export. Pushes auf `main` veröffentlichen `/dev/`; erfolgreiche Builds auf `feat`, `feat/...` und `feat-...` erhalten über den separaten Vorschau-Workflow auf `main` einen Branch-Testbuild. Beide Workflows lassen sich auch manuell starten; die Schreibrechte für Pages liegen in den Deployment-Jobs.
 
 ## Befehle
 
