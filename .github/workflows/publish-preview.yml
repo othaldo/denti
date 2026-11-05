@@ -6,6 +6,7 @@ on:
     types: [completed]
     branches: [feat, 'feat/**', 'feat-*']
   workflow_dispatch:
+  delete:
 
 permissions:
   contents: read
@@ -15,6 +16,8 @@ jobs:
     name: Publish successful feature builds
     if: >-
       (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'delete' && github.event.ref_type == 'branch' &&
+       (github.event.ref == 'feat' || startsWith(github.event.ref, 'feat/') || startsWith(github.event.ref, 'feat-'))) ||
       (github.event_name == 'workflow_run' &&
        github.event.workflow_run.conclusion == 'success' &&
        (github.event.workflow_run.event == 'push' || github.event.workflow_run.event == 'workflow_dispatch') &&

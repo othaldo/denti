@@ -12,6 +12,7 @@ Updates direkt im Hauptmenü laden und nach einem bewussten Neustart installiere
 | Pull Request nach `main` | Tests, Web- und Windows-Releaseexport, herunterladbares Actions-Artefakt; keine Veröffentlichung |
 | Push auf `main` | Dieselben Prüfungen und Pakete; Testversion auf `/dev/` |
 | Push auf `feat`, `feat/...` oder `feat-...` | Dieselben Prüfungen und Pakete; eigene Branch-Vorschau unter `/preview/` |
+| Feature-Branch löschen | Pages wird automatisch ohne dessen Vorschau neu veröffentlicht |
 | Tag `vX.Y.Z` | Geprüfte Pakete und GitHub-Release-Entwurf; stabile Website bleibt unverändert |
 | Tag `vX.Y.Z-beta.N` | Release-Entwurf als Vorabversion; stabile Website bleibt unverändert |
 | Stabiles Release veröffentlichen | Veröffentlichte Webdateien werden am bisherigen Spiellink bereitgestellt; `/dev/` bleibt separat |
@@ -49,9 +50,14 @@ ausschließlich ihre bisherigen Stable-/Main-Builds.
 Die Vorschaupakete bleiben 90 Tage erhalten (höchstens so lange wie die
 Repository-Einstellung erlaubt). Nach Ablauf oder manuellem Löschen des neuesten
 erfolgreichen Build-Artefakts entfällt die Vorschau beim nächsten Deployment.
-Ein erneuter Build stellt sie wieder her. Auch gelöschte Branches verschwinden
-beim nächsten Deployment aus der Übersicht. **Publish Denti branch previews**
-kann dafür auf `main` manuell gestartet werden. Es muss bereits ein Stable-
+Ein erneuter Build stellt sie wieder her. Das Löschen eines Feature-Branches
+startet automatisch **Publish Denti branch previews** auf `main`. Nach dessen
+Deployment sind sowohl der Eintrag in der Übersicht als auch die Dateien unter
+der bisherigen Vorschau-URL entfernt. Das gilt auch bei automatischer
+Branch-Löschung nach einem Merge; andere Branch-Vorschauen bleiben erhalten.
+Tags und Branches außerhalb der Feature-Namenskonvention lösen keine Bereinigung
+aus. Der Workflow kann auch auf `main` manuell gestartet werden.
+Es muss bereits ein Stable-
 oder Main-Build vorhanden sein, um die gemeinsame Website zusammenzusetzen.
 
 Die Pages-Veröffentlichung läuft mit dem Workflow und den Skripten von `main`;

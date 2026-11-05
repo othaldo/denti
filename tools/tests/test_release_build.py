@@ -229,6 +229,30 @@ class ReleaseTests(unittest.TestCase):
             with self.subTest(overrides=overrides), self.assertRaises(ValueError):
                 pages.latest_previews(self.preview_client([self.preview_run(**overrides)], payload))
 
+    def test_deleted_branch_page_is_removed_while_other_previews_remain(self):
+        package, payload = self.preview_fixture()
+        deleted, kept = "feat/removed", "feat/kept"
+        client = self.preview_client([self.preview_run(1, deleted), self.preview_run(2, kept)], payload)
+        original = client.read
+        def read(path, **kwargs):
+            if path == "git/ref/heads/" + deleted:
+                return None
+            return original(path, **kwargs)
+        client.read = read
+        with patch.object(client, "read", wraps=client.read) as requests:
+            previews = pages.latest_previews(client)
+        self.assertEqual(set(previews), {kept})
+        self.assertNotIn("actions/runs/1/artifacts?per_page=100&page=1",
+                         [call.args[0] for call in requests.call_args_list])
+        output = self.root / "site"
+        pages.compose(output, None, package, previews)
+        self.assertFalse((output / "preview" / pages.preview_slug(deleted)).exists())
+        self.assertTrue((output / "preview" / pages.preview_slug(kept) / "index.html").is_file())
+        index = (output / "preview/index.html").read_text()
+        self.assertNotIn(deleted, index)
+        self.assertIn(kept, index)
+        self.assertEqual((output / "index.html").read_bytes(), (output / "dev/index.html").read_bytes())
+
     def test_preview_discovery_paginates_past_main_builds(self):
         _, payload = self.preview_fixture()
         client = self.preview_client([self.preview_run()], payload)
