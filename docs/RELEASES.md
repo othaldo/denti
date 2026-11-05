@@ -11,7 +11,7 @@ Updates direkt im Hauptmenü laden und nach einem bewussten Neustart installiere
 | --- | --- |
 | Pull Request nach `main` | Tests, Web- und Windows-Releaseexport, herunterladbares Actions-Artefakt; keine Veröffentlichung |
 | Push auf `main` | Dieselben Prüfungen und Pakete; Testversion auf `/dev/` |
-| Push auf `feat`, `feat/...` oder `feat-...` | Dieselben Prüfungen und Pakete; eigene Branch-Vorschau unter `/preview/` |
+| Push auf `feat`, `feat/...`, `feat-...` oder die entsprechenden `feature`-Namen | Dieselben Prüfungen und Pakete; eigene Branch-Vorschau unter `/preview/` |
 | Feature-Branch löschen | Pages wird automatisch ohne dessen Vorschau neu veröffentlicht |
 | Tag `vX.Y.Z` | Geprüfte Pakete und GitHub-Release-Entwurf; stabile Website bleibt unverändert |
 | Tag `vX.Y.Z-beta.N` | Release-Entwurf als Vorabversion; stabile Website bleibt unverändert |
@@ -33,7 +33,7 @@ stabilen Veröffentlichung, auch wenn `main` weiterentwickelt wird.
 1. Die Workflow-Änderungen müssen zuerst auf `main` liegen. Der Feature-Branch
    braucht ebenfalls den aktualisierten `build.yml`-Workflow (bei älteren Branches
    einmal `main` hineinmergen).
-2. Einen Branch wie `feat/element-reactions` pushen. Jeder weitere Push baut
+2. Einen Branch wie `feat/element-reactions` oder `feature/class-foundation` pushen. Jeder weitere Push baut
    die Vorschau automatisch neu. Alternativ unter **Actions → Build Denti →
    Run workflow** diesen Branch auswählen und den Build manuell starten.
 3. Nach dem erfolgreichen Build läuft **Publish Denti branch previews**. Unter

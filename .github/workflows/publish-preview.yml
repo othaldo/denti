@@ -4,7 +4,7 @@ on:
   workflow_run:
     workflows: [Build Denti]
     types: [completed]
-    branches: [feat, 'feat/**', 'feat-*']
+    branches: [feat, 'feat/**', 'feat-*', feature, 'feature/**', 'feature-*']
   workflow_dispatch:
   delete:
 
@@ -17,7 +17,8 @@ jobs:
     if: >-
       (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
       (github.event_name == 'delete' && github.event.ref_type == 'branch' &&
-       (github.event.ref == 'feat' || startsWith(github.event.ref, 'feat/') || startsWith(github.event.ref, 'feat-'))) ||
+       (github.event.ref == 'feat' || startsWith(github.event.ref, 'feat/') || startsWith(github.event.ref, 'feat-') ||
+        github.event.ref == 'feature' || startsWith(github.event.ref, 'feature/') || startsWith(github.event.ref, 'feature-'))) ||
       (github.event_name == 'workflow_run' &&
        github.event.workflow_run.conclusion == 'success' &&
        (github.event.workflow_run.event == 'push' || github.event.workflow_run.event == 'workflow_dispatch') &&

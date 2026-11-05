@@ -202,10 +202,14 @@ class ReleaseTests(unittest.TestCase):
                 self.preview_run(branch="main"), self.preview_run(branch="v0.5.0"),
                 self.preview_run(2), self.preview_run(1),
                 self.preview_run(3, branch="feat-other", event="workflow_dispatch"),
-                self.preview_run(4, branch="feat")]
+                self.preview_run(4, branch="feat"),
+                self.preview_run(5, branch="feature/class-foundation"),
+                self.preview_run(6, branch="feature-other", event="workflow_dispatch"),
+                self.preview_run(7, branch="feature")]
         client = self.preview_client(runs, payload)
         with patch.object(client, "read", wraps=client.read) as read:
-            self.assertEqual(set(pages.latest_previews(client)), {"feat/element-reactions", "feat-other", "feat"})
+            self.assertEqual(set(pages.latest_previews(client)),
+                             {"feat/element-reactions", "feat-other", "feat", "feature/class-foundation", "feature-other", "feature"})
         calls = [call.args[0] for call in read.call_args_list]
         self.assertNotIn("actions/runs/1/artifacts?per_page=100&page=1", calls)
         self.assertNotIn("git/ref/heads/feat/pr", calls)
@@ -231,7 +235,7 @@ class ReleaseTests(unittest.TestCase):
 
     def test_deleted_branch_page_is_removed_while_other_previews_remain(self):
         package, payload = self.preview_fixture()
-        deleted, kept = "feat/removed", "feat/kept"
+        deleted, kept = "feature/removed", "feat/kept"
         client = self.preview_client([self.preview_run(1, deleted), self.preview_run(2, kept)], payload)
         original = client.read
         def read(path, **kwargs):
