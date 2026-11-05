@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main, feat, 'feat/**', 'feat-*']
+    branches: [main, feat, 'feat/**', 'feat-*', feature, 'feature/**', 'feature-*']
     tags: ['v*']
   workflow_dispatch:
     inputs:
@@ -90,7 +90,9 @@ jobs:
           name: ${{ steps.metadata.outputs.artifact }}
           path: dist/*
           if-no-files-found: error
-          retention-days: ${{ (github.ref == 'refs/heads/feat' || startsWith(github.ref, 'refs/heads/feat/') || startsWith(github.ref, 'refs/heads/feat-')) && 90 || 14 }}
+          retention-days: >-
+            ${{ (github.ref == 'refs/heads/feat' || startsWith(github.ref, 'refs/heads/feat/') || startsWith(github.ref, 'refs/heads/feat-') ||
+                 github.ref == 'refs/heads/feature' || startsWith(github.ref, 'refs/heads/feature/') || startsWith(github.ref, 'refs/heads/feature-')) && 90 || 14 }}
 
   draft-release:
     name: Create versioned release draft

@@ -118,7 +118,7 @@ def latest_dev(client):
 
 
 def is_feature_branch(branch):
-    return branch == "feat" or branch.startswith(("feat/", "feat-"))
+    return branch in ["feat", "feature"] or branch.startswith(("feat/", "feat-", "feature/", "feature-"))
 
 
 def preview_slug(branch):
