@@ -16,6 +16,7 @@ static func packets(effects: ItemEffectContext, enemy: Enemy, weapon: WeaponData
 static func after_hit(effects: ItemEffectContext, enemy: Enemy, weapon: WeaponData, affixes: Array[Dictionary], critical: bool, dealt: float, factor: float, was_chilled: bool, source_uid: String = "") -> void:
 	if dealt <= 0:
 		return
+	ElementReactions.after_hit(effects, enemy, weapon, affixes)
 	if affixes.is_empty() and not critical:
 		return
 	var wet := WeaponAffixes.find(affixes, &"wet")
@@ -59,7 +60,7 @@ static func _chain(effects: ItemEffectContext, source: Enemy, power: float) -> v
 	var chain_power := effects.power(&"chain")
 	var targets := mini(data.proc_targets + int(wet) + int(chain_power > 0), data.proc_target_cap)
 	var radius := data.proc_radius + (85.0 if wet else 0.0)
-	var candidates := _nearby(effects, source.global_position, radius, [source])
+	var candidates := nearby(effects, source.global_position, radius, [source])
 	if candidates.is_empty() or not effects.ready_proc(&"enchantment_electric", data.proc_cooldown):
 		return
 	var visited: Array[Enemy] = [source]
@@ -74,7 +75,7 @@ static func _chain(effects: ItemEffectContext, source: Enemy, power: float) -> v
 		effects.line(from, next.global_position, data.color)
 		ElementImpactBatch.emit_from(next, &"electric", next.global_position, from.direction_to(next.global_position), 24)
 		previous = next
-		candidates = _nearby(effects, next.global_position, radius, visited)
+		candidates = nearby(effects, next.global_position, radius, visited)
 
 
 static func _holy(effects: ItemEffectContext, enemy: Enemy, weapon: WeaponData, affixes: Array[Dictionary], factor: float) -> void:
@@ -101,7 +102,7 @@ static func on_enemy_died(effects: ItemEffectContext, enemy: Enemy) -> void:
 		return
 	if float(effects.cooldowns.get("enchantment_fire", 0)) > 0:
 		return
-	var candidates := _nearby(effects, enemy.global_position, data.proc_radius, [enemy])
+	var candidates := nearby(effects, enemy.global_position, data.proc_radius, [enemy])
 	if candidates.is_empty() or not effects.ready_proc(&"enchantment_fire", data.proc_cooldown):
 		return
 	# Share a bounded single-hit budget, never the sum of all pending DoTs.
@@ -116,7 +117,7 @@ static func _area(effects: ItemEffectContext, source: Enemy, amount: float, data
 	var excluded: Array[Enemy] = []
 	if not include_source:
 		excluded.append(source)
-	var candidates := _nearby(effects, source.global_position, data.proc_radius, excluded)
+	var candidates := nearby(effects, source.global_position, data.proc_radius, excluded)
 	for other in candidates.slice(0, data.proc_targets):
 		_damage(other, amount, data.id, proc_id)
 	effects.ring(source.global_position, data.proc_radius, data.color)
@@ -128,7 +129,7 @@ static func _damage(enemy: Enemy, amount: float, kind: StringName, proc_id: Stri
 	enemy.take_damage(0, null, false, &"", additions)
 
 
-static func _nearby(effects: ItemEffectContext, at: Vector2, radius: float, excluded: Array[Enemy]) -> Array[Enemy]:
+static func nearby(effects: ItemEffectContext, at: Vector2, radius: float, excluded: Array[Enemy]) -> Array[Enemy]:
 	var result: Array[Enemy] = []
 	for other in effects.player.nearby_enemies(at, radius, false):
 		if other.health > 0 and not excluded.has(other) and at.distance_squared_to(other.global_position) <= radius * radius:

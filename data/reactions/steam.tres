@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ElementReactionData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/weapons/element_reaction_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"reaction_steam"
+display_name = "Dampfstoß"
+elements = Array[StringName]([&"fire", &"wet"])
+power_element = &"fire"
+damage_element = &"fire"
+damage_factor = 0.5
+radius = 105.0
+targets = 5
+cooldown = 1.2

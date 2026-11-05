@@ -58,6 +58,7 @@ func _run() -> void:
 	game.wave.set_process(false)
 	paused = true
 	brush = WeaponCatalog.by_id(&"magic_toothbrush")
+	await _reaction_targets()
 	await _electric()
 	await _fire()
 	await _poison()
@@ -69,6 +70,35 @@ func _run() -> void:
 	session.clear_run()
 	print("PASS enchantment roles, item bridges, bounded procs, utility, telemetry, drops and resume" if not failed else "FAIL enchantment synergies")
 	finish(1 if failed else 0)
+
+func _reaction_targets() -> void:
+	# Exercise both typed exclusion-list branches through real reaction damage.
+	for reaction in ElementReactions.ALL:
+		await _reset()
+		var source := _enemy()
+		var neighbor := _enemy(Vector2(45, 0))
+		var distant := _enemy(Vector2(300, 0))
+		var kinds: Array[String] = []
+		var additions: Array[Dictionary] = []
+		for kind in reaction.elements:
+			kinds.append(str(kind))
+			if kind == &"wet":
+				source.apply_wet(2)
+			else:
+				additions.append({"id": str(kind), "damage": 20.0})
+		source.take_damage(0, null, false, &"", additions)
+		var source_before := source.health
+		var neighbor_before := neighbor.health
+		var distant_before := distant.health
+		ElementReactions.after_hit(game.items.effect_context, source, brush, _effects(kinds))
+		_check(neighbor.health < neighbor_before, "%s did not damage its nearby target" % reaction.id)
+		_check((source.health < source_before) == reaction.include_source, "%s ignored its source exclusion rule" % reaction.id)
+		_check(distant.health == distant_before, "%s damaged a target outside its radius" % reaction.id)
+		_check(game.telemetry.enchantment_support.get(str(reaction.id), 0) == 1, "%s failed to trigger exactly once" % reaction.id)
+		source_before = source.health
+		neighbor_before = neighbor.health
+		ElementReactions.after_hit(game.items.effect_context, source, brush, _effects(kinds))
+		_check(source.health == source_before and neighbor.health == neighbor_before, "%s bypassed its cooldown" % reaction.id)
 
 func _electric() -> void:
 	await _reset()

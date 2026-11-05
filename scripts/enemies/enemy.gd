@@ -642,7 +642,7 @@ func take_damage(amount: float, weapon: WeaponData = null, critical: bool = fals
 		var definition := WeaponAffixes.by_id(kind)
 		var tick := bool(addition.get("dot_tick", false))
 		var value := float(addition.damage) * (1.0 if tick else 1.0 - data.affix_resistance(kind))
-		if definition != null and definition.dot_duration > 0 and not tick:
+		if definition != null and definition.dot_duration > 0 and not tick and not bool(addition.get("instant", false)):
 			delayed.append({"id": kind, "damage": value, "can_spread": bool(addition.get("can_spread", true)), "duration": float(addition.get("duration", 0))})
 		else:
 			direct.append({"id": kind, "damage": value, "dot_tick": tick, "proc_id": str(addition.get("proc_id", "affix_" + str(kind)))})

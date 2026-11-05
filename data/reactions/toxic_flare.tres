@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ElementReactionData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/weapons/element_reaction_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"reaction_toxic_flare"
+display_name = "Giftbrand"
+elements = Array[StringName]([&"fire", &"poison"])
+power_element = &"fire"
+damage_element = &"poison"
+damage_factor = 0.65
+radius = 95.0
+targets = 4
+cooldown = 1.5
