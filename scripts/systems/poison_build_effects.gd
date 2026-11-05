@@ -28,18 +28,7 @@ func after_hit(effects: ItemEffectContext, enemy: Enemy, weapon: WeaponData, tie
 	var state := enemy.affix_effects
 	var depot := state.depot
 	if effects.power(&"poison_depot") > 0:
-		_prune()
-		if depot.target_lock <= 0 and depot.ticks.is_empty() and depots.size() < RULES.depot_targets:
-			# One root-normalized base hit, never the accepted crit/boss/proc total.
-			var root_hit := weapon.raw_damage_with_stats(tier, effects.player.stats) / maxi(weapon.hands, 1)
-			var base := effects.player.stats.scale_damage(maxf(RULES.depot_damage, root_hit * RULES.depot_weapon_factor) * effects.power(&"poison_depot"))
-			var resisted := base * (1.0 - enemy.data.affix_resistance(&"poison"))
-			var amount := resisted + minf(state.budget(&"poison") * RULES.poison_budget_bonus, resisted)
-			if amount > 0 and effects.ready_proc(&"poison_depot", RULES.depot_interval):
-				depot.open(amount, weapon.range_at_tier(tier))
-				depots.append(weakref(enemy))
-				effects.enchantment_support.emit(&"poison_depots", 1)
-				enemy.queue_redraw()
+		apply_depot(effects, enemy, weapon, tier, effects.power(&"poison_depot"))
 	if state.budget(&"poison") + depot.budget() <= 0: return
 	if effects.power(&"poison_nerve") > 0 and depot.nerve_lock <= 0:
 		depot.nerve_time = RULES.nerve_duration
@@ -62,6 +51,23 @@ func after_hit(effects: ItemEffectContext, enemy: Enemy, weapon: WeaponData, tie
 			effects.line(enemy.global_position, other.global_position, WeaponAffixes.by_id(&"poison").color)
 	previous = weakref(enemy)
 	window = RULES.switch_window
+
+func apply_depot(effects: ItemEffectContext, enemy: Enemy, weapon: WeaponData, tier: int, strength: float) -> bool:
+	if strength <= 0 or not enemy.is_targetable() or enemy.data.is_boss and enemy.boss_phase_timer > 0: return false
+	_prune()
+	var state := enemy.affix_effects
+	var depot := state.depot
+	if depot.target_lock > 0 or not depot.ticks.is_empty() or depots.size() >= RULES.depot_targets: return false
+	var root_hit := weapon.raw_damage_with_stats(tier, effects.player.stats) / maxi(weapon.hands, 1)
+	var base := effects.player.stats.scale_damage(maxf(RULES.depot_damage, root_hit * RULES.depot_weapon_factor) * strength)
+	var resisted := base * (1.0 - enemy.data.affix_resistance(&"poison"))
+	var amount := resisted + minf(state.budget(&"poison") * RULES.poison_budget_bonus, resisted)
+	if amount <= 0 or not effects.ready_proc(&"poison_depot", RULES.depot_interval): return false
+	depot.open(amount, weapon.range_at_tier(tier))
+	depots.append(weakref(enemy))
+	effects.enchantment_support.emit(&"poison_depots", 1)
+	enemy.queue_redraw()
+	return true
 
 func on_enemy_died(effects: ItemEffectContext, enemy: Enemy) -> void:
 	var depot := enemy.affix_effects.depot

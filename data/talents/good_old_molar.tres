@@ -1,0 +1,60 @@
+[gd_resource type="Resource" script_class="TalentTreeData" load_steps=9 format=3]
+[ext_resource type="Script" path="res://scripts/player/talent_tree_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/player/talent_node_data.gd" id="2"]
+[sub_resource type="Resource" id="Breit"]
+script = ExtResource("2")
+id = &"versatile"
+display_name = "Werkzeugkunde"
+description = "+1 Nahschaden und +1 Fernschaden je Rang."
+max_ranks = 3
+stat_changes = {"melee_damage": 1.0, "ranged_damage": 1.0}
+icon_index = 4
+[sub_resource type="Resource" id="Antritt"]
+script = ExtResource("2")
+id = &"molar_opener"
+display_name = "Anlauf nehmen"
+description = "Erster Waffentreffer bis 0.9 s nach einem Dash: +20 % Waffenschaden."
+parent = &"versatile"
+effects = {"opener_bonus": 20.0}
+icon_index = 8
+[sub_resource type="Resource" id="Reserve"]
+script = ExtResource("2")
+id = &"molar_stride"
+display_name = "Wurzelreserve"
+description = "+15 Wurzelkraft je Rang. Erhöht den Vorrat, lädt ihn beim Kauf nicht auf."
+parent = &"molar_opener"
+max_ranks = 3
+stat_changes = {"dash_recovery_bonus": 15.0}
+icon_index = 28
+[sub_resource type="Resource" id="Hart"]
+script = ExtResource("2")
+id = &"molar_armor"
+display_name = "Solider Schmelz"
+description = "+2 Härte je Rang."
+branch = 1
+max_ranks = 3
+stat_changes = {"armor": 2.0}
+icon_index = 7
+[sub_resource type="Resource" id="Heilen"]
+script = ExtResource("2")
+id = &"molar_regen"
+display_name = "Nachpolieren"
+description = "+0.4 Speichel je Rang."
+branch = 1
+parent = &"molar_armor"
+max_ranks = 3
+stat_changes = {"regen": 0.4}
+icon_index = 6
+[sub_resource type="Resource" id="Schild"]
+script = ExtResource("2")
+id = &"molar_overheal"
+display_name = "Versiegelung"
+description = "50 % Überheilung speist den Schildvorrat. Je 20 gespeicherte Heilung: ein Schild, maximal fünf. Teilt Vorrat und Grenzen mit Speichelkelch."
+branch = 1
+parent = &"molar_regen"
+effects = {"overheal_shield": 0.5}
+icon_index = 26
+[resource]
+script = ExtResource("1")
+branches = PackedStringArray("Freie Werkzeugwahl", "Standfest")
+nodes = Array[ExtResource("2")]([SubResource("Breit"), SubResource("Antritt"), SubResource("Reserve"), SubResource("Hart"), SubResource("Heilen"), SubResource("Schild")])

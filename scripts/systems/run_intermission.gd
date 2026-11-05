@@ -7,6 +7,9 @@ static func restore(game, saved: Dictionary) -> void:
 	var player: Player = game.player
 	var shop: ShopController = game.shop
 	var upgrade_data: Array = saved.get("upgrades", [])
+	if game.talents.enabled and game.rewards.step == PostWaveRewards.Step.LEVELS:
+		game._advance_post_wave_rewards()
+		return
 	if not saved.has("rewards"):
 		if game.in_shop:
 			game.rewards.step = PostWaveRewards.Step.SHOP

@@ -1,9 +1,8 @@
 class_name RunSetup
 extends RefCounted
 
-# Ordered preparation steps. A future class selection gets its own entry/view.
-const STEPS: Array[StringName] = [&"difficulty", &"weapon"]
-const LABELS := {&"difficulty": "Schwierigkeit", &"weapon": "Waffe"}
+const STEPS: Array[StringName] = [&"difficulty", &"class", &"weapon"]
+const LABELS := {&"difficulty": "Schwierigkeit", &"class": "Klasse", &"weapon": "Waffe"}
 var step: StringName = &"difficulty"
 var visited_step: StringName = &"difficulty"
 var difficulty_id: StringName = &"normal"
@@ -16,6 +15,7 @@ var resume_pending := false
 func select_class(id: StringName) -> bool:
 	var profile := ClassCatalog.by_id(id)
 	if profile == null or not profile.valid() or (resume_pending and id != class_id): return false
+	if resume_pending: return true
 	class_id = id
 	root_capacity = profile.root_capacity
 	if not WeaponEligibility.starter(WeaponCatalog.by_id(weapon_id), profile, root_capacity): weapon_id = &""

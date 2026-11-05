@@ -69,6 +69,7 @@ func _ready() -> void:
 		setup_selector.selection_changed.connect(_save_weapon_preview)
 		setup_selector.chosen.connect(_launch_prepared_run)
 		setup_selector.difficulty_chosen.connect(_select_setup_difficulty)
+		setup_selector.class_chosen.connect(_select_setup_class)
 		setup_selector.next_requested.connect(_advance_setup)
 		setup_selector.step_requested.connect(_visit_setup_step)
 		_show_home()
@@ -750,6 +751,13 @@ func _advance_setup() -> void:
 	setup.next_step()
 	_show_setup_step()
 
+func _select_setup_class(id: StringName) -> void:
+	if setup == null or not setup.select_class(id): return
+	setup_selector.class_profile = ClassCatalog.by_id(setup.class_id)
+	setup_selector.brand_text.text = setup_selector.class_profile.display_name
+	setup_selector.brand_text.tooltip_text = setup_selector.class_profile.description
+	setup.save_to(_draft_path())
+
 
 func _setup_back() -> void:
 	if setup != null and setup.previous_step():
@@ -761,6 +769,11 @@ func _setup_back() -> void:
 func _show_setup_step() -> void:
 	match setup.step:
 		&"difficulty": _show_difficulty()
+		&"class":
+			page = &"class"
+			setup.mark_reached(page)
+			setup_selector.show_class(setup)
+			setup.save_to(_draft_path())
 		&"weapon": _show_setup_weapons()
 
 
@@ -790,6 +803,7 @@ func _start_new_game(difficulty_id: StringName) -> void:
 	if setup == null: setup = RunSetup.new()
 	_select_setup_difficulty(difficulty_id)
 	_advance_setup()
+	if setup.step == &"class": _advance_setup() # Existing preview/tool entrypoint.
 
 
 func _launch_prepared_run(weapon: WeaponData) -> void:
@@ -802,6 +816,7 @@ func _launch_prepared_run(weapon: WeaponData) -> void:
 	session.selected_story_mode = setup.story_mode
 	session.pending_start_weapon_id = weapon.id
 	session.pending_start_class_id = setup.class_id
+	session.pending_talent_run = not setup.resume_pending
 	var saved: Dictionary = session.load_run() if setup.resume_pending else {}
 	if not saved.is_empty() and bool(saved.get("starter_pending", false)):
 		saved["difficulty_id"] = str(setup.difficulty_id)

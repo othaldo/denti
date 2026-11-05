@@ -146,7 +146,8 @@ func preferred_tags(loadout: WeaponLoadout) -> Array[StringName]:
 				if not result.has(build_tag):
 					result.append(build_tag)
 	if is_instance_valid(loadout.stats) and loadout.stats.crit_chance >= 0.15 and not result.has(&"crit"): result.append(&"crit")
-	if (power(&"wave_shield") > 0 or is_instance_valid(loadout.stats) and loadout.stats.shield_charges > 0) and not result.has(&"shield"): result.append(&"shield")
+	if float(effect_context.extra_powers.get("opener_poison", 0)) > 0 and not result.has(&"poison"): result.append(&"poison")
+	if (power(&"wave_shield") > 0 or power(&"overheal_shield") > 0 or is_instance_valid(loadout.stats) and loadout.stats.shield_charges > 0) and not result.has(&"shield"): result.append(&"shield")
 	return result
 
 
@@ -272,6 +273,7 @@ func on_kill(at: Vector2, is_boss: bool) -> int:
 
 func modify_damage(enemy: Enemy, weapon: WeaponData, base: float) -> float:
 	var bonus := base_weapon_damage_bonus()
+	bonus += player.class_combat.damage_bonus(enemy, weapon)
 	if enemy.data.is_boss:
 		bonus += power(&"boss_bonus") * 100.0
 	if enemy.has_bleeding():
@@ -438,7 +440,7 @@ func _rebuild_powers() -> void:
 
 
 func power(effect_kind: StringName) -> float:
-	return float(powers.get(effect_kind, 0.0))
+	return float(powers.get(effect_kind, 0.0)) + float(effect_context.extra_powers.get(str(effect_kind), 0.0))
 
 
 func ready_proc(effect_kind: StringName, wait: float) -> bool:

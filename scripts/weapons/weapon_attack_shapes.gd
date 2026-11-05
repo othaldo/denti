@@ -35,6 +35,7 @@ static func hit(enemy: Enemy, weapon: WeaponData, tier: int, damage: float, crit
 	if show_impact and dealt > 0:
 		ElementImpactBatch.emit_from(enemy, WeaponElementVisuals.element(weapon, affixes), hit_at, direction, clampf(enemy.data.radius * 1.15, 27, 52))
 	if items != null:
+		items.player.class_combat.after_hit(items.effect_context, enemy, weapon, tier, dealt)
 		WeaponEnchantmentEffects.after_hit(items.effect_context, enemy, weapon, affixes, critical, dealt, affix_factor, was_chilled, source_uid, tier)
 	if enemy.health > 0.0:
 		var push := weapon.knockback_at_tier(tier) * (1.0 - enemy.data.knockback_resistance)

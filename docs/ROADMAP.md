@@ -28,8 +28,11 @@ zentrale Attributregeln, Waffenrollen/Eignung und kompatible Speicherung.
 Das [Giftpaket](POISON_PACKAGE.md) ergänzt jetzt Depotfüllung, Nervensonde und
 Giftzahn einschließlich Tags, gespeicherten Zielzuständen und relevanter
 Reliktauswahl. Technische Prüfungen und erste Wellenproben sind vorhanden;
-die menschliche Spielstil-/Balanceabnahme bleibt offen. Spezialklassen und
-Skilltree folgen. Bestehende Blutungs- und Wasserbuilds dienen als Kontrollen.
+die menschliche Spielstil-/Balanceabnahme bleibt offen. [Assassine und gemeinsame
+Talentverteilung](ASSASSIN_AND_TALENTS.md) sind jetzt ebenfalls spielbar: zwei
+Klassen, zwei Assassinenwege, ein Levelpunktebudget und gespeicherte Entwürfe.
+Sechs verdiente Eröffnungsruns besiegen den ersten Boss; vollständige/späte
+Klassenbalance bleibt offen. Blutungs- und Wasserbuilds dienen als Kontrollen.
 
 Ergänzung 01.11.2026: Der [Buildvergleich auf Normal](BUILD_COMPARISON.md) ergänzt
 die stationären Waffenmessungen um vollständige Wellen, Verzauberungen, Heilung

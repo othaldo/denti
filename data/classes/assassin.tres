@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="PlayerClassData" load_steps=9 format=3]
+[ext_resource type="Script" path="res://scripts/player/player_class_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/player/class_stat_rule_data.gd" id="2"]
+[ext_resource type="Script" path="res://scripts/player/dash_data.gd" id="3"]
+[ext_resource type="Script" path="res://scripts/player/class_combat_data.gd" id="4"]
+[ext_resource type="Resource" path="res://data/talents/assassin.tres" id="5"]
+[sub_resource type="Resource" id="Melee"]
+script = ExtResource("2")
+stat = &"melee_damage"
+gain_factor = 1.25
+[sub_resource type="Resource" id="Dash"]
+script = ExtResource("3")
+capacity = 150.0
+cost = 75.0
+recharge_rate = 30.0
+cooldown = 0.45
+contact_damage_multiplier = 0.65
+max_stamina_bonus = 200.0
+[sub_resource type="Resource" id="Combat"]
+script = ExtResource("4")
+opener_bonus = 20.0
+opener_roles = Array[StringName]([&"contact"])
+[resource]
+script = ExtResource("1")
+id = &"assassin"
+display_name = "Assassine"
+description = "4 Wurzeln · nur kurze Kontaktwaffen. 85 Schmelz, +3 Nahschaden, +8 % Bewegung. Nahschadensgewinne ×1.25. Zwei Dashes, 35 % weniger Kontaktschaden im Dash. Antritt: erster Treffer binnen 0.9 s nach Dash +20 % Waffenschaden."
+root_capacity = 4
+starting_stats = {"max_health": -15.0, "melee_damage": 3.0, "speed_bonus": 8.0}
+stat_rules = Array[ExtResource("2")]([SubResource("Melee")])
+allowed_weapon_roles = Array[StringName]([&"contact"])
+preferred_tags = Array[StringName]([&"melee", &"mobility"])
+dash_override = SubResource("Dash")
+combat_rules = SubResource("Combat")
+talent_tree = ExtResource("5")

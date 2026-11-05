@@ -38,6 +38,10 @@ func _run() -> void:
 		return
 	menu.difficulty_buttons[&"normal"].pressed.emit()
 	menu._advance_setup()
+	if menu.page != &"class":
+		_fail("preparation skipped class choice")
+		return
+	menu._advance_setup()
 	if current_scene != menu or menu.page != &"weapon" or session.has_run():
 		_fail("preparation loaded the arena or created a run")
 		return
@@ -169,7 +173,7 @@ func _run() -> void:
 		_fail("continue lost the level-up earned during combat")
 		return
 	game.wave._process(game.wave.remaining)
-	if not paused or not game.choice_panel.visible or game.choice_panel.current_upgrades.size() != 4:
+	if not paused or not game.talent_panel.visible or game.choice_panel.visible or game.rewards.pending_levels != 1:
 		_fail("post-wave level-up choices did not open after loot collection")
 		return
 	game.game_menu._to_main_menu()
@@ -180,10 +184,11 @@ func _run() -> void:
 	await process_frame
 	await process_frame
 	game = current_scene
-	if not paused or game.rewards.pending_levels != 1 or not game.choice_panel.visible or game.choice_panel.current_upgrades.size() != 4:
+	if not paused or game.rewards.pending_levels != 1 or not game.talent_panel.visible or game.choice_panel.visible:
 		_fail("continue lost a post-wave level-up choice")
 		return
-	choose_panel(game.choice_panel, 0)
+	game._on_talent_stat_requested(&"max_health")
+	game._on_talents_completed()
 	if not paused or not game.shop_panel.visible:
 		_fail("shop did not open before saving")
 		return
@@ -208,6 +213,7 @@ func _run() -> void:
 		_fail("confirmed new game did not offer difficulty selection")
 		return
 	menu.difficulty_buttons[&"normal"].pressed.emit()
+	menu._advance_setup()
 	menu._advance_setup()
 	menu.setup_selector.select_weapon(0)
 	menu.setup_selector.confirm_button.pressed.emit()

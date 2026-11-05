@@ -60,6 +60,7 @@ func _run() -> void:
 	current_scene = menu
 	menu._new_game()
 	menu.setup_selector.confirm_selection()
+	menu.setup_selector.confirm_selection()
 	menu.setup_selector.select_weapon(1)
 	for extent in [Vector2i(1280, 720), Vector2i(320, 568), Vector2i(568, 320), Vector2i(1920, 1080)]:
 		root.size = extent

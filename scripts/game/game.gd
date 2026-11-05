@@ -40,6 +40,8 @@ const UPGRADES: Array[UpgradeData] = [
 @onready var session: Node = get_node("/root/GameSession")
 
 var run_flow := RunFlow.new()
+var talents := TalentProgression.new()
+var talent_panel: TalentPanel
 
 var xp: int = 0
 var xp_goal: int = 5
@@ -87,10 +89,12 @@ var story_travel: StoryTravel
 func _enter_tree() -> void:
 	var run: Node = get_node("/root/GameSession")
 	if not run.resume_requested:
+		talents.enabled = run.pending_talent_run
 		var profile := ClassCatalog.by_id(run.pending_start_class_id)
 		if profile != null and profile != ClassCatalog.DEFAULT:
 			get_node("Player/Stats").begin_class(profile)
 	run.pending_start_class_id = ClassCatalog.DEFAULT.id
+	run.pending_talent_run = false
 	if run.test_scenario_id != &"":
 		var preset := TestArenaCatalog.by_id(run.test_scenario_id)
 		if preset != null and preset.diagnostic != TestArenaData.Diagnostic.NONE:
@@ -127,6 +131,13 @@ func _ready() -> void:
 	player.stats.damage_taken.connect(_record_player_damage)
 	player.dash.started.connect(telemetry.record_dash)
 	player.dash.contacted.connect(telemetry.record_dash_contact)
+	talent_panel = TalentPanel.new()
+	add_child(talent_panel)
+	talent_panel.talent_requested.connect(_on_talent_requested)
+	talent_panel.stat_requested.connect(_on_talent_stat_requested)
+	talent_panel.undo_requested.connect(_on_talent_undo)
+	talent_panel.completed.connect(_on_talents_completed)
+	talent_panel.cursor_changed.connect(_save_run)
 	player.stats.shield_blocked.connect(items.on_shield_blocked)
 	player.stats.shield_blocked.connect(relics.on_shield_blocked)
 	player.stats.healed.connect(items.on_healed)
@@ -300,6 +311,7 @@ func _start_combat_wave() -> void:
 	run_flow.enter(RunFlow.Phase.COMBAT)
 	rewards.begin_wave()
 	player.dash.reset_wave()
+	player.class_combat.reset_wave()
 	var profile_id := wave.prepare_next_wave_profile()
 	telemetry.begin_wave(wave.current_wave + 1, profile_id, _combat_build_snapshot())
 	wave.start_next_wave()
@@ -713,6 +725,13 @@ func _award_xp(amount: int) -> void:
 func _show_level_choice() -> void:
 	get_node("/root/SceneTransitions").present(&"rewards")
 	run_flow.enter(RunFlow.Phase.REWARDS)
+	if talents.enabled:
+		talents.prepare(rewards.pending_levels, level - rewards.pending_levels + 1, player.stats.luck)
+		choice_panel.hide()
+		talent_panel.present(talents, player.stats, UPGRADES, rewards.pending_levels)
+		get_tree().paused = true
+		_save_run()
+		return
 	var pool: Array[UpgradeData] = []
 	var equipped_stats: Array[StringName] = []
 	for weapon in player.loadout.equipped():
@@ -748,6 +767,39 @@ func _update_level_reroll() -> void:
 	var earned_level := level - maxi(rewards.pending_levels - 1, 0)
 	choice_panel.update_level_reroll(coins, EconomyRules.level_reroll_cost(earned_level, rewards.level_rerolls), earned_level)
 
+func _on_talent_requested(id: StringName) -> void:
+	if rewards.step != PostWaveRewards.Step.LEVELS or not talent_panel.visible: return
+	if talents.plan_talent(id, player.stats, UPGRADES, rewards.pending_levels):
+		talent_panel.refresh()
+		_save_run()
+
+func _on_talent_stat_requested(id: StringName) -> void:
+	if rewards.step != PostWaveRewards.Step.LEVELS or not talent_panel.visible: return
+	if talents.plan_stat(id, player.stats, UPGRADES, rewards.pending_levels):
+		talent_panel.refresh()
+		_save_run()
+
+func _on_talent_undo() -> void:
+	if rewards.step != PostWaveRewards.Step.LEVELS or not talent_panel.visible: return
+	talents.undo()
+	talent_panel.refresh()
+	_save_run()
+
+func _sync_talents() -> void:
+	player.class_combat.profile = player.stats.class_data
+	var powers := talents.powers(player.stats.class_data.talent_tree)
+	player.class_combat.powers = powers
+	items.effect_context.extra_powers = powers
+
+func _on_talents_completed() -> void:
+	if rewards.step != PostWaveRewards.Step.LEVELS or not talent_panel.visible: return
+	var count := rewards.pending_levels
+	if not talents.commit(player.stats, UPGRADES, count): return
+	_sync_talents()
+	for index in count: rewards.resolve_level()
+	talent_panel.hide()
+	_advance_post_wave_rewards()
+
 
 func _on_level_reroll() -> void:
 	if ended or starter_pending or wave.active or in_shop or rewards.step != PostWaveRewards.Step.LEVELS or rewards.pending_levels <= 0 or not choice_panel.visible or choice_panel.mode != &"upgrade":
@@ -763,6 +815,7 @@ func _on_level_reroll() -> void:
 
 
 func _on_upgrade_chosen(upgrade: UpgradeData) -> void:
+	if talents.enabled: return
 	player.stats.apply_upgrade(upgrade.stat, upgrade.amount)
 	rewards.resolve_level()
 	_advance_post_wave_rewards()
@@ -1241,6 +1294,7 @@ func _run_recap_data() -> Dictionary:
 		"weapons": player.loadout.save_data(),
 		"items": items.owned.duplicate(),
 		"relics": relics.owned.duplicate(),
+		"talents": talents.save_data(),
 		"telemetry": telemetry.save_data(),
 		"waves": telemetry.wave_summaries(),
 	}
@@ -1248,6 +1302,7 @@ func _run_recap_data() -> Dictionary:
 
 func _combat_build_snapshot() -> Dictionary:
 	return {"class_id": str(player.stats.class_data.id), "class_version": player.stats.class_data.rules_version, "player_stats": player.stats.to_save_data(), "weapons": player.loadout.save_data(),
+		"talents": talents.save_data(),
 		"items": items.owned.duplicate(), "relics": relics.owned.duplicate(),
 		"upgrade_points": rewards.weapon_upgrades.points}
 
@@ -1256,6 +1311,9 @@ func debug_start_wave(number: int) -> void:
 	if not DebugRunControls.allowed() or player.loadout.equipped().is_empty():
 		return
 	weapon_mastery.eligible = false
+	talent_panel.hide()
+	talents.actions.clear()
+	talents.tiers.clear()
 	element_impacts.clear()
 	wave.active = false
 	# Remove immediately while paused so old loot callbacks and attacks cannot
@@ -1292,6 +1350,7 @@ func debug_start_wave(number: int) -> void:
 	# A pending strike may still retain a reference to a removed enemy.
 	player.loadout.restore(player.loadout.save_data())
 	player.dash.reset_wave()
+	player.class_combat.reset_wave()
 	rewards.begin_wave()
 	wave.current_wave = clampi(number, 1, WaveController.MAX_WAVES) - 1
 	wave.next_profile_id = &""

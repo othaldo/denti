@@ -1,7 +1,7 @@
 class_name RunSaveData
 extends RefCounted
 
-const DICTIONARIES := ["player", "items", "relics", "telemetry", "rewards", "story", "weapon_mastery", "boss_stage_rewards", "poison_build"]
+const DICTIONARIES := ["player", "items", "relics", "telemetry", "rewards", "story", "weapon_mastery", "boss_stage_rewards", "poison_build", "talents", "class_combat"]
 const ARRAYS := ["weapons", "owned_weapons", "enemies", "loot", "acid", "offers", "weapon_runtime", "player_projectiles", "upgrades", "horde_waves", "burst_times", "elite_times", "elite_counts"]
 const RECORD_ARRAYS := ["weapons", "enemies", "loot", "acid", "weapon_runtime", "player_projectiles"]
 
@@ -93,6 +93,16 @@ static func _valid_structure(value: Dictionary) -> bool:
 	var player: Dictionary = value.player
 	if not _containers(player, ["class_state"], []) or not ClassCatalog.valid_state(player.get("class_state", {})): return false
 	var profile := ClassCatalog.by_id(StringName(str(player.get("class_state", {}).get("id", "good_old_molar"))))
+	if not TalentProgression.valid(value.get("talents", {}), profile): return false
+	var talent_state: Dictionary = value.get("talents", {})
+	if talent_state.get("enabled", false):
+		var pending_value: Variant = value.get("rewards", {}).get("pending_levels", 0)
+		var level_value: Variant = value.get("level", 1)
+		if not (pending_value is int or pending_value is float) or not (level_value is int or level_value is float): return false
+		var pending := int(pending_value)
+		if int(talent_state.spent) + pending > int(value.get("level", 1)) - 1: return false
+		if not talent_state.tiers.is_empty() and talent_state.tiers.size() != pending: return false
+	if not ClassCombatEffects.valid(value.get("class_combat", {})): return false
 	for entry in value.get("weapons", []):
 		var weapon := WeaponCatalog.by_id(StringName(weapon_id(str(entry.get("id", "")))))
 		if weapon != null and not WeaponEligibility.allowed(weapon, profile): return false

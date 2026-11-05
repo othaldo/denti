@@ -1,5 +1,9 @@
 # Attribute und Anzeigenamen
 
+Neue Runs verteilen verdiente Levelpunkte im gemeinsamen
+[Talent-/Attributbild](ASSASSIN_AND_TALENTS.md). Definitionen und wirksame
+Vorschauen bleiben dieselben; alte Saves nutzen weiterhin Statkarten.
+
 `DentiAttributes.Type` in [denti_attributes.gd](../scripts/player/denti_attributes.gd) ist die gemeinsame Attributdefinition. Sie ordnet jedem Attribut den bestehenden Ressourcen-/Speicherschlüssel, Anzeigenamen, Bedeutung, Einheit und Stat-Icon zu. Shop, Level-up-Karten, Buildübersicht und Debugmenü beziehen diese Angaben von dort. Waffen verwenden dieselben Namen für ihre Attributskalierung und die kritische Trefferchance.
 
 | Enum | Anzeigename | Bedeutung | Einheit |

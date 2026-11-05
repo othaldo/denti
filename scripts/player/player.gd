@@ -28,6 +28,7 @@ var attack_time: float = 0.0
 var attack_direction: Vector2 = Vector2.RIGHT
 var is_moving: bool = false
 var dash := PlayerDash.new()
+var class_combat := ClassCombatEffects.new()
 var motion_start := Vector2.ZERO
 var motion_end := Vector2.ZERO
 var motion_tick := -1
@@ -54,6 +55,8 @@ func _ready() -> void:
 	loadout.stats = stats
 	dash.stats = stats
 	dash.config = stats.class_data.dash_config()
+	class_combat.profile = stats.class_data
+	dash.started.connect(class_combat.on_dash)
 	stats.changed.connect(dash.clamp_charge)
 	get_node("/root/GameInput").changed.connect(_sync_dash_input)
 	dash_trail = DashTrail.new()
@@ -73,6 +76,7 @@ func _physics_process(delta: float) -> void:
 	dash_motion_seconds = 0.0
 	var was_dashing := dash.active
 	if combat_active():
+		class_combat.advance(delta)
 		dash_moved = was_dashing
 		dash.advance(self, delta)
 	else:

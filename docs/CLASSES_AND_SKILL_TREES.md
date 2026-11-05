@@ -4,7 +4,8 @@ Aktuelle Reihenfolge und technische Abnahme:
 [Umsetzungsplan für Klassen und Synergien, 05.11.2026](CLASSES_AND_SYNERGIES_IMPLEMENTATION_PLAN.md).
 Die Zahlen und Baumgrößen in diesem Entwurf bleiben Beispiele.
 
-Designvorschlag vom 04.11.2026 auf Nutzeranregung. **Noch nicht implementiert.**
+Designvorschlag vom 04.11.2026 auf Nutzeranregung. **Historischer Entwurf:** Der
+aktuelle erste Baum und Assassine stehen in [Umsetzung P3](ASSASSIN_AND_TALENTS.md).
 Ziel sind erkennbare Spielstile von Welle 1 an und unterschiedliche Builds
 innerhalb derselben Klasse. Konkrete Zahlen sind Startwerte für einen Prototyp,
 keine gemessene Balance. Dieses Konzept vertieft die

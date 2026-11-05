@@ -8,8 +8,10 @@ Build-Menü nennen die Klasse. Freie reguläre Waffenwahl, sechs Standardwurzeln
 Grundstats und normale Dashwerte bleiben erhalten. Explizite Wurzelparameter
 für Challenges und alte Saves bleiben nutzbar.
 
-Weitere sichtbare Klassen, neue Synergie-Items und der Skilltree folgen in den
-nächsten Schnitten. Die bestehenden Level-up-Karten bleiben hier erhalten.
+Dieser Text beschreibt den ersten Schnitt. Inzwischen ergänzen das
+[Giftpaket](POISON_PACKAGE.md) und [Assassine/Talentverteilung](ASSASSIN_AND_TALENTS.md)
+das Fundament. Neue Runs nutzen gemeinsame Talent-/Attributpunkte; alte Runs
+behalten ihre Level-up-Karten.
 
 ## Gemeinsame Datenbasis
 
@@ -114,5 +116,5 @@ Native Aufnahmen im tatsächlichen Godot-Renderer:
 [Build-Menü Mobil](screenshots/class_foundation/class_build_mobile.png).
 
 Das unabhängig von Spezialklassen spielbare [Giftpaket](POISON_PACKAGE.md) ist
-inzwischen implementiert. Sein menschlicher Spielstiltest bleibt vor der
-Balancefreigabe offen. Danach folgt der Assassine mit gemeinsamer Talentgrundlage.
+inzwischen implementiert. [Assassine und Talentgrundlage](ASSASSIN_AND_TALENTS.md)
+sind ebenfalls spielbar. Menschliche und späte Balanceabnahme bleiben offen.

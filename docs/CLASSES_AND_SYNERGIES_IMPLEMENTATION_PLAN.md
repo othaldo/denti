@@ -3,7 +3,8 @@
 Arbeitsplan vom **05.11.2026**, auf Basis des aktuellen Checkouts.
 **P1 ist umgesetzt:** [Klassenfundament und Prüfungen](CLASS_FOUNDATION.md).
 **P2 ist spielbar implementiert:** [Giftpaket, Messungen und offene Balancepunkte](POISON_PACKAGE.md).
-Die menschliche Spielstilabnahme bleibt offen; Spezialklassen und Skilltree folgen. Dieser Plan bündelt die bisherigen Entwürfe; bei abweichenden
+**P3 ist spielbar implementiert:** [Assassine und gemeinsame Levelpunkte](ASSASSIN_AND_TALENTS.md).
+Menschliche Spielstilabnahme und vollständige Klassenbalance bleiben offen. Dieser Plan bündelt die bisherigen Entwürfe; bei abweichenden
 Reihenfolgen oder Beispielwerten ist er die aktuelle Arbeitsgrundlage.
 
 ## Ziel und Umfang
@@ -348,11 +349,13 @@ Dichte-, Boss- und Wirtschaftswerte.
 
 ## Nächster konkreter Arbeitsschnitt
 
-**P1 und die technische Umsetzung von P2 sind vorhanden.** Vor der Balancefreigabe
+**P1 und die technische Umsetzung von P2/P3 sind vorhanden.** Vor der Balancefreigabe
 des Giftläufers gezielt mit Depotfüllung/Nervensonde spielen: wenige Treffer,
 Zielwechsel, Rückzug; anschließend isolierter Boss und späte Horden. Die erste
 Fernkampf-Wechselroute des Diagnosepiloten verliert zu viel Angriffszeit.
 Das ist keine bestätigte Verbesserung gegenüber Fokussieren.
 
-Danach **P3: Assassine und gemeinsamer Talentbaum**, zunächst zwei Wege und
-ein gemeinsames XP-Punktebudget. Kein paralleler Neubau aller Klassen.
+Die Assassinenwege sind mit verdienten Punkten bis zum ersten Boss geprüft.
+Nächste Abnahme: menschlicher Spielstilvergleich und späte Klassen-/Wurzelbalance.
+Nächster Inhaltsschnitt: **P4: Eis** mit Vorbereitung und Verbrauch eines schweren
+Treffers; Feuer folgt separat. Kein paralleler Neubau aller Klassen.

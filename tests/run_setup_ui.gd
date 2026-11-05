@@ -61,6 +61,8 @@ func _run() -> void:
 	_check(not view.details.visible and menu.page == &"difficulty", "Escape skipped the selection behind details")
 	_check(menu.difficulty_buttons[&"hell"].has_focus(), "closing details lost their source focus")
 	await _click(view.confirm_button)
+	_check(menu.page == &"class", "Continue skipped class selection")
+	await _click(view.confirm_button)
 	_check(menu.page == &"weapon" and view.selected_id == &"" and view.confirm_button.disabled, "Continue auto-selected or started a weapon")
 	_check(view.header.get_global_rect() == header and view.footer.get_global_rect() == footer, "step change moved the navigation")
 	await _click(view.icon_buttons[16])

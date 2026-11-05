@@ -1,0 +1,62 @@
+[gd_resource type="Resource" script_class="TalentTreeData" load_steps=9 format=3]
+[ext_resource type="Script" path="res://scripts/player/talent_tree_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/player/talent_node_data.gd" id="2"]
+[sub_resource type="Resource" id="Gift"]
+script = ExtResource("2")
+id = &"venom_opener"
+display_name = "Giftstich"
+description = "Dein Antritt setzt ein Giftdepot mit 75 % Stärke. Geteilte Depotgrenzen; Depotfüllung behält ihre volle Stärke."
+effects = {"opener_poison": 0.75}
+icon_index = 103
+[sub_resource type="Resource" id="Lauf"]
+script = ExtResource("2")
+id = &"venom_stride"
+display_name = "Flüchtig"
+description = "+4 % Bewegung je Rang."
+parent = &"venom_opener"
+max_ranks = 3
+stat_changes = {"speed_bonus": 4.0}
+icon_index = 8
+[sub_resource type="Resource" id="Wechsel"]
+script = ExtResource("2")
+id = &"venom_switch"
+display_name = "Beißwechsel"
+description = "Antritt gegen ein anderes Ziel als beim letzten Antritt: zusätzlich +25 % Waffenschaden. Gilt auch nach einem Kill. Legt deinen Abschlussweg fest."
+parent = &"venom_stride"
+parent_rank = 3
+exclusive_group = &"assassin_finish"
+effects = {"switch_opener_bonus": 25.0}
+icon_index = 104
+[sub_resource type="Resource" id="Fokus"]
+script = ExtResource("2")
+id = &"pressure"
+display_name = "Druckpunkt"
+description = "Fokustreffer: +4 % Waffenschaden je Stufe, maximal vier. Aufbau alle 0.45 s; ohne Treffer auf das Fokusziel nach 2 s verloren."
+branch = 1
+effects = {"focus_bonus": 4.0}
+icon_index = 16
+[sub_resource type="Resource" id="Polster"]
+script = ExtResource("2")
+id = &"pursuit_health"
+display_name = "Bisspolster"
+description = "+8 Schmelz je Rang."
+branch = 1
+parent = &"pressure"
+max_ranks = 3
+stat_changes = {"max_health": 8.0}
+icon_index = 7
+[sub_resource type="Resource" id="Bleiben"]
+script = ExtResource("2")
+id = &"pursuit_finish"
+display_name = "Durchziehen"
+description = "Bei vier Fokusstufen zusätzlich +20 % Waffenschaden gegen dieses Ziel. Legt deinen Abschlussweg fest."
+branch = 1
+parent = &"pursuit_health"
+parent_rank = 3
+exclusive_group = &"assassin_finish"
+effects = {"focus_finish_bonus": 20.0}
+icon_index = 4
+[resource]
+script = ExtResource("1")
+branches = PackedStringArray("Giftlauf", "Nachsetzen")
+nodes = Array[ExtResource("2")]([SubResource("Gift"), SubResource("Lauf"), SubResource("Wechsel"), SubResource("Fokus"), SubResource("Polster"), SubResource("Bleiben")])

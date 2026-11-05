@@ -29,7 +29,7 @@ func _conversion(source: StringName, target: StringName, factor: float) -> Class
 	return result
 
 func _run() -> void:
-	_check(ClassCatalog.DEFAULT.valid() and ClassCatalog.profiles.size() == 1, "neutral shipping class is invalid or exposes diagnostic profiles")
+	_check(ClassCatalog.DEFAULT.valid() and ClassCatalog.profiles.size() == 2, "shipping classes are invalid or expose diagnostic profiles")
 	for weapon in WeaponCatalog.ALL:
 		_check(not weapon.class_roles.is_empty(), "standard weapon has no class role: " + str(weapon.id))
 		for role in weapon.class_roles: _check(role in WeaponRoles.ALL, "unknown standard weapon role")

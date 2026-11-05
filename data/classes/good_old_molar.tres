@@ -1,9 +1,11 @@
-[gd_resource type="Resource" script_class="PlayerClassData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="PlayerClassData" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/player/player_class_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/talents/good_old_molar.tres" id="2"]
 
 [resource]
 script = ExtResource("1")
 id = &"good_old_molar"
 display_name = "Good Old Molar"
 description = "Der klassische Denti. Freie Waffenwahl."
+talent_tree = ExtResource("2")

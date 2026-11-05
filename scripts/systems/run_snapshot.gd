@@ -44,6 +44,8 @@ static func capture(game) -> Dictionary:
 		"weapon_runtime": weapon_runtime,
 		"player_projectiles": player_projectiles,
 		"items": game.items.save_data(),
+		"talents": game.talents.save_data(),
+		"class_combat": game.player.class_combat.save_data(enemy_indices),
 		"poison_build": game.items.effect_context.poison_build.save_data(enemy_indices),
 		"relics": game.relics.save_data(),
 		"telemetry": game.telemetry.save_data(),
@@ -70,6 +72,7 @@ static func restore(game, saved: Dictionary) -> void:
 	game.weapon_fusion_panel.hide()
 	game.weapon_fusion_panel.plan = null
 	game.weapon_enchantment_panel.hide()
+	game.talent_panel.hide()
 	game.run_flow.enter(RunFlow.Phase.COMBAT)
 	var wave: WaveController = game.wave
 	var player: Player = game.player
@@ -111,6 +114,8 @@ static func restore(game, saved: Dictionary) -> void:
 			if old_weapon != null:
 				player.loadout.acquire(old_weapon)
 	game.items.restore(saved.get("items", {}))
+	game.talents.restore(saved.get("talents", {}))
+	game._sync_talents()
 	game.relics.restore(saved.get("relics", {}))
 	game.rewards.restore(saved.get("rewards", {}))
 	game.rewards.weapon_upgrades.validate(player.loadout, game.coins, wave.current_wave)
@@ -147,6 +152,7 @@ static func restore(game, saved: Dictionary) -> void:
 	var runtime: Array = saved.get("weapon_runtime", [])
 	var weapons := player.loadout.equipped()
 	var restored_enemies: Array[Node] = game.get_node("Enemies").get_children()
+	player.class_combat.restore(saved.get("class_combat", {}), restored_enemies)
 	game.items.effect_context.poison_build.restore(saved.get("poison_build", {}), restored_enemies)
 	var projectiles := game.get_node("Projectiles") as PlayerProjectilePool
 	for entry in saved.get("player_projectiles", []):

@@ -13,6 +13,8 @@ extends Resource
 @export var allowed_weapon_roles: Array[StringName] = []
 @export var preferred_tags: Array[StringName] = []
 @export var dash_override: DashData
+@export var talent_tree: TalentTreeData
+@export var combat_rules: ClassCombatData
 
 func rule_for(stat: StringName) -> ClassStatRuleData:
 	for rule in stat_rules:
@@ -21,6 +23,8 @@ func rule_for(stat: StringName) -> ClassStatRuleData:
 
 func valid() -> bool:
 	if id == &"" or display_name.is_empty() or rules_version < 1 or root_capacity < 1: return false
+	if talent_tree != null and not talent_tree.valid(): return false
+	if combat_rules != null and not combat_rules.valid(): return false
 	for role in allowed_weapon_roles:
 		if role not in WeaponRoles.ALL: return false
 	for key in starting_stats:

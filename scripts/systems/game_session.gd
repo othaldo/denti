@@ -18,6 +18,7 @@ var progression_path: String = "user://progression.cfg"
 var resume_requested: bool = false
 var pending_start_weapon_id: StringName = &""
 var pending_start_class_id: StringName = &"good_old_molar"
+var pending_talent_run := false
 var setup_requested := false
 var selected_difficulty_id: StringName = &"normal"
 var selected_story_mode: bool = false

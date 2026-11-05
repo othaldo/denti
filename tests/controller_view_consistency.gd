@@ -133,6 +133,8 @@ func _run() -> void:
 	_check(menu.setup_selector.details.heading.text == "Hell" and menu.setup_selector.current_difficulty == &"normal", "setup R3 describes the selected difficulty instead of the focused locked card")
 	await _joy(JOY_BUTTON_B)
 	menu.setup_selector.confirm_selection()
+	_check(menu.page == &"class", "class selection is absent from controller preparation")
+	menu.setup_selector.confirm_selection()
 	menu.setup_selector.select_weapon(1)
 	await _settle()
 	var starter: Button = menu.setup_selector.weapon_view.icon_buttons[3]
