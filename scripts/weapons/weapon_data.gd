@@ -7,6 +7,7 @@ const WET_STATUS = preload("res://data/statuses/wet.tres")
 @export var chest_upgrades: Dictionary = {}
 @export var rolls: Dictionary = {}
 @export var id: StringName
+@export var class_roles: Array[StringName] = []
 @export var display_name: String
 @export var role: String
 @export_multiline var description: String

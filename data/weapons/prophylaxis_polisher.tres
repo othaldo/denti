@@ -14,6 +14,7 @@ filter_clip = true
 script = ExtResource("1")
 role = "Verlässliche kritische Treffer"
 id = &"prophylaxis_polisher"
+class_roles = Array[StringName]([&"contact"])
 display_name = "Prophylaxe-Polierer"
 description = "1 Wurzel · Schnelle Politur mit +10 % Waffen-Crit. Jeder dritte Angriff glänzt kritisch, auch nach einem Zielwechsel."
 hands = 1

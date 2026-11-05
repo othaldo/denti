@@ -12,6 +12,7 @@ filter_clip = true
 script = ExtResource("1")
 role = "Wurzelkanalbrecher"
 id = &"root_breaker"
+class_roles = Array[StringName]([&"contact"])
 display_name = "Wurzelkanalbrecher"
 description = "Jeder vierte Treffer auf dasselbe Ziel löst einen Durchbruch durch die Gegnerlinie aus. Zielwechsel halbiert die Ladung."
 hands = 1

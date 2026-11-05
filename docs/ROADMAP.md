@@ -18,6 +18,16 @@ Details zum Iststand: [README](../README.md), [Story-Modus](STORY_MODE.md), [Waf
 
 ## Prioritäten
 
+Ergänzung 05.11.2026: Für die nächste Entwicklungsphase liegt ein
+[gemeinsamer Umsetzungsplan für Klassenregeln und Synergiefamilien](CLASSES_AND_SYNERGIES_IMPLEMENTATION_PLAN.md)
+vor. Reihenfolge: Klassen-/Stat-/Waffenfundament mit Good Old Molar, vollständiges
+Giftpaket, Assassine mit Run-Skilltree, getrennte Eis-/Feuerpakete, danach Hüter
+und Spültechniker sowie Gesamtbalance. Das
+[Klassenfundament mit Good Old Molar](CLASS_FOUNDATION.md) ist jetzt umgesetzt:
+zentrale Attributregeln, Waffenrollen/Eignung und kompatible Speicherung.
+Giftpaket, Spezialklassen und Skilltree folgen. Bestehende
+Blutungs- und Wasserbuilds dienen als Kontrollen.
+
 Ergänzung 01.11.2026: Der [Buildvergleich auf Normal](BUILD_COMPARISON.md) ergänzt
 die stationären Waffenmessungen um vollständige Wellen, Verzauberungen, Heilung
 und normale Bewegung. Buffs für unattraktive Alternativen haben Vorrang;

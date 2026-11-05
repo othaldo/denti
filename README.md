@@ -39,6 +39,8 @@ Die vier Farbstufen der Boss-Entzündung. Die Vorschau zeigt einen Frame der Ani
 
 [Startwaffe wählen](docs/STARTER_SELECTION.md): Schwierigkeit und eine von 18 Standardwaffen im Menü vorbereiten, mit Zurück/Weiter und ausdrücklichem Run-Start.
 
+[Good Old Molar und Klassenfundament](docs/CLASS_FOUNDATION.md): Basis-Denti mit freier Waffenwahl; gemeinsame Regeln für spätere Klassen mit eigenen Wurzeln, Attributgrenzen und Waffenrollen.
+
 ## Spielen
 
 Für Performance-Tests im Web-Build: Im Hauptmenü siebenmal **Einstellungen → Zurück**, dann **Code eingeben**. `debug map` startet die volle Welle-17-Testarena, `boss charge` den Boss-Test. Der normale Spielstand bleibt erhalten. [Testarenen und Messwerte](docs/TEST_ARENAS.md).
@@ -157,7 +159,7 @@ Unter Windows können die Tests mit dem Godot-Konsolenprogramm ausgeführt werde
 python tools/run_tests.py --godot Godot_v4.7.2-stable_win64_console.exe
 ```
 
-Der Runner benötigt Python 3.10+ (keine Zusatzpakete). Standardmäßig laufen 178 Tests für Spielfluss, Spielstände, Kampf, Balance, Shop und bedienbare UI. 21 zusätzliche Grafik-, Debug-, Waffenvergleichs- und umfassende Boss-Routenprüfungen sind mit `--suite extended` gezielt aufrufbar; `--suite all --timeout 300` führt beide Gruppen aus. Normale CI-Builds verwenden die Kernprüfung, Release-Tags die vollständige Suite. Bis zu vier Tests laufen parallel, mit getrennten Godot-Benutzerdaten und unverändertem Simulationsschritt von 1/60 Sekunde. `--jobs 1` läuft seriell; `--filter 'weapon_*'` wählt innerhalb der Suite eine Teilmenge. Fehlercodes, `SCRIPT ERROR:`, Engine-`ERROR:`, Ressourcen-/Objektlecks und Zeitüberschreitungen lassen den Lauf fehlschlagen. Laufzeiten und Logs stehen unter `.godot/test_results.json` und `.godot/test_runs/`. [Auswahl, Befehle und Laufzeitvergleich](docs/TEST_RUNTIME.md).
+Der Runner benötigt Python 3.10+ (keine Zusatzpakete). Standardmäßig laufen 179 Tests für Spielfluss, Spielstände, Kampf, Balance, Shop und bedienbare UI. 21 zusätzliche Grafik-, Debug-, Waffenvergleichs- und umfassende Boss-Routenprüfungen sind mit `--suite extended` gezielt aufrufbar; `--suite all --timeout 300` führt beide Gruppen aus. Normale CI-Builds verwenden die Kernprüfung, Release-Tags die vollständige Suite. Bis zu vier Tests laufen parallel, mit getrennten Godot-Benutzerdaten und unverändertem Simulationsschritt von 1/60 Sekunde. `--jobs 1` läuft seriell; `--filter 'weapon_*'` wählt innerhalb der Suite eine Teilmenge. Fehlercodes, `SCRIPT ERROR:`, Engine-`ERROR:`, Ressourcen-/Objektlecks und Zeitüberschreitungen lassen den Lauf fehlschlagen. Laufzeiten und Logs stehen unter `.godot/test_results.json` und `.godot/test_runs/`. [Auswahl, Befehle und Laufzeitvergleich](docs/TEST_RUNTIME.md).
 
 [Testpiloten und Zeitraffer](docs/BOT_SIMULATION.md) vergleichen Reaktion,
 Kampfstrategie und Buildregel getrennt über verdiente Runs bis W20 (`--last-wave 20`).

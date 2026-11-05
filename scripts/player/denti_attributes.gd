@@ -4,11 +4,7 @@ extends RefCounted
 # Stable enum identities for gameplay/UI; resource and save keys stay compatible.
 enum Type { DAMAGE, ARMOR, MAX_HEALTH, ATTACK_SPEED, CRIT_CHANCE, REGEN, MOVEMENT, LUCK, MELEE_DAMAGE, RANGED_DAMAGE, DODGE, DASH_RECOVERY }
 
-const KEYS: Array[StringName] = [
-	&"damage_bonus", &"armor", &"max_health", &"attack_speed", &"crit_chance",
-	&"regen", &"speed_bonus", &"luck", &"melee_damage", &"ranged_damage", &"dodge_chance",
-	&"dash_recovery_bonus",
-]
+const KEYS: Array[StringName] = PlayerStatKeys.ALL
 const NAMES: Array[String] = [
 	"Bisskraft", "Härte", "Schmelz", "Putzeifer", "Glanz", "Speichel",
 	"Bewegung", "Zahnglück", "Nahschaden", "Fernschaden", "Zahnflutsch",
@@ -75,7 +71,7 @@ static func value_text(stats: PlayerStats, type: Type) -> String:
 		Type.REGEN: return stats.regen_text()
 		Type.DASH_RECOVERY: return stats.stamina_text()
 		Type.MAX_HEALTH: return "%.0f HP" % stats.max_health
-		Type.DODGE: return "%s %%" % number(stats.effective_dodge_chance() * 100.0) + (" (max.)" if stats.dodge_chance >= PlayerStats.MAX_DODGE_CHANCE else "")
+		Type.DODGE: return "%s %%" % number(stats.effective_dodge_chance() * 100.0) + (" (max.)" if stats.dodge_chance >= stats.dodge_limit() else "")
 	var value: float = float(stats.get(key_for(type)))
 	if is_fraction(type):
 		return "%s %%" % number(value * 100.0)
@@ -103,20 +99,20 @@ static func upgrade_preview_text(stats: PlayerStats, type: Type, amount: float) 
 	# Add to the raw stat before applying effective limits: excess dodge/stamina
 	# still offsets penalties, but the choice must show what actually takes effect.
 	var before := float(stats.get(key_for(type)))
-	var after := before + amount
-	var maximum := INF
+	var after := stats.preview_upgrade(key_for(type), amount)
+	var maximum := stats.maximum_for(key_for(type))
 	match type:
 		Type.DODGE:
-			maximum = PlayerStats.MAX_DODGE_CHANCE
+			maximum = stats.dodge_limit()
 			before = clampf(before, 0.0, maximum)
 			after = clampf(after, 0.0, maximum)
 		Type.CRIT_CHANCE:
-			maximum = PlayerStats.MAX_CRIT_CHANCE
+			maximum = maximum if is_finite(maximum) else PlayerStats.MAX_CRIT_CHANCE
 			before = clampf(before, 0.0, maximum)
 			after = clampf(after, 0.0, maximum)
 		Type.DASH_RECOVERY:
-			var config := PlayerStats.DASH_CONFIG
-			maximum = config.capacity + config.max_stamina_bonus
+			var config := stats.class_data.dash_config()
+			maximum = config.capacity + minf(maximum, config.max_stamina_bonus)
 			before = config.capacity + clampf(before, 0.0, config.max_stamina_bonus)
 			after = config.capacity + clampf(after, 0.0, config.max_stamina_bonus)
 		Type.MAX_HEALTH:

@@ -126,6 +126,7 @@ func acquire(item: ShopOfferData) -> bool:
 
 func preferred_tags(loadout: WeaponLoadout) -> Array[StringName]:
 	var result: Array[StringName] = []
+	if is_instance_valid(loadout.stats): result.assign(loadout.stats.class_data.preferred_tags)
 	for template in ItemCatalog.ALL:
 		if template.weapon_data == null and count(template.id) > 0:
 			for tag in template.tags:

@@ -12,6 +12,7 @@ filter_clip = true
 script = ExtResource("1")
 role = "Dreifaltigkeitsbürste"
 id = &"trinity_brush"
+class_roles = Array[StringName]([&"ranged"])
 display_name = "Dreifaltigkeitsbürste"
 description = "Drei Pastestrahlen markieren Gegner. Weitere Treffer detonieren die Markierung im Umkreis."
 hands = 2

@@ -27,6 +27,7 @@ var current_difficulty: StringName = &"normal"
 var committed := false
 var keyboard_focus := false
 var standalone := true
+var class_profile: PlayerClassData = ClassCatalog.DEFAULT
 var options: Array[WeaponData]:
 	get: return weapon_view.options
 var selected_id: StringName:
@@ -176,6 +177,9 @@ func show_options(weapons: Array[WeaponData], selected: StringName = &"") -> voi
 	weapon_view.focus_selection.call_deferred()
 
 func _show_step(setup: RunSetup = null) -> void:
+	if setup != null: class_profile = ClassCatalog.by_id(setup.class_id)
+	brand_text.text = class_profile.display_name
+	brand_text.tooltip_text = class_profile.description
 	details.visible = false
 	difficulty_view.visible = current_step == &"difficulty"
 	weapon_view.visible = current_step == &"weapon"
@@ -223,7 +227,7 @@ func show_details() -> void:
 	else:
 		var weapon := weapon_view.selected_weapon()
 		if weapon == null: return
-		details.present(weapon.display_name, RunSetupPresentation.details(weapon), source)
+		details.present(weapon.display_name, RunSetupPresentation.details(weapon) + "\n\n" + class_profile.display_name + "\n" + class_profile.description, source)
 
 func _locked_details(id: StringName) -> void:
 	details.present(DifficultyCatalog.by_id(id).display_name, "Ein Sieg auf Hard schaltet Hell frei.", difficulty_view.buttons[id])
@@ -274,7 +278,7 @@ func _layout() -> void:
 	header.size = Vector2(rect.size.x, 44 if compact else 60)
 	brand_text.visible = rect.size.x >= 650
 	branding.position = Vector2.ZERO
-	branding.size = Vector2(130 if brand_text.visible else 40, header.size.y)
+	branding.size = Vector2(250 if brand_text.visible else 40, header.size.y)
 	for button: Button in step_buttons.values(): button.add_theme_font_size_override("font_size", 14 if compact else 18)
 	steps.reset_size()
 	steps.size.y = header.size.y

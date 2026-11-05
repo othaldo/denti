@@ -85,6 +85,11 @@ static func _valid_structure(value: Dictionary) -> bool:
 	if mastery.has("eligible") and not mastery.eligible is bool: return false
 	if mastery.has("starter_id") and not mastery.starter_id is String: return false
 	var player: Dictionary = value.player
+	if not _containers(player, ["class_state"], []) or not ClassCatalog.valid_state(player.get("class_state", {})): return false
+	var profile := ClassCatalog.by_id(StringName(str(player.get("class_state", {}).get("id", "good_old_molar"))))
+	for entry in value.get("weapons", []):
+		var weapon := WeaponCatalog.by_id(StringName(weapon_id(str(entry.get("id", "")))))
+		if weapon != null and not WeaponEligibility.allowed(weapon, profile): return false
 	if not _containers(player, ["dash"], []): return false
 	var dash: Dictionary = player.get("dash", {})
 	if not _containers(dash, [], ["direction", "last_direction"]): return false

@@ -12,6 +12,7 @@ filter_clip = true
 script = ExtResource("1")
 role = "Lichtstrahl durch Gegnerlinien"
 id = &"uv_lamp"
+class_roles = Array[StringName]([&"ranged"])
 display_name = "UV-Lampe"
 description = "2 Wurzeln · Breiter Sofortstrahl trifft die ganze Linie. +10 % Waffen-Crit; kritische Treffer verursachen ×2 Schaden."
 hands = 2

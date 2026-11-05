@@ -53,6 +53,7 @@ func _ready() -> void:
 	stats.dodged.connect(_on_dodged)
 	loadout.stats = stats
 	dash.stats = stats
+	dash.config = stats.class_data.dash_config()
 	stats.changed.connect(dash.clamp_charge)
 	get_node("/root/GameInput").changed.connect(_sync_dash_input)
 	dash_trail = DashTrail.new()

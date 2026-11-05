@@ -12,6 +12,7 @@ filter_clip = true
 script = ExtResource("1")
 role = "Schwere Gegnerlinien durchbohren"
 id = &"crown_launcher"
+class_roles = Array[StringName]([&"ranged"])
 display_name = "Kronenwerfer"
 description = "2 Wurzeln · Fernkampf · Durchschlag wächst mit Stufe"
 hands = 2

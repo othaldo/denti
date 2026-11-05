@@ -12,6 +12,7 @@ filter_clip = true
 script = ExtResource("1")
 role = "Gruppen durchnässen und wegdrücken"
 id = &"water_turbine"
+class_roles = Array[StringName]([&"ranged"])
 display_name = "Mundduschen-Turbine"
 description = "2 Wurzeln · Breiter Wasserfächer stößt Gruppen zurück und verlangsamt sie durch Nass; Kontrolle statt Rohschaden."
 hands = 2

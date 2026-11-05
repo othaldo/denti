@@ -12,6 +12,7 @@ filter_clip = true
 script = ExtResource("1")
 role = "Große Explosionen gegen Horden"
 id = &"fluoride_rocket"
+class_roles = Array[StringName]([&"ranged"])
 display_name = "Fluorid-Rakete"
 description = "2 Wurzeln · Langsame Rakete mit großer Explosion. Stark gegen Horden; profitiert von Fluorid-Spray."
 hands = 2

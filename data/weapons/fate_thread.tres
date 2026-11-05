@@ -12,6 +12,7 @@ filter_clip = true
 script = ExtResource("1")
 role = "Schicksalsfaden"
 id = &"fate_thread"
+class_roles = Array[StringName]([&"reach"])
 display_name = "Schicksalsfaden"
 description = "Verbindet nahe Gegner mit Zahnseide. Bewegung spannt die Fäden, bis sie mit Schnittschaden und Blutung reißen."
 hands = 1

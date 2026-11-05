@@ -86,6 +86,11 @@ var story_travel: StoryTravel
 
 func _enter_tree() -> void:
 	var run: Node = get_node("/root/GameSession")
+	if not run.resume_requested:
+		var profile := ClassCatalog.by_id(run.pending_start_class_id)
+		if profile != null and profile != ClassCatalog.DEFAULT:
+			get_node("Player/Stats").begin_class(profile)
+	run.pending_start_class_id = ClassCatalog.DEFAULT.id
 	if run.test_scenario_id != &"":
 		var preset := TestArenaCatalog.by_id(run.test_scenario_id)
 		if preset != null and preset.diagnostic != TestArenaData.Diagnostic.NONE:
@@ -231,6 +236,7 @@ func _show_starters(selected_id: StringName = &"") -> void:
 	for weapon in WeaponCatalog.ALL:
 		if player.loadout.can_acquire(weapon):
 			starters.append(weapon)
+	choice_panel.starter_selection.class_profile = player.stats.class_data
 	choice_panel.show_starters(starters, selected_id)
 	get_tree().paused = true
 	_save_run()
@@ -712,6 +718,7 @@ func _show_level_choice() -> void:
 	for weapon in player.loadout.equipped():
 		equipped_stats.append(StringName(weapon.data.damage_stat + "_damage"))
 	for upgrade in UPGRADES:
+		if not player.stats.upgrade_has_effect(upgrade.stat, upgrade.with_tier(4).amount): continue
 		if upgrade.stat == &"dash_recovery_bonus" and player.stats.stamina_bonus() >= player.dash.config.max_stamina_bonus:
 			continue
 		if upgrade.stat in [&"melee_damage", &"ranged_damage"] and not equipped_stats.has(upgrade.stat):
@@ -721,9 +728,14 @@ func _show_level_choice() -> void:
 	var choices: Array[UpgradeData] = []
 	# Pending levels include this choice; resolve their earned levels oldest first.
 	var earned_level := level - maxi(rewards.pending_levels - 1, 0)
-	for index in ChoicePanel.UPGRADE_COUNT:
-		var choice := pool[index].with_tier(DentiRarity.upgrade_tier(earned_level, player.stats.luck))
-		choices.append(choice.with_stat_context(player.stats))
+	for upgrade in pool:
+		var choice := upgrade.with_tier(DentiRarity.upgrade_tier(earned_level, player.stats.luck)).with_stat_context(player.stats)
+		if player.stats.upgrade_has_effect(choice.stat, choice.amount): choices.append(choice)
+		if choices.size() == ChoicePanel.UPGRADE_COUNT: break
+	if choices.is_empty():
+		rewards.resolve_level()
+		_advance_post_wave_rewards.call_deferred()
+		return
 	choice_panel.show_upgrades(choices, player.stats)
 	var progress := rewards.choice_progress()
 	choice_panel.set_progress(progress.x, progress.y)
@@ -1235,7 +1247,7 @@ func _run_recap_data() -> Dictionary:
 
 
 func _combat_build_snapshot() -> Dictionary:
-	return {"player_stats": player.stats.to_save_data(), "weapons": player.loadout.save_data(),
+	return {"class_id": str(player.stats.class_data.id), "class_version": player.stats.class_data.rules_version, "player_stats": player.stats.to_save_data(), "weapons": player.loadout.save_data(),
 		"items": items.owned.duplicate(), "relics": relics.owned.duplicate(),
 		"upgrade_points": rewards.weapon_upgrades.points}
 
@@ -1276,7 +1288,7 @@ func debug_start_wave(number: int) -> void:
 	configured_stats["health"] = player.stats.max_health
 	configured_stats["shield_charges"] = 0
 	configured_stats["regen_progress"] = 0.0
-	player.stats.load_save_data(configured_stats)
+	player.stats.load_save_data(configured_stats, player.stats.class_save_data())
 	# A pending strike may still retain a reference to a removed enemy.
 	player.loadout.restore(player.loadout.save_data())
 	player.dash.reset_wave()

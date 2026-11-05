@@ -14,6 +14,7 @@ filter_clip = true
 script = ExtResource("1")
 role = "Schwere Geschosse mit Durchschlag"
 id = &"amalgam_slingshot"
+class_roles = Array[StringName]([&"ranged"])
 display_name = "Amalgam-Schleuder"
 description = "1 Wurzel · Langsame Metallkugel mit Rückstoß und kleinem Flächenschaden."
 hands = 1

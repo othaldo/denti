@@ -12,6 +12,7 @@ filter_clip = true
 script = ExtResource("1")
 role = "Zahn der Offenbarung"
 id = &"revelation"
+class_roles = Array[StringName]([&"ranged"])
 display_name = "Zahn der Offenbarung"
 description = "Lädt einen breiten Lichtstrahl auf. Kritische Salven erzeugen zwei seitliche Strahlen."
 hands = 2
