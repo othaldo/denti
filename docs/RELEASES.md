@@ -47,6 +47,15 @@ ersetzt die letzte erfolgreiche Vorschau nicht. Main- und Release-Deployments
 binden die Vorschauen wieder ein. Der Hauptlink und `/dev/` beziehen weiterhin
 ausschließlich ihre bisherigen Stable-/Main-Builds.
 
+Die Veröffentlichung übernimmt den auslösenden Build direkt anhand seiner Run-ID.
+Die Übersicht anderer Builds wird ohne GitHubs verzögerten Statusfilter gelesen;
+nur lokal als erfolgreich abgeschlossene Läufe kommen infrage. Ein verspäteter
+Deployment-Lauf ersetzt keine neuere erfolgreiche Vorschau durch einen älteren
+Build. Im Deployment-Log stehen Branch, Version und vollständiger Commit; der
+Laufname nennt den auslösenden Branch und die Buildnummer. Der im Feature-Build
+übersprungene Job **Publish main web test build** veröffentlicht ausschließlich
+`main`; die Branch-Vorschau übernimmt der separate Vorschau-Workflow.
+
 Die Vorschaupakete bleiben 90 Tage erhalten (höchstens so lange wie die
 Repository-Einstellung erlaubt). Nach Ablauf oder manuellem Löschen des neuesten
 erfolgreichen Build-Artefakts entfällt die Vorschau beim nächsten Deployment.

@@ -111,9 +111,26 @@ def run_package(client, run):
         page += 1
 
 
+def workflow_runs(client):
+    # GitHub's status-filtered listing can lag behind completed workflow events.
+    # Read the current runs and check their conclusions locally instead.
+    page = 1
+    while True:
+        runs = client.read("actions/workflows/build.yml/runs?per_page=100&page=" + str(page))["workflow_runs"]
+        yield from runs
+        if len(runs) < 100:
+            return
+        page += 1
+
+
+def successful_run(run):
+    return run.get("status") == "completed" and run.get("conclusion") == "success"
+
+
 def latest_dev(client):
-    runs = client.read("actions/workflows/build.yml/runs?branch=main&event=push&status=success&per_page=5")
-    for run in runs["workflow_runs"]:
+    for run in workflow_runs(client):
+        if not successful_run(run) or run.get("head_branch") != "main" or run.get("event") != "push":
+            continue
         package = run_package(client, run)
         if package is not None:
             return package
@@ -130,31 +147,33 @@ def preview_slug(branch):
     return readable + "-" + hashlib.sha256(branch.encode("utf-8")).hexdigest()[:8]
 
 
-def latest_previews(client):
+def latest_previews(client, triggering_run_id=None):
     previews = {}
     seen = set()
-    page = 1
-    while True:
-        runs = client.read("actions/workflows/build.yml/runs?status=success&per_page=100&page=" + str(page))
-        for run in runs["workflow_runs"]:
-            branch = run.get("head_branch") or ""
-            if (not is_feature_branch(branch) or branch in seen or
-                    run["event"] not in ["push", "workflow_dispatch"]):
-                continue
-            # PRs/forks must never supply content to this privileged deployment.
-            if run["head_repository"]["full_name"] != run["repository"]["full_name"]:
-                continue
-            # Deleted branches disappear on the next deployment.
-            ref = client.read("git/ref/heads/" + urllib.parse.quote(branch, safe="/"), missing=True)
-            seen.add(branch)
-            if ref is None:
-                continue
-            package = run_package(client, run)
-            if package is not None:
-                previews[branch] = package
-        if len(runs["workflow_runs"]) < 100:
-            return previews
-        page += 1
+    runs = list(workflow_runs(client))
+    if triggering_run_id is not None:
+        triggering_run = client.read("actions/runs/" + str(triggering_run_id))
+        if not successful_run(triggering_run):
+            raise ValueError("the triggering preview build has not completed successfully")
+        runs.append(triggering_run)
+    # A delayed/rerun deployment must never roll back a newer successful build.
+    for run in sorted(runs, key=lambda entry: entry["run_number"], reverse=True):
+        branch = run.get("head_branch") or ""
+        if (not successful_run(run) or not is_feature_branch(branch) or branch in seen or
+                run["event"] not in ["push", "workflow_dispatch"]):
+            continue
+        # PRs/forks must never supply content to this privileged deployment.
+        if run["head_repository"]["full_name"] != run["repository"]["full_name"]:
+            continue
+        # Deleted branches disappear on the next deployment.
+        ref = client.read("git/ref/heads/" + urllib.parse.quote(branch, safe="/"), missing=True)
+        seen.add(branch)
+        if ref is None:
+            continue
+        package = run_package(client, run)
+        if package is not None:
+            previews[branch] = package
+    return previews
 
 
 def extract_web(package, target):
@@ -198,6 +217,7 @@ def compose(output, stable, dev, previews=None):
         target.mkdir()
         extract_web(package, target)
         manifest = package[0]
+        print("Preview:", branch, "|", manifest["version"], "|", manifest["commit"])
         links.append('<li><a href="' + slug + '/">' + html.escape(branch) + '</a> · ' +
                      html.escape(manifest["version"]) + ' · <code>' + html.escape(manifest["commit"][:7]) + '</code></li>')
     preview_root.joinpath("index.html").write_text(
@@ -221,13 +241,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dev-dist", type=Path)
     parser.add_argument("--require-stable", action="store_true")
+    parser.add_argument("--preview-run", type=int, help="Successful build run that triggered this preview deployment")
     args = parser.parse_args()
     client = GitHub(os.environ.get("GITHUB_REPOSITORY", ""), os.environ.get("GH_TOKEN", ""))
     stable = stable_release(client)
     if args.require_stable and stable is None:
         raise ValueError("publish a stable GitHub release before deploying it")
     dev = local_dev(args.dev_dist) if args.dev_dist else latest_dev(client)
-    compose(ROOT / "build/site", stable, dev, latest_previews(client))
+    compose(ROOT / "build/site", stable, dev, latest_previews(client, args.preview_run))
 
 
 if __name__ == "__main__":
