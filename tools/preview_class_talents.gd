@@ -57,6 +57,8 @@ func _run() -> void:
 	progress.enabled = true
 	progress.prepare(3, 2, 0)
 	game.talent_panel.present(progress, molar, game.UPGRADES, 3)
+	game.talent_panel._select(&"tool_variety")
+	await _capture("talent_molar_1280x720")
 	root.content_scale_size = Vector2i(320, 568)
 	root.size = root.content_scale_size
 	await _capture("talent_molar_320x568")

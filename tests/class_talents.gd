@@ -56,6 +56,7 @@ func _run() -> void:
 	await _combat()
 	_test_paths()
 	_test_free_nodes()
+	await _test_molar_toolkit()
 	await _legacy()
 	session.clear_run()
 	print("PASS class talent budget, paths, combat windows, draft/save flow and legacy progression" if failures == 0 else "FAIL class talents")
@@ -355,8 +356,8 @@ func _test_paths() -> void:
 	var flexible := TalentProgression.new()
 	flexible.enabled = true
 	flexible.prepare(5, 2, 0)
-	for id in [&"versatile", &"tool_a_melee", &"tool_a_ranged", &"tool_a_bite", &"molar_opener"]:
-		_check(flexible.plan_talent(id, molar, game.UPGRADES, 5) if id != &"molar_opener" else not flexible.plan_talent(id, molar, game.UPGRADES, 5), "base tree gate wrong: " + str(id))
+	for id in [&"versatile", &"tool_a_melee", &"tool_a_ranged", &"tool_a_bite", &"tool_elements"]:
+		_check(flexible.plan_talent(id, molar, game.UPGRADES, 5) if id != &"tool_elements" else not flexible.plan_talent(id, molar, game.UPGRADES, 5), "base tree gate wrong: " + str(id))
 	_check(flexible.plan_talent(&"tool_a_tempo", molar, game.UPGRADES, 5), "base tree row 1 attribute refused")
 	_check(flexible.commit(molar, game.UPGRADES, 5), "base tree commit failed")
 	var effects := ClassCombatEffects.new()
@@ -409,6 +410,40 @@ func _test_free_nodes() -> void:
 	_near(dash.cost(), 50, "Sprintfaden dash cost")
 	dash.cost_cut = 500
 	_near(dash.cost(), dash.config.cost * 0.5, "dash cost cut is not floored")
+
+func _test_molar_toolkit() -> void:
+	# Good Old Molar's loadout talents read the equipped weapons.
+	var effects: ClassCombatEffects = game.player.class_combat
+	var saved: Dictionary = effects.powers
+	effects.opener_time = 0
+	var drill := WeaponCatalog.by_id(&"turbo_drill")
+	game.player.loadout.acquire(drill)
+	var counts := {}
+	for instance in game.player.loadout.equipped(): counts[instance.data.id] = int(counts.get(instance.data.id, 0)) + 1
+	var types := counts.size()
+	var copies: int = int(counts.get(drill.id, 1)) - 1
+	_check(copies >= 1, "test loadout needs a duplicated drill")
+	effects.powers = {"tool_variety": 3.0}
+	_near(effects.damage_bonus(null, drill), 3.0 * types, "Werkzeugvielfalt per weapon type")
+	effects.powers = {"tool_twin": 3.0}
+	_near(effects.damage_bonus(null, drill), 3.0 * copies, "Gleiches Werkzeug per extra copy")
+	effects.powers = {"tool_twin": 3.0, "tool_spec_key": 1.0}
+	_near(effects.damage_bonus(null, drill), 6.0 * copies - 8.0 * (types - 1), "Fachidiot keystone trade-off")
+	effects.powers = {"tool_variety": 3.0, "tool_mix_key": 1.0}
+	_near(effects.damage_bonus(null, drill), 6.0 * types - 10.0 * copies, "Bunter Koffer keystone trade-off")
+	# Rückstoßpuls shoves enemies away at the end of a dash.
+	effects.powers = {"dash_pulse": 70.0}
+	var near := _enemy(Vector2(60, 0))
+	var before: float = near.global_position.distance_to(game.player.global_position)
+	game.player._dash_pulse()
+	_check(near.global_position.distance_to(game.player.global_position) >= before + 60.0 * (1.0 - near.data.knockback_resistance) - 0.01, "Rückstoßpuls did not shove a nearby enemy")
+	effects.powers = {}
+	var far_before := near.global_position
+	game.player._dash_pulse()
+	_check(near.global_position == far_before, "dash pulse without talent moved enemies")
+	near.queue_free()
+	effects.powers = saved
+	await process_frame
 
 func _legacy() -> void:
 	var snapshot := RunSnapshot.capture(game)

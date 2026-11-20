@@ -9,6 +9,7 @@ const MAX_IFRAMES := 0.4
 const FULL_IFRAMES_DAMAGE_FRACTION := 0.15
 const ATTACK_ANIMATION_DURATION := 0.18
 const DODGE_IFRAMES := 0.15
+const DASH_PULSE_RADIUS := 110.0
 
 @onready var stats: PlayerStats = $Stats
 @onready var loadout: WeaponLoadout = $Weapons
@@ -57,6 +58,7 @@ func _ready() -> void:
 	dash.stats = stats
 	dash.config = stats.class_data.dash_config()
 	class_combat.profile = stats.class_data
+	class_combat.loadout = loadout
 	dash.started.connect(class_combat.on_dash)
 	dash_cut = ClassDashCut.new()
 	dash_cut.player = self
@@ -98,12 +100,27 @@ func _physics_process(delta: float) -> void:
 	if dash_moved:
 		dash_trail.add_segment(motion_start, motion_end)
 		dash_cut.extend(motion_end)
-		if not dash.active: dash_cut.release()
+		if not dash.active:
+			dash_cut.release()
+			_dash_pulse()
 	is_moving = global_position.distance_squared_to(before_move) > 0.01
 	_animate_sprite(dash.direction if was_dashing else direction, delta)
 	hurt_time = maxf(hurt_time - delta, 0.0)
 	dodge_time = maxf(dodge_time - delta, 0.0)
 	sprite.modulate = Color(1.0, 0.55, 0.55) if hurt_time > 0.0 else (Color(0.72, 0.94, 1.0) if dodge_time > 0.0 else Color.WHITE)
+
+
+## Rückstoßpuls talent: the end of a dash shoves nearby enemies away.
+func _dash_pulse() -> void:
+	var push := class_combat.power("dash_pulse")
+	if push <= 0.0: return
+	for enemy in nearby_enemies(global_position, DASH_PULSE_RADIUS):
+		if not enemy.is_targetable(): continue
+		var away := global_position.direction_to(enemy.global_position)
+		if away.is_zero_approx(): away = dash.direction
+		enemy.global_position += away * push * (1.0 - clampf(enemy.data.knockback_resistance, 0.0, 1.0))
+	ElementImpactBatch.emit_from(self, &"water", global_position, dash.direction, DASH_PULSE_RADIUS, true)
+	items.enchantment_support.emit(&"class_dash_pulses", 1)
 
 
 func movement_direction() -> Vector2:

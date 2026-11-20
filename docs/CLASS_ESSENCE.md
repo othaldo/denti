@@ -100,8 +100,19 @@ Baum aus drei Ästen nebeneinander (WoW-Classic-Prinzip):
 | **Zuckerrausch** | Bewegung, Wurzelkraft, Zahnflutsch, Putzeifer · Naschkatze (Rückgabe, 3) · Weiter Sprung (+30 px Dashweite, 2) → Kreuzschnitt → Doppelspule / Nachbrenner (Spur-Kill setzt Dash-Abklingzeit zurück) → Schlüsselstein **Sprintfaden** (Dash −25 Wurzelkraft, mindestens halbe Kosten; Spur-Direktschaden −25 %) · 3 freie Wurzeln |
 | **Zahnpflege** | Schmelz, Härte, Speichel, Zahnglück · Versiegelung · 4 freie Wurzeln |
 
-Good Old Molar: **Werkzeug**, **Standfest**, **Beweglichkeit** mit seinen bisherigen
-Talenten und je drei bis vier freien Wurzeln. Talent-IDs bleiben kompatibel.
+**Good Old Molar** bleibt ohne Klassenverb. Sein Baum belohnt, was nur er hat:
+sechs Wurzeln und freie Waffenwahl. Mehrere Talente nutzen bestehende Item-Mechaniken
+(gleiche Effektschlüssel wie Mundspülung, Funkenclip, Glanzpuder, Glanzprisma,
+Rückholfeder, Amalgamkern, Fluoridgel, Splitterkrone, Keramikschale).
+
+| Good Old Molar | Inhalt |
+| --- | --- |
+| **Werkzeugkasten** (Mischbuild) | Werkzeugkunde · **Werkzeugvielfalt** (+3 % Waffenschaden je unterschiedlichem Waffentyp, 3) → **Elementmix** (+4 % je unterschiedlichem Element, 2) → Schlüsselstein **Bunter Koffer** (Vielfalt doppelt; −10 % je Duplikat derselben Waffe) · Spritzspülung (Projektil-Spritzer) · Funkenbrücke (Wasser/Licht springt) · 3 freie Wurzeln |
+| **Fachpraxis** (Spezialisierung) | **Gleiches Werkzeug** (+3 % je weiterem Exemplar desselben Typs, 3) → Schlüsselstein **Fachidiot** (doppelt; −8 % je weiterem Waffentyp) · Glanzfunke (Krit-Explosion) → Glanzprisma (Krit-Strahl) · Rückholfeder · 3 freie Wurzeln |
+| **Standfest** (Verteidigung) | Solider Schmelz → Nachpolieren → Versiegelung → **Splitterschmelz** (Schildblock- und Trefferssplitter) · **Amalgamfüllung** (Härte → Schaden) · **Schutzwall** (+1 Schild je Welle) · Wurzelreserve · **Rückstoßpuls** (Dashende stößt Gegner 70 px weg) · 1 freie Wurzel |
+
+„Anlauf nehmen“ ist entfernt (unsichtbarer +20-%-Einzeltreffer); vorhandene Ränge
+werden beim Laden als Levelpunkte erstattet. Übrige Talent-IDs bleiben kompatibel.
 
 Damit entstehen beim Assassinen unterscheidbare Wege: Giftteppich (Giftspur +
 Lange Schwaden + Giftschneise, Depotfüllung/Nervensonde), Dauerdash (Zuckerrausch + Sprintfaden, Zucker- und
