@@ -91,7 +91,7 @@ jobs:
           path: dist/*
           if-no-files-found: error
           retention-days: >-
-            ${{ (github.ref == 'refs/heads/feat' || startsWith(github.ref, 'refs/heads/feat/') || startsWith(github.ref, 'refs/heads/feat-') ||
+            ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feat' || startsWith(github.ref, 'refs/heads/feat/') || startsWith(github.ref, 'refs/heads/feat-') ||
                  github.ref == 'refs/heads/feature' || startsWith(github.ref, 'refs/heads/feature/') || startsWith(github.ref, 'refs/heads/feature-')) && 90 || 14 }}
 
   draft-release:

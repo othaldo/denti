@@ -390,9 +390,19 @@ class ReleaseTests(unittest.TestCase):
         self.assertNotIn("feat/<script>", index)
 
     def test_preview_alone_cannot_become_the_stable_or_main_build(self):
+        # Expired main artifacts must not block previews, yet the preview stays under /preview/.
         package, _ = self.preview_fixture()
+        output = self.root / "site"
+        pages.compose(output, None, None, {"feat/example": package})
+        self.assertFalse((output / "release.json").exists())
+        self.assertFalse((output / "dev/release.json").exists())
+        self.assertIn("preview/", (output / "index.html").read_text())
+        slug = pages.preview_slug("feat/example")
+        self.assertTrue((output / "preview" / slug / "release.json").exists())
+
+    def test_nothing_to_deploy_still_fails(self):
         with self.assertRaises(ValueError):
-            pages.compose(self.root / "site", None, None, {"feat/example": package})
+            pages.compose(self.root / "site", None, None, {})
 
 
 if __name__ == "__main__":
