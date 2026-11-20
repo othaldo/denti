@@ -2,7 +2,7 @@
 
 Ein kleiner 2D-Arena-Survivor über einen göttlichen Backenzahn, der Plaque, Zucker und Karies den Kampf ansagt. Du steuerst Denti direkt; seine Waffen greifen automatisch an. Zwischen den Wellen entscheiden Levelaufstiege und Einkäufe, wie der nächste Kampf läuft.
 
-**Aktuelle Version: 0.7.0.** Alle Änderungen seit 0.1 stehen in der [Patchnote-Historie](CHANGELOG.md).
+**Aktuelle Version: 0.8.0.** Alle Änderungen seit 0.1 stehen in der [Patchnote-Historie](CHANGELOG.md).
 
 GitHub Actions testet und baut **Web und Windows**. Testpakete stehen bei den
 [Actions-Läufen](https://github.com/othaldo/denti/actions) zum Download bereit;
@@ -100,6 +100,8 @@ Ab Welle 8 kann in normalen Wellen höchstens ein **Goldzahn-Gauner** auftauchen
 - **Nachtklinik:** dunkle Spielansichten, große Objektbilder und kompakte Iconwerte. Hover erklärt Werte, Klick öffnet Details oder das Dentikon. Kurze Hover-, Klick-, Kauf- und Fusionsreaktionen laufen auch in der Shop-Pause. UI-Klänge und reduzierte Bewegung werden unter **Escape → Einstellungen** gespeichert; Kauf, Pins, Preisbindung, Vergleich, Verkauf und Fusion bleiben erhalten. [Gestaltung und Aufnahmen](docs/UI_ART_DIRECTION.md).
 
 Das Spiel ist ein **spielbarer Prototyp**. Balancing, Effekte und weitere Inhalte sind noch in Arbeit.
+
+**0.8.0** bringt sechs Klassen mit eigenem Spielprinzip und einen echten Talentbaum: drei Äste mit sichtbaren Skills, Modifikatoren, Schlüsselsteinen und frei bindbaren Attributwurzeln. Bosse geben jetzt mehrere Levelpunkte, und die Dentipedia erklärt Klassen und Baum. [Klassen-Essenz](docs/CLASS_ESSENCE.md), [Talentbaum](docs/TALENT_TREE_V3_PLAN.md) und [Patchnotes](CHANGELOG.md).
 
 **0.7.0** ergänzt Controller-Steuerung mit Xbox-/PlayStation-Symbolen, ein gemeinsames Tastenschema und gezielte Fokusführung in Shop, Verzaubern und Dentipedia. Einstellbare Controller-Modi schützen vor Eingaben angeschlossener Lenkräder und Simulator-Panels. Waffenmeisterschaften, gezielte Aufstiege ab Mk V und aktivere Bossangriffe bündeln die weiteren Änderungen seit 0.6.0. [Controller-Steuerung und Ansichten](docs/CONTROLLER_SUPPORT.md), [Waffenaufstiege](docs/WEAPON_ASCENSION.md) und [Patchnotes](CHANGELOG.md).
 
