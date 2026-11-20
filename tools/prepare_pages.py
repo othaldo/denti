@@ -194,11 +194,19 @@ def extract_web(package, target):
 
 
 def compose(output, stable, dev, previews=None):
-    if stable is None and dev is None:
+    if stable is None and dev is None and not previews:
         raise ValueError("there is no build to deploy")
     # Always create a new site. Never merge old, possibly stale exported files.
     output.mkdir(parents=True, exist_ok=False)
-    extract_web(stable or dev, output)
+    if stable is not None or dev is not None:
+        extract_web(stable or dev, output)
+    else:
+        # Expired main artifacts must not block branch previews, but a preview
+        # never becomes the root game: the root only points to /preview/.
+        output.joinpath("index.html").write_text(
+            '<!doctype html><html lang="de"><meta charset="utf-8"><title>Denti</title>'
+            '<h1>Denti</h1><p>Zurzeit ist keine veröffentlichte Version verfügbar.</p>'
+            '<a href="preview/">Branch-Testbuilds</a></html>', encoding="utf-8")
     development = output / "dev"
     development.mkdir()
     if dev is not None:
@@ -227,7 +235,7 @@ def compose(output, stable, dev, previews=None):
         ('<ul>' + ''.join(links) + '</ul>' if links else '<p>Zurzeit sind keine Branch-Testbuilds verfügbar.</p>') +
         '<a href="../">Veröffentlichte Version</a> · <a href="../dev/">Main-Testbuild</a></html>', encoding="utf-8")
     (output / ".nojekyll").touch()
-    print("Pages root:", (stable or dev)[0]["version"], "| /dev/:", dev[0]["version"] if dev else "unavailable")
+    print("Pages root:", (stable or dev)[0]["version"] if (stable or dev) else "placeholder", "| /dev/:", dev[0]["version"] if dev else "unavailable")
     if os.environ.get("GITHUB_STEP_SUMMARY"):
         with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as summary:
             summary.write("### Branch-Testbuilds\n\n")
