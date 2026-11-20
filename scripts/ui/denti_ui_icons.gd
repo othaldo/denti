@@ -14,6 +14,9 @@ const ITEM_MYTHIC: Texture2D = preload("res://assets/items/item_icons_mythic_pac
 const DODGE_ATLAS: Texture2D = preload("res://assets/items/item_icons_dodge_packed.png")
 const RELIC_ATLAS: Texture2D = preload("res://assets/relics/relic_icons_atlas.png")
 const POISON_ATLAS: Texture2D = preload("res://assets/items/item_icons_poison.png")
+const TALENT_ATLAS: Texture2D = preload("res://assets/classes/talent_icons.webp")
+const TALENT_COLUMNS := 8
+const TALENT_ROWS := 4
 const HUD_ATLAS: Texture2D = preload("res://assets/ui/hud_icons_atlas.png")
 const STAT_ATLAS: Texture2D = preload("res://assets/ui/stat_icons_atlas.png")
 const RANGE: Texture2D = preload("res://assets/ui/range.svg")
@@ -97,6 +100,11 @@ static func item(index: int) -> Texture2D:
 
 static func hud(index: int) -> Texture2D:
 	return _region(HUD_ATLAS, clampi(index, 0, HUD_COLUMNS * HUD_ROWS - 1), HUD_COLUMNS, HUD_ROWS)
+
+
+static func talent(index: int) -> Texture2D:
+	if index < 0 or index >= TALENT_COLUMNS * TALENT_ROWS: return null
+	return _region(TALENT_ATLAS, index, TALENT_COLUMNS, TALENT_ROWS)
 
 
 static func stat(index: int) -> Texture2D:

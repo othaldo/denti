@@ -14,7 +14,7 @@ display_name = "Werkzeugkunde"
 description = "+1 Nahschaden und +1 Fernschaden je Rang."
 max_ranks = 3
 stat_changes = {"melee_damage": 1.0, "ranged_damage": 1.0}
-icon_index = 4
+icon_index = 0
 [sub_resource type="Resource" id="N2"]
 script = ExtResource("2")
 id = &"tool_a_ranged"
@@ -36,7 +36,7 @@ description = "+3 % Waffenschaden je unterschiedlichem Waffentyp in deinen Wurze
 row = 1
 max_ranks = 3
 effects = {"tool_variety": 3.0}
-icon_index = 28
+icon_index = 1
 [sub_resource type="Resource" id="N5"]
 script = ExtResource("2")
 id = &"tool_a_tempo"
@@ -59,7 +59,7 @@ description = "Fernprojektile spritzen mit 15 % Schaden auf nahe Gegner. Je Rang
 row = 2
 max_ranks = 2
 effects = {"splash": 0.15}
-icon_index = 3
+icon_index = 2
 [sub_resource type="Resource" id="N8"]
 script = ExtResource("2")
 id = &"tool_chain"
@@ -68,7 +68,7 @@ description = "Wasser- und Lichttreffer springen mit 25 % Schaden auf ein nahes 
 row = 2
 column = 2
 effects = {"chain": 0.25}
-icon_index = 57
+icon_index = 3
 [sub_resource type="Resource" id="N9"]
 script = ExtResource("2")
 id = &"tool_free_2"
@@ -85,7 +85,7 @@ row = 3
 parent = &"tool_variety"
 max_ranks = 2
 effects = {"tool_elements": 4.0}
-icon_index = 14
+icon_index = 4
 [sub_resource type="Resource" id="N11"]
 script = ExtResource("2")
 id = &"tool_free_3"
@@ -101,7 +101,7 @@ description = "Schlüsselstein: Werkzeugvielfalt zählt doppelt. Jedes weitere E
 row = 4
 parent = &"tool_elements"
 effects = {"tool_mix_key": 1.0}
-icon_index = 19
+icon_index = 5
 [sub_resource type="Resource" id="N13"]
 script = ExtResource("2")
 id = &"tool_a_crit"
@@ -117,7 +117,7 @@ description = "+3 % Waffenschaden je weiterem Exemplar desselben Waffentyps. Je 
 branch = 1
 max_ranks = 3
 effects = {"tool_twin": 3.0}
-icon_index = 12
+icon_index = 6
 [sub_resource type="Resource" id="N15"]
 script = ExtResource("2")
 id = &"spec_a_luck"
@@ -142,7 +142,7 @@ branch = 1
 row = 1
 max_ranks = 2
 effects = {"crit_burst": 0.15}
-icon_index = 42
+icon_index = 8
 [sub_resource type="Resource" id="N18"]
 script = ExtResource("2")
 id = &"spec_a_bite"
@@ -161,7 +161,7 @@ row = 2
 column = 0
 max_ranks = 2
 effects = {"projectile_return": 0.15}
-icon_index = 66
+icon_index = 9
 [sub_resource type="Resource" id="N20"]
 script = ExtResource("2")
 id = &"spec_crit_beam"
@@ -171,7 +171,7 @@ branch = 1
 row = 2
 parent = &"spec_crit_burst"
 effects = {"crit_beam": 0.3}
-icon_index = 43
+icon_index = 10
 [sub_resource type="Resource" id="N21"]
 script = ExtResource("2")
 id = &"spec_free_2"
@@ -197,7 +197,7 @@ branch = 1
 row = 3
 parent = &"tool_twin"
 effects = {"tool_spec_key": 1.0}
-icon_index = 16
+icon_index = 7
 [sub_resource type="Resource" id="N24"]
 script = ExtResource("2")
 id = &"spec_a_tempo"
@@ -221,7 +221,7 @@ description = "+2 Härte je Rang."
 branch = 2
 max_ranks = 3
 stat_changes = {"armor": 2.0}
-icon_index = 7
+icon_index = 11
 [sub_resource type="Resource" id="N27"]
 script = ExtResource("2")
 id = &"stand_a_armor"
@@ -247,7 +247,7 @@ row = 1
 parent = &"molar_armor"
 max_ranks = 3
 stat_changes = {"regen": 0.4}
-icon_index = 6
+icon_index = 12
 [sub_resource type="Resource" id="N30"]
 script = ExtResource("2")
 id = &"stand_free_1"
@@ -266,7 +266,7 @@ row = 2
 column = 0
 max_ranks = 2
 effects = {"armor_damage": 0.01}
-icon_index = 16
+icon_index = 13
 [sub_resource type="Resource" id="N32"]
 script = ExtResource("2")
 id = &"molar_overheal"
@@ -276,7 +276,7 @@ branch = 2
 row = 2
 parent = &"molar_regen"
 effects = {"overheal_shield": 0.5}
-icon_index = 26
+icon_index = 14
 [sub_resource type="Resource" id="N33"]
 script = ExtResource("2")
 id = &"stand_wall"
@@ -286,7 +286,7 @@ branch = 2
 row = 2
 column = 2
 effects = {"wave_shield": 1.0}
-icon_index = 19
+icon_index = 15
 [sub_resource type="Resource" id="N34"]
 script = ExtResource("2")
 id = &"move_a_speed"
@@ -305,7 +305,7 @@ row = 3
 parent = &"molar_overheal"
 max_ranks = 2
 effects = {"shield_shards": 12.0, "thorns": 8.0}
-icon_index = 23
+icon_index = 16
 [sub_resource type="Resource" id="N36"]
 script = ExtResource("2")
 id = &"move_a_dodge"
@@ -324,7 +324,7 @@ row = 4
 column = 0
 max_ranks = 3
 stat_changes = {"dash_recovery_bonus": 15.0}
-icon_index = 28
+icon_index = 17
 [sub_resource type="Resource" id="N38"]
 script = ExtResource("2")
 id = &"stand_pulse"
@@ -344,5 +344,5 @@ column = 2
 max_ranks = 8
 [resource]
 script = ExtResource("1")
-branches = PackedStringArray("Werkzeugkasten", "Fachpraxis", "Standfest")
+branches = Array[String](["Werkzeugkasten", "Fachpraxis", "Standfest"])
 nodes = Array[ExtResource("2")]([SubResource("N0"), SubResource("N1"), SubResource("N2"), SubResource("N3"), SubResource("N4"), SubResource("N5"), SubResource("N6"), SubResource("N7"), SubResource("N8"), SubResource("N9"), SubResource("N10"), SubResource("N11"), SubResource("N12"), SubResource("N13"), SubResource("N14"), SubResource("N15"), SubResource("N16"), SubResource("N17"), SubResource("N18"), SubResource("N19"), SubResource("N20"), SubResource("N21"), SubResource("N22"), SubResource("N23"), SubResource("N24"), SubResource("N25"), SubResource("N26"), SubResource("N27"), SubResource("N28"), SubResource("N29"), SubResource("N30"), SubResource("N31"), SubResource("N32"), SubResource("N33"), SubResource("N34"), SubResource("N35"), SubResource("N36"), SubResource("N37"), SubResource("N38"), SubResource("N39")])

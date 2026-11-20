@@ -5,7 +5,8 @@ extends Resource
 ## `points_per_row` points are invested in that branch, attribute path nodes
 ## included, so attributes are the way into deeper talents.
 
-@export var branches: PackedStringArray = ["", "", ""]
+# Keep branch titles in the binary resources produced by the Web export.
+@export var branches: Array[String] = []
 @export var points_per_row := 3
 @export var nodes: Array[TalentNodeData] = []
 
@@ -56,6 +57,7 @@ func valid() -> bool:
 		# Arrows point downward inside one branch, so no cycles are possible.
 		if previous == null or previous.max_ranks < node.parent_rank or previous.branch != node.branch or previous.row >= node.row: return false
 	for branch in TalentNodeData.BRANCHES:
+		if branches[branch].strip_edges().is_empty(): return false
 		var opening := false
 		for node in branch_nodes(branch):
 			if node.row == 0: opening = true

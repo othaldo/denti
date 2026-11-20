@@ -70,7 +70,7 @@ func setup(new_tree: TalentTreeData, upgrades: Array[UpgradeData], detail_contro
 
 static func _icon(node: TalentNodeData, upgrades: Array[UpgradeData]) -> Texture2D:
 	if node.free_attribute: return null
-	if not node.is_attribute(): return DentiUIIcons.item(node.icon_index)
+	if not node.is_attribute(): return DentiUIIcons.talent(node.icon_index)
 	var template := TalentProgression.template_for(upgrades, node.stat)
 	return DentiUIIcons.stat(template.icon_index if template != null else 0)
 
@@ -80,18 +80,29 @@ func update_state(new_ranks: Dictionary, branch_points: Array[int], keyboard: bo
 	for branch in headers.size():
 		headers[branch].text = "%s · %d" % [tree.branches[branch], points[branch]]
 		RunSetupStyle.choice(tabs[branch], branch == focus_branch, keyboard)
-	_fit_tabs()
+	_fit_branch_titles()
 	queue_redraw()
 
-## Narrow tabs drop the point count instead of clipping the branch name.
-func _fit_tabs() -> void:
+func _fit_branch_titles() -> void:
 	for branch in tabs.size():
+		var header := headers[branch]
+		if header.visible and header.size.x > 0:
+			var header_size := _fit_font_size(header.get_theme_font("font"), header.text, header.size.x - 16, 20)
+			header.add_theme_font_size_override("font_size", header_size)
 		var tab := tabs[branch]
+		if not tab.visible or tab.size.x <= 0: continue
 		var font := tab.get_theme_font("font")
-		var font_size := tab.get_theme_font_size("font_size")
-		var full := headers[branch].text
-		var fits := font.get_string_size(full, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x + 20 <= tab.size.x
-		tab.text = full if fits or tab.size.x <= 0 else tree.branches[branch]
+		var width := tab.size.x - 12
+		var preferred := 13 if tab.size.x < 140 else 16
+		var fits := font.get_string_size(header.text, HORIZONTAL_ALIGNMENT_LEFT, -1, preferred).x <= width
+		tab.text = header.text if fits else tree.branches[branch]
+		tab.add_theme_font_size_override("font_size", _fit_font_size(font, tab.text, width, preferred))
+
+static func _fit_font_size(font: Font, title: String, width: float, preferred: int) -> int:
+	var font_size := preferred
+	while font_size > 10 and font.get_string_size(title, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x > width:
+		font_size -= 1
+	return font_size
 
 func button(id: StringName) -> TalentNodeButton:
 	return buttons.get(str(id)) as TalentNodeButton
@@ -159,8 +170,7 @@ func layout_in(available: Vector2) -> void:
 	for branch in tabs.size():
 		tabs[branch].position = Vector2(branch * (tab_width + 8), 0)
 		tabs[branch].size = Vector2(tab_width, maxf(tab_height, 40.0))
-		tabs[branch].add_theme_font_size_override("font_size", 13 if tab_width < 140 else 16)
-	_fit_tabs()
+	_fit_branch_titles()
 	for key in buttons:
 		var node_button: TalentNodeButton = buttons[key]
 		var node := node_button.node

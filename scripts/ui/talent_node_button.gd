@@ -15,6 +15,7 @@ var selected := false
 
 func _init() -> void:
 	flat = true
+	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	focus_mode = Control.FOCUS_ALL
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	for style in ["normal", "hover", "pressed", "disabled", "hover_pressed"]:
@@ -58,7 +59,7 @@ func _draw() -> void:
 	_shape(centre, extent * 0.5, fill, edge, width)
 	if texture != null:
 		var icon_extent := extent * (0.62 if node.is_attribute() else 0.74)
-		var tint := Color(0.42, 0.40, 0.46, 0.75) if locked else Color.WHITE
+		var tint := Color(0.70, 0.66, 0.75, 0.9) if locked else Color.WHITE
 		draw_texture_rect(texture, Rect2(centre - Vector2.ONE * icon_extent * 0.5, Vector2.ONE * icon_extent), false, tint)
 	elif node.free_attribute:
 		# Free root: a plus socket, the attribute is chosen when spending.

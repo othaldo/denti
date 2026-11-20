@@ -300,24 +300,44 @@ func _selection() -> void:
 	RunStore.clear(session.save_path + ".setup.json")
 
 func _panel_layout() -> void:
-	for extent in [Vector2i(320, 568), Vector2i(568, 320), Vector2i(1280, 720), Vector2i(3840, 1600)]:
+	var panel: TalentPanel = game.talent_panel
+	await _check_panel_layout(panel)
+	var molar := new_stats()
+	molar.begin_class(ClassCatalog.DEFAULT)
+	var progress := TalentProgression.new()
+	progress.enabled = true
+	progress.prepare(3, 2, 0)
+	panel.present(progress, molar, game.UPGRADES, 3)
+	await _check_panel_layout(panel)
+	panel.present(game.talents, game.player.stats, game.UPGRADES, game.rewards.pending_levels)
+	molar.free()
+
+func _check_panel_layout(panel: TalentPanel) -> void:
+	for extent in [Vector2i(320, 568), Vector2i(568, 320), Vector2i(960, 680), Vector2i(1280, 720), Vector2i(3840, 1600)]:
 		root.content_scale_size = extent
 		root.size = extent
 		await _settle()
-		var view: TalentPanel = game.talent_panel
 		var screen := Rect2(Vector2.ZERO, Vector2(extent))
-		_check(screen.encloses(view.done_button.get_global_rect()) and screen.encloses(view.undo_button.get_global_rect()), "talent footer is outside viewport at %s" % extent)
-		_check(not view.stage.title_label.get_global_rect().intersects(view.stage.progress_label.get_global_rect()), "talent title overlaps points")
-		_check(not view.stage.body_scroll.get_v_scroll_bar().visible, "talent tree needs scrolling at %s" % extent)
-		var body := view.stage.body_scroll.get_global_rect().grow(1)
-		_check(body.encloses(view.details.get_global_rect()), "talent details leave the stage at %s" % extent)
+		_check(screen.encloses(panel.done_button.get_global_rect()) and screen.encloses(panel.undo_button.get_global_rect()), "talent footer is outside viewport at %s" % extent)
+		_check(not panel.stage.title_label.get_global_rect().intersects(panel.stage.progress_label.get_global_rect()), "talent title overlaps points")
+		_check(not panel.stage.body_scroll.get_v_scroll_bar().visible, "talent tree needs scrolling at %s" % extent)
+		var body := panel.stage.body_scroll.get_global_rect().grow(1)
+		_check(body.encloses(panel.details.get_global_rect()), "talent details leave the stage at %s" % extent)
+		var tree := panel.stats.class_data.talent_tree
+		for branch in TalentNodeData.BRANCHES:
+			var title: Control = panel.view.tabs[branch] if panel.view.compact else panel.view.headers[branch]
+			var text: String = title.get("text")
+			var font := title.get_theme_font("font")
+			var width := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, title.get_theme_font_size("font_size")).x
+			_check(title.visible and text.begins_with(tree.branches[branch]) and width <= title.size.x, "talent branch title missing or clipped at %s: %s" % [extent, tree.branches[branch]])
 		var shown: Array[Rect2] = []
-		for node: TalentNodeData in game.player.stats.class_data.talent_tree.nodes:
-			var cell := view.view.button(node.id)
+		for node in tree.nodes:
+			var cell := panel.view.button(node.id)
+			_check(node.free_attribute or cell.texture != null, "talent node has no icon: %s" % node.id)
 			if not cell.visible: continue
 			var rect := cell.get_global_rect()
 			_check(body.encloses(rect) and rect.size.x >= 32, "talent node outside stage or too small at %s: %s" % [extent, node.id])
-			_check(not rect.intersects(view.details.get_global_rect()), "talent node under details at %s: %s" % [extent, node.id])
+			_check(not rect.intersects(panel.details.get_global_rect()), "talent node under details at %s: %s" % [extent, node.id])
 			for other in shown: _check(not rect.intersects(other), "talent nodes overlap at %s: %s" % [extent, node.id])
 			shown.append(rect)
 		_check(shown.size() >= 5, "too few talent nodes visible at %s" % extent)

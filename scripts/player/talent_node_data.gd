@@ -27,7 +27,7 @@ const ROWS := 6
 @export var exclusive_group: StringName
 @export var stat_changes: Dictionary = {}
 @export var effects: Dictionary = {}
-@export var icon_index: int = 0
+@export var icon_index: int = -1
 
 func is_attribute() -> bool:
 	return stat != &"" or free_attribute
