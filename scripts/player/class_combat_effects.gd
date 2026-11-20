@@ -75,6 +75,10 @@ static func valid(saved: Dictionary) -> bool:
 	for key in saved:
 		if key == "trails":
 			if not ClassDashCut.valid(saved[key]): return false
+		elif key == "molar":
+			if not MolarSkills.valid(saved[key]): return false
+		elif key == "assassin":
+			if not AssassinSkills.valid(saved[key]): return false
 		elif not (saved[key] is int or saved[key] is float) or not is_finite(float(saved[key])): return false
 	return true
 

@@ -22,10 +22,31 @@ func _run() -> void:
 	menu._select_setup_class(&"assassin")
 	menu.setup_selector.class_view.selected_id = &"assassin"
 	menu.setup_selector.class_view.refresh()
-	for extent in [Vector2i(1280, 720), Vector2i(320, 568), Vector2i(568, 320)]:
+	for extent in [Vector2i(1920, 1080), Vector2i(1280, 720), Vector2i(320, 568), Vector2i(568, 320)]:
 		root.content_scale_size = extent
 		root.size = extent
 		await _capture("class_pick_%dx%d" % [extent.x, extent.y])
+	menu._select_setup_class(&"good_old_molar")
+	menu.setup_selector.class_view.selected_id = &"good_old_molar"
+	menu.setup_selector.class_view.refresh()
+	root.content_scale_size = Vector2i(1280, 720)
+	root.size = root.content_scale_size
+	await _capture("class_pick_molar_1280x720")
+	# Future-proofing: the same step with many classes (placeholder copies).
+	var shipped := ClassCatalog.profiles.duplicate()
+	for copy in 10: ClassCatalog.profiles.append(shipped[copy % shipped.size()])
+	var crowded: GameMenu = load("res://scenes/ui/game_menu.tscn").instantiate()
+	root.add_child(crowded)
+	crowded._new_game()
+	crowded._advance_setup()
+	for extent in [Vector2i(1280, 720), Vector2i(320, 568)]:
+		root.content_scale_size = extent
+		root.size = extent
+		await _capture("class_pick_many_%dx%d" % [extent.x, extent.y])
+	crowded.free()
+	ClassCatalog.profiles.assign(shipped)
+	root.content_scale_size = Vector2i(1280, 720)
+	root.size = root.content_scale_size
 	menu.free()
 	session.pending_start_class_id = &"assassin"
 	session.pending_start_weapon_id = &"turbo_drill"
@@ -46,7 +67,7 @@ func _run() -> void:
 	root.size = root.content_scale_size
 	for id in [&"venom_dose", &"silk_a_melee", &"silk_a_melee", &"silk_edge"]:
 		game._on_talent_requested(id)
-	game.talent_panel._select(&"venom_nerve")
+	game.talent_panel._select(&"venom_bloom")
 	await _capture("talent_draft_1280x720")
 	game.talent_panel._select(&"care_free_1")
 	await _capture("talent_free_1280x720")
@@ -55,10 +76,28 @@ func _run() -> void:
 	molar.begin_class(ClassCatalog.DEFAULT)
 	var progress := TalentProgression.new()
 	progress.enabled = true
-	progress.prepare(3, 2, 0)
+	# Committed Standfest points with one root bound to Härte, then a fresh draft.
+	progress.prepare(5, 2, 0)
+	for id in [&"stand_a_health", &"stand_a_health", &"stand_a_armor"]:
+		progress.plan_talent(id, molar, game.UPGRADES, 5)
+	progress.plan_talent(&"stand_free_1", molar, game.UPGRADES, 5, &"armor")
+	progress.plan_talent(&"stand_free_1", molar, game.UPGRADES, 5)
+	progress.commit(molar, game.UPGRADES, 5)
+	progress.prepare(3, 7, 0)
 	game.talent_panel.present(progress, molar, game.UPGRADES, 3)
 	game.talent_panel._select(&"tool_variety")
 	await _capture("talent_molar_1280x720")
+	game.talent_panel._select(&"stand_free_1")
+	await _capture("talent_bound_1280x720")
+	game.talent_panel._select(&"tool_mix_key")
+	await _capture("talent_keystone_1280x720")
+	game.talent_panel._select(&"tool_rehearsal")
+	await _capture("talent_skill_1280x720")
+	root.content_scale_size = Vector2i(1920, 1080)
+	root.size = root.content_scale_size
+	await _capture("talent_skill_1920x1080")
+	root.content_scale_size = Vector2i(1280, 720)
+	root.size = root.content_scale_size
 	root.content_scale_size = Vector2i(320, 568)
 	root.size = root.content_scale_size
 	await _capture("talent_molar_320x568")

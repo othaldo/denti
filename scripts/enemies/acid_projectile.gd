@@ -64,6 +64,10 @@ func _physics_process(delta: float) -> void:
 	elif lifetime <= 0.0:
 		_retire()
 
+## Destroyed by a player effect (Schmelzwall) without hitting anyone.
+func shatter() -> void:
+	_retire()
+
 func _retire() -> void:
 	if is_instance_valid(pool) and get_parent() == pool:
 		pool.recycle(self)

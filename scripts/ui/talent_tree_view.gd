@@ -176,7 +176,10 @@ func layout_in(available: Vector2) -> void:
 		var node := node_button.node
 		node_button.visible = node.branch in shown
 		if not node_button.visible: continue
-		var own := maxf(node_size * 0.82, minf(34.0, cell * 0.85)) if node.is_attribute() else node_size
+		var own := node_size
+		if node.is_attribute(): own = maxf(node_size * 0.82, minf(34.0, cell * 0.85))
+		elif node.is_skill(): own = minf(node_size * 1.22, cell * 0.96)
+		elif node.is_modifier(): own = maxf(node_size * 0.82, minf(34.0, cell * 0.85))
 		node_button.size = Vector2.ONE * own
 		node_button.position = cell_centre(node) - Vector2.ONE * own * 0.5
 	queue_redraw()

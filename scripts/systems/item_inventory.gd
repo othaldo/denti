@@ -187,6 +187,7 @@ func attack_interval_factor() -> float:
 		temporary_bonus = minf(power(&"sugar_rush"), 0.50) * 100.0
 	elif sugar_crash_time > 0.0:
 		temporary_bonus = -25.0
+	if player.molar_skills != null: temporary_bonus += player.molar_skills.attack_speed_bonus()
 	return player.stats.attack_interval_with_bonus(temporary_bonus) / player.stats.attack_interval
 
 

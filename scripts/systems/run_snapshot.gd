@@ -45,7 +45,7 @@ static func capture(game) -> Dictionary:
 		"player_projectiles": player_projectiles,
 		"items": game.items.save_data(),
 		"talents": game.talents.save_data(),
-		"class_combat": game.player.class_combat.save_data(enemy_indices).merged({"trails": game.player.dash_cut.save_data(enemy_indices)}),
+		"class_combat": game.player.class_combat.save_data(enemy_indices).merged({"trails": game.player.dash_cut.save_data(enemy_indices), "molar": game.player.molar_skills.save_data(), "assassin": game.player.assassin_skills.save_data()}),
 		"poison_build": game.items.effect_context.poison_build.save_data(enemy_indices),
 		"relics": game.relics.save_data(),
 		"telemetry": game.telemetry.save_data(),
@@ -154,6 +154,8 @@ static func restore(game, saved: Dictionary) -> void:
 	var restored_enemies: Array[Node] = game.get_node("Enemies").get_children()
 	player.class_combat.restore(saved.get("class_combat", {}), restored_enemies)
 	player.dash_cut.restore(saved.get("class_combat", {}).get("trails", []), restored_enemies)
+	player.molar_skills.restore(saved.get("class_combat", {}).get("molar", {}))
+	player.assassin_skills.restore(saved.get("class_combat", {}).get("assassin", {}))
 	game.items.effect_context.poison_build.restore(saved.get("poison_build", {}), restored_enemies)
 	var projectiles := game.get_node("Projectiles") as PlayerProjectilePool
 	for entry in saved.get("player_projectiles", []):

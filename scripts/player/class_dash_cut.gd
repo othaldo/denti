@@ -39,7 +39,7 @@ func limit() -> int:
 	return maxi(rules().trail_limit + roundi(power("trail_limit")), 1)
 
 func width() -> float:
-	return rules().trail_width + power("trail_width")
+	return (rules().trail_width + power("trail_width")) * player.assassin_skills.width_factor()
 
 func field_duration() -> float:
 	return rules().trail_field + power("trail_field")
@@ -75,7 +75,7 @@ func release() -> void:
 		_remove(trail)
 		return
 	trail.state = State.ARMED
-	trail.time = rules().trail_delay
+	trail.time = player.assassin_skills.snap_delay(rules().trail_delay)
 
 func _remove(trail: Dictionary) -> void:
 	for index in trails.size():
@@ -148,6 +148,7 @@ func _field_tick(trail: Dictionary) -> void:
 	for enemy in _enemies_in(trail):
 		if not enemy.is_targetable() or enemy.data.is_boss and enemy.boss_phase_timer > 0: continue
 		var additions: Array[Dictionary] = [{"id": "poison", "damage": poison_for(enemy) * share, "proc_id": str(PROC_ID)}]
+		player.assassin_skills.mark(enemy)
 		enemy.take_damage(0, null, false, PROC_ID, additions)
 		touched += 1
 		if slows and enemy.affix_effects.depot.nerve_lock <= 0:
@@ -190,6 +191,8 @@ func poison_factor() -> float:
 
 func _strike(enemy: Enemy, factor: float, trail: Variant) -> float:
 	var additions: Array[Dictionary] = [{"id": "poison", "damage": poison_for(enemy) * factor, "proc_id": str(PROC_ID)}]
+	# Mark before the hit: a kill by this very strike already counts for Giftblüte.
+	player.assassin_skills.mark(enemy)
 	var dealt := enemy.take_damage(damage_for(enemy, factor), null, false, PROC_ID, additions)
 	if dealt <= 0.0: return 0.0
 	if enemy.health <= 0.0:

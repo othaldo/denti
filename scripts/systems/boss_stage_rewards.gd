@@ -10,11 +10,29 @@ const PROFILES: Array[BossStageRewardData] = [
 ]
 var phase_mask := 0
 var xp_released := 0
+## Fixed for the stage at its first payout; -1 = not yet decided.
+var xp_budget := -1
 var paid := false
 var legacy_credit := false
 
 static func profile(wave_number: int) -> BossStageRewardData:
 	return PROFILES[clampi(wave_number / 5 - 1, 0, 3)]
+
+## XP that brings the player exactly `levels` level-ups from the current state.
+static func xp_for_levels(game, levels: int) -> int:
+	if levels <= 0: return 0
+	var total := maxi(game.xp_goal - game.xp, 1)
+	var next: int = game.level
+	for step in levels - 1:
+		next += 1
+		total += game.xp_goal_for_level(next)
+	return total
+
+func stage_xp(game) -> int:
+	if xp_budget < 0:
+		var budget := profile(game.wave.current_wave)
+		xp_budget = xp_for_levels(game, budget.levels) if budget.levels > 0 else budget.xp
+	return xp_budget
 
 func release_phase(game, at: Vector2, phase: int) -> void:
 	if paid or legacy_credit or not WaveController.is_boss_wave(game.wave.current_wave): return
@@ -22,7 +40,7 @@ func release_phase(game, at: Vector2, phase: int) -> void:
 	if phase_mask & bit: return
 	phase_mask |= bit
 	var budget := profile(game.wave.current_wave)
-	var amount := roundi(budget.xp * budget.phase_xp_fraction)
+	var amount := roundi(stage_xp(game) * budget.phase_xp_fraction)
 	xp_released += amount
 	game._spawn_loot(at, &"xp", amount, &"", {"source": "boss_stage"})
 
@@ -42,9 +60,9 @@ func deliver(game, at: Vector2) -> void:
 			if drop.kind == &"xp": credit.xp += drop.amount
 			elif drop.kind == &"coin": credit.coins += drop.amount
 			else: credit.capsules += 1
-	var remaining_xp := maxi(budget.xp - xp_released - credit.xp, 0)
+	var remaining_xp := maxi(stage_xp(game) - xp_released - credit.xp, 0)
 	while remaining_xp > 0:
-		var amount := mini(remaining_xp, 8)
+		var amount := mini(remaining_xp, maxi(8, ceili(stage_xp(game) / 12.0)))
 		game._spawn_loot(at + Vector2(randf_range(-45, 45), randf_range(-35, 35)), &"xp", amount, &"", {"source": "boss_stage"})
 		remaining_xp -= amount
 	# Roll normal denominations separately: Goldsonde/Goldextraktor keep their
@@ -63,11 +81,12 @@ func deliver(game, at: Vector2) -> void:
 		game._spawn_loot(at + Vector2((index - (count - 1) * 0.5) * 40, -45), &"chest", int(capsule.scrap_coins), WeaponAffixes.CHEST_ID, capsule)
 
 func save_data() -> Dictionary:
-	return {"version": 1, "phase_mask": phase_mask, "xp_released": xp_released, "paid": paid, "legacy_credit": legacy_credit}
+	return {"version": 1, "phase_mask": phase_mask, "xp_released": xp_released, "xp_budget": xp_budget, "paid": paid, "legacy_credit": legacy_credit}
 
 func restore(saved: Dictionary) -> void:
 	phase_mask = clampi(int(saved.get("phase_mask", 0)), 0, 3)
-	xp_released = clampi(int(saved.get("xp_released", 0)), 0, PROFILES[-1].xp)
+	xp_budget = clampi(int(saved.get("xp_budget", -1)), -1, 100000)
+	xp_released = clampi(int(saved.get("xp_released", 0)), 0, maxi(xp_budget, PROFILES[-1].xp))
 	paid = bool(saved.get("paid", false))
 	legacy_credit = bool(saved.get("legacy_credit", not saved.has("version")))
 

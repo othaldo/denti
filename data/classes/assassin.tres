@@ -1,9 +1,10 @@
-[gd_resource type="Resource" script_class="PlayerClassData" load_steps=9 format=3]
+[gd_resource type="Resource" script_class="PlayerClassData" load_steps=10 format=3]
 [ext_resource type="Script" path="res://scripts/player/player_class_data.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/player/class_stat_rule_data.gd" id="2"]
 [ext_resource type="Script" path="res://scripts/player/dash_data.gd" id="3"]
 [ext_resource type="Script" path="res://scripts/player/class_combat_data.gd" id="4"]
 [ext_resource type="Resource" path="res://data/talents/assassin.tres" id="5"]
+[ext_resource type="Texture2D" path="res://assets/classes/assassin_portrait_v2.png" id="6"]
 [sub_resource type="Resource" id="Melee"]
 script = ExtResource("2")
 stat = &"melee_damage"
@@ -29,6 +30,9 @@ trail_sugar_factor = 2.0
 [resource]
 script = ExtResource("1")
 id = &"assassin"
+tagline = "Mitten durch die Horde: Jeder Dash zieht eine Giftschneise."
+play_style = PackedStringArray("Dashe durch Gruppen: Die Schneise schnappt zu und bleibt als Giftfeld liegen", "Kein Kontaktschaden im Dash, Spur-Kills laden Wurzelkraft nach", "Nur 4 Wurzeln, nur Kontaktwaffen, weniger Schmelz")
+portrait = ExtResource("6")
 display_name = "Assassine"
 description = "4 Wurzeln · nur kurze Kontaktwaffen. 85 Schmelz, +3 Nahschaden, +8 % Bewegung. Zwei Dashes ohne Kontaktschaden. Giftschneise: Jeder Dash zieht eine Giftspur, die zuschnappt und 3 s als Giftfeld liegen bleibt. Spur-Kills geben Wurzelkraft zurück."
 root_capacity = 4

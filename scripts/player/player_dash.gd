@@ -19,6 +19,8 @@ var last_direction := Vector2.DOWN
 var cost_cut := 0.0
 ## Talent bonus to dash length; duration stays fixed, so the dash gets faster.
 var distance_bonus := 0.0
+## Assassin Rausch: dashes cost no root power while it lasts.
+var free_dashes := false
 var active: bool:
 	get: return remaining > 0.0
 
@@ -26,6 +28,7 @@ func distance() -> float:
 	return config.distance + maxf(distance_bonus, 0.0)
 
 func cost() -> float:
+	if free_dashes: return 0.0
 	return maxf(config.cost - cost_cut, config.cost * 0.5)
 
 func ready_to_dash() -> bool:

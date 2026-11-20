@@ -143,6 +143,8 @@ func _run() -> void:
 	# Early victory, exact fixed budget and collection before mandatory choices.
 	await _fresh(5)
 	boss = game.boss
+	var stage_xp: int = game.wave.boss_rewards.stage_xp(game)
+	_check(stage_xp == BossStageRewards.xp_for_levels(game, 4) and stage_xp > 30, "boss stage budget is not four level points")
 	game.wave.boss_rewards.release_phase(game, game.player.global_position, 1)
 	game.wave.boss_rewards.release_phase(game, game.player.global_position, 1)
 	game.wave.boss_rewards.release_phase(game, game.player.global_position, 2)
@@ -151,18 +153,22 @@ func _run() -> void:
 	await process_frame
 	_check(game.collecting_wave_loot and not game.wave.active and game.wave.remaining > 0 and not game.shop_panel.visible, "early boss death waited for timer or skipped loot collection")
 	var totals := _loot_totals()
-	_check(totals.xp == 30 and totals.coins == 32 and totals.chests == 1, "phase fragments and boss completion did not share one fixed budget")
+	_check(totals.xp == stage_xp and totals.coins == 32 and totals.chests == 1, "phase fragments and boss completion did not share one fixed budget")
 	game.wave.boss_rewards.deliver(game, game.player.global_position)
 	_check(_loot_totals() == totals, "completion budget paid twice")
 	for drop: Loot in game.get_node("Loot").get_children():
 		if not drop.is_queued_for_deletion(): drop.advance_collection(0.01, drop.global_position, 0)
 	await process_frame
 	await process_frame
-	_check(game.rewards.pending_levels > 0 and game.rewards.step == PostWaveRewards.Step.LEVELS and not game.shop_panel.visible, "boss XP did not queue levels after complete collection")
-	_check(game.telemetry.wave_xp == 30 and game.telemetry.wave_coins == 32, "boss payouts bypassed loot telemetry")
+	_check(game.rewards.pending_levels == 4 and game.rewards.step == PostWaveRewards.Step.LEVELS and not game.shop_panel.visible, "boss XP did not queue exactly four levels after complete collection")
+	_check(game.telemetry.wave_xp == stage_xp and game.telemetry.wave_coins == 32, "boss payouts bypassed loot telemetry")
 	_check(game.wave.boss_rewards.save_data().paid, "paid state was not captured")
+	var resumed := BossStageRewards.new()
+	resumed.restore(game.wave.boss_rewards.save_data())
+	_check(resumed.xp_budget == stage_xp, "resume lost the decided boss stage budget")
 	# Endlessly many boss/minion kills cannot generate additional stage budgets.
 	await _fresh(30)
+	var endless_xp: int = game.wave.boss_rewards.stage_xp(game)
 	var bosses := BossEncounter.remaining(game.get_node("Enemies"))
 	_check(bosses.size() == 2, "endless stage lost the second boss")
 	_kill(bosses[0])
@@ -172,17 +178,18 @@ func _run() -> void:
 	_kill(bosses[1])
 	await process_frame
 	await process_frame
-	_check(game.collecting_wave_loot and _loot_totals().xp == 65, "last double-boss death failed the single shared budget")
+	_check(game.collecting_wave_loot and _loot_totals().xp == endless_xp, "last double-boss death failed the single shared budget")
 	# Completion also recovers when the last boss disappears without its normal
 	# defeat callback; no timer wait or lost stage budget.
 	await _fresh(15)
+	var king_xp: int = game.wave.boss_rewards.stage_xp(game)
 	game.boss.queue_free()
 	await process_frame
 	await process_frame
 	paused = false
 	game._process(1.0 / 60)
 	paused = true
-	_check(game.collecting_wave_loot and not game.wave.active and game.wave.boss_rewards.paid and _loot_totals().xp == 55, "empty boss stage waited for its timer or lost its payout")
+	_check(game.collecting_wave_loot and not game.wave.active and game.wave.boss_rewards.paid and _loot_totals().xp == king_xp, "empty boss stage waited for its timer or lost its payout")
 	# Old saves keep their earned/lying loot and receive only the missing budget.
 	await _fresh(5)
 	game.telemetry.wave_xp = 10
@@ -191,8 +198,9 @@ func _run() -> void:
 	game._spawn_loot(game.player.global_position, &"xp", 5)
 	game._spawn_loot(game.player.global_position, &"coin", 4)
 	game.wave.boss_rewards.restore({})
+	var legacy_xp: int = game.wave.boss_rewards.stage_xp(game)
 	game.wave.boss_rewards.deliver(game, game.player.global_position)
-	_check(_loot_totals().xp == 20 and _loot_totals().coins == 20 and _loot_totals().chests == 0, "legacy boss save duplicated prior loot instead of topping up the fixed budget")
+	_check(_loot_totals().xp == legacy_xp - 10 and _loot_totals().coins == 20 and _loot_totals().chests == 0, "legacy boss save duplicated prior loot instead of topping up the fixed budget")
 	for bad in [{"state": "bad"}, {"anchor": [0]}, {"used": 1}]:
 		_check(RunSaveData.normalize({"wave": 10, "player": {}, "enemies": [{"caramel": {"overload": bad}}]}).is_empty(), "malformed ritual passed run validation")
 	session.clear_run()

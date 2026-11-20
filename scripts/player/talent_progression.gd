@@ -2,9 +2,14 @@ class_name TalentProgression
 extends RefCounted
 
 const VERSION := 1
+## Free roots bound to the same attribute this often grant one bonus rank.
+const BUND_SIZE := 3
 var enabled := false
 var spent := 0
 var ranks: Dictionary = {}
+## Committed free-root bindings: node id -> attribute key. The first point in a
+## free root binds it; every later rank raises only that attribute.
+var bound: Dictionary = {}
 # Offers are rolled once for the queued earned levels, never on Undo/resume.
 var tiers: Array[int] = []
 var actions: Array[Dictionary] = []
@@ -26,6 +31,40 @@ func draft_ranks() -> Dictionary:
 	for action in actions:
 		if action.kind == "talent": result[action.id] = int(result.get(action.id, 0)) + 1
 	return result
+
+## Bindings including the open draft (first point of an unbound root binds it).
+func draft_bound() -> Dictionary:
+	var result := bound.duplicate()
+	for action in actions:
+		if action.kind == "talent" and action.has("stat") and not result.has(action.id): result[action.id] = str(action.stat)
+	return result
+
+func bound_stat(id: StringName) -> StringName:
+	return StringName(str(draft_bound().get(str(id), "")))
+
+## How many roots are (or would be, with the draft) bound to `key`.
+func bund_count(key: StringName) -> int:
+	var total := 0
+	for value in draft_bound().values():
+		if StringName(str(value)) == key: total += 1
+	return total
+
+## True when the draft action at `position` creates the binding that completes a Wurzelbund.
+func _completes_bund(position: int) -> bool:
+	var created := bound.duplicate()
+	for index in position + 1:
+		var action: Dictionary = actions[index]
+		if action.kind != "talent" or not action.has("stat"): continue
+		if created.has(action.id):
+			if index == position: return false
+			continue
+		created[action.id] = str(action.stat)
+		if index == position:
+			var total := 0
+			for value in created.values():
+				if str(value) == str(action.stat): total += 1
+			return total == BUND_SIZE
+	return false
 
 static func template_for(upgrades: Array[UpgradeData], key: StringName) -> UpgradeData:
 	for upgrade in upgrades:
@@ -58,7 +97,7 @@ func reason(id: StringName, stats: PlayerStats, upgrades: Array[UpgradeData], co
 	if not blocked.is_empty(): return blocked
 	if used(tree) + node.cost > count: return "Keine freien Levelpunkte"
 	if node.free_attribute:
-		return "" if not free_choices(stats, upgrades).is_empty() else "Attributgrenze erreicht"
+		return "" if not free_choices(stats, upgrades, node).is_empty() else "Attributgrenze erreicht"
 	if node.is_attribute():
 		return "" if attribute_choice(node, stats, upgrades) != null else "Attributgrenze erreicht"
 	var preview := preview_stats(stats, upgrades)
@@ -73,16 +112,23 @@ func plan_talent(id: StringName, stats: PlayerStats, upgrades: Array[UpgradeData
 	if not enabled or not reason(id, stats, upgrades, count).is_empty(): return false
 	var node := stats.class_data.talent_tree.by_id(id)
 	if node.free_attribute:
-		if stat not in free_choices(stats, upgrades): return false
+		var binding := bound_stat(id)
+		if binding != &"": stat = binding
+		if stat not in free_choices(stats, upgrades, node): return false
 		actions.append({"kind": "talent", "id": str(id), "stat": str(stat)})
 		return true
 	actions.append({"kind": "talent", "id": str(id)})
 	return true
 
-## Attributes a free node may grant right now: every class-usable level-up
-## attribute that would still have an effect at the next point's grade.
-func free_choices(stats: PlayerStats, upgrades: Array[UpgradeData]) -> Array[StringName]:
+## Attributes a free node may grant right now: its bound attribute, or for an
+## unbound root every class-usable attribute that still has an effect at the
+## next point's grade.
+func free_choices(stats: PlayerStats, upgrades: Array[UpgradeData], node: TalentNodeData = null) -> Array[StringName]:
 	var result: Array[StringName] = []
+	var binding := bound_stat(node.id) if node != null else &""
+	if binding != &"":
+		if stat_choice(binding, stats, upgrades) != null: result.append(binding)
+		return result
 	for upgrade in upgrades:
 		if not class_allows(upgrade.stat, stats.class_data): continue
 		if stat_choice(upgrade.stat, stats, upgrades) != null: result.append(upgrade.stat)
@@ -121,11 +167,11 @@ func preview_stats(stats: PlayerStats, upgrades: Array[UpgradeData]) -> PlayerSt
 	var preview := PlayerStats.new()
 	preview.load_save_data(stats.to_save_data(), stats.class_save_data())
 	var index := 0
-	for action in actions:
-		index += _apply(action, preview, upgrades, index)
+	for position in actions.size():
+		index += _apply(actions[position], preview, upgrades, index, position)
 	return preview
 
-func _apply(action: Dictionary, stats: PlayerStats, upgrades: Array[UpgradeData], index: int) -> int:
+func _apply(action: Dictionary, stats: PlayerStats, upgrades: Array[UpgradeData], index: int, position: int = -1) -> int:
 	if action.kind == "stat":
 		var template := template_for(upgrades, StringName(action.id))
 		if template == null or index >= tiers.size(): return 0
@@ -139,6 +185,10 @@ func _apply(action: Dictionary, stats: PlayerStats, upgrades: Array[UpgradeData]
 		if template == null or index >= tiers.size(): return node.cost
 		var choice := template.with_tier(tiers[index]).with_stat_context(stats)
 		stats.apply_upgrade(choice.stat, choice.amount)
+		if node.free_attribute and position >= 0 and _completes_bund(position):
+			# Wurzelbund: one extra rank of the bound attribute at the same grade.
+			var bonus := template.with_tier(tiers[index]).with_stat_context(stats)
+			stats.apply_upgrade(bonus.stat, bonus.amount)
 		return node.cost
 	for key in node.stat_changes: stats.apply_upgrade(StringName(key), float(node.stat_changes[key]))
 	return node.cost
@@ -149,13 +199,15 @@ func commit(stats: PlayerStats, upgrades: Array[UpgradeData], count: int) -> boo
 	var simulation := TalentProgression.new()
 	simulation.enabled = true
 	simulation.ranks = ranks.duplicate()
+	simulation.bound = bound.duplicate()
 	simulation.tiers = tiers.duplicate()
 	for action in actions:
 		var accepted := simulation.plan_talent(StringName(action.id), stats, upgrades, count, StringName(str(action.get("stat", "")))) if action.kind == "talent" else simulation.plan_stat(StringName(action.id), stats, upgrades, count)
 		if not accepted: return false
 	var index := 0
-	for action in actions: index += _apply(action, stats, upgrades, index)
+	for position in actions.size(): index += _apply(actions[position], stats, upgrades, index, position)
 	ranks = draft_ranks()
+	bound = draft_bound()
 	spent += count
 	actions.clear()
 	tiers.clear()
@@ -170,7 +222,7 @@ func powers(tree: TalentTreeData) -> Dictionary:
 	return result
 
 func save_data() -> Dictionary:
-	return {"version": VERSION, "enabled": enabled, "spent": spent, "ranks": ranks.duplicate(), "tiers": tiers.duplicate(), "actions": actions.duplicate(true), "cursor": cursor.duplicate()}
+	return {"version": VERSION, "enabled": enabled, "spent": spent, "ranks": ranks.duplicate(), "bound": bound.duplicate(), "tiers": tiers.duplicate(), "actions": actions.duplicate(true), "cursor": cursor.duplicate()}
 
 static func valid(saved: Dictionary, profile: PlayerClassData) -> bool:
 	if saved.is_empty(): return true
@@ -199,6 +251,13 @@ static func valid(saved: Dictionary, profile: PlayerClassData) -> bool:
 		var node := tree.by_id(StringName(str(key)))
 		if node.parent != &"" and int(saved.ranks.get(str(node.parent), 0)) < node.parent_rank: return false
 	if points > int(saved.spent): return false
+	if not saved.get("bound", {}) is Dictionary: return false
+	var bindings: Dictionary = saved.get("bound", {}).duplicate()
+	for key in bindings:
+		var node := tree.by_id(StringName(str(key)))
+		var value: Variant = bindings[key]
+		if node == null or not node.free_attribute or not value is String: return false
+		if StringName(value) not in PlayerStatKeys.ALL or not class_allows(StringName(value), profile): return false
 	for tier in saved.tiers:
 		if not (tier is int or tier is float) or float(tier) != int(tier) or int(tier) not in [1, 2, 3, 4]: return false
 	var current: Dictionary = saved.ranks.duplicate()
@@ -214,6 +273,8 @@ static func valid(saved: Dictionary, profile: PlayerClassData) -> bool:
 			if node.free_attribute:
 				var chosen := StringName(str(action.get("stat", "")))
 				if chosen not in PlayerStatKeys.ALL or not class_allows(chosen, profile): return false
+				if bindings.has(action.id) and StringName(str(bindings[action.id])) != chosen: return false
+				bindings[action.id] = str(chosen)
 			current[action.id] = int(current.get(action.id, 0)) + 1
 			used_points += node.cost
 		else:
@@ -245,18 +306,28 @@ static func migrate(root: Dictionary) -> void:
 	var rewards: Variant = root.get("rewards", {})
 	if not rewards is Dictionary: return
 	var pending: Variant = rewards.get("pending_levels", 0)
-	if not (pending is int or pending is float): return
+	var carry: Variant = rewards.get("carry_levels", 0)
+	if not (pending is int or pending is float) or not (carry is int or carry is float): return
 	saved.ranks = kept
 	saved.spent = maxi(int(saved.spent) - refund, 0)
 	saved.actions = []
 	saved.tiers = []
-	rewards.pending_levels = int(pending) + refund
+	# Bindings of removed roots go with them.
+	if saved.get("bound") is Dictionary:
+		for key in saved.bound.keys():
+			if tree.by_id(StringName(str(key))) == null: saved.bound.erase(key)
+	var step := int(rewards.get("step", PostWaveRewards.Step.COMBAT))
+	if step in [PostWaveRewards.Step.COMBAT, PostWaveRewards.Step.COLLECTING, PostWaveRewards.Step.LEVELS]:
+		rewards.pending_levels = int(pending) + refund
+	else:
+		rewards.carry_levels = int(carry) + refund
 	root.rewards = rewards
 
 func restore(saved: Dictionary) -> void:
 	enabled = bool(saved.get("enabled", false))
 	spent = int(saved.get("spent", 0))
 	ranks = saved.get("ranks", {}).duplicate()
+	bound = saved.get("bound", {}).duplicate()
 	tiers.assign(saved.get("tiers", []))
 	actions.assign(saved.get("actions", []))
 	cursor = saved.get("cursor", {}).duplicate()

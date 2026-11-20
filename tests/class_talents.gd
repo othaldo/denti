@@ -57,6 +57,8 @@ func _run() -> void:
 	_test_paths()
 	_test_free_nodes()
 	await _test_molar_toolkit()
+	await _test_molar_skills()
+	await _test_assassin_skills()
 	await _legacy()
 	session.clear_run()
 	print("PASS class talent budget, paths, combat windows, draft/save flow and legacy progression" if failures == 0 else "FAIL class talents")
@@ -109,6 +111,15 @@ func _reward_flow() -> void:
 	var migrated := RunSaveData.normalize(retired)
 	_check(not migrated.is_empty() and migrated.talents.ranks.is_empty() and int(migrated.talents.spent) == 0 and migrated.talents.actions.is_empty()
 		and int(migrated.rewards.pending_levels) == int(snapshot.rewards.pending_levels) + 3, "retired talents were not refunded as level points")
+	# A save in the shop carries the refund into the next wave instead of losing it.
+	var shop_save := retired.duplicate(true)
+	shop_save.rewards.step = PostWaveRewards.Step.SHOP
+	var carried := RunSaveData.normalize(shop_save)
+	_check(not carried.is_empty() and int(carried.rewards.carry_levels) == 3 and int(carried.rewards.pending_levels) == int(snapshot.rewards.pending_levels), "shop save lost refunded talent points")
+	var next_wave := PostWaveRewards.new()
+	next_wave.restore(carried.rewards)
+	next_wave.begin_wave()
+	_check(next_wave.pending_levels == 3 and next_wave.carry_levels == 0, "carried refund did not join the next wave")
 	session.resume_requested = true
 	paused = false
 	change_scene_to_file("res://scenes/game/game.tscn")
@@ -319,7 +330,7 @@ func _check_panel_layout(panel: TalentPanel) -> void:
 		await _settle()
 		var screen := Rect2(Vector2.ZERO, Vector2(extent))
 		_check(screen.encloses(panel.done_button.get_global_rect()) and screen.encloses(panel.undo_button.get_global_rect()), "talent footer is outside viewport at %s" % extent)
-		_check(not panel.stage.title_label.get_global_rect().intersects(panel.stage.progress_label.get_global_rect()), "talent title overlaps points")
+		_check(not panel.stage.title_label.get_global_rect().intersects(panel.points_badge.get_global_rect()), "talent title overlaps points")
 		_check(not panel.stage.body_scroll.get_v_scroll_bar().visible, "talent tree needs scrolling at %s" % extent)
 		var body := panel.stage.body_scroll.get_global_rect().grow(1)
 		_check(body.encloses(panel.details.get_global_rect()), "talent details leave the stage at %s" % extent)
@@ -343,6 +354,12 @@ func _check_panel_layout(panel: TalentPanel) -> void:
 		_check(shown.size() >= 5, "too few talent nodes visible at %s" % extent)
 
 func _test_paths() -> void:
+	# The class tile grid keeps large tiles for few classes and adds columns,
+	# never shrinking below a touch size, when many classes ship later.
+	var few := ClassSelection.grid_layout(2, 460, 450)
+	_check(few.columns == 1 and is_equal_approx(few.cell, ClassSelection.TILE_MAX), "two classes lost their large single-column tiles")
+	var many := ClassSelection.grid_layout(12, 460, 450)
+	_check(many.columns >= 3 and many.cell >= ClassSelection.TILE_MIN, "many classes did not add columns at a touch-sized tile")
 	var stats := new_stats()
 	stats.begin_class(ClassCatalog.by_id(&"assassin"))
 	var assassin_tree := stats.class_data.talent_tree
@@ -386,6 +403,29 @@ func _test_paths() -> void:
 	effects.on_dash()
 	_check(effects.damage_bonus(null, WeaponCatalog.by_id(&"turbo_drill")) > 0, "Good Old Molar lost its opener talent")
 
+## Wurzelbund: three roots bound to one attribute grant one bonus rank once.
+func _test_root_bund() -> void:
+	var stats := new_stats()
+	stats.begin_class(ClassCatalog.by_id(&"assassin"))
+	var tree := TalentProgression.new()
+	tree.enabled = true
+	tree.prepare(7, 2, 0)
+	for id in [&"care_a_health", &"care_a_health", &"care_a_health"]:
+		_check(tree.plan_talent(id, stats, game.UPGRADES, 7), "care row 0 refused for bund")
+	_check(tree.plan_talent(&"care_free_1", stats, game.UPGRADES, 7, &"armor") and tree.plan_talent(&"care_free_2", stats, game.UPGRADES, 7, &"armor"), "roots refused armor")
+	_check(tree.plan_talent(&"care_a_health", stats, game.UPGRADES, 7), "care row 2 gate point refused")
+	# Undo releases a draft binding again.
+	_check(tree.plan_talent(&"care_free_3", stats, game.UPGRADES, 7, &"luck") and tree.bound_stat(&"care_free_3") == &"luck", "third root refused luck")
+	tree.undo()
+	_check(tree.bound_stat(&"care_free_3") == &"" and tree.bund_count(&"armor") == 2, "undo kept a draft binding")
+	_check(tree.plan_talent(&"care_free_3", stats, game.UPGRADES, 7, &"armor") and tree.bund_count(&"armor") == 3, "third armor root not counted")
+	var template := TalentProgression.template_for(game.UPGRADES, &"armor")
+	var expected := template.with_tier(tree.tiers[3]).amount + template.with_tier(tree.tiers[4]).amount + 2.0 * template.with_tier(tree.tiers[6]).amount
+	var before := stats.armor
+	_check(tree.commit(stats, game.UPGRADES, 7), "bund draft failed commit")
+	_near(stats.armor - before, expected, "Wurzelbund bonus rank missing or doubled")
+	stats.free()
+
 func _test_free_nodes() -> void:
 	# Hell safety: every branch offers a free attribute choice by row 2, so no
 	# talent route can starve the build of survival or damage attributes.
@@ -407,14 +447,29 @@ func _test_free_nodes() -> void:
 	_check(not tree.free_choices(stats, game.UPGRADES).has(&"ranged_damage"), "contact class may pick ranged damage on a free node")
 	_check(not tree.plan_talent(&"care_free_1", stats, game.UPGRADES, 5), "free node accepted without a chosen attribute")
 	_check(not tree.plan_talent(&"care_free_1", stats, game.UPGRADES, 5, &"ranged_damage"), "free node accepted a forbidden attribute")
-	_check(tree.plan_talent(&"care_free_1", stats, game.UPGRADES, 5, &"crit_chance") and tree.plan_talent(&"care_free_1", stats, game.UPGRADES, 5, &"melee_damage"), "free node refused class attributes")
+	# The first point binds the root; a later rank cannot switch the attribute.
+	_check(tree.plan_talent(&"care_free_1", stats, game.UPGRADES, 5, &"crit_chance"), "free node refused a class attribute")
+	_check(tree.bound_stat(&"care_free_1") == &"crit_chance" and tree.free_choices(stats, game.UPGRADES, ClassCatalog.by_id(&"assassin").talent_tree.by_id(&"care_free_1")) == [&"crit_chance"], "first point did not bind the free root")
+	_check(tree.plan_talent(&"care_free_1", stats, game.UPGRADES, 5, &"melee_damage") and tree.actions[-1].stat == "crit_chance", "bound root accepted a different attribute")
 	var invalid := tree.save_data()
 	invalid.actions[-1].stat = "ranged_damage"
 	_check(not TalentProgression.valid(invalid, stats.class_data), "saved free node with forbidden attribute accepted")
+	invalid = tree.save_data()
+	invalid.actions[-1].stat = "melee_damage"
+	_check(not TalentProgression.valid(invalid, stats.class_data), "saved draft switched a bound root")
 	var crit := stats.crit_chance
 	var melee := stats.melee_damage
 	_check(tree.commit(stats, game.UPGRADES, 5), "free node draft failed commit")
-	_check(stats.crit_chance > crit and stats.melee_damage > melee, "free node did not grant the chosen attributes")
+	_check(stats.crit_chance > crit and is_equal_approx(stats.melee_damage, melee), "bound root did not grant only its attribute")
+	var saved := tree.save_data()
+	_check(saved.bound == {"care_free_1": "crit_chance"}, "binding was not stored after commit")
+	var resumed := TalentProgression.new()
+	resumed.restore(saved)
+	_check(TalentProgression.valid(saved, stats.class_data) and resumed.bound_stat(&"care_free_1") == &"crit_chance", "resume lost the root binding")
+	var tampered := saved.duplicate(true)
+	tampered.bound["care_a_health"] = "armor"
+	_check(not TalentProgression.valid(tampered, stats.class_data), "binding on a fixed attribute node accepted")
+	_test_root_bund()
 	# Keystones trade one strength for another instead of adding flat power.
 	var cut: ClassDashCut = game.player.dash_cut
 	var saved_powers: Dictionary = game.player.class_combat.powers
@@ -463,6 +518,184 @@ func _test_molar_toolkit() -> void:
 	_check(near.global_position == far_before, "dash pulse without talent moved enemies")
 	near.queue_free()
 	effects.powers = saved
+	await process_frame
+
+func _idle_weapons() -> void:
+	for weapon in game.player.loadout.equipped():
+		weapon.cooldown = 99.0
+		weapon.attack_time = 0.0
+
+func _test_molar_skills() -> void:
+	var effects: ClassCombatEffects = game.player.class_combat
+	var saved: Dictionary = effects.powers
+	var skills: MolarSkills = game.player.molar_skills
+	var molar_tree := ClassCatalog.DEFAULT.talent_tree
+	_check(molar_tree.valid() and molar_tree.capacity() >= 100, "molar tree invalid or too small")
+	var kinds := {}
+	for node in molar_tree.nodes: kinds[node.kind] = int(kinds.get(node.kind, 0)) + 1
+	_check(int(kinds.get(&"skill", 0)) == 3 and int(kinds.get(&"modifier", 0)) >= 9, "molar tree lacks its three skills and modifiers")
+	for node in molar_tree.nodes:
+		if node.is_modifier(): _check(node.parent != &"", "skill modifier usable without its skill: " + str(node.id))
+	var target := _enemy(Vector2(40, 0))
+	# Generalprobe: all weapons attack at once, waits without a target.
+	effects.powers = {"skill_rehearsal": 1.0, "rehearsal_quickdraw": 1.0}
+	skills.reset_wave()
+	_near(skills.rehearsal_interval(), MolarSkills.REHEARSAL_INTERVAL, "Generalprobe base interval")
+	_idle_weapons()
+	skills.rehearsal_time = 0.001
+	skills.advance(0.01)
+	var fired := 0
+	for weapon in game.player.loadout.equipped():
+		if weapon.attack_time > 0.0: fired += 1
+	_check(fired == game.player.loadout.equipped().size() and skills.rehearsal_count == 1, "Generalprobe did not fire every weapon")
+	_check(skills.attack_speed_bonus() > 0.0, "Schnellgriff missing after Generalprobe")
+	effects.powers = {"skill_rehearsal": 1.0, "rehearsal_speed": 2.0}
+	_near(skills.rehearsal_interval(), MolarSkills.REHEARSAL_INTERVAL - 2.0, "Lampenfieber interval")
+	target.global_position += Vector2(5000, 0)
+	_idle_weapons()
+	skills.rehearsal_time = 0.001
+	skills.advance(0.01)
+	_check(skills.rehearsal_count == 1 and skills.rehearsal_time <= 0.0, "Generalprobe wasted its salvo without a target")
+	target.global_position -= Vector2(5000, 0)
+	# Gleichtakt: every n-th attack of a duplicated weapon opens a salvo.
+	effects.powers = {"skill_unison": 1.0, "unison_haste": 1.0}
+	skills.reset_wave()
+	var drills: Array[WeaponInstance] = []
+	for weapon in game.player.loadout.equipped():
+		if weapon.data.id == &"turbo_drill": drills.append(weapon)
+	_check(drills.size() >= 2, "Gleichtakt test needs two drills")
+	_idle_weapons()
+	var opened := 0
+	for attack in MolarSkills.UNISON_EVERY:
+		if skills.unison_trigger(drills[0]): opened += 1
+	_check(opened == 1 and drills[1].attack_time > 0.0, "Gleichtakt did not open a salvo of the copies on the 5th attack")
+	_check(skills.weapon_interval_factor(drills[0]) < 1.0, "Taktgeber haste missing after a salvo")
+	_check(int(skills.unison_counts.get(str(drills[0].data.id), 0)) == 0, "forced salvo attacks counted toward the next Gleichtakt")
+	effects.powers = {"skill_unison": 1.0, "unison_rate": 2.0}
+	_check(skills.unison_every() == 3, "Serienfertigung interval")
+	effects.powers = {"spec_master": 8.0}
+	skills.reset_wave()
+	var tiered := drills[0].tier
+	drills[0].tier = 3
+	_near(skills.weapon_interval_factor(drills[0]), 1.0 / 1.08, "Meisterhand on Mk III")
+	drills[0].tier = 1
+	_near(skills.weapon_interval_factor(drills[0]), 1.0, "Meisterhand below Mk III")
+	drills[0].tier = tiered
+	# Schmelzwall: shove, damage with Splitterring, shatter enemy projectiles.
+	effects.powers = {"skill_wall": 1.0, "wall_shards": 1.0, "wall_heal": 1.0}
+	skills.reset_wave()
+	var pool := game.get_node("EnemyProjectiles") as EnemyProjectilePool
+	var shot := pool.acquire()
+	shot.launch(game.player.global_position + Vector2(-60, 0), Vector2.LEFT, 10.0, 5.0, game.player)
+	var distance: float = target.global_position.distance_to(game.player.global_position)
+	var health: float = target.health
+	game.player.stats.health = game.player.stats.max_health - 10.0
+	var hp: float = game.player.stats.health
+	skills._wall()
+	_check(target.global_position.distance_to(game.player.global_position) > distance and target.health < health, "Schmelzwall did not shove and damage")
+	_check(not shot.is_physics_processing(), "Schmelzwall did not shatter an enemy projectile")
+	_check(game.player.stats.health > hp, "Amalgamguss did not heal from a shattered projectile")
+	_check(skills.wall_cooldown > 0.0, "Schmelzwall cooldown missing")
+	effects.powers = {"skill_wall": 1.0, "wall_anchor": 1.0}
+	_near(skills.wall_radius(), MolarSkills.WALL_RADIUS * 1.5, "Unverrückbar radius")
+	# Standing still releases the ring once the cooldown is over.
+	effects.powers = {"skill_wall": 1.0}
+	skills.reset_wave()
+	target.global_position = game.player.global_position + Vector2(50, 0)
+	game.player.is_moving = false
+	skills.advance(MolarSkills.WALL_STILL_SECONDS + 0.05)
+	_check(skills.wall_cooldown > 0.0, "standing still did not release Schmelzwall")
+	# Resume keeps skill timers and counters.
+	skills.unison_counts = {"turbo_drill": 3}
+	var state := skills.save_data()
+	_check(MolarSkills.valid(state) and not MolarSkills.valid({"unison_counts": "bad"}), "molar skill state validation")
+	var restored := MolarSkills.new()
+	restored.player = game.player
+	restored.restore(state)
+	_check(restored.save_data() == state, "molar skill state changed on restore")
+	restored.free()
+	target.queue_free()
+	effects.powers = saved
+	skills.reset_wave()
+	await process_frame
+
+func _test_assassin_skills() -> void:
+	var effects: ClassCombatEffects = game.player.class_combat
+	var saved: Dictionary = effects.powers
+	var skills: AssassinSkills = game.player.assassin_skills
+	var tree: TalentTreeData = ClassCatalog.by_id(&"assassin").talent_tree
+	_check(tree.valid() and tree.capacity() >= 100, "assassin tree invalid or too small")
+	var kinds := {}
+	for node in tree.nodes:
+		kinds[node.kind] = int(kinds.get(node.kind, 0)) + 1
+		if node.is_modifier(): _check(node.parent != &"", "assassin modifier usable without its skill: " + str(node.id))
+	_check(int(kinds.get(&"skill", 0)) == 3 and int(kinds.get(&"modifier", 0)) >= 9 and int(kinds.get(&"keystone", 0)) == 3, "assassin tree lacks skills, modifiers or keystones")
+	# Giftblüte: a lane kill bursts into a cloud; unmarked deaths do not.
+	effects.powers = {"skill_bloom": 1.0}
+	skills.reset_wave()
+	var weak := _enemy(Vector2(70, 0))
+	weak.health = 1
+	game.player.dash_cut._strike(weak, 1.0, null)
+	_check(weak.health <= 0 and skills.clouds.size() == 1, "lane kill did not bloom into a poison cloud")
+	var later := _enemy(Vector2(80, 30))
+	skills.mark(later)
+	later.take_damage(later.health + 100.0)
+	_check(skills.clouds.size() == 2, "marked enemy dying later did not bloom")
+	var plain := _enemy(Vector2(90, -30))
+	plain.take_damage(plain.health + 100.0)
+	_check(skills.clouds.size() == 2, "unmarked death bloomed")
+	var neighbour := _enemy(Vector2(70, 10))
+	skills.advance(0.01)
+	_check(neighbour.affix_effects.is_active(), "poison cloud did not poison a neighbour")
+	_check(not skills.marks.has(neighbour.get_instance_id()), "cloud marked without Kettenblüte")
+	effects.powers = {"skill_bloom": 1.0, "bloom_chain": 1.0}
+	skills.advance(AssassinSkills.CLOUD_INTERVAL + 0.01)
+	_check(skills.marks.has(neighbour.get_instance_id()), "Kettenblüte did not mark cloud victims")
+	for index in 8: skills._bloom(game.player.global_position)
+	_check(skills.clouds.size() == AssassinSkills.CLOUD_LIMIT, "poison clouds are not capped")
+	neighbour.queue_free()
+	# Rausch: three quick dashes, free dashes and wider lanes, then the crash.
+	effects.powers = {"skill_rush": 1.0}
+	skills.reset_wave()
+	for dash in 3: skills.on_dash()
+	_check(skills.rushing() and game.player.dash.cost() == 0.0, "three quick dashes did not start a free-dash rush")
+	_near(skills.width_factor(), AssassinSkills.RUSH_WIDTH, "rush lane width")
+	skills.advance(AssassinSkills.RUSH_SECONDS + 0.01)
+	_check(not skills.rushing() and game.player.dash.cost() > 0.0 and skills.move_factor() < 1.0, "rush did not end in a sugar crash")
+	effects.powers = {"skill_rush": 1.0, "rush_nocrash": 1.0, "rush_hyper": 1.0, "rush_glaze": 1.0}
+	skills.reset_wave()
+	for dash in 2: skills.on_dash()
+	_check(skills.rushing() and skills.snap_delay(0.25) < 0.25, "Hyperaktiv/Zuckerguss missing")
+	skills.advance(AssassinSkills.RUSH_SECONDS + AssassinSkills.RUSH_HYPER_SECONDS + 0.01)
+	_near(skills.move_factor(), 1.0, "Kein Kater still crashed")
+	# Durchflutschen: the dash shatters projectiles, first one per dash gives a shield.
+	effects.powers = {"skill_slip": 1.0, "slip_heal": 1.0}
+	skills.reset_wave()
+	skills.on_dash_started()
+	var pool := game.get_node("EnemyProjectiles") as EnemyProjectilePool
+	var first := pool.acquire()
+	first.launch(game.player.global_position + Vector2(40, 5), Vector2.LEFT, 0.0, 5.0, game.player)
+	var second := pool.acquire()
+	second.launch(game.player.global_position + Vector2(80, -5), Vector2.LEFT, 0.0, 5.0, game.player)
+	var shields: int = game.player.stats.shield_charges
+	game.player.stats.health = game.player.stats.max_health - 10.0
+	var hp: float = game.player.stats.health
+	skills.sweep(game.player.global_position, game.player.global_position + Vector2(120, 0))
+	_check(not first.is_physics_processing() and not second.is_physics_processing(), "dash did not shatter projectiles on its path")
+	_check(game.player.stats.shield_charges == mini(shields + 1, 5), "Durchflutschen shield missing or doubled")
+	_near(game.player.stats.health - hp, 2.0, "Heilflutsch per shattered projectile")
+	# Resume keeps rush, crash, shield cooldown and clouds.
+	skills._bloom(game.player.global_position)
+	var state := skills.save_data()
+	_check(AssassinSkills.valid(state) and not AssassinSkills.valid({"clouds": "bad"}), "assassin skill state validation")
+	var restored := AssassinSkills.new()
+	restored.player = game.player
+	restored.restore(state)
+	_check(restored.save_data() == state, "assassin skill state changed on restore")
+	restored.free()
+	effects.powers = saved
+	skills.reset_wave()
+	for drop in game.get_node("Loot").get_children(): drop.queue_free()
 	await process_frame
 
 func _legacy() -> void:

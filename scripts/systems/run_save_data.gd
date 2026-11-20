@@ -82,7 +82,7 @@ static func _valid_structure(value: Dictionary) -> bool:
 	for key in ["previous", "window"]:
 		if poison_build.has(key) and not (poison_build[key] is int or poison_build[key] is float): return false
 	var boss_rewards: Dictionary = value.get("boss_stage_rewards", {})
-	for key in ["version", "phase_mask", "xp_released"]:
+	for key in ["version", "phase_mask", "xp_released", "xp_budget"]:
 		if boss_rewards.has(key) and not (boss_rewards[key] is int or boss_rewards[key] is float): return false
 	if boss_rewards.has("paid") and not boss_rewards.paid is bool: return false
 	if boss_rewards.has("legacy_credit") and not boss_rewards.legacy_credit is bool: return false
@@ -100,8 +100,10 @@ static func _valid_structure(value: Dictionary) -> bool:
 		var pending_value: Variant = value.get("rewards", {}).get("pending_levels", 0)
 		var level_value: Variant = value.get("level", 1)
 		if not (pending_value is int or pending_value is float) or not (level_value is int or level_value is float): return false
+		var carry_value: Variant = value.get("rewards", {}).get("carry_levels", 0)
+		if not (carry_value is int or carry_value is float) or float(carry_value) < 0: return false
 		var pending := int(pending_value)
-		if int(talent_state.spent) + pending > int(value.get("level", 1)) - 1: return false
+		if int(talent_state.spent) + pending + int(carry_value) > int(value.get("level", 1)) - 1: return false
 		if not talent_state.tiers.is_empty() and talent_state.tiers.size() != pending: return false
 	if not ClassCombatEffects.valid(value.get("class_combat", {})): return false
 	for entry in value.get("weapons", []):

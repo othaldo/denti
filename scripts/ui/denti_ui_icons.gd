@@ -17,6 +17,13 @@ const POISON_ATLAS: Texture2D = preload("res://assets/items/item_icons_poison.pn
 const TALENT_ATLAS: Texture2D = preload("res://assets/classes/talent_icons.webp")
 const TALENT_COLUMNS := 8
 const TALENT_ROWS := 4
+const MOLAR_TALENT_ATLAS: Texture2D = preload("res://assets/classes/molar_talent_icons.webp")
+const MOLAR_TALENT_COLUMNS := 5
+const MOLAR_TALENT_ROWS := 3
+const ASSASSIN_TALENT_ATLAS: Texture2D = preload("res://assets/classes/assassin_talent_icons.webp")
+const ASSASSIN_TALENT_COLUMNS := 7
+const ASSASSIN_TALENT_ROWS := 2
+const ASSASSIN_TALENT_COUNT := 13
 const HUD_ATLAS: Texture2D = preload("res://assets/ui/hud_icons_atlas.png")
 const STAT_ATLAS: Texture2D = preload("res://assets/ui/stat_icons_atlas.png")
 const RANGE: Texture2D = preload("res://assets/ui/range.svg")
@@ -103,8 +110,17 @@ static func hud(index: int) -> Texture2D:
 
 
 static func talent(index: int) -> Texture2D:
-	if index < 0 or index >= TALENT_COLUMNS * TALENT_ROWS: return null
-	return _region(TALENT_ATLAS, index, TALENT_COLUMNS, TALENT_ROWS)
+	if index < 0: return null
+	var base_count := TALENT_COLUMNS * TALENT_ROWS
+	if index < base_count:
+		return _region(TALENT_ATLAS, index, TALENT_COLUMNS, TALENT_ROWS)
+	var cell := index - base_count
+	var molar_count := MOLAR_TALENT_COLUMNS * MOLAR_TALENT_ROWS
+	if cell < molar_count:
+		return _region(MOLAR_TALENT_ATLAS, cell, MOLAR_TALENT_COLUMNS, MOLAR_TALENT_ROWS)
+	cell -= molar_count
+	if cell >= ASSASSIN_TALENT_COUNT: return null
+	return _region(ASSASSIN_TALENT_ATLAS, cell, ASSASSIN_TALENT_COLUMNS, ASSASSIN_TALENT_ROWS)
 
 
 static func stat(index: int) -> Texture2D:

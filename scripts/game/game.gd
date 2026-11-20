@@ -312,6 +312,8 @@ func _start_combat_wave() -> void:
 	player.dash.reset_wave()
 	player.class_combat.reset_wave()
 	player.dash_cut.reset_wave()
+	player.molar_skills.reset_wave()
+	player.assassin_skills.reset_wave()
 	var profile_id := wave.prepare_next_wave_profile()
 	telemetry.begin_wave(wave.current_wave + 1, profile_id, _combat_build_snapshot())
 	wave.start_next_wave()
@@ -497,6 +499,7 @@ func _create_enemy(data: EnemyData, at: Vector2, treasure: bool = false) -> void
 	enemy.weapon_hit.connect(relics.on_weapon_hit)
 	enemy.died.connect(items.on_enemy_died)
 	enemy.died.connect(relics.on_enemy_died)
+	enemy.died.connect(player.assassin_skills.on_enemy_died)
 	enemy.attack_performed.connect(sound.play_cue)
 	if data.is_boss:
 		enemy.death_started.connect(_on_boss_death_started)
@@ -718,8 +721,13 @@ func _award_xp(amount: int) -> void:
 	while xp >= xp_goal:
 		xp -= xp_goal
 		level += 1
-		xp_goal = 5 + (level - 1) * 3
+		xp_goal = xp_goal_for_level(level)
 		rewards.earn_level()
+
+
+## XP needed to finish `for_level` and reach the next one.
+static func xp_goal_for_level(for_level: int) -> int:
+	return 5 + (maxi(for_level, 1) - 1) * 3
 
 
 func _show_level_choice() -> void:
@@ -1348,6 +1356,8 @@ func debug_start_wave(number: int) -> void:
 	player.dash.reset_wave()
 	player.class_combat.reset_wave()
 	player.dash_cut.reset_wave()
+	player.molar_skills.reset_wave()
+	player.assassin_skills.reset_wave()
 	rewards.begin_wave()
 	wave.current_wave = clampi(number, 1, WaveController.MAX_WAVES) - 1
 	wave.next_profile_id = &""

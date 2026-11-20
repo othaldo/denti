@@ -17,6 +17,8 @@ __pycache__/
 !assets/ui/element_icons_atlas.png.import
 !assets/ui/weapon_support_icons_atlas.png.import
 !assets/classes/talent_icons.webp.import
+!assets/classes/molar_talent_icons.webp.import
+!assets/classes/assassin_talent_icons.webp.import
 !assets/vfx/element_hit_splats.png.import
 
 # The modular Count artwork uses mipmaps at combat sprite sizes.

@@ -39,6 +39,8 @@ var dash_moved := false
 var _dash_held := false
 var dash_trail: DashTrail
 var dash_cut: ClassDashCut
+var molar_skills: MolarSkills
+var assassin_skills: AssassinSkills
 
 
 func nearby_enemies(at: Vector2, radius: float, include_radius: bool = true) -> Array[Enemy]:
@@ -66,6 +68,15 @@ func _ready() -> void:
 	# drawing under the player node never reached the screen.
 	_attach_dash_cut.call_deferred()
 	dash.started.connect(dash_cut.on_dash_started)
+	molar_skills = MolarSkills.new()
+	molar_skills.player = self
+	add_child(molar_skills)
+	stats.shield_blocked.connect(molar_skills.on_shield_blocked)
+	assassin_skills = AssassinSkills.new()
+	assassin_skills.player = self
+	add_child(assassin_skills)
+	dash.started.connect(assassin_skills.on_dash_started)
+	dash.started.connect(assassin_skills.on_dash)
 	stats.changed.connect(dash.clamp_charge)
 	get_node("/root/GameInput").changed.connect(_sync_dash_input)
 	dash_trail = DashTrail.new()
@@ -87,6 +98,8 @@ func _physics_process(delta: float) -> void:
 	if combat_active():
 		class_combat.advance(delta)
 		dash_cut.advance(delta)
+		molar_skills.advance(delta)
+		assassin_skills.advance(delta)
 		dash_moved = was_dashing
 		dash.advance(self, delta)
 	else:
@@ -100,6 +113,7 @@ func _physics_process(delta: float) -> void:
 	if dash_moved:
 		dash_trail.add_segment(motion_start, motion_end)
 		dash_cut.extend(motion_end)
+		assassin_skills.sweep(motion_start, motion_end)
 		if not dash.active:
 			dash_cut.release()
 			_dash_pulse()
@@ -135,7 +149,8 @@ func floor_movement_factor() -> float:
 	var factor := 1.0
 	for encounter: CaramelEncounter in get_tree().get_nodes_in_group("caramel_encounters"):
 		factor = minf(factor, encounter.speed_factor_at(global_position))
-	return factor
+	# Assassin sugar crash after a Rausch.
+	return factor * assassin_skills.move_factor() if assassin_skills != null else factor
 
 
 func combat_active() -> bool:

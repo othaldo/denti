@@ -9,6 +9,10 @@ extends Resource
 const BRANCHES := 3
 const COLUMNS := 3
 const ROWS := 6
+## Talent kinds with their own shape in the tree. Empty = ordinary talent.
+## skill: visible automatic ability, the goal of a branch (large diamond).
+## modifier: changes a skill (small diamond). keystone: strong trade-off (octagon).
+const KINDS: Array[StringName] = [&"", &"skill", &"modifier", &"keystone"]
 
 @export var id: StringName
 @export var display_name: String
@@ -27,7 +31,21 @@ const ROWS := 6
 @export var exclusive_group: StringName
 @export var stat_changes: Dictionary = {}
 @export var effects: Dictionary = {}
+## Cell in the painted talent atlas. Negative: no icon yet, the tree draws a placeholder.
 @export var icon_index: int = -1
+@export var kind: StringName = &""
+
+func is_skill() -> bool:
+	return kind == &"skill"
+
+func is_modifier() -> bool:
+	return kind == &"modifier"
+
+func is_keystone() -> bool:
+	return kind == &"keystone"
+
+func has_placeholder_icon() -> bool:
+	return not is_attribute() and icon_index < 0
 
 func is_attribute() -> bool:
 	return stat != &"" or free_attribute
@@ -36,6 +54,7 @@ func valid() -> bool:
 	if id == &"" or max_ranks < 1 or cost < 1 or parent_rank < 1: return false
 	if branch < 0 or branch >= BRANCHES or row < 0 or row >= ROWS or column < 0 or column >= COLUMNS: return false
 	if free_attribute and stat != &"": return false
+	if kind not in KINDS or (kind != &"" and is_attribute()): return false
 	if is_attribute():
 		if (not free_attribute and stat not in PlayerStatKeys.ALL) or cost != 1 or not stat_changes.is_empty() or not effects.is_empty(): return false
 	elif display_name.is_empty():

@@ -262,12 +262,20 @@ kleine Darstellung. Die erste native Vorschau liegt unter
 
 ## Beute: vorläufige Startwerte
 
-| Stage | Basis-XP | Basis-Münzen | Upgrade-Kapseln |
+| Stage | Levelpunkte | Basis-Münzen | Upgrade-Kapseln |
 | --- | ---: | ---: | ---: |
-| W5 / Graf | 30 | 32 | 1 |
-| W10 / Prinz | 45 | 55 | 2 |
-| W15 / König | 55 | 70 | 2 |
-| W20 und Endlosbossstage | 65 | 85 | 2 |
+| W5 / Graf | 4 | 32 | 1 |
+| W10 / Prinz | 4 | 55 | 2 |
+| W15 / König | 5 | 70 | 2 |
+| W20 und Endlosbossstage | 5 | 85 | 2 |
+
+**Spieltestkorrektur 20.11.2026:** Die festen 30–65 XP ergaben bei der linear
+steigenden Levelkurve nur noch etwa einen Levelpunkt, während normale Wellen
+4–6 bringen. Das Budget steht jetzt in Levelpunkten (`levels`). Beim ersten
+Auszahlen der Stage wird daraus genau die XP berechnet, die vom aktuellen Stand
+aus diese Anzahl Aufstiege ergibt. Der Wert wird gespeichert, damit Fortsetzen
+nichts neu würfelt. XP-Sammelboni können wie bei normaler Beute etwas mehr ergeben.
+Die alten XP-Werte bleiben als Rückfall für `levels = 0` in den Ressourcen.
 
 Die Werte stehen in vier `BossStageRewardData`-Resources. Jeder der ersten beiden
 Lebensphasenwechsel kann einmal ungefähr 10 % der XP als sammelbaren Splitter
