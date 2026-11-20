@@ -12,6 +12,7 @@ filter_clip = true
 script = ExtResource("1")
 role = "Boss-Fokus im Nahkampf"
 id = &"turbo_drill"
+class_roles = Array[StringName]([&"contact"])
 display_name = "Turbo-Bohrer"
 description = "1 Wurzel · Nahkampf: ein weiteres Ziel für 50 % Schaden. +25–40 % gegen Bosse."
 hands = 1

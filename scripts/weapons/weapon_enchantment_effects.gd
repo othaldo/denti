@@ -13,10 +13,11 @@ static func packets(effects: ItemEffectContext, enemy: Enemy, weapon: WeaponData
 	return result
 
 
-static func after_hit(effects: ItemEffectContext, enemy: Enemy, weapon: WeaponData, affixes: Array[Dictionary], critical: bool, dealt: float, factor: float, was_chilled: bool, source_uid: String = "") -> void:
+static func after_hit(effects: ItemEffectContext, enemy: Enemy, weapon: WeaponData, affixes: Array[Dictionary], critical: bool, dealt: float, factor: float, was_chilled: bool, source_uid: String = "", tier: int = 1) -> void:
 	if dealt <= 0:
 		return
 	ElementReactions.after_hit(effects, enemy, weapon, affixes)
+	effects.poison_build.after_hit(effects, enemy, weapon, tier)
 	if affixes.is_empty() and not critical:
 		return
 	var wet := WeaponAffixes.find(affixes, &"wet")

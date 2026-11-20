@@ -194,6 +194,8 @@ func snapshot(game) -> Dictionary:
 	return {"coins": game.coins, "level": game.level, "xp": game.xp, "xp_goal": game.xp_goal,
 		"stats": game.player.stats.to_save_data().duplicate(true), "equipment": game.player.loadout.save_data().duplicate(true),
 		"items": game.items.save_data().duplicate(true), "relics": game.relics.save_data().duplicate(true), "upgrade_points": game.rewards.weapon_upgrades.points,
+		"class_id": str(game.player.stats.class_data.id), "talents": game.talents.save_data(),
+		"class_support": game.telemetry.enchantment_support.duplicate(), "dashes": game.telemetry.dashes,
 		"gold_earned": game.telemetry.coins_collected, "xp_earned": game.telemetry.xp_collected,
 		"chests": game.telemetry.chests_found}
 
@@ -213,6 +215,9 @@ func resolve_intermission(game) -> void:
 			return
 		match game.rewards.step:
 			PostWaveRewards.Step.LEVELS:
+				if game.talents.enabled:
+					await spend_talent_points(game)
+					continue
 				var upgrade := level_choice(game)
 				if not await before_intermission_action(game, "Aufstieg", "Wählt " + upgrade.effect_text()): return
 				game._on_upgrade_chosen(upgrade)
@@ -242,6 +247,22 @@ func level_choice(game) -> UpgradeData:
 		var matching: Array = game.choice_panel.current_upgrades.filter(func(upgrade: UpgradeData): return upgrade.stat == stat)
 		if not matching.is_empty(): return matching[0]
 	return game.choice_panel.current_upgrades[0]
+
+func spend_talent_points(game) -> void:
+	for point in 100:
+		if game.talents.used(game.player.stats.class_data.talent_tree) >= game.rewards.pending_levels: break
+		var selected := fallback_talent_stat(game)
+		if selected == &"" or not game.talents.plan_stat(selected, game.player.stats, game.UPGRADES, game.rewards.pending_levels):
+			push_error("Earned progression cannot allocate a level point")
+			failures += 1
+			return
+	game._on_talents_completed()
+
+func fallback_talent_stat(game) -> StringName:
+	var primary := &"melee_damage" if game.player.loadout.equipped()[0].data.damage_stat == "melee" else &"ranged_damage"
+	for key: StringName in [primary, &"max_health", &"attack_speed", &"armor", &"regen"]:
+		if game.talents.stat_choice(key, game.player.stats, game.UPGRADES) != null: return key
+	return &""
 
 
 func spend_upgrade_points(game) -> void:

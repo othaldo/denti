@@ -12,6 +12,7 @@ filter_clip = true
 script = ExtResource("1")
 role = "Blutung schnell aufbauen"
 id = &"plaque_scaler"
+class_roles = Array[StringName]([&"contact"])
 display_name = "Zahnsteinkratzer"
 description = "1 Wurzel · Schnelle Schnitte bauen Blutung auf. Ein zweites Ziel auf der Hiebspur erhält 50 % Trefferschaden."
 hands = 1

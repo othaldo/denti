@@ -48,7 +48,7 @@ static func _active(enemy: Enemy, kind: StringName) -> bool:
 		&"wet": return enemy.wet_time > 0
 		&"ice": return enemy.chill_time > 0
 		&"fire": return enemy.affix_effects.fire_budget > 0 and (enemy.affix_effects.fire_time > 0 or enemy.affix_effects.pending.has("fire"))
-		&"poison": return enemy.affix_effects.poison_time > 0 and enemy.affix_effects.pending.has("poison")
+		&"poison": return enemy.affix_effects.budget(&"poison") + enemy.affix_effects.depot.budget() > 0
 	return false
 
 

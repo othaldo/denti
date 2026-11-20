@@ -229,9 +229,9 @@ Beim Verzaubern liegt Aufsteigen als reguläre Zeile vor den vier Effektplätzen
 Die Effektauswahl ist abgeschlossen, und offene Entwürfe werden beim Zurückgehen
 weder stillschweigend bestätigt noch verworfen. Siehe [Bedienmodell](CONTROLLER_INTERACTION_PLAN.md).
 
-- Vor/Zurück und bereits besuchte Schritte behalten die Wahl. Der Schrittverlauf
-  zeigt keine noch nicht existierende Klasse. Später wird der Klassenschritt
-  zwischen Schwierigkeit und Waffe eingefügt, mit derselben Bühne und Navigation.
+- Vor/Zurück und bereits besuchte Schritte behalten die Wahl. Seit P3 liegt die
+  [Klassenauswahl](ASSASSIN_AND_TALENTS.md) zwischen Schwierigkeit und Waffe,
+  mit derselben Bühne und Navigation. Gesperrte Startwaffen werden ausgefiltert.
 - Vorschau, Tastaturfokus, gewählte Option und gesperrte Option sind verschiedene Zustände.
 - Escape beziehungsweise Zurück geht eine Ebene zurück, ohne einen Run zu starten.
 - Doppelklick und Doppeltippen können weder Schritte überspringen noch einen zweiten Run anlegen.

@@ -202,6 +202,7 @@ func sample_combat(config: Dictionary, movement: String, sample_seed: int, secon
 		"damage_dealt": summary.damage_dealt, "weapon_damage": game.telemetry.weapon_damage.duplicate(),
 		"dps": summary.damage_dealt / maxf(elapsed, PROFILES.STEP),
 		"proc_damage": game.telemetry.proc_damage.duplicate(),
+		"enchantment_support": game.telemetry.enchantment_support.duplicate(),
 		"boss_ttk": game.telemetry.last_boss_ttk if game.probe_outcome == "boss_killed" else null,
 		"boss_health_fraction": clampf(game.boss.health / game.boss.max_health, 0, 1) if is_instance_valid(game.boss) else 0.0,
 		"coins_collected": summary.coins_collected, "xp_collected": summary.xp_collected,

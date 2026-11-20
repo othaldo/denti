@@ -150,7 +150,7 @@ func _pick_item(tier: int, items: ItemInventory, loadout: WeaponLoadout) -> Shop
 func _pick_weapon(tier: int, loadout: WeaponLoadout, allow_unavailable: bool = false) -> ShopOfferData:
 	var candidates: Array[ShopOfferData] = []
 	for template in WEAPON_OFFERS:
-		if template.weapon_data != null and (allow_unavailable or loadout.can_acquire(template.weapon_data, tier)) and not _already_offered(template.id, tier):
+		if loadout.weapon_allowed(template.weapon_data) and (allow_unavailable or loadout.can_acquire(template.weapon_data, tier)) and not _already_offered(template.id, tier):
 			candidates.append(template)
 	if candidates.is_empty():
 		return null

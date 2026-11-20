@@ -6,6 +6,9 @@ enum Step { COMBAT, COLLECTING, LEVELS, CHESTS, SHOP, END, RELICS, STORY, WEAPON
 
 var step: Step = Step.COMBAT
 var pending_levels: int = 0
+## Level points refunded while the post-wave level step was already over
+## (e.g. a save in the shop). They join the next wave's pending levels.
+var carry_levels: int = 0
 var level_rerolls: int = 0
 var pending_chests: Array[Dictionary] = []
 var pending_relics: Array[String] = []
@@ -24,7 +27,8 @@ var upgrade_income := WeaponUpgradeIncome.new()
 func begin_wave() -> void:
 	upgrade_income.begin_wave()
 	step = Step.COMBAT
-	pending_levels = 0
+	pending_levels = carry_levels
+	carry_levels = 0
 	level_rerolls = 0
 	pending_chests.clear()
 	pending_relics.clear()
@@ -155,7 +159,7 @@ func resolve_story() -> void:
 
 
 func save_data() -> Dictionary:
-	return {"step": step, "pending_levels": pending_levels, "level_rerolls": level_rerolls, "pending_chests": pending_chests.duplicate(true),
+	return {"step": step, "pending_levels": pending_levels, "carry_levels": carry_levels, "level_rerolls": level_rerolls, "pending_chests": pending_chests.duplicate(true),
 		"pending_relics": pending_relics.duplicate(), "chest_spawned": chest_spawned, "random_chests_spawned": random_chests_spawned, "treasure_spawned": treasure_spawned, "final_wave": final_wave, "pending_story": str(pending_story),
 		"choices_resolved": choices_resolved, "choices_total": choices_total,
 		"weapon_upgrades": weapon_upgrades.save_data(), "weapons_resolved": weapons_resolved, "upgrade_income": upgrade_income.save_data()}
@@ -170,6 +174,7 @@ func restore(saved: Dictionary) -> void:
 	if StoryCatalog.dialogue(pending_story).is_empty():
 		pending_story = &""
 	pending_levels = maxi(int(saved.get("pending_levels", 0)), 0)
+	carry_levels = maxi(int(saved.get("carry_levels", 0)), 0)
 	level_rerolls = maxi(int(saved.get("level_rerolls", 0)), 0) if step == Step.LEVELS and pending_levels > 0 else 0
 	pending_chests.clear()
 	for entry in saved.get("pending_chests", []):

@@ -12,6 +12,7 @@ filter_clip = true
 script = ExtResource("1")
 role = "Gewitterdusche"
 id = &"storm_shower"
+class_roles = Array[StringName]([&"ranged"])
 display_name = "Gewitterdusche"
 description = "Treffer hinterlassen leitende Pfützen. Entladungen verbinden nasse Gegner in den Pfützen."
 hands = 1

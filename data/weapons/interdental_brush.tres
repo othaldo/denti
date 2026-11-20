@@ -12,6 +12,7 @@ filter_clip = true
 script = ExtResource("1")
 role = "Breiter Schwung gegen Gruppen"
 id = &"interdental_brush"
+class_roles = Array[StringName]([&"contact"])
 display_name = "Interdental-Bürste"
 description = "1 Wurzel · Schneller Rundumschnitt: drängt Gegner zurück und baut Blutung auf."
 hands = 1

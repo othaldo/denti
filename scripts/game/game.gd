@@ -40,6 +40,8 @@ const UPGRADES: Array[UpgradeData] = [
 @onready var session: Node = get_node("/root/GameSession")
 
 var run_flow := RunFlow.new()
+var talents := TalentProgression.new()
+var talent_panel: TalentPanel
 
 var xp: int = 0
 var xp_goal: int = 5
@@ -86,6 +88,13 @@ var story_travel: StoryTravel
 
 func _enter_tree() -> void:
 	var run: Node = get_node("/root/GameSession")
+	if not run.resume_requested:
+		talents.enabled = run.pending_talent_run
+		var profile := ClassCatalog.by_id(run.pending_start_class_id)
+		if profile != null and profile != ClassCatalog.DEFAULT:
+			get_node("Player/Stats").begin_class(profile)
+	run.pending_start_class_id = ClassCatalog.DEFAULT.id
+	run.pending_talent_run = false
 	if run.test_scenario_id != &"":
 		var preset := TestArenaCatalog.by_id(run.test_scenario_id)
 		if preset != null and preset.diagnostic != TestArenaData.Diagnostic.NONE:
@@ -122,6 +131,12 @@ func _ready() -> void:
 	player.stats.damage_taken.connect(_record_player_damage)
 	player.dash.started.connect(telemetry.record_dash)
 	player.dash.contacted.connect(telemetry.record_dash_contact)
+	talent_panel = TalentPanel.new()
+	add_child(talent_panel)
+	talent_panel.talent_requested.connect(_on_talent_requested)
+	talent_panel.undo_requested.connect(_on_talent_undo)
+	talent_panel.completed.connect(_on_talents_completed)
+	talent_panel.cursor_changed.connect(_save_run)
 	player.stats.shield_blocked.connect(items.on_shield_blocked)
 	player.stats.shield_blocked.connect(relics.on_shield_blocked)
 	player.stats.healed.connect(items.on_healed)
@@ -231,6 +246,7 @@ func _show_starters(selected_id: StringName = &"") -> void:
 	for weapon in WeaponCatalog.ALL:
 		if player.loadout.can_acquire(weapon):
 			starters.append(weapon)
+	choice_panel.starter_selection.class_profile = player.stats.class_data
 	choice_panel.show_starters(starters, selected_id)
 	get_tree().paused = true
 	_save_run()
@@ -294,6 +310,11 @@ func _start_combat_wave() -> void:
 	run_flow.enter(RunFlow.Phase.COMBAT)
 	rewards.begin_wave()
 	player.dash.reset_wave()
+	player.class_combat.reset_wave()
+	player.dash_cut.reset_wave()
+	player.molar_skills.reset_wave()
+	player.assassin_skills.reset_wave()
+	player.reset_skill_modules()
 	var profile_id := wave.prepare_next_wave_profile()
 	telemetry.begin_wave(wave.current_wave + 1, profile_id, _combat_build_snapshot())
 	wave.start_next_wave()
@@ -479,6 +500,8 @@ func _create_enemy(data: EnemyData, at: Vector2, treasure: bool = false) -> void
 	enemy.weapon_hit.connect(relics.on_weapon_hit)
 	enemy.died.connect(items.on_enemy_died)
 	enemy.died.connect(relics.on_enemy_died)
+	enemy.died.connect(player.assassin_skills.on_enemy_died)
+	enemy.died.connect(player.notify_enemy_died)
 	enemy.attack_performed.connect(sound.play_cue)
 	if data.is_boss:
 		enemy.death_started.connect(_on_boss_death_started)
@@ -625,6 +648,7 @@ func _spawn_loot(at: Vector2, kind: StringName, amount: int, reward_id: StringNa
 
 func _on_loot_collected(kind: StringName, amount: int, reward_id: StringName = &"", drop: Loot = null) -> void:
 	sound.play_cue(&"pickup")
+	player.notify_loot(kind, amount, drop)
 	if kind == &"chest":
 		if reward_id == WeaponAffixes.CHEST_ID and drop != null:
 			rewards.queue_affix_chest(drop.reward_data, items)
@@ -700,18 +724,31 @@ func _award_xp(amount: int) -> void:
 	while xp >= xp_goal:
 		xp -= xp_goal
 		level += 1
-		xp_goal = 5 + (level - 1) * 3
+		xp_goal = xp_goal_for_level(level)
 		rewards.earn_level()
+
+
+## XP needed to finish `for_level` and reach the next one.
+static func xp_goal_for_level(for_level: int) -> int:
+	return 5 + (maxi(for_level, 1) - 1) * 3
 
 
 func _show_level_choice() -> void:
 	get_node("/root/SceneTransitions").present(&"rewards")
 	run_flow.enter(RunFlow.Phase.REWARDS)
+	if talents.enabled:
+		talents.prepare(rewards.pending_levels, level - rewards.pending_levels + 1, player.stats.luck)
+		choice_panel.hide()
+		talent_panel.present(talents, player.stats, UPGRADES, rewards.pending_levels)
+		get_tree().paused = true
+		_save_run()
+		return
 	var pool: Array[UpgradeData] = []
 	var equipped_stats: Array[StringName] = []
 	for weapon in player.loadout.equipped():
 		equipped_stats.append(StringName(weapon.data.damage_stat + "_damage"))
 	for upgrade in UPGRADES:
+		if not player.stats.upgrade_has_effect(upgrade.stat, upgrade.with_tier(4).amount): continue
 		if upgrade.stat == &"dash_recovery_bonus" and player.stats.stamina_bonus() >= player.dash.config.max_stamina_bonus:
 			continue
 		if upgrade.stat in [&"melee_damage", &"ranged_damage"] and not equipped_stats.has(upgrade.stat):
@@ -721,9 +758,14 @@ func _show_level_choice() -> void:
 	var choices: Array[UpgradeData] = []
 	# Pending levels include this choice; resolve their earned levels oldest first.
 	var earned_level := level - maxi(rewards.pending_levels - 1, 0)
-	for index in ChoicePanel.UPGRADE_COUNT:
-		var choice := pool[index].with_tier(DentiRarity.upgrade_tier(earned_level, player.stats.luck))
-		choices.append(choice.with_stat_context(player.stats))
+	for upgrade in pool:
+		var choice := upgrade.with_tier(DentiRarity.upgrade_tier(earned_level, player.stats.luck)).with_stat_context(player.stats)
+		if player.stats.upgrade_has_effect(choice.stat, choice.amount): choices.append(choice)
+		if choices.size() == ChoicePanel.UPGRADE_COUNT: break
+	if choices.is_empty():
+		rewards.resolve_level()
+		_advance_post_wave_rewards.call_deferred()
+		return
 	choice_panel.show_upgrades(choices, player.stats)
 	var progress := rewards.choice_progress()
 	choice_panel.set_progress(progress.x, progress.y)
@@ -735,6 +777,35 @@ func _show_level_choice() -> void:
 func _update_level_reroll() -> void:
 	var earned_level := level - maxi(rewards.pending_levels - 1, 0)
 	choice_panel.update_level_reroll(coins, EconomyRules.level_reroll_cost(earned_level, rewards.level_rerolls), earned_level)
+
+func _on_talent_requested(id: StringName, stat: StringName = &"") -> void:
+	if rewards.step != PostWaveRewards.Step.LEVELS or not talent_panel.visible: return
+	if talents.plan_talent(id, player.stats, UPGRADES, rewards.pending_levels, stat):
+		talent_panel.refresh()
+		_save_run()
+
+func _on_talent_undo() -> void:
+	if rewards.step != PostWaveRewards.Step.LEVELS or not talent_panel.visible: return
+	talents.undo()
+	talent_panel.refresh()
+	_save_run()
+
+func _sync_talents() -> void:
+	player.class_combat.profile = player.stats.class_data
+	var powers := talents.powers(player.stats.class_data.talent_tree)
+	player.class_combat.powers = powers
+	player.dash.cost_cut = float(powers.get("dash_cost_cut", 0))
+	player.dash.distance_bonus = float(powers.get("dash_distance", 0))
+	items.effect_context.extra_powers = powers
+
+func _on_talents_completed() -> void:
+	if rewards.step != PostWaveRewards.Step.LEVELS or not talent_panel.visible: return
+	var count := rewards.pending_levels
+	if not talents.commit(player.stats, UPGRADES, count): return
+	_sync_talents()
+	for index in count: rewards.resolve_level()
+	talent_panel.hide()
+	_advance_post_wave_rewards()
 
 
 func _on_level_reroll() -> void:
@@ -751,6 +822,7 @@ func _on_level_reroll() -> void:
 
 
 func _on_upgrade_chosen(upgrade: UpgradeData) -> void:
+	if talents.enabled: return
 	player.stats.apply_upgrade(upgrade.stat, upgrade.amount)
 	rewards.resolve_level()
 	_advance_post_wave_rewards()
@@ -912,7 +984,7 @@ func _finish_loot_collection() -> void:
 	coins += interest
 	telemetry.record_loot(&"coin", interest, &"interest")
 	if (wave.current_wave < WaveController.MAX_WAVES or wave.current_wave > WaveController.MAX_WAVES and wave.current_wave % 10 == 0) and WaveController.is_boss_wave(wave.current_wave) and rewards.pending_relics.is_empty():
-		rewards.queue_relics(RelicCatalog.choices(relics.owned))
+		rewards.queue_relics(RelicCatalog.choices(relics.owned, items.preferred_tags(player.loadout)))
 	if story.enabled and wave.current_wave > story.completed_boss_wave:
 		var dialogue_id := StoryCatalog.after_boss(wave.current_wave)
 		if dialogue_id != &"":
@@ -1229,13 +1301,15 @@ func _run_recap_data() -> Dictionary:
 		"weapons": player.loadout.save_data(),
 		"items": items.owned.duplicate(),
 		"relics": relics.owned.duplicate(),
+		"talents": talents.save_data(),
 		"telemetry": telemetry.save_data(),
 		"waves": telemetry.wave_summaries(),
 	}
 
 
 func _combat_build_snapshot() -> Dictionary:
-	return {"player_stats": player.stats.to_save_data(), "weapons": player.loadout.save_data(),
+	return {"class_id": str(player.stats.class_data.id), "class_version": player.stats.class_data.rules_version, "player_stats": player.stats.to_save_data(), "weapons": player.loadout.save_data(),
+		"talents": talents.save_data(),
 		"items": items.owned.duplicate(), "relics": relics.owned.duplicate(),
 		"upgrade_points": rewards.weapon_upgrades.points}
 
@@ -1244,6 +1318,9 @@ func debug_start_wave(number: int) -> void:
 	if not DebugRunControls.allowed() or player.loadout.equipped().is_empty():
 		return
 	weapon_mastery.eligible = false
+	talent_panel.hide()
+	talents.actions.clear()
+	talents.tiers.clear()
 	element_impacts.clear()
 	wave.active = false
 	# Remove immediately while paused so old loot callbacks and attacks cannot
@@ -1276,10 +1353,15 @@ func debug_start_wave(number: int) -> void:
 	configured_stats["health"] = player.stats.max_health
 	configured_stats["shield_charges"] = 0
 	configured_stats["regen_progress"] = 0.0
-	player.stats.load_save_data(configured_stats)
+	player.stats.load_save_data(configured_stats, player.stats.class_save_data())
 	# A pending strike may still retain a reference to a removed enemy.
 	player.loadout.restore(player.loadout.save_data())
 	player.dash.reset_wave()
+	player.class_combat.reset_wave()
+	player.dash_cut.reset_wave()
+	player.molar_skills.reset_wave()
+	player.assassin_skills.reset_wave()
+	player.reset_skill_modules()
 	rewards.begin_wave()
 	wave.current_wave = clampi(number, 1, WaveController.MAX_WAVES) - 1
 	wave.next_profile_id = &""

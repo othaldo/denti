@@ -37,13 +37,16 @@ static func capture(game) -> Dictionary:
 	var result := {
 		"base_victory": game.base_victory,
 		"weapon_mastery": game.weapon_mastery.save_data(),
-		"player": {"position": SnapshotValues.vector_data(game.player.position), "stats": game.player.stats.to_save_data(), "hurt_time": game.player.hurt_time, "dodge_time": game.player.dodge_time, "presentation": game.player.expressions.save_data(), "status_effects": game.player.status_effects.save_data()},
+		"player": {"position": SnapshotValues.vector_data(game.player.position), "stats": game.player.stats.to_save_data(), "class_state": game.player.stats.class_save_data(), "hurt_time": game.player.hurt_time, "dodge_time": game.player.dodge_time, "presentation": game.player.expressions.save_data(), "status_effects": game.player.status_effects.save_data()},
 		"xp": game.xp, "xp_goal": game.xp_goal, "level": game.level, "coins": game.coins,
 		"weapons": game.player.loadout.save_data(), "starter_pending": game.starter_pending,
 		"starter_preview": str(game.choice_panel.starter_selection.selected_id) if game.starter_pending else "",
 		"weapon_runtime": weapon_runtime,
 		"player_projectiles": player_projectiles,
 		"items": game.items.save_data(),
+		"talents": game.talents.save_data(),
+		"class_combat": game.player.class_combat.save_data(enemy_indices).merged({"trails": game.player.dash_cut.save_data(enemy_indices), "molar": game.player.molar_skills.save_data(), "assassin": game.player.assassin_skills.save_data(), "modules": game.player.save_skill_modules()}),
+		"poison_build": game.items.effect_context.poison_build.save_data(enemy_indices),
 		"relics": game.relics.save_data(),
 		"telemetry": game.telemetry.save_data(),
 		"rewards": game.rewards.save_data(),
@@ -69,6 +72,7 @@ static func restore(game, saved: Dictionary) -> void:
 	game.weapon_fusion_panel.hide()
 	game.weapon_fusion_panel.plan = null
 	game.weapon_enchantment_panel.hide()
+	game.talent_panel.hide()
 	game.run_flow.enter(RunFlow.Phase.COMBAT)
 	var wave: WaveController = game.wave
 	var player: Player = game.player
@@ -82,7 +86,8 @@ static func restore(game, saved: Dictionary) -> void:
 	if game.mastery_notice != null: game.mastery_notice.hide()
 	var player_data: Dictionary = saved.get("player", {})
 	player.position = SnapshotValues.read_vector(player_data.get("position", [640.0, 360.0]))
-	player.stats.load_save_data(player_data.get("stats", {}))
+	player.stats.load_save_data(player_data.get("stats", {}), player_data.get("class_state", {}))
+	player.dash.config = player.stats.class_data.dash_config()
 	player.hurt_time = maxf(float(player_data.get("hurt_time", 0.0)), 0.0)
 	player.dodge_time = clampf(float(player_data.get("dodge_time", 0.0)), 0.0, Player.DODGE_IFRAMES)
 	player.expressions.restore(player_data.get("presentation", {}))
@@ -109,6 +114,8 @@ static func restore(game, saved: Dictionary) -> void:
 			if old_weapon != null:
 				player.loadout.acquire(old_weapon)
 	game.items.restore(saved.get("items", {}))
+	game.talents.restore(saved.get("talents", {}))
+	game._sync_talents()
 	game.relics.restore(saved.get("relics", {}))
 	game.rewards.restore(saved.get("rewards", {}))
 	game.rewards.weapon_upgrades.validate(player.loadout, game.coins, wave.current_wave)
@@ -145,6 +152,12 @@ static func restore(game, saved: Dictionary) -> void:
 	var runtime: Array = saved.get("weapon_runtime", [])
 	var weapons := player.loadout.equipped()
 	var restored_enemies: Array[Node] = game.get_node("Enemies").get_children()
+	player.class_combat.restore(saved.get("class_combat", {}), restored_enemies)
+	player.dash_cut.restore(saved.get("class_combat", {}).get("trails", []), restored_enemies)
+	player.molar_skills.restore(saved.get("class_combat", {}).get("molar", {}))
+	player.assassin_skills.restore(saved.get("class_combat", {}).get("assassin", {}))
+	player.restore_skill_modules(saved.get("class_combat", {}).get("modules", {}))
+	game.items.effect_context.poison_build.restore(saved.get("poison_build", {}), restored_enemies)
 	var projectiles := game.get_node("Projectiles") as PlayerProjectilePool
 	for entry in saved.get("player_projectiles", []):
 		if not entry is Dictionary:

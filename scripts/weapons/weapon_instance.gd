@@ -35,6 +35,10 @@ var focus_time: float = 0.0
 var crit_cycle_progress: int = 0
 var evolution: WeaponEvolutionEffects
 var floss_cut: WeaponFlossCut
+## Set only while a class skill forces an extra attack (Generalprobe, Gleichtakt).
+var skill_boost := 0.0
+var skill_crit := false
+var skill_attack := false
 
 
 func configure(weapon: WeaponData, weapon_tier: int = 1) -> void:
@@ -153,7 +157,26 @@ func _physics_process(delta: float) -> void:
 
 
 func attack_interval() -> float:
-	return data.cooldown_at_tier(tier, player.stats.attack_interval, player.items.attack_interval_factor())
+	var interval := data.cooldown_at_tier(tier, player.stats.attack_interval, player.items.attack_interval_factor())
+	if player.molar_skills != null: interval *= player.molar_skills.weapon_interval_factor(self)
+	return interval * player.module_interval_factor(self)
+
+
+## Extra attack requested by a class skill. Returns false without a target in
+## reach or while this weapon is still mid-swing. The extra attack never counts
+## toward skill triggers, so skills cannot chain into themselves.
+func force_attack(boost: float, guaranteed_crit: bool = false) -> bool:
+	if attack_time > 0.0 or (evolution != null and evolution.charge_time > 0): return false
+	var nearest := EnemySpatialIndex.nearest(get_tree(), player.enemy_index, player.global_position, data.range_at_tier(tier), true, null, player.global_position + home_position)
+	if nearest == null: return false
+	skill_attack = true
+	skill_boost = boost
+	skill_crit = guaranteed_crit
+	_begin_attack([nearest])
+	skill_attack = false
+	skill_boost = 0.0
+	skill_crit = false
+	return true
 
 
 func _begin_attack(targets: Array[Enemy]) -> void:
@@ -169,8 +192,16 @@ func _begin_attack(targets: Array[Enemy]) -> void:
 	if focus_target_id != nearest.get_instance_id() or focus_time <= 0.0:
 		focus_target_id = nearest.get_instance_id()
 		focus_hits = 0
-	var guaranteed := data.crit_cycle > 0 and crit_cycle_progress + 1 >= data.crit_cycle
+	if not skill_attack and player.molar_skills != null and player.molar_skills.unison_trigger(self):
+		# Gleichtakt: this attack opens the synchronized salvo itself.
+		skill_boost = MolarSkills.UNISON_BOOST
+		skill_crit = true
+	var guaranteed := skill_crit or data.crit_cycle > 0 and crit_cycle_progress + 1 >= data.crit_cycle
 	var damage := player.stats.roll_critical_damage(data.raw_damage_with_stats(tier, player.stats), data.crit_bonus, data.crit_multiplier, guaranteed)
+	damage *= 1.0 + skill_boost
+	if not skill_attack:
+		skill_boost = 0.0
+		skill_crit = false
 	if data.crit_cycle > 0:
 		crit_cycle_progress = (crit_cycle_progress + 1) % data.crit_cycle
 	damage *= 1.0 + minf(float(focus_hits) * data.focus_step, data.focus_cap)

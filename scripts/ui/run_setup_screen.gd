@@ -6,6 +6,7 @@ signal selection_changed
 signal back_requested
 signal next_requested
 signal difficulty_chosen(id: StringName)
+signal class_chosen(id: StringName)
 signal step_requested(id: StringName)
 
 var panel: Control
@@ -14,9 +15,11 @@ var body: Control
 var footer: Control
 var branding: HBoxContainer
 var brand_text: Label
+var mascot: TextureRect
 var steps: HBoxContainer
 var step_buttons: Dictionary = {}
 var difficulty_view: DifficultySelection
+var class_view: ClassSelection
 var weapon_view: WeaponSelection
 var back_button: Button
 var confirm_button: Button
@@ -27,6 +30,7 @@ var current_difficulty: StringName = &"normal"
 var committed := false
 var keyboard_focus := false
 var standalone := true
+var class_profile: PlayerClassData = ClassCatalog.DEFAULT
 var options: Array[WeaponData]:
 	get: return weapon_view.options
 var selected_id: StringName:
@@ -49,7 +53,7 @@ func _ready() -> void:
 	branding = HBoxContainer.new()
 	branding.add_theme_constant_override("separation", 12)
 	header.add_child(branding)
-	var mascot := TextureRect.new()
+	mascot = TextureRect.new()
 	mascot.texture = preload("res://assets/denti/denti_unarmed.png")
 	mascot.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	mascot.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -87,6 +91,11 @@ func _ready() -> void:
 	difficulty_view.locked_requested.connect(_locked_details)
 	difficulty_view.details_requested.connect(func(title: String, description: String) -> void:
 		details.present(title, description, get_viewport().gui_get_focus_owner()))
+	class_view = ClassSelection.new()
+	body.add_child(class_view)
+	class_view.selected.connect(class_chosen.emit)
+	class_view.details_requested.connect(func(title: String, text: String) -> void:
+		details.present(title, text, get_viewport().gui_get_focus_owner()))
 	weapon_view = WeaponSelection.new()
 	body.add_child(weapon_view)
 	weapon_view.selection_changed.connect(func() -> void:
@@ -168,6 +177,17 @@ func show_preparation(setup: RunSetup, weapons: Array[WeaponData]) -> void:
 	_show_step(setup)
 	weapon_view.focus_selection.call_deferred()
 
+func show_class(setup: RunSetup) -> void:
+	standalone = false
+	current_step = &"class"
+	committed = false
+	class_view.selected_id = setup.class_id
+	class_view.refresh()
+	for index in class_view.buttons.size():
+		class_view.buttons[index].disabled = setup.resume_pending and ClassCatalog.profiles[index].id != setup.class_id
+	_show_step(setup)
+	class_view.focus_selection.call_deferred()
+
 func show_options(weapons: Array[WeaponData], selected: StringName = &"") -> void:
 	current_step = &"weapon"
 	committed = false
@@ -176,10 +196,15 @@ func show_options(weapons: Array[WeaponData], selected: StringName = &"") -> voi
 	weapon_view.focus_selection.call_deferred()
 
 func _show_step(setup: RunSetup = null) -> void:
+	if setup != null: class_profile = ClassCatalog.by_id(setup.class_id)
+	brand_text.text = class_profile.display_name
+	_apply_class_art()
+	brand_text.tooltip_text = class_profile.description
 	details.visible = false
 	difficulty_view.visible = current_step == &"difficulty"
+	class_view.visible = current_step == &"class"
 	weapon_view.visible = current_step == &"weapon"
-	confirm_button.text = "Weiter" if current_step == &"difficulty" else "Run starten"
+	confirm_button.text = "Run starten" if current_step == &"weapon" else "Weiter"
 	confirm_button.disabled = current_step == &"weapon" and selected_id == &""
 	details_button.disabled = confirm_button.disabled
 	for id in step_buttons:
@@ -201,7 +226,7 @@ func select_weapon(index: int, notify: bool = true) -> void:
 
 func confirm_selection() -> void:
 	if committed or not is_visible_in_tree() or details.visible: return
-	if current_step == &"difficulty":
+	if current_step in [&"difficulty", &"class"]:
 		next_requested.emit()
 		return
 	var weapon := weapon_view.selected_weapon()
@@ -209,6 +234,14 @@ func confirm_selection() -> void:
 	committed = true
 	confirm_button.disabled = true
 	chosen.emit(weapon)
+
+## Header mascot and the empty weapon preview show the chosen class.
+func _apply_class_art() -> void:
+	var art: Texture2D = class_profile.portrait if class_profile.portrait != null else preload("res://assets/denti/denti_unarmed.png")
+	mascot.texture = art
+	if weapon_view.idle_art != art:
+		weapon_view.idle_art = art
+		if weapon_view.selected_id == &"": weapon_view.art.texture = art
 
 func show_details() -> void:
 	var source := get_viewport().gui_get_focus_owner()
@@ -220,10 +253,12 @@ func show_details() -> void:
 	if current_step == &"difficulty":
 		var data := DifficultyCatalog.by_id(current_difficulty)
 		details.present(data.display_name, data.description, source)
+	elif current_step == &"class":
+		details.present(class_profile.display_name, DentipediaData.class_body(class_profile), source)
 	else:
 		var weapon := weapon_view.selected_weapon()
 		if weapon == null: return
-		details.present(weapon.display_name, RunSetupPresentation.details(weapon), source)
+		details.present(weapon.display_name, RunSetupPresentation.details(weapon) + "\n\n" + class_profile.display_name + "\n" + class_profile.description, source)
 
 func _locked_details(id: StringName) -> void:
 	details.present(DifficultyCatalog.by_id(id).display_name, "Ein Sieg auf Hard schaltet Hell frei.", difficulty_view.buttons[id])
@@ -247,6 +282,7 @@ func _sync_input_mode() -> void:
 	details.keyboard_focus = keyboard_focus
 	difficulty_view.keyboard_focus = keyboard_focus
 	difficulty_view.refresh()
+	class_view.refresh()
 	weapon_view.keyboard_focus = keyboard_focus
 	weapon_view.refresh()
 	for button in [back_button, confirm_button, details_button, details.close_button] + step_buttons.values():
@@ -273,8 +309,9 @@ func _layout() -> void:
 	var compact := rect.size.x < 600 or rect.size.y < 480
 	header.size = Vector2(rect.size.x, 44 if compact else 60)
 	brand_text.visible = rect.size.x >= 650
+	branding.visible = rect.size.x >= 420 or standalone
 	branding.position = Vector2.ZERO
-	branding.size = Vector2(130 if brand_text.visible else 40, header.size.y)
+	branding.size = Vector2(250 if brand_text.visible else 40, header.size.y)
 	for button: Button in step_buttons.values(): button.add_theme_font_size_override("font_size", 14 if compact else 18)
 	steps.reset_size()
 	steps.size.y = header.size.y
@@ -282,7 +319,7 @@ func _layout() -> void:
 	var content := RunSetupLayout.body(rect.size)
 	body.position = content.position
 	body.size = content.size
-	for view in [difficulty_view, weapon_view]:
+	for view in [difficulty_view, class_view, weapon_view]:
 		view.position = Vector2.ZERO
 		view.size = content.size
 	footer.position = Vector2(0, rect.size.y - (52 if compact else 56))

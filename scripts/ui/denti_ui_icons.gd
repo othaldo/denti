@@ -13,6 +13,26 @@ const ITEM_FAMILIES: Array[Texture2D] = [
 const ITEM_MYTHIC: Texture2D = preload("res://assets/items/item_icons_mythic_packed.png")
 const DODGE_ATLAS: Texture2D = preload("res://assets/items/item_icons_dodge_packed.png")
 const RELIC_ATLAS: Texture2D = preload("res://assets/relics/relic_icons_atlas.png")
+const POISON_ATLAS: Texture2D = preload("res://assets/items/item_icons_poison.png")
+const TALENT_ATLAS: Texture2D = preload("res://assets/classes/talent_icons.webp")
+const TALENT_COLUMNS := 8
+const TALENT_ROWS := 4
+const MOLAR_TALENT_ATLAS: Texture2D = preload("res://assets/classes/molar_talent_icons.webp")
+const MOLAR_TALENT_COLUMNS := 5
+const MOLAR_TALENT_ROWS := 3
+const ASSASSIN_TALENT_ATLAS: Texture2D = preload("res://assets/classes/assassin_talent_icons.webp")
+const ASSASSIN_TALENT_COLUMNS := 7
+const ASSASSIN_TALENT_ROWS := 2
+const ASSASSIN_TALENT_COUNT := 13
+const ROSTER_TALENT_COLUMNS := 8
+const ROSTER_TALENT_ROWS := 3
+# Atlas order matches ATLAS_BASE in tools/generate_class_roster.py.
+const ROSTER_TALENT_ATLASES: Array[Texture2D] = [
+	preload("res://assets/classes/tooth_fairy_talent_icons.webp"),
+	preload("res://assets/classes/ember_talent_icons.webp"),
+	preload("res://assets/classes/rinser_talent_icons.webp"),
+	preload("res://assets/classes/frost_warden_talent_icons.webp"),
+]
 const HUD_ATLAS: Texture2D = preload("res://assets/ui/hud_icons_atlas.png")
 const STAT_ATLAS: Texture2D = preload("res://assets/ui/stat_icons_atlas.png")
 const RANGE: Texture2D = preload("res://assets/ui/range.svg")
@@ -70,6 +90,8 @@ const HUD_ROWS := 2
 
 
 static func item(index: int) -> Texture2D:
+	if index >= 103 and index <= 105:
+		return _poison_icon(index - 103)
 	if index >= SUPPORT_ICON_START and index < SUPPORT_ICON_START + SUPPORT_REGIONS.size():
 		var region := SUPPORT_REGIONS[index - SUPPORT_ICON_START]
 		# Equal visible length for wide arrows, round targets and diagonal slashes.
@@ -96,6 +118,27 @@ static func hud(index: int) -> Texture2D:
 	return _region(HUD_ATLAS, clampi(index, 0, HUD_COLUMNS * HUD_ROWS - 1), HUD_COLUMNS, HUD_ROWS)
 
 
+static func talent(index: int) -> Texture2D:
+	if index < 0: return null
+	var base_count := TALENT_COLUMNS * TALENT_ROWS
+	if index < base_count:
+		return _region(TALENT_ATLAS, index, TALENT_COLUMNS, TALENT_ROWS)
+	var cell := index - base_count
+	var molar_count := MOLAR_TALENT_COLUMNS * MOLAR_TALENT_ROWS
+	if cell < molar_count:
+		return _region(MOLAR_TALENT_ATLAS, cell, MOLAR_TALENT_COLUMNS, MOLAR_TALENT_ROWS)
+	cell -= molar_count
+	var assassin_capacity := ASSASSIN_TALENT_COLUMNS * ASSASSIN_TALENT_ROWS
+	if cell < assassin_capacity:
+		return _region(ASSASSIN_TALENT_ATLAS, cell, ASSASSIN_TALENT_COLUMNS, ASSASSIN_TALENT_ROWS) if cell < ASSASSIN_TALENT_COUNT else null
+	cell -= assassin_capacity
+	var atlas_capacity := ROSTER_TALENT_COLUMNS * ROSTER_TALENT_ROWS
+	@warning_ignore("integer_division")
+	var atlas_index := cell / atlas_capacity
+	if atlas_index >= ROSTER_TALENT_ATLASES.size(): return null
+	return _region(ROSTER_TALENT_ATLASES[atlas_index], cell % atlas_capacity, ROSTER_TALENT_COLUMNS, ROSTER_TALENT_ROWS)
+
+
 static func stat(index: int) -> Texture2D:
 	if index == 11:
 		return STAMINA
@@ -107,7 +150,14 @@ static func stat(index: int) -> Texture2D:
 
 
 static func relic(index: int) -> Texture2D:
+	if index == 5: return _poison_icon(2)
 	return _region(RELIC_ATLAS, clampi(index, 0, 4), 3, 2)
+
+
+static func _poison_icon(index: int) -> Texture2D:
+	var size := POISON_ATLAS.get_size()
+	var cell := Vector2(size.x / 3.0, size.y)
+	return _framed_region(POISON_ATLAS, Rect2(Vector2(cell.x * index, 0), cell), Vector2.ONE * maxf(cell.x, cell.y))
 
 
 static func _region(atlas: Texture2D, index: int, columns: int, rows: int) -> Texture2D:

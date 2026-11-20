@@ -46,6 +46,7 @@ var cached_pickup_range: float = Loot.MAGNET_DISTANCE
 
 func _ready() -> void:
 	effect_context.player = player
+	effect_context.relics = relics
 	effect_context.inventory_data = inventory_data
 	effect_context.feedback.connect(feedback.emit)
 	effect_context.enchantment_support.connect(enchantment_support.emit)
@@ -55,6 +56,7 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	effect_context.poison_build.advance(delta)
 	for key in cooldowns.keys():
 		cooldowns[key] = maxf(float(cooldowns[key]) - delta, 0.0)
 		if str(key).begins_with("enchantment_leech:") and float(cooldowns[key]) <= 0:
@@ -126,12 +128,14 @@ func acquire(item: ShopOfferData) -> bool:
 
 func preferred_tags(loadout: WeaponLoadout) -> Array[StringName]:
 	var result: Array[StringName] = []
+	if is_instance_valid(loadout.stats): result.assign(loadout.stats.class_data.preferred_tags)
 	for template in ItemCatalog.ALL:
 		if template.weapon_data == null and count(template.id) > 0:
 			for tag in template.tags:
 				if not result.has(tag):
 					result.append(tag)
 	for weapon in loadout.equipped():
+		if weapon.data.damage_type == "Wasser" and not result.has(&"water"): result.append(&"water")
 		var tag: StringName = &"ranged" if weapon.data.attack_mode in [&"projectile", &"beam", &"beam_line", &"cone"] else &"melee"
 		if not result.has(tag):
 			result.append(tag)
@@ -141,11 +145,13 @@ func preferred_tags(loadout: WeaponLoadout) -> Array[StringName]:
 			for build_tag in WeaponAffixes.by_id(StringName(affix.id)).build_tags:
 				if not result.has(build_tag):
 					result.append(build_tag)
+	if is_instance_valid(loadout.stats) and loadout.stats.crit_chance >= 0.15 and not result.has(&"crit"): result.append(&"crit")
+	if (power(&"wave_shield") > 0 or power(&"overheal_shield") > 0 or is_instance_valid(loadout.stats) and loadout.stats.shield_charges > 0) and not result.has(&"shield"): result.append(&"shield")
 	return result
 
 
 func pickup_range() -> float:
-	return cached_pickup_range
+	return cached_pickup_range * player.module_pickup_factor()
 
 
 func coin_double_chance() -> float:
@@ -181,10 +187,13 @@ func attack_interval_factor() -> float:
 		temporary_bonus = minf(power(&"sugar_rush"), 0.50) * 100.0
 	elif sugar_crash_time > 0.0:
 		temporary_bonus = -25.0
+	if player.molar_skills != null: temporary_bonus += player.molar_skills.attack_speed_bonus()
+	temporary_bonus += player.module_attack_speed_bonus()
 	return player.stats.attack_interval_with_bonus(temporary_bonus) / player.stats.attack_interval
 
 
 func on_wave_start() -> void:
+	effect_context.poison_build.clear()
 	puddles.clear()
 	sugar_kills_progress = 0
 	sugar_rush_time = 0.0
@@ -265,6 +274,8 @@ func on_kill(at: Vector2, is_boss: bool) -> int:
 
 func modify_damage(enemy: Enemy, weapon: WeaponData, base: float) -> float:
 	var bonus := base_weapon_damage_bonus()
+	bonus += player.class_combat.damage_bonus(enemy, weapon)
+	bonus += player.module_damage_bonus(enemy, weapon)
 	if enemy.data.is_boss:
 		bonus += power(&"boss_bonus") * 100.0
 	if enemy.has_bleeding():
@@ -327,6 +338,7 @@ func create_puddle(at: Vector2) -> void:
 
 
 func on_enemy_died(enemy: Enemy, _amount: float) -> void:
+	effect_context.poison_build.on_enemy_died(effect_context, enemy)
 	WeaponEnchantmentEffects.on_enemy_died(effect_context, enemy)
 	if not enemy.has_bleeding() or power(&"bleed_spread") <= 0.0:
 		return
@@ -397,6 +409,7 @@ func save_data() -> Dictionary:
 
 
 func restore(saved: Dictionary) -> void:
+	effect_context.poison_build.clear()
 	owned.clear()
 	for key in saved.get("owned", {}):
 		var template := ItemCatalog.by_id(StringName(str(key)))
@@ -429,7 +442,7 @@ func _rebuild_powers() -> void:
 
 
 func power(effect_kind: StringName) -> float:
-	return float(powers.get(effect_kind, 0.0))
+	return float(powers.get(effect_kind, 0.0)) + float(effect_context.extra_powers.get(str(effect_kind), 0.0))
 
 
 func ready_proc(effect_kind: StringName, wait: float) -> bool:

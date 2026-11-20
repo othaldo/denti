@@ -1,6 +1,6 @@
 # Items und Builds
 
-Die Zahnklinik bietet **94 Items**: 17 Familien mit je vier Seltenheiten, 17 ergänzende Spezialitems und neun einmalige Mythics. Alle ursprünglichen 32 Items behalten ihre IDs, Effekte und Icons; 62 neue Items ergänzen den Pool. [Zahnflutsch: Ausweichen und fünf neue Items](DODGE.md).
+Die Zahnklinik bietet **96 Items**: 17 Familien mit je vier Seltenheiten, 19 ergänzende Spezialitems und neun einmalige Mythics. Alle ursprünglichen 32 Items behalten ihre IDs, Effekte und Icons; 64 neue Items ergänzen den Pool. [Zahnflutsch](DODGE.md), [Giftpaket](POISON_PACKAGE.md).
 
 **Common / Gewöhnlich**, **Uncommon / Ungewöhnlich**, **Rare / Selten** und **Legendary / Legendär** bieten verschiedene Kombinationen aus Bonus, Synergie und Nachteil. Seltenere Varianten sind eigene Items: Sie ersetzen vorhandene Exemplare nicht und fusionieren nicht. Das **Familienlimit liegt bei zwölf Exemplaren über alle vier Seltenheiten zusammen**. Frühe Käufe lassen damit Platz für spätere, seltenere Varianten. Spezialitems lassen sich in der Regel sechsmal stapeln. Goldsonde, Zahnfee-Pfand, Speichelkelch, Amalgamkern und Zuckerschock behalten wegen ihrer begrenzten Spezialeffekte zwei Exemplare; Göttliches Siegel und Mythics bleiben einmalig. Gespeicherte Builds behalten ihren Besitz.
 
@@ -13,6 +13,21 @@ Bisskraft und Item-Prozentboni werden addiert; Folgeeffekte skalieren einen bere
 Die [ursprünglichen Designnotizen](ITEM_RARITY_EXPANSION.md) erklären die Auswahl; ihre niedrigeren Limits sind durch diese Stapelregeln ersetzt. Die [Attributübersicht](ATTRIBUTES.md) definiert die einheitlichen Namen: Härte ist Rüstung, Schmelz sind maximale HP. Die Tabellen geben die Ressourcentexte wieder; im Spiel werden deren ältere Bezeichnungen zentral aufgelöst. [Alle 56 neuen Icons in Kartengröße](screenshots/item_families_icons_48px.png).
 
 Verzauberungen verbinden diese Familien zusätzlich: Blutungsitems unterstützen auch verzauberte Waffen; Kettenitems erweitern Elektro auf bis zu drei Sprünge. Leitlack verstärkt Elektro gegen nasse Ziele, Nässeverzauberungen aktivieren Spülpfützen und Lebensraub kann Heilungsbuilds ergänzen. [Mechaniken, Grenzen und Zahlen](WEAPON_AFFIXES.md).
+
+## Gift / Zielwechsel
+
+Beide Items sind **einmal pro Run** kaufbar und funktionieren mit Good Old Molar.
+Depotfüllung benötigt keine Giftverzauberung. Nervensonde benötigt Restgift
+aus einer Verzauberung oder einem Depot.
+
+| Seltenheit | Item | Vollständiger Effekt | Basispreis |
+| --- | --- | --- | ---: |
+| Common | Depotfüllung | Reale Waffentreffer legen ein Giftdepot für 6 s an. Budget: 125 % des Waffen-Grundtreffers je Wurzel, mindestens 18 vor Bisskraft; Waffenstufe und Nah-/Fernschaden zählen, Krits und Bossmultiplikatoren nicht. Bereits vorhandenes Restgift erhöht es um 35 %, höchstens bis zum doppelten Grundbudget. Maximal drei Ziele, 0,6 s gemeinsames Intervall, dasselbe Ziel erst nach 8 s. −3 % Putzeifer. | 7 |
+| Uncommon | Nervensonde | Reale Waffentreffer auf vergiftete Ziele bremsen sie 1,4 s um 25 %, pro Ziel alle 3 s. Halbe Wirkung auf Eliten, Viertelwirkung auf Bosse; die stärkste Verlangsamung zählt. | 9 |
+
+Ticks lösen keine Depots, erneute Kontrolle oder Heilung aus. Depots wirken nach
+einem Rückzug weiter. Der [Giftzahn](relics.md) kann einen Teil bestehenden
+Restgifts beim Wechsel früher wirken lassen; er erzeugt dabei kein neues Budget.
 
 ## Schmelz / HP
 

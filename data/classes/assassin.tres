@@ -1,0 +1,46 @@
+[gd_resource type="Resource" script_class="PlayerClassData" load_steps=10 format=3]
+[ext_resource type="Script" path="res://scripts/player/player_class_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/player/class_stat_rule_data.gd" id="2"]
+[ext_resource type="Script" path="res://scripts/player/dash_data.gd" id="3"]
+[ext_resource type="Script" path="res://scripts/player/class_combat_data.gd" id="4"]
+[ext_resource type="Resource" path="res://data/talents/assassin.tres" id="5"]
+[ext_resource type="Texture2D" path="res://assets/classes/assassin_portrait_v2.png" id="6"]
+[sub_resource type="Resource" id="Melee"]
+script = ExtResource("2")
+stat = &"melee_damage"
+gain_factor = 1.25
+[sub_resource type="Resource" id="Dash"]
+script = ExtResource("3")
+capacity = 150.0
+cost = 75.0
+recharge_rate = 30.0
+cooldown = 0.45
+contact_damage_multiplier = 0.0
+max_stamina_bonus = 200.0
+[sub_resource type="Resource" id="Combat"]
+script = ExtResource("4")
+trail_enabled = true
+trail_damage = 16.0
+trail_melee_scaling = 1.5
+trail_poison = 30.0
+trail_poison_scaling = 2.0
+trail_refund = 10.0
+trail_refund_cap = 40.0
+trail_sugar_factor = 2.0
+[resource]
+script = ExtResource("1")
+id = &"assassin"
+tagline = "Mitten durch die Horde: Jeder Dash zieht eine Giftschneise."
+play_style = Array[String](["Dashe durch Gruppen: Die Schneise schnappt zu und bleibt als Giftfeld liegen", "Kein Kontaktschaden im Dash, Spur-Kills laden Wurzelkraft nach", "Nur 4 Wurzeln, nur Kontaktwaffen, weniger Schmelz"])
+portrait = ExtResource("6")
+combat_sprite = ExtResource("6")
+display_name = "Assassine"
+description = "4 Wurzeln · nur kurze Kontaktwaffen. 85 Schmelz, +3 Nahschaden, +8 % Bewegung. Zwei Dashes ohne Kontaktschaden. Giftschneise: Jeder Dash zieht eine Giftspur, die zuschnappt und 3 s als Giftfeld liegen bleibt. Spur-Kills geben Wurzelkraft zurück."
+root_capacity = 4
+starting_stats = {"max_health": -15.0, "melee_damage": 3.0, "speed_bonus": 8.0}
+stat_rules = Array[ExtResource("2")]([SubResource("Melee")])
+allowed_weapon_roles = Array[StringName]([&"contact"])
+preferred_tags = Array[StringName]([&"melee", &"mobility", &"poison"])
+dash_override = SubResource("Dash")
+combat_rules = SubResource("Combat")
+talent_tree = ExtResource("5")

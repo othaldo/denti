@@ -8,12 +8,15 @@ signal ring_requested(at: Vector2, radius: float, color: Color)
 signal puddle_requested(at: Vector2)
 
 var player: Player
+var relics: RelicInventory
+var poison_build := PoisonBuildEffects.new()
 var inventory_data: ItemInventoryData
 var cooldowns: Dictionary = {}
+var extra_powers: Dictionary = {}
 
 
 func power(kind: StringName) -> float:
-	return float(inventory_data.powers.get(kind, 0.0))
+	return float(inventory_data.powers.get(kind, 0.0)) + float(extra_powers.get(str(kind), 0.0))
 
 
 func ready_proc(kind: StringName, wait: float) -> bool:

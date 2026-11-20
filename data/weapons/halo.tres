@@ -12,6 +12,7 @@ filter_clip = true
 script = ExtResource("1")
 role = "Heiligenschein"
 id = &"halo"
+class_roles = Array[StringName]([&"ranged"])
 display_name = "Heiligenschein"
 description = "Kronen kreisen kurz am Ziel und kehren durch Gegner zu Denti zurück."
 hands = 2

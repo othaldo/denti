@@ -69,6 +69,7 @@ func _ready() -> void:
 		setup_selector.selection_changed.connect(_save_weapon_preview)
 		setup_selector.chosen.connect(_launch_prepared_run)
 		setup_selector.difficulty_chosen.connect(_select_setup_difficulty)
+		setup_selector.class_chosen.connect(_select_setup_class)
 		setup_selector.next_requested.connect(_advance_setup)
 		setup_selector.step_requested.connect(_visit_setup_step)
 		_show_home()
@@ -392,6 +393,7 @@ func _show_stats() -> void:
 	_clear_rows()
 	_build_navigation(&"stats")
 	var stats: PlayerStats = game.player.stats
+	DentiUIComponents.label(rows, stats.class_data.display_name, 18)
 	var wave_text := "Endlos · Welle %d" % game.wave.current_wave if game.wave.endless_enabled else "Welle %d / %d" % [game.wave.current_wave, WaveController.MAX_WAVES]
 	DentiUIComponents.label(rows, "Leben %.0f / %.0f · Schild %d · Level %d\nXP %d / %d · %s\nOffene Aufstiege: %d" % [stats.health, stats.max_health, stats.shield_charges, game.level, game.xp, game.xp_goal, wave_text, game.rewards.pending_levels], 16)
 	var wallet := HBoxContainer.new()
@@ -676,7 +678,7 @@ func _choose_new_run() -> void:
 		setup.story_mode = session.selected_story_mode
 		setup.difficulty_id = session.selected_difficulty_id
 	setup.resume_pending = false
-	setup.root_capacity = PlayerStats.DEFAULT_ROOT_CAPACITY
+	setup.root_capacity = ClassCatalog.by_id(setup.class_id).root_capacity
 	if session.has_run():
 		_show_new_game_confirmation()
 		return
@@ -749,6 +751,13 @@ func _advance_setup() -> void:
 	setup.next_step()
 	_show_setup_step()
 
+func _select_setup_class(id: StringName) -> void:
+	if setup == null or not setup.select_class(id): return
+	setup_selector.class_profile = ClassCatalog.by_id(setup.class_id)
+	setup_selector.brand_text.text = setup_selector.class_profile.display_name
+	setup_selector.brand_text.tooltip_text = setup_selector.class_profile.description
+	setup.save_to(_draft_path())
+
 
 func _setup_back() -> void:
 	if setup != null and setup.previous_step():
@@ -760,6 +769,11 @@ func _setup_back() -> void:
 func _show_setup_step() -> void:
 	match setup.step:
 		&"difficulty": _show_difficulty()
+		&"class":
+			page = &"class"
+			setup.mark_reached(page)
+			setup_selector.show_class(setup)
+			setup.save_to(_draft_path())
 		&"weapon": _show_setup_weapons()
 
 
@@ -771,7 +785,7 @@ func _show_setup_weapons() -> void:
 	setup_selector.visible = true
 	var options: Array[WeaponData] = []
 	for weapon in WeaponCatalog.ALL:
-		if weapon.hands <= setup.root_capacity: options.append(weapon)
+		if WeaponEligibility.starter(weapon, ClassCatalog.by_id(setup.class_id), setup.root_capacity): options.append(weapon)
 	setup.mark_reached(page)
 	setup_selector.show_preparation(setup, options)
 	setup.weapon_id = setup_selector.selected_id
@@ -789,10 +803,11 @@ func _start_new_game(difficulty_id: StringName) -> void:
 	if setup == null: setup = RunSetup.new()
 	_select_setup_difficulty(difficulty_id)
 	_advance_setup()
+	if setup.step == &"class": _advance_setup() # Existing preview/tool entrypoint.
 
 
 func _launch_prepared_run(weapon: WeaponData) -> void:
-	if launching_run or setup == null or weapon not in WeaponCatalog.ALL or weapon.hands > setup.root_capacity:
+	if launching_run or setup == null or weapon not in WeaponCatalog.ALL or ClassCatalog.by_id(setup.class_id) == null or not WeaponEligibility.starter(weapon, ClassCatalog.by_id(setup.class_id), setup.root_capacity):
 		return
 	if not session.select_difficulty(setup.difficulty_id):
 		_show_difficulty()
@@ -800,6 +815,8 @@ func _launch_prepared_run(weapon: WeaponData) -> void:
 	launching_run = true
 	session.selected_story_mode = setup.story_mode
 	session.pending_start_weapon_id = weapon.id
+	session.pending_start_class_id = setup.class_id
+	session.pending_talent_run = not setup.resume_pending
 	var saved: Dictionary = session.load_run() if setup.resume_pending else {}
 	if not saved.is_empty() and bool(saved.get("starter_pending", false)):
 		saved["difficulty_id"] = str(setup.difficulty_id)
@@ -828,6 +845,7 @@ func _continue_game() -> void:
 		setup.weapon_id = StringName(str(saved.get("starter_preview", "")))
 		setup.story_mode = bool(saved.get("story", {}).get("enabled", false))
 		setup.root_capacity = int(saved.get("player", {}).get("stats", {}).get("root_capacity", PlayerStats.DEFAULT_ROOT_CAPACITY))
+		setup.class_id = StringName(str(saved.get("player", {}).get("class_state", {}).get("id", "good_old_molar")))
 		setup.resume_pending = true
 		_show_setup_step()
 		return

@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="PlayerClassData" load_steps=5 format=3]
+[ext_resource type="Script" path="res://scripts/player/player_class_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/talents/tooth_fairy.tres" id="2"]
+[ext_resource type="Texture2D" path="res://assets/classes/tooth_fairy_portrait.png" id="3"]
+[ext_resource type="Script" path="res://scripts/player/dash_data.gd" id="4"]
+[sub_resource type="Resource" id="Dash"]
+script = ExtResource("4")
+capacity = 100.0
+cost = 100.0
+distance = 230.0
+duration = 0.3
+[resource]
+script = ExtResource("1")
+id = &"tooth_fairy"
+tagline = "Für jeden Zahn eine Münze: Jede eingesammelte Beute feuert einen Lichtsplitter."
+play_style = Array[String](["Jede eingesammelte Beute feuert einen Lichtsplitter auf den nächsten Gegner", "Glück und Münzen machen die Splitter stärker", "Kaum Beutemagnet, weniger Waffenschaden, nur 5 Wurzeln"])
+portrait = ExtResource("3")
+combat_sprite = ExtResource("3")
+display_name = "Zahnfee"
+description = "Die Zahnfee hat kaum Beutemagnet. Jede Beute, die sie im Kampf einsammelt, feuert einen Lichtsplitter auf den nächsten Gegner; Glück verstärkt ihn, Glanz lässt ihn kritisch treffen. Ihr Dash ist ein langer Gleitflug."
+root_capacity = 5
+starting_stats = {"damage_bonus": -15.0, "luck": 10.0}
+preferred_tags = Array[StringName]([&"economy", &"luck", &"crit"])
+dash_override = SubResource("Dash")
+talent_tree = ExtResource("2")

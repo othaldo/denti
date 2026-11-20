@@ -22,7 +22,7 @@ func with_tier(new_tier: int) -> UpgradeData:
 
 func with_stat_context(stats: PlayerStats) -> UpgradeData:
 	if stat == &"dash_recovery_bonus":
-		amount = minf(amount, PlayerStats.DASH_CONFIG.max_stamina_bonus - stats.stamina_bonus())
+		amount = minf(amount, stats.class_data.dash_config().max_stamina_bonus - stats.stamina_bonus())
 	return self
 
 

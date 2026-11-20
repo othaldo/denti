@@ -8,3 +8,4 @@ id = &"shattered_halo"
 display_name = "Splitter-Heiligenschein"
 description = "Blockt ein Schild Schaden, verursachen deine Waffen vier Sekunden lang 30 % mehr Schaden."
 icon_index = 2
+tags = Array[StringName]([&"shield"])

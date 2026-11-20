@@ -21,6 +21,10 @@ func _menu() -> void:
 	current_scene = menu
 	await _settle()
 
+func _weapons() -> void:
+	menu._advance_setup()
+	if menu.page == &"class": menu._advance_setup()
+
 func _run() -> void:
 	session = root.get_node("GameSession")
 	session.save_path = "user://menu_setup_test.json"
@@ -32,11 +36,12 @@ func _run() -> void:
 	menu._new_game()
 	menu.difficulty_buttons[&"hard"].pressed.emit()
 	_check(menu.page == &"difficulty" and not session.has_run(), "difficulty click started a run")
-	menu._advance_setup()
+	_weapons()
 	menu.setup_selector.select_weapon(7)
 	menu.setup_selector.back_button.pressed.emit()
+	menu._setup_back()
 	_check(menu.page == &"difficulty" and menu.setup.difficulty_id == &"hard", "back forgot the difficulty")
-	menu._advance_setup()
+	_weapons()
 	_check(menu.setup_selector.selected_id == WeaponCatalog.ALL[7].id, "forward forgot the weapon")
 	for extent in [Vector2i(320, 568), Vector2i(568, 320), Vector2i(720, 1280), Vector2i(1040, 600), Vector2i(1280, 720), Vector2i(1920, 1080)]:
 		root.content_scale_size = extent
@@ -46,13 +51,14 @@ func _run() -> void:
 		var view := menu.setup_selector
 		_check(screen.encloses(view.panel.get_global_rect()) and view.panel.get_global_rect().encloses(view.back_button.get_global_rect()) and view.panel.get_global_rect().encloses(view.confirm_button.get_global_rect()), "weapon navigation overflow at %s" % extent)
 		menu._setup_back()
+		menu._setup_back()
 		await _settle()
 		_check(screen.encloses(view.panel.get_global_rect()), "difficulty overflow at %s: %s" % [extent, view.panel.get_global_rect()])
 		for card: Button in menu.difficulty_buttons.values():
 			for label_name in ["Title", "Requirement"]:
 				var label: Label = card.get_node(label_name)
 				_check(card.get_global_rect().grow(0.5).encloses(label.get_global_rect()), "difficulty caption overflow at %s" % extent)
-		menu._advance_setup()
+		_weapons()
 		await _settle()
 		_check(current_scene == menu and root.get_node_or_null("Game") == null and not session.has_run(), "arena instantiated during preparation")
 	# Restarting the app/menu must preserve the draft without inventing a combat save.
@@ -77,7 +83,7 @@ func _run() -> void:
 	menu._new_game()
 	menu._show_difficulty()
 	menu.difficulty_buttons[&"easy"].pressed.emit()
-	menu._advance_setup()
+	_weapons()
 	menu.setup_selector.select_weapon(0)
 	menu._setup_back()
 	menu._setup_back()
@@ -105,7 +111,7 @@ func _run() -> void:
 	await _menu()
 	menu._continue_game()
 	_check(menu.page == &"difficulty" and menu.setup.weapon_id == WeaponCatalog.ALL[4].id, "migrated draft changes were lost")
-	menu._advance_setup()
+	_weapons()
 	menu.setup_selector.confirm_button.pressed.emit()
 	await _settle()
 	game = current_scene
@@ -115,7 +121,7 @@ func _run() -> void:
 	session.clear_run()
 	await _menu()
 	menu._new_story_game()
-	menu._advance_setup()
+	_weapons()
 	menu.setup_selector.select_weapon(1)
 	menu.setup_selector.confirm_selection()
 	await _settle()

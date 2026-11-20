@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"poison_depot"
+display_name = "Depotfüllung"
+description = "Treffer setzen ein Giftdepot. Über 6 s: 125 % des Waffen-Grundtreffers je Wurzel, mindestens 18; Bisskraft und Nah-/Fernschaden skalieren. Bis zu 3 Ziele, alle 0.6 s; Zielpause 8 s. Restgift erhöht das Depot um 35 %, höchstens auf das Doppelte. -3 % Putzeifer."
+rarity_tier = 1
+price = 7
+icon_index = 103
+stat_changes = { &"attack_speed": -3.0 }
+effect_kind = &"poison_depot"
+effect_value = 1.0
+max_stacks = 1
+tags = Array[StringName]([&"poison", &"preparation", &"mobility"])

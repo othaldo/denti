@@ -8,3 +8,4 @@ id = &"blood_moon_tooth"
 display_name = "Blutmond-Zahn"
 description = "Blutende Gegner explodieren beim Tod und verteilen Blutung. Auch Verzauberungen zählen. Keine Ketten."
 icon_index = 0
+tags = Array[StringName]([&"bleed"])

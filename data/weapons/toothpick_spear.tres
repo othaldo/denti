@@ -12,6 +12,7 @@ filter_clip = true
 script = ExtResource("1")
 role = "Gegnerlinien im Nahkampf durchstoßen"
 id = &"toothpick_spear"
+class_roles = Array[StringName]([&"reach"])
 display_name = "Zahnstocher-Speer"
 description = "1 Wurzel · Langer Stich trifft Gegner auf einer schmalen Linie."
 hands = 1

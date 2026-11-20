@@ -6,6 +6,7 @@ var remaining := TICK_INTERVAL
 # Fixed future installments per type: repeated hits add their own budget rather
 # than refreshing/multiplying an existing DPS stack. Memory is bounded by duration.
 var pending: Dictionary = {}
+var depot := PoisonDepotState.new()
 var fire_budget: float = 0.0
 var fire_time: float = 0.0
 var fire_can_spread: bool = false
@@ -20,7 +21,7 @@ var holy_power: float = 0.0
 const MAX_DOT_DURATION := 8.0
 
 func is_active() -> bool:
-	return not pending.is_empty() or poison_time > 0 or holy_time > 0 or fire_time > 0
+	return not pending.is_empty() or poison_time > 0 or holy_time > 0 or fire_time > 0 or depot.active()
 
 func apply(kind: StringName, amount: float, can_spread: bool = true, duration: float = 0.0) -> void:
 	var definition := WeaponAffixes.by_id(kind)
@@ -59,6 +60,8 @@ func budget(kind: StringName) -> float:
 	return total
 
 func advance(enemy: Enemy, delta: float) -> void:
+	depot.advance(enemy, delta)
+	if enemy.health <= 0: return
 	var had_marks := holy_marks > 0
 	poison_lock = maxf(poison_lock - delta, 0)
 	poison_time = maxf(poison_time - delta, 0)
@@ -102,12 +105,14 @@ func advance(enemy: Enemy, delta: float) -> void:
 
 func save_data() -> Dictionary:
 	return {"remaining": remaining, "pending": pending.duplicate(true),
+		"depot": depot.save_data(),
 		"fire_budget": fire_budget, "fire_time": fire_time, "fire_can_spread": fire_can_spread,
 		"poison_stacks": poison_stacks, "poison_time": poison_time, "poison_lock": poison_lock,
 		"ice_power": ice_power, "holy_marks": holy_marks, "holy_time": holy_time, "holy_power": holy_power}
 
 func restore(saved: Dictionary) -> void:
 	pending.clear()
+	depot.restore(saved.get("depot", {}))
 	fire_budget = maxf(float(saved.get("fire_budget", 0)), 0)
 	fire_time = clampf(float(saved.get("fire_time", 0)), 0, WeaponAffixes.by_id(&"fire").dot_duration)
 	fire_can_spread = bool(saved.get("fire_can_spread", false))
@@ -133,6 +138,10 @@ func restore(saved: Dictionary) -> void:
 			pending[kind] = ticks
 
 func draw_markers(enemy: Enemy) -> void:
+	if not depot.ticks.is_empty():
+		enemy.draw_arc(Vector2.ZERO, enemy.data.radius + 3, -PI * 0.85, -PI * 0.15, 12, WeaponAffixes.by_id(&"poison").color, 2.5)
+	if depot.nerve_time > 0:
+		enemy.draw_line(Vector2(-5, enemy.data.radius + 3), Vector2(5, enemy.data.radius + 3), Color(0.7, 0.35, 1), 2.5)
 	var offset := 0
 	for definition in WeaponAffixes.ALL:
 		if enemy.data.affix_resistance(definition.id) > 0:
@@ -149,3 +158,15 @@ func draw_markers(enemy: Enemy) -> void:
 	if holy_time > 0 and holy_marks > 0:
 		for index in holy_marks:
 			enemy.draw_circle(Vector2(-7 + index * 7, -enemy.data.radius - 14), 2.5, WeaponAffixes.by_id(&"holy").color)
+
+# Preserve the remaining tick schedule and resistance already paid at application.
+func consume_poison(amount: float) -> float:
+	var ordinary := budget(&"poison")
+	var total := ordinary + depot.budget()
+	var spent := minf(maxf(amount, 0), total)
+	if total <= 0: return 0
+	var fraction := spent / total
+	var ticks: Array = pending.get("poison", [])
+	for index in ticks.size(): ticks[index] *= 1.0 - fraction
+	depot.consume(depot.budget() * fraction)
+	return spent

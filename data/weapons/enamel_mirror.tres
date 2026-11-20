@@ -12,6 +12,7 @@ filter_clip = true
 script = ExtResource("1")
 role = "Präziser Lichttreffer"
 id = &"enamel_mirror"
+class_roles = Array[StringName]([&"ranged"])
 display_name = "Schmelzspiegel"
 description = "1 Wurzel · Lichtstrahl · sofortiger Treffer"
 hands = 1

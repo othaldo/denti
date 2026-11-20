@@ -2,7 +2,19 @@
 
 Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü angezeigt. 0.1.0 wurde rückblickend anhand der Git-Historie dokumentiert; 0.2.0 bündelt die seitdem entstandenen Änderungen. Die Einträge beschreiben implementierte Funktionen. Weitere Pläne stehen in der [Roadmap](docs/ROADMAP.md).
 
-## Noch ohne neue Versionsnummer — 02.11.2026
+## 0.8.0 — 20.11.2026
+
+- **Sechs Klassen mit eigenem Spielprinzip:** Neben Good Old Molar gibt es Assassine (Dash zieht eine Giftschneise), Zahnfee (eingesammelte Beute feuert Lichtsplitter), Glutzahn (Hitze aufbauen und in der Horde ausbrechen), Spültechniker (nasse Laufspur, Strom folgt ihr) und Frostwächter (Dash zieht eine Eiswand). Jede Klasse hat eigene Wurzeln, Startwerte und einen klaren Nachteil. [Klassen-Essenz](docs/CLASS_ESSENCE.md), [Klassenplan](docs/CLASS_ROSTER_PLAN.md).
+
+- **Echter Talentbaum statt Statkarten:** Drei Äste nebeneinander, Reihen öffnen sich über investierte Punkte, Pfeile zeigen Voraussetzungen. Attribute sind Wegknoten; freie Wurzeln binden sich beim ersten Punkt an ein Attribut, drei gleiche ergeben einen Wurzelbund. Jeder Ast führt zu einem sichtbaren Skill mit Modifikatoren und endet in einem Schlüsselstein. Der Baum passt ohne Scrollen auf Desktop, Tablet und Handy. [Talentbaum v3](docs/TALENT_TREE_V3_PLAN.md).
+
+- **Good-Old-Molar-Skills:** Generalprobe (alle Waffen feuern gleichzeitig), Gleichtakt (gleiche Waffen synchronisieren sich zu kritischen Salven) und Schmelzwall (Ring bei Schildblock oder Stillstand). Talente, die nur Items kopierten, wurden ersetzt; ihre Punkte werden erstattet, auch über den Shop hinweg.
+
+- **Klassenauswahl mit Begründung:** Porträts als Kacheln, daneben Spielprinzip, Eckdaten, Spielweise und die drei Skills. Die gewählte Klasse erscheint auch in der Waffenwahl und im Kampf als Spielfigur.
+
+- **Bosse geben Levelpunkte:** Eine Bossstage zahlt vier bis fünf Levelpunkte statt fester XP, die bei späten Leveln nur noch für etwa einen reichten. Freie Levelpunkte zeigt ein Aufstiegssymbol statt „LP“.
+
+- **Dentipedia:** Neue Kategorie „Klassen“ mit allen Klassen, Ästen und Skills sowie das Thema „Klassen & Talentbaum“. Der Talentbaum erklärt seine Regeln über ein Info-Symbol.
 
 - **Verdiente Botläufe bis Welle 20:** Vollständige Bosswellen mit Beutesammlung, angebotenen Relikten und echten Folgeshops. Neue UV-/Schneide-Kaufpläne, Element/Lebensraub-, Zufalls- und Ohne-Shop-Regeln sowie ein blinder Kreisfahrer trennen Bewegung und Buildbeitrag. Die späteren Bosswarnungen und gemalten Projektile werden erfasst. Launcher und Berichte unterstützen alle 20 Wellen. [Schwierigkeitsprüfung und Grenzen](docs/DIFFICULTY_AUDIT.md).
 

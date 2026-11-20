@@ -12,6 +12,7 @@ func evolution_ready(index: int, recipe: WeaponEvolutionRecipe, items: ItemInven
 	var weapons := equipped()
 	if recipe == null or index < 0 or index >= weapons.size():
 		return false
+	if not weapon_allowed(recipe.result): return false
 	var selected := weapons[index]
 	if selected.tier != MAX_TIER or selected.data.id not in [recipe.base_weapon, recipe.partner_weapon]:
 		return false
@@ -77,6 +78,7 @@ func fusion_plan(index: int, recipe: WeaponEvolutionRecipe = null, items: ItemIn
 
 func commit_fusion(plan: WeaponFusionPlan, items: ItemInventory, points: WeaponUpgradeState) -> bool:
 	if plan == null or not plan.valid() or points == null or not points.actions.is_empty(): return false
+	if not weapon_allowed(plan.result_data): return false
 	var weapons := equipped()
 	var selected: WeaponInstance
 	var partner: WeaponInstance
@@ -97,7 +99,7 @@ func commit_fusion(plan: WeaponFusionPlan, items: ItemInventory, points: WeaponU
 	var fresh_data := WeaponRolls.fuse(selected.data, partner.data) if recipe == null else fusion_plan(index, recipe, items).result_data
 	fresh.configure(selected, partner, fresh_data, selected.tier + 1 if recipe == null else MAX_TIER, plan.recipe_id)
 	fresh.selected.assign(plan.selected)
-	if not fresh.valid(): return false
+	if not fresh.valid() or not weapon_allowed(fresh.result_data): return false
 	var inherited := fresh.effects()
 	var refund := fresh.refund()
 	var invested := selected.invested_coins + (partner.invested_coins if partner != null else 0)
@@ -150,9 +152,13 @@ func used_slots() -> int:
 
 
 func can_acquire(data: WeaponData, tier: int = 1) -> bool:
-	if data.evolution_kind != &"":
+	if not weapon_allowed(data) or data.evolution_kind != &"":
 		return false
 	return used_slots() + data.hands <= capacity or (tier < MAX_TIER and _find_tier(data.id, tier) != null)
+
+
+func weapon_allowed(data: WeaponData) -> bool:
+	return WeaponEligibility.allowed(data, stats.class_data if is_instance_valid(stats) else null)
 
 
 func acquire(data: WeaponData, tier: int = 1, paid_coins: int = -1) -> bool:
@@ -172,7 +178,7 @@ func acquire(data: WeaponData, tier: int = 1, paid_coins: int = -1) -> bool:
 
 
 func purchase_fusion_target(data: WeaponData, tier: int = 1) -> WeaponInstance:
-	if tier >= MAX_TIER or used_slots() + data.hands <= capacity:
+	if not weapon_allowed(data) or tier >= MAX_TIER or used_slots() + data.hands <= capacity:
 		return null
 	return _best_fusion_partner(data, tier)
 
@@ -194,7 +200,7 @@ func can_merge(index: int) -> bool:
 	if index < 0 or index >= weapons.size():
 		return false
 	var weapon := weapons[index]
-	return weapon.tier < MAX_TIER and _merge_partner(weapon) != null
+	return weapon_allowed(weapon.data) and weapon.tier < MAX_TIER and _merge_partner(weapon) != null
 
 
 func merge_affix_conflict(index: int) -> bool:
@@ -229,14 +235,19 @@ func merge(index: int) -> bool:
 	return true
 
 
-func restore(saved: Array, enforce_capacity: bool = true) -> void:
+func restore(saved: Array, enforce_capacity: bool = true) -> bool:
+	# Reject the whole operation before deleting any owned equipment.
+	for entry in saved:
+		if entry is Dictionary:
+			var data := WeaponCatalog.by_id(StringName(str(entry.get("id", ""))))
+			if data != null and not weapon_allowed(data): return false
 	for weapon in equipped():
 		weapon.free()
 	for entry in saved:
 		if not entry is Dictionary:
 			continue
 		var data := WeaponCatalog.by_id(StringName(str(entry.get("id", ""))))
-		if data != null and (not enforce_capacity or used_slots() + data.hands <= capacity):
+		if weapon_allowed(data) and (not enforce_capacity or used_slots() + data.hands <= capacity):
 			var tier := clampi(int(entry.get("tier", 1)), 1, MAX_TIER)
 			var weapon := _add(WeaponRolls.resolve(data, entry.get("rolls", {}), entry.get("upgrades", {})), tier, maxi(int(entry.get("invested_coins", _legacy_value(data, tier))), 0))
 			weapon.affixes = WeaponAffixes.sanitize(entry.get("affixes", []))
@@ -244,6 +255,7 @@ func restore(saved: Array, enforce_capacity: bool = true) -> void:
 			weapon.instance_uid = str(entry.get("uid", weapon.instance_uid))
 			weapon.refresh_affix_stats()
 	_refresh_positions()
+	return true
 
 
 func save_data() -> Array[Dictionary]:

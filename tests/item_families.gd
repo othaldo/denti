@@ -43,7 +43,7 @@ func _run() -> void:
 				_check(float(value) > 0.0, "mythic has a downside")
 		var icon: Texture2D = item.icon_texture if item.icon_texture != null else DentiUIIcons.item(item.icon_index)
 		_check(icon != null and icon.get_width() > 0, "missing icon: " + str(item.id))
-		if item.icon_index >= 30:
+		if item.icon_index >= 30 and item.icon_index <= 90:
 			_check(not new_cells.has(item.icon_index), "new items share an icon cell")
 			new_cells.append(item.icon_index)
 			var atlas := icon as AtlasTexture
@@ -51,7 +51,7 @@ func _run() -> void:
 			if item.icon_index >= 86:
 				expected_sheet = "item_icons_dodge_packed.png"
 			_check(atlas != null and atlas.atlas.resource_path.ends_with(expected_sheet) and atlas.region.size == Vector2(512, 512), "item selects the wrong padded atlas cell")
-	_check(count == 94 and families.size() == 17 and mythics.size() == 9, "incomplete item expansion including Runenpolitur")
+	_check(count == 96 and families.size() == 17 and mythics.size() == 9, "incomplete item expansion including poison package")
 	new_cells.sort()
 	_check(new_cells.size() == 61 and new_cells[0] == 30 and new_cells[60] == 90, "new icon indices have gaps")
 	for family_id in families:

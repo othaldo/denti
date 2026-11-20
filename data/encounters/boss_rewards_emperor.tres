@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 xp = 65
+levels = 5
 coins = 85
 capsules = 2
 

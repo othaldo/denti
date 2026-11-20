@@ -13,6 +13,7 @@ filter_clip = true
 script = ExtResource("1")
 role = "Zahnseidenhieb nach vorn"
 id = &"floss_whip"
+class_roles = Array[StringName]([&"reach"])
 display_name = "Zahnseidenpeitsche"
 description = "1 Wurzel · Ein Faden schnellt nach vorn und trifft Gegner auf seinem Weg. Blutung."
 hands = 1

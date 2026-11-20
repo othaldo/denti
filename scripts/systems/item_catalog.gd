@@ -2,6 +2,8 @@ class_name ItemCatalog
 extends RefCounted
 
 const ALL: Array[ShopOfferData] = [
+	preload("res://data/items/poison_depot.tres"),
+	preload("res://data/items/nerve_probe.tres"),
 	preload("res://data/items/metal_crown.tres"),
 	preload("res://data/items/fluoride_gel.tres"),
 	preload("res://data/items/gold_filling.tres"),

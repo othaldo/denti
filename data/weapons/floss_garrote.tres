@@ -14,6 +14,7 @@ filter_clip = true
 script = ExtResource("1")
 role = "Doppelfaden zum Abstandhalten"
 id = &"floss_garrote"
+class_roles = Array[StringName]([&"reach"])
 display_name = "Zahnseiden-Schneide"
 description = "2 Wurzeln · Zwei Fäden schnellen nach vorn, treffen Gegner auf ihrem Weg und stoßen sie zurück. Blutung."
 hands = 2

@@ -1,7 +1,7 @@
 class_name RunSaveData
 extends RefCounted
 
-const DICTIONARIES := ["player", "items", "relics", "telemetry", "rewards", "story", "weapon_mastery", "boss_stage_rewards"]
+const DICTIONARIES := ["player", "items", "relics", "telemetry", "rewards", "story", "weapon_mastery", "boss_stage_rewards", "poison_build", "talents", "class_combat"]
 const ARRAYS := ["weapons", "owned_weapons", "enemies", "loot", "acid", "offers", "weapon_runtime", "player_projectiles", "upgrades", "horde_waves", "burst_times", "elite_times", "elite_counts"]
 const RECORD_ARRAYS := ["weapons", "enemies", "loot", "acid", "weapon_runtime", "player_projectiles"]
 
@@ -19,9 +19,10 @@ static func normalize(value: Variant) -> Dictionary:
 		for entry in value.get(key, []):
 			if not entry is Dictionary:
 				return {}
-	if not _valid_structure(value):
-		return {}
 	var result: Dictionary = value.duplicate(true)
+	TalentProgression.migrate(result)
+	if not _valid_structure(result):
+		return {}
 	for section in ["stats", "presentation", "status_effects", "dash"]:
 		if result.player.has(section) and not result.player[section] is Dictionary:
 			return {}
@@ -74,8 +75,14 @@ static func _containers(value: Dictionary, dictionaries: Array, arrays: Array) -
 
 
 static func _valid_structure(value: Dictionary) -> bool:
+	var poison_build: Dictionary = value.get("poison_build", {})
+	if not _containers(poison_build, [], ["depots"]): return false
+	for index in poison_build.get("depots", []):
+		if not (index is int or index is float): return false
+	for key in ["previous", "window"]:
+		if poison_build.has(key) and not (poison_build[key] is int or poison_build[key] is float): return false
 	var boss_rewards: Dictionary = value.get("boss_stage_rewards", {})
-	for key in ["version", "phase_mask", "xp_released"]:
+	for key in ["version", "phase_mask", "xp_released", "xp_budget"]:
 		if boss_rewards.has(key) and not (boss_rewards[key] is int or boss_rewards[key] is float): return false
 	if boss_rewards.has("paid") and not boss_rewards.paid is bool: return false
 	if boss_rewards.has("legacy_credit") and not boss_rewards.legacy_credit is bool: return false
@@ -85,6 +92,23 @@ static func _valid_structure(value: Dictionary) -> bool:
 	if mastery.has("eligible") and not mastery.eligible is bool: return false
 	if mastery.has("starter_id") and not mastery.starter_id is String: return false
 	var player: Dictionary = value.player
+	if not _containers(player, ["class_state"], []) or not ClassCatalog.valid_state(player.get("class_state", {})): return false
+	var profile := ClassCatalog.by_id(StringName(str(player.get("class_state", {}).get("id", "good_old_molar"))))
+	if not TalentProgression.valid(value.get("talents", {}), profile): return false
+	var talent_state: Dictionary = value.get("talents", {})
+	if talent_state.get("enabled", false):
+		var pending_value: Variant = value.get("rewards", {}).get("pending_levels", 0)
+		var level_value: Variant = value.get("level", 1)
+		if not (pending_value is int or pending_value is float) or not (level_value is int or level_value is float): return false
+		var carry_value: Variant = value.get("rewards", {}).get("carry_levels", 0)
+		if not (carry_value is int or carry_value is float) or float(carry_value) < 0: return false
+		var pending := int(pending_value)
+		if int(talent_state.spent) + pending + int(carry_value) > int(value.get("level", 1)) - 1: return false
+		if not talent_state.tiers.is_empty() and talent_state.tiers.size() != pending: return false
+	if not ClassCombatEffects.valid(value.get("class_combat", {})): return false
+	for entry in value.get("weapons", []):
+		var weapon := WeaponCatalog.by_id(StringName(weapon_id(str(entry.get("id", "")))))
+		if weapon != null and not WeaponEligibility.allowed(weapon, profile): return false
 	if not _containers(player, ["dash"], []): return false
 	var dash: Dictionary = player.get("dash", {})
 	if not _containers(dash, [], ["direction", "last_direction"]): return false
@@ -228,6 +252,14 @@ static func _valid_structure(value: Dictionary) -> bool:
 		if pillow.has("active") and not pillow.active is bool: return false
 		if not _containers(entry, ["affix_effects"], ["position", "direction", "boss_dash_end", "boss_dash_origin", "inflicted_statuses"]):
 			return false
+		var affix: Dictionary = entry.get("affix_effects", {})
+		if not _containers(affix, ["depot"], []): return false
+		var depot: Dictionary = affix.get("depot", {})
+		if not _containers(depot, [], ["ticks"]): return false
+		for amount in depot.get("ticks", []):
+			if not (amount is float or amount is int): return false
+		for key in ["remaining", "target_lock", "nerve_time", "nerve_lock", "origin_range"]:
+			if depot.has(key) and not (depot[key] is float or depot[key] is int): return false
 	for entry in value.get("loot", []):
 		if not _containers(entry, ["reward_data"], ["position"]):
 			return false

@@ -12,6 +12,7 @@ filter_clip = true
 script = ExtResource("1")
 role = "Gegner für Schmelztreffer vorbereiten"
 id = &"fluoride_sprayer"
+class_roles = Array[StringName]([&"ranged"])
 display_name = "Fluorid-Sprüher"
 description = "2 Wurzeln · Sprühkegel macht Gegner 2 s anfällig für +20 % Schmelzschaden. Kombiniere mit Paste und Raketen."
 hands = 2

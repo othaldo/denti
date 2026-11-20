@@ -12,6 +12,7 @@ filter_clip = true
 script = ExtResource("1")
 role = "Schnelle Treffer und Nass"
 id = &"water_jet"
+class_roles = Array[StringName]([&"ranged"])
 display_name = "Wasserflosser"
 description = "1 Wurzel · Fernkampf · macht nass, verlangsamt und stößt zurück"
 hands = 1
