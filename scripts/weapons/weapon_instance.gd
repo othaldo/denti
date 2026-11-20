@@ -158,7 +158,8 @@ func _physics_process(delta: float) -> void:
 
 func attack_interval() -> float:
 	var interval := data.cooldown_at_tier(tier, player.stats.attack_interval, player.items.attack_interval_factor())
-	return interval * player.molar_skills.weapon_interval_factor(self) if player.molar_skills != null else interval
+	if player.molar_skills != null: interval *= player.molar_skills.weapon_interval_factor(self)
+	return interval * player.module_interval_factor(self)
 
 
 ## Extra attack requested by a class skill. Returns false without a target in

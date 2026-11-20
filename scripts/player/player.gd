@@ -16,6 +16,11 @@ const DASH_PULSE_RADIUS := 110.0
 @onready var items: ItemInventory = get_node("../Items")
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var sprite_base_scale: Vector2 = sprite.scale
+## The expressive base Denti; class looks are normalized against it.
+@onready var base_body_texture: Texture2D = sprite.texture
+@onready var base_body_scale: Vector2 = sprite.scale
+var class_look: Texture2D
+static var used_rects: Dictionary = {}
 @onready var expressions: DentiExpressions = $Sprite2D/Expressions
 @onready var status_effects: PlayerStatusEffects = $StatusEffects
 @onready var arena: DentiArena = get_node("../Arena")
@@ -41,6 +46,9 @@ var dash_trail: DashTrail
 var dash_cut: ClassDashCut
 var molar_skills: MolarSkills
 var assassin_skills: AssassinSkills
+## Verb/skill modules of the other classes; each acts only for its own class.
+var skill_modules: Array[ClassSkillModule] = []
+var dash_origin := Vector2.ZERO
 
 
 func nearby_enemies(at: Vector2, radius: float, include_radius: bool = true) -> Array[Enemy]:
@@ -77,12 +85,56 @@ func _ready() -> void:
 	add_child(assassin_skills)
 	dash.started.connect(assassin_skills.on_dash_started)
 	dash.started.connect(assassin_skills.on_dash)
+	dash.started.connect(func() -> void: dash_origin = global_position)
+	for script in ClassSkillRegistry.MODULES:
+		var module: ClassSkillModule = script.new()
+		module.player = self
+		add_child(module)
+		skill_modules.append(module)
+		dash.started.connect(module.on_dash_started)
+		stats.shield_blocked.connect(module.on_shield_blocked)
 	stats.changed.connect(dash.clamp_charge)
+	stats.changed.connect(apply_class_look)
+	apply_class_look()
 	get_node("/root/GameInput").changed.connect(_sync_dash_input)
 	dash_trail = DashTrail.new()
 	dash_trail.z_index = -1
 	add_child(dash_trail)
 
+
+## Shows the chosen class on the combat sprite. A class look is scaled so its
+## tooth matches the base body height and stands on the same foot line; the
+## face overlay is hidden because the class art carries its own face.
+func apply_class_look() -> void:
+	var look: Texture2D = stats.class_data.combat_sprite if stats.class_data != null else null
+	if look == class_look: return
+	class_look = look
+	if look == null:
+		sprite.texture = base_body_texture
+		sprite.offset = Vector2.ZERO
+		sprite_base_scale = base_body_scale
+		expressions.visible = true
+		return
+	var source := _used_rect(base_body_texture)
+	var target := _used_rect(look)
+	var factor := float(source.size.y) / maxf(float(target.size.y), 1.0)
+	var new_scale := base_body_scale * factor
+	# Bottom centre of the visible pixels, relative to each texture's centre.
+	var source_foot := Vector2(source.get_center().x, source.end.y) - Vector2(base_body_texture.get_size()) * 0.5
+	var target_foot := Vector2(target.get_center().x, target.end.y) - Vector2(look.get_size()) * 0.5
+	sprite.texture = look
+	sprite.offset = source_foot * base_body_scale / new_scale - target_foot
+	sprite_base_scale = new_scale
+	sprite.scale = new_scale
+	expressions.visible = false
+
+static func _used_rect(texture: Texture2D) -> Rect2i:
+	var key := texture.resource_path
+	if not used_rects.has(key):
+		var image := texture.get_image()
+		if image != null and image.is_compressed(): image.decompress()
+		used_rects[key] = image.get_used_rect() if image != null else Rect2i(Vector2i.ZERO, Vector2i(texture.get_size()))
+	return used_rects[key]
 
 func _physics_process(delta: float) -> void:
 	var direction := movement_direction()
@@ -100,6 +152,7 @@ func _physics_process(delta: float) -> void:
 		dash_cut.advance(delta)
 		molar_skills.advance(delta)
 		assassin_skills.advance(delta)
+		for module in skill_modules: module.advance(delta)
 		dash_moved = was_dashing
 		dash.advance(self, delta)
 	else:
@@ -114,9 +167,11 @@ func _physics_process(delta: float) -> void:
 		dash_trail.add_segment(motion_start, motion_end)
 		dash_cut.extend(motion_end)
 		assassin_skills.sweep(motion_start, motion_end)
+		for module in skill_modules: module.sweep(motion_start, motion_end)
 		if not dash.active:
 			dash_cut.release()
 			_dash_pulse()
+			for module in skill_modules: module.on_dash_ended(dash_origin, motion_end)
 	is_moving = global_position.distance_squared_to(before_move) > 0.01
 	_animate_sprite(dash.direction if was_dashing else direction, delta)
 	hurt_time = maxf(hurt_time - delta, 0.0)
@@ -137,6 +192,59 @@ func _dash_pulse() -> void:
 	items.enchantment_support.emit(&"class_dash_pulses", 1)
 
 
+# --- Class skill modules ------------------------------------------------------
+
+func reset_skill_modules() -> void:
+	for module in skill_modules: module.reset_wave()
+
+func notify_weapon_hit(enemy: Enemy, weapon: WeaponData, dealt: float) -> void:
+	for module in skill_modules: module.on_weapon_hit(enemy, weapon, dealt)
+
+func notify_enemy_died(enemy: Enemy, _amount: float = 0.0) -> void:
+	for module in skill_modules: module.on_enemy_died(enemy)
+
+func notify_loot(kind: StringName, amount: int, drop: Loot) -> void:
+	for module in skill_modules: module.on_loot_collected(kind, amount, drop)
+
+func module_attack_speed_bonus() -> float:
+	var total := 0.0
+	for module in skill_modules: total += module.attack_speed_bonus()
+	return total
+
+func module_interval_factor(weapon: WeaponInstance) -> float:
+	var factor := 1.0
+	for module in skill_modules: factor *= module.weapon_interval_factor(weapon)
+	return factor
+
+func module_damage_bonus(enemy: Enemy, weapon: WeaponData) -> float:
+	var total := 0.0
+	for module in skill_modules: total += module.damage_bonus(enemy, weapon)
+	return total
+
+func module_pickup_factor() -> float:
+	var factor := 1.0
+	for module in skill_modules: factor *= module.pickup_factor()
+	return factor
+
+func skill_module(id: StringName) -> ClassSkillModule:
+	for module in skill_modules:
+		if module.class_id() == id: return module
+	return null
+
+func save_skill_modules() -> Dictionary:
+	var result := {}
+	for module in skill_modules:
+		var state := module.save_data()
+		if not state.is_empty(): result[module.state_key()] = state
+	return result
+
+func restore_skill_modules(saved: Variant) -> void:
+	var states: Dictionary = saved if saved is Dictionary else {}
+	for module in skill_modules:
+		var state: Variant = states.get(module.state_key(), {})
+		module.restore(state if state is Dictionary else {})
+
+
 func movement_direction() -> Vector2:
 	if mobile_controls.visible and mobile_controls.combat_active and mobile_controls.touch_index >= 0:
 		return mobile_controls.movement_direction(0.0)
@@ -149,8 +257,10 @@ func floor_movement_factor() -> float:
 	var factor := 1.0
 	for encounter: CaramelEncounter in get_tree().get_nodes_in_group("caramel_encounters"):
 		factor = minf(factor, encounter.speed_factor_at(global_position))
-	# Assassin sugar crash after a Rausch.
-	return factor * assassin_skills.move_factor() if assassin_skills != null else factor
+	# Assassin sugar crash after a Rausch, plus class module movement rules.
+	if assassin_skills != null: factor *= assassin_skills.move_factor()
+	for module in skill_modules: factor *= module.move_factor()
+	return factor
 
 
 func combat_active() -> bool:

@@ -8,7 +8,7 @@
 script = ExtResource("1")
 id = &"good_old_molar"
 tagline = "Der Allrounder: jede Waffe, sechs Wurzeln, deine Ausrüstung ist das Spiel."
-play_style = PackedStringArray("Mischt beliebige Waffen oder spezialisiert sich auf eine", "Generalprobe, Gleichtakt oder Schmelzwall als Ziel im Baum", "Kein Klassenverb und keine Einschränkung")
+play_style = Array[String](["Mischt beliebige Waffen oder spezialisiert sich auf eine", "Generalprobe, Gleichtakt oder Schmelzwall als Ziel im Baum", "Kein Klassenverb und keine Einschränkung"])
 portrait = ExtResource("3")
 display_name = "Good Old Molar"
 description = "Der klassische Denti mit sechs Wurzeln und freier Waffenwahl. Sein Baum belohnt bunte Waffenmischungen (Generalprobe), viele gleiche Waffen (Gleichtakt) oder Schilde und Stillstand (Schmelzwall)."

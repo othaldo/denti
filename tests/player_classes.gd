@@ -29,7 +29,12 @@ func _conversion(source: StringName, target: StringName, factor: float) -> Class
 	return result
 
 func _run() -> void:
-	_check(ClassCatalog.DEFAULT.valid() and ClassCatalog.profiles.size() == 2, "shipping classes are invalid or expose diagnostic profiles")
+	var shipped: Array[StringName] = [&"good_old_molar", &"assassin", &"tooth_fairy", &"ember", &"rinser", &"frost_warden"]
+	var ids: Array[StringName] = []
+	for profile in ClassCatalog.profiles:
+		_check(profile.valid(), "shipping class invalid: " + str(profile.id))
+		ids.append(profile.id)
+	_check(ClassCatalog.DEFAULT.valid() and ids == shipped, "shipping classes changed or expose diagnostic profiles: " + str(ids))
 	for weapon in WeaponCatalog.ALL:
 		_check(not weapon.class_roles.is_empty(), "standard weapon has no class role: " + str(weapon.id))
 		for role in weapon.class_roles: _check(role in WeaponRoles.ALL, "unknown standard weapon role")

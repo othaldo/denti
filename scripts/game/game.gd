@@ -314,6 +314,7 @@ func _start_combat_wave() -> void:
 	player.dash_cut.reset_wave()
 	player.molar_skills.reset_wave()
 	player.assassin_skills.reset_wave()
+	player.reset_skill_modules()
 	var profile_id := wave.prepare_next_wave_profile()
 	telemetry.begin_wave(wave.current_wave + 1, profile_id, _combat_build_snapshot())
 	wave.start_next_wave()
@@ -500,6 +501,7 @@ func _create_enemy(data: EnemyData, at: Vector2, treasure: bool = false) -> void
 	enemy.died.connect(items.on_enemy_died)
 	enemy.died.connect(relics.on_enemy_died)
 	enemy.died.connect(player.assassin_skills.on_enemy_died)
+	enemy.died.connect(player.notify_enemy_died)
 	enemy.attack_performed.connect(sound.play_cue)
 	if data.is_boss:
 		enemy.death_started.connect(_on_boss_death_started)
@@ -646,6 +648,7 @@ func _spawn_loot(at: Vector2, kind: StringName, amount: int, reward_id: StringNa
 
 func _on_loot_collected(kind: StringName, amount: int, reward_id: StringName = &"", drop: Loot = null) -> void:
 	sound.play_cue(&"pickup")
+	player.notify_loot(kind, amount, drop)
 	if kind == &"chest":
 		if reward_id == WeaponAffixes.CHEST_ID and drop != null:
 			rewards.queue_affix_chest(drop.reward_data, items)
@@ -1358,6 +1361,7 @@ func debug_start_wave(number: int) -> void:
 	player.dash_cut.reset_wave()
 	player.molar_skills.reset_wave()
 	player.assassin_skills.reset_wave()
+	player.reset_skill_modules()
 	rewards.begin_wave()
 	wave.current_wave = clampi(number, 1, WaveController.MAX_WAVES) - 1
 	wave.next_profile_id = &""

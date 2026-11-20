@@ -24,6 +24,15 @@ const ASSASSIN_TALENT_ATLAS: Texture2D = preload("res://assets/classes/assassin_
 const ASSASSIN_TALENT_COLUMNS := 7
 const ASSASSIN_TALENT_ROWS := 2
 const ASSASSIN_TALENT_COUNT := 13
+const ROSTER_TALENT_COLUMNS := 8
+const ROSTER_TALENT_ROWS := 3
+# Atlas order matches ATLAS_BASE in tools/generate_class_roster.py.
+const ROSTER_TALENT_ATLASES: Array[Texture2D] = [
+	preload("res://assets/classes/tooth_fairy_talent_icons.webp"),
+	preload("res://assets/classes/ember_talent_icons.webp"),
+	preload("res://assets/classes/rinser_talent_icons.webp"),
+	preload("res://assets/classes/frost_warden_talent_icons.webp"),
+]
 const HUD_ATLAS: Texture2D = preload("res://assets/ui/hud_icons_atlas.png")
 const STAT_ATLAS: Texture2D = preload("res://assets/ui/stat_icons_atlas.png")
 const RANGE: Texture2D = preload("res://assets/ui/range.svg")
@@ -119,8 +128,15 @@ static func talent(index: int) -> Texture2D:
 	if cell < molar_count:
 		return _region(MOLAR_TALENT_ATLAS, cell, MOLAR_TALENT_COLUMNS, MOLAR_TALENT_ROWS)
 	cell -= molar_count
-	if cell >= ASSASSIN_TALENT_COUNT: return null
-	return _region(ASSASSIN_TALENT_ATLAS, cell, ASSASSIN_TALENT_COLUMNS, ASSASSIN_TALENT_ROWS)
+	var assassin_capacity := ASSASSIN_TALENT_COLUMNS * ASSASSIN_TALENT_ROWS
+	if cell < assassin_capacity:
+		return _region(ASSASSIN_TALENT_ATLAS, cell, ASSASSIN_TALENT_COLUMNS, ASSASSIN_TALENT_ROWS) if cell < ASSASSIN_TALENT_COUNT else null
+	cell -= assassin_capacity
+	var atlas_capacity := ROSTER_TALENT_COLUMNS * ROSTER_TALENT_ROWS
+	@warning_ignore("integer_division")
+	var atlas_index := cell / atlas_capacity
+	if atlas_index >= ROSTER_TALENT_ATLASES.size(): return null
+	return _region(ROSTER_TALENT_ATLASES[atlas_index], cell % atlas_capacity, ROSTER_TALENT_COLUMNS, ROSTER_TALENT_ROWS)
 
 
 static func stat(index: int) -> Texture2D:

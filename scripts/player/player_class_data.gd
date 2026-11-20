@@ -8,8 +8,10 @@ extends Resource
 ## One sentence on the class verb for the class selection preview.
 @export var tagline: String
 ## Short play-style lines shown next to the facts in the class selection.
-@export var play_style: PackedStringArray = []
+@export var play_style: Array[String] = []
 @export var portrait: Texture2D
+## Full-body combat look. Empty keeps the expressive base Denti (body + faces).
+@export var combat_sprite: Texture2D
 @export var root_capacity: int = 6
 @export var starting_stats: Dictionary = {}
 @export var stat_rules: Array[ClassStatRuleData] = []

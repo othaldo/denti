@@ -29,6 +29,8 @@ var choice_row: HFlowContainer
 var free_stat: StringName
 var undo_button: Button
 var points_badge: LevelPointsBadge
+var help_button: Button
+var help: RunSetupDetails
 var done_button: Button
 
 func _ready() -> void:
@@ -68,6 +70,8 @@ func _ready() -> void:
 	done_button.pressed.connect(completed.emit)
 	stage.footer.add_child(done_button)
 	stage.present("Entwicklung", view)
+	help = RunSetupDetails.new()
+	stage.add_child(help)
 	ControllerPrompt.bind(done_button, &"ui_confirm", false)
 	ControllerPrompt.bind(undo_button, &"ui_undo", false)
 	hide()
@@ -163,6 +167,14 @@ func refresh() -> void:
 	if points_badge == null:
 		points_badge = LevelPointsBadge.new()
 		stage.header.add_child(points_badge)
+		help_button = Button.new()
+		help_button.icon = preload("res://assets/ui/info.svg")
+		help_button.tooltip_text = "So funktioniert der Talentbaum"
+		help_button.custom_minimum_size = Vector2(40, 40)
+		help_button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		RunSetupStyle.quiet(help_button)
+		stage.header.add_child(help_button)
+		help_button.pressed.connect(func() -> void: help.present("Talentbaum", DentipediaData.topic_body("Klassen & Talentbaum"), help_button))
 	points_badge.count = count - state.used(tree)
 	undo_button.disabled = state.actions.is_empty()
 	done_button.disabled = count <= 0 or state.used(tree) != count

@@ -43,7 +43,7 @@ func _ready() -> void:
 	for profile in ClassCatalog.profiles:
 		var button := RunSetupChoice.new()
 		button.tooltip_text = profile.display_name
-		button.set_meta("controller_details", func() -> void: details_requested.emit(profile.display_name, profile.description))
+		button.set_meta("controller_details", func() -> void: details_requested.emit(profile.display_name, DentipediaData.class_body(profile)))
 		gallery.add_child(button)
 		button.show_artwork(profile.portrait)
 		button.pressed.connect(func() -> void:

@@ -15,6 +15,8 @@ var weapon_name: Label
 var roots_label: Label
 var stat_buttons: Array[RunSetupValue] = []
 var keyboard_focus := false
+## Shown while no weapon is selected: the chosen class.
+var idle_art: Texture2D = preload("res://assets/denti/denti_unarmed.png")
 
 func _ready() -> void:
 	catalog_scroll = ScrollContainer.new()
@@ -72,7 +74,7 @@ func show_options(weapons: Array[WeaponData], selected: StringName = &"") -> voi
 		grid.add_child(button)
 		button.show_artwork(RunSetupPresentation.weapon_icon(options[index]))
 		icon_buttons.append(button)
-	art.texture = preload("res://assets/denti/denti_unarmed.png")
+	art.texture = idle_art
 	weapon_name.text = ""
 	roots_label.text = ""
 	for button in stat_buttons: button.visible = false

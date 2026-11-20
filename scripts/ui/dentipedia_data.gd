@@ -1,7 +1,7 @@
 class_name DentipediaData
 extends RefCounted
 
-const CATEGORIES := ["Waffen", "Items", "Relikte", "Werte", "Mechaniken", "Verzauberungen"]
+const CATEGORIES := ["Waffen", "Items", "Relikte", "Werte", "Mechaniken", "Verzauberungen", "Klassen"]
 const ASCENSION_OVERVIEW := "Ab Mk IV kannst du die gewählte Waffe mit Punkten und Gold gezielt auf Mk V, VI und höher bringen. Je Wurzel kosten die Aufstiege 3/5/8/12 Punkte und 60/100/160/240 Gold. Zwei-Wurzel-Waffen bezahlen das Doppelte; im Endlosmodus steigt der Goldanteil mit dem Endlosfaktor. Jeder Aufstieg gibt additiv +10 % Basisschaden sowie +3 % Tempo und Reichweite. Vier Effektplätze und das Mk-IV-Angriffsmuster gelten weiter. Rückgängig nimmt den geplanten Schritt zurück; Fertig übernimmt Punkte, Gold und Waffe gemeinsam. Beim Fortsetzen bleibt der Entwurf erhalten."
 const ENCHANTMENT_OVERVIEW := "Upgrade-Kapseln geben Waffenpunkte. Wähle im Verzauberungsfenster zuerst ein konkretes Waffenexemplar. Jede Kapsel gibt zwei Punkte. Ein Rang kostet einen Punkt je belegter Wurzel: 1 bei kleinen, 2 bei großen Waffen. Aktivieren startet bei 1/10; höchstens 10/10. Der Effekt gilt nur für diese Waffe.\n\nMk I, II, III und IV besitzen einen, zwei, drei und vier Effektplätze. Alle vier sind sichtbar; gesperrte Plätze öffnen sich beim Mk-Aufstieg der Waffe. Waffenpunkte kaufen keine zusätzlichen Plätze.\n\nPro Waffe ist ein Element wählbar: Feuer, Eis, Gift, Blutung, Elektro oder Wasser. Andere Plätze tragen Reichweite, Angriffstempo, Lebensraub, Krit-Chance, Krit-Schaden oder Wucht. Auch ein Ausbau ohne Element ist möglich. Die Wurzelkosten beeinflussen die Effektstärke; die Vorschau zeigt den Wert für deine Zielwaffe.\n\nRückgängig nimmt geplante Schritte zurück. Fertig übernimmt die Verteilung. Unverbrauchte Punkte bleiben erhalten und lassen sich später, auch über Verzaubern im Shop, ausgeben. Bei einer Fusion wählst du bei Bedarf die Effekte des Ergebnisses; nicht übernommene Punkte werden erstattet. Bei anderen Wurzelkosten werden die investierten Punkte in bezahlbare Ränge umgerechnet." + "\n\n" + ASCENSION_OVERVIEW
 const ENCHANTMENT_SYNERGIES := {
@@ -47,6 +47,7 @@ const TOPICS := {
 	"Speichern & Fortsetzen": "Der Run speichert Kampfzustand, Ausrüstung, Waffenwerte, Verzauberungen, Münzen und den aktuellen Fortschritt. Fortsetzen lädt auch offene Belohnungen und nicht ausgegebene Waffenpunkte.\n\nEin offener Verzauberungsentwurf bleibt erhalten und ändert den Build erst nach Fertig. Eine noch unbestätigte Fusionsauswahl wird dagegen verworfen; die ursprünglichen Waffen bleiben erhalten.\n\nEin neuer Run ersetzt den bisherigen erst beim bestätigten Start. Freigeschaltete Schwierigkeiten und entdeckte Spezialwaffen gehören zum dauerhaften Fortschritt und bleiben auch nach Run-Ende bestehen.",
 	"Alte Spielstände": "Bereits bezahlte alte Effekte bleiben erhalten, auch frühere Kombinationen mehrerer Elemente oder zusätzliche belegte Plätze. Neue Investitionen folgen den aktuellen Grenzen. Weihe ist nur noch Altbestand und nicht neu auswählbar.\n\nAlte, schon ausgewürfelte Kapselangebote und gespeicherte Itemfunde werden mit ihren bisherigen Entscheidungen aufgelöst. Das können auch Slot- oder Mk-Aufstiege sein. Neue Kapseln geben stattdessen zwei Waffenpunkte. Alte freie Punkte werden einmalig verdoppelt; offene Entwürfe werden mit den aktuellen Wurzelkosten neu geprüft.\n\nBei einem Elementwechsel in der manuellen Fusion gelten höchstens ein Element und vier Plätze. Nicht übernommene Ränge gehen als freie Punkte zurück. Die neue Waffenform richtet sich bei alten gemischten Waffen nach ihrem stärksten Element.",
 	"Bedienung & Einstellungen": "WASD oder Pfeiltasten bewegen Denti; Waffen greifen automatisch an. Shift aktiviert den Wurzelsprung. Escape schließt zuerst offene Details und öffnet sonst die Pause.\n\nAuf Touchgeräten ziehst und hältst du auf der freien Spielfläche zum Bewegen. Nachziehen ändert die Richtung, Loslassen stoppt. Ein zweiter Finger kann den Dash-Button unten rechts betätigen. Menüs, Karten und Details bedienst du per Tippen.\n\nIn der Pause erreichst du Werte, Items, Dentipedia und Einstellungen. Lautstärke, UI-Klänge, reduzierte UI-Bewegung und FPS-Anzeige lassen sich dort anpassen. Das Lesen in der Dentipedia setzt einen pausierten Kampf nicht fort.",
+	"Klassen & Talentbaum": "Jede Klasse hat ein eigenes Spielprinzip und einen Talentbaum mit drei Ästen. Mit jedem Aufstieg verdienst du einen Levelpunkt; ein Bosskampf gibt vier bis fünf auf einmal. Verteilt wird nach der Welle, wenn die Beute eingesammelt ist.\n\nEine Reihe eines Astes öffnet sich, sobald genug Punkte in diesem Ast stecken: drei für die zweite Reihe, sechs für die dritte und so weiter. Die Zahl an der Linie zeigt die nächste Schwelle. Attributpunkte zählen mit. Pfeile zeigen echte Voraussetzungen.\n\nKreise sind Attribute: Jeder Rang gibt den beim Aufstieg gewürfelten Wert, Glück verbessert ihn. Kreise mit Plus sind freie Wurzeln: Der erste Punkt bindet sie an ein Attribut deiner Wahl, danach steigert sie nur noch dieses. Drei Wurzeln mit demselben Attribut ergeben einen Wurzelbund und einen Bonusrang.\n\nKacheln sind Talente, die Regeln verändern. Der große Diamant ist der Skill des Astes, eine sichtbare Fähigkeit; die kleinen Rauten darunter verändern ihn. Achtecke sind Schlüsselsteine: starke Tauschgeschäfte mit einem Nachteil.\n\nTippen wählt einen Knoten, erneutes Tippen skillt ihn. Rückgängig nimmt geplante Punkte zurück, bis du übernimmst. Alle Punkte müssen verteilt werden.",
 }
 
 static func entries(category: int, discovered: Array[String]) -> Array[Dictionary]:
@@ -79,7 +80,33 @@ static func entries(category: int, discovered: Array[String]) -> Array[Dictionar
 			result.append({"title": "Verzauberungen", "body": enchantment_overview()})
 			for data in WeaponAffixes.ALL:
 				result.append(_enchantment(data))
+		6:
+			result.append({"title": "Klassen & Talentbaum", "body": topic_body("Klassen & Talentbaum")})
+			for profile in ClassCatalog.profiles:
+				result.append({"title": profile.display_name, "icon": profile.portrait, "body": class_body(profile)})
 	return result
+
+## Full class explanation, built from the class data so it never drifts:
+## verb, facts, play style and every branch with skill, modifiers and keystone.
+static func class_body(profile: PlayerClassData) -> String:
+	var facts: Array[String] = []
+	for fact in ClassSelection.fact_rows(profile): facts.append(str(fact.text))
+	var lines: Array[String] = [profile.tagline, profile.description, " · ".join(facts)]
+	var style: Array[String] = []
+	for line in profile.play_style: style.append("• " + line)
+	if not style.is_empty(): lines.append("\n".join(style))
+	var tree := profile.talent_tree
+	if tree != null:
+		for branch in TalentNodeData.BRANCHES:
+			var parts: Array[String] = [tree.branches[branch].to_upper()]
+			var modifiers: Array[String] = []
+			for node in tree.branch_nodes(branch):
+				if node.is_skill(): parts.append("Skill %s: %s" % [node.display_name, node.description])
+				elif node.is_modifier(): modifiers.append("%s: %s" % [node.display_name, node.description])
+				elif node.is_keystone(): parts.append("Schlüsselstein %s: %s" % [node.display_name, node.description])
+			if not modifiers.is_empty(): parts.insert(2, "Verändert durch: " + " · ".join(modifiers))
+			lines.append("\n".join(parts))
+	return "\n\n".join(lines)
 
 static func topic_body(title: String) -> String:
 	if title == "Verzauberungen": return enchantment_overview()

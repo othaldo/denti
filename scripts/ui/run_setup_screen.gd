@@ -15,6 +15,7 @@ var body: Control
 var footer: Control
 var branding: HBoxContainer
 var brand_text: Label
+var mascot: TextureRect
 var steps: HBoxContainer
 var step_buttons: Dictionary = {}
 var difficulty_view: DifficultySelection
@@ -52,7 +53,7 @@ func _ready() -> void:
 	branding = HBoxContainer.new()
 	branding.add_theme_constant_override("separation", 12)
 	header.add_child(branding)
-	var mascot := TextureRect.new()
+	mascot = TextureRect.new()
 	mascot.texture = preload("res://assets/denti/denti_unarmed.png")
 	mascot.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	mascot.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -197,6 +198,7 @@ func show_options(weapons: Array[WeaponData], selected: StringName = &"") -> voi
 func _show_step(setup: RunSetup = null) -> void:
 	if setup != null: class_profile = ClassCatalog.by_id(setup.class_id)
 	brand_text.text = class_profile.display_name
+	_apply_class_art()
 	brand_text.tooltip_text = class_profile.description
 	details.visible = false
 	difficulty_view.visible = current_step == &"difficulty"
@@ -233,6 +235,14 @@ func confirm_selection() -> void:
 	confirm_button.disabled = true
 	chosen.emit(weapon)
 
+## Header mascot and the empty weapon preview show the chosen class.
+func _apply_class_art() -> void:
+	var art: Texture2D = class_profile.portrait if class_profile.portrait != null else preload("res://assets/denti/denti_unarmed.png")
+	mascot.texture = art
+	if weapon_view.idle_art != art:
+		weapon_view.idle_art = art
+		if weapon_view.selected_id == &"": weapon_view.art.texture = art
+
 func show_details() -> void:
 	var source := get_viewport().gui_get_focus_owner()
 	if not ControllerFocus.contains(self, source): source = details_button
@@ -244,7 +254,7 @@ func show_details() -> void:
 		var data := DifficultyCatalog.by_id(current_difficulty)
 		details.present(data.display_name, data.description, source)
 	elif current_step == &"class":
-		details.present(class_profile.display_name, class_profile.description, source)
+		details.present(class_profile.display_name, DentipediaData.class_body(class_profile), source)
 	else:
 		var weapon := weapon_view.selected_weapon()
 		if weapon == null: return

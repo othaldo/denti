@@ -156,7 +156,7 @@ func layout_in(extent: Vector2) -> void:
 	portrait = extent.x < 620 and extent.y > extent.x
 	var compact := extent.x < 760 or extent.y < 330
 	var inline_search := extent.x >= 900 or not portrait and extent.x >= 530
-	category_grid.columns = 3 if portrait else 6
+	category_grid.columns = 4 if portrait else DentipediaData.CATEGORIES.size()
 	for index in category_buttons.size():
 		var button := category_buttons[index]
 		button.text = "Effekte" if compact and index == 5 else ("Mechanik" if compact and index == 4 else DentipediaData.CATEGORIES[index])

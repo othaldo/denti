@@ -32,6 +32,11 @@ func _run() -> void:
 	root.content_scale_size = Vector2i(1280, 720)
 	root.size = root.content_scale_size
 	await _capture("class_pick_molar_1280x720")
+	menu._select_setup_class(&"tooth_fairy")
+	menu.setup_selector.class_view.selected_id = &"tooth_fairy"
+	menu.setup_selector.class_view.refresh()
+	menu._advance_setup()
+	await _capture("weapon_pick_tooth_fairy_1280x720")
 	# Future-proofing: the same step with many classes (placeholder copies).
 	var shipped := ClassCatalog.profiles.duplicate()
 	for copy in 10: ClassCatalog.profiles.append(shipped[copy % shipped.size()])
@@ -101,5 +106,20 @@ func _run() -> void:
 	root.content_scale_size = Vector2i(320, 568)
 	root.size = root.content_scale_size
 	await _capture("talent_molar_320x568")
+	# Roster trees in the same native component.
+	root.content_scale_size = Vector2i(1280, 720)
+	root.size = root.content_scale_size
+	for class_id in [&"tooth_fairy", &"ember", &"rinser", &"frost_warden"]:
+		var roster := new_stats()
+		roster.begin_class(ClassCatalog.by_id(class_id))
+		var roster_progress := TalentProgression.new()
+		roster_progress.enabled = true
+		roster_progress.prepare(3, 2, 0)
+		game.talent_panel.present(roster_progress, roster, game.UPGRADES, 3)
+		for node in roster.class_data.talent_tree.nodes:
+			if node.is_skill():
+				game.talent_panel._select(node.id)
+				break
+		await _capture("talent_%s_1280x720" % class_id)
 	session.clear_run()
 	finish()

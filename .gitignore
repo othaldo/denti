@@ -19,6 +19,14 @@ __pycache__/
 !assets/classes/talent_icons.webp.import
 !assets/classes/molar_talent_icons.webp.import
 !assets/classes/assassin_talent_icons.webp.import
+!assets/classes/tooth_fairy_talent_icons.webp.import
+!assets/classes/ember_talent_icons.webp.import
+!assets/classes/rinser_talent_icons.webp.import
+!assets/classes/frost_warden_talent_icons.webp.import
+!assets/classes/tooth_fairy_portrait.png.import
+!assets/classes/ember_portrait.png.import
+!assets/classes/rinser_portrait.png.import
+!assets/classes/frost_warden_portrait.png.import
 !assets/vfx/element_hit_splats.png.import
 
 # The modular Count artwork uses mipmaps at combat sprite sizes.

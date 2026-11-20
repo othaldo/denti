@@ -151,7 +151,7 @@ func preferred_tags(loadout: WeaponLoadout) -> Array[StringName]:
 
 
 func pickup_range() -> float:
-	return cached_pickup_range
+	return cached_pickup_range * player.module_pickup_factor()
 
 
 func coin_double_chance() -> float:
@@ -188,6 +188,7 @@ func attack_interval_factor() -> float:
 	elif sugar_crash_time > 0.0:
 		temporary_bonus = -25.0
 	if player.molar_skills != null: temporary_bonus += player.molar_skills.attack_speed_bonus()
+	temporary_bonus += player.module_attack_speed_bonus()
 	return player.stats.attack_interval_with_bonus(temporary_bonus) / player.stats.attack_interval
 
 
@@ -274,6 +275,7 @@ func on_kill(at: Vector2, is_boss: bool) -> int:
 func modify_damage(enemy: Enemy, weapon: WeaponData, base: float) -> float:
 	var bonus := base_weapon_damage_bonus()
 	bonus += player.class_combat.damage_bonus(enemy, weapon)
+	bonus += player.module_damage_bonus(enemy, weapon)
 	if enemy.data.is_boss:
 		bonus += power(&"boss_bonus") * 100.0
 	if enemy.has_bleeding():

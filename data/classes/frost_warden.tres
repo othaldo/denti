@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="PlayerClassData" load_steps=5 format=3]
+[ext_resource type="Script" path="res://scripts/player/player_class_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/talents/frost_warden.tres" id="2"]
+[ext_resource type="Texture2D" path="res://assets/classes/frost_warden_portrait.png" id="3"]
+[ext_resource type="Script" path="res://scripts/player/dash_data.gd" id="4"]
+[sub_resource type="Resource" id="Dash"]
+script = ExtResource("4")
+capacity = 100.0
+cost = 100.0
+distance = 150.0
+duration = 0.16
+recharge_rate = 18.0
+[resource]
+script = ExtResource("1")
+id = &"frost_warden"
+tagline = "Bis hierhin und nicht weiter: Dein Dash zieht eine Eiswand."
+play_style = Array[String](["Setz Eiswände quer zur Horde: Gegner stauen sich und kühlen aus", "Wer lange an der Wand steht, wird spröde", "Langsamer, nur ein Dash; Bosse brechen durch"])
+portrait = ExtResource("3")
+combat_sprite = ExtResource("3")
+display_name = "Frostwächter"
+description = "Der Frostwächter hinterlässt mit jedem Dash eine Eiswand. Gewöhnliche Gegner kommen nicht hindurch, stauen sich davor, werden verlangsamt und nach kurzer Zeit spröde. Bosse zerbrechen die Wand. Die Wand hält keine Geschosse auf."
+root_capacity = 6
+starting_stats = {"speed_bonus": -10.0, "armor": 2.0}
+preferred_tags = Array[StringName]([&"defense", &"shield", &"area", &"crit"])
+dash_override = SubResource("Dash")
+talent_tree = ExtResource("2")
