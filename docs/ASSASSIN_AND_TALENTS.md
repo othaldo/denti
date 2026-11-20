@@ -4,6 +4,17 @@ Stand **05.11.2026**: spielbare Umsetzung von P3 des
 [Klassen-/Synergieplans](CLASSES_AND_SYNERGIES_IMPLEMENTATION_PLAN.md).
 Vollständige Run-/Endlosbalance und menschliche Spielstilabnahme bleiben offen.
 
+**Nach dem Handy-Spieltest auf Hard gestalterisch nicht abgenommen:** Talente
+und Dash unterscheiden sich für den Spieler zu wenig. Der Duell-/Fokusansatz
+wird als künftiger Klassenkern verworfen. [Feedback und Konsequenzen](HORDE_PLAYSTYLE_REVIEW.md).
+Der folgende Text dokumentiert den noch vorhandenen technischen Stand.
+
+**Abgelöst am 20.11.2026:** Antritt, Fokus, Giftstich und die Abschlusssperre sind
+beim Assassinen entfernt. Neues Verb, Werte und Talentäste: [Klassen-Essenz](CLASS_ESSENCE.md).
+Der Text unten ist für Assassinenwege nur noch historisch; Good Old Molar behält
+sein Antrittstalent. Alte Spielstände erstatten entfernte Talentränge als
+ausstehende Levelpunkte.
+
 ## Klassenauswahl
 
 Die Vorbereitung führt durch **Schwierigkeit → Klasse → Waffe**. Bereits gewählte
@@ -164,7 +175,8 @@ $env:APPDATA = Join-Path (Get-Location) '.godot/class_earned_userdata'
 [Good Old Molar Mobil](screenshots/class_talents/molar_mobile.png).
 Native Godot-Compatibility-Aufnahmen mit `tools/preview_class_talents.gd`.
 
-Neues gemaltes Porträt: [assassin_portrait.png](../assets/classes/assassin_portrait.png).
+Aktuelles gemaltes Porträt: [assassin_portrait_v2.png](../assets/classes/assassin_portrait_v2.png).
+Nach Nutzerfeedback: grüne, tief gezogene Mütze, Maske und finstere Miene.
 Eingebautes `imagegen`, transparente Ausgabe, kanonisches Denti als Referenz.
-[Exakter Prompt](../assets/classes/assassin_portrait.prompt.md).
+[Exakter Prompt](../assets/classes/assassin_portrait_v2.prompt.md).
 Bestehende Referenzen und Kampfgrafiken bleiben erhalten.

@@ -37,8 +37,10 @@ func valid() -> bool:
 	for conversion in conversions:
 		if conversion == null or not conversion.valid() or _cyclic(conversion.target_stat, []): return false
 	if dash_override != null:
-		for key in ["capacity", "cost", "distance", "duration", "recharge_rate", "cooldown", "contact_damage_multiplier"]:
+		for key in ["capacity", "cost", "distance", "duration", "recharge_rate", "cooldown"]:
 			if not is_finite(float(dash_override.get(key))) or float(dash_override.get(key)) <= 0.0: return false
+		# Zero is valid: a pass-through dash without contact damage.
+		if not is_finite(dash_override.contact_damage_multiplier) or dash_override.contact_damage_multiplier < 0.0: return false
 		if not is_finite(dash_override.recovery_delay) or dash_override.recovery_delay < 0.0 or not is_finite(dash_override.max_stamina_bonus) or dash_override.max_stamina_bonus < 0.0: return false
 		if dash_override.capacity < dash_override.cost: return false
 	return true

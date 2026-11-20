@@ -1,8 +1,12 @@
 class_name TalentPanel
 extends CanvasLayer
 
-signal talent_requested(id: StringName)
-signal stat_requested(id: StringName)
+## Post-wave level point distribution in one talent tree. Attributes are path
+## nodes inside the tree; there is no separate attribute tab any more.
+## Tap/click selects a node, tapping the selected node again (or the button)
+## spends a point.
+
+signal talent_requested(id: StringName, stat: StringName)
 signal undo_requested
 signal completed
 signal cursor_changed
@@ -14,17 +18,17 @@ var count := 0
 var tab := "talent"
 var selected: StringName
 var stage: RewardStage
-var content: VBoxContainer
-var grid: GridContainer
-var branches: BoxContainer
-var details: VBoxContainer
+var view: TalentTreeView
+var details: PanelContainer
 var detail_title: Label
+var detail_kind: Label
 var detail_text: Label
+var detail_reason: Label
 var buy_button: Button
+var choice_row: HFlowContainer
+var free_stat: StringName
 var undo_button: Button
 var done_button: Button
-var tab_buttons: Array[Button] = []
-var cards: Dictionary = {}
 
 func _ready() -> void:
 	layer = 12
@@ -32,49 +36,46 @@ func _ready() -> void:
 	stage = RewardStage.new()
 	add_child(stage)
 	stage.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	content = VBoxContainer.new()
-	content.add_theme_constant_override("separation", 16)
-	var tabs := HBoxContainer.new()
-	content.add_child(tabs)
-	for kind in ["talent", "stat"]:
-		var button := _button("Talente" if kind == "talent" else "Attribute")
-		button.pressed.connect(func() -> void:
-			tab = kind
-			selected = &""
-			_save_cursor()
-			refresh())
-		tabs.add_child(button)
-		tab_buttons.append(button)
-	details = VBoxContainer.new()
-	details.add_theme_constant_override("separation", 8)
-	content.add_child(details)
-	detail_title = _label(details, "", 22)
-	detail_text = _label(details, "", 16)
+	view = TalentTreeView.new()
+	view.node_pressed.connect(_on_node_pressed)
+	view.branch_selected.connect(func(_branch: int) -> void: stage.refresh_focus())
+	view.compact_changed.connect(_on_compact_changed)
+	details = PanelContainer.new()
+	DentiUIStyle.style_chip(details)
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 8)
+	details.add_child(column)
+	view.add_child(details)
+	detail_title = _label(column, "", 22)
+	detail_kind = _label(column, "", 14)
+	detail_kind.add_theme_color_override("font_color", DentiUIStyle.MUTED)
+	detail_text = _label(column, "", 16)
+	detail_text.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	detail_reason = _label(column, "", 15)
+	detail_reason.add_theme_color_override("font_color", DentiUIStyle.CORAL)
+	choice_row = HFlowContainer.new()
+	choice_row.add_theme_constant_override("h_separation", 6)
+	choice_row.add_theme_constant_override("v_separation", 6)
+	column.add_child(choice_row)
 	buy_button = _button("Skillen · 1 LP", true)
-	details.add_child(buy_button)
-	buy_button.pressed.connect(func() -> void:
-		if tab == "talent": talent_requested.emit(selected)
-		else: stat_requested.emit(selected))
-	branches = BoxContainer.new()
-	branches.add_theme_constant_override("separation", 20)
-	content.add_child(branches)
-	grid = GridContainer.new()
-	grid.add_theme_constant_override("h_separation", 12)
-	grid.add_theme_constant_override("v_separation", 10)
-	content.add_child(grid)
+	column.add_child(buy_button)
+	buy_button.pressed.connect(_buy_selected)
 	undo_button = _button("Rückgängig")
 	undo_button.pressed.connect(undo_requested.emit)
 	stage.footer.add_child(undo_button)
 	done_button = _button("Übernehmen", true)
 	done_button.pressed.connect(completed.emit)
 	stage.footer.add_child(done_button)
-	stage.layout_changed.connect(func(extent: Vector2) -> void:
-		branches.vertical = extent.x < 620
-		grid.columns = 2 if extent.x < 620 else 4)
-	stage.present("Entwicklung", content)
+	stage.present("Entwicklung", view)
 	ControllerPrompt.bind(done_button, &"ui_confirm", false)
 	ControllerPrompt.bind(undo_button, &"ui_undo", false)
 	hide()
+
+func _on_compact_changed(compact: bool) -> void:
+	detail_title.add_theme_font_size_override("font_size", 18 if compact else 22)
+	detail_text.add_theme_font_size_override("font_size", 14 if compact else 16)
+	detail_kind.visible = not compact
+	buy_button.custom_minimum_size.y = 40 if compact else 48
 
 func _button(text: String, primary: bool = false) -> Button:
 	var button := Button.new()
@@ -84,11 +85,11 @@ func _button(text: String, primary: bool = false) -> Button:
 	DentiUIStyle.style_button(button, primary)
 	return button
 
-func _label(parent: Node, text: String, size: int) -> Label:
+func _label(parent: Node, text: String, font_size: int) -> Label:
 	var label := Label.new()
 	label.text = text
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label.add_theme_font_size_override("font_size", size)
+	label.add_theme_font_size_override("font_size", font_size)
 	parent.add_child(label)
 	return label
 
@@ -97,27 +98,61 @@ func present(progress: TalentProgression, context: PlayerStats, templates: Array
 	stats = context
 	upgrades = templates
 	count = pending
-	tab = str(state.cursor.get("tab", "talent"))
+	tab = "talent"
 	selected = StringName(str(state.cursor.get("id", "")))
+	view.setup(stats.class_data.talent_tree, upgrades, details)
+	if stats.class_data.talent_tree.by_id(selected) == null: selected = _default_selection()
+	var node := stats.class_data.talent_tree.by_id(selected)
+	if node != null: view.focus_branch = node.branch
 	show()
 	refresh()
-	stage.body_scroll.scroll_vertical = 0
 
-func _clear(parent: Node) -> void:
-	for child in parent.get_children():
-		parent.remove_child(child)
-		child.queue_free()
+func _default_selection() -> StringName:
+	var tree := stats.class_data.talent_tree
+	for node in tree.nodes:
+		if state.reason(node.id, stats, upgrades, count).is_empty(): return node.id
+	return tree.nodes[0].id
+
+func _on_node_pressed(id: StringName) -> void:
+	if id == selected and state.reason(id, stats, upgrades, count).is_empty():
+		_buy_selected()
+		return
+	_select(id)
+
+func _buy_selected() -> void:
+	var node := stats.class_data.talent_tree.by_id(selected)
+	if node == null: return
+	if node.free_attribute:
+		var options := state.free_choices(stats, upgrades)
+		if free_stat not in options: free_stat = options[0] if not options.is_empty() else &""
+		if free_stat == &"": return
+	talent_requested.emit(selected, free_stat if node.free_attribute else &"")
+
+func _pick_free(key: StringName) -> void:
+	free_stat = key
+	refresh()
 
 func _select(id: StringName) -> void:
 	selected = id
+	var node := stats.class_data.talent_tree.by_id(id)
+	if node != null and view.compact and node.branch != view.focus_branch:
+		view.focus_branch = node.branch
+		view.layout_in(view.extent)
 	_save_cursor()
-	_refresh_detail()
-	stage.body_scroll.scroll_vertical = 0
-	buy_button.grab_focus()
+	refresh()
+	var focused := view.button(id)
+	if focused != null and focused.visible: focused.grab_focus()
 
 func _save_cursor() -> void:
-	state.cursor = {"tab": tab, "id": str(selected)}
+	state.cursor = {"tab": "talent", "id": str(selected)}
 	cursor_changed.emit()
+
+func node_state(node: TalentNodeData, ranks: Dictionary) -> TalentNodeButton.State:
+	var rank := int(ranks.get(str(node.id), 0))
+	if rank >= node.max_ranks: return TalentNodeButton.State.MAXED
+	if state.reason(node.id, stats, upgrades, count).is_empty(): return TalentNodeButton.State.AVAILABLE
+	if rank > 0: return TalentNodeButton.State.INVESTED
+	return TalentNodeButton.State.OPEN if state.structurally_open(node.id, stats.class_data.talent_tree) else TalentNodeButton.State.LOCKED
 
 func refresh() -> void:
 	if state == null or stats == null: return
@@ -128,87 +163,72 @@ func refresh() -> void:
 	stage.progress_label.tooltip_text = "Freie Levelpunkte"
 	undo_button.disabled = state.actions.is_empty()
 	done_button.disabled = count <= 0 or state.used(tree) != count
-	for index in tab_buttons.size(): RunSetupStyle.choice(tab_buttons[index], tab == ("talent" if index == 0 else "stat"), get_node("/root/GameInput").navigation_active)
-	_clear(branches)
-	_clear(grid)
-	cards.clear()
-	branches.visible = tab == "talent"
-	grid.visible = tab == "stat"
 	var ranks := state.draft_ranks()
-	if tab == "talent":
-		for branch in 2:
-			var column := VBoxContainer.new()
-			column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			column.add_theme_constant_override("separation", 10)
-			branches.add_child(column)
-			_label(column, tree.branches[branch], 21)
-			for node in tree.nodes:
-				if node.branch != branch: continue
-				if node.parent != &"":
-					var line := ColorRect.new()
-					line.color = DentiUIStyle.GOLD if int(ranks.get(str(node.parent), 0)) >= node.parent_rank else DentiUIStyle.LINE
-					line.custom_minimum_size = Vector2(2, 14)
-					line.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-					column.add_child(line)
-				var rank := int(ranks.get(str(node.id), 0))
-				var button := _button("%s  ·  %d/%d" % [node.display_name, rank, node.max_ranks])
-				button.icon = DentiUIIcons.item(node.icon_index)
-				button.add_theme_constant_override("icon_max_width", 40)
-				button.custom_minimum_size.y = 64
-				button.clip_text = true
-				button.tooltip_text = node.description
-				var reason := state.reason(node.id, stats, upgrades, count)
-				if not reason.is_empty() and rank == 0: button.modulate = Color(0.65, 0.65, 0.65)
-				RunSetupStyle.choice(button, rank > 0, get_node("/root/GameInput").navigation_active)
-				button.pressed.connect(func() -> void: _select(node.id))
-				column.add_child(button)
-				cards[str(node.id)] = button
-	else:
-		for upgrade in upgrades:
-			if upgrade.stat == &"ranged_damage" and stats.class_data.allowed_weapon_roles == [&"contact"]: continue
-			var choice := state.stat_choice(upgrade.stat, stats, upgrades)
-			var button := _button(upgrade.display_name)
-			button.add_theme_font_size_override("font_size", 14)
-			button.icon = DentiUIIcons.stat(upgrade.icon_index)
-			button.add_theme_constant_override("icon_max_width", 22)
-			button.clip_text = true
-			button.disabled = choice == null
-			button.pressed.connect(func() -> void: _select(upgrade.stat))
-			grid.add_child(button)
-			cards[str(upgrade.stat)] = button
-	_refresh_detail()
+	var branch_points: Array[int] = []
+	for branch in TalentNodeData.BRANCHES: branch_points.append(tree.branch_points(ranks, branch))
+	view.update_state(ranks, branch_points, get_node("/root/GameInput").navigation_active)
+	for node in tree.nodes:
+		view.button(node.id).set_state(int(ranks.get(str(node.id), 0)), node_state(node, ranks), node.id == selected)
+	_refresh_detail(ranks)
 	stage.relayout()
 
-func _refresh_detail() -> void:
-	details.visible = selected != &""
-	if not details.visible: return
-	if tab == "talent":
-		var node := stats.class_data.talent_tree.by_id(selected)
-		if node == null:
-			details.hide()
-			return
+func _refresh_detail(ranks: Dictionary) -> void:
+	var tree := stats.class_data.talent_tree
+	var node := tree.by_id(selected)
+	details.visible = node != null
+	if node == null: return
+	var rank := int(ranks.get(str(node.id), 0))
+	var reason := state.reason(selected, stats, upgrades, count)
+	var preview := state.preview_stats(stats, upgrades)
+	_build_choices(node)
+	if node.free_attribute:
+		var options := state.free_choices(stats, upgrades)
+		if free_stat not in options and not options.is_empty(): free_stat = options[0]
+		var picked := state.stat_choice(free_stat, stats, upgrades) if free_stat in options else null
+		var picked_template := TalentProgression.template_for(upgrades, free_stat)
+		detail_title.text = "Freie Wurzel · %s" % picked_template.display_name if picked_template != null else "Freie Wurzel"
+		detail_kind.text = "%s · Rang %d/%d" % [tree.branches[node.branch], rank, node.max_ranks]
+		detail_text.text = (picked.effect_text() + "\n" + DentiAttributes.upgrade_preview_text(preview, DentiAttributes.from_key(picked.stat), picked.amount)) if picked != null else ""
+	elif node.is_attribute():
+		var template := TalentProgression.template_for(upgrades, node.stat)
+		var choice := state.attribute_choice(node, stats, upgrades)
+		detail_title.text = template.display_name if template != null else str(node.stat)
+		detail_kind.text = "%s · Rang %d/%d" % [tree.branches[node.branch], rank, node.max_ranks]
+		detail_text.text = (choice.effect_text() + "\n" + DentiAttributes.upgrade_preview_text(preview, DentiAttributes.from_key(choice.stat), choice.amount)) if choice != null else ""
+	else:
 		detail_title.text = node.display_name
-		var reason := state.reason(selected, stats, upgrades, count)
-		detail_text.text = node.description + ("\n" + reason if not reason.is_empty() else "")
-		if reason.is_empty() and not node.stat_changes.is_empty():
-			var preview := state.preview_stats(stats, upgrades)
+		detail_kind.text = "%s · Rang %d/%d" % [tree.branches[node.branch], rank, node.max_ranks]
+		detail_text.text = node.description
+		if reason.is_empty():
 			for key in node.stat_changes:
 				detail_text.text += "\n" + DentiAttributes.upgrade_preview_text(preview, DentiAttributes.from_key(StringName(key)), float(node.stat_changes[key]))
-			preview.free()
-		buy_button.text = "Skillen · %d LP" % node.cost
-		buy_button.disabled = not reason.is_empty()
-	else:
-		var choice := state.stat_choice(selected, stats, upgrades)
-		var template := TalentProgression.template_for(upgrades, selected)
-		if template == null:
-			details.hide()
-			return
-		detail_title.text = template.display_name
-		var preview := state.preview_stats(stats, upgrades)
-		detail_text.text = (choice.effect_text() + "\n" + DentiAttributes.upgrade_preview_text(preview, DentiAttributes.from_key(choice.stat), choice.amount)) if choice != null else "Attributgrenze erreicht"
-		preview.free()
-		buy_button.text = "Steigern · 1 LP"
-		buy_button.disabled = choice == null or state.used(stats.class_data.talent_tree) >= count
+	preview.free()
+	detail_reason.text = reason
+	detail_reason.visible = not detail_reason.text.is_empty()
+	buy_button.text = "Skillen · %d LP" % node.cost
+	buy_button.disabled = not reason.is_empty()
+
+## Free nodes: one icon per class-usable attribute; spent attributes at their cap are disabled.
+func _build_choices(node: TalentNodeData) -> void:
+	for child in choice_row.get_children():
+		choice_row.remove_child(child)
+		child.queue_free()
+	choice_row.visible = node.free_attribute
+	if not node.free_attribute: return
+	var options := state.free_choices(stats, upgrades)
+	var keyboard: bool = get_node("/root/GameInput").navigation_active
+	for upgrade in upgrades:
+		if not TalentProgression.class_allows(upgrade.stat, stats.class_data): continue
+		var pick := Button.new()
+		pick.icon = DentiUIIcons.stat(upgrade.icon_index)
+		pick.expand_icon = true
+		pick.custom_minimum_size = Vector2(40, 40)
+		pick.tooltip_text = upgrade.display_name
+		pick.disabled = upgrade.stat not in options
+		RunSetupStyle.choice(pick, upgrade.stat == free_stat, keyboard, 10)
+		var key := upgrade.stat
+		pick.pressed.connect(func() -> void: _pick_free(key))
+		choice_row.add_child(pick)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not visible or not ControllerFocus.active(stage): return

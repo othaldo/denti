@@ -71,7 +71,7 @@ const HUD_ROWS := 2
 
 
 static func item(index: int) -> Texture2D:
-	if index >= 103 and index <= 104:
+	if index >= 103 and index <= 105:
 		return _poison_icon(index - 103)
 	if index >= SUPPORT_ICON_START and index < SUPPORT_ICON_START + SUPPORT_REGIONS.size():
 		var region := SUPPORT_REGIONS[index - SUPPORT_ICON_START]

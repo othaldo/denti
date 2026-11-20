@@ -5,7 +5,7 @@ var path := "flexible"
 func _run() -> void:
 	root.get_node("SceneTransitions").enabled = false
 	var report := {"schema_version": 1, "hz": 60, "method": "One free drill; actual HP, drops, XP points, shared stat/talent budget, paid shops and finite dash charge. Normal W1-5, deterministic hunt without hazard reading. Diagnostic policies, not winrates.", "samples": []}
-	for policy: String in ["flexible", "poison", "pursuit"]:
+	for policy: String in ["flexible", "silk", "rush"]:
 		path = policy
 		for sample_seed in [13579, 24680]:
 			var sample: Dictionary = await sample_run("turbo_drill", &"normal", "hunt", sample_seed)
@@ -25,8 +25,8 @@ func make_run(build: String, difficulty: StringName, sample_seed: int):
 
 func spend_talent_points(game) -> void:
 	var order: Array[StringName] = [&"versatile", &"molar_opener", &"molar_stride"]
-	if path == "poison": order = [&"venom_opener", &"venom_stride", &"venom_switch"]
-	elif path == "pursuit": order = [&"pressure", &"pursuit_health", &"pursuit_finish"]
+	if path == "silk": order = [&"venom_dose", &"venom_nerve", &"silk_wide"]
+	elif path == "rush": order = [&"rush_refund", &"rush_cross", &"rush_spool"]
 	for point in 100:
 		if game.talents.used(game.player.stats.class_data.talent_tree) >= game.rewards.pending_levels: break
 		var planned := false
@@ -50,17 +50,15 @@ func before_combat_step(game, _frame: int) -> bool:
 
 func farm_direction(game, movement: String, elapsed: float) -> Vector2:
 	if path == "flexible" or WaveController.is_boss_wave(game.wave.current_wave): return super.farm_direction(game, movement, elapsed)
-	var target: Enemy = game.player.class_combat.focus.get_ref() as Enemy if path == "pursuit" and game.player.class_combat.focus != null else null
-	if not is_instance_valid(target) or not target.is_targetable():
-		var best := INF
-		for enemy: Enemy in game.get_node("Enemies").get_children():
-			if not enemy.is_targetable(): continue
-			var distance: float = enemy.global_position.distance_squared_to(game.player.global_position)
-			# Select a new approach, never override automatic weapon targeting.
-			if path == "poison" and enemy.affix_effects.depot.target_lock > 0: distance *= 4
-			if distance < best:
-				best = distance
-				target = enemy
+	var target: Enemy = null
+	var best := INF
+	for enemy: Enemy in game.get_node("Enemies").get_children():
+		if not enemy.is_targetable(): continue
+		var distance: float = enemy.global_position.distance_squared_to(game.player.global_position)
+		# Select a new approach, never override automatic weapon targeting.
+		if distance < best:
+			best = distance
+			target = enemy
 	if target == null: return super.farm_direction(game, movement, elapsed)
 	var offset: Vector2 = target.global_position - game.player.global_position
 	var inward := offset.normalized() if not offset.is_zero_approx() else Vector2.RIGHT

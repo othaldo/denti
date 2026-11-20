@@ -15,11 +15,21 @@ var recovery: float = 0.0
 var remaining: float = 0.0
 var direction := Vector2.DOWN
 var last_direction := Vector2.DOWN
+## Talent reduction of the per-dash cost; never below half the class cost.
+var cost_cut := 0.0
+## Talent bonus to dash length; duration stays fixed, so the dash gets faster.
+var distance_bonus := 0.0
 var active: bool:
 	get: return remaining > 0.0
 
+func distance() -> float:
+	return config.distance + maxf(distance_bonus, 0.0)
+
+func cost() -> float:
+	return maxf(config.cost - cost_cut, config.cost * 0.5)
+
 func ready_to_dash() -> bool:
-	return not active and charge >= config.cost - 0.00001 and cooldown <= 0.00001
+	return not active and charge >= cost() - 0.00001 and cooldown <= 0.00001
 
 func request(movement: Vector2, in_combat: bool) -> bool:
 	clamp_charge()
@@ -27,7 +37,7 @@ func request(movement: Vector2, in_combat: bool) -> bool:
 		return false
 	direction = movement.normalized() if not movement.is_zero_approx() else last_direction
 	last_direction = direction
-	charge = maxf(charge - config.cost, 0.0)
+	charge = maxf(charge - cost(), 0.0)
 	cooldown = config.cooldown
 	remaining = config.duration
 	recovery = config.recovery_delay
@@ -54,9 +64,9 @@ func advance(player: Player, delta: float) -> void:
 	if active:
 		var used := minf(time, remaining)
 		var before := player.global_position
-		var stopped := DashCollision.move(player, direction * config.distance / config.duration * used, used)
+		var stopped := DashCollision.move(player, direction * distance() / config.duration * used, used)
 		if stopped:
-			used *= clampf(before.distance_to(player.global_position) / (config.distance / config.duration * used), 0, 1)
+			used *= clampf(before.distance_to(player.global_position) / (distance() / config.duration * used), 0, 1)
 		player.dash_motion_seconds = used
 		remaining = maxf(remaining - used, 0.0)
 		time -= used

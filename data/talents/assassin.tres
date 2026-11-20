@@ -1,62 +1,307 @@
-[gd_resource type="Resource" script_class="TalentTreeData" load_steps=9 format=3]
+[gd_resource type="Resource" script_class="TalentTreeData" load_steps=40 format=3]
 [ext_resource type="Script" path="res://scripts/player/talent_tree_data.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/player/talent_node_data.gd" id="2"]
-[sub_resource type="Resource" id="Gift"]
+[sub_resource type="Resource" id="N0"]
 script = ExtResource("2")
-id = &"venom_opener"
-display_name = "Giftstich"
-description = "Dein Antritt setzt ein Giftdepot mit 75 % Stärke. Geteilte Depotgrenzen; Depotfüllung behält ihre volle Stärke."
-effects = {"opener_poison": 0.75}
+id = &"silk_a_melee"
+stat = &"melee_damage"
+column = 0
+max_ranks = 8
+[sub_resource type="Resource" id="N1"]
+script = ExtResource("2")
+id = &"venom_dose"
+display_name = "Giftfaden"
+description = "Mehr Spurgift: +10 Giftbudget je Rang."
+max_ranks = 3
+effects = {"trail_poison": 10.0}
 icon_index = 103
-[sub_resource type="Resource" id="Lauf"]
+[sub_resource type="Resource" id="N2"]
 script = ExtResource("2")
-id = &"venom_stride"
-display_name = "Flüchtig"
-description = "+4 % Bewegung je Rang."
-parent = &"venom_opener"
+id = &"silk_a_bite"
+stat = &"damage_bonus"
+column = 2
+max_ranks = 8
+[sub_resource type="Resource" id="N3"]
+script = ExtResource("2")
+id = &"silk_edge"
+display_name = "Scharfe Seide"
+description = "+8 Spurschaden je Rang."
+row = 1
+column = 0
+max_ranks = 2
+effects = {"trail_damage": 8.0}
+icon_index = 17
+[sub_resource type="Resource" id="N4"]
+script = ExtResource("2")
+id = &"venom_field"
+display_name = "Lange Schwaden"
+description = "Das Giftfeld bleibt 1 s länger liegen. Je Rang."
+row = 1
+max_ranks = 2
+effects = {"trail_field": 1.0}
+icon_index = 20
+[sub_resource type="Resource" id="N5"]
+script = ExtResource("2")
+id = &"silk_a_crit"
+stat = &"crit_chance"
+row = 1
+column = 2
 max_ranks = 3
-stat_changes = {"speed_bonus": 4.0}
-icon_index = 8
-[sub_resource type="Resource" id="Wechsel"]
+[sub_resource type="Resource" id="N6"]
 script = ExtResource("2")
-id = &"venom_switch"
-display_name = "Beißwechsel"
-description = "Antritt gegen ein anderes Ziel als beim letzten Antritt: zusätzlich +25 % Waffenschaden. Gilt auch nach einem Kill. Legt deinen Abschlussweg fest."
-parent = &"venom_stride"
-parent_rank = 3
-exclusive_group = &"assassin_finish"
-effects = {"switch_opener_bonus": 25.0}
+id = &"silk_a_tempo"
+stat = &"attack_speed"
+row = 2
+column = 0
+max_ranks = 4
+[sub_resource type="Resource" id="N7"]
+script = ExtResource("2")
+id = &"venom_nerve"
+display_name = "Lähmende Schneise"
+description = "Gegner im Giftfeld werden verlangsamt (wie Nervensonde)."
+row = 2
+parent = &"venom_dose"
+effects = {"trail_nerve": 1.0}
 icon_index = 104
-[sub_resource type="Resource" id="Fokus"]
+[sub_resource type="Resource" id="N8"]
 script = ExtResource("2")
-id = &"pressure"
-display_name = "Druckpunkt"
-description = "Fokustreffer: +4 % Waffenschaden je Stufe, maximal vier. Aufbau alle 0.45 s; ohne Treffer auf das Fokusziel nach 2 s verloren."
-branch = 1
-effects = {"focus_bonus": 4.0}
-icon_index = 16
-[sub_resource type="Resource" id="Polster"]
-script = ExtResource("2")
-id = &"pursuit_health"
-display_name = "Bisspolster"
-description = "+8 Schmelz je Rang."
-branch = 1
-parent = &"pressure"
+id = &"silk_free_1"
+free_attribute = true
+row = 2
+column = 2
 max_ranks = 3
-stat_changes = {"max_health": 8.0}
-icon_index = 7
-[sub_resource type="Resource" id="Bleiben"]
+[sub_resource type="Resource" id="N9"]
 script = ExtResource("2")
-id = &"pursuit_finish"
-display_name = "Durchziehen"
-description = "Bei vier Fokusstufen zusätzlich +20 % Waffenschaden gegen dieses Ziel. Legt deinen Abschlussweg fest."
+id = &"silk_free_2"
+free_attribute = true
+row = 3
+column = 0
+max_ranks = 3
+[sub_resource type="Resource" id="N10"]
+script = ExtResource("2")
+id = &"silk_wide"
+display_name = "Breite Schwaden"
+description = "+14 px Spurbreite je Rang."
+row = 3
+parent = &"venom_nerve"
+max_ranks = 2
+effects = {"trail_width": 14.0}
+icon_index = 12
+[sub_resource type="Resource" id="N11"]
+script = ExtResource("2")
+id = &"silk_free_3"
+free_attribute = true
+row = 3
+column = 2
+max_ranks = 5
+[sub_resource type="Resource" id="N12"]
+script = ExtResource("2")
+id = &"silk_free_4"
+free_attribute = true
+row = 4
+column = 0
+max_ranks = 5
+[sub_resource type="Resource" id="N13"]
+script = ExtResource("2")
+id = &"silk_bind"
+display_name = "Zuschnüren"
+description = "Überlebende werden beim Zuschnappen bis zu 45 px auf die Spur gezogen. Die Horde ballt sich für den nächsten Schnitt."
+row = 4
+parent = &"silk_wide"
+effects = {"trail_pull": 45.0}
+icon_index = 10
+[sub_resource type="Resource" id="N14"]
+script = ExtResource("2")
+id = &"venom_focus"
+display_name = "Giftschneise"
+description = "Schlüsselstein: Spur-Direktschaden nur noch 35 %, Spurgift ×2.5."
+row = 4
+column = 2
+effects = {"trail_poison_focus": 1.0}
+icon_index = 105
+[sub_resource type="Resource" id="N15"]
+script = ExtResource("2")
+id = &"rush_a_speed"
+stat = &"speed_bonus"
 branch = 1
-parent = &"pursuit_health"
-parent_rank = 3
-exclusive_group = &"assassin_finish"
-effects = {"focus_finish_bonus": 20.0}
-icon_index = 4
+column = 0
+max_ranks = 6
+[sub_resource type="Resource" id="N16"]
+script = ExtResource("2")
+id = &"rush_refund"
+display_name = "Naschkatze"
+description = "Spur-Kills geben +5 Wurzelkraft mehr zurück; Obergrenze je Spur +20. Je Rang."
+branch = 1
+max_ranks = 3
+effects = {"trail_refund": 5.0, "trail_refund_cap": 20.0}
+icon_index = 73
+[sub_resource type="Resource" id="N17"]
+script = ExtResource("2")
+id = &"rush_a_stamina"
+stat = &"dash_recovery_bonus"
+branch = 1
+column = 2
+max_ranks = 6
+[sub_resource type="Resource" id="N18"]
+script = ExtResource("2")
+id = &"rush_a_dodge"
+stat = &"dodge_chance"
+branch = 1
+row = 1
+column = 0
+max_ranks = 4
+[sub_resource type="Resource" id="N19"]
+script = ExtResource("2")
+id = &"rush_reach"
+display_name = "Weiter Sprung"
+description = "+30 px Dashweite je Rang."
+branch = 1
+row = 1
+max_ranks = 2
+effects = {"dash_distance": 30.0}
+icon_index = 8
+[sub_resource type="Resource" id="N20"]
+script = ExtResource("2")
+id = &"rush_a_tempo"
+stat = &"attack_speed"
+branch = 1
+row = 1
+column = 2
+max_ranks = 4
+[sub_resource type="Resource" id="N21"]
+script = ExtResource("2")
+id = &"rush_cross"
+display_name = "Kreuzschnitt"
+description = "Schnappt eine Spur über einer noch sichtbaren Spur zu, explodiert die Kreuzung mit 150 % Spurschaden."
+branch = 1
+row = 2
+parent = &"rush_refund"
+effects = {"trail_cross": 1.5}
+icon_index = 27
+[sub_resource type="Resource" id="N22"]
+script = ExtResource("2")
+id = &"rush_spool"
+display_name = "Doppelspule"
+description = "Eine weitere Spur kann gleichzeitig gespannt sein."
+branch = 1
+row = 3
+parent = &"rush_cross"
+effects = {"trail_limit": 1.0}
+icon_index = 72
+[sub_resource type="Resource" id="N23"]
+script = ExtResource("2")
+id = &"rush_free_1"
+free_attribute = true
+branch = 1
+row = 2
+column = 0
+max_ranks = 3
+[sub_resource type="Resource" id="N24"]
+script = ExtResource("2")
+id = &"rush_free_2"
+free_attribute = true
+branch = 1
+row = 2
+column = 2
+max_ranks = 3
+[sub_resource type="Resource" id="N25"]
+script = ExtResource("2")
+id = &"rush_free_3"
+free_attribute = true
+branch = 1
+row = 3
+column = 0
+max_ranks = 5
+[sub_resource type="Resource" id="N26"]
+script = ExtResource("2")
+id = &"rush_reset"
+display_name = "Nachbrenner"
+description = "Ein Spur-Kill setzt die Dash-Abklingzeit zurück."
+branch = 1
+row = 3
+column = 2
+parent = &"rush_cross"
+effects = {"trail_kill_reset": 1.0}
+icon_index = 27
+[sub_resource type="Resource" id="N27"]
+script = ExtResource("2")
+id = &"rush_sprint"
+display_name = "Sprintfaden"
+description = "Schlüsselstein: Dashes kosten 25 Wurzelkraft weniger, Spur-Direktschaden −25 %."
+branch = 1
+row = 4
+parent = &"rush_spool"
+effects = {"dash_cost_cut": 25.0, "trail_weakness": 0.25}
+icon_index = 14
+[sub_resource type="Resource" id="N28"]
+script = ExtResource("2")
+id = &"care_a_health"
+stat = &"max_health"
+branch = 2
+column = 0
+max_ranks = 15
+[sub_resource type="Resource" id="N29"]
+script = ExtResource("2")
+id = &"care_a_armor"
+stat = &"armor"
+branch = 2
+max_ranks = 15
+[sub_resource type="Resource" id="N30"]
+script = ExtResource("2")
+id = &"care_a_regen"
+stat = &"regen"
+branch = 2
+column = 2
+max_ranks = 15
+[sub_resource type="Resource" id="N31"]
+script = ExtResource("2")
+id = &"care_a_luck"
+stat = &"luck"
+branch = 2
+row = 1
+max_ranks = 8
+[sub_resource type="Resource" id="N32"]
+script = ExtResource("2")
+id = &"care_free_1"
+free_attribute = true
+branch = 2
+row = 1
+column = 0
+max_ranks = 5
+[sub_resource type="Resource" id="N33"]
+script = ExtResource("2")
+id = &"care_free_2"
+free_attribute = true
+branch = 2
+row = 1
+column = 2
+max_ranks = 5
+[sub_resource type="Resource" id="N34"]
+script = ExtResource("2")
+id = &"care_free_3"
+free_attribute = true
+branch = 2
+row = 2
+column = 0
+max_ranks = 5
+[sub_resource type="Resource" id="N35"]
+script = ExtResource("2")
+id = &"care_free_4"
+free_attribute = true
+branch = 2
+row = 2
+column = 2
+max_ranks = 5
+[sub_resource type="Resource" id="N36"]
+script = ExtResource("2")
+id = &"care_seal"
+display_name = "Versiegelung"
+description = "50 % Überheilung speisen den Schildvorrat; je 20 ein Schild, maximal fünf."
+branch = 2
+row = 2
+effects = {"overheal_shield": 0.5}
+icon_index = 26
 [resource]
 script = ExtResource("1")
-branches = PackedStringArray("Giftlauf", "Nachsetzen")
-nodes = Array[ExtResource("2")]([SubResource("Gift"), SubResource("Lauf"), SubResource("Wechsel"), SubResource("Fokus"), SubResource("Polster"), SubResource("Bleiben")])
+branches = PackedStringArray("Giftspur", "Zuckerrausch", "Zahnpflege")
+nodes = Array[ExtResource("2")]([SubResource("N0"), SubResource("N1"), SubResource("N2"), SubResource("N3"), SubResource("N4"), SubResource("N5"), SubResource("N6"), SubResource("N7"), SubResource("N8"), SubResource("N9"), SubResource("N10"), SubResource("N11"), SubResource("N12"), SubResource("N13"), SubResource("N14"), SubResource("N15"), SubResource("N16"), SubResource("N17"), SubResource("N18"), SubResource("N19"), SubResource("N20"), SubResource("N21"), SubResource("N22"), SubResource("N23"), SubResource("N24"), SubResource("N25"), SubResource("N26"), SubResource("N27"), SubResource("N28"), SubResource("N29"), SubResource("N30"), SubResource("N31"), SubResource("N32"), SubResource("N33"), SubResource("N34"), SubResource("N35"), SubResource("N36")])

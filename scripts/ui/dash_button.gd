@@ -54,5 +54,5 @@ func refresh() -> void:
 	vessel.trailing_ratio = vessel.displayed_ratio
 	vessel.impact = 0.0
 	vessel._upload()
-	caption.text = "%.1f s" % dash.cooldown if dash.charge >= dash.config.cost and dash.cooldown > 0 else "/ %d" % roundi(dash.capacity)
-	tooltip_text = "Wurzelkraft · Wurzelsprung (%s)\n%d / %d · %d pro Dash · %.2f/s · voll in %.1f s\n%.1f s Cooldown · Gegnerkontakt beim Dash: +%.0f %% Schaden." % ["Tippen" if touch_mode else "Shift", roundi(dash.charge), roundi(dash.capacity), roundi(dash.config.cost), dash.config.recharge_rate, dash.config.refill_time(dash.capacity), dash.config.cooldown, (dash.config.contact_damage_multiplier - 1.0) * 100.0]
+	caption.text = "%.1f s" % dash.cooldown if dash.charge >= dash.cost() and dash.cooldown > 0 else "/ %d" % roundi(dash.capacity)
+	tooltip_text = "Wurzelkraft · Wurzelsprung (%s)\n%d / %d · %d pro Dash · %.2f/s · voll in %.1f s\n%.1f s Cooldown · %s" % ["Tippen" if touch_mode else "Shift", roundi(dash.charge), roundi(dash.capacity), roundi(dash.cost()), dash.config.recharge_rate, dash.config.refill_time(dash.capacity), dash.config.cooldown, "Kein Kontaktschaden beim Dash" if dash.config.contact_damage_multiplier <= 0.0 else "Gegnerkontakt beim Dash: %+.0f %% Schaden" % ((dash.config.contact_damage_multiplier - 1.0) * 100.0)]

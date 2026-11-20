@@ -34,7 +34,7 @@ func _ready() -> void:
 		content.offset_top = 10
 		content.offset_bottom = -12
 		var art := TextureRect.new()
-		art.texture = preload("res://assets/classes/assassin_portrait.png") if profile.id == &"assassin" else preload("res://assets/denti/denti_unarmed.png")
+		art.texture = preload("res://assets/classes/assassin_portrait_v2.png") if profile.id == &"assassin" else preload("res://assets/denti/denti_unarmed.png")
 		art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		art.custom_minimum_size.y = 125

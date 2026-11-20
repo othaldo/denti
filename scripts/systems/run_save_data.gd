@@ -19,9 +19,10 @@ static func normalize(value: Variant) -> Dictionary:
 		for entry in value.get(key, []):
 			if not entry is Dictionary:
 				return {}
-	if not _valid_structure(value):
-		return {}
 	var result: Dictionary = value.duplicate(true)
+	TalentProgression.migrate(result)
+	if not _valid_structure(result):
+		return {}
 	for section in ["stats", "presentation", "status_effects", "dash"]:
 		if result.player.has(section) and not result.player[section] is Dictionary:
 			return {}

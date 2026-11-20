@@ -37,6 +37,7 @@ var dash_motion_seconds := 0.0
 var dash_moved := false
 var _dash_held := false
 var dash_trail: DashTrail
+var dash_cut: ClassDashCut
 
 
 func nearby_enemies(at: Vector2, radius: float, include_radius: bool = true) -> Array[Enemy]:
@@ -57,6 +58,12 @@ func _ready() -> void:
 	dash.config = stats.class_data.dash_config()
 	class_combat.profile = stats.class_data
 	dash.started.connect(class_combat.on_dash)
+	dash_cut = ClassDashCut.new()
+	dash_cut.player = self
+	# Ground layer of the arena (below enemy bodies at z 3), not a child of Denti:
+	# drawing under the player node never reached the screen.
+	_attach_dash_cut.call_deferred()
+	dash.started.connect(dash_cut.on_dash_started)
 	stats.changed.connect(dash.clamp_charge)
 	get_node("/root/GameInput").changed.connect(_sync_dash_input)
 	dash_trail = DashTrail.new()
@@ -77,10 +84,12 @@ func _physics_process(delta: float) -> void:
 	var was_dashing := dash.active
 	if combat_active():
 		class_combat.advance(delta)
+		dash_cut.advance(delta)
 		dash_moved = was_dashing
 		dash.advance(self, delta)
 	else:
 		dash.finish()
+		dash_cut.release()
 	if not was_dashing:
 		velocity = direction * stats.move_speed * floor_movement_factor()
 		move_and_slide()
@@ -88,6 +97,8 @@ func _physics_process(delta: float) -> void:
 	motion_end = global_position
 	if dash_moved:
 		dash_trail.add_segment(motion_start, motion_end)
+		dash_cut.extend(motion_end)
+		if not dash.active: dash_cut.release()
 	is_moving = global_position.distance_squared_to(before_move) > 0.01
 	_animate_sprite(dash.direction if was_dashing else direction, delta)
 	hurt_time = maxf(hurt_time - delta, 0.0)
@@ -134,6 +145,15 @@ func _unhandled_input(event: InputEvent) -> void:
 func _notification(what: int) -> void:
 	if what in [NOTIFICATION_APPLICATION_FOCUS_IN, NOTIFICATION_UNPAUSED]:
 		_dash_held = Input.is_action_pressed("dash")
+	elif what == NOTIFICATION_PREDELETE and is_instance_valid(dash_cut) and dash_cut.get_parent() == null:
+		# Never attached (player freed first or used outside the arena): free it here.
+		dash_cut.free()
+
+
+## The trail lives in the arena root so it draws as ground beneath enemies.
+func _attach_dash_cut() -> void:
+	if is_instance_valid(dash_cut) and dash_cut.get_parent() == null and get_parent() != null:
+		get_parent().add_child(dash_cut)
 
 
 func _sync_dash_input() -> void:
@@ -184,6 +204,8 @@ func play_attack_animation(aim: Vector2, kind: StringName = &"brush") -> void:
 func take_contact_hit(amount: float, inflicted_statuses: Array[Dictionary] = [], during_dash: bool = false) -> float:
 	if during_dash or dash.active:
 		dash.contacted.emit()
+		# A zero multiplier means a true pass-through: no damage, no shield or dodge roll.
+		if dash.config.contact_damage_multiplier <= 0.0: return 0.0
 		amount *= dash.config.contact_damage_multiplier
 	return take_hit(amount, inflicted_statuses)
 

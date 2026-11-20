@@ -7,6 +7,15 @@ Arbeitsplan vom **05.11.2026**, auf Basis des aktuellen Checkouts.
 Menschliche Spielstilabnahme und vollständige Klassenbalance bleiben offen. Dieser Plan bündelt die bisherigen Entwürfe; bei abweichenden
 Reihenfolgen oder Beispielwerten ist er die aktuelle Arbeitsgrundlage.
 
+**Spieltestkorrektur:** P3 ist gestalterisch nicht abgenommen. Vor weiteren
+Klassen-/Elementpaketen muss der [Horden-Spielstilentwurf](HORDE_PLAYSTYLE_REVIEW.md)
+überarbeitet werden. Der vorgeschlagene Duell-/Fokuspfad entfällt als Zielbild.
+
+**Neue Leitlinie (20.11.2026):** [Klassen-Essenz](CLASS_ESSENCE.md) – Klasse =
+Verb + Linse + Verzicht. Der Assassine ist als „Durchschneiden“ (Dash-Schnittspur)
+umgebaut; Antritt/Fokus und Giftstich sind entfernt. P4 (Eis/Feuer) wartet auf den
+Spieltest dieses Prototyps; Hüter und Spültechniker folgen danach dem neuen Schema.
+
 ## Ziel und Umfang
 
 Zwei zusammenhängende, getrennt nutzbare Systeme:

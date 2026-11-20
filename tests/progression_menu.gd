@@ -187,7 +187,7 @@ func _run() -> void:
 	if not paused or game.rewards.pending_levels != 1 or not game.talent_panel.visible or game.choice_panel.visible:
 		_fail("continue lost a post-wave level-up choice")
 		return
-	game._on_talent_stat_requested(&"max_health")
+	game._on_talent_requested(&"stand_a_health")
 	game._on_talents_completed()
 	if not paused or not game.shop_panel.visible:
 		_fail("shop did not open before saving")

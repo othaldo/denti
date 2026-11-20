@@ -146,7 +146,6 @@ func preferred_tags(loadout: WeaponLoadout) -> Array[StringName]:
 				if not result.has(build_tag):
 					result.append(build_tag)
 	if is_instance_valid(loadout.stats) and loadout.stats.crit_chance >= 0.15 and not result.has(&"crit"): result.append(&"crit")
-	if float(effect_context.extra_powers.get("opener_poison", 0)) > 0 and not result.has(&"poison"): result.append(&"poison")
 	if (power(&"wave_shield") > 0 or power(&"overheal_shield") > 0 or is_instance_valid(loadout.stats) and loadout.stats.shield_charges > 0) and not result.has(&"shield"): result.append(&"shield")
 	return result
 

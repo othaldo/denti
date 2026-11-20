@@ -37,27 +37,19 @@ func _run() -> void:
 	game._award_xp(5 + 8 + 11 + 14 + 17)
 	game.wave.active = false
 	game._begin_loot_collection()
-	for extent in [Vector2i(1280, 720), Vector2i(320, 568), Vector2i(568, 320)]:
+	for extent in [Vector2i(3840, 1600), Vector2i(1920, 1080), Vector2i(1280, 720), Vector2i(320, 568), Vector2i(568, 320)]:
 		root.content_scale_size = extent
 		root.size = extent
-		game.talent_panel.selected = &""
-		game.talent_panel.tab = "talent"
-		game.talent_panel.refresh()
+		game.talent_panel._select(&"venom_dose")
 		await _capture("talent_tree_%dx%d" % [extent.x, extent.y])
-		game.talent_panel._select(&"venom_opener")
-		await _capture("talent_detail_%dx%d" % [extent.x, extent.y])
-		game.talent_panel.tab = "stat"
-		game.talent_panel._select(&"melee_damage")
-		game.talent_panel.refresh()
-		await _capture("talent_stats_%dx%d" % [extent.x, extent.y])
 	root.content_scale_size = Vector2i(1280, 720)
 	root.size = root.content_scale_size
-	game._on_talent_requested(&"venom_opener")
-	game._on_talent_requested(&"venom_stride")
-	game.talent_panel.tab = "talent"
-	game.talent_panel._select(&"venom_stride")
-	game.talent_panel.refresh()
+	for id in [&"venom_dose", &"silk_a_melee", &"silk_a_melee", &"silk_edge"]:
+		game._on_talent_requested(id)
+	game.talent_panel._select(&"venom_nerve")
 	await _capture("talent_draft_1280x720")
+	game.talent_panel._select(&"care_free_1")
+	await _capture("talent_free_1280x720")
 	# Inspect the second shipping tree in the same native component.
 	var molar := new_stats()
 	molar.begin_class(ClassCatalog.DEFAULT)

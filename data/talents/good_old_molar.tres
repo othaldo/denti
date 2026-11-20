@@ -1,7 +1,13 @@
-[gd_resource type="Resource" script_class="TalentTreeData" load_steps=9 format=3]
+[gd_resource type="Resource" script_class="TalentTreeData" load_steps=31 format=3]
 [ext_resource type="Script" path="res://scripts/player/talent_tree_data.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/player/talent_node_data.gd" id="2"]
-[sub_resource type="Resource" id="Breit"]
+[sub_resource type="Resource" id="N0"]
+script = ExtResource("2")
+id = &"tool_a_melee"
+stat = &"melee_damage"
+column = 0
+max_ranks = 8
+[sub_resource type="Resource" id="N1"]
 script = ExtResource("2")
 id = &"versatile"
 display_name = "Werkzeugkunde"
@@ -9,24 +15,71 @@ description = "+1 Nahschaden und +1 Fernschaden je Rang."
 max_ranks = 3
 stat_changes = {"melee_damage": 1.0, "ranged_damage": 1.0}
 icon_index = 4
-[sub_resource type="Resource" id="Antritt"]
+[sub_resource type="Resource" id="N2"]
+script = ExtResource("2")
+id = &"tool_a_ranged"
+stat = &"ranged_damage"
+column = 2
+max_ranks = 8
+[sub_resource type="Resource" id="N3"]
+script = ExtResource("2")
+id = &"tool_a_bite"
+stat = &"damage_bonus"
+row = 1
+column = 0
+max_ranks = 8
+[sub_resource type="Resource" id="N4"]
+script = ExtResource("2")
+id = &"tool_a_tempo"
+stat = &"attack_speed"
+row = 1
+column = 2
+max_ranks = 6
+[sub_resource type="Resource" id="N5"]
+script = ExtResource("2")
+id = &"tool_a_crit"
+stat = &"crit_chance"
+row = 2
+column = 0
+max_ranks = 4
+[sub_resource type="Resource" id="N6"]
 script = ExtResource("2")
 id = &"molar_opener"
 display_name = "Anlauf nehmen"
 description = "Erster Waffentreffer bis 0.9 s nach einem Dash: +20 % Waffenschaden."
+row = 2
 parent = &"versatile"
 effects = {"opener_bonus": 20.0}
 icon_index = 8
-[sub_resource type="Resource" id="Reserve"]
+[sub_resource type="Resource" id="N7"]
 script = ExtResource("2")
-id = &"molar_stride"
-display_name = "Wurzelreserve"
-description = "+15 Wurzelkraft je Rang. Erhöht den Vorrat, lädt ihn beim Kauf nicht auf."
-parent = &"molar_opener"
-max_ranks = 3
-stat_changes = {"dash_recovery_bonus": 15.0}
-icon_index = 28
-[sub_resource type="Resource" id="Hart"]
+id = &"tool_free_1"
+free_attribute = true
+row = 2
+column = 2
+max_ranks = 5
+[sub_resource type="Resource" id="N8"]
+script = ExtResource("2")
+id = &"tool_free_2"
+free_attribute = true
+row = 3
+column = 0
+max_ranks = 5
+[sub_resource type="Resource" id="N9"]
+script = ExtResource("2")
+id = &"tool_free_3"
+free_attribute = true
+row = 3
+column = 2
+max_ranks = 5
+[sub_resource type="Resource" id="N10"]
+script = ExtResource("2")
+id = &"stand_a_health"
+stat = &"max_health"
+branch = 1
+column = 0
+max_ranks = 15
+[sub_resource type="Resource" id="N11"]
 script = ExtResource("2")
 id = &"molar_armor"
 display_name = "Solider Schmelz"
@@ -35,26 +88,136 @@ branch = 1
 max_ranks = 3
 stat_changes = {"armor": 2.0}
 icon_index = 7
-[sub_resource type="Resource" id="Heilen"]
+[sub_resource type="Resource" id="N12"]
+script = ExtResource("2")
+id = &"stand_a_armor"
+stat = &"armor"
+branch = 1
+column = 2
+max_ranks = 15
+[sub_resource type="Resource" id="N13"]
+script = ExtResource("2")
+id = &"stand_a_regen"
+stat = &"regen"
+branch = 1
+row = 1
+column = 0
+max_ranks = 15
+[sub_resource type="Resource" id="N14"]
 script = ExtResource("2")
 id = &"molar_regen"
 display_name = "Nachpolieren"
 description = "+0.4 Speichel je Rang."
 branch = 1
+row = 1
 parent = &"molar_armor"
 max_ranks = 3
 stat_changes = {"regen": 0.4}
 icon_index = 6
-[sub_resource type="Resource" id="Schild"]
+[sub_resource type="Resource" id="N15"]
 script = ExtResource("2")
 id = &"molar_overheal"
 display_name = "Versiegelung"
 description = "50 % Überheilung speist den Schildvorrat. Je 20 gespeicherte Heilung: ein Schild, maximal fünf. Teilt Vorrat und Grenzen mit Speichelkelch."
 branch = 1
+row = 2
 parent = &"molar_regen"
 effects = {"overheal_shield": 0.5}
 icon_index = 26
+[sub_resource type="Resource" id="N16"]
+script = ExtResource("2")
+id = &"stand_free_1"
+free_attribute = true
+branch = 1
+row = 1
+column = 2
+max_ranks = 5
+[sub_resource type="Resource" id="N17"]
+script = ExtResource("2")
+id = &"stand_free_2"
+free_attribute = true
+branch = 1
+row = 2
+column = 0
+max_ranks = 5
+[sub_resource type="Resource" id="N18"]
+script = ExtResource("2")
+id = &"stand_free_3"
+free_attribute = true
+branch = 1
+row = 2
+column = 2
+max_ranks = 5
+[sub_resource type="Resource" id="N19"]
+script = ExtResource("2")
+id = &"move_a_speed"
+stat = &"speed_bonus"
+branch = 2
+column = 0
+max_ranks = 6
+[sub_resource type="Resource" id="N20"]
+script = ExtResource("2")
+id = &"molar_stride"
+display_name = "Wurzelreserve"
+description = "+15 Wurzelkraft je Rang. Erhöht den Vorrat, lädt ihn beim Kauf nicht auf."
+branch = 2
+max_ranks = 3
+stat_changes = {"dash_recovery_bonus": 15.0}
+icon_index = 28
+[sub_resource type="Resource" id="N21"]
+script = ExtResource("2")
+id = &"move_a_stamina"
+stat = &"dash_recovery_bonus"
+branch = 2
+column = 2
+max_ranks = 8
+[sub_resource type="Resource" id="N22"]
+script = ExtResource("2")
+id = &"move_a_dodge"
+stat = &"dodge_chance"
+branch = 2
+row = 1
+column = 0
+max_ranks = 5
+[sub_resource type="Resource" id="N23"]
+script = ExtResource("2")
+id = &"move_a_luck"
+stat = &"luck"
+branch = 2
+row = 1
+column = 2
+max_ranks = 8
+[sub_resource type="Resource" id="N24"]
+script = ExtResource("2")
+id = &"move_free_1"
+free_attribute = true
+branch = 2
+row = 1
+max_ranks = 5
+[sub_resource type="Resource" id="N25"]
+script = ExtResource("2")
+id = &"move_free_2"
+free_attribute = true
+branch = 2
+row = 2
+column = 0
+max_ranks = 5
+[sub_resource type="Resource" id="N26"]
+script = ExtResource("2")
+id = &"move_free_3"
+free_attribute = true
+branch = 2
+row = 2
+max_ranks = 5
+[sub_resource type="Resource" id="N27"]
+script = ExtResource("2")
+id = &"move_free_4"
+free_attribute = true
+branch = 2
+row = 2
+column = 2
+max_ranks = 5
 [resource]
 script = ExtResource("1")
-branches = PackedStringArray("Freie Werkzeugwahl", "Standfest")
-nodes = Array[ExtResource("2")]([SubResource("Breit"), SubResource("Antritt"), SubResource("Reserve"), SubResource("Hart"), SubResource("Heilen"), SubResource("Schild")])
+branches = PackedStringArray("Werkzeug", "Standfest", "Beweglichkeit")
+nodes = Array[ExtResource("2")]([SubResource("N0"), SubResource("N1"), SubResource("N2"), SubResource("N3"), SubResource("N4"), SubResource("N5"), SubResource("N6"), SubResource("N7"), SubResource("N8"), SubResource("N9"), SubResource("N10"), SubResource("N11"), SubResource("N12"), SubResource("N13"), SubResource("N14"), SubResource("N15"), SubResource("N16"), SubResource("N17"), SubResource("N18"), SubResource("N19"), SubResource("N20"), SubResource("N21"), SubResource("N22"), SubResource("N23"), SubResource("N24"), SubResource("N25"), SubResource("N26"), SubResource("N27")])

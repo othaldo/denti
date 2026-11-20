@@ -134,7 +134,6 @@ func _ready() -> void:
 	talent_panel = TalentPanel.new()
 	add_child(talent_panel)
 	talent_panel.talent_requested.connect(_on_talent_requested)
-	talent_panel.stat_requested.connect(_on_talent_stat_requested)
 	talent_panel.undo_requested.connect(_on_talent_undo)
 	talent_panel.completed.connect(_on_talents_completed)
 	talent_panel.cursor_changed.connect(_save_run)
@@ -312,6 +311,7 @@ func _start_combat_wave() -> void:
 	rewards.begin_wave()
 	player.dash.reset_wave()
 	player.class_combat.reset_wave()
+	player.dash_cut.reset_wave()
 	var profile_id := wave.prepare_next_wave_profile()
 	telemetry.begin_wave(wave.current_wave + 1, profile_id, _combat_build_snapshot())
 	wave.start_next_wave()
@@ -767,15 +767,9 @@ func _update_level_reroll() -> void:
 	var earned_level := level - maxi(rewards.pending_levels - 1, 0)
 	choice_panel.update_level_reroll(coins, EconomyRules.level_reroll_cost(earned_level, rewards.level_rerolls), earned_level)
 
-func _on_talent_requested(id: StringName) -> void:
+func _on_talent_requested(id: StringName, stat: StringName = &"") -> void:
 	if rewards.step != PostWaveRewards.Step.LEVELS or not talent_panel.visible: return
-	if talents.plan_talent(id, player.stats, UPGRADES, rewards.pending_levels):
-		talent_panel.refresh()
-		_save_run()
-
-func _on_talent_stat_requested(id: StringName) -> void:
-	if rewards.step != PostWaveRewards.Step.LEVELS or not talent_panel.visible: return
-	if talents.plan_stat(id, player.stats, UPGRADES, rewards.pending_levels):
+	if talents.plan_talent(id, player.stats, UPGRADES, rewards.pending_levels, stat):
 		talent_panel.refresh()
 		_save_run()
 
@@ -789,6 +783,8 @@ func _sync_talents() -> void:
 	player.class_combat.profile = player.stats.class_data
 	var powers := talents.powers(player.stats.class_data.talent_tree)
 	player.class_combat.powers = powers
+	player.dash.cost_cut = float(powers.get("dash_cost_cut", 0))
+	player.dash.distance_bonus = float(powers.get("dash_distance", 0))
 	items.effect_context.extra_powers = powers
 
 func _on_talents_completed() -> void:
@@ -1351,6 +1347,7 @@ func debug_start_wave(number: int) -> void:
 	player.loadout.restore(player.loadout.save_data())
 	player.dash.reset_wave()
 	player.class_combat.reset_wave()
+	player.dash_cut.reset_wave()
 	rewards.begin_wave()
 	wave.current_wave = clampi(number, 1, WaveController.MAX_WAVES) - 1
 	wave.next_profile_id = &""
