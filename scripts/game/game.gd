@@ -26,6 +26,7 @@ const UPGRADES: Array[UpgradeData] = [
 @onready var player: Player = $Player
 @onready var arena: DentiArena = $Arena
 @onready var element_impacts: ElementImpactBatch = $ElementImpacts
+var death_pops: EnemyDeathPops
 @onready var wave: WaveController = $WaveController
 @onready var shop: ShopController = $ShopController
 @onready var items: ItemInventory = $Items
@@ -103,6 +104,13 @@ func _enter_tree() -> void:
 
 func _ready() -> void:
 	element_impacts.attach_burst_layer($EnemyProjectiles)
+	death_pops = EnemyDeathPops.new()
+	death_pops.name = "DeathPops"
+	death_pops.economy = session.economy_graphics()
+	add_child(death_pops)
+	# Same z as enemy bodies; sibling order draws the pops above them.
+	move_child(death_pops, $Enemies.get_index() + 1)
+	session.graphics_changed.connect(_on_graphics_changed)
 	hud.bind_mobile_controls(mobile_controls)
 	randomize()
 	session.begin_graphics_run()
@@ -1079,8 +1087,13 @@ func _clear_arena(collect_drops: bool, keep_boss: bool = false) -> void:
 	_clear_combat(keep_boss)
 
 
+func _on_graphics_changed() -> void:
+	death_pops.economy = session.economy_graphics()
+
+
 func _clear_combat(keep_boss: bool = false) -> void:
 	element_impacts.clear()
+	death_pops.clear()
 	for enemy in $Enemies.get_children():
 		if keep_boss and (enemy.data.is_boss or enemy.data.is_boss_objective):
 			continue
@@ -1323,6 +1336,7 @@ func debug_start_wave(number: int) -> void:
 	talents.actions.clear()
 	talents.tiers.clear()
 	element_impacts.clear()
+	death_pops.clear()
 	wave.active = false
 	# Remove immediately while paused so old loot callbacks and attacks cannot
 	# leak into the freshly started wave.
