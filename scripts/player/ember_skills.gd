@@ -42,6 +42,7 @@ const SKIN_HEAL_CAP := 3
 const DASH_HEAT := 15.0
 const EMBER := Color(1.0, 0.5, 0.18)
 const HOT := Color(1.0, 0.25, 0.15)
+const CORE_STYLE: SkillCloudStyle = preload("res://data/vfx/skill_clouds/ember.tres")
 
 var heat := 0.0
 var overheat := 0.0
@@ -186,8 +187,11 @@ func _tick_skin(delta: float) -> void:
 func _draw() -> void:
 	for core in cores:
 		var fade := clampf(float(core.time), 0.0, 1.0)
-		draw_circle(to_local(core.at), CORE_RADIUS, Color(EMBER.darkened(0.3), 0.22 * fade))
-		draw_arc(to_local(core.at), CORE_RADIUS, 0.0, TAU, 40, Color(EMBER, 0.7 * fade), 2.5, true)
+		# Smoke with rising embers; the ring keeps the exact heat radius.
+		var remaining := float(core.time)
+		var total := CORE_SECONDS + (CORE_LINGER if power("core_linger") > 0.0 else 0.0)
+		SkillPuffs.draw_cloud(self, to_local(core.at), CORE_RADIUS, CORE_STYLE, maxf(total - remaining, 0.0), remaining, SkillPuffs.seed_for(core.at))
+		draw_arc(to_local(core.at), CORE_RADIUS, 0.0, TAU, 40, Color(EMBER, 0.55 * fade), 2.0, true)
 	if active() and player != null:
 		# Heat gauge as a ring around Denti: readable without a new HUD element.
 		var centre := to_local(player.global_position)

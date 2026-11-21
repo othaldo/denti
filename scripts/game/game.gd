@@ -107,6 +107,7 @@ func _ready() -> void:
 	death_pops = EnemyDeathPops.new()
 	death_pops.name = "DeathPops"
 	death_pops.economy = session.economy_graphics()
+	SkillPuffs.economy = death_pops.economy
 	add_child(death_pops)
 	# Same z as enemy bodies; sibling order draws the pops above them.
 	move_child(death_pops, $Enemies.get_index() + 1)
@@ -1089,6 +1090,7 @@ func _clear_arena(collect_drops: bool, keep_boss: bool = false) -> void:
 
 func _on_graphics_changed() -> void:
 	death_pops.economy = session.economy_graphics()
+	SkillPuffs.economy = death_pops.economy
 
 
 func _clear_combat(keep_boss: bool = false) -> void:

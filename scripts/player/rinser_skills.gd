@@ -38,6 +38,7 @@ const SHOWER_THRESHOLD := 0.35
 const SHOWER_STONE := 0.5
 const WATER := Color(0.35, 0.75, 1.0)
 const SPARK := Color(1.0, 0.95, 0.45)
+const FOAM_STYLE: SkillCloudStyle = preload("res://data/vfx/skill_clouds/foam.tres")
 
 var trail: Array[Dictionary] = []
 var last_drop := Vector2.INF
@@ -209,11 +210,11 @@ func _draw() -> void:
 	if trail.size() > 1:
 		var points := PackedVector2Array()
 		for segment in trail: points.append(to_local(segment.at))
-		draw_polyline(points, Color(WATER, 0.3), TRAIL_RADIUS * 1.4, true)
-		draw_polyline(points, Color(WATER, 0.65), 3.0, true)
+		draw_polyline(points, Color(WATER, 0.16), TRAIL_RADIUS * 1.4, true)
+		draw_polyline(points, Color(WATER, 0.55), 3.0, true)
+	# Foam flakes with bubbles on the wet trail.
 	for segment in trail:
-		var fade := clampf(float(segment.time), 0.0, 1.0)
-		draw_circle(to_local(segment.at), 6.0, Color(WATER.lightened(0.3), 0.55 * fade))
+		SkillPuffs.draw_cloud(self, to_local(segment.at), TRAIL_RADIUS, FOAM_STYLE, float(segment.age), float(segment.time), SkillPuffs.seed_for(segment.at))
 	if not loop.is_empty():
 		draw_arc(to_local(loop.at), loop.radius, 0.0, TAU, 48, Color(SPARK, 0.6), 3.0, true)
 	draw_effects()

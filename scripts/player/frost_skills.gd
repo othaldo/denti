@@ -31,6 +31,7 @@ const BREATH_RADIUS := 150.0
 const STARE_RADIUS := 120.0
 const STARE_PUSH := 60.0
 const ICE := Color(0.7, 0.92, 1.0)
+const WALL_STYLE: SkillCloudStyle = preload("res://data/vfx/skill_clouds/frost.tres")
 
 var walls: Array[Dictionary] = []
 var dash_start := Vector2.ZERO
@@ -159,10 +160,10 @@ func _draw() -> void:
 		var fade := clampf(float(wall.time), 0.0, 1.0)
 		var a := to_local(wall.a)
 		var b := to_local(wall.b)
-		draw_line(a, b, Color(ICE.darkened(0.2), 0.45 * fade), WALL_HALF * 2.0, true)
+		# Icy mist on the wall; the crisp line keeps its exact position readable.
+		var remaining := float(wall.time)
+		SkillPuffs.draw_lane(self, a, b, WALL_HALF * 2.0, WALL_STYLE, maxf(wall_seconds() - remaining, 0.0), remaining, SkillPuffs.seed_for(wall.a))
 		draw_line(a, b, Color(ICE.lightened(0.3), 0.9 * fade), 4.0, true)
-		draw_circle(a, WALL_HALF, Color(ICE.darkened(0.2), 0.45 * fade))
-		draw_circle(b, WALL_HALF, Color(ICE.darkened(0.2), 0.45 * fade))
 	for id in brittle:
 		var enemy := instance_from_id(id) as Enemy
 		if is_instance_valid(enemy): draw_arc(to_local(enemy.global_position), enemy.data.radius + 6.0, 0.0, TAU, 20, Color(ICE, 0.85), 2.5, true)

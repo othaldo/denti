@@ -15,6 +15,7 @@ const SNAP_FLASH := 0.2
 const MAX_SAVED := 8
 const POISON := Color(0.43, 1.0, 0.3)
 const THREAD_COLOR := Color(0.78, 1.0, 0.7, 0.9)
+const FIELD_STYLE: SkillCloudStyle = preload("res://data/vfx/skill_clouds/poison_lane.tres")
 
 var player: Player
 var trails: Array[Dictionary] = []
@@ -236,12 +237,9 @@ func _draw() -> void:
 			# The lane stays readable for its whole life and fades in the last second.
 			# Kept translucent so enemy telegraphs and projectiles remain on top.
 			var fade := clampf(float(trail.time), 0.0, 1.0)
-			var pulse := 0.04 * sin(seconds * 6.0)
-			_lane(a, b, width(), Color(POISON.darkened(0.15), (0.4 + pulse) * fade), Color(POISON, 0.9 * fade))
-			for bubble in 6:
-				var t := fposmod(seconds * 0.35 + bubble / 6.0, 1.0)
-				var side := (b - a).normalized().orthogonal() * sin(seconds * 3.0 + bubble * 1.7) * width() * 0.25
-				draw_circle(a.lerp(b, t) + side, 3.0 + (bubble % 3), Color(POISON.lightened(0.35), 0.6 * fade))
+			# A light fill and the rim keep the exact lane; gas billows on top.
+			_lane(a, b, width(), Color(POISON.darkened(0.15), 0.16 * fade), Color(POISON, 0.75 * fade))
+			SkillPuffs.draw_lane(self, a, b, width(), FIELD_STYLE, age, float(trail.time), SkillPuffs.seed_for(trail.a))
 
 ## Capsule-shaped lane: translucent fill plus a clear rim, readable on the floor.
 func _lane(a: Vector2, b: Vector2, lane_width: float, fill: Color, rim: Color) -> void:

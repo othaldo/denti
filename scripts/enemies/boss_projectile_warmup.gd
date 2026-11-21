@@ -124,6 +124,7 @@ static func art_textures() -> Array[Texture2D]:
 	result.append(KingAcidArt.ATLAS)
 	result.append(KingAcidArt.STREAM)
 	result.append(EmperorCourtArt.ATLAS)
+	result.append(SkillPuffs.ATLAS)
 	for data in EnemyCatalog.ALL:
 		result.append(data.sprite)
 	var weapons: Array[WeaponData] = WeaponCatalog.ALL.duplicate()
