@@ -68,6 +68,7 @@ static func restore(game, saved: Dictionary) -> void:
 	if saved.is_empty():
 		return
 	game.element_impacts.clear()
+	if game.death_pops != null: game.death_pops.clear()
 	# An unconfirmed fusion is only a preview; resume uses the saved ingredients.
 	game.weapon_fusion_panel.hide()
 	game.weapon_fusion_panel.plan = null

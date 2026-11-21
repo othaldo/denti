@@ -94,6 +94,7 @@ var loot_goblin: LootGoblin
 var inflicted_statuses: Array[Dictionary] = []
 var spatial_index: EnemySpatialIndex
 var hit_flash_time: float = 0.0
+var hit_reaction := EnemyHitReaction.new()
 var spatial_order: int = 0
 var motion_slot: int = -1
 var simulation_enabled: bool = true
@@ -255,6 +256,7 @@ func _process(delta: float) -> void:
 		queue_redraw()
 	sprite.position.y = sin(animation_time) * (2.2 if data.is_boss else 1.2)
 	sprite.rotation = sin(animation_time * 0.7) * (0.025 if data.is_boss else 0.045)
+	_apply_hit_reaction(delta)
 	sync_inflammation_aura(delta)
 	if pulse_flash_time > 0.0:
 		pulse_flash_time = maxf(pulse_flash_time - delta, 0.0)
@@ -725,6 +727,7 @@ func take_damage(amount: float, weapon: WeaponData = null, critical: bool = fals
 		if kind == &"ice" and health > 0.0:
 			chill_time = maxf(chill_time, WeaponAffixes.by_id(kind).slow_duration)
 			affix_effects.ice_power = maxf(affix_effects.ice_power, float(addition.damage))
+	_register_hit_reaction(applied, critical, amount <= 0 or proc_id != &"", incoming_direction)
 	if weapon != null:
 		weapon_hit.emit(self, applied * normal_share, weapon, critical)
 	# A synchronous on-hit effect can kill this enemy in a nested damage call.
@@ -786,8 +789,37 @@ func _finish_death(amount: float, delayed: Array[Dictionary]) -> void:
 		death_started.emit(global_position)
 		queue_redraw()
 	else:
+		EnemyDeathPops.emit_from(self)
 		defeated.emit(global_position, data)
 		queue_free()
+
+
+func _register_hit_reaction(applied: float, critical: bool, indirect: bool, incoming_direction: Vector2) -> void:
+	# Pylons and other objectives animate their sprite scale themselves.
+	if data.is_boss_objective or dying: return
+	var away := incoming_direction
+	if away.is_zero_approx() and is_instance_valid(target):
+		away = global_position - target.global_position
+	var size_factor := EnemyHitReaction.BOSS_FACTOR if data.is_boss else (EnemyHitReaction.ELITE_FACTOR if data.is_elite else 1.0)
+	hit_reaction.register(applied / maxf(max_health, 1.0), critical, indirect, away, size_factor)
+
+
+func _apply_hit_reaction(delta: float) -> void:
+	if data.is_boss_objective: return
+	if not hit_reaction.active():
+		if sprite.position.x != 0.0:
+			sprite.position.x = 0.0
+			sprite.scale = sprite_base_scale
+		return
+	hit_reaction.advance(delta)
+	var recoil := hit_reaction.offset(data.radius)
+	# The bob above rewrites y every frame; x has no other owner.
+	sprite.position.x = recoil.x
+	sprite.position.y += recoil.y
+	sprite.scale = sprite_base_scale * hit_reaction.scale_factor()
+	if not hit_reaction.active():
+		sprite.position.x = 0.0
+		sprite.scale = sprite_base_scale
 
 
 func _boss_phase_floor() -> float:

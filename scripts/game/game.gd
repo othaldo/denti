@@ -26,6 +26,7 @@ const UPGRADES: Array[UpgradeData] = [
 @onready var player: Player = $Player
 @onready var arena: DentiArena = $Arena
 @onready var element_impacts: ElementImpactBatch = $ElementImpacts
+var death_pops: EnemyDeathPops
 @onready var wave: WaveController = $WaveController
 @onready var shop: ShopController = $ShopController
 @onready var items: ItemInventory = $Items
@@ -103,6 +104,14 @@ func _enter_tree() -> void:
 
 func _ready() -> void:
 	element_impacts.attach_burst_layer($EnemyProjectiles)
+	death_pops = EnemyDeathPops.new()
+	death_pops.name = "DeathPops"
+	death_pops.economy = session.economy_graphics()
+	SkillPuffs.economy = death_pops.economy
+	add_child(death_pops)
+	# Same z as enemy bodies; sibling order draws the pops above them.
+	move_child(death_pops, $Enemies.get_index() + 1)
+	session.graphics_changed.connect(_on_graphics_changed)
 	hud.bind_mobile_controls(mobile_controls)
 	randomize()
 	session.begin_graphics_run()
@@ -350,7 +359,8 @@ func _process(delta: float) -> void:
 		autosave_timer += delta
 		if autosave_timer >= 8.0:
 			autosave_timer = 0.0
-			_save_run()
+			# Periodic combat autosave: snapshot here, JSON and file write off-thread.
+			_save_run(true)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -1078,8 +1088,14 @@ func _clear_arena(collect_drops: bool, keep_boss: bool = false) -> void:
 	_clear_combat(keep_boss)
 
 
+func _on_graphics_changed() -> void:
+	death_pops.economy = session.economy_graphics()
+	SkillPuffs.economy = death_pops.economy
+
+
 func _clear_combat(keep_boss: bool = false) -> void:
 	element_impacts.clear()
+	death_pops.clear()
 	for enemy in $Enemies.get_children():
 		if keep_boss and (enemy.data.is_boss or enemy.data.is_boss_objective):
 			continue
@@ -1322,6 +1338,7 @@ func debug_start_wave(number: int) -> void:
 	talents.actions.clear()
 	talents.tiers.clear()
 	element_impacts.clear()
+	death_pops.clear()
 	wave.active = false
 	# Remove immediately while paused so old loot callbacks and attacks cannot
 	# leak into the freshly started wave.
@@ -1390,12 +1407,12 @@ func _on_end_main_menu() -> void:
 	get_node("/root/SceneTransitions").change_scene("res://scenes/ui/game_menu.tscn")
 
 
-func _save_run() -> void:
+func _save_run(background: bool = false) -> void:
 	if ended or not is_node_ready():
 		return
 	var profiler := get_node_or_null("CombatDiagnostics") as CombatDiagnostics
 	var started := Time.get_ticks_usec() if profiler != null else 0
-	session.save_run(RUN_SNAPSHOT.capture(self))
+	session.save_run(RUN_SNAPSHOT.capture(self), background)
 	if profiler != null:
 		profiler.save_ms = float(Time.get_ticks_usec() - started) / 1000.0
 

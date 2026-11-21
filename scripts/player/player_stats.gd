@@ -113,6 +113,25 @@ func begin_class(profile: PlayerClassData) -> bool:
 	return true
 
 
+## Debug-only class change during a run: swaps the class's starting stat
+## offsets and root difference, keeps everything earned since. Health keeps
+## its share of the maximum.
+func switch_class(profile: PlayerClassData) -> bool:
+	if profile == null or not profile.valid() or profile == class_data: return false
+	var share := health / maxf(max_health, 1.0)
+	var previous := class_data
+	for key in previous.starting_stats:
+		_raw_values[str(key)] = raw_stat(StringName(str(key))) - float(previous.starting_stats[key])
+	for key in profile.starting_stats:
+		_raw_values[str(key)] = raw_stat(StringName(str(key))) + float(profile.starting_stats[key])
+	root_capacity = maxi(root_capacity + profile.root_capacity - previous.root_capacity, 1)
+	class_data = profile
+	_class_initialized = true
+	health = clampf(max_health * share, 1.0, max_health)
+	changed.emit()
+	return true
+
+
 func raw_stat(stat: StringName) -> float:
 	return float(_raw_values.get(str(stat), 0.0))
 

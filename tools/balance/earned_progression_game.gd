@@ -11,7 +11,7 @@ func _ready() -> void:
 	seed(probe_seed)
 
 
-func _save_run() -> void:
+func _save_run(_background: bool = false) -> void:
 	pass
 
 

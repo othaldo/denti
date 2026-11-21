@@ -129,6 +129,8 @@ func update_graphics_performance(combat_active: bool) -> void:
 
 
 func _notification(what: int) -> void:
+	if what in [NOTIFICATION_WM_CLOSE_REQUEST, NOTIFICATION_PREDELETE]:
+		RunStore.finish_pending()
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
 		application_focused = false
 	elif what == NOTIFICATION_APPLICATION_FOCUS_IN:
@@ -198,9 +200,9 @@ func load_run() -> Dictionary:
 	return RunStore.load_run(save_path)
 
 
-func save_run(data: Dictionary) -> Error:
+func save_run(data: Dictionary, background: bool = false) -> Error:
 	data["version"] = SAVE_VERSION
-	var error := RunStore.save_run(save_path, data)
+	var error := RunStore.save_run_background(save_path, data) if background else RunStore.save_run(save_path, data)
 	if error != OK:
 		push_warning("Spielstand konnte nicht gespeichert werden: %s" % save_path)
 	return error

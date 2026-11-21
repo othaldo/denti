@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="SkillCloudStyle" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/vfx/skill_cloud_style.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+color = Color(0.58, 1, 0.36, 1)
+depth_shade = 0.22
+puffs = 7
+puff_size = 0.85
+spread = 0.6
+drift = 0.35
+breathe = 0.09
+opacity = 0.5
+shadow_opacity = 0.0
+edge_opacity = 0.0
+bubbles = 5
+bubble_period = 1.1
+bubble_color = Color(0.82, 1, 0.66, 0.9)
+sparkles = 0
+spawn_seconds = 0.2
+fade_seconds = 1.0

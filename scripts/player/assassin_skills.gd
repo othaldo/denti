@@ -39,6 +39,7 @@ const SLIP_MIRROR_RANGE := 320.0
 const SLIP_MIRROR_FACTOR := 0.5
 const FLASH_SECONDS := 0.4
 const RUSH_COLOR := Color(1.0, 0.55, 0.78)
+const CLOUD_STYLE: SkillCloudStyle = preload("res://data/vfx/skill_clouds/poison.tres")
 
 var player: Player
 var marks: Dictionary = {}
@@ -210,15 +211,11 @@ func _flash(at: Vector2, radius: float, color: Color) -> void:
 	if flashes.size() > 16: flashes.pop_front()
 
 func _draw() -> void:
-	var poison := ClassDashCut.POISON
 	for cloud in clouds:
-		var fade := clampf(float(cloud.time), 0.0, 1.0)
-		var at := to_local(cloud.at)
-		draw_circle(at, cloud_radius(), Color(poison.darkened(0.2), 0.28 * fade))
-		draw_arc(at, cloud_radius(), 0.0, TAU, 40, Color(poison, 0.75 * fade), 2.5, true)
-		for bubble in 5:
-			var angle := clock * 1.3 + bubble * TAU / 5.0
-			draw_circle(at + Vector2.from_angle(angle) * cloud_radius() * 0.55, 3.0 + bubble % 2, Color(poison.lightened(0.35), 0.6 * fade))
+		# Age follows from the remaining time, so saved clouds resume seamlessly.
+		var remaining := float(cloud.time)
+		var age := maxf(cloud_seconds() - remaining, 0.0)
+		SkillPuffs.draw_cloud(self, to_local(cloud.at), cloud_radius(), CLOUD_STYLE, age, remaining, SkillPuffs.seed_for(cloud.at))
 	if rushing() and player != null:
 		# A pink sugar halo around Denti while the rush lasts.
 		var pulse := 0.5 + 0.5 * sin(clock * 10.0)

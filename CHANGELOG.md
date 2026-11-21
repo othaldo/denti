@@ -2,6 +2,18 @@
 
 Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü angezeigt. 0.1.0 wurde rückblickend anhand der Git-Historie dokumentiert; 0.2.0 bündelt die seitdem entstandenen Änderungen. Die Einträge beschreiben implementierte Funktionen. Weitere Pläne stehen in der [Roadmap](docs/ROADMAP.md).
 
+## 0.8.1 — 21.11.2026
+
+- **Kein Autosave-Ruckler mehr im Kampf:** Der Kampf speichert weiterhin alle acht Sekunden, schreibt JSON und Datei aber im Hintergrund. In einer vollen 4K-Arena sinkt die Zeit im Hauptthread von etwa 15 auf 7–9 ms. Laden, Löschen, weitere Saves und das Beenden warten einen laufenden Hintergrund-Save ab; der Web-Export speichert wie bisher synchron. [Messung und Grenzen](docs/PERFORMANCE_AUDIT.md).
+
+- **Spürbare Treffer:** Getroffene Gegner zucken in Schlagrichtung zusammen und federn nach; kritische Treffer stärker, Bosse nur leicht. Gewöhnliche Gegner verschwinden beim Tod nicht mehr schlagartig, sondern zerplatzen mit Blitz, Ring und Krümeln. Rein kosmetisch und gebündelt gezeichnet. [Vorschau und Regeln](docs/ENEMY_IMPACTS.md).
+
+- **Lebendige Skill-Effekte:** Giftwolke und Giftschneise der Assassine wabern, der Glut-Kern raucht über glühendem Boden, die Eiswand des Frostwächters dampft vor Frost und die Spülspur schäumt. Alle nutzen einen eingefärbten Puff-Atlas ohne Partikel-Nodes; der exakte Wirkungsbereich bleibt markiert. [Aufbau und Prompt für gemalte Puffs](docs/SKILL_CLOUDS.md).
+
+- **Klasse im Testmenü wechseln:** Unter **F4 → Run** lässt sich die Klasse mitten im Run setzen. Startboni, Wurzeln, Dash, Skills und Talentbaum folgen der neuen Klasse; verdiente Werte, Waffen und Items bleiben. Talentränge der alten Klasse und Waffen, die die neue Klasse nicht tragen darf, fallen weg, damit der Run fortsetzbar bleibt.
+
+- **Performance-Messung echter Runs:** `tools/perf_run_probe.gd` lässt den Testpiloten Runs mit Klasse, Talenten und häufigem Dash in beliebiger Auflösung spielen und zerlegt jede Framezeit nach Systemen. Wellen bis 14 lagen in 4K bei 2–3,5 ms pro Frame.
+
 ## 0.8.0 — 20.11.2026
 
 - **Sechs Klassen mit eigenem Spielprinzip:** Neben Good Old Molar gibt es Assassine (Dash zieht eine Giftschneise), Zahnfee (eingesammelte Beute feuert Lichtsplitter), Glutzahn (Hitze aufbauen und in der Horde ausbrechen), Spültechniker (nasse Laufspur, Strom folgt ihr) und Frostwächter (Dash zieht eine Eiswand). Jede Klasse hat eigene Wurzeln, Startwerte und einen klaren Nachteil. [Klassen-Essenz](docs/CLASS_ESSENCE.md), [Klassenplan](docs/CLASS_ROSTER_PLAN.md).
