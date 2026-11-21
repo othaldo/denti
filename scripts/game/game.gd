@@ -350,7 +350,8 @@ func _process(delta: float) -> void:
 		autosave_timer += delta
 		if autosave_timer >= 8.0:
 			autosave_timer = 0.0
-			_save_run()
+			# Periodic combat autosave: snapshot here, JSON and file write off-thread.
+			_save_run(true)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -1390,12 +1391,12 @@ func _on_end_main_menu() -> void:
 	get_node("/root/SceneTransitions").change_scene("res://scenes/ui/game_menu.tscn")
 
 
-func _save_run() -> void:
+func _save_run(background: bool = false) -> void:
 	if ended or not is_node_ready():
 		return
 	var profiler := get_node_or_null("CombatDiagnostics") as CombatDiagnostics
 	var started := Time.get_ticks_usec() if profiler != null else 0
-	session.save_run(RUN_SNAPSHOT.capture(self))
+	session.save_run(RUN_SNAPSHOT.capture(self), background)
 	if profiler != null:
 		profiler.save_ms = float(Time.get_ticks_usec() - started) / 1000.0
 

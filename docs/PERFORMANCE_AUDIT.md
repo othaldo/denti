@@ -147,7 +147,35 @@ wird nur im Testprozess gesetzt, nicht in den normalen Einstellungen gespeichert
 
 Die Vergleichsbilder erzeugt `res://tools/preview_combat_performance.gd`.
 Ein echtes Handy oder ein mobiler Browser wurde hier nicht profiliert.
-Autosave bleibt synchron; Browser-/Geräte-I/O, kalte Textur-/Shaderstarts und
+Browser-/Geräte-I/O, kalte Textur-/Shaderstarts und
 sehr viele gleichzeitig aktive Synergie-Ringe bleiben sinnvolle Kandidaten für
 die nächste Messung auf dem tatsächlich langsamen Gerät. Der lokale Web-Export
 wurde mangels installierter Export-Templates nicht geprüft.
+
+## Autosave im Kampf · 21.11.2026
+
+Der Kampf speichert alle acht Sekunden. Bisher lief der ganze Save im
+Hauptthread. In der vollen Welle-17-Arena (110 Gegner, rund 1100 Drops, 265 KB)
+kostete er etwa 15 ms: Snapshot 4,5 ms, `JSON.stringify` 8,5 ms, Schreiben und
+Umbenennen 1,5 ms. Das war der längste Frame der 4K-Messung.
+
+Jetzt erzeugt der periodische Autosave nur noch Snapshot und Tiefenkopie im
+Hauptthread (7–9 ms in derselben Arena). JSON und Dateizugriff laufen über den
+`WorkerThreadPool`. Es gibt höchstens einen Hintergrund-Save. Jeder andere
+Zugriff auf `RunStore` (Laden, synchrones Speichern, Löschen) wartet ihn ab;
+ebenso das Schließen des Spiels. Saves bei Wellenende, Shop und Belohnungen
+bleiben synchron. Builds ohne Threads, also der aktuelle Web-Export, speichern
+wie bisher synchron. `tests/run_store_background.gd` prüft Kopie, Reihenfolge,
+Löschen und temporäre Dateien.
+
+Gemessen mit Godot 4.7.2, RTX 4070, 3840 × 2160, Compatibility-Renderer:
+`tools/perf_run_probe.gd` lässt den Bot echte Runs mit Klasse, Talenten und
+häufigem Dash spielen und schreibt jede Framezeit samt Systemaufteilung nach
+`.godot/`. Späte Bot-Wellen (40–60 Gegner) lagen bei 2,4–3,5 ms pro Frame,
+P99 meist unter 8 ms; die GPU-Zeit blieb unter 1 ms. Der Bot löst keinen
+Autosave aus und erreicht nicht Welle 20; der Autosave wurde daher in der
+Stress-Arena gemessen.
+
+```powershell
+& Godot_v4.7.2-stable_win64_console.exe --audio-driver Dummy --fixed-fps 60 --path . --script res://tools/perf_run_probe.gd -- --class=ember --dash-often --resolution=3840x2160 --weapons=turbo_drill --skills=expert --strategies=kite --build-policies=full_build --last-wave=20
+```
