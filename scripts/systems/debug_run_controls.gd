@@ -2,6 +2,8 @@ class_name DebugRunControls
 extends RefCounted
 
 var game: Node2D
+## Weapons the last class switch removed because the new class cannot wield them.
+var removed_weapons: Array[String] = []
 
 
 static func allowed(debug_build: bool = OS.is_debug_build(), web_build: bool = OS.has_feature("web"), platform: String = OS.get_name()) -> bool:
@@ -50,6 +52,46 @@ func add_item(id: StringName, copies: int) -> int:
 		added += 1
 	changed()
 	return added
+
+
+## Switches the class mid-run. Earned stats, weapons and items stay; class
+## starting offsets, roots, dash, skill state and talent ranks follow the new
+## class. Ranks of the old tree are dropped because they are invalid in the
+## new tree; their points stay spent. Weapons the new class cannot wield are
+## removed without refund (listed in removed_weapons), since such a run could
+## not be resumed. Returns "" or the reason it is blocked.
+func set_class(id: StringName) -> String:
+	var profile := ClassCatalog.by_id(id)
+	if not allowed() or profile == null:
+		return "Unbekannte Klasse"
+	if profile == game.player.stats.class_data:
+		return "Bereits aktiv"
+	if game.starter_pending:
+		return "Erst Startwaffe wählen"
+	if game.rewards.step == PostWaveRewards.Step.LEVELS:
+		return "Erst Aufstieg abschließen"
+	var player: Player = game.player
+	if not player.stats.switch_class(profile):
+		return "Klasse ungültig"
+	removed_weapons.clear()
+	var equipped: Array[WeaponInstance] = player.loadout.equipped()
+	for index in range(equipped.size() - 1, -1, -1):
+		if not player.loadout.weapon_allowed(equipped[index].data):
+			removed_weapons.append(WeaponPresentation.weapon_name(equipped[index]))
+			player.loadout.sell(index)
+	player.dash.config = profile.dash_config()
+	player.dash.charge = minf(player.dash.charge, player.dash.capacity)
+	game.talents.enabled = profile.talent_tree != null
+	game.talents.ranks.clear()
+	game.talents.bound.clear()
+	game.talents.actions.clear()
+	game.talents.tiers.clear()
+	game.talents.cursor.clear()
+	player.reset_skill_modules()
+	player.class_combat.reset_wave()
+	game._sync_talents()
+	changed()
+	return ""
 
 
 func set_coins(value: int) -> void:

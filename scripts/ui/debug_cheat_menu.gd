@@ -35,6 +35,7 @@ var owned_rows: VBoxContainer
 var coin_amount: SpinBox
 var wave_number: SpinBox
 var difficulty_select: OptionButton
+var class_select: OptionButton
 var wave_button: Button
 var status: Label
 var stats: Dictionary = {}
@@ -178,6 +179,18 @@ func _build_ui() -> void:
 	var run := _tab(tabs, "Run")
 	row = HBoxContainer.new()
 	run.add_child(row)
+	row.add_child(_label("Klasse"))
+	class_select = OptionButton.new()
+	class_select.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	class_select.fit_to_longest_item = false
+	DentiUIStyle.style_button(class_select, false, true)
+	class_select.add_theme_constant_override("icon_max_width", 32)
+	for profile in ClassCatalog.profiles:
+		class_select.add_icon_item(_small_icon(profile.portrait), profile.display_name)
+	row.add_child(class_select)
+	_button(row, "Setzen", _set_class)
+	row = HBoxContainer.new()
+	run.add_child(row)
 	row.add_child(_label("Münzen"))
 	coin_amount = _spin(row, 0, 10000000, 1, 0)
 	_button(row, "Setzen", func() -> void: controls.set_coins(int(coin_amount.value)); refresh())
@@ -261,6 +274,8 @@ func refresh() -> void:
 	wave_number.value = maxi(game.wave.current_wave, 1)
 	for index in DifficultyCatalog.ALL.size():
 		if DifficultyCatalog.ALL[index].id == game.wave.difficulty_id: difficulty_select.select(index)
+	for index in ClassCatalog.profiles.size():
+		if ClassCatalog.profiles[index] == game.player.stats.class_data: class_select.select(index)
 	var saved: Dictionary = game.player.stats.to_save_data()
 	for key in stats:
 		stats[key].value = float(saved[key]) * (100.0 if DentiAttributes.is_fraction(DentiAttributes.from_key(StringName(key))) else 1.0)
@@ -318,6 +333,15 @@ func _apply_stats() -> void:
 		values[key] = stats[key].value / (100.0 if DentiAttributes.is_fraction(DentiAttributes.from_key(StringName(key))) else 1.0)
 	controls.set_stats(values)
 	status.text = "Stats übernommen"
+	refresh()
+
+
+func _set_class() -> void:
+	var profile := ClassCatalog.profiles[class_select.selected]
+	var blocked := controls.set_class(profile.id)
+	status.text = blocked if not blocked.is_empty() else "Klasse: %s" % profile.display_name
+	if blocked.is_empty() and not controls.removed_weapons.is_empty():
+		status.text += " · entfernt: " + ", ".join(controls.removed_weapons)
 	refresh()
 
 
