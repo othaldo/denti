@@ -2,7 +2,7 @@ class_name RunSaveData
 extends RefCounted
 
 const DICTIONARIES := ["player", "items", "relics", "telemetry", "rewards", "story", "weapon_mastery", "boss_stage_rewards", "poison_build", "talents", "class_combat"]
-const ARRAYS := ["weapons", "owned_weapons", "enemies", "loot", "acid", "offers", "weapon_runtime", "player_projectiles", "upgrades", "horde_waves", "burst_times", "elite_times", "elite_counts"]
+const ARRAYS := ["weapons", "owned_weapons", "enemies", "loot", "acid", "offers", "weapon_runtime", "player_projectiles", "upgrades", "horde_waves", "burst_times", "elite_times", "elite_counts", "new_fusion_discoveries"]
 const RECORD_ARRAYS := ["weapons", "enemies", "loot", "acid", "weapon_runtime", "player_projectiles"]
 
 
@@ -91,6 +91,8 @@ static func _valid_structure(value: Dictionary) -> bool:
 	if not _containers(mastery, [], ["earned", "pending", "unlocks", "pending_unlocks"]): return false
 	if mastery.has("eligible") and not mastery.eligible is bool: return false
 	if mastery.has("starter_id") and not mastery.starter_id is String: return false
+	for id in value.get("new_fusion_discoveries", []):
+		if not id is String: return false
 	var player: Dictionary = value.player
 	if not _containers(player, ["class_state"], []) or not ClassCatalog.valid_state(player.get("class_state", {})): return false
 	var profile := ClassCatalog.by_id(StringName(str(player.get("class_state", {}).get("id", "good_old_molar"))))

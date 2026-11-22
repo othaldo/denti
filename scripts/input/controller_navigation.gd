@@ -53,7 +53,7 @@ func ensure_focus() -> void:
 			target = candidate
 			break
 	if target == null and entry.preferred.is_valid(): target = entry.preferred.call()
-	if not ControllerFocus.available(target):
+	if not ControllerFocus.accepts(scope, target):
 		var choices := ControllerFocus.controls(scope)
 		target = choices[0] if not choices.is_empty() else null
 	if target != null:
@@ -64,7 +64,7 @@ func _focus_changed(control: Control) -> void:
 	var entry := top_scope()
 	if entry.is_empty(): return
 	var scope: Control = entry.scope.get_ref()
-	if ControllerFocus.contains(scope, control): entry.key = ControllerFocus.key(scope, control)
+	if ControllerFocus.accepts(scope, control): entry.key = ControllerFocus.key(scope, control)
 	_decorate(control)
 
 func _decorate(control: Control) -> void:

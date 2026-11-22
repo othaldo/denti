@@ -26,6 +26,11 @@ func _check_widgets(extent: Vector2i, context: String) -> void:
 	_check(bounds.encloses(panel.get_global_rect()), "panel exceeds viewport: " + context)
 	for control in [ui.main_scroll, ui.shop_actions, ui.coins_label, ui.reroll_button, ui.continue_button, ui.items_scroll]:
 		_check(panel.get_global_rect().encloses(control.get_global_rect()), "widget exceeds panel: %s %s" % [control, context])
+	var reroll := ui.reroll_button
+	var price_width := reroll.get_theme_font("font").get_string_size(reroll.text, HORIZONTAL_ALIGNMENT_LEFT, -1, reroll.get_theme_font_size("font_size")).x
+	var icon_width := minf(reroll.icon.get_width(), reroll.get_theme_constant("icon_max_width"))
+	var content_width := reroll.size.x - reroll.get_theme_stylebox("normal").get_minimum_size().x - icon_width - reroll.get_theme_constant("h_separation")
+	_check(reroll.text == str(game.shop.reroll_cost) and price_width <= content_width, "shop reroll price is clipped at %s: %s" % [extent, reroll.text])
 	if not ui.compact:
 		_check(ui.left_scroll.get_global_rect().encloses(ui.stat_grid.get_global_rect()), "stats exceed desktop build area: " + context)
 		_check(ui.main_scroll.get_global_rect().encloses(ui.offers_grid.get_global_rect()), "offers exceed desktop body: " + context)
@@ -66,6 +71,7 @@ func _run() -> void:
 		if DisplayServer.get_name() != "headless":
 			DisplayServer.window_set_size(extent)
 		game.coins = 100000
+		game.shop.reroll_cost = 107
 		game.items.owned.clear()
 		game.player.loadout.restore([{"id": "magic_toothbrush", "tier": 1}])
 		game.shop.offers.assign([ShopController.by_id(&"uv_lamp"), ShopController.by_id(&"mint_essence"), ShopController.by_id(&"metal_crown"), ShopController.by_id(&"amalgam_core")])

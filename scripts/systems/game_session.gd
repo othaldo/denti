@@ -218,11 +218,14 @@ func clear_run() -> void:
 func load_progression() -> void:
 	progression_data.load_from(progression_path)
 
-func discover_fusion(id: StringName) -> void:
+func discover_fusion(id: StringName) -> bool:
 	if test_scenario_id != &"" or WeaponEvolutions.by_id(id) == null or discovered_fusions.has(str(id)):
-		return
+		return false
 	discovered_fusions.append(str(id))
-	_save_progression()
+	if _save_progression() != OK:
+		discovered_fusions.pop_back()
+		return false
+	return true
 
 
 func _save_progression() -> Error:
@@ -265,7 +268,9 @@ func unlock_hell() -> bool:
 	if test_scenario_id != &"" or hell_unlocked:
 		return false
 	hell_unlocked = true
-	_save_progression()
+	if _save_progression() != OK:
+		hell_unlocked = false
+		return false
 	return true
 
 

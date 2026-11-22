@@ -5,6 +5,7 @@ enum Area { BUILD, OFFERS }
 var view: CanvasLayer
 var area := Area.OFFERS
 var positions: Array[String] = ["", ""]
+var build_anchor := ""
 var was_active := false
 var empty: ControllerPassiveTarget
 
@@ -26,8 +27,8 @@ func sync() -> void:
 		var focus: Control = view.get_viewport().gui_get_focus_owner()
 		if view.expanded:
 			area = Area.OFFERS if view.selected_kind == "offer" else Area.BUILD
-		elif ControllerFocus.contains(view.build_column, focus): area = Area.BUILD
-		elif ControllerFocus.contains(view.offer_scroll, focus): area = Area.OFFERS
+		else:
+			_remember(focus)
 	was_active = controller
 	var root: Control = view.get_node("Root")
 	if controller:
@@ -74,11 +75,17 @@ func preferred() -> Control:
 
 func _remember(control: Control) -> void:
 	if not view.visible or view.expanded: return
-	if not active():
-		if ControllerFocus.contains(view.build_column, control): area = Area.BUILD
-		elif ControllerFocus.contains(view.offer_scroll, control): area = Area.OFFERS
-		else: return
-	if control in targets(): positions[area] = str(control.get_meta("controller_focus_key", ""))
+	if not ControllerFocus.available(control): return
+	var collected := ControllerFocus.contains(view.items_row, control)
+	if collected or ControllerFocus.contains(view.build_column, control):
+		area = Area.BUILD
+	elif ControllerFocus.contains(view.offer_scroll, control):
+		area = Area.OFFERS
+	else:
+		return
+	if control in targets():
+		positions[area] = str(control.get_meta("controller_focus_key", ""))
+		if area == Area.BUILD and not collected: build_anchor = positions[area]
 
 func change(direction: int) -> void:
 	if view.expanded: return
@@ -90,15 +97,54 @@ func change(direction: int) -> void:
 	restore.call_deferred()
 
 func restore() -> void:
+	if not ControllerFocus.active(view.get_node("Root")) or view.expanded: return
 	var control := preferred()
 	if control != null:
 		control.grab_focus()
 		ControllerFocus.reveal(control)
 
 func neighbor(source: Control, side: Side) -> Control:
-	if area == Area.OFFERS and view.offers_grid.columns == 1 and side in [SIDE_LEFT, SIDE_RIGHT]: return source
-	var target := ControllerFocus.spatial_neighbor(source, side, targets())
-	return target if target != null else source
+	var choices := targets()
+	var next_section: Control
+	if area == Area.BUILD:
+		var collected: Array[Control] = []
+		var build: Array[Control] = []
+		for control in choices:
+			if ControllerFocus.contains(view.items_row, control): collected.append(control)
+			else: build.append(control)
+		if source in collected:
+			if side == SIDE_TOP and not build.is_empty():
+				for control in build:
+					if str(control.get_meta("controller_focus_key", "")) == build_anchor: return control
+				return build.back()
+			choices = collected
+		else:
+			choices = build
+			if side == SIDE_BOTTOM and not collected.is_empty():
+				next_section = collected[0]
+	var target := _row_neighbor(source, side, choices)
+	return target if target != null else (next_section if next_section != null else source)
+
+func _row_neighbor(source: Control, side: Side, choices: Array[Control]) -> Control:
+	var row_y := source.get_global_rect().get_center().y
+	if side in [SIDE_LEFT, SIDE_RIGHT]:
+		# Keep lateral input in the visible row, including full-width weapons.
+		choices = choices.filter(func(control: Control) -> bool:
+			return absf(control.get_global_rect().get_center().y - row_y) <= 1.0)
+	else:
+		var direction := 1.0 if side == SIDE_BOTTOM else -1.0
+		var distance := INF
+		for control in choices:
+			var offset := direction * (control.get_global_rect().get_center().y - row_y)
+			if offset > 1.0: distance = minf(distance, offset)
+		if is_inf(distance): return null
+		var next_y := row_y + direction * distance
+		choices = choices.filter(func(control: Control) -> bool:
+			return absf(control.get_global_rect().get_center().y - next_y) <= 1.0)
+	return ControllerFocus.spatial_neighbor(source, side, choices)
+
+func can_inspect(focus: Control) -> bool:
+	return focus != empty and focus in targets()
 
 func details() -> void:
 	var focus: Control = view.get_viewport().gui_get_focus_owner()

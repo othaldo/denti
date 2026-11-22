@@ -54,6 +54,7 @@ var ended: bool:
 	set(value): run_flow.set_phase_flag(RunFlow.Phase.ENDED, value)
 var base_victory: bool = false
 var weapon_mastery := RunWeaponMastery.new()
+var new_fusion_discoveries: Array[String] = []
 var mastery_notice: WeaponMasteryNotice
 # Compatibility accessor: the phase is the only stored source of truth.
 var in_shop: bool:
@@ -148,6 +149,7 @@ func _ready() -> void:
 	talent_panel.cursor_changed.connect(_save_run)
 	player.stats.shield_blocked.connect(items.on_shield_blocked)
 	player.stats.shield_blocked.connect(relics.on_shield_blocked)
+	player.relics = relics
 	player.stats.healed.connect(items.on_healed)
 	player.stats.healed.connect(telemetry.record_healing)
 	player.stats.dodged.connect(items.on_player_dodged)
@@ -995,7 +997,7 @@ func _finish_loot_collection() -> void:
 	coins += interest
 	telemetry.record_loot(&"coin", interest, &"interest")
 	if (wave.current_wave < WaveController.MAX_WAVES or wave.current_wave > WaveController.MAX_WAVES and wave.current_wave % 10 == 0) and WaveController.is_boss_wave(wave.current_wave) and rewards.pending_relics.is_empty():
-		rewards.queue_relics(RelicCatalog.choices(relics.owned, items.preferred_tags(player.loadout)))
+		rewards.queue_relics(RelicCatalog.choices(relics.owned, items.preferred_tags(player.loadout), player.stats.class_data.id))
 	if story.enabled and wave.current_wave > story.completed_boss_wave:
 		var dialogue_id := StoryCatalog.after_boss(wave.current_wave)
 		if dialogue_id != &"":
@@ -1123,6 +1125,7 @@ func _finish_run() -> void:
 	base_victory = true
 	weapon_mastery.record(session, &"victory", wave.difficulty_id, wave.current_wave)
 	weapon_mastery.take_pending()
+	weapon_mastery.take_pending_unlocks()
 	boss_pending = false
 	_sync_music()
 	_clear_arena(true)
@@ -1141,6 +1144,7 @@ func _on_endless_requested() -> void:
 	wave.endless_enabled = true
 	ended = false
 	rewards.final_wave = false
+	new_fusion_discoveries.clear()
 	choice_panel.visible = false
 	player.set_physics_process(true)
 	_open_shop()
@@ -1223,7 +1227,8 @@ func _on_fusion_confirmed(plan: WeaponFusionPlan) -> void:
 		return
 	weapon_fusion_panel.hide()
 	weapon_fusion_panel.plan = null
-	if plan.recipe_id != &"": get_node("/root/GameSession").discover_fusion(plan.recipe_id)
+	if plan.recipe_id != &"" and session.discover_fusion(plan.recipe_id):
+		new_fusion_discoveries.append(str(plan.recipe_id))
 	shop_panel.close_details()
 	_update_shop_panel()
 	shop_panel.animate_equipment(player.loadout.equipped().size() - 1)
@@ -1312,6 +1317,7 @@ func _run_recap_data() -> Dictionary:
 		"endless_enabled": wave.endless_enabled,
 		"base_victory": base_victory,
 		"weapon_mastery": weapon_mastery.save_data(),
+		"new_fusion_discoveries": new_fusion_discoveries.duplicate(),
 		"wave_reached": wave.current_wave,
 		"final_level": level,
 		"coins_left": coins,

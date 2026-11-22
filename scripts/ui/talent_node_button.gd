@@ -64,7 +64,7 @@ func _draw() -> void:
 	var edge := _edge()
 	var width := 3.0 if state in [State.INVESTED, State.MAXED, State.AVAILABLE] else 2.0
 	if selected:
-		_shape(centre, extent * 0.5 + 5.0, Color(DentiUIStyle.INK, 0.0), DentiUIStyle.INK, 2.5)
+		_shape(centre, extent * 0.5 + 5.0, Color.TRANSPARENT, DentiUIStyle.GOLD, 2.5)
 	_shape(centre, extent * 0.5, fill, edge, width)
 	var ink := DentiUIStyle.LINE if locked else DentiUIStyle.GOLD
 	if texture != null:

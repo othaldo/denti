@@ -67,6 +67,8 @@ func _run() -> void:
 	_check(session.mastery_flags(&"turbo_drill") == 1, "exam did not survive account reload")
 	game._on_player_died()
 	_check(session.mastery_flags(&"turbo_drill") == 1 and game.choice_panel.subtitle_label.text.contains("Zahnprüfung"), "a later death removed the achievement or hid it in the recap")
+	var death_notices: VBoxContainer = game.choice_panel.end_notices.notices
+	_check(death_notices.get_child_count() == 3, "death did not show the earned exam and both weapon unlocks")
 	# Victory tiers are cumulative, including a first win directly on Hell.
 	for pair in [[&"normal", 3], [&"hard", 7], [&"hell", 15]]:
 		_new_game(&"water_jet", pair[0])
@@ -74,6 +76,8 @@ func _run() -> void:
 		game.wave.current_wave = 20
 		game._finish_run()
 		_check(session.mastery_flags(&"water_jet") == pair[1] and game.choice_panel.subtitle_label.text.contains("Neu:"), "victory awarded the wrong cumulative medal tier")
+		var victory_notices: VBoxContainer = game.choice_panel.end_notices.notices
+		_check(victory_notices.get_child_count() == game.weapon_mastery.earned.size() + game.weapon_mastery.unlocks.size(), "victory omitted newly earned seals or weapon unlocks")
 		var earned: Array[String] = game.weapon_mastery.earned.duplicate()
 		game._finish_run()
 		_check(game.weapon_mastery.earned == earned, "double victory awarded mastery twice")
@@ -81,6 +85,7 @@ func _run() -> void:
 		_check(game.wave.endless_enabled and session.mastery_flags(&"water_jet") == pair[1], "endless continuation lost the wave-20 medal")
 		game._on_player_died()
 		_check(session.mastery_flags(&"water_jet") == pair[1], "endless death revoked a win")
+		_check(not game.choice_panel.end_notices.visible, "endless death replayed the wave-20 victory notices")
 	_new_game(&"enamel_mirror", &"hell")
 	game.wave.current_wave = 20
 	game._finish_run()

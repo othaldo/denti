@@ -37,6 +37,7 @@ static func capture(game) -> Dictionary:
 	var result := {
 		"base_victory": game.base_victory,
 		"weapon_mastery": game.weapon_mastery.save_data(),
+		"new_fusion_discoveries": game.new_fusion_discoveries.duplicate(),
 		"player": {"position": SnapshotValues.vector_data(game.player.position), "stats": game.player.stats.to_save_data(), "class_state": game.player.stats.class_save_data(), "hurt_time": game.player.hurt_time, "dodge_time": game.player.dodge_time, "presentation": game.player.expressions.save_data(), "status_effects": game.player.status_effects.save_data()},
 		"xp": game.xp, "xp_goal": game.xp_goal, "level": game.level, "coins": game.coins,
 		"weapons": game.player.loadout.save_data(), "starter_pending": game.starter_pending,
@@ -84,6 +85,7 @@ static func restore(game, saved: Dictionary) -> void:
 	wave.restore_state(saved, game.story.enabled)
 	game.base_victory = bool(saved.get("base_victory", wave.endless_enabled))
 	game.weapon_mastery.restore(saved.get("weapon_mastery", {}))
+	game.new_fusion_discoveries.assign(saved.get("new_fusion_discoveries", []))
 	if game.mastery_notice != null: game.mastery_notice.hide()
 	var player_data: Dictionary = saved.get("player", {})
 	player.position = SnapshotValues.read_vector(player_data.get("position", [640.0, 360.0]))

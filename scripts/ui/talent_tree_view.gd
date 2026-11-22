@@ -1,9 +1,8 @@
 class_name TalentTreeView
 extends Control
 
-## Fits the whole three-branch talent grid into the reward stage body without
-## scrolling. Wide screens show all branches plus a side detail column;
-## narrow screens show one branch at a time with branch tabs and details below.
+## Wide screens show all branches beside the details. Narrow screens show a
+## single branch and tabs. The reward stage scrolls when these cannot fit.
 
 signal node_pressed(id: StringName)
 signal branch_selected(branch: int)
@@ -13,6 +12,7 @@ const WIDE := 860.0
 const HEADER := 34.0
 const TABS := 48.0
 const BRANCH_GAP := 28.0
+const MIN_CELL := 40.0
 
 var tree: TalentTreeData
 var detail: Control
@@ -54,16 +54,18 @@ func setup(new_tree: TalentTreeData, upgrades: Array[UpgradeData], detail_contro
 		headers.append(label)
 		var tab := Button.new()
 		tab.clip_text = true
+		ControllerFocus.tag(tab, "talent:branch:%d" % branch)
 		tab.pressed.connect(func() -> void:
 			focus_branch = branch
-			branch_selected.emit(branch)
-			layout_in(extent))
+			layout_in(extent)
+			branch_selected.emit(branch))
 		add_child(tab)
 		tabs.append(tab)
 	for node in tree.nodes:
 		var button := TalentNodeButton.new()
 		button.configure(node, _icon(node, upgrades))
 		var id := node.id
+		ControllerFocus.tag(button, "talent:node:%s" % id)
 		button.pressed.connect(func() -> void: node_pressed.emit(id))
 		add_child(button)
 		buttons[str(node.id)] = button
@@ -110,36 +112,46 @@ func button(id: StringName) -> TalentNodeButton:
 func layout_in(available: Vector2) -> void:
 	if tree == null or detail == null: return
 	extent = available
-	custom_minimum_size = Vector2.ZERO
-	size = available
 	compact = available.x < WIDE
 	compact_changed.emit(compact)
-	var area: Rect2
-	var tab_height := 0.0
-	if not compact:
-		var side := clampf(available.x * 0.28, 280.0, 420.0)
-		area = Rect2(0, 0, available.x - side - 24, available.y)
-		_place_detail(Vector2(available.x - side, 0), side, available.y)
-	elif available.x >= available.y * 1.35:
-		# Landscape phone: one branch with tabs, details beside it.
-		var side := clampf(available.x * 0.4, 200.0, 340.0)
-		tab_height = 40.0
-		area = Rect2(0, tab_height + 6, available.x - side - 12, available.y - tab_height - 6)
-		_place_detail(Vector2(available.x - side, 0), side, available.y)
-	else:
-		tab_height = TABS
-		detail.size = Vector2(available.x, 0)
-		var wanted := detail.get_combined_minimum_size().y
-		var detail_height := clampf(wanted, 120.0, available.y * 0.45)
-		area = Rect2(0, tab_height + 8, available.x, maxf(available.y - tab_height - 8 - detail_height - 10, 100))
-		_place_detail(Vector2(0, available.y - detail_height), available.x, detail_height)
 	var shown: Array[int] = []
 	if compact: shown.append(focus_branch)
 	else: shown.assign([0, 1, 2])
 	var row_count := 3
 	for branch in shown: row_count = maxi(row_count, tree.rows(branch))
-	var branch_width := (area.size.x - BRANCH_GAP * (shown.size() - 1)) / shown.size()
+	var landscape := compact and available.x >= available.y * 1.35
+	var tab_height := (40.0 if landscape else TABS) if compact else 0.0
 	var header := 0.0 if compact else HEADER
+	var tree_width := available.x
+	var detail_width := available.x
+	if not compact:
+		detail_width = clampf(available.x * 0.28, 280.0, 420.0)
+		tree_width -= detail_width + 24
+	elif landscape:
+		detail_width = clampf(available.x * 0.4, 200.0, 340.0)
+		tree_width -= detail_width + 12
+	var branch_width := (tree_width - BRANCH_GAP * (shown.size() - 1)) / shown.size()
+	var can_transpose := compact and branch_width >= row_count * MIN_CELL
+	var min_grid_height := (TalentNodeData.COLUMNS if can_transpose else row_count) * MIN_CELL
+	var details_below := compact and not landscape
+	var top := tab_height + (8.0 if details_below else (4.0 if landscape else 0.0))
+	var detail_minimum := detail.get_combined_minimum_size().y
+	var minimum_height := top + header + min_grid_height
+	var detail_height := detail_minimum
+	if details_below:
+		detail_height = maxf(120.0, detail_height)
+		minimum_height += detail_height + 10
+	else:
+		minimum_height = maxf(minimum_height, detail_minimum)
+	custom_minimum_size = Vector2(0, minimum_height if minimum_height > available.y else 0.0)
+	var height := maxf(available.y, minimum_height)
+	size = Vector2(available.x, height)
+	var area := Rect2(0, top, tree_width, height - top)
+	if details_below:
+		area.size.y -= detail_height + 10
+		_place_detail(Vector2(0, height - detail_height), detail_width, detail_height)
+	else:
+		_place_detail(Vector2(available.x - detail_width, 0), detail_width, height)
 	var grid_height := area.size.y - header - 8
 	cell = minf(branch_width / TalentNodeData.COLUMNS, grid_height / row_count)
 	transposed = false
@@ -149,7 +161,7 @@ func layout_in(available: Vector2) -> void:
 		if sideways > cell:
 			cell = sideways
 			transposed = true
-	cell = clampf(cell, 40.0, 132.0)
+	cell = clampf(cell, MIN_CELL, 132.0)
 	var node_size := clampf(cell * 0.72, 36.0, 92.0)
 	for branch in TalentNodeData.BRANCHES:
 		var visible_branch := branch in shown
@@ -162,7 +174,9 @@ func layout_in(available: Vector2) -> void:
 		var left := area.position.x + index * (branch_width + BRANCH_GAP)
 		columns[branch] = Rect2(left, area.position.y, branch_width, area.size.y)
 		var grid := Vector2(cell * (row_count if transposed else TalentNodeData.COLUMNS), cell * (TalentNodeData.COLUMNS if transposed else row_count))
-		origins[branch] = Vector2(left + (branch_width - grid.x) * 0.5, area.position.y + header + 4 + maxf(grid_height - grid.y, 0.0) * (0.5 if transposed else 0.0))
+		var spare := maxf(area.size.y - header - grid.y, 0.0)
+		var leading := spare * 0.5 if transposed else minf(4.0, spare)
+		origins[branch] = Vector2(left + (branch_width - grid.x) * 0.5, area.position.y + header + leading)
 		headers[branch].position = Vector2(left, area.position.y)
 		headers[branch].size = Vector2(branch_width, HEADER)
 	var tabs_width := area.size.x if compact else available.x

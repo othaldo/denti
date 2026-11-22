@@ -32,11 +32,15 @@ var chest_item: ShopOfferData
 var relic_options: Array[RelicData] = []
 var end_recap: Dictionary = {}
 var block_controller_accept := false
+var end_notices: RunEndNotices
 
-@onready var legacy_panel: PanelContainer = $Root/Center/Panel
-@onready var legacy_cards: GridContainer = $Root/Center/Panel/Margin/Rows/Cards
-@onready var legacy_title: Label = $Root/Center/Panel/Margin/Rows/Title
-@onready var legacy_subtitle: Label = $Root/Center/Panel/Margin/Rows/Subtitle
+@onready var results := $Root/Center/Results as BoxContainer
+@onready var legacy_panel: PanelContainer = $Root/Center/Results/Panel
+@onready var legacy_margin: MarginContainer = $Root/Center/Results/Panel/Margin
+@onready var legacy_cards: GridContainer = $Root/Center/Results/Panel/Margin/Rows/Cards
+@onready var legacy_title: Label = $Root/Center/Results/Panel/Margin/Rows/Title
+@onready var legacy_subtitle: Label = $Root/Center/Results/Panel/Margin/Rows/Subtitle
+@onready var legacy_portrait: TextureRect = $Root/Center/Results/Panel/Margin/Rows/Portrait
 var legacy_buttons: Array[UpgradeCard] = []
 
 func _ready() -> void:
@@ -44,7 +48,11 @@ func _ready() -> void:
 	$Root.theme = DentiUIStyle.make_theme()
 	$Root/Dim.color = Color(0.12, 0.06, 0.13, 0.78)
 	DentiUIStyle.style_dialog(legacy_panel)
-	$Root/Center/Panel/Margin/Rows/LevelActions.hide()
+	legacy_margin.get_node("Rows/LevelActions").hide()
+	end_notices = RunEndNotices.new()
+	end_notices.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	results.add_child(end_notices)
+	legacy_panel.minimum_size_changed.connect(_fit_end_notices)
 	for index in UPGRADE_COUNT:
 		legacy_buttons.append(legacy_cards.get_child(index))
 		legacy_buttons[index].pressed.connect(_on_choice_pressed.bind(index))
@@ -103,7 +111,7 @@ func _input(event: InputEvent) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if visible and ControllerFocus.active($Root) and mode == &"credits" and event.is_action_pressed("ui_cancel"):
-		show_end(end_won, end_coins, end_recap)
+		_display_end()
 		get_viewport().set_input_as_handled()
 		return
 	if visible and ControllerFocus.active($Root) and mode == &"upgrade" and event.is_action_pressed("ui_reroll") and not reroll_button.disabled:
@@ -141,6 +149,7 @@ func _use_legacy(next: StringName) -> void:
 	level_actions.hide()
 	starter_selection.visible = mode == &"starter"
 	$Root/Center.visible = mode != &"starter"
+	end_notices.visible = mode == &"end" and end_notices.has_entries()
 	buttons = legacy_buttons
 	cards = legacy_cards
 	dialog_panel = legacy_panel
@@ -160,28 +169,49 @@ func _update_layout() -> void:
 		return
 	if mode == &"starter": return
 	var extent: Vector2 = $Root.size
-	var compact := extent.x < 600 or extent.y < 600
-	legacy_panel.custom_minimum_size = Vector2(minf(extent.x - 24, 900), 0)
-	var portrait := $Root/Center/Panel/Margin/Rows/Portrait
-	portrait.visible = extent.y >= 600
-	portrait.custom_minimum_size.y = 64
+	var panel_width := minf(extent.x - 24, 900)
+	legacy_portrait.visible = extent.y >= 600
+	legacy_portrait.custom_minimum_size.y = 64
+	if end_notices.visible:
+		results.vertical = extent.x < 540
+		if results.vertical:
+			legacy_portrait.visible = extent.y >= 650
+		else:
+			panel_width = minf(extent.x - 24, 1180) - _end_notices_width() - results.get_theme_constant("separation")
+	legacy_panel.custom_minimum_size = Vector2(panel_width, 0)
+	var compact := panel_width < 576 or extent.y < 600
 	title_label.add_theme_font_size_override("font_size", 22 if compact else 30)
 	subtitle_label.visible = true
 	subtitle_label.custom_minimum_size.y = 0
 	subtitle_label.add_theme_font_size_override("font_size", 14 if compact else 17)
 	for edge in ["left", "right", "top", "bottom"]:
-		$Root/Center/Panel/Margin.add_theme_constant_override("margin_" + edge, 8 if compact else 14)
+		legacy_margin.add_theme_constant_override("margin_" + edge, 8 if compact else 14)
 	cards.columns = 2 if mode == &"end" else 1
 	cards.add_theme_constant_override("h_separation", 8 if compact else 12)
 	cards.add_theme_constant_override("v_separation", 8 if compact else 12)
 	if mode == &"end":
-		subtitle_label.text = _end_summary(end_won, end_coins, end_recap)
+		subtitle_label.text = _end_summary(end_won, end_coins, end_recap, compact)
 		var labels := ["Neuer Run", "Credits", "Hauptmenü", "Endlos"] if compact else ["Noch einmal spielen", "Credits", "Hauptmenü", "Endlos weiterspielen"]
 		for index in buttons.size():
 			buttons[index].custom_minimum_size = Vector2(0, 40 if compact else 48)
 			buttons[index].add_theme_font_size_override("font_size", 14 if compact else 18)
 			buttons[index].text = labels[index]
 			buttons[index].set_meta("controller_action_label", labels[index])
+		_fit_end_notices()
+	ControllerFocus.style_buttons(legacy_panel, get_node("/root/GameInput").navigation_active)
+
+
+func _end_notices_width() -> float:
+	var width: float = $Root.size.x
+	return minf(width - 24, 900) if results.vertical else clampf(width * 0.28, 250, 316)
+
+
+func _fit_end_notices() -> void:
+	if not end_notices.visible: return
+	var available_height: float = $Root.size.y + $Root/Center.offset_bottom - 24
+	if results.vertical:
+		available_height -= legacy_panel.get_combined_minimum_size().y + results.get_theme_constant("separation")
+	end_notices.fit(_end_notices_width(), maxf(RunEndNotices.CARD_HEIGHT, available_height))
 
 func set_progress(current: int, total: int) -> void:
 	stage.set_progress(current, total)
@@ -236,18 +266,23 @@ func _finish_reward() -> void:
 	DentiUIMotion.reveal(reward_view)
 
 func show_end(won: bool, coins: int, recap: Dictionary = {}) -> void:
-	_use_legacy(&"end")
 	end_won = won
 	end_coins = coins
 	end_recap = recap.duplicate(true)
+	end_notices.present(end_recap)
+	_display_end()
+
+
+func _display_end() -> void:
+	_use_legacy(&"end")
 	current_upgrades.clear()
-	title_label.text = "Endlos beendet!" if not won and bool(recap.get("endless_enabled", false)) else ("Alle huldigen Denti!" if won else "Denti ist ausgefallen!")
+	title_label.text = "Endlos beendet!" if not end_won and bool(end_recap.get("endless_enabled", false)) else ("Alle huldigen Denti!" if end_won else "Denti ist ausgefallen!")
 	buttons[0].show_action("Noch einmal spielen", true)
 	buttons[1].show_action("Credits")
 	buttons[2].show_action("Hauptmenü")
 	buttons[3].show_action("Endlos weiterspielen", true)
 	for index in 3: buttons[index].show()
-	buttons[3].visible = won and not bool(recap.get("endless_enabled", false)) and int(recap.get("wave_reached", 0)) == WaveController.MAX_WAVES
+	buttons[3].visible = end_won and not bool(end_recap.get("endless_enabled", false)) and int(end_recap.get("wave_reached", 0)) == WaveController.MAX_WAVES
 	buttons[3].tooltip_text = "Mit diesem Build in Welle 21 weiterspielen. Dein Sieg bleibt erhalten."
 	_update_layout()
 	visible = true
@@ -275,10 +310,10 @@ func _on_choice_pressed(index: int) -> void:
 			elif index == 1: _show_credits()
 			elif index == 2: main_menu_requested.emit()
 			elif index == 3 and buttons[3].visible: endless_requested.emit()
-		&"credits": show_end(end_won, end_coins, end_recap)
+		&"credits": _display_end()
 
 
-func _end_summary(won: bool, coins: int, recap: Dictionary) -> String:
+func _end_summary(won: bool, coins: int, recap: Dictionary, compact: bool) -> String:
 	var mastery_line := WeaponMasteries.recap(recap.get("weapon_mastery", {}))
 	var run: Dictionary = recap.get("telemetry", {})
 	if run.is_empty():
@@ -287,7 +322,6 @@ func _end_summary(won: bool, coins: int, recap: Dictionary) -> String:
 	var minutes := floori(float(elapsed) / 60.0)
 	var seconds := elapsed % 60
 	var outcome := "Sieg" if won or bool(recap.get("base_victory", false)) else "Niederlage"
-	var compact: bool = $Root.size.x < 600.0 or $Root.size.y < 600.0
 	if compact:
 		return "%s · %s\nWelle %d · Level %d · %02d:%02d\n%d Kills · %d Münzen übrig%s" % [outcome, DifficultyCatalog.by_id(StringName(str(recap.get("difficulty_id", "normal")))).display_name, int(recap.get("wave_reached", 0)), int(recap.get("final_level", 1)), minutes, seconds, int(run.get("kills", 0)), coins, ("\nSieg in Welle 20 bleibt erhalten." if bool(recap.get("endless_enabled", false)) else "") + ("\n" + mastery_line if not mastery_line.is_empty() else "")]
 	var lines: PackedStringArray = [
@@ -353,6 +387,7 @@ func _format_number(value: int) -> String:
 
 func _show_credits() -> void:
 	mode = &"credits"
+	end_notices.hide()
 	dialog_panel.custom_minimum_size = Vector2(800, 420)
 	_update_layout()
 	title_label.text = "Credits"
@@ -363,4 +398,5 @@ func _show_credits() -> void:
 	buttons[1].visible = false
 	buttons[2].visible = false
 	buttons[3].visible = false
+	ControllerFocus.style_buttons(legacy_panel, get_node("/root/GameInput").navigation_active)
 	buttons[0].grab_focus()
