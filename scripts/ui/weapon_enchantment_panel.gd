@@ -272,7 +272,7 @@ func _layout(extent: Vector2) -> void:
 				_weapon_card(index, Rect2(index % 2 * (cell + 12), gallery_top + (index / 2) * (cell + 12), cell, cell), true)
 		_hero(Rect2(rail + gap, 0, hero_width, content_height), false)
 		var right := Rect2(rail + hero_width + gap * 2, 0, extent.x - rail - hero_width - gap * 2, 0)
-		var height := _picker(right) if picking_slot >= 0 else _overview(right, false)
+		var height := _picker(right, extent.y - 8) if picking_slot >= 0 else _overview(right, false)
 		body.custom_minimum_size.y = maxf(content_height, right.position.y + height) + 8
 	body.size = Vector2(extent.x, maxf(extent.y, body.custom_minimum_size.y))
 	stage.refresh_focus()
@@ -455,11 +455,32 @@ func _slots(rect: Rect2, compact: bool, row_height: float) -> float:
 	return SLOT_COUNT * (row_height + gap) - gap
 
 
-func _picker(rect: Rect2) -> float:
+func _picker(rect: Rect2, available := 0.0) -> float:
 	var columns := 2 if rect.size.x < 400 else 3
 	var gap := 8.0
 	var width := (rect.size.x - gap * (columns - 1)) / columns
 	var options: Array = models[selected_weapon].options
+	var selected: Dictionary = {}
+	for option: Dictionary in options:
+		if option.id == selected_effect: selected = option
+	var description := ""
+	if selected_effect != &"":
+		description = AffixPresentation.effect_description(selected_effect)
+		if not str(selected.get("blocked", "")).is_empty(): description = str(selected.blocked)
+	var target_line := _selection_target()
+	var preview_height := _selection_height(description, target_line, rect.size.x) if selected_effect != &"" else 0.0
+	var rows := 0
+	for elemental in [true, false]:
+		var count := 0
+		for option: Dictionary in options:
+			if WeaponAffixes.by_id(option.id).elemental == elemental: count += 1
+		rows += ceili(float(count) / columns)
+	# Desktop keeps choices and their detail in one viewport: option cards give
+	# up height before the selected effect is pushed below the fold.
+	var option_height := 58.0
+	if available > 0 and rows > 0:
+		option_height = clampf(floorf((available - 2 * 36 - preview_height) / rows) - gap, 44, 58)
+	var pitch := option_height + gap
 	var bottom := 0.0
 	for elemental in [true, false]:
 		var current := StringName(models[selected_weapon].element)
@@ -470,13 +491,14 @@ func _picker(rect: Rect2) -> float:
 		for option: Dictionary in options:
 			var data := WeaponAffixes.by_id(option.id)
 			if data.elemental != elemental: continue
-			var row := Rect2(rect.position + Vector2(index % columns * (width + gap), bottom + (index / columns) * 66), Vector2(width, 58))
+			var row := Rect2(rect.position + Vector2(index % columns * (width + gap), bottom + (index / columns) * pitch), Vector2(width, option_height))
 			var button := _button(body, "", row)
 			button.set_meta("effect_id", data.id)
 			ControllerFocus.tag(button, "effect:%s" % data.id)
 			RunSetupStyle.choice(button, selected_effect == data.id, stage.keyboard_focus)
-			_art(button, DentiUIIcons.item(data.icon_index), Rect2(8, 12, 34, 36))
-			_text(button, data.display_name, Rect2(47, 6, width - 52, 46), 15, DentiUIStyle.INK, true)
+			var icon_size := minf(36, option_height - 16)
+			_art(button, DentiUIIcons.item(data.icon_index), Rect2(8, (option_height - icon_size) / 2, 34, icon_size))
+			_text(button, data.display_name, Rect2(47, 4, width - 52, option_height - 8), 15, DentiUIStyle.INK, true)
 			button.disabled = not str(option.blocked).is_empty()
 			if bool(option.existing):
 				_art(button, preload("res://assets/ui/setup_check.svg"), Rect2(width - 20, 5, 14, 14))
@@ -490,29 +512,43 @@ func _picker(rect: Rect2) -> float:
 				_refresh.call_deferred())
 			effect_buttons.append(button)
 			index += 1
-		bottom += ceili(float(index) / columns) * 66 + 6
+		bottom += ceili(float(index) / columns) * pitch + 6
 	if selected_effect != &"":
 		var data := WeaponAffixes.by_id(selected_effect)
-		var selected: Dictionary = {}
-		for option: Dictionary in options:
-			if option.id == selected_effect: selected = option
 		selection_preview = Control.new()
 		body.add_child(selection_preview)
-		_place(selection_preview, Rect2(rect.position + Vector2(0, bottom), Vector2(rect.size.x, 160)))
-		_text(selection_preview, "%s · 1/10" % data.display_name, Rect2(0, 6, rect.size.x, 30), 22)
-		var target_name := str(models[selected_weapon].name) + " · " + WeaponPresentation.tier_text(current_data(), int(models[selected_weapon].tier))
-		var copies := 0
-		for model: Dictionary in models:
-			if model.id == current_data().id: copies += 1
-		if copies > 1: target_name += " · #%d" % (selected_weapon + 1)
-		_text(selection_preview, target_name, Rect2(0, 36, rect.size.x, 24), 14, DentiUIStyle.MUTED)
-		_text(selection_preview, str(selected.get("value", "")), Rect2(0, 64, rect.size.x, 30), 17, DentiUIStyle.MINT)
-		var description := AffixPresentation.effect_description(selected_effect)
-		if not str(selected.get("blocked", "")).is_empty(): description = str(selected.blocked)
-		var label := _text(selection_preview, description, Rect2(0, 100, rect.size.x, 72), 16, DentiUIStyle.MUTED, true)
-		selection_preview.size.y = 104 + maxf(72, label.get_minimum_size().y)
-		return bottom + selection_preview.size.y
+		_place(selection_preview, Rect2(rect.position + Vector2(0, bottom), Vector2(rect.size.x, preview_height)))
+		_text(selection_preview, "%s · 1/10" % data.display_name, Rect2(0, 4, rect.size.x, 30), 22)
+		var y := 36.0
+		# The hero already names the weapon and Mk; only copies need telling apart.
+		if not target_line.is_empty():
+			_text(selection_preview, target_line, Rect2(0, y, rect.size.x, 22), 14, DentiUIStyle.MUTED)
+			y += 24
+		_text(selection_preview, str(selected.get("value", "")), Rect2(0, y, rect.size.x, 28), 17, DentiUIStyle.MINT)
+		var label := _text(selection_preview, description, Rect2(0, y + 32, rect.size.x, preview_height - y - 32), 16, DentiUIStyle.MUTED, true)
+		label.vertical_alignment = VERTICAL_ALIGNMENT_TOP
+		var needed := label.position.y + label.get_minimum_size().y + 6
+		if needed > preview_height:
+			preview_height = needed
+			label.size.y = needed - 6 - label.position.y
+			selection_preview.size.y = preview_height
+		return bottom + preview_height
 	return bottom
+
+
+func _selection_target() -> String:
+	if models.is_empty(): return ""
+	var copies := 0
+	for model: Dictionary in models:
+		if model.id == models[selected_weapon].id: copies += 1
+	if copies < 2: return ""
+	return "%s · %s · #%d" % [models[selected_weapon].name, WeaponPresentation.tier_text(current_data(), int(models[selected_weapon].tier)), selected_weapon + 1]
+
+
+func _selection_height(description: String, target_line: String, width: float) -> float:
+	var font := stage.get_theme_font("font", "Label")
+	var text_height := font.get_multiline_string_size(description, HORIZONTAL_ALIGNMENT_LEFT, width, 16, -1, TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND | TextServer.BREAK_ADAPTIVE).y
+	return 36.0 + (24.0 if not target_line.is_empty() else 0.0) + 32.0 + ceilf(text_height) + 6
 
 
 func _reveal_selection() -> void:

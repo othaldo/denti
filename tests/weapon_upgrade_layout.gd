@@ -53,6 +53,12 @@ func _run() -> void:
 		_check_text(panel.body)
 		_check(panel.effect_buttons.size() == 12, "catalogue needs six elements and six supports")
 		_check(is_instance_valid(panel.selection_preview) and panel.stage.body_scroll.get_global_rect().intersects(panel.selection_preview.get_global_rect()), "selected value is outside the scroll viewport")
+		if extent.x >= 1280 and extent.y >= 720:
+			# Desktop (the project stretch keeps at least 720 logical rows) fits the
+			# catalogue and selected detail without the view jumping.
+			var scroll := panel.stage.body_scroll
+			_check(scroll.scroll_vertical == 0 and scroll.get_v_scroll_bar().max_value <= scroll.size.y + 1, "desktop picker scrolls at %s" % extent)
+			_check(scroll.get_global_rect().grow(1).encloses(panel.selection_preview.get_global_rect()), "desktop selection detail is cut off at %s" % extent)
 		panel._back()
 		await _settle()
 		_check(panel.upgrade_buttons[3].disabled and panel.upgrade_buttons[3].text == "Ab Mk IV", "Mk IV lock disappeared")
