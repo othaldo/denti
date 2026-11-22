@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = &"molar_root_weave"
 display_name = "Wurzelgeflecht"
-description = "Treffen zwei verschiedene Waffen kurz nacheinander denselben Gegner, folgt ein Wurzelschlag mit 40 % des Treffers."
+description = "Treffen zwei verschiedene Waffen kurz nacheinander denselben Gegner, folgt ein Wurzelschlag mit 40 % des Treffers."
 tags = Array[StringName]([&"melee", &"ranged"])
 class_id = &"good_old_molar"
 talent_icon = 1

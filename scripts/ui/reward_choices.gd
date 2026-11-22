@@ -39,7 +39,9 @@ func layout_in(extent: Vector2) -> void:
 	if kind == &"upgrade":
 		columns = 4 if extent.x >= 1000 else (2 if extent.x >= 500 else 1)
 	elif kind == &"relic":
-		columns = 3 if extent.x >= 850 else (2 if extent.x >= 600 else 1)
+		# Four relics: one row when wide, otherwise 2 x 2, never 3 + 1. Long relic
+		# texts need a full-width card on flat landscape phones.
+		columns = 4 if extent.x >= 1000 else (2 if extent.x >= 500 and extent.y >= 360 else 1)
 	cards.columns = mini(columns, count)
 	var tall := kind != &"chest" and ((extent.x >= 850 and extent.y >= 320) or (extent.x >= 600 and extent.y >= 650))
 	var width := minf(extent.x, 760) if kind == &"chest" else extent.x

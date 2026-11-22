@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = &"frost_glacier_heart"
 display_name = "Gletscherherz"
-description = "Zerbricht ein Boss eine Eiswand, ist er kurz verlangsamt und nimmt 20 % mehr Waffenschaden."
+description = "Zerbricht ein Boss eine Eiswand, ist er kurz verlangsamt und nimmt 20 % mehr Waffenschaden."
 tags = Array[StringName]([&"defense", &"shield"])
 class_id = &"frost_warden"
 talent_icon = 155

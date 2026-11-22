@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = &"assassin_nightshade"
 display_name = "Nachtschatten"
-description = "Gegner in einem Giftfeld der Giftschneise nehmen 20 % mehr Waffenschaden."
+description = "Gegner in einem Giftfeld der Giftschneise nehmen 20 % mehr Waffenschaden."
 tags = Array[StringName]([&"poison", &"melee"])
 class_id = &"assassin"
 talent_icon = 21

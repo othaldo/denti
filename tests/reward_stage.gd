@@ -124,6 +124,14 @@ func _run() -> void:
 		await _settle()
 		_check_stage(panel.stage, extent)
 		_check(not panel.level_actions.is_visible_in_tree(), "relic choices inherited the level reroll footer")
+		# Four relics form one row or a 2 x 2 grid, never three plus a stray card.
+		var relic_columns: int = panel.reward_view.cards.columns
+		_check(relic_columns in [1, 2, 4], "four relics split into an uneven grid: %d columns at %s" % [relic_columns, extent])
+		if extent.x >= 1280:
+			_check(relic_columns == 4, "desktop relic choice is not one row at %s" % extent)
+			var viewport := Rect2(Vector2.ZERO, Vector2(extent)).grow(0.5)
+			for card in panel.buttons:
+				_check(viewport.encloses(_physical_rect(card)), "desktop relic card needs scrolling at %s" % extent)
 		await _check_choices(panel.stage, panel.buttons, extent)
 		panel.show_chest(ShopController.by_id(&"metal_crown"), 7)
 		await _settle()
