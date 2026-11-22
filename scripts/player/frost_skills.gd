@@ -25,6 +25,17 @@ const SPLINTER_SHARE := 0.4
 const WAVE_BASE := 18.0
 const WAVE_MELEE := 0.8
 const WAVE_RADIUS := 40.0
+## Frostwelle splinters: the expiring wall bursts into ice shards flying out
+## to both sides. Each shard pierces once, chills and makes its targets brittle.
+const SHARD_SPACING := 28.0
+const SHARD_MIN := 6
+const SHARD_MAX := 14
+const SHARD_SPEED := 380.0
+const SHARD_RANGE := 170.0
+const SHARD_HITS := 2
+const SHARD_RADIUS := 8.0
+const SHARD_SPREAD := 0.45
+const SHARD_LIMIT := 64
 const ARMOR_COOLDOWN := 8.0
 const ARMOR_FAST := 5.0
 const BREATH_RADIUS := 150.0
@@ -39,6 +50,7 @@ var contact: Dictionary = {}
 var brittle: Dictionary = {}
 var armor_cooldown := 0.0
 var spike_tick := 0.0
+var shards: Array[Dictionary] = []
 
 func class_id() -> StringName:
 	return &"frost_warden"
@@ -50,6 +62,7 @@ func reset_wave() -> void:
 	brittle.clear()
 	armor_cooldown = 0.0
 	spike_tick = 0.0
+	shards.clear()
 
 func wall_seconds() -> float:
 	var seconds := WALL_SECONDS + power("frost_thick") + (1.5 if power("wall_lasting") > 0.0 else 0.0)
@@ -122,16 +135,45 @@ func _shatter(enemy: Enemy, dealt: float, chain: bool) -> void:
 	ElementImpactBatch.emit_from(player, &"ice", at, Vector2.RIGHT, 50.0, true)
 	support(&"class_frost_shatters")
 
-## Frostwelle: an expiring wall bursts and hits everything beside it.
+## Frostwelle: an expiring wall bursts into ice shards on both sides.
 func _wave(wall: Dictionary) -> void:
-	var amount := scaled(WAVE_BASE + maxf(player.stats.melee_damage, 0.0) * WAVE_MELEE) * (1.5 if power("wave_avalanche") > 0.0 else 1.0)
-	for enemy in player.enemies_on_segment(wall.a, wall.b, WAVE_RADIUS + 30.0):
-		if not enemy.is_targetable(): continue
-		var closest := Geometry2D.get_closest_point_to_segment(enemy.global_position, wall.a, wall.b)
-		if closest.distance_to(enemy.global_position) <= WAVE_RADIUS + enemy.data.radius:
-			enemy.take_damage(amount, null, false, &"class_frost")
-	flash(wall.a.lerp(wall.b, 0.5), wall.a.distance_to(wall.b) * 0.5 + WAVE_RADIUS, ICE)
+	var amount := scaled(WAVE_BASE + maxf(player.stats.melee_damage, 0.0) * WAVE_MELEE)
+	var a: Vector2 = wall.a
+	var b: Vector2 = wall.b
+	var count := clampi(roundi(a.distance_to(b) / SHARD_SPACING), SHARD_MIN, SHARD_MAX)
+	if power("wave_avalanche") > 0.0: count *= 2
+	var normal := (b - a).orthogonal().normalized()
+	if normal.is_zero_approx(): normal = Vector2.UP
+	for index in count:
+		var side := 1.0 if index % 2 == 0 else -1.0
+		var at := a.lerp(b, (float(index) + 0.5) / float(count))
+		var direction := (normal * side).rotated(randf_range(-SHARD_SPREAD, SHARD_SPREAD))
+		shards.append({"at": at, "dir": direction, "left": SHARD_RANGE, "damage": amount, "hits": SHARD_HITS, "hit": {}})
+	while shards.size() > SHARD_LIMIT: shards.pop_front()
+	flash(a.lerp(b, 0.5), a.distance_to(b) * 0.25 + 20.0, ICE)
 	support(&"class_frost_waves")
+
+func _advance_shards(delta: float) -> void:
+	var after := BRITTLE_FAST if power("frost_bite") > 0.0 else BRITTLE_AFTER
+	for index in range(shards.size() - 1, -1, -1):
+		var shard := shards[index]
+		var step := minf(SHARD_SPEED * delta, float(shard.left))
+		var from: Vector2 = shard.at
+		shard.at = from + shard.dir * step
+		shard.left = float(shard.left) - step
+		for enemy in player.enemies_on_segment(from, shard.at, SHARD_RADIUS):
+			if int(shard.hits) <= 0: break
+			var id := enemy.get_instance_id()
+			if shard.hit.has(id) or not enemy.is_targetable(): continue
+			shard.hit[id] = true
+			shard.hits = int(shard.hits) - 1
+			enemy.take_damage(float(shard.damage), null, false, &"class_frost")
+			enemy.chill_time = maxf(enemy.chill_time, CHILL_SECONDS * 2.0)
+			if enemy.health > 0.0 and not enemy.data.is_boss: brittle[id] = BRITTLE_SECONDS
+			contact[id] = maxf(float(contact.get(id, 0.0)), after)
+		if int(shard.hits) <= 0 or float(shard.left) <= 0.0:
+			if int(shard.hits) <= 0: ElementImpactBatch.emit_from(player, &"ice", shard.at, shard.dir, 18.0, false)
+			shards.remove_at(index)
 
 func on_shield_blocked() -> void:
 	if not active(): return
@@ -153,6 +195,7 @@ func advance(delta: float) -> void:
 			if walls[index].time <= 0.0:
 				if power("skill_frostwave") > 0.0: _wave(walls[index])
 				walls.remove_at(index)
+		_advance_shards(delta)
 	super.advance(delta)
 
 func _draw() -> void:
@@ -167,6 +210,13 @@ func _draw() -> void:
 	for id in brittle:
 		var enemy := instance_from_id(id) as Enemy
 		if is_instance_valid(enemy): draw_arc(to_local(enemy.global_position), enemy.data.radius + 6.0, 0.0, TAU, 20, Color(ICE, 0.85), 2.5, true)
+	for shard in shards:
+		var tip := to_local(shard.at)
+		var dir: Vector2 = shard.dir
+		var side := dir.orthogonal() * 3.5
+		var fade := clampf(float(shard.left) / 40.0, 0.0, 1.0)
+		draw_line(tip - dir * 22.0, tip - dir * 6.0, Color(ICE, 0.35 * fade), 3.0, true)
+		draw_colored_polygon(PackedVector2Array([tip + dir * 7.0, tip + side, tip - dir * 9.0, tip - side]), Color(ICE.lightened(0.35), 0.95 * fade))
 	draw_effects()
 
 func save_data() -> Dictionary:
