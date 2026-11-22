@@ -322,7 +322,7 @@ ersetzen. Die Schrittreihenfolge erlaubt später eine Klassenauswahl dazwischen.
 
 ### Startwerte und Balance
 
-- Jede Auswahl beginnt mit genau einer normalen Mk-I-Waffe, ohne Zufallsrollen oder Verzauberungen. Wurzelkosten bleiben unverändert. Alle Standardwaffen sind ohne Freischaltung oder vorherigen Sieg verfügbar.
+- Jede Auswahl beginnt mit genau einer normalen Mk-I-Waffe, ohne Zufallsrollen oder Verzauberungen. Wurzelkosten bleiben unverändert. Seit 22.11.2026 sind acht Standardwaffen sofort verfügbar; die übrigen werden über Meisterschafts-Siegel freigeschaltet ([Meta-Progression](META_PROGRESSION.md)).
 - Die ersten drei Wellen auf Normal werden mit jeder Waffe geprüft, einschließlich langsamer Flächen- und Unterstützungswaffen. Schwache Starts erhalten gezielte Balanceanpassungen; die Auswahl wird dadurch nicht wieder auf eine Teilmenge eingeschränkt.
 - Eine noch unbestätigte Vorschau wird beim Speichern als Auswahlzustand behandelt. Fortsetzen darf daraus keine bereits ausgerüstete Waffe machen; nach bestätigtem Start wird keine zweite Waffe vergeben.
 - Optional später: „Zufällig“ aus allen Standardwaffen. Auch eine zufällige Vorschau braucht die Bestätigung und bleibt beim Fortsetzen stabil.
@@ -350,7 +350,7 @@ Nach Schritt 3 wird geprüft, ob Dash die bisherige Gegnerdichte zu stark entwer
 - **Gegnerdruck:** Dichte, gemischte Rollen, Burst-Rhythmus und Projektilräume weiter messen. Neue Bossmechaniken und Dash werden gemeinsam mit den vorhandenen Drucksystemen getestet.
 - **Gauner und Economy · umgesetzt, Balance offen:** Verfolgen zwischen Horden und Münzverluste durch entkommene Beute mit Nah-/Fernkampf-Builds vergleichen. Einnahmen, Rerollausgaben und gerettetes/verlorenes Gold in vollständigen Runs auswerten; [Startwerte und Prognose](LOOT_GOBLIN.md).
 - **Risiko-/Belohnungswellen:** Freiwillig erschwerte Wellen mit vorher sichtbaren Zusatzbelohnungen. Auswahl bleibt zwischen Wellen.
-- **Meta und weitere Inhalte:** Zusätzliche Arenen und neue Entscheidungen. Standardwaffen bleiben vollständig als Starts verfügbar. Schwierigkeit, Story, Endlos, Relikte und Evolutionen sind bereits vorhanden und werden weiter abgestimmt.
+- **Meta und weitere Inhalte:** Zusätzliche Arenen und neue Entscheidungen. Waffen-Freischaltungen sind umgesetzt; Klassen, Items/Relikte und Kariesstufen folgen ([Meta-Progression](META_PROGRESSION.md)). Schwierigkeit, Story, Endlos, Relikte und Evolutionen sind bereits vorhanden und werden weiter abgestimmt.
 - **Run-Rückblick und Telemetrie:** Bestehende gemeinsame Messung um Dash und Boss-Angriffsquellen ergänzen. Direkte Waffen-, Item- und Proc-Schäden bleiben getrennt und werden nicht doppelt gezählt; Werte überleben Fortsetzen.
 - **Performance und Lesbarkeit:** Neue Flächen, Kollisionsprüfungen und Bossdarstellung unter hoher Gegnerzahl sowie im Web-Build messen. Warnungen bleiben auch unter Waffen- und Verzauberungseffekten sichtbar.
 

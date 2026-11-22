@@ -210,6 +210,7 @@ func _ready() -> void:
 		return
 	mastery_notice = WeaponMasteryNotice.new()
 	add_child(mastery_notice)
+	shop.weapon_available = session.weapon_unlocked
 	var prepared_weapon := WeaponCatalog.by_id(session.pending_start_weapon_id)
 	session.pending_start_weapon_id = &""
 	if session.resume_requested:
@@ -221,7 +222,7 @@ func _ready() -> void:
 				_on_starter_chosen(prepared_weapon)
 			return
 	player.global_position = arena.arena_size / 2.0
-	if prepared_weapon in WeaponCatalog.ALL and player.loadout.acquire(prepared_weapon):
+	if prepared_weapon in WeaponCatalog.ALL and session.weapon_unlocked(prepared_weapon.id) and player.loadout.acquire(prepared_weapon):
 		weapon_mastery.begin(prepared_weapon.id, session.test_scenario_id == &"")
 		if session.selected_story_mode:
 			story.start()
@@ -253,7 +254,7 @@ func _show_starters(selected_id: StringName = &"") -> void:
 	starter_pending = true
 	var starters: Array[WeaponData] = []
 	for weapon in WeaponCatalog.ALL:
-		if player.loadout.can_acquire(weapon):
+		if player.loadout.can_acquire(weapon) and session.weapon_unlocked(weapon.id):
 			starters.append(weapon)
 	choice_panel.starter_selection.class_profile = player.stats.class_data
 	choice_panel.show_starters(starters, selected_id)
@@ -305,7 +306,7 @@ func _on_story_travel_finished() -> void:
 func _on_starter_chosen(weapon: WeaponData) -> void:
 	if not starter_pending:
 		return
-	if weapon not in WeaponCatalog.ALL or not player.loadout.acquire(weapon):
+	if weapon not in WeaponCatalog.ALL or not session.weapon_unlocked(weapon.id) or not player.loadout.acquire(weapon):
 		_show_starters()
 		return
 	starter_pending = false
@@ -1007,7 +1008,7 @@ func _finish_loot_collection() -> void:
 
 func _advance_post_wave_rewards() -> void:
 	if mastery_notice != null and rewards.step != PostWaveRewards.Step.END:
-		mastery_notice.present(weapon_mastery.starter_id, weapon_mastery.take_pending())
+		mastery_notice.present(weapon_mastery.starter_id, weapon_mastery.take_pending(), weapon_mastery.take_pending_unlocks())
 	var progress := rewards.choice_progress()
 	if rewards.step in [PostWaveRewards.Step.LEVELS, PostWaveRewards.Step.CHESTS, PostWaveRewards.Step.RELICS, PostWaveRewards.Step.WEAPONS]:
 		get_node("/root/SceneTransitions").present(&"rewards")

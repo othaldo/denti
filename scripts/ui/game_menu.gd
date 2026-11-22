@@ -784,10 +784,13 @@ func _show_setup_weapons() -> void:
 	menu_stage.visible = false
 	setup_selector.visible = true
 	var options: Array[WeaponData] = []
+	var locked := {}
 	for weapon in WeaponCatalog.ALL:
-		if WeaponEligibility.starter(weapon, ClassCatalog.by_id(setup.class_id), setup.root_capacity): options.append(weapon)
+		if not WeaponEligibility.starter(weapon, ClassCatalog.by_id(setup.class_id), setup.root_capacity): continue
+		options.append(weapon)
+		if not session.weapon_unlocked(weapon.id): locked[weapon.id] = WeaponUnlocks.requirement(weapon.id)
 	setup.mark_reached(page)
-	setup_selector.show_preparation(setup, options)
+	setup_selector.show_preparation(setup, options, locked)
 	setup.weapon_id = setup_selector.selected_id
 	setup.save_to(_draft_path())
 
@@ -807,7 +810,7 @@ func _start_new_game(difficulty_id: StringName) -> void:
 
 
 func _launch_prepared_run(weapon: WeaponData) -> void:
-	if launching_run or setup == null or weapon not in WeaponCatalog.ALL or ClassCatalog.by_id(setup.class_id) == null or not WeaponEligibility.starter(weapon, ClassCatalog.by_id(setup.class_id), setup.root_capacity):
+	if launching_run or setup == null or weapon not in WeaponCatalog.ALL or not session.weapon_unlocked(weapon.id) or ClassCatalog.by_id(setup.class_id) == null or not WeaponEligibility.starter(weapon, ClassCatalog.by_id(setup.class_id), setup.root_capacity):
 		return
 	if not session.select_difficulty(setup.difficulty_id):
 		_show_difficulty()

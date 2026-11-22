@@ -88,7 +88,7 @@ static func _valid_structure(value: Dictionary) -> bool:
 	if boss_rewards.has("legacy_credit") and not boss_rewards.legacy_credit is bool: return false
 	# Check container contracts before passing JSON values to typed subsystem APIs.
 	var mastery: Dictionary = value.get("weapon_mastery", {})
-	if not _containers(mastery, [], ["earned", "pending"]): return false
+	if not _containers(mastery, [], ["earned", "pending", "unlocks", "pending_unlocks"]): return false
 	if mastery.has("eligible") and not mastery.eligible is bool: return false
 	if mastery.has("starter_id") and not mastery.starter_id is String: return false
 	var player: Dictionary = value.player

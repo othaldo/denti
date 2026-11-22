@@ -4,8 +4,14 @@ extends Control
 signal selection_changed
 signal details_requested(title: String, description: String)
 
+const LOCKED_TINT := Color(0.6, 0.53, 0.64, 0.36)
+
 var options: Array[WeaponData] = []
 var selected_id: StringName = &""
+## Locked weapon id -> unlock requirement. Locked weapons can be inspected, not chosen.
+var locked: Dictionary = {}
+## Weapon in the preview; may be locked while `selected_id` stays empty.
+var shown: WeaponData
 var icon_buttons: Array[Button] = []
 var catalog_scroll: ScrollContainer
 var grid: GridContainer
@@ -59,22 +65,27 @@ func _label(font_size: int) -> Label:
 	preview.add_child(label)
 	return label
 
-func show_options(weapons: Array[WeaponData], selected: StringName = &"") -> void:
+func show_options(weapons: Array[WeaponData], selected: StringName = &"", locked_requirements: Dictionary = {}) -> void:
 	options = weapons.duplicate()
+	locked = locked_requirements.duplicate()
 	selected_id = &""
+	shown = null
 	for button in icon_buttons:
 		grid.remove_child(button)
 		button.queue_free()
 	icon_buttons.clear()
 	for index in options.size():
 		var button := RunSetupChoice.new()
-		button.tooltip_text = options[index].display_name + " · " + options[index].roots_text()
+		var requirement: String = locked.get(options[index].id, "")
+		button.tooltip_text = options[index].display_name + " · " + (requirement if requirement != "" else options[index].roots_text())
 		button.pressed.connect(select_weapon.bind(index))
-		button.set_meta("controller_details", func() -> void: details_requested.emit(options[index].display_name, RunSetupPresentation.details(options[index])))
+		button.set_meta("controller_details", func() -> void: details_requested.emit(options[index].display_name, requirement if requirement != "" else RunSetupPresentation.details(options[index])))
 		grid.add_child(button)
 		button.show_artwork(RunSetupPresentation.weapon_icon(options[index]))
+		if requirement != "": _mark_locked(button)
 		icon_buttons.append(button)
 	art.texture = idle_art
+	art.modulate = Color.WHITE
 	weapon_name.text = ""
 	roots_label.text = ""
 	for button in stat_buttons: button.visible = false
@@ -85,6 +96,22 @@ func show_options(weapons: Array[WeaponData], selected: StringName = &"") -> voi
 			break
 	_layout()
 
+func _mark_locked(button: RunSetupChoice) -> void:
+	button.set_meta("locked", true)
+	button.artwork.modulate = LOCKED_TINT
+	var lock := TextureRect.new()
+	lock.name = "Lock"
+	lock.texture = preload("res://assets/ui/setup_lock.svg")
+	lock.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	lock.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	lock.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	button.add_child(lock)
+	lock.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	lock.offset_left = -24
+	lock.offset_top = -24
+	lock.offset_right = -6
+	lock.offset_bottom = -6
+
 func selected_weapon() -> WeaponData:
 	for weapon in options:
 		if weapon.id == selected_id: return weapon
@@ -93,15 +120,18 @@ func selected_weapon() -> WeaponData:
 func select_weapon(index: int, notify: bool = true) -> void:
 	if index < 0 or index >= options.size(): return
 	var weapon := options[index]
-	selected_id = weapon.id
+	var requirement: String = locked.get(weapon.id, "")
+	shown = weapon
+	selected_id = weapon.id if requirement == "" else &""
 	art.texture = RunSetupPresentation.weapon_icon(weapon)
+	art.modulate = LOCKED_TINT if requirement != "" else Color.WHITE
 	weapon_name.text = weapon.display_name
-	roots_label.text = weapon.roots_text() + "\n" + weapon.scaling_label()
+	roots_label.text = requirement if requirement != "" else weapon.roots_text() + "\n" + weapon.scaling_label()
 	var values := RunSetupPresentation.values(weapon)
 	for stat in 3:
 		stat_buttons[stat].value = values[stat]
 		stat_buttons[stat].tooltip_text = [weapon.scaling_description(), "Angriffspause", "Reichweite"][stat]
-		stat_buttons[stat].visible = true
+		stat_buttons[stat].visible = requirement == ""
 	refresh()
 	_layout()
 	if notify:
@@ -111,7 +141,7 @@ func select_weapon(index: int, notify: bool = true) -> void:
 func refresh() -> void:
 	for index in icon_buttons.size():
 		var button: RunSetupChoice = icon_buttons[index]
-		button.selected = options[index].id == selected_id
+		button.selected = shown != null and options[index].id == shown.id
 		button.keyboard_focus = keyboard_focus
 		button.refresh()
 	for button in stat_buttons: RunSetupStyle.focus(button, keyboard_focus)
@@ -120,7 +150,7 @@ func focus_selection() -> void:
 	if icon_buttons.is_empty() or not is_visible_in_tree(): return
 	var index := 0
 	for current in options.size():
-		if options[current].id == selected_id: index = current
+		if shown != null and options[current].id == shown.id: index = current
 	icon_buttons[index].grab_focus()
 	catalog_scroll.ensure_control_visible(icon_buttons[index])
 
@@ -153,7 +183,7 @@ func _layout() -> void:
 	var roots_size := 14 if compact else 17
 	if roots_label.get_theme_font_size("font_size") != roots_size:
 		roots_label.add_theme_font_size_override("font_size", roots_size)
-	if selected_id == &"":
+	if shown == null:
 		art.position = Vector2.ZERO
 		art.size = extent
 		return
@@ -187,7 +217,7 @@ func _layout() -> void:
 func _place_name(rect: Rect2, font_size: int) -> void:
 	# Shape at the final width. Label's deferred autowrap minimum can retain
 	# a narrow column's height across rotations (also in paused/headless saves).
-	DentiUIComponents.wrap_text(weapon_name, selected_weapon().display_name, rect.size.x, font_size, true)
+	DentiUIComponents.wrap_text(weapon_name, shown.display_name, rect.size.x, font_size, true)
 	weapon_name.position = rect.position
 	weapon_name.size = rect.size
 

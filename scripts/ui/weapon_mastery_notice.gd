@@ -39,13 +39,18 @@ func _ready() -> void:
 	visible = false
 
 
-func present(id: StringName, awards: Array[String]) -> void:
+func present(id: StringName, awards: Array[String], unlocks: Array[String] = []) -> void:
 	if awards.is_empty() or not WeaponMasteries.valid_weapon(id): return
 	var definition := WeaponMasteries.by_id(StringName(awards[-1]))
 	if definition == null: return
 	icon.texture = WeaponMasteryIcons.icon(definition.icon_index)
 	source_title = "Zahnprüfung bestanden" if definition.id == &"exam" else definition.display_name + " erreicht"
 	source_weapon = WeaponCatalog.by_id(id).display_name
+	var unlocked: PackedStringArray = []
+	for weapon_id in unlocks:
+		var weapon := WeaponCatalog.by_id(StringName(weapon_id))
+		if weapon != null: unlocked.append(weapon.display_name)
+	if not unlocked.is_empty(): source_weapon += "\nNeu: " + ", ".join(unlocked)
 	remaining = 4.0
 	visible = true
 	_layout()
