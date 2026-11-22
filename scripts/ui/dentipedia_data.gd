@@ -69,7 +69,7 @@ static func entries(category: int, discovered: Array[String]) -> Array[Dictionar
 				result.append({"title": item.display_name, "icon": item.icon_texture if item.icon_texture != null else DentiUIIcons.item(item.icon_index), "body": item.effect_text() + "\n\n" + item.limit_text(), "rarity_tier": item.rarity_tier})
 		2:
 			for relic in RelicCatalog.CATALOG:
-				result.append({"title": relic.display_name, "icon": DentiUIIcons.relic_icon(relic), "body": DentiAttributes.resolve_text(relic.description), "rarity_tier": 4, "rarity_caption": "Göttliches Relikt" if relic.class_id == &"" else "Relikt · " + ClassCatalog.by_id(relic.class_id).display_name})
+				result.append({"title": relic.display_name, "icon": DentiUIIcons.relic_icon(relic), "body": DentiAttributes.resolve_text(relic.description), "rarity_tier": 4, "rarity_caption": "Göttliches Relikt"})
 		3:
 			for type in DentiAttributes.ACTIVE:
 				result.append({"title": DentiAttributes.name_for(type), "icon": DentiUIIcons.stat(DentiAttributes.ICONS[type]), "body": DentiAttributes.meaning_for(type)})
@@ -95,6 +95,10 @@ static func class_body(profile: PlayerClassData) -> String:
 	var style: Array[String] = []
 	for line in profile.play_style: style.append("• " + line)
 	if not style.is_empty(): lines.append("\n".join(style))
+	if profile.id == ClassCatalog.NECRODENT_ID:
+		lines.append("Gefolgschaft\n%s Der Balken zeigt den aktuellen Schmelz jedes Zahns. Zwei Punkte Schmelz auf Denti geben jedem Zahn einen Punkt. Milchzähne kommen in großer Zahl, Backenzähne beißen härter und Wachzähne haben am meisten Schmelz." % WeaponPresentation.retinue_health_text())
+		lines.append("Stab und Bisse\nNahschaden erhöht den Grundbiss. Bisskraft verstärkt den Schaden, Putzeifer verkürzt die Bisspause und Glanz erhöht die Krit-Chance. Unter Pause → Stats → Gefolgschaft stehen die aktuellen Werte.")
+		lines.append("Verzauberungen\nElemente wirken bei den Bissen. Mit mehr Zähnen verteilt sich ihr Schaden auf mehr Bisse. Angriffstempo, Krit-Chance, Krit-Schaden und Wucht wirken auf die Zähne. Lebensraub heilt Denti in einem gemeinsamen Intervall. Reichweite und Fusionen erhöhen die Befehlsreichweite.")
 	var tree := profile.talent_tree
 	if tree != null:
 		for branch in TalentNodeData.BRANCHES:

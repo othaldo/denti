@@ -48,8 +48,6 @@ var molar_skills: MolarSkills
 var assassin_skills: AssassinSkills
 ## Verb/skill modules of the other classes; each acts only for its own class.
 var skill_modules: Array[ClassSkillModule] = []
-## Set by the game; class relics change the class modules' verbs.
-var relics: RelicInventory
 var dash_origin := Vector2.ZERO
 
 
@@ -200,13 +198,7 @@ func reset_skill_modules() -> void:
 	for module in skill_modules: module.reset_wave()
 
 func notify_weapon_hit(enemy: Enemy, weapon: WeaponData, dealt: float) -> void:
-	molar_skills.on_weapon_hit(enemy, weapon, dealt)
-	assassin_skills.on_weapon_hit(enemy, weapon, dealt)
 	for module in skill_modules: module.on_weapon_hit(enemy, weapon, dealt)
-
-## Owned class relic of the class being played.
-func has_class_relic(id: StringName) -> bool:
-	return relics != null and relics.has_relic(id)
 
 func notify_enemy_died(enemy: Enemy, _amount: float = 0.0) -> void:
 	for module in skill_modules: module.on_enemy_died(enemy)
@@ -225,7 +217,7 @@ func module_interval_factor(weapon: WeaponInstance) -> float:
 	return factor
 
 func module_damage_bonus(enemy: Enemy, weapon: WeaponData) -> float:
-	var total := assassin_skills.damage_bonus(enemy, weapon)
+	var total := 0.0
 	for module in skill_modules: total += module.damage_bonus(enemy, weapon)
 	return total
 

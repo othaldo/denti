@@ -26,11 +26,6 @@ const PILLOW_EVERY := 25
 const PILLOW_FAST := 15
 const PILLOW_PUSH := 60.0
 const PILLOW_RADIUS := 120.0
-## Traumfänger: while dashing, loot in this radius flies to the fairy.
-const DREAM_RADIUS := 320.0
-## Mondsichel: a critical shard bursts and hits enemies around its target.
-const CRESCENT_RADIUS := 70.0
-const CRESCENT_SHARE := 0.5
 const LIGHT := Color(1.0, 0.92, 0.55)
 
 var tokens := SHARD_RATE
@@ -73,24 +68,10 @@ func shard(from: Vector2, factor: float = 1.0, guaranteed_crit: bool = false) ->
 
 func _hit(target: Enemy, from: Vector2, factor: float, guaranteed_crit: bool) -> void:
 	var amount := player.stats.roll_critical_damage(shard_damage() * factor, 0.0, 1.5, guaranteed_crit)
-	var critical := player.stats.last_roll_critical
-	var at := target.global_position
-	target.take_damage(amount, null, critical, &"class_fairy")
-	beam(from, at, LIGHT)
-	if critical and relic(&"fairy_crescent"): _crescent(at, target, amount * CRESCENT_SHARE)
+	target.take_damage(amount, null, player.stats.last_roll_critical, &"class_fairy")
+	beam(from, target.global_position, LIGHT)
 	ElementImpactBatch.emit_from(target, &"electric", target.global_position, from.direction_to(target.global_position), 22)
 	support(&"class_fairy_shards")
-
-func _crescent(at: Vector2, excluded: Enemy, amount: float) -> void:
-	for enemy in player.nearby_enemies(at, CRESCENT_RADIUS):
-		if enemy != excluded and enemy.is_targetable(): enemy.take_damage(amount, null, false, &"fairy_crescent")
-	flash(at, CRESCENT_RADIUS, LIGHT)
-
-func _dreamcatch() -> void:
-	var index := player.get_parent().get_node_or_null("Loot") as LootSpatialIndex
-	if index == null: return
-	for drop in index.in_circle(player.global_position, DREAM_RADIUS):
-		if not drop.wave_collecting: drop.begin_wave_collection()
 
 func on_loot_collected(kind: StringName, _amount: int, drop: Loot) -> void:
 	if not active() or not player.combat_active(): return
@@ -143,7 +124,6 @@ func on_weapon_hit(enemy: Enemy, _weapon: WeaponData, dealt: float) -> void:
 
 func advance(delta: float) -> void:
 	tokens = minf(tokens + delta * SHARD_RATE, SHARD_RATE)
-	if active() and player.dash.active and relic(&"fairy_dreamcatcher"): _dreamcatch()
 	bounty_time = maxf(bounty_time - delta, 0.0)
 	super.advance(delta)
 

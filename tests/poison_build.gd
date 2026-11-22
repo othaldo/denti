@@ -250,7 +250,8 @@ func _selection_and_access() -> void:
 	for sample in 80:
 		seed(sample)
 		var choices := RelicCatalog.choices([], tags)
-		_check(choices.size() == RelicCatalog.OFFER_COUNT and choices.has("venom_fang"), "poison build has no relevant milestone option")
+		var poison_option := choices.any(func(id: String) -> bool: return RelicCatalog.by_id(StringName(id)).tags.has(&"poison"))
+		_check(choices.size() == RelicCatalog.OFFER_COUNT and poison_option, "poison build has no relevant milestone option")
 		var unique := {}
 		for id in choices: unique[id] = true
 		_check(unique.size() == choices.size(), "duplicate relic in choice")

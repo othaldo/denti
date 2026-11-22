@@ -405,6 +405,16 @@ func _show_stats() -> void:
 	coin.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	coin.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	wallet.add_child(coin)
+	var equipped: Array[WeaponInstance] = game.player.loadout.equipped()
+	if not equipped.is_empty() and equipped[0].data.attack_mode == &"command":
+		var staff := equipped[0]
+		var retinue := LinkButton.new()
+		retinue.name = "RetinueDetails"
+		retinue.text = "Gefolgschaft"
+		retinue.add_theme_color_override("font_color", DentiUIStyle.GOLD)
+		retinue.pressed.connect(_show_weapon_details.bind(staff.data, staff.tier, staff, "build:retinue"))
+		ControllerFocus.tag(retinue, "build:retinue")
+		wallet.add_child(retinue)
 	if not BossEncounter.remaining(game.get_node("Enemies")).is_empty():
 		var boss_details := LinkButton.new()
 		boss_details.text = "Bossdetails"
@@ -444,7 +454,7 @@ func _show_stats() -> void:
 	weapons.add_theme_constant_override("separation", 4)
 	weapons.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	weapon_scroll.add_child(weapons)
-	for weapon in game.player.loadout.equipped():
+	for weapon in equipped:
 		var chip := Button.new()
 		chip.text = WeaponPresentation.tier_text(weapon.data, weapon.tier)
 		chip.icon = weapon.data.sprite
@@ -482,8 +492,9 @@ func _show_boss_details() -> void:
 	_update_build_layout()
 
 
-func _show_weapon_details(data: WeaponData, tier: int, weapon: WeaponInstance = null) -> void:
-	build_return_focus = "build:weapon:%s" % weapon.instance_uid if weapon != null else ""
+func _show_weapon_details(data: WeaponData, tier: int, weapon: WeaponInstance = null, return_key: String = "") -> void:
+	build_return_focus = return_key
+	if build_return_focus.is_empty() and weapon != null: build_return_focus = "build:weapon:%s" % weapon.instance_uid
 	page = &"weapon_details"
 	_clear_rows()
 	menu_stage.hide()

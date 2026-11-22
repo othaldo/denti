@@ -4,9 +4,9 @@
 
 [resource]
 script = ExtResource("1")
-id = &"assassin_nightshade"
-display_name = "Nachtschatten"
-description = "Gegner in einem Giftfeld der Giftschneise nehmen 20 % mehr Waffenschaden."
+id = &"belladonna"
+display_name = "Tollkirsche"
+description = "Vergiftete Gegner in deiner Nähe nehmen 20 % mehr Waffenschaden."
+icon_index = 9
 tags = Array[StringName]([&"poison", &"melee"])
-class_id = &"assassin"
-talent_icon = 21
+placeholder_item_icon = 104

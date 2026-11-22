@@ -38,6 +38,7 @@ var coin_amount: SpinBox
 var wave_number: SpinBox
 var difficulty_select: OptionButton
 var class_select: OptionButton
+var necrodent_unlock_button: Button
 var wave_button: Button
 var status: Label
 var stats: Dictionary = {}
@@ -186,7 +187,7 @@ func _build_ui() -> void:
 		icon.texture = _small_icon(DentiUIIcons.relic_icon(relic))
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		row.add_child(icon)
-		var name_label := _label(relic.display_name + ("" if relic.class_id == &"" else " · " + ClassCatalog.by_id(relic.class_id).display_name))
+		var name_label := _label(relic.display_name)
 		name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		name_label.tooltip_text = DentiAttributes.resolve_text(relic.description)
 		name_label.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -206,6 +207,8 @@ func _build_ui() -> void:
 		class_select.add_icon_item(_small_icon(profile.portrait), profile.display_name)
 	row.add_child(class_select)
 	_button(row, "Setzen", _set_class)
+	necrodent_unlock_button = _button(run, "Nekrodent freischalten", _unlock_necrodent)
+	necrodent_unlock_button.tooltip_text = "Schaltet die Klasse im lokalen Profil für neue Runs frei."
 	row = HBoxContainer.new()
 	run.add_child(row)
 	row.add_child(_label("Münzen"))
@@ -293,6 +296,7 @@ func refresh() -> void:
 		if DifficultyCatalog.ALL[index].id == game.wave.difficulty_id: difficulty_select.select(index)
 	for index in ClassCatalog.profiles.size():
 		if ClassCatalog.profiles[index] == game.player.stats.class_data: class_select.select(index)
+	_refresh_necrodent_unlock_button()
 	var saved: Dictionary = game.player.stats.to_save_data()
 	for key in stats:
 		stats[key].value = float(saved[key]) * (100.0 if DentiAttributes.is_fraction(DentiAttributes.from_key(StringName(key))) else 1.0)
@@ -318,8 +322,6 @@ func refresh() -> void:
 	for id in relic_buttons:
 		var owned: bool = game.relics.has_relic(id)
 		relic_buttons[id].text = "Entfernen" if owned else "+"
-		var relic := RelicCatalog.by_id(id)
-		relic_buttons[id].tooltip_text = "Wirkt nur als " + ClassCatalog.by_id(relic.class_id).display_name if relic.class_id != &"" and relic.class_id != game.player.stats.class_data.id else ""
 	_refresh_weapon_button()
 	_refresh_item_detail()
 	wave_button.disabled = equipped.is_empty()
@@ -371,6 +373,18 @@ func _set_class() -> void:
 	if blocked.is_empty() and not controls.removed_weapons.is_empty():
 		status.text += " · entfernt: " + ", ".join(controls.removed_weapons)
 	refresh()
+
+
+func _refresh_necrodent_unlock_button() -> void:
+	var unlocked: bool = controls.game.session.class_unlocked(ClassCatalog.NECRODENT_ID)
+	necrodent_unlock_button.disabled = unlocked
+	necrodent_unlock_button.text = "Nekrodent freigeschaltet" if unlocked else "Nekrodent freischalten"
+
+
+func _unlock_necrodent() -> void:
+	var result: Error = controls.game.session.debug_unlock_necrodent()
+	status.text = "Nekrodent im lokalen Profil freigeschaltet" if result == OK else "Freischaltung konnte nicht gespeichert werden"
+	_refresh_necrodent_unlock_button()
 
 
 func _start_wave() -> void:

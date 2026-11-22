@@ -4,9 +4,9 @@
 
 [resource]
 script = ExtResource("1")
-id = &"frost_ice_flower"
+id = &"ice_flower"
 display_name = "Eisblume"
-description = "Stirbt ein spröder Gegner, werden bis zu vier Gegner daneben spröde."
-tags = Array[StringName]([&"area", &"crit"])
-class_id = &"frost_warden"
-talent_icon = 145
+description = "Stirbt ein verlangsamter Gegner, werden bis zu vier Gegner daneben kurz verlangsamt."
+icon_index = 16
+tags = Array[StringName]([&"ice", &"area"])
+placeholder_item_icon = 89

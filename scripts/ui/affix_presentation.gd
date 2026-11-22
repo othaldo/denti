@@ -14,18 +14,24 @@ static func display_value(value: float, kind: StringName, weapon: WeaponData, st
 		return WeaponAffixes.utility_value({"id": str(kind), "damage": value}, weapon.hands) + (0.5 if kind == &"wet" and items != null and items.power(&"conductive_wet") > 0 else 0.0)
 	if data.stat_key != &"":
 		return value
-	return WeaponAffixes.effect_damage(value, kind, weapon, stats) * (data.proc_factor if data.effect_kind == "holy" else 1.0)
+	var power := WeaponAffixes.effect_damage(value, kind, weapon, stats) * (data.proc_factor if data.effect_kind == "holy" else 1.0)
+	if weapon.attack_mode == &"command" and items != null:
+		var retinue := items.player.skill_module(ClassCatalog.NECRODENT_ID) as NecrodentSkills
+		if retinue != null and retinue.active():
+			power *= NecrodentSkills.enchantment_share(retinue.retinue_size())
+	return power
 
 
 static func value_text(value: float, kind: StringName, weapon: WeaponData, stats: PlayerStats = null, items: ItemInventory = null) -> String:
-	return ("%.2f" if WeaponAffixes.by_id(kind).effect_kind in ["wet", "leech"] else "%.1f") % display_value(value, kind, weapon, stats, items)
+	var text := ("%.2f" if WeaponAffixes.by_id(kind).effect_kind in ["wet", "leech"] else "%.1f") % display_value(value, kind, weapon, stats, items)
+	return text.replace(".", ",") if weapon.attack_mode == &"command" else text
 
 
 static func summary(weapon: WeaponInstance, stats: PlayerStats = null, items: ItemInventory = null) -> String:
 	var lines: PackedStringArray = []
 	for affix in weapon.affixes:
 		var data := WeaponAffixes.by_id(StringName(affix.id))
-		lines.append("%s +%s %s · %s" % [data.display_name, value_text(float(affix.damage), data.id, weapon.data, stats, items), damage_unit(data.id, items), progress_text(affix)])
+		lines.append("%s +%s %s · %s" % [data.display_name, value_text(float(affix.damage), data.id, weapon.data, stats, items), damage_unit(data.id, items, weapon.data), progress_text(affix)])
 	return "Verzauberungen · %d/%d Plätze" % [weapon.affixes.size(), maxi(WeaponUpgrades.slots(weapon.tier), weapon.affixes.size())] + ("\n" + "\n".join(lines) if not lines.is_empty() else "")
 
 
@@ -33,7 +39,7 @@ static func dot_duration(kind: StringName, items: ItemInventory = null) -> float
 	return minf(WeaponAffixes.by_id(kind).dot_duration + (items.power(&"bleed_clock") if items != null and kind == &"bleed" else 0.0), EnemyAffixEffects.MAX_DOT_DURATION)
 
 
-static func damage_unit(kind: StringName, items: ItemInventory = null) -> String:
+static func damage_unit(kind: StringName, items: ItemInventory = null, weapon: WeaponData = null) -> String:
 	var data := WeaponAffixes.by_id(kind)
 	if data.effect_kind == "wet":
 		return "s Nässe"
@@ -43,11 +49,28 @@ static func damage_unit(kind: StringName, items: ItemInventory = null) -> String
 		return "Schaden / Lichtstoß"
 	if data.stat_key != &"":
 		return (data.stat_unit + " " if not data.stat_unit.is_empty() else "") + ("Rückstoß" if data.id == &"knockback" else data.display_name)
-	return "Gesamtschaden über %.0f s" % dot_duration(kind, items) if data.dot_duration > 0 else "Schaden/Treffer"
+	if data.dot_duration > 0:
+		return "Gesamtschaden über %.0f s" % dot_duration(kind, items)
+	return "Schaden/Biss" if weapon != null and weapon.attack_mode == &"command" else "Schaden/Treffer"
 
 
-static func effect_description(kind: StringName) -> String:
+static func effect_description(kind: StringName, weapon: WeaponData = null) -> String:
 	var data := WeaponAffixes.by_id(kind)
+	if weapon != null and weapon.attack_mode == &"command":
+		match kind:
+			&"range": return "Der Dash kann weiter entfernte Gegner markieren."
+			&"tempo": return "Die Zähne beißen schneller."
+			&"crit": return "Die Zähne treffen häufiger kritisch."
+			&"crit_damage": return "Kritische Bisse verursachen mehr direkten Bissschaden."
+			&"knockback": return "Bisse stoßen Gegner weiter zurück."
+			&"leech": return "Bisse heilen Denti. Die Zähne teilen ein Heilintervall."
+			&"fire": return "Bisse entzünden Gegner. Beim Tod kann die Glut überspringen."
+			&"ice": return "Bisse kühlen Gegner. Kritische Bisse auf gekühlte Ziele lösen Eissplitter aus."
+			&"poison": return "Bisse vergiften. Wiederholte Bisse bauen Giftstufen auf."
+			&"bleed": return "Bisse lassen Gegner bluten. Blutungsitems verstärken den Effekt."
+			&"electric": return "Bisse lösen Kettenblitze aus. Nässe und Kettenitems erlauben weitere Sprünge."
+			&"wet": return "Bisse verursachen Wasserschaden und machen Gegner nass."
+			&"holy": return "Drei kritische Bisse auf ein markiertes Ziel lösen einen Lichtstoß aus."
 	if not data.description.is_empty():
 		return data.description
 	if data.stat_key == &"range":
@@ -72,7 +95,7 @@ static func comparison(weapon: WeaponInstance, option: Dictionary, stats: Player
 		var upgrades := weapon.data.chest_upgrades.duplicate(true)
 		upgrades["mk"] = int(upgrades.get("mk", 0)) + 1
 		var next := WeaponRolls.resolve(weapon.data, weapon.data.rolls, upgrades)
-		return "%s → %s\n+10 %% Basisschaden\n+3 %% Tempo und Reichweite\nBenötigt mindestens Mk IV" % [WeaponPresentation.tier_text(weapon.data, weapon.tier), WeaponPresentation.tier_text(next, weapon.tier)]
+		return "%s → %s\n%s\nBenötigt mindestens Mk IV" % [WeaponPresentation.tier_text(weapon.data, weapon.tier), WeaponPresentation.tier_text(next, weapon.tier), WeaponPresentation.ascension_effect(weapon.data)]
 	var data := WeaponAffixes.by_id(StringName(option.id))
 	var index := WeaponAffixes.find(weapon.affixes, data.id)
 	var before := float(weapon.affixes[index].damage) if index >= 0 else 0.0
@@ -81,8 +104,8 @@ static func comparison(weapon: WeaponInstance, option: Dictionary, stats: Player
 	var value_before := value_text(before, data.id, weapon.data, stats, items)
 	var value_after := value_text(after, data.id, weapon.data, stats, items)
 	if compact:
-		var unit := "Schaden / %.0f s" % dot_duration(data.id, items) if data.dot_duration > 0 else damage_unit(data.id, items)
-		result = effect_description(data.id) + "\n" + ("+%s → +%s" % [value_before, value_after] if index >= 0 else "+%s" % value_after) + " " + unit
+		var unit := "Schaden / %.0f s" % dot_duration(data.id, items) if data.dot_duration > 0 else damage_unit(data.id, items, weapon.data)
+		result = effect_description(data.id, weapon.data) + "\n" + ("+%s → +%s" % [value_before, value_after] if index >= 0 else "+%s" % value_after) + " " + unit
 		if index >= 0:
 			result += "\n%s → %s" % [progress_text(weapon.affixes[index]), progress_text(WeaponAffixes.upgraded(weapon.affixes[index], option))]
 		elif weapon.affixes.size() >= weapon.affix_slots:
@@ -91,9 +114,9 @@ static func comparison(weapon: WeaponInstance, option: Dictionary, stats: Player
 			result += "\nBis zu %.0f %% langsamer für %.1f s" % [data.slow_fraction * 100, data.slow_duration]
 		return result
 	if index >= 0:
-		result += "\nAuf dieser Waffe: +%s → +%s %s" % [value_before, value_after, damage_unit(data.id, items)]
+		result += "\nAuf dieser Waffe: +%s → +%s %s" % [value_before, value_after, damage_unit(data.id, items, weapon.data)]
 	else:
-		result += "\nAuf dieser Waffe: +%s %s" % [value_after, damage_unit(data.id, items)]
+		result += "\nAuf dieser Waffe: +%s %s" % [value_after, damage_unit(data.id, items, weapon.data)]
 	if index >= 0:
 		result += "\n%s → %s" % [progress_text(weapon.affixes[index]), progress_text(WeaponAffixes.upgraded(weapon.affixes[index], option))]
 		result += "\nFortschritt: +%.1f %% · danach %.1f %%" % [WeaponAffixes.progress_weight(weapon.affixes[index], option) * 100, float(WeaponAffixes.upgraded(weapon.affixes[index], option).get("progress", 0)) * 100]
@@ -103,11 +126,13 @@ static func comparison(weapon: WeaponInstance, option: Dictionary, stats: Player
 		result += "\nBelegt einen freien Platz für Verzauberungen"
 	if data.slow_fraction > 0:
 		result += "\nVerlangsamt für %.1f s" % data.slow_duration
-	return result + "\n" + effect_description(data.id) + "\n" + mechanics_text(data.id)
+	return result + "\n" + effect_description(data.id, weapon.data) + "\n" + mechanics_text(data.id, weapon.data)
 
 
-static func mechanics_text(kind: StringName) -> String:
+static func mechanics_text(kind: StringName, weapon: WeaponData = null) -> String:
 	var data := WeaponAffixes.by_id(kind)
+	if kind == &"leech" and weapon != null and weapon.attack_mode == &"command":
+		return "Bis zu %.0f %% des tatsächlichen Bissschadens als Heilung. Höchstens %.1f HP je Impuls bei einer Wurzel. Zwischen Impulsen liegen mindestens %.2f s." % [data.proc_factor * 100, data.utility_cap, data.proc_cooldown]
 	match kind:
 		&"fire":
 			return "Glut: %.0f %% eines Trefferbudgets an bis zu %d Ziele im Radius %.0f. Intervall %.2f s; übertragene Glut verbreitet sich nicht erneut." % [data.proc_factor * 100, data.proc_targets, data.proc_radius, data.proc_cooldown]

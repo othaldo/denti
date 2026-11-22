@@ -4,9 +4,9 @@
 
 [resource]
 script = ExtResource("1")
-id = &"molar_crown_echo"
-display_name = "Kronen-Echo"
-description = "Blockt ein Schild Schaden, greifen alle Waffen sofort an. Höchstens alle 3 s."
+id = &"bell_crown"
+display_name = "Glockenkrone"
+description = "Blockt ein Schild Schaden, greifen alle Waffen sofort an. Höchstens alle 3 s."
+icon_index = 7
 tags = Array[StringName]([&"shield", &"defense"])
-class_id = &"good_old_molar"
-talent_icon = 45
+placeholder_item_icon = 35

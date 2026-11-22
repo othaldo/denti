@@ -36,9 +36,6 @@ const SHOWER_COOLDOWN := 20.0
 const SHOWER_FAST := 12.0
 const SHOWER_THRESHOLD := 0.35
 const SHOWER_STONE := 0.5
-## Strudelsiegel: a dash draws nearby enemies onto the closest trail segment.
-const WHIRL_RADIUS := 240.0
-const WHIRL_PULL := 70.0
 const WATER := Color(0.35, 0.75, 1.0)
 const SPARK := Color(1.0, 0.95, 0.45)
 const FOAM_STYLE: SkillCloudStyle = preload("res://data/vfx/skill_clouds/foam.tres")
@@ -118,19 +115,15 @@ func _pulse() -> void:
 func on_trail_enemy(enemy: Enemy) -> bool:
 	return on_trail.has(enemy.get_instance_id())
 
-## Leitungswasser: wet enemies off the trail conduct as well.
-func conducts(enemy: Enemy) -> bool:
-	return on_trail_enemy(enemy) or relic(&"rinser_tap_water") and enemy.wet_time > 0.0
-
 ## Strom: a hit on an enemy standing on the trail jumps to others on it.
 func on_weapon_hit(enemy: Enemy, _weapon: WeaponData, dealt: float) -> void:
-	if not active() or dealt <= 0.0 or arc_cooldown > 0.0 or not conducts(enemy): return
+	if not active() or dealt <= 0.0 or arc_cooldown > 0.0 or not on_trail_enemy(enemy): return
 	arc_cooldown = ARC_COOLDOWN
 	var amount := dealt * (ARC_SHARE + 0.1 * power("rinse_copper"))
 	var targets := 0
 	for other in player.nearby_enemies(enemy.global_position, ARC_RANGE):
 		if targets >= ARC_TARGETS + roundi(power("rinse_conductor")): break
-		if other == enemy or not other.is_targetable() or not conducts(other): continue
+		if other == enemy or not other.is_targetable() or not on_trail_enemy(other): continue
 		other.take_damage(amount, null, false, &"class_rinse")
 		beam(enemy.global_position, other.global_position, SPARK, 2.5)
 		targets += 1
@@ -153,7 +146,6 @@ func on_dash_started() -> void:
 	dash_direction = player.dash.direction
 	if _surge() > 0: support(&"class_rinse_surges")
 	if power("skill_flood") > 0.0: _flood()
-	if relic(&"rinser_whirlpool"): _whirl()
 	if power("flood_puddles") > 0.0:
 		for index in range(maxi(trail.size() - 3, 0), trail.size()): player.items.create_puddle(trail[index].at)
 
@@ -163,19 +155,6 @@ func _flood() -> void:
 		if not enemy.is_targetable() or enemy.wet_time <= 0.0: continue
 		var direction := dash_direction if power("flood_suction") <= 0.0 else enemy.global_position.direction_to(player.global_position)
 		enemy.global_position += direction * SURGE_PUSH * (1.0 - clampf(enemy.data.knockback_resistance, 0.0, 1.0))
-
-func _whirl() -> void:
-	if trail.is_empty(): return
-	var moved := 0
-	for enemy in player.nearby_enemies(player.global_position, WHIRL_RADIUS):
-		if not enemy.is_targetable() or on_trail_enemy(enemy): continue
-		var closest: Vector2 = trail[0].at
-		for segment in trail:
-			if enemy.global_position.distance_squared_to(segment.at) < enemy.global_position.distance_squared_to(closest): closest = segment.at
-		var offset := (closest - enemy.global_position).limit_length(WHIRL_PULL)
-		enemy.global_position += offset * (1.0 - clampf(enemy.data.knockback_resistance, 0.0, 1.0))
-		moved += 1
-	if moved > 0: flash(player.global_position, WHIRL_RADIUS, WATER)
 
 ## Notdusche: one emergency wave at low health, then a cooldown.
 func _shower() -> void:

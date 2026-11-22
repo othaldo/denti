@@ -39,7 +39,7 @@ func _run() -> void:
 		await _capture("levelup",extent)
 		ui.stage.body_scroll.scroll_vertical = 10000
 		await _capture("levelup_bottom",extent)
-		ui.show_relics([RelicCatalog.CATALOG[2],RelicCatalog.by_id(&"frost_glacier_heart"),RelicCatalog.CATALOG[3],RelicCatalog.CATALOG[0]])
+		ui.show_relics([RelicCatalog.CATALOG[2],RelicCatalog.by_id(&"glacier_heart"),RelicCatalog.CATALOG[3],RelicCatalog.CATALOG[0]])
 		ui.set_progress(5,5)
 		await _capture("relics",extent)
 		ui.stage.body_scroll.scroll_vertical = 10000

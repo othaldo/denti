@@ -41,13 +41,6 @@ const ARMOR_FAST := 5.0
 const BREATH_RADIUS := 150.0
 const STARE_RADIUS := 120.0
 const STARE_PUSH := 60.0
-## Gletscherherz: a boss breaking a wall is slowed and takes more damage.
-const GLACIER_SECONDS := 3.0
-const GLACIER_BONUS := 20.0
-const GLACIER_COOLDOWN := 6.0
-## Eisblume: a brittle enemy dying passes brittleness to its neighbours.
-const FLOWER_RADIUS := 100.0
-const FLOWER_TARGETS := 4
 const ICE := Color(0.7, 0.92, 1.0)
 const WALL_STYLE: SkillCloudStyle = preload("res://data/vfx/skill_clouds/frost.tres")
 
@@ -58,9 +51,6 @@ var brittle: Dictionary = {}
 var armor_cooldown := 0.0
 var spike_tick := 0.0
 var shards: Array[Dictionary] = []
-var glacier_cooldown := 0.0
-## Boss instance id -> remaining Gletscherherz seconds.
-var glacier: Dictionary = {}
 
 func class_id() -> StringName:
 	return &"frost_warden"
@@ -73,8 +63,6 @@ func reset_wave() -> void:
 	armor_cooldown = 0.0
 	spike_tick = 0.0
 	shards.clear()
-	glacier_cooldown = 0.0
-	glacier.clear()
 
 func wall_seconds() -> float:
 	var seconds := WALL_SECONDS + power("frost_thick") + (1.5 if power("wall_lasting") > 0.0 else 0.0)
@@ -105,7 +93,6 @@ func _hold(delta: float) -> void:
 			if offset.length() >= limit: continue
 			if enemy.data.is_boss:
 				wall.time = 0.0
-				_glacier(enemy)
 				break
 			var side: Vector2 = offset.normalized() if not offset.is_zero_approx() else (wall.b - wall.a).orthogonal().normalized()
 			var push := limit + (SLIDE_PUSH * delta * 4.0 if power("wall_slide") > 0.0 else 0.0)
@@ -123,32 +110,6 @@ func _hold(delta: float) -> void:
 		if spike_tick <= 0.0:
 			spike_tick = SPIKE_TICK
 			for id in touching: touching[id].take_damage(scaled(SPIKE_DAMAGE), null, false, &"class_frost")
-
-func _glacier(boss: Enemy) -> void:
-	if not relic(&"frost_glacier_heart") or glacier_cooldown > 0.0: return
-	glacier_cooldown = GLACIER_COOLDOWN
-	boss.chill_time = maxf(boss.chill_time, GLACIER_SECONDS)
-	glacier[boss.get_instance_id()] = GLACIER_SECONDS
-	flash(boss.global_position, boss.data.radius + 40.0, ICE)
-	ElementImpactBatch.emit_from(player, &"ice", boss.global_position, Vector2.RIGHT, boss.data.radius + 30.0, true)
-
-func damage_bonus(enemy: Enemy, _weapon: WeaponData) -> float:
-	return GLACIER_BONUS if active() and glacier.has(enemy.get_instance_id()) else 0.0
-
-func on_enemy_died(enemy: Enemy) -> void:
-	if not active() or not relic(&"frost_ice_flower"): return
-	var id := enemy.get_instance_id()
-	if not brittle.has(id): return
-	brittle.erase(id)
-	var spread := 0
-	for other in player.nearby_enemies(enemy.global_position, FLOWER_RADIUS):
-		if spread >= FLOWER_TARGETS: break
-		if other == enemy or not other.is_targetable() or other.data.is_boss or brittle.has(other.get_instance_id()): continue
-		brittle[other.get_instance_id()] = BRITTLE_SECONDS
-		other.chill_time = maxf(other.chill_time, CHILL_SECONDS)
-		beam(enemy.global_position, other.global_position, ICE, 2.0)
-		spread += 1
-	if spread > 0: flash(enemy.global_position, FLOWER_RADIUS * 0.6, ICE)
 
 ## Zerschmettern: a hit on a brittle enemy shatters it into splinters.
 func on_weapon_hit(enemy: Enemy, _weapon: WeaponData, dealt: float) -> void:
@@ -225,10 +186,6 @@ func on_shield_blocked() -> void:
 func advance(delta: float) -> void:
 	if active():
 		armor_cooldown = maxf(armor_cooldown - delta, 0.0)
-		glacier_cooldown = maxf(glacier_cooldown - delta, 0.0)
-		for id in glacier.keys():
-			glacier[id] = float(glacier[id]) - delta
-			if glacier[id] <= 0.0: glacier.erase(id)
 		for id in brittle.keys():
 			brittle[id] = float(brittle[id]) - delta
 			if brittle[id] <= 0.0 or not is_instance_valid(instance_from_id(id)): brittle.erase(id)

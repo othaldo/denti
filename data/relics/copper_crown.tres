@@ -4,9 +4,9 @@
 
 [resource]
 script = ExtResource("1")
-id = &"rinser_tap_water"
-display_name = "Leitungswasser"
-description = "Der Strom springt auch zwischen nassen Gegnern abseits der Spülspur."
+id = &"copper_crown"
+display_name = "Kupferkrone"
+description = "Treffer auf nasse Gegner springen als Strom auf einen weiteren nassen Gegner."
+icon_index = 14
 tags = Array[StringName]([&"water", &"chain"])
-class_id = &"rinser"
-talent_icon = 109
+placeholder_item_icon = 63

@@ -4,9 +4,9 @@
 
 [resource]
 script = ExtResource("1")
-id = &"assassin_midnight_blade"
-display_name = "Mitternachtsklinge"
+id = &"shadow_floss"
+display_name = "Schattenseide"
 description = "Der erste Waffentreffer nach einem Dash überträgt die Hälfte des Gifts im Ziel auf bis zu vier Gegner daneben."
+icon_index = 8
 tags = Array[StringName]([&"poison", &"mobility"])
-class_id = &"assassin"
-talent_icon = 20
+placeholder_item_icon = 54

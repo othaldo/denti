@@ -2,6 +2,40 @@ class_name WeaponPresentation
 extends RefCounted
 
 const EVOLUTION_COLOR := Color("ff3038")
+const BITE_CONTEXT := "Bisswerte vor Gegnerresistenzen und Zielboni. Elementschaden kommt hinzu."
+
+
+static func retinue_rows(data: WeaponData, player: Player) -> Array[Dictionary]:
+	if player == null or player.items == null: return []
+	var retinue := player.skill_module(ClassCatalog.NECRODENT_ID) as NecrodentSkills
+	if retinue == null or not retinue.active(): return []
+	var chance := clampf(player.stats.crit_chance + data.crit_bonus, 0.0, 1.0)
+	var rows: Array[Dictionary] = [
+		{"label": "Zähne zu Wellenbeginn", "value": str(retinue.retinue_size())},
+	]
+	var roster := retinue.roster_counts()
+	for kind in roster.size():
+		if roster[kind] == 0: continue
+		rows.append({"label": "%s ×%d" % [NecrodentSkills.TOOTH_NAMES[kind], roster[kind]],
+			"value": "%s Schmelz · %s Biss" % [_decimal(retinue.tooth_max_health(kind)), _decimal(retinue.bite_damage_before_target_bonuses(kind))]})
+	rows.append_array([
+		{"label": "Kritischer Biss", "value": "%s %% · ×%s" % [_decimal(chance * 100.0), _decimal(data.crit_multiplier)]},
+		{"label": "Bisspause", "value": ("%.2f s" % retinue.bite_interval(data)).replace(".", ",")},
+	])
+	return rows
+
+
+static func retinue_health_text() -> String:
+	return "Gegnerkontakt kostet Zähne Schmelz. Bei 0 stehen sie normalerweise nach %s s wieder auf." % _decimal(NecrodentSkills.RECOVERY_SECONDS)
+
+
+static func _decimal(value: float) -> String:
+	return DentiAttributes.number(value).replace(".", ",")
+
+
+static func ascension_effect(data: WeaponData) -> String:
+	if data.attack_mode == &"command": return "+3 % Biss-Tempo und Befehlsreichweite"
+	return "+10 % Basisschaden · +3 % Tempo und Reichweite"
 
 
 static func weapon_name(weapon: WeaponInstance) -> String:

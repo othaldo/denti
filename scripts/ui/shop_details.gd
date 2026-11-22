@@ -86,11 +86,14 @@ func show_weapon(data: WeaponData, tier: int, player: Player, equipped: bool, eq
 	subtitle.add_theme_color_override("font_color", WeaponPresentation.EVOLUTION_COLOR if data.evolution_kind != &"" else DentiUIStyle.INK)
 	if data.evolution_kind != &"":
 		subtitle.text = "Evolution · %s · %s · %s" % [WeaponPresentation.tier_text(data, tier), data.roots_text(), data.damage_type_label()]
-	subtitle.text += "\n" + data.scaling_label()
+	if data.attack_mode != &"command": subtitle.text += "\n" + data.scaling_label()
 	subtitle.tooltip_text = data.scaling_description()
 	var current := WeaponPresentation.values(data, tier, player)
 	_clear_values()
 	if data.attack_mode == &"command":
+		if equipped:
+			for row in WeaponPresentation.retinue_rows(data, player):
+				_value(row.label, row.value)
 		_rolled_value("Befehlsreichweite", "%d" % roundi(current.range), data, "range")
 	else:
 		_rolled_value("Treffer", "%.1f" % current.damage, data, "damage")
@@ -109,6 +112,8 @@ func show_weapon(data: WeaponData, tier: int, player: Player, equipped: bool, eq
 	effect.text = " · ".join(mechanics)
 	if data.evolution_kind != &"":
 		effect.text = data.description
+	if equipped and data.attack_mode == &"command":
+		effect.text = WeaponPresentation.retinue_health_text() + "\n" + WeaponPresentation.BITE_CONTEXT
 	effect.visible = not effect.text.is_empty()
 	synergy.text = WeaponPresentation.synergy(data, equipment, player)
 	synergy.visible = not synergy.text.is_empty()
@@ -122,8 +127,8 @@ func show_affixes(weapon: WeaponInstance, stats: PlayerStats, items: ItemInvento
 	DentiUIComponents.label(affix_rows, "Verzauberungen · %d/%d Plätze" % [weapon.affixes.size(), maxi(WeaponUpgrades.slots(weapon.tier), weapon.affixes.size())], 14)
 	for affix in weapon.affixes:
 		var data := WeaponAffixes.by_id(StringName(affix.id))
-		var label := DentiUIComponents.label(affix_rows, "%s +%s %s" % [data.display_name, AffixPresentation.value_text(float(affix.damage), data.id, weapon.data, stats, items), AffixPresentation.damage_unit(data.id, items)], 14)
-		label.tooltip_text = AffixPresentation.effect_description(data.id) + "\n" + AffixPresentation.mechanics_text(data.id)
+		var label := DentiUIComponents.label(affix_rows, "%s +%s %s" % [data.display_name, AffixPresentation.value_text(float(affix.damage), data.id, weapon.data, stats, items), AffixPresentation.damage_unit(data.id, items, weapon.data)], 14)
+		label.tooltip_text = (AffixPresentation.effect_description(data.id, weapon.data) + "\n" + AffixPresentation.mechanics_text(data.id, weapon.data)).strip_edges()
 		label.add_theme_color_override("font_color", data.color)
 		var rarity := DentiUIComponents.label(affix_rows, AffixPresentation.progress_text(affix), 12)
 		if affix.has("level"):

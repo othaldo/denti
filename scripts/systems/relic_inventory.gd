@@ -18,10 +18,12 @@ var moving_hits: int = 0
 var halo_time: float = 0.0
 var flashes: Array[Dictionary] = []
 var blood_burst_busy: bool = false
+var synergies := RelicSynergies.new(self)
 
 
 func _process(delta: float) -> void:
 	halo_time = maxf(halo_time - delta, 0.0)
+	synergies.advance(delta)
 	var had_flashes := not flashes.is_empty()
 	for index in range(flashes.size() - 1, -1, -1):
 		flashes[index]["life"] = float(flashes[index]["life"]) - delta
@@ -57,9 +59,11 @@ func damage_factor() -> float:
 
 func on_wave_start() -> void:
 	halo_time = 0.0
+	synergies.reset_wave()
 
 
 func on_shield_blocked() -> void:
+	synergies.on_shield_blocked()
 	if not has_relic(&"shattered_halo"):
 		return
 	halo_time = HALO_DURATION
@@ -70,6 +74,7 @@ func on_shield_blocked() -> void:
 func on_weapon_hit(enemy: Enemy, amount: float, weapon: WeaponData, critical: bool) -> void:
 	if owned.is_empty():
 		return
+	synergies.on_weapon_hit(enemy, amount, weapon, critical)
 	if has_relic(&"tidal_seal") and weapon.damage_type == "Wasser":
 		water_hits += 1
 		if water_hits >= 5:
@@ -91,7 +96,21 @@ func on_weapon_hit(enemy: Enemy, amount: float, weapon: WeaponData, critical: bo
 				_line(enemy.global_position, next.global_position, Color(0.27, 0.95, 0.98))
 
 
+func on_dash_started() -> void:
+	if not owned.is_empty(): synergies.on_dash_started()
+
+
+func on_loot_collected(kind: StringName) -> void:
+	if not owned.is_empty(): synergies.on_loot_collected(kind)
+
+
+## Synergy relic bonus in percent points on one weapon hit.
+func weapon_damage_bonus(enemy: Enemy) -> float:
+	return synergies.weapon_damage_bonus(enemy)
+
+
 func on_enemy_died(enemy: Enemy, amount: float) -> void:
+	if not owned.is_empty(): synergies.on_enemy_died(enemy)
 	if not blood_burst_busy and has_relic(&"blood_moon_tooth") and enemy.has_bleeding():
 		blood_burst_busy = true
 		_blood_burst(enemy, amount)

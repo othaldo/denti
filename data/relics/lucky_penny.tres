@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/relic_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"lucky_penny"
+display_name = "Glückspfennig"
+description = "Eingesammelte Münzen feuern manchmal einen Lichtsplitter auf den nächsten Gegner. Glück erhöht Chance und Schaden."
+icon_index = 11
+tags = Array[StringName]([&"luck", &"economy", &"crit"])
+placeholder_item_icon = 9

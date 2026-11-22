@@ -38,15 +38,6 @@ const SLIP_HEAL_CAP := 4
 const SLIP_MIRROR_RANGE := 320.0
 const SLIP_MIRROR_FACTOR := 0.5
 const FLASH_SECONDS := 0.4
-## Mitternachtsklinge: the first weapon hit after a dash spreads the target's poison.
-const BLADE_WINDOW := 2.5
-const BLADE_SHARE := 0.5
-const BLADE_TARGETS := 4
-const BLADE_RADIUS := 110.0
-## Cap per neighbour, in snap-poison budgets, so huge depots cannot multiply.
-const BLADE_CAP := 3.0
-## Nachtschatten: weapon damage bonus on enemies inside a poison field.
-const NIGHTSHADE_BONUS := 20.0
 const RUSH_COLOR := Color(1.0, 0.55, 0.78)
 const CLOUD_STYLE: SkillCloudStyle = preload("res://data/vfx/skill_clouds/poison.tres")
 
@@ -61,9 +52,6 @@ var slip_cooldown := 0.0
 var slip_heals := 0
 var slip_shielded := false
 var flashes: Array[Dictionary] = []
-var blade_time := 0.0
-## Enemy instance id -> remaining Nachtschatten seconds.
-var nightshade: Dictionary = {}
 
 func _ready() -> void:
 	top_level = true
@@ -82,8 +70,6 @@ func reset_wave() -> void:
 	slip_cooldown = 0.0
 	slip_heals = 0
 	slip_shielded = false
-	blade_time = 0.0
-	nightshade.clear()
 	flashes.clear()
 	if player != null: player.dash.free_dashes = false
 	queue_redraw()
@@ -161,35 +147,6 @@ func slip_radius() -> float:
 func on_dash_started() -> void:
 	slip_heals = 0
 	slip_shielded = false
-	if relic(&"assassin_midnight_blade"): blade_time = BLADE_WINDOW
-
-func relic(id: StringName) -> bool:
-	return player.stats.class_data.id == &"assassin" and player.has_class_relic(id)
-
-# --- Class relics ------------------------------------------------------------
-
-func expose(enemy: Enemy, seconds: float) -> void:
-	nightshade[enemy.get_instance_id()] = seconds
-
-func damage_bonus(enemy: Enemy, _weapon: WeaponData) -> float:
-	return NIGHTSHADE_BONUS if nightshade.has(enemy.get_instance_id()) and relic(&"assassin_nightshade") else 0.0
-
-func on_weapon_hit(enemy: Enemy, weapon: WeaponData, dealt: float) -> void:
-	if blade_time <= 0.0 or weapon == null or dealt <= 0.0: return
-	blade_time = 0.0
-	var poison := enemy.affix_effects.budget(&"poison") + enemy.affix_effects.depot.budget()
-	if poison <= 0.0: return
-	var spread := 0
-	for other in player.nearby_enemies(enemy.global_position, BLADE_RADIUS):
-		if spread >= BLADE_TARGETS: break
-		if other == enemy or not other.is_targetable(): continue
-		var amount := minf(poison * BLADE_SHARE, player.dash_cut.poison_for(other) * BLADE_CAP)
-		var additions: Array[Dictionary] = [{"id": "poison", "damage": amount, "proc_id": "assassin_midnight_blade"}]
-		other.take_damage(0, null, false, &"assassin_midnight_blade", additions)
-		spread += 1
-	if spread > 0:
-		_flash(enemy.global_position, BLADE_RADIUS, DentiUIStyle.MINT)
-		ElementImpactBatch.emit_from(player, &"poison", enemy.global_position, Vector2.RIGHT, BLADE_RADIUS, true)
 
 ## Called after each dash motion step with the swept segment.
 func sweep(start: Vector2, end: Vector2) -> void:
@@ -226,10 +183,6 @@ func _slipped(at: Vector2) -> void:
 func advance(delta: float) -> void:
 	clock += delta
 	slip_cooldown = maxf(slip_cooldown - delta, 0.0)
-	blade_time = maxf(blade_time - delta, 0.0)
-	for id in nightshade.keys():
-		nightshade[id] = float(nightshade[id]) - delta
-		if nightshade[id] <= 0.0: nightshade.erase(id)
 	for id in marks.keys():
 		marks[id] = float(marks[id]) - delta
 		if marks[id] <= 0.0: marks.erase(id)

@@ -233,7 +233,20 @@ func _save_progression() -> Error:
 
 func class_unlocked(id: StringName) -> bool:
 	return ClassCatalog.by_id(id) != null and (id != ClassCatalog.NECRODENT_ID
+		or progression_data.necrodent_debug_unlocked
 		or progression_data.class_wins.size() == ClassCatalog.MASTERY_CLASSES.size())
+
+
+func debug_unlock_necrodent() -> Error:
+	if not DebugRunControls.allowed() or test_scenario_id != &"":
+		return ERR_UNAVAILABLE
+	if class_unlocked(ClassCatalog.NECRODENT_ID):
+		return OK
+	progression_data.necrodent_debug_unlocked = true
+	var result := _save_progression()
+	if result != OK:
+		progression_data.necrodent_debug_unlocked = false
+	return result
 
 
 func record_class_victory(id: StringName, difficulty: StringName, eligible: bool) -> bool:
@@ -244,11 +257,12 @@ func record_class_victory(id: StringName, difficulty: StringName, eligible: bool
 	var key := str(id)
 	if key in progression_data.class_wins:
 		return false
+	var was_unlocked := class_unlocked(ClassCatalog.NECRODENT_ID)
 	progression_data.class_wins.append(key)
 	if _save_progression() != OK:
 		progression_data.class_wins.erase(key)
 		return false
-	return class_unlocked(ClassCatalog.NECRODENT_ID)
+	return not was_unlocked and class_unlocked(ClassCatalog.NECRODENT_ID)
 
 
 func record_weapon_mastery(id: StringName, flags: int) -> Array[String]:

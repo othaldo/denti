@@ -276,6 +276,7 @@ func modify_damage(enemy: Enemy, weapon: WeaponData, base: float) -> float:
 	var bonus := base_weapon_damage_bonus()
 	bonus += player.class_combat.damage_bonus(enemy, weapon)
 	bonus += player.module_damage_bonus(enemy, weapon)
+	bonus += relics.weapon_damage_bonus(enemy)
 	if enemy.data.is_boss:
 		bonus += power(&"boss_bonus") * 100.0
 	if enemy.has_bleeding():

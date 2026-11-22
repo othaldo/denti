@@ -14,9 +14,10 @@ max_ranks = 8
 script = ExtResource("2")
 id = &"necro_swarm_recruit"
 display_name = "Milchzahn"
-description = "Ein weiterer Zahn schließt sich an."
+description = "Pro Rang schließt sich ein weiterer Zahn an."
 effects = {"necro_teeth": 1}
-icon_index = 61
+max_ranks = 3
+icon_index = 158
 
 [sub_resource type="Resource" id="N2"]
 script = ExtResource("2")
@@ -61,9 +62,9 @@ script = ExtResource("2")
 id = &"necro_swarm"
 row = 2
 display_name = "Ausschwärmen"
-description = "Zähne ohne Befehl verteilen sich auf verschiedene Ziele und springen nach einem Kill weiter."
-effects = {"necro_swarm": 1}
-icon_index = 65
+description = "Ein weiterer Zahn schließt sich an. Die Zähne verteilen sich und springen nach einem Kill zum nächsten Gegner."
+effects = {"necro_swarm": 1, "necro_teeth": 1}
+icon_index = 157
 kind = &"skill"
 
 [sub_resource type="Resource" id="N8"]
@@ -75,7 +76,7 @@ display_name = "Schnelle Wurzeln"
 description = "Die Zähne laufen pro Rang schneller."
 effects = {"necro_speed": 15}
 max_ranks = 3
-icon_index = 64
+icon_index = 169
 
 [sub_resource type="Resource" id="N9"]
 script = ExtResource("2")
@@ -92,7 +93,7 @@ row = 3
 display_name = "Scharfe Kanten"
 description = "Bisse verursachen Blutung. Zahnseide verstärkt den Effekt."
 effects = {"necro_bleeding": 1}
-icon_index = 63
+icon_index = 159
 kind = &"modifier"
 parent = &"necro_swarm"
 
@@ -120,7 +121,7 @@ display_name = "Milchgebiss"
 description = "Pro Rang schließt sich ein weiterer Zahn an."
 effects = {"necro_teeth": 1}
 max_ranks = 2
-icon_index = 61
+icon_index = 158
 
 [sub_resource type="Resource" id="N14"]
 script = ExtResource("2")
@@ -145,7 +146,7 @@ row = 5
 display_name = "Zahnwechsel"
 description = "Zwei weitere Zähne schließen sich an. Jeder Biss verursacht 20 % weniger Schaden."
 effects = {"necro_teeth": 2, "necro_small": 1}
-icon_index = 62
+icon_index = 160
 kind = &"keystone"
 
 [sub_resource type="Resource" id="N17"]
@@ -169,9 +170,10 @@ script = ExtResource("2")
 id = &"necro_brute_recruit"
 branch = 1
 display_name = "Backenzahn"
-description = "Ein weiterer Zahn schließt sich an."
-effects = {"necro_teeth": 1}
-icon_index = 85
+description = "Pro Rang schließt sich ein Backenzahn an."
+effects = {"necro_teeth": 1, "necro_molar_teeth": 1}
+max_ranks = 2
+icon_index = 162
 
 [sub_resource type="Resource" id="N20"]
 script = ExtResource("2")
@@ -224,7 +226,7 @@ row = 2
 display_name = "Festbeißen"
 description = "Aufeinanderfolgende Bisse am selben befohlenen Ziel werden stärker."
 effects = {"necro_focus": 1}
-icon_index = 86
+icon_index = 161
 kind = &"skill"
 
 [sub_resource type="Resource" id="N26"]
@@ -237,7 +239,7 @@ display_name = "Schnelle Wurzeln"
 description = "Die Zähne laufen pro Rang schneller."
 effects = {"necro_speed": 15}
 max_ranks = 3
-icon_index = 88
+icon_index = 169
 
 [sub_resource type="Resource" id="N27"]
 script = ExtResource("2")
@@ -257,7 +259,7 @@ display_name = "Fester Griff"
 description = "Der Schadensbonus von Festbeißen steigt pro Rang."
 effects = {"necro_focus_power": 0.15}
 max_ranks = 3
-icon_index = 87
+icon_index = 163
 kind = &"modifier"
 parent = &"necro_focus"
 
@@ -285,10 +287,10 @@ id = &"necro_brute_reinforcements"
 branch = 1
 row = 4
 display_name = "Zweite Reihe"
-description = "Pro Rang schließt sich ein weiterer Zahn an."
-effects = {"necro_teeth": 1}
+description = "Pro Rang schließt sich ein Backenzahn an."
+effects = {"necro_teeth": 1, "necro_molar_teeth": 1}
 max_ranks = 2
-icon_index = 85
+icon_index = 162
 
 [sub_resource type="Resource" id="N32"]
 script = ExtResource("2")
@@ -314,9 +316,9 @@ id = &"necro_focus_crown"
 branch = 1
 row = 5
 display_name = "Weisheitsgebiss"
-description = "Ein weiterer Zahn schließt sich an. Bisse sind stärker, aber seltener."
-effects = {"necro_teeth": 1, "necro_heavy": 1}
-icon_index = 88
+description = "Ein Backenzahn schließt sich an. Bisse sind stärker, aber seltener."
+effects = {"necro_teeth": 1, "necro_molar_teeth": 1, "necro_heavy": 1}
+icon_index = 164
 kind = &"keystone"
 
 [sub_resource type="Resource" id="N35"]
@@ -341,9 +343,10 @@ script = ExtResource("2")
 id = &"necro_guard_recruit"
 branch = 2
 display_name = "Wachzahn"
-description = "Ein weiterer Zahn schließt sich an."
-effects = {"necro_teeth": 1}
-icon_index = 133
+description = "Pro Rang schließt sich ein Wachzahn an."
+effects = {"necro_teeth": 1, "necro_guard_teeth": 1}
+max_ranks = 2
+icon_index = 166
 
 [sub_resource type="Resource" id="N38"]
 script = ExtResource("2")
@@ -394,9 +397,9 @@ id = &"necro_guard"
 branch = 2
 row = 2
 display_name = "Geleit"
-description = "Nach einem Dash bleiben die Zähne kurz bei Denti und beißen Gegner entlang seines Laufwegs."
+description = "Nach einem Dash bleiben die Zähne bei Denti. Sie ziehen nahe gewöhnliche Nahkämpfer auf sich."
 effects = {"necro_guard": 1}
-icon_index = 135
+icon_index = 165
 kind = &"skill"
 
 [sub_resource type="Resource" id="N44"]
@@ -409,7 +412,7 @@ display_name = "Schnelle Wurzeln"
 description = "Die Zähne laufen pro Rang schneller."
 effects = {"necro_speed": 15}
 max_ranks = 3
-icon_index = 137
+icon_index = 169
 
 [sub_resource type="Resource" id="N45"]
 script = ExtResource("2")
@@ -429,7 +432,7 @@ display_name = "Lange Leine"
 description = "Das Geleit hält pro Rang länger an."
 effects = {"necro_guard_duration": 0.5}
 max_ranks = 3
-icon_index = 136
+icon_index = 167
 kind = &"modifier"
 parent = &"necro_guard"
 
@@ -457,10 +460,10 @@ id = &"necro_guard_reinforcements"
 branch = 2
 row = 4
 display_name = "Wachwechsel"
-description = "Pro Rang schließt sich ein weiterer Zahn an."
-effects = {"necro_teeth": 1}
+description = "Pro Rang schließt sich ein Wachzahn an."
+effects = {"necro_teeth": 1, "necro_guard_teeth": 1}
 max_ranks = 2
-icon_index = 133
+icon_index = 166
 
 [sub_resource type="Resource" id="N50"]
 script = ExtResource("2")
@@ -486,9 +489,9 @@ id = &"necro_guard_crown"
 branch = 2
 row = 5
 display_name = "Letzte Wache"
-description = "Ein weiterer Zahn schließt sich an. Während des Geleits rappeln sich Zähne schneller auf."
-effects = {"necro_teeth": 1, "necro_guard_revive": 1}
-icon_index = 137
+description = "Ein Wachzahn schließt sich an. Während des Geleits rappeln sich Zähne schneller auf."
+effects = {"necro_teeth": 1, "necro_guard_teeth": 1, "necro_guard_revive": 1}
+icon_index = 168
 kind = &"keystone"
 
 [sub_resource type="Resource" id="N53"]

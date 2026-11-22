@@ -367,7 +367,7 @@ func _root_info(rect: Rect2) -> void:
 	button.add_theme_font_size_override("font_size", 16)
 	var text_width := button.get_theme_font("font").get_string_size(meta, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
 	_art(button, preload("res://assets/ui/info.svg"), Rect2(minf((rect.size.x + text_width) / 2 + 8, rect.size.x - 18), (rect.size.y - 14) / 2, 14, 14))
-	button.tooltip_text = "Effektstärke nach Wurzeln. Details öffnen."
+	button.tooltip_text = "Bisswerte und Befehlsreichweite" if data.attack_mode == &"command" else "Effektstärke nach Wurzeln. Details öffnen."
 	button.pressed.connect(func() -> void:
 		details.present(data.display_name, models[selected_weapon].root_info, button))
 
@@ -465,7 +465,7 @@ func _picker(rect: Rect2, available := 0.0) -> float:
 		if option.id == selected_effect: selected = option
 	var description := ""
 	if selected_effect != &"":
-		description = AffixPresentation.effect_description(selected_effect)
+		description = str(selected.get("description", ""))
 		if not str(selected.get("blocked", "")).is_empty(): description = str(selected.blocked)
 	var target_line := _selection_target()
 	var preview_height := _selection_height(description, target_line, rect.size.x) if selected_effect != &"" else 0.0
@@ -505,7 +505,7 @@ func _picker(rect: Rect2, available := 0.0) -> float:
 			elif button.disabled:
 				_art(button, preload("res://assets/ui/setup_lock.svg"), Rect2(width - 20, 5, 14, 14))
 			button.modulate.a = 0.48 if button.disabled and not bool(option.existing) else 1.0
-			button.tooltip_text = str(option.blocked) if button.disabled else AffixPresentation.effect_description(data.id)
+			button.tooltip_text = str(option.blocked) if button.disabled else str(option.description)
 			button.pressed.connect(func() -> void:
 				selected_effect = data.id
 				_save_cursor()
@@ -714,7 +714,7 @@ func _show_focused_details() -> void:
 		details.present(source.details_title, source.details_text, source)
 	elif source != null and source.has_meta("effect_id"):
 		var id := StringName(source.get_meta("effect_id"))
-		details.present(WeaponAffixes.by_id(id).display_name, AffixPresentation.effect_description(id), source)
+		details.present(WeaponAffixes.by_id(id).display_name, AffixPresentation.effect_description(id, current_data()), source)
 	else:
 		details.present(current_data().display_name, str(models[selected_weapon].root_info), source)
 
@@ -737,7 +737,7 @@ func _ascension(rect: Rect2, short: bool = false) -> void:
 	row.disabled = not row.blocked_reason.is_empty() and not get_node("/root/GameInput").controller_active
 	row.action_label = "Aufsteigen"
 	row.details_title = title
-	row.details_text = (row.blocked_reason + "\n\n" if not row.blocked_reason.is_empty() else "") + "%s · %d Punkte · %d Gold\n+10 %% Basisschaden · +3 %% Tempo und Reichweite\nFertig übernimmt den Aufstieg; Rückgängig nimmt ihn zurück." % [offer.next, offer.cost, offer.coins]
+	row.details_text = (row.blocked_reason + "\n\n" if not row.blocked_reason.is_empty() else "") + "%s · %d Punkte · %d Gold\n%s\nFertig übernimmt den Aufstieg; Rückgängig nimmt ihn zurück." % [offer.next, offer.cost, offer.coins, WeaponPresentation.ascension_effect(current_data())]
 	row.tooltip_text = row.details_text
 	var blocked := not row.blocked_reason.is_empty()
 	var heading := _text(row, title, Rect2(12, 6 if blocked else 16, rect.size.x - 24, 28), 16 if short else 19)

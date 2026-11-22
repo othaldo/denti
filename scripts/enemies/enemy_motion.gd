@@ -61,6 +61,7 @@ func step(index: EnemySpatialIndex, delta: float) -> void:
 	# full world-space path, including nonuniform scale and swept charge contact.
 	var ordinary_space := index.global_transform == Transform2D.IDENTITY
 	var player: Player
+	var retinue: NecrodentSkills
 	var player_at := Vector2.ZERO
 	for slot in enemies.size():
 		var enemy := enemies[slot]
@@ -69,6 +70,7 @@ func step(index: EnemySpatialIndex, delta: float) -> void:
 		if player == null and enemy.target != null:
 			player = enemy.target
 			player_at = player.global_position
+			retinue = NecrodentSkills.for_player(player)
 		var data := enemy.data
 		if not ordinary_space or enemy.target != player or player == null or enemy.loot_goblin != null or data.is_boss or data.is_elite or data.is_boss_objective or data.aura_radius > 0.0 or enemy.overtime_active or enemy.bleed_time > 0.0 or enemy.affix_effects.is_active() or enemy.special_phase != Enemy.SpecialPhase.COOLDOWN:
 			enemy._physics_process(delta)
@@ -81,7 +83,8 @@ func step(index: EnemySpatialIndex, delta: float) -> void:
 				enemy._physics_process(delta)
 			continue
 		var before := positions[slot]
-		var direction := before.direction_to(player_at)
+		var destination := retinue.pursuit_destination(enemy, player_at) if retinue != null else player_at
+		var direction := before.direction_to(destination)
 		var attack := enemy.active_special_attack
 		var timer := enemy.special_timer
 		if attack != EnemyData.SpecialAttack.NONE:

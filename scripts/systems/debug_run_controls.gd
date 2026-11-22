@@ -55,7 +55,7 @@ func add_item(id: StringName, copies: int) -> int:
 	return added
 
 
-## Grants or removes a relic, including class relics of other classes.
+## Grants or removes a relic.
 ## Returns whether the relic is owned afterwards.
 func toggle_relic(id: StringName) -> bool:
 	if not allowed() or RelicCatalog.by_id(id) == null:

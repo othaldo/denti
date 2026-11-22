@@ -33,6 +33,14 @@ const ROSTER_TALENT_ATLASES: Array[Texture2D] = [
 	preload("res://assets/classes/rinser_talent_icons.webp"),
 	preload("res://assets/classes/frost_warden_talent_icons.webp"),
 ]
+const NECRO_TALENT_ATLAS: Texture2D = preload("res://assets/classes/necrodent_talent_icons.png")
+const NECRO_TALENT_FIRST := 157
+const NECRO_TALENT_REGIONS: Array[Rect2] = [
+	Rect2(26, 50, 314, 289), Rect2(418, 70, 246, 254), Rect2(758, 70, 255, 249), Rect2(1104, 47, 318, 290),
+	Rect2(45, 398, 267, 297), Rect2(395, 407, 285, 266), Rect2(745, 403, 314, 274), Rect2(1134, 388, 268, 306),
+	Rect2(7, 788, 348, 242), Rect2(436, 760, 217, 274), Rect2(744, 746, 311, 298), Rect2(1108, 740, 316, 306),
+	Rect2(95, 50, 177, 79),
+]
 const HUD_ATLAS: Texture2D = preload("res://assets/ui/hud_icons_atlas.png")
 const STAT_ATLAS: Texture2D = preload("res://assets/ui/stat_icons_atlas.png")
 const RANGE: Texture2D = preload("res://assets/ui/range.svg")
@@ -120,6 +128,12 @@ static func hud(index: int) -> Texture2D:
 
 static func talent(index: int) -> Texture2D:
 	if index < 0: return null
+	if index >= NECRO_TALENT_FIRST:
+		var cell_index := index - NECRO_TALENT_FIRST
+		if cell_index >= NECRO_TALENT_REGIONS.size(): return null
+		var region := NECRO_TALENT_REGIONS[cell_index]
+		var frame := Vector2.ONE * maxf(region.size.x, region.size.y) / 0.83
+		return _framed_region(NECRO_TALENT_ATLAS, region, frame)
 	var base_count := TALENT_COLUMNS * TALENT_ROWS
 	if index < base_count:
 		return _region(TALENT_ATLAS, index, TALENT_COLUMNS, TALENT_ROWS)
@@ -149,8 +163,19 @@ static func stat(index: int) -> Texture2D:
 	return _framed_region(STAT_ATLAS, STAT_REGIONS[clampi(index, 0, STAT_REGIONS.size() - 1)], STAT_FRAME_SIZE)
 
 
+## Painted 4 x 3 atlas for relics 6-17. Until it exists, those relics borrow
+## an item icon (`RelicData.placeholder_item_icon`).
+const RELIC_EXPANSION_PATH := "res://assets/relics/relic_icons_expansion.png"
+const RELIC_EXPANSION_COLUMNS := 4
+const RELIC_EXPANSION_ROWS := 3
+const RELIC_EXPANSION_FIRST := 6
+
+
 static func relic_icon(relic: RelicData) -> Texture2D:
-	if relic.talent_icon >= 0: return talent(relic.talent_icon)
+	if relic.icon_index >= RELIC_EXPANSION_FIRST:
+		if ResourceLoader.exists(RELIC_EXPANSION_PATH):
+			return _region(load(RELIC_EXPANSION_PATH), relic.icon_index - RELIC_EXPANSION_FIRST, RELIC_EXPANSION_COLUMNS, RELIC_EXPANSION_ROWS)
+		return item(maxi(relic.placeholder_item_icon, 0))
 	return relic(relic.icon_index)
 
 

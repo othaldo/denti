@@ -105,16 +105,13 @@ func _run() -> void:
 	menu._set_class()
 	_check(stats.class_data == ember and menu.status.text.contains(ember.display_name), "Menu must switch the class")
 	_check(menu.class_select.selected == target, "Menu must show the active class")
-	# Relikte tab: grant and remove any relic, class relics of other classes included.
+	# Relikte tab: grant and remove any relic.
 	_check(menu.relic_buttons.size() == RelicCatalog.CATALOG.size(), "Every relic needs a row in the Relikte tab")
-	menu._toggle_relic(&"ember_volcano_heart")
-	_check(game.relics.has_relic(&"ember_volcano_heart") and menu.relic_buttons[&"ember_volcano_heart"].text == "Entfernen", "Menu must grant a class relic")
-	menu._toggle_relic(&"frost_ice_flower")
-	_check(game.relics.has_relic(&"frost_ice_flower") and menu.relic_buttons[&"frost_ice_flower"].tooltip_text.contains("Frostwächter"), "Foreign class relic must be grantable and marked")
-	_check(session.load_run().get("relics", {}).get("owned", []).has("ember_volcano_heart"), "Granted relic must reach the save")
-	menu._toggle_relic(&"ember_volcano_heart")
-	menu._toggle_relic(&"frost_ice_flower")
-	_check(game.relics.owned.is_empty() and menu.relic_buttons[&"ember_volcano_heart"].text == "+", "Menu must remove relics again")
+	menu._toggle_relic(&"heat_stone")
+	_check(game.relics.has_relic(&"heat_stone") and menu.relic_buttons[&"heat_stone"].text == "Entfernen", "Menu must grant a relic")
+	_check(session.load_run().get("relics", {}).get("owned", []).has("heat_stone"), "Granted relic must reach the save")
+	menu._toggle_relic(&"heat_stone")
+	_check(game.relics.owned.is_empty() and menu.relic_buttons[&"heat_stone"].text == "+", "Menu must remove relics again")
 	menu.close_menu()
 
 	session.clear_run()

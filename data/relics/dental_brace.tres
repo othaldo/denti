@@ -4,9 +4,9 @@
 
 [resource]
 script = ExtResource("1")
-id = &"molar_root_weave"
-display_name = "Wurzelgeflecht"
-description = "Treffen zwei verschiedene Waffen kurz nacheinander denselben Gegner, folgt ein Wurzelschlag mit 40 % des Treffers."
+id = &"dental_brace"
+display_name = "Zahnspange"
+description = "Treffen zwei verschiedene Waffen kurz nacheinander denselben Gegner, folgt ein Zusatzschlag mit 40 % des Treffers."
+icon_index = 6
 tags = Array[StringName]([&"melee", &"ranged"])
-class_id = &"good_old_molar"
-talent_icon = 1
+placeholder_item_icon = 36

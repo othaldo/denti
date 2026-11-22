@@ -4,9 +4,9 @@
 
 [resource]
 script = ExtResource("1")
-id = &"fairy_dreamcatcher"
-display_name = "Traumfänger"
-description = "Während eines Dashes fliegt Beute aus weitem Umkreis zur Zahnfee."
+id = &"milk_tooth_tin"
+display_name = "Milchzahndose"
+description = "Während eines Dashes fliegt Beute aus weitem Umkreis zu dir."
+icon_index = 10
 tags = Array[StringName]([&"economy", &"mobility"])
-class_id = &"tooth_fairy"
-talent_icon = 75
+placeholder_item_icon = 51

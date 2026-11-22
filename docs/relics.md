@@ -2,9 +2,10 @@
 
 Nach den Bossen in Welle 5, 10 und 15 erscheint jeweils eine Auswahl aus vier noch nicht gewählten Relikten. Die Entscheidung folgt auf die Levelaufstiege und Upgrade-Kapseln, bevor der Shop öffnet. Relikte sind weder Shop-Items noch stapelbar. Du siehst sie im Pausenmenü unter **Items**.
 
-## Allgemeine Relikte
+Alle Relikte stehen jeder Klasse offen. Sie setzen an allgemeinen Mechaniken an
+und bilden dadurch mit manchen Klassen besonders starke Synergien.
 
-Für jede Klasse.
+## Grundrelikte
 
 | Relikt | Effekt |
 | --- | --- |
@@ -15,36 +16,32 @@ Für jede Klasse.
 | Pilger-Kompass | Während Denti sich bewegt, springt jeder sechste Waffentreffer auf einen weiteren Gegner über. |
 | Giftzahn | Ein echter Waffentreffer auf ein anderes vergiftetes Ziel innerhalb von 2 s zieht 25 % des Restgifts am vorherigen Ziel vor (höchstens 30). Dieser Anteil verschwindet aus dem Restbudget. Höchstens einmal pro Sekunde; die Ziele müssen innerhalb von 240 liegen. Kein Kill nötig. |
 
-## Klassen-Relikte
+## Synergie-Relikte
 
-Jede Klasse hat zwei eigene Relikte. Sie verändern die Klassenmechanik statt
-pauschaler Werte und werden nur dieser Klasse angeboten.
-
-| Klasse | Relikt | Effekt |
+| Relikt | Effekt | Besonders stark mit |
 | --- | --- | --- |
-| Good Old Molar | Wurzelgeflecht | Treffen zwei verschiedene Waffen kurz nacheinander (0,8 s) denselben Gegner, folgt ein Wurzelschlag mit 40 % des zweiten Treffers. Höchstens zehnmal pro Sekunde. |
-| Good Old Molar | Kronen-Echo | Ein geblockter Treffer lässt alle Waffen sofort angreifen; höchstens alle 3 s. Zählt nicht für Generalprobe oder Gleichtakt. |
-| Assassine | Mitternachtsklinge | Der erste Waffentreffer innerhalb von 2,5 s nach einem Dash kopiert die Hälfte des Gifts im Ziel auf bis zu vier Gegner daneben. Je Gegner höchstens das Dreifache eines Schneisengifts. |
-| Assassine | Nachtschatten | Gegner in einem Giftfeld der Giftschneise nehmen 20 % mehr Waffenschaden. |
-| Zahnfee | Traumfänger | Während eines Dashes fliegt Beute aus weitem Umkreis zur Zahnfee und löst dabei ihre Lichtsplitter aus. |
-| Zahnfee | Mondsichel | Kritische Lichtsplitter treffen Gegner um das Ziel mit halbem Schaden. |
-| Glutzahn | Vulkanherz | Jeder Gegner, den eine Feuernova tötet, lädt 10 Hitze für die nächste (höchstens 60). |
-| Glutzahn | Glutzange | Während der Überhitzung setzen Waffentreffer Gegner mit 40 % des Treffers in Brand. |
-| Spültechniker | Strudelsiegel | Jeder Dash zieht Gegner in der Nähe ein Stück auf den nächsten Punkt der Spülspur. |
-| Spültechniker | Leitungswasser | Der Strom springt auch zwischen nassen Gegnern abseits der Spur, etwa durch Wasserwaffen, Pfützen oder das Gezeiten-Siegel. |
-| Frostwächter | Gletscherherz | Zerbricht ein Boss eine Eiswand, ist er 3 s verlangsamt und nimmt 20 % mehr Waffenschaden; höchstens alle 6 s. |
-| Frostwächter | Eisblume | Stirbt ein spröder Gegner, werden bis zu vier Gegner daneben spröde (keine Bosse). |
+| Zahnspange | Treffen zwei verschiedene Waffen innerhalb von 0,8 s denselben Gegner, folgt ein Zusatzschlag mit 40 % des zweiten Treffers. Höchstens zehnmal pro Sekunde. | gemischten Waffen, Good Old Molar |
+| Glockenkrone | Ein geblockter Treffer lässt alle Waffen sofort angreifen; höchstens alle 3 s. Zählt nicht für Klassen-Skills, die Angriffe zählen. | Schild-Builds, Molar, Frostwächter, Zahnfee |
+| Schattenseide | Der erste Waffentreffer innerhalb von 2,5 s nach einem Dash kopiert die Hälfte des Gifts im Ziel auf bis zu vier Gegner daneben; je Gegner höchstens das Dreifache des Treffers. | Gift und Dash, Assassine |
+| Tollkirsche | Vergiftete Gegner in Dentis Nähe nehmen 20 % mehr Waffenschaden. | Gift im Nahkampf, Assassine |
+| Milchzahndose | Während eines Dashes fliegt Beute aus weitem Umkreis zu Denti. | Beute, Zahnfee |
+| Glückspfennig | Eingesammelte Münzen feuern im Kampf mit 15–60 % Chance einen Lichtsplitter auf den nächsten Gegner; Glück erhöht Chance und Schaden. Höchstens acht pro Sekunde. | Glück und Münzen, Zahnfee |
+| Zunderzahn | Brennende Gegner setzen beim Tod bis zu vier Gegner daneben mit der Hälfte ihres Restbrands in Brand. Keine Kettenreaktion im selben Moment. | Feuer, Glutzahn |
+| Hitzestein | Jeder Gegner in Dentis Nähe gibt 3 % mehr Waffenschaden, höchstens 24 %. | Gedränge, Glutzahn, Assassine |
+| Kupferkrone | Ein Treffer auf einen nassen Gegner springt mit 35 % als Strom auf den nächsten anderen nassen Gegner; höchstens viermal pro Sekunde. | Wasser und Elektro, Spültechniker |
+| Mundspülstrudel | Jeder Dash zieht Gegner in der Nähe ein Stück zu Denti. | Flächenschaden, Spültechniker, Frostwächter, Glutzahn |
+| Eisblume | Stirbt ein verlangsamter Gegner, sind bis zu vier Gegner daneben 1,5 s verlangsamt. | Eis, Frostwächter |
+| Gletscherherz | Verlangsamte Elites und Bosse nehmen 20 % mehr Waffenschaden (Eis- oder Nervenverlangsamung). | Kontrolle, Frostwächter, Bosskämpfe |
 
-Die Icons der Klassen-Relikte sind vorerst Talent-Icons der Klasse. Ein eigener
-gemalter Relikt-Atlas folgt.
+Jedes Synergie-Relikt hat ein eigenes gemaltes Symbol. [Relikt-Atlas](../assets/relics/relic_icons_expansion.png)
 
 ## Auswahl
 
-Enthält die Auswahl mindestens ein Klassen-Relikt, solange die Klasse noch eines
-übrig hat. Wenn passende unbesessene allgemeine Relikte existieren, enthält sie
-außerdem mindestens eine zum Build passende Option. Die übrigen Plätze bleiben freie Alternativen;
+Wenn passende unbesessene Relikte existieren, enthält die Auswahl mindestens
+eine zum Build passende Option. Die übrigen Plätze bleiben freie Alternativen;
 es gibt kein garantiertes bestimmtes Relikt. Besitz, Waffen, Verzauberungen,
-Schildquellen und ein ausgebauter Glanzwert bestimmen die passenden Tags.
+Schildquellen, ein ausgebauter Glanzwert und die bevorzugten Tags der Klasse
+bestimmen die passenden Tags.
 
 Die Zähler, der aktive Schildbonus und das letzte Giftziel samt Zeitfenster werden
 mit dem Lauf gespeichert. Die Reliktwahl unterbricht keinen Kampf und bleibt beim

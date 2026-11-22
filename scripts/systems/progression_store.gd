@@ -5,12 +5,14 @@ var hell_unlocked: bool = false
 var discovered_fusions: Array[String] = []
 var weapon_masteries: Dictionary = {}
 var class_wins: Array[String] = []
+var necrodent_debug_unlocked := false
 
 
 func load_from(path: String) -> void:
 	var config := ConfigFile.new()
 	var loaded := config.load(path) == OK
 	hell_unlocked = loaded and bool(config.get_value("difficulty", "hell_unlocked", false))
+	necrodent_debug_unlocked = loaded and bool(config.get_value("debug", "necrodent_unlocked", false))
 	discovered_fusions.clear()
 	weapon_masteries.clear()
 	class_wins.clear()
@@ -36,6 +38,7 @@ func save_to(path: String) -> Error:
 	config.set_value("dentipedia", "fusions", discovered_fusions)
 	config.set_value("mastery", "weapons", weapon_masteries.duplicate())
 	config.set_value("mastery", "classes", class_wins.duplicate())
+	config.set_value("debug", "necrodent_unlocked", necrodent_debug_unlocked)
 	var temporary := "%s.%d.tmp" % [path, OS.get_process_id()]
 	var error := config.save(temporary)
 	if error == OK:

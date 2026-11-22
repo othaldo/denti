@@ -331,6 +331,9 @@ func _physics_process(delta: float) -> void:
 	var before_move := global_position
 	contact_timer = maxf(contact_timer - delta, 0.0)
 	if active_special_attack == EnemyData.SpecialAttack.NONE:
+		var retinue := NecrodentSkills.for_player(target)
+		if retinue != null:
+			direction = global_position.direction_to(retinue.pursuit_destination(self, target.global_position))
 		global_position += direction * _movement_speed() * delta
 	else:
 		if special_phase == SpecialPhase.WARNING:
