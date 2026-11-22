@@ -2,6 +2,8 @@ extends "res://tests/support/test_runtime.gd"
 
 var game: Node2D
 var failures := 0
+## Enemy offsets are measured from this root anchor, where the weapon aims from.
+var origin := Vector2.ZERO
 
 
 func _initialize() -> void:
@@ -41,7 +43,7 @@ func _run() -> void:
 		_check(_grips(weapon) == grips, "grips moved away from their root positions during a shot")
 		_check(not game.element_impacts.events.is_empty(), "plain floss has no visible blood impact")
 		if double:
-			_check(distant.global_position.x > game.player.global_position.x + weapon.data.attack_range - 5, "double floss lost its outward knockback")
+			_check(distant.global_position.x > game.player.global_position.x + origin.x + weapon.data.attack_range - 5, "double floss lost its outward knockback")
 		# Both painted grips stay put throughout the complete cast in every aim direction.
 		for density in [1.0, WeaponLayout.density_scale(6)]:
 			weapon.visual_density = density
@@ -106,6 +108,7 @@ func _equip(id: StringName) -> WeaponInstance:
 	game.player.loadout.restore([{"id": str(id), "tier": 1}])
 	var weapon: WeaponInstance = game.player.loadout.equipped()[0]
 	weapon.set_physics_process(false)
+	origin = weapon.home_position
 	return weapon
 
 
@@ -126,7 +129,7 @@ func _check_connections(weapon: WeaponInstance) -> void:
 
 
 func _enemy(offset: Vector2) -> Enemy:
-	game._create_enemy(WaveController.PLAQUE, game.player.global_position + offset)
+	game._create_enemy(WaveController.PLAQUE, game.player.global_position + origin + offset)
 	var enemy: Enemy = game.get_node("Enemies").get_child(-1)
 	enemy.health = 10000
 	enemy.max_health = 10000

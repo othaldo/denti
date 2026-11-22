@@ -65,7 +65,10 @@ func _equip(extras: int = 0) -> WeaponInstance:
 
 
 func _enemy(offset: Vector2, health: float = 10000) -> Enemy:
-	game._create_enemy(WaveController.PLAQUE, game.player.global_position + offset)
+	# Offsets are measured from the equipped weapon's root anchor.
+	var weapons: Array[WeaponInstance] = game.player.loadout.equipped()
+	var origin := weapons[0].home_position if not weapons.is_empty() else Vector2.ZERO
+	game._create_enemy(WaveController.PLAQUE, game.player.global_position + origin + offset)
 	var enemy: Enemy = game.get_node("Enemies").get_child(-1)
 	enemy.set_simulation_enabled(false)
 	enemy.health = health

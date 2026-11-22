@@ -11,9 +11,10 @@ static func tick(strike: WeaponStrike, weapon: WeaponInstance, start: float, end
 	var candidates: Array[Enemy] = []
 	if strike.contact_hits == 0 and target_alive: candidates.append(target)
 	if strike.contact_limit > 1 or strike.contact_hits > 0 or not target_alive:
-		var nearby := weapon.player.nearby_enemies(weapon.player.global_position, weapon.data.range_at_tier(weapon.tier))
+		var origin := weapon.anchor_position()
+		var nearby := weapon.player.nearby_enemies(origin, weapon.data.range_at_tier(weapon.tier))
 		nearby.sort_custom(func(a: Enemy, b: Enemy):
-			return weapon.aim.dot(a.global_position - weapon.player.global_position) < weapon.aim.dot(b.global_position - weapon.player.global_position))
+			return weapon.aim.dot(a.global_position - origin) < weapon.aim.dot(b.global_position - origin))
 		for enemy in nearby:
 			if enemy != target or not target_alive: candidates.append(enemy)
 	var steps := maxi(ceili((end - start) / 0.025), 1)
@@ -26,12 +27,12 @@ static func tick(strike: WeaponStrike, weapon: WeaponInstance, start: float, end
 		for enemy in candidates:
 			if not is_instance_valid(enemy) or enemy.is_queued_for_deletion() or enemy.health <= 0: continue
 			if strike.hit_ids.has(enemy.get_instance_id()): continue
-			var offset := enemy.global_position - weapon.player.global_position
+			var offset := enemy.global_position - weapon.anchor_position()
 			if weapon.aim.dot(offset) < 0: continue
 			if strike.contact_hits == 0 and target_alive and enemy != target: continue
 			# Follow-up contacts only continue forward from the first actual impact.
 			if strike.contact_hits > 0 and weapon.aim.dot(enemy.global_position - strike.primary_contact) < 0: continue
-			if not WeaponAttackShapes.contains(weapon.data, weapon.tier, weapon.player.global_position, weapon.aim, enemy.global_position, enemy.data.radius): continue
+			if not WeaponAttackShapes.contains(weapon.data, weapon.tier, weapon.anchor_position(), weapon.aim, enemy.global_position, enemy.data.radius): continue
 			var closest := Geometry2D.get_closest_point_to_segment(enemy.global_position, grip, tip)
 			var radius := enemy.data.radius + weapon.data.attack_width * 0.5
 			if closest.distance_squared_to(enemy.global_position) > radius * radius: continue

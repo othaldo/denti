@@ -1,6 +1,8 @@
 extends "res://tests/support/test_runtime.gd"
 
 var game: Node2D
+## Enemy offsets are measured from this root anchor, where the weapon aims from.
+var origin := Vector2.ZERO
 
 
 func _initialize() -> void:
@@ -59,8 +61,7 @@ func _run() -> void:
 	along = _enemy(Vector2(450, 0))
 	side = _enemy(Vector2(0, 150))
 	var uv := _equip(&"uv_lamp")
-	# A piercing ray follows the offset barrel, not an invisible line from Denti.
-	uv.hold_position = WeaponMotion.hand_position(uv.home_position, Vector2.RIGHT)
+	# A piercing ray follows the barrel on its root, not an invisible line from Denti.
 	uv.attack_time = uv.attack_duration
 	uv.aim_at(front.global_position)
 	along.global_position = uv.muzzle_position() + uv.aim * 450
@@ -70,6 +71,8 @@ func _run() -> void:
 		_fail("UV did not pierce along the whole beam")
 		return
 	_clear()
+	# The two-root garrote sits between roots 0 and 1; place enemies around it.
+	origin = WeaponLayout.anchor(0, 2, game.player.loadout.capacity)
 	front = _enemy(Vector2(80, 0))
 	side = _enemy(Vector2(150, 10))
 	behind = _enemy(Vector2(-80, 0))
@@ -209,7 +212,7 @@ func _run() -> void:
 
 
 func _enemy(offset: Vector2) -> Enemy:
-	game._create_enemy(WaveController.PLAQUE, game.player.global_position + offset)
+	game._create_enemy(WaveController.PLAQUE, game.player.global_position + origin + offset)
 	var enemy: Enemy = game.get_node("Enemies").get_child(-1)
 	enemy.health = 10000.0
 	enemy.max_health = 10000.0

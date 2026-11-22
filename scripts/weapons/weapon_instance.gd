@@ -14,7 +14,11 @@ var attack_time: float = 0.0
 var attack_duration: float = 0.32
 var idle_time: float = 0.0
 var aim: Vector2 = Vector2.RIGHT
+## First of the neighbouring roots this weapon occupies; -1 until the loadout assigns one.
+var root_index: int = -1
+## Fixed grip anchor of the occupied roots, relative to Denti.
 var home_position: Vector2 = Vector2.ZERO
+## Kept equal to home_position; weapons no longer move along a lane around Denti.
 var hold_position: Vector2 = Vector2.ZERO
 var visual_density: float = 1.0
 var attack_phase: float = 0.0
@@ -84,9 +88,14 @@ func muzzle_position() -> Vector2:
 	return sprite.to_global(WeaponMotion.tip_local(data))
 
 
+## World position of the root anchor; targeting and reach are measured from here.
+func anchor_position() -> Vector2:
+	return player.global_position + home_position
+
+
 func aim_at(point: Vector2) -> void:
-	# Keep the hand lane stable, then align the real emission point with the target.
-	aim = (point - player.global_position - hold_position).normalized()
+	# Hold the grip on its root, then align the real emission point with the target.
+	aim = anchor_position().direction_to(point)
 	update_visual()
 	if data.held_style == "upright":
 		aim = muzzle_position().direction_to(point)
@@ -109,8 +118,7 @@ func _track_beam() -> void:
 func update_visual() -> void:
 	if sprite == null:
 		return
-	var home := home_position if WeaponMotion.is_contact(data) or attack_time <= 0.0 else hold_position
-	var pose_data := WeaponMotion.pose(data, tier, home, aim, progress(), idle_time, aim_distance, visual_density)
+	var pose_data := WeaponMotion.pose(data, tier, home_position, aim, progress(), idle_time, aim_distance, visual_density)
 	sprite.position = pose_data.position
 	sprite.rotation = pose_data.rotation
 	sprite.scale = pose_data.scale
@@ -118,8 +126,9 @@ func update_visual() -> void:
 		elastic.set_progress(progress())
 	if floss_cut != null:
 		floss_cut.set_pose(pose_data, progress(), idle_time, visual_density)
-	# Denti's face stays readable even when a rear hand thrusts across the body.
-	z_index = -1 if WeaponMotion.is_contact(data) or sprite.position.y < -12.0 else 1
+	# Denti's face stays readable even when a weapon aims across the body from its root.
+	var across := absf(home_position.x) > 12.0 and home_position.x * aim.x < 0.0
+	z_index = -1 if WeaponMotion.is_contact(data) or across or sprite.position.y < -12.0 else 1
 
 
 func _physics_process(delta: float) -> void:
@@ -142,7 +151,7 @@ func _physics_process(delta: float) -> void:
 	if evolution != null and evolution.charge_time > 0:
 		return
 	var reach := data.range_at_tier(tier)
-	var nearest := EnemySpatialIndex.nearest(get_tree(), player.enemy_index, player.global_position, reach, true, null, player.global_position + home_position)
+	var nearest := EnemySpatialIndex.nearest(get_tree(), player.enemy_index, anchor_position(), reach, true)
 	if nearest == null:
 		focus_target_id = 0
 		focus_hits = 0
@@ -167,7 +176,7 @@ func attack_interval() -> float:
 ## toward skill triggers, so skills cannot chain into themselves.
 func force_attack(boost: float, guaranteed_crit: bool = false) -> bool:
 	if attack_time > 0.0 or (evolution != null and evolution.charge_time > 0): return false
-	var nearest := EnemySpatialIndex.nearest(get_tree(), player.enemy_index, player.global_position, data.range_at_tier(tier), true, null, player.global_position + home_position)
+	var nearest := EnemySpatialIndex.nearest(get_tree(), player.enemy_index, anchor_position(), data.range_at_tier(tier), true)
 	if nearest == null: return false
 	skill_attack = true
 	skill_boost = boost
@@ -181,10 +190,9 @@ func force_attack(boost: float, guaranteed_crit: bool = false) -> bool:
 
 func _begin_attack(targets: Array[Enemy]) -> void:
 	var nearest := targets[0]
-	aim_distance = player.global_position.distance_to(nearest.global_position)
-	aim = player.global_position.direction_to(nearest.global_position)
-	if not WeaponMotion.is_contact(data):
-		hold_position = WeaponMotion.hand_position(home_position, aim)
+	aim_distance = anchor_position().distance_to(nearest.global_position)
+	aim = anchor_position().direction_to(nearest.global_position)
+	hold_position = home_position
 	hit_point = to_local(nearest.global_position)
 	beam_target_id = nearest.get_instance_id() if data.attack_mode in [&"beam", &"beam_line"] else 0
 	beam_tracking = beam_target_id != 0
@@ -301,9 +309,8 @@ func restore_motion(saved: Dictionary, enemies: Array[Node]) -> void:
 	var saved_point: Array = saved.get("hit_point", [0.0, 0.0])
 	if saved_point.size() == 2:
 		hit_point = Vector2(float(saved_point[0]), float(saved_point[1]))
-	var saved_hold: Array = saved.get("hold", [home_position.x, home_position.y])
-	if saved_hold.size() == 2:
-		hold_position = Vector2(float(saved_hold[0]), float(saved_hold[1]))
+	# Older saves stored an orbit lane in "hold"; the grip now stays on its root.
+	hold_position = home_position
 	idle_time = maxf(float(saved.get("idle_time", 0.0)), 0.0)
 	aim_distance = maxf(float(saved.get("aim_distance", 1000.0)), 0.0)
 	update_visual()

@@ -3,6 +3,8 @@ extends "res://tests/support/test_runtime.gd"
 
 var game: Node2D
 var failures: Array[String] = []
+## Enemy offsets are measured from the brush's root anchor.
+var origin := Vector2.ZERO
 
 func _initialize() -> void: call_deferred("_run")
 
@@ -12,7 +14,7 @@ func _check(ok: bool, message: String) -> void:
 	push_error(message)
 
 func _enemy(offset: Vector2, scaled_health := false) -> Enemy:
-	game._create_enemy(EnemyCatalog.BACTERIA, game.player.global_position + offset)
+	game._create_enemy(EnemyCatalog.BACTERIA, game.player.global_position + origin + offset)
 	var enemy: Enemy = game.get_node("Enemies").get_child(-1)
 	enemy.set_simulation_enabled(false)
 	if not scaled_health:
@@ -32,9 +34,10 @@ func _sweep(tier: int, direction: Vector2, density: float, element: StringName =
 	weapon.data = WeaponSkins.with_element(weapon.data, element)
 	if range_bonus > 0: weapon.data = WeaponRolls.resolve(weapon.data, {}, {"range": range_bonus})
 	weapon.visual_density = density
+	origin = weapon.home_position
 	var pose_data := WeaponMotion.pose(weapon.data, tier, weapon.home_position, direction, 0.47, 0, 35, density)
 	var blade := WeaponMotion.segment(weapon.data, pose_data)
-	_check(is_equal_approx(blade[1].length(), weapon.data.range_at_tier(tier)), "visible brush does not reach its advertised radius")
+	_check(is_equal_approx((blade[1] - weapon.home_position).length(), weapon.data.range_at_tier(tier)), "visible brush does not reach its advertised radius")
 	var near := _enemy(direction * 35)
 	var targets: Array[Enemy] = [near]
 	for index in 8:
@@ -61,6 +64,7 @@ func _resume() -> void:
 	game.player.loadout.restore([{"id": "interdental_brush", "tier": 4}])
 	var weapon: WeaponInstance = game.player.loadout.equipped()[0]
 	weapon.set_physics_process(false)
+	origin = weapon.home_position
 	for offset in [Vector2(35, 0), Vector2(-100, 0), Vector2(0, 100), Vector2(0, -100)]: _enemy(offset, true)
 	weapon._physics_process(0.001)
 	weapon._physics_process(weapon.attack_duration * 0.45)

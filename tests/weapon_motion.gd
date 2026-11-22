@@ -1,6 +1,8 @@
 extends "res://tests/support/test_runtime.gd"
 
 var game: Node2D
+## Enemy offsets are measured from this root anchor, where the weapon aims from.
+var origin := Vector2.ZERO
 
 func _initialize() -> void:
 	call_deferred("_run")
@@ -26,8 +28,8 @@ func _run() -> void:
 		var gun := _equip(&"water_jet")
 		gun._physics_process(0.01)
 		var bullet: WeaponProjectile = game.get_node("Projectiles").get_child(-1)
-		if bullet.global_position.distance_to(gun.muzzle_position()) > 0.01 or bullet.global_position.distance_to(game.player.global_position) < 30:
-			_fail("water fired from Denti instead of its nozzle")
+		if bullet.global_position.distance_to(gun.muzzle_position()) > 0.01 or bullet.global_position.distance_to(gun.anchor_position()) < 30:
+			_fail("water fired from its root instead of its nozzle")
 			return
 		if bullet.direction.dot(bullet.global_position.direction_to(enemy.global_position)) < 0.999:
 			_fail("barrel emission did not point at the target")
@@ -138,6 +140,8 @@ func _run() -> void:
 			for direction in [Vector2.RIGHT, Vector2.LEFT, Vector2.UP, Vector2.DOWN]:
 				for distance in [45.0, data.range_at_tier(tier)]:
 					_clear()
+					# Reach and close contact both count from the weapon's own root.
+					origin = WeaponLayout.anchor(0, data.hands, game.player.loadout.capacity)
 					var compact_target := _enemy(direction * distance)
 					var compact := _equip(id)
 					compact.tier = tier
@@ -163,7 +167,7 @@ func _equip(id: StringName) -> WeaponInstance:
 	return weapon
 
 func _enemy(offset: Vector2, use_scaled_health: bool = false) -> Enemy:
-	game._create_enemy(WaveController.PLAQUE, game.player.global_position + offset)
+	game._create_enemy(WaveController.PLAQUE, game.player.global_position + origin + offset)
 	var enemy: Enemy = game.get_node("Enemies").get_child(-1)
 	if not use_scaled_health:
 		enemy.health = 10000

@@ -3,7 +3,14 @@ extends Node2D
 
 const MAX_TIER := 4
 
-var stats: PlayerStats
+var stats: PlayerStats:
+	set(value):
+		if is_instance_valid(stats) and stats.root_capacity_changed.is_connected(refresh_roots):
+			stats.root_capacity_changed.disconnect(refresh_roots)
+		stats = value
+		# Root anchors form a ring sized by the capacity, so re-anchor on change.
+		if is_instance_valid(stats) and not stats.root_capacity_changed.is_connected(refresh_roots):
+			stats.root_capacity_changed.connect(refresh_roots)
 var capacity: int:
 	get: return stats.root_capacity if is_instance_valid(stats) else PlayerStats.DEFAULT_ROOT_CAPACITY
 
@@ -113,9 +120,11 @@ func commit_fusion(plan: WeaponFusionPlan, items: ItemInventory, points: WeaponU
 		partner.free()
 		selected.refresh_affix_stats()
 	else:
+		var root := selected.root_index
 		if partner != null: partner.free()
 		selected.free()
 		var evolved := _add(fresh.result_data, MAX_TIER, invested)
+		evolved.root_index = root
 		evolved.affixes.assign(inherited)
 		evolved.affix_slots = WeaponUpgrades.slots(MAX_TIER)
 		evolved.instance_uid = uid
@@ -253,6 +262,8 @@ func restore(saved: Array, enforce_capacity: bool = true) -> bool:
 			weapon.affixes = WeaponAffixes.sanitize(entry.get("affixes", []))
 			weapon.affix_slots = clampi(maxi(int(entry.get("affix_slots", 1)), weapon.affixes.size()), 1, WeaponAffixes.MAX_SLOTS)
 			weapon.instance_uid = str(entry.get("uid", weapon.instance_uid))
+			# Older saves have no root; they are packed in equipment order.
+			weapon.root_index = int(entry.get("root", -1))
 			weapon.refresh_affix_stats()
 	_refresh_positions()
 	return true
@@ -261,7 +272,7 @@ func restore(saved: Array, enforce_capacity: bool = true) -> bool:
 func save_data() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for weapon in equipped():
-		result.append({"id": str(weapon.data.id), "tier": weapon.tier, "invested_coins": weapon.invested_coins, "uid": weapon.instance_uid, "rolls": weapon.data.rolls.duplicate(true), "upgrades": weapon.data.chest_upgrades.duplicate(true), "affix_slots": weapon.affix_slots, "affixes": weapon.affixes.duplicate(true)})
+		result.append({"id": str(weapon.data.id), "tier": weapon.tier, "invested_coins": weapon.invested_coins, "uid": weapon.instance_uid, "rolls": weapon.data.rolls.duplicate(true), "upgrades": weapon.data.chest_upgrades.duplicate(true), "affix_slots": weapon.affix_slots, "affixes": weapon.affixes.duplicate(true), "root": weapon.root_index})
 	return result
 
 
@@ -355,18 +366,67 @@ func _refresh_positions() -> void:
 	var weapons := equipped()
 	# Prepare after every equipment change, including an in-place tier fusion.
 	prepare_projectile_visuals()
+	_assign_roots(weapons)
 	for index in weapons.size():
-		weapons[index].position = Vector2.ZERO
-		weapons[index].home_position = WeaponLayout.home(index, weapons.size())
-		weapons[index].visual_density = WeaponLayout.density_scale(weapons.size())
-		weapons[index].attack_phase = WeaponLayout.phase(index, weapons.size())
-		if not WeaponMotion.is_contact(weapons[index].data):
-			if weapons[index].focus_target_id == 0 and weapons[index].attack_time <= 0.0:
-				weapons[index].aim = Vector2.RIGHT if weapons[index].home_position.x > 0.0 else Vector2.LEFT
-			weapons[index].hold_position = WeaponMotion.hand_position(weapons[index].home_position, weapons[index].aim)
+		var weapon := weapons[index]
+		weapon.position = Vector2.ZERO
+		weapon.home_position = WeaponLayout.anchor(weapon.root_index, weapon.data.hands, capacity)
+		weapon.hold_position = weapon.home_position
+		weapon.visual_density = WeaponLayout.density_scale(weapons.size())
+		weapon.attack_phase = WeaponLayout.phase(index, weapons.size())
+		if not WeaponMotion.is_contact(weapon.data) and weapon.focus_target_id == 0 and weapon.attack_time <= 0.0:
+			weapon.aim = Vector2.RIGHT if weapon.home_position.x >= 0.0 else Vector2.LEFT
+		weapon.update_visual()
+
+
+## Re-anchors weapons after the root capacity changed.
+func refresh_roots() -> void:
+	_refresh_positions()
+
+
+## Every weapon keeps the roots it was given; selling or fusing never moves the
+## others. Only weapons without valid roots (new purchases, older saves or a
+## changed capacity) take the first free run of neighbouring roots.
+func _assign_roots(weapons: Array[WeaponInstance]) -> void:
+	var count := maxi(capacity, 1)
+	var taken: Array[bool] = []
+	taken.resize(count)
+	taken.fill(false)
+	var pending: Array[WeaponInstance] = []
+	for weapon in weapons:
+		if _roots_free(taken, weapon.root_index, weapon.data.hands):
+			_take_roots(taken, weapon.root_index, weapon.data.hands)
 		else:
-			weapons[index].hold_position = weapons[index].home_position
-		weapons[index].update_visual()
+			pending.append(weapon)
+	for weapon in pending:
+		var root := -1
+		for start in count:
+			if _roots_free(taken, start, weapon.data.hands):
+				root = start
+				break
+		if root < 0:
+			# Only a fragmented ring lands here: repack in equipment order.
+			var cursor := 0
+			for packed in weapons:
+				packed.root_index = cursor % count
+				cursor += packed.data.hands
+			return
+		weapon.root_index = root
+		_take_roots(taken, root, weapon.data.hands)
+
+
+func _roots_free(taken: Array[bool], root: int, hands: int) -> bool:
+	if root < 0 or root >= taken.size() or hands > taken.size():
+		return false
+	for offset in maxi(hands, 1):
+		if taken[(root + offset) % taken.size()]:
+			return false
+	return true
+
+
+func _take_roots(taken: Array[bool], root: int, hands: int) -> void:
+	for offset in maxi(hands, 1):
+		taken[(root + offset) % taken.size()] = true
 
 func prepare_projectile_visuals() -> void:
 	if get_parent() == null or get_parent().get_parent() == null:

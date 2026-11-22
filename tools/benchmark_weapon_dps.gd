@@ -80,7 +80,8 @@ func _measure(data: WeaponData, tier: int, scenario: String) -> Dictionary:
 	var angles: Array = [0.0, 12.0, -12.0, 24.0, -24.0] if scenario == "pack" else ([0.0, 0.0, 0.0, 0.0, 0.0] if scenario == "lane" else [0.0])
 	for index in angles.size():
 		var target_distance := data.range_at_tier(tier) * (0.25 + float(index) * 0.15) if scenario == "lane" else distance
-		var position: Vector2 = game.player.global_position + Vector2.RIGHT.rotated(deg_to_rad(angles[index])) * target_distance
+		# Distances count from the weapon's root anchor, where reach is measured.
+		var position: Vector2 = weapon.anchor_position() + Vector2.RIGHT.rotated(deg_to_rad(angles[index])) * target_distance
 		game._create_enemy(WaveController.BOSS if scenario == "boss" else WaveController.PLAQUE, position)
 		var enemy: Enemy = game.get_node("Enemies").get_child(-1)
 		enemy.damaged.disconnect(game._on_enemy_damaged)

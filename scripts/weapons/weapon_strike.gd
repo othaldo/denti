@@ -35,16 +35,16 @@ func tick(weapon: WeaponInstance, from_progress: float, to_progress: float) -> v
 		if is_instance_valid(target) and not target.is_queued_for_deletion():
 			candidates.append(target)
 	else:
-		candidates = weapon.player.nearby_enemies(weapon.player.global_position, weapon.data.range_at_tier(weapon.tier))
+		candidates = weapon.player.nearby_enemies(weapon.anchor_position(), weapon.data.range_at_tier(weapon.tier))
 	for enemy in candidates:
 		if enemy == null or enemy.health <= 0.0 or hit_ids.has(enemy.get_instance_id()):
 			continue
 		if weapon.data.attack_mode == &"melee" and enemy.get_instance_id() != target_id:
 			continue
 		if weapon.data.attack_animation == "floss_cut":
-			if weapon.aim.dot(enemy.global_position - weapon.player.global_position) >= 0:
+			if weapon.aim.dot(enemy.global_position - weapon.anchor_position()) >= 0:
 				enemies.append(enemy)
-		elif WeaponAttackShapes.contains(weapon.data, weapon.tier, weapon.player.global_position, weapon.aim, enemy.global_position, enemy.data.radius):
+		elif WeaponAttackShapes.contains(weapon.data, weapon.tier, weapon.anchor_position(), weapon.aim, enemy.global_position, enemy.data.radius):
 			enemies.append(enemy)
 	if enemies.is_empty():
 		return

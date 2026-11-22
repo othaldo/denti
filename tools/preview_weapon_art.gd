@@ -85,8 +85,6 @@ func _run() -> void:
 			camera.reset_smoothing()
 			var weapon: WeaponInstance = game.player.loadout.equipped()[0]
 			weapon.aim = direction
-			if not WeaponMotion.is_contact(weapon.data):
-				weapon.hold_position = WeaponMotion.hand_position(weapon.home_position, direction)
 			weapon.aim_distance = weapon.data.range_at_tier(1) * 0.72
 			weapon.attack_duration = weapon.data.animation_duration
 			weapon.attack_time = weapon.attack_duration * 0.53 if active else 0.0

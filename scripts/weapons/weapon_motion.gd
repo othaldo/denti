@@ -17,12 +17,6 @@ static func tip_local(data: WeaponData) -> Vector2:
 	return (data.tip_anchor - data.grip_anchor) * data.held_texture().get_size()
 
 
-static func hand_position(home: Vector2, direction: Vector2) -> Vector2:
-	# Keep distinct hands rather than collapsing the whole loadout toward its aim.
-	var lane := home.y * 0.55 + signf(home.x) * 30.0
-	return direction * 40.0 + direction.orthogonal() * lane
-
-
 static func pose(data: WeaponData, tier: int, home: Vector2, aim: Vector2, progress: float, idle_time: float, target_distance: float = INF, density: float = 1.0) -> Dictionary:
 	var active := progress >= 0.0
 	var side := -1.0 if aim.x < -0.02 else 1.0
@@ -41,9 +35,10 @@ static func pose(data: WeaponData, tier: int, home: Vector2, aim: Vector2, progr
 		scale.y *= side
 		rotation = aim.angle() - (tip_local(data) * scale).angle()
 		if not is_contact(data) and active:
-			var nozzle := home + aim * minf(24.0, maxf(target_distance - home.length() - 12.0, 8.0))
+			# The grip stays on its root; only the barrel reaches toward the target.
+			var nozzle := home + aim * minf(24.0, maxf(target_distance - 12.0, 8.0))
 			if data.attack_mode in [&"projectile", &"beam"]:
-				nozzle = home + aim * minf(42.0, maxf(target_distance - home.length() - 12.0, 8.0))
+				nozzle = home + aim * minf(42.0, maxf(target_distance - 12.0, 8.0))
 			grip = nozzle - (tip_local(data) * scale).rotated(rotation)
 	elif data.held_style == "upright":
 		scale.x *= side
@@ -83,16 +78,17 @@ static func pose(data: WeaponData, tier: int, home: Vector2, aim: Vector2, progr
 			# A short blade must not orbit outside a nearby target's body.
 			# Distant targets still use the full extension up to the weapon's range.
 			hand_distance = minf(hand_distance, maxf(target_distance - data.attack_width * 0.5, 12.0))
-		var attack_grip := Vector2.RIGHT.rotated(angle) * hand_distance
+		# Strikes leave from the weapon's root and return to it; reach counts from there.
+		var attack_grip := home + Vector2.RIGHT.rotated(angle) * hand_distance
 		if data.attack_animation in ["thrust", "drill", "polish"]:
-			attack_grip = aim * lerpf(12.0, hand_distance, extension)
+			attack_grip = home + aim * lerpf(12.0, hand_distance, extension)
 		rotation = angle - native_angle
 		if data.held_style == "aimed":
 			# Powered tools keep their handle below the working head while advancing.
 			scale.y *= side
 			rotation = angle - (tip_local(data) * scale).angle()
 			var head_distance := length + lerpf(12.0, hand_distance, extension)
-			attack_grip = aim * head_distance - (tip_local(data) * scale).rotated(rotation)
+			attack_grip = home + aim * head_distance - (tip_local(data) * scale).rotated(rotation)
 		var weight := clampf(progress / ACTIVE_START, 0.0, 1.0)
 		if progress > ACTIVE_END:
 			weight = 1.0 - (progress - ACTIVE_END) / (1.0 - ACTIVE_END)

@@ -119,20 +119,28 @@ wenn der passende Fusionspartner beziehungsweise alle Evolutionszutaten vorliege
 ## Haltung und Angriffe
 
 Alle 18 Waffen haben einen Griffpunkt und einen eigenen Abschuss- beziehungsweise
-Kontaktpunkt. Fernkampfgeschosse starten am Waffenkopf. Laufwaffen zielen aus einer
-Halteposition neben Denti und spiegeln beim Seitenwechsel; die Amalgam-Schleuder
-bleibt aufrecht. Ruhepositionen kreisen nicht automatisch um Denti.
+Kontaktpunkt. Fernkampfgeschosse starten am Waffenkopf.
+
+Die Wurzeln bilden ein festes n-Eck um Denti, n ist die Wurzelzahl der Klasse.
+Wurzel 1 liegt rechts, die weiteren folgen im Uhrzeigersinn; keine Ecke sitzt
+direkt über Dentis Kopf. Jede Waffe behält ihre Wurzel, auch wenn eine andere
+verkauft wird. Neue Waffen nehmen die erste freie Folge benachbarter Wurzeln.
+2-Wurzel-Waffen halten ihren Griff zwischen beiden Ecken. Der Griff bleibt am
+Anker: Laufwaffen drehen sich nur zum Ziel und spiegeln beim Seitenwechsel, die
+Amalgam-Schleuder bleibt aufrecht. Nahkampfwaffen stoßen oder schwingen vom Anker
+aus vor und kehren dorthin zurück. Spielstände speichern die Wurzel je Waffe;
+ältere Spielstände werden beim Laden lückenlos in Ausrüstungsreihenfolge belegt.
 
 `WeaponLayout` setzt gemeinsame Größenlimits (100 px Nahkampf, 76 px Fernkampf),
-seitliche Haltepunkte und eine zusätzliche Verkleinerung bis 12 % bei sechs Waffen.
+die Wurzelanker und eine zusätzliche Verkleinerung bis 12 % bei sechs Waffen.
 Die Limits gelten unabhängig von der Atlasauflösung; die individuellen Größen
 liegen in den Waffenressourcen. Linke Nahkampfwaffen ruhen nach außen gespiegelt
 und werden hinter Denti gezeichnet, damit sein Gesicht sichtbar bleibt.
 Angriffsanimation und Kontaktprüfung verwenden dieselbe Skalierung. Kleine
 Waffen erreichen weiterhin ihre volle Reichweite durch die Angriffsbewegung.
 
-Jede Waffe bevorzugt den Gegner, der ihrem eigenen Haltepunkt am nächsten liegt,
-innerhalb ihrer bisherigen Reichweite um Denti. Es gibt keine feste Reservierung
+Jede Waffe wählt den Gegner, der ihrer eigenen Wurzel am nächsten liegt.
+Reichweite, Kontaktprüfung und Fadenlänge zählen ebenfalls ab dieser Wurzel. Es gibt keine feste Reservierung
 von Gegnern: mehrere Waffen können einen einzelnen Gegner gemeinsam fokussieren.
 Beim ersten Kontakt beziehungsweise nach einer Angriffslücke werden die Starts
 über bis zu 75 % eines Angriffsintervalls verteilt. Anschließend bleibt das

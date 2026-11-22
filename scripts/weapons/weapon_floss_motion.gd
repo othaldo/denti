@@ -41,8 +41,9 @@ static func pose(data: WeaponData, tier: int, home: Vector2, aim: Vector2, progr
 		var side := 0.0 if grips.size() == 1 else (-0.5 if index == 0 else 0.5)
 		var tip := origin + Vector2.from_angle(heading) * 9
 		if progress >= 0:
-			var launch := aim * START_RADIUS + aim.orthogonal() * side * data.floss_strand_spacing
-			var maximum := aim * data.range_at_tier(tier) + aim.orthogonal() * side * data.floss_strand_spacing
+			# Strands leave from the root anchor; reach counts from there.
+			var launch := home + aim * START_RADIUS + aim.orthogonal() * side * data.floss_strand_spacing
+			var maximum := home + aim * data.range_at_tier(tier) + aim.orthogonal() * side * data.floss_strand_spacing
 			if progress < WeaponMotion.ACTIVE_START:
 				tip = tip.lerp(launch, smoothstep(0, WeaponMotion.ACTIVE_START, progress))
 			elif active:

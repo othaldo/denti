@@ -64,7 +64,8 @@ func _run() -> void:
 				var weapon: WeaponInstance = game.player.loadout.equipped()[0]
 				weapon.set_physics_process(false)
 				weapon.visual_density = density
-				var enemy := target(game.player.global_position + direction * minf(210, data.range_at_tier(4)))
+				# Reach counts from the weapon's root anchor.
+				var enemy := target(weapon.anchor_position() + direction * minf(210, data.range_at_tier(4)))
 				var targets: Array[Enemy] = [enemy]
 				weapon.aim = direction
 				weapon.update_visual()
