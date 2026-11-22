@@ -32,7 +32,6 @@ func _init() -> void:
 func configure(data: TalentNodeData, icon_texture: Texture2D) -> void:
 	node = data
 	texture = icon_texture
-	tooltip_text = data.display_name
 	queue_redraw()
 
 func set_binding(icon_texture: Texture2D) -> void:
@@ -59,17 +58,18 @@ func _draw() -> void:
 	var extent := minf(size.x, size.y)
 	var centre := size * 0.5
 	var locked := state == State.LOCKED
-	var fill := DentiUIStyle.RAISED if not locked else DentiUIStyle.PANEL
+	var quiet := locked and not (selected or has_focus() or is_hovered())
+	var fill := DentiUIStyle.RAISED if not quiet else DentiUIStyle.BACKGROUND
 	if is_hovered() and not locked: fill = fill.lightened(0.08)
 	var edge := _edge()
 	var width := 3.0 if state in [State.INVESTED, State.MAXED, State.AVAILABLE] else 2.0
 	if selected:
 		_shape(centre, extent * 0.5 + 5.0, Color.TRANSPARENT, DentiUIStyle.GOLD, 2.5)
-	_shape(centre, extent * 0.5, fill, edge, width)
-	var ink := DentiUIStyle.LINE if locked else DentiUIStyle.GOLD
+	_shape(centre, extent * 0.5, fill, edge.darkened(0.24) if quiet else edge, width)
+	var ink := DentiUIStyle.LINE.darkened(0.24) if quiet else (DentiUIStyle.MUTED if locked else DentiUIStyle.GOLD)
 	if texture != null:
 		var icon_extent := extent * _icon_share()
-		var tint := Color(0.70, 0.66, 0.75, 0.9) if locked else Color.WHITE
+		var tint := Color(0.66, 0.61, 0.70, 0.58) if quiet else Color.WHITE
 		draw_texture_rect(texture, Rect2(centre - Vector2.ONE * icon_extent * 0.5, Vector2.ONE * icon_extent), false, tint)
 		if bound: _root_mark(centre, extent, ink)
 	elif node.free_attribute:

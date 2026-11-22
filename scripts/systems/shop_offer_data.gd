@@ -4,6 +4,7 @@ extends Resource
 @export var id: StringName
 @export var display_name: String
 @export_multiline var description: String
+@export var card_summary: String
 @export_range(1, 5) var rarity_tier: int = 1
 @export_range(1, 4) var weapon_tier: int = 1
 @export var price: int = 3
@@ -24,6 +25,8 @@ func effect_text() -> String:
 
 
 func card_effect_text() -> String:
+	if not card_summary.is_empty():
+		return DentiAttributes.resolve_text(card_summary)
 	# Icon values already explain unconditional stats. Keep the first additional
 	# mechanic on the purchase card; the full description stays in hover/details.
 	var stat_clauses: PackedStringArray = []

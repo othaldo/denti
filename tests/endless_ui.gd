@@ -28,6 +28,13 @@ func _run() -> void:
 			if panel.buttons[3].visible != (state == 0) or panel.level_actions.visible:
 				_fail("endless continuation offered in the wrong outcome")
 				return
+			var primary := panel.buttons[3 if state == 0 else 0]
+			if not primary.has_focus() or primary.get_theme_stylebox("normal").bg_color != DentiUIStyle.GOLD:
+				_fail("run result does not focus its primary action")
+				return
+			if panel.subtitle_label.text.contains("freigeschaltet") or panel.subtitle_label.text.contains("Neu:"):
+				_fail("run statistics repeat the rewards from the notices")
+				return
 			var bounds := Rect2(Vector2.ZERO, Vector2(extent))
 			var dialog := panel.dialog_panel.get_global_rect()
 			if not bounds.encloses(dialog):

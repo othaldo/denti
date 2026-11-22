@@ -5,6 +5,7 @@ extends Control
 ## single branch and tabs. The reward stage scrolls when these cannot fit.
 
 signal node_pressed(id: StringName)
+signal node_previewed(id: StringName)
 signal branch_selected(branch: int)
 signal compact_changed(compact: bool)
 
@@ -67,8 +68,17 @@ func setup(new_tree: TalentTreeData, upgrades: Array[UpgradeData], detail_contro
 		var id := node.id
 		ControllerFocus.tag(button, "talent:node:%s" % id)
 		button.pressed.connect(func() -> void: node_pressed.emit(id))
+		button.mouse_entered.connect(_request_preview.bind(id, false))
+		button.mouse_exited.connect(_request_preview.bind(&"", false))
+		button.focus_entered.connect(_request_preview.bind(id, true))
+		button.focus_exited.connect(_request_preview.bind(&"", true))
 		add_child(button)
 		buttons[str(node.id)] = button
+
+func _request_preview(id: StringName, focus_event: bool) -> void:
+	if not is_visible_in_tree(): return
+	var navigation_active: bool = get_node("/root/GameInput").navigation_active
+	if focus_event == navigation_active: node_previewed.emit(id)
 
 static func _icon(node: TalentNodeData, upgrades: Array[UpgradeData]) -> Texture2D:
 	if node.free_attribute: return null

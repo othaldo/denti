@@ -137,6 +137,9 @@ func _run() -> void:
 	game.shop_panel.offer_buttons[0].grab_focus()
 	await _settle()
 	_check(bar.visible_height > ControllerActionBar.HEIGHT, "narrow shop shortcuts did not wrap into readable rows")
+	var offer: OfferCard = game.shop_panel.offer_buttons[0]
+	var shop_body: Rect2 = game.shop_panel.main_scroll.get_global_rect().grow(1)
+	_check(shop_body.encloses(offer.name_label.get_global_rect()) and shop_body.encloses(offer.price_label.get_global_rect()), "controller offers hide their name or price while focused")
 	var before_inspection: Rect2 = game.shop_panel.offer_buttons[0].get_global_rect()
 	game.shop_panel._select("offer", 0)
 	game.shop_panel.detail_buy_button.grab_focus()

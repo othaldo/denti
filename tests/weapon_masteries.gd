@@ -66,7 +66,7 @@ func _run() -> void:
 	session.load_progression()
 	_check(session.mastery_flags(&"turbo_drill") == 1, "exam did not survive account reload")
 	game._on_player_died()
-	_check(session.mastery_flags(&"turbo_drill") == 1 and game.choice_panel.subtitle_label.text.contains("Zahnprüfung"), "a later death removed the achievement or hid it in the recap")
+	_check(session.mastery_flags(&"turbo_drill") == 1, "a later death removed the achievement")
 	var death_notices: VBoxContainer = game.choice_panel.end_notices.notices
 	_check(death_notices.get_child_count() == 3, "death did not show the earned exam and both weapon unlocks")
 	# Victory tiers are cumulative, including a first win directly on Hell.
@@ -75,7 +75,7 @@ func _run() -> void:
 		game.wave.active = false
 		game.wave.current_wave = 20
 		game._finish_run()
-		_check(session.mastery_flags(&"water_jet") == pair[1] and game.choice_panel.subtitle_label.text.contains("Neu:"), "victory awarded the wrong cumulative medal tier")
+		_check(session.mastery_flags(&"water_jet") == pair[1], "victory awarded the wrong cumulative medal tier")
 		var victory_notices: VBoxContainer = game.choice_panel.end_notices.notices
 		_check(victory_notices.get_child_count() == game.weapon_mastery.earned.size() + game.weapon_mastery.unlocks.size(), "victory omitted newly earned seals or weapon unlocks")
 		var earned: Array[String] = game.weapon_mastery.earned.duplicate()

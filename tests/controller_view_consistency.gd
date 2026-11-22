@@ -306,6 +306,12 @@ func _run() -> void:
 		talent.present(talent_progress, game.player.stats, game.UPGRADES, 1)
 		await _settle()
 		_check(talent.view.button(free_node.id).has_focus(), "talent tree does not focus the restored node")
+		var next_node: TalentNodeData = talent.stats.class_data.talent_tree.nodes[0]
+		talent.view.button(next_node.id).grab_focus()
+		await _settle()
+		_check(talent.selected == free_node.id and talent.previewed == next_node.id and talent.buy_button.disabled and talent.detail_text.text.contains("→"), "focus does not preview the next talent without applying it")
+		talent.view.button(free_node.id).grab_focus()
+		await _settle()
 		var attribute: Button = talent.choice_row.get_child(1)
 		attribute.grab_focus()
 		var attribute_key := str(attribute.get_meta("controller_focus_key", ""))

@@ -77,7 +77,7 @@ Zu Beginn wählst du eine Startwaffe. Im Kampf sammelst du XP und Münzen. Errei
 
 ## Was schon spielbar ist
 
-Nach dem Sieg in Welle 20 kannst du **Endlos weiterspielen** wählen. Dein Sieg und Build bleiben erhalten; der Shop führt anschließend in Welle 21. Endloswellen dauern 60 Sekunden, Gegner und Preise steigen stärker, und Welle 30/40/... bringt zwei Bosse. Auch Endlosruns lassen sich speichern und fortsetzen. [Brotato-Vergleich, Balancekurve und Vorschau](docs/ENDLESS_MODE.md).
+Nach dem Sieg in Welle 20 kannst du **Fertig** oder **Endlos weiterspielen** wählen. Bei Endlos löst du zuerst die offenen Belohnungen ein. Danach führt der Shop in Welle 21. Dein Sieg und dein Build bleiben erhalten. Endloswellen dauern 60 Sekunden, Gegner und Preise steigen stärker, und Welle 30/40/... bringt zwei Bosse. Auch Endlosruns lassen sich speichern und fortsetzen. [Brotato-Vergleich, Balancekurve und Vorschau](docs/ENDLESS_MODE.md).
 
 Auf Normal fällt Gold in Welle 1–4 garantiert und sinkt bis Welle 20 auf 55 % Drop-Chance. Goldsonde und Goldextraktor ermöglichen wertvollere Drops; Level-up-Angebote lassen sich gegen Münzen neu würfeln. Wiederholte Rerolls werden zunehmend teurer: Ein normaler Shop beginnt bei 2/3/5/8/12 Münzen. XP bleibt unabhängig. Shoppreise steigen nach der Brotato-Kurve; gemerkte Angebote behalten ihren Preis. Economy und Messungen stehen in [ECONOMY_BALANCE.md](docs/ECONOMY_BALANCE.md).
 

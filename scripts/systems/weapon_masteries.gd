@@ -49,18 +49,6 @@ static func all_flags() -> int:
 	return result
 
 
-static func recap(saved: Dictionary) -> String:
-	var starter := StringName(str(saved.get("starter_id", "")))
-	if not valid_weapon(starter): return ""
-	var flags := 0
-	for id in saved.get("earned", []):
-		var definition := by_id(StringName(str(id)))
-		if definition != null: flags |= definition.flag
-	var ids := ids_for(flags)
-	if ids.is_empty(): return ""
-	return "Neu: %s · %s" % [by_id(StringName(ids[-1])).display_name, WeaponCatalog.by_id(starter).display_name]
-
-
 static func details(flags: int) -> String:
 	var lines: PackedStringArray = []
 	for definition in ALL:

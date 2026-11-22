@@ -266,7 +266,7 @@ func _show_starters(selected_id: StringName = &"") -> void:
 
 func _present_story(screen: StringName) -> void:
 	get_node("/root/SceneTransitions").present(screen)
-	run_flow.enter(RunFlow.Phase.STORY)
+	if not ended: run_flow.enter(RunFlow.Phase.STORY)
 	choice_panel.visible = false
 	shop_panel.visible = false
 	hud.visible = false
@@ -288,6 +288,10 @@ func _finish_story(next: StringName) -> void:
 	elif next == &"wave":
 		story.greeted_boss_wave = wave.current_wave + 1
 		_start_combat_wave()
+	elif next == &"restart":
+		_restart()
+	elif next == &"main_menu":
+		_on_end_main_menu()
 	else:
 		rewards.resolve_story()
 		_advance_post_wave_rewards()
@@ -1143,11 +1147,11 @@ func _on_endless_requested() -> void:
 		return
 	wave.endless_enabled = true
 	ended = false
-	rewards.final_wave = false
 	new_fusion_discoveries.clear()
 	choice_panel.visible = false
 	player.set_physics_process(true)
-	_open_shop()
+	rewards.continue_endless()
+	_advance_post_wave_rewards()
 
 
 func _open_shop() -> void:
@@ -1400,6 +1404,7 @@ func debug_start_wave(number: int) -> void:
 
 
 func _restart() -> void:
+	if _show_end_epilogue(&"restart"): return
 	session.clear_run()
 	get_tree().paused = false
 	if session.test_scenario_id != &"":
@@ -1410,8 +1415,17 @@ func _restart() -> void:
 
 
 func _on_end_main_menu() -> void:
+	if _show_end_epilogue(&"main_menu"): return
 	get_tree().paused = false
 	get_node("/root/SceneTransitions").change_scene("res://scenes/ui/game_menu.tscn")
+
+
+func _show_end_epilogue(next: StringName) -> bool:
+	if not ended or not base_victory or not story.enabled or rewards.pending_story == &"": return false
+	story.begin_dialogue(rewards.pending_story, next)
+	rewards.pending_story = &""
+	_show_story_line()
+	return true
 
 
 func _save_run(background: bool = false) -> void:

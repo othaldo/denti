@@ -31,16 +31,28 @@ func _check_widgets(extent: Vector2i, context: String) -> void:
 	var icon_width := minf(reroll.icon.get_width(), reroll.get_theme_constant("icon_max_width"))
 	var content_width := reroll.size.x - reroll.get_theme_stylebox("normal").get_minimum_size().x - icon_width - reroll.get_theme_constant("h_separation")
 	_check(reroll.text == str(game.shop.reroll_cost) and price_width <= content_width, "shop reroll price is clipped at %s: %s" % [extent, reroll.text])
-	if not ui.compact:
-		_check(ui.left_scroll.get_global_rect().encloses(ui.stat_grid.get_global_rect()), "stats exceed desktop build area: " + context)
-		_check(ui.main_scroll.get_global_rect().encloses(ui.offers_grid.get_global_rect()), "offers exceed desktop body: " + context)
+	if not ui.flow.vertical:
+		_check_column(ui.left_scroll, ui.stat_grid, "stats exceed desktop build area: " + context)
+		_check_column(ui.offer_scroll, ui.offers_grid, "offers exceed desktop offer area: " + context)
 	for card in ui.offer_buttons:
-		for control in [card.icon_rect, card.name_label, card.category_label, card.summary_row, card.effect_label, card.buy_button, card.reserve_button]:
+		for control in [card.icon_rect, card.name_label, card.category_label, card.summary_row, card.effect_label, card.buy_button, card.reserve_button, card.info_badge]:
 			if control.is_visible_in_tree():
 				_check(card.get_global_rect().encloses(control.get_global_rect()), "card widget exceeds its slot: %s %s" % [control, context])
+		if card.info_badge.is_visible_in_tree():
+			_check(not card.name_label.get_global_rect().intersects(card.info_badge.get_global_rect()), "details icon covers the offer name: " + context)
 		for label in [card.name_label, card.category_label, card.effect_label]:
 			if label.is_visible_in_tree() and not label.text.is_empty():
 				_check(label.size.y >= label.get_theme_font("font").get_height(label.get_theme_font_size("font_size")), "card text lost its visible height: %s %s" % [label, context])
+		if card.effect_label.is_visible_in_tree():
+			_check(card.effect_label.get_visible_line_count() == card.effect_label.get_line_count(), "shop cuts off its effect summary: " + context)
+
+
+func _check_column(scroll: ScrollContainer, content: Control, message: String) -> void:
+	var area := scroll.get_global_rect().grow(1)
+	var bar := scroll.get_v_scroll_bar()
+	area.position.y -= scroll.scroll_vertical
+	area.size.y += maxf(0, bar.max_value - bar.page)
+	_check(area.encloses(content.get_global_rect()), message)
 
 
 func _capture(extent: Vector2i, stage: String) -> void:
@@ -79,10 +91,13 @@ func _run() -> void:
 		await _settle()
 		var panel: Control = ui.get_node("Root/Center/Panel")
 		_check_widgets(extent, "empty inventory")
+		var offers_viewport := (ui.main_scroll if ui.flow.vertical else ui.offer_scroll).get_global_rect()
+		_check(offers_viewport.encloses(ui.offer_buttons[0].name_label.get_global_rect()) and offers_viewport.encloses(ui.offer_buttons[0].price_label.get_global_rect()), "shop opens before its first offer is readable at %s" % extent)
 		await _capture(extent, "before")
 		var before := panel.get_global_rect()
 		var footer := ui.shop_actions.get_global_rect()
 		var main := ui.main_scroll.get_global_rect()
+		var purchase := ui.offer_buttons[0].buy_button.get_global_rect()
 		for index in [1, 2, 3]:
 			ui.offer_buttons[index].buy_button.pressed.emit()
 			_check(game.shop.offers[index] == null, "purchase fixture did not buy the offer")
@@ -91,6 +106,9 @@ func _run() -> void:
 				_check(panel.get_global_rect().is_equal_approx(before), "purchase changed shop bounds at %s: %s -> %s" % [extent, before, panel.get_global_rect()])
 				_check(ui.shop_actions.get_global_rect().is_equal_approx(footer), "purchase changed footer bounds at %s" % extent)
 				_check(ui.main_scroll.get_global_rect().is_equal_approx(main), "purchase changed main viewport at %s" % extent)
+				if extent.x >= 1000:
+					var current := ui.offer_buttons[0].buy_button.get_global_rect()
+					_check(current.is_equal_approx(purchase), "purchase moved a neighboring buy button at %s: %s to %s" % [extent, purchase, current])
 			_check(Rect2(Vector2.ZERO, Vector2(extent)).encloses(panel.get_global_rect()), "shop escaped viewport after purchase at %s" % extent)
 			_check(footer.encloses(ui.continue_button.get_global_rect()) and footer.encloses(ui.items_scroll.get_global_rect()), "footer contents escaped their slot at %s" % extent)
 		_check_widgets(extent, "after purchases")

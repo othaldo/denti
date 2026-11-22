@@ -111,7 +111,7 @@ func _input(event: InputEvent) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if visible and ControllerFocus.active($Root) and mode == &"credits" and event.is_action_pressed("ui_cancel"):
-		_display_end()
+		_display_end(true)
 		get_viewport().set_input_as_handled()
 		return
 	if visible and ControllerFocus.active($Root) and mode == &"upgrade" and event.is_action_pressed("ui_reroll") and not reroll_button.disabled:
@@ -192,6 +192,7 @@ func _update_layout() -> void:
 	if mode == &"end":
 		subtitle_label.text = _end_summary(end_won, end_coins, end_recap, compact)
 		var labels := ["Neuer Run", "Credits", "Hauptmenü", "Endlos"] if compact else ["Noch einmal spielen", "Credits", "Hauptmenü", "Endlos weiterspielen"]
+		if end_won: labels[2] = "Fertig"
 		for index in buttons.size():
 			buttons[index].custom_minimum_size = Vector2(0, 40 if compact else 48)
 			buttons[index].add_theme_font_size_override("font_size", 14 if compact else 18)
@@ -273,20 +274,26 @@ func show_end(won: bool, coins: int, recap: Dictionary = {}) -> void:
 	_display_end()
 
 
-func _display_end() -> void:
+func _display_end(from_credits := false) -> void:
 	_use_legacy(&"end")
 	current_upgrades.clear()
 	title_label.text = "Endlos beendet!" if not end_won and bool(end_recap.get("endless_enabled", false)) else ("Alle huldigen Denti!" if end_won else "Denti ist ausgefallen!")
-	buttons[0].show_action("Noch einmal spielen", true)
+	var can_continue := end_won and not bool(end_recap.get("endless_enabled", false)) and int(end_recap.get("wave_reached", 0)) == WaveController.MAX_WAVES
+	buttons[0].show_action("Noch einmal spielen", not can_continue)
 	buttons[1].show_action("Credits")
+	MenuStyle.quiet(buttons[1])
 	buttons[2].show_action("Hauptmenü")
 	buttons[3].show_action("Endlos weiterspielen", true)
 	for index in 3: buttons[index].show()
-	buttons[3].visible = end_won and not bool(end_recap.get("endless_enabled", false)) and int(end_recap.get("wave_reached", 0)) == WaveController.MAX_WAVES
+	buttons[3].visible = can_continue
 	buttons[3].tooltip_text = "Mit diesem Build in Welle 21 weiterspielen. Dein Sieg bleibt erhalten."
+	cards.move_child(buttons[3], 0)
+	cards.move_child(buttons[0], 1)
+	cards.move_child(buttons[2], 2)
+	cards.move_child(buttons[1], 3)
 	_update_layout()
 	visible = true
-	buttons[0].grab_focus()
+	buttons[1 if from_credits else (3 if can_continue else 0)].grab_focus()
 
 func _on_choice_pressed(index: int) -> void:
 	match mode:
@@ -310,11 +317,10 @@ func _on_choice_pressed(index: int) -> void:
 			elif index == 1: _show_credits()
 			elif index == 2: main_menu_requested.emit()
 			elif index == 3 and buttons[3].visible: endless_requested.emit()
-		&"credits": _display_end()
+		&"credits": _display_end(true)
 
 
 func _end_summary(won: bool, coins: int, recap: Dictionary, compact: bool) -> String:
-	var mastery_line := WeaponMasteries.recap(recap.get("weapon_mastery", {}))
 	var run: Dictionary = recap.get("telemetry", {})
 	if run.is_empty():
 		return "Run beendet · %d Münzen übrig" % coins
@@ -323,7 +329,7 @@ func _end_summary(won: bool, coins: int, recap: Dictionary, compact: bool) -> St
 	var seconds := elapsed % 60
 	var outcome := "Sieg" if won or bool(recap.get("base_victory", false)) else "Niederlage"
 	if compact:
-		return "%s · %s\nWelle %d · Level %d · %02d:%02d\n%d Kills · %d Münzen übrig%s" % [outcome, DifficultyCatalog.by_id(StringName(str(recap.get("difficulty_id", "normal")))).display_name, int(recap.get("wave_reached", 0)), int(recap.get("final_level", 1)), minutes, seconds, int(run.get("kills", 0)), coins, ("\nSieg in Welle 20 bleibt erhalten." if bool(recap.get("endless_enabled", false)) else "") + ("\n" + mastery_line if not mastery_line.is_empty() else "")]
+		return "%s · %s\nWelle %d · Level %d · %02d:%02d\n%d Kills · %d Münzen übrig%s" % [outcome, DifficultyCatalog.by_id(StringName(str(recap.get("difficulty_id", "normal")))).display_name, int(recap.get("wave_reached", 0)), int(recap.get("final_level", 1)), minutes, seconds, int(run.get("kills", 0)), coins, "\nSieg in Welle 20 bleibt erhalten." if bool(recap.get("endless_enabled", false)) else ""]
 	var lines: PackedStringArray = [
 		"%s auf %s · Welle %d · Level %d · %02d:%02d Minuten" % [outcome, DifficultyCatalog.by_id(StringName(str(recap.get("difficulty_id", "normal")))).display_name, int(recap.get("wave_reached", 0)), int(recap.get("final_level", 1)), minutes, seconds],
 		"%s Gegner besiegt · %s Bosse · %s Gesamtschaden" % [
@@ -334,8 +340,6 @@ func _end_summary(won: bool, coins: int, recap: Dictionary, compact: bool) -> St
 		"Upgrade-Kapseln: %d gefunden · %d behalten · %d zerlegt" % [
 			int(run.get("chests_found", 0)), int(run.get("chests_kept", 0)), int(run.get("chests_scrapped", 0))],
 	]
-	if bool(recap.get("hell_unlocked_now", false)):
-		lines.append("Hell freigeschaltet!")
 	var weapon_damage: Dictionary = run.get("weapon_damage", {})
 	var weapon_total := 0.0
 	for amount in weapon_damage.values():
@@ -358,7 +362,6 @@ func _end_summary(won: bool, coins: int, recap: Dictionary, compact: bool) -> St
 		for id in proc_ids.slice(0, mini(2, proc_ids.size())):
 			proc_lines.append("%s %s" % [_proc_name(StringName(str(id))), _format_number(roundi(float(proc_damage[id])))])
 		lines.append("Synergien · " + " · ".join(proc_lines))
-	if not mastery_line.is_empty(): lines.append(mastery_line)
 	return "\n".join(lines)
 
 

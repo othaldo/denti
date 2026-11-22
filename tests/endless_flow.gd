@@ -8,6 +8,7 @@ func _run() -> void:
 	session.save_path = "user://test_endless_flow.json"
 	session.report_dir = "user://test_endless_reports"
 	session.resume_requested = false
+	session.pending_talent_run = true
 	session.clear_run()
 	change_scene_to_file("res://scenes/game/game.tscn")
 	await process_frame
@@ -22,23 +23,36 @@ func _run() -> void:
 	game.items.acquire(ShopController.by_id(&"gold_probe"))
 	game._award_xp(5)
 	game.rewards.queue_chest(&"metal_crown", 4)
+	game.rewards.weapon_upgrades.points = 4
 	game._on_wave_finished(20)
-	if game.ended or game.choice_panel.mode != &"upgrade":
-		_fail("victory skipped pending levels")
+	if not game.ended or not game.base_victory or game.choice_panel.mode != &"end" or not game.choice_panel.buttons[3].visible or game.choice_panel.buttons[2].text != "Fertig" or session.has_run():
+		_fail("normal victory did not immediately offer Endless or Finish")
 		return
-	choose_panel(game.choice_panel, 0)
-	if game.choice_panel.mode != &"chest" or game.ended:
-		_fail("victory skipped pending chest rewards")
-		return
-	choose_panel(game.choice_panel, 0)
-	if not game.ended or not game.base_victory or not game.choice_panel.buttons[3].visible or session.has_run():
-		_fail("normal victory did not offer an optional endless continuation")
+	if game.talent_panel.visible or game.weapon_enchantment_panel.visible or game.rewards.pending_levels != 1 or game.rewards.pending_chests.size() != 1:
+		_fail("victory resolved rewards before the player chose to continue")
 		return
 	var stats_before: Dictionary = game.player.stats.to_save_data()
 	var weapons_before: Array[Dictionary] = game.player.loadout.save_data()
 	choose_panel(game.choice_panel, 3)
-	if game.ended or not game.wave.endless_enabled or not game.in_shop or game.coins != 100 or game.wave.current_wave != 20 or game.player.stats.to_save_data() != stats_before or game.player.loadout.save_data() != weapons_before:
-		_fail("entering endless changed the completed build or skipped the wave 20 shop")
+	if game.ended or not game.wave.endless_enabled or not game.talent_panel.visible or game.in_shop or game.coins != 100 or game.wave.current_wave != 20 or game.player.stats.to_save_data() != stats_before or game.player.loadout.save_data() != weapons_before or not session.has_run():
+		_fail("Endless did not save and open the queued talent choice before the shop")
+		return
+	game = await _resume(session)
+	if not game.talent_panel.visible or not game.wave.endless_enabled or not game.base_victory or game.rewards.pending_levels != 1 or game.rewards.pending_chests.size() != 1:
+		_fail("resume lost the rewards deferred until Endless")
+		return
+	game._on_talent_requested(game.talent_panel.selected)
+	game._on_talents_completed()
+	if game.choice_panel.mode != &"chest" or not game.choice_panel.visible or game.in_shop:
+		_fail("chest choice did not follow the talents")
+		return
+	choose_panel(game.choice_panel, 0)
+	if not game.weapon_enchantment_panel.visible or game.in_shop:
+		_fail("weapon upgrades did not follow the chest")
+		return
+	game._on_weapon_upgrades_completed()
+	if not game.in_shop or game.rewards.pending_levels != 0 or not game.rewards.pending_chests.is_empty():
+		_fail("the wave-20 shop did not wait for the deferred reward queue")
 		return
 	game._on_shop_continue()
 	if not game.wave.active or game.wave.current_wave != 21 or game.wave.duration != 60.0 or game.rewards.pending_levels != 0:
@@ -54,6 +68,7 @@ func _run() -> void:
 	await process_frame
 	game.wave.current_wave = 29
 	game.rewards.begin_wave()
+	game.rewards.weapon_upgrades.points = 0
 	game.telemetry.begin_wave(30)
 	game.wave.start_next_wave()
 	game.wave.boss_rewards.paid = true # This scenario supplies its own exact seven-coin reward.

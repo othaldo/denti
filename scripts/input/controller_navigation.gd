@@ -173,16 +173,20 @@ func _scroll(delta: float) -> void:
 	var parent: Node = get_viewport().gui_get_focus_owner()
 	var target: ScrollContainer
 	while parent != null and ControllerFocus.contains(scope, parent as Control):
-		if parent is ScrollContainer:
+		if parent is ScrollContainer and _can_scroll(parent):
 			target = parent
 			break
 		parent = parent.get_parent()
 	if target == null:
 		for candidate: ScrollContainer in scope.find_children("*", "ScrollContainer", true, false):
-			if ControllerFocus.visible(candidate) and candidate.get_v_scroll_bar().max_value > candidate.get_v_scroll_bar().page:
+			if ControllerFocus.visible(candidate) and _can_scroll(candidate):
 				target = candidate
 				break
 	if target != null: target.scroll_vertical += roundi(amount * SCROLL_SPEED * delta)
+
+func _can_scroll(container: ScrollContainer) -> bool:
+	var bar := container.get_v_scroll_bar()
+	return container.vertical_scroll_mode != ScrollContainer.SCROLL_MODE_DISABLED and bar.max_value > bar.page
 
 func popup_open() -> bool:
 	var focus := get_viewport().gui_get_focus_owner()

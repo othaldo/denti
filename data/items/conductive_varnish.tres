@@ -8,6 +8,7 @@ icon_index = 3
 icon_texture = ExtResource("2")
 display_name = "Leitlack"
 description = "Nasse Gegner: +18 % Wasser-, Licht- und Elektro-Verzauberungsschaden, längere Nassdauer und größere Kettenreichweite. -3 % Bewegung."
+card_summary = "Bei Nässe +18 % Schaden durch Wasser-, Licht- und Elektro-Verzauberungen."
 rarity_tier = 2
 price = 9
 stat_changes = { &"speed_bonus": -3.0 }

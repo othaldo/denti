@@ -118,16 +118,21 @@ func _run() -> void:
 		if game.choice_panel.visible:
 			break
 		await physics_frame
-	if game.ended or game.coins != 7 or game.rewards.pending_levels != 1 or game.rewards.pending_chests.size() != 1 or game.choice_panel.mode != &"upgrade":
-		_fail("final rewards did not wait for all drops before victory")
+	if not game.ended or game.coins != 7 or game.rewards.pending_levels != 1 or game.rewards.pending_chests.size() != 1 or game.choice_panel.mode != &"end":
+		_fail("final boss did not show victory with the collected loot and unresolved rewards")
+		return
+	choose_panel(game.choice_panel, 3)
+	if game.ended or game.choice_panel.mode != &"upgrade":
+		_fail("Endless did not open the deferred legacy level-up")
 		return
 	choose_panel(game.choice_panel, 0)
 	if game.ended or game.choice_panel.mode != &"chest":
 		_fail("final chest choice did not follow the level-up")
 		return
 	choose_panel(game.choice_panel, 1)
-	if not game.ended or game.coins != 10 or game.choice_panel.mode != &"end":
-		_fail("final chest scrap did not finish before victory")
+	if game.weapon_enchantment_panel.visible: game._on_weapon_upgrades_completed()
+	if not game.in_shop or game.ended or game.coins != 10:
+		_fail("final chest scrap did not finish before the Endless shop")
 		return
 	paused = false
 	session.clear_run()

@@ -152,8 +152,12 @@ func _run() -> void:
 	game._clear_arena(false)
 	await process_frame
 	game.rewards.earn_level()
+	var victory_seed: Dictionary = game.RUN_SNAPSHOT.capture(game)
 	game._begin_loot_collection()
-	if not _check(not game.ended and game.rewards.step == PostWaveRewards.Step.LEVELS, "finale skipped final rewards"):
+	if not _check(game.ended and game.base_victory and game.choice_panel.mode == &"end" and not game.story_dialogue.visible and not session.has_run(), "Story did not show victory before rewards or epilogue"):
+		return
+	game._on_endless_requested()
+	if not _check(not game.ended and game.rewards.step == PostWaveRewards.Step.LEVELS, "Endless did not open the final rewards"):
 		return
 	choose_panel(game.choice_panel, 0)
 	if game.rewards.step == PostWaveRewards.Step.WEAPONS:
@@ -161,12 +165,11 @@ func _run() -> void:
 			return
 		game._on_weapon_upgrades_completed()
 		await process_frame
-	if not _check(game.story.dialogue_id == &"finale" and not game.ended, "victory appeared before epilogue"):
+	if not _check(game.story.dialogue_id == &"finale" and not game.ended, "Endless skipped the epilogue after rewards"):
 		return
 	_finish_dialogue(game)
-	if not _check(game.ended and game.base_victory and not session.has_run(), "story did not finish after epilogue"):
+	if not _check(game.in_shop and game.base_victory and session.has_run(), "Story Endless did not reach the shop after the epilogue"):
 		return
-	game._on_endless_requested()
 	game._on_shop_continue()
 	if not _check(game.wave.current_wave == 21 and game.story.completed_boss_wave == 20 and not game.story_dialogue.visible, "endless replayed story"):
 		return
@@ -184,13 +187,18 @@ func _run() -> void:
 	game._restore_run(old)
 	if not _check(not game.story.enabled and game.arena.floor_texture == DentiArena.FLOOR, "old save was silently converted to story"):
 		return
-	paused = false
-	game.queue_free()
-	await process_frame
-	session.clear_run()
-	var menu: GameMenu = load("res://scenes/ui/game_menu.tscn").instantiate()
-	root.add_child(menu)
-	current_scene = menu
+	game._restore_run(victory_seed)
+	game._begin_loot_collection()
+	choose_panel(game.choice_panel, 2)
+	if not _check(game.ended and game.story_dialogue.visible and game.story.dialogue_id == &"finale" and game.rewards.pending_levels == 1 and not session.has_run(), "Finish applied rewards or skipped the epilogue"):
+		return
+	_finish_dialogue(game)
+	for frame in 90:
+		if current_scene is GameMenu: break
+		await process_frame
+	var menu := current_scene as GameMenu
+	if not _check(menu != null and not session.has_run(), "Finish did not return to the menu after the epilogue"):
+		return
 	var story_button: Button = menu.actions.get(&"story")
 	if not _check(story_button != null, "main menu lacks story entry"):
 		return

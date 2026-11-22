@@ -179,7 +179,7 @@ func refresh() -> void:
 
 
 func _refresh() -> void:
-	if stage == null: return
+	if stage == null or not is_inside_tree() or not visible: return
 	count_label.text = _balance_text()
 	back_button.text = "Zurück" if picking_slot >= 0 else "Rückgängig"
 	back_button.disabled = picking_slot < 0 and state.actions.is_empty()

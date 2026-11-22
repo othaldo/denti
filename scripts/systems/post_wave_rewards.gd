@@ -97,6 +97,14 @@ func begin_collection() -> void:
 func finish_collection(is_final: bool) -> void:
 	final_wave = is_final
 	_update_choice_total()
+	if final_wave:
+		step = Step.END
+		return
+	_advance()
+
+
+func continue_endless() -> void:
+	final_wave = false
 	_advance()
 
 

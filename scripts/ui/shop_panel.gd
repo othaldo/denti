@@ -58,7 +58,7 @@ var selected_uid: int = 0
 var compact := false
 var dense_layout := false
 var layout_queued := false
-var card_layout_profile := Vector3i(-1, -1, -1)
+var card_layout_profile: Array[bool] = []
 var offer_column: VBoxContainer
 var offer_scroll: ScrollContainer
 var stat_grid: GridContainer
@@ -200,20 +200,19 @@ func _update_layout() -> void:
 	for chip in stat_chips:
 		chip.custom_minimum_size.y = 30 if short or dense_layout else 34
 	amalgam_chip.custom_minimum_size.y = 30 if short or dense_layout else 34
-	# The PC action row leaves less vertical space. Scroll only when the actual
-	# build needs it (e.g. an extra Amalgam row), rather than using a tall cutoff.
-	wide = wide and left_scroll.get_child(0).get_combined_minimum_size().y <= body_height
-	compact = not wide
 	flow.vertical = not side_by_side
+	flow.move_child(offer_scroll, 1 if side_by_side else 0)
 	details.heading.add_theme_font_size_override("font_size", 17 if narrow else 21)
 	details.icon.custom_minimum_size = Vector2(32, 40) if extent.x < 420 else Vector2(64, 64)
 	left_scroll.custom_minimum_size.x = 280 if side_by_side else 0
 	left_scroll.size_flags_horizontal = Control.SIZE_FILL if side_by_side else Control.SIZE_EXPAND_FILL
-	left_scroll.size_flags_vertical = Control.SIZE_SHRINK_BEGIN if compact else Control.SIZE_EXPAND_FILL
-	offer_scroll.size_flags_vertical = Control.SIZE_SHRINK_BEGIN if compact else Control.SIZE_EXPAND_FILL
-	main_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO if compact else ScrollContainer.SCROLL_MODE_SHOW_NEVER
-	left_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO if wide else ScrollContainer.SCROLL_MODE_DISABLED
-	offer_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	left_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL if side_by_side else Control.SIZE_SHRINK_BEGIN
+	offer_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL if side_by_side else Control.SIZE_SHRINK_BEGIN
+	# Keep overflow in its own column on desktop so changing the build or an
+	# offer cannot redistribute the height of the neighboring buy buttons.
+	main_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED if side_by_side else ScrollContainer.SCROLL_MODE_AUTO
+	left_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_RESERVE if side_by_side else ScrollContainer.SCROLL_MODE_DISABLED
+	offer_scroll.vertical_scroll_mode = left_scroll.vertical_scroll_mode
 	offers_grid.columns = 4 if side_by_side else (2 if extent.x >= 600 else 1)
 	offers_section.size_flags_vertical = Control.SIZE_SHRINK_BEGIN if compact else Control.SIZE_EXPAND_FILL
 	offers_grid.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
@@ -232,13 +231,15 @@ func _update_layout() -> void:
 		DentiUIMotion.bind_action(button)
 		button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	var large_icons := wide and not dense_layout and extent.x >= 1500
-	var profile := Vector3i(int(dense_layout), int(not side_by_side), int(large_icons))
+	var compact_cards := extent.x < 1150 or body_height < DESKTOP_MIN_BODY_HEIGHT
+	var inline_actions := not side_by_side and (extent.x >= 760 or (extent.x >= 480 and extent.x < 600))
+	var profile: Array[bool] = [dense_layout, compact_cards, large_icons, inline_actions, side_by_side]
 	# Unchanged profiles must preserve fitted text slots across purchases/rerolls.
 	if profile != card_layout_profile:
 		card_layout_profile = profile
 		for card in offer_buttons:
 			card.size_flags_vertical = Control.SIZE_EXPAND_FILL
-			card.set_catalog_layout(true, dense_layout, not side_by_side)
+			card.set_catalog_layout(true, dense_layout, compact_cards, inline_actions, side_by_side)
 			if large_icons:
 				card.icon_rect.custom_minimum_size = Vector2(152, 152)
 	_layout_inventory()
@@ -258,7 +259,7 @@ func _refresh_header() -> void:
 
 func _size_offer_grid() -> void:
 	if offers_grid != null and is_inside_tree() and not is_queued_for_deletion():
-		offers_grid.custom_minimum_size.y = 0.0 if compact else minf(MAX_OFFER_HEIGHT, _available_body_height())
+		offers_grid.custom_minimum_size.y = 0.0 if flow.vertical else minf(MAX_OFFER_HEIGHT, _available_body_height())
 
 
 func _available_body_height() -> float:

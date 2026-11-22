@@ -17,6 +17,7 @@ var upgrades: Array[UpgradeData] = []
 var count := 0
 var tab := "talent"
 var selected: StringName
+var previewed: StringName
 var stage: RewardStage
 var view: TalentTreeView
 var details: PanelContainer
@@ -41,7 +42,9 @@ func _ready() -> void:
 	stage.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	view = TalentTreeView.new()
 	view.node_pressed.connect(_on_node_pressed)
+	view.node_previewed.connect(_preview_node)
 	view.branch_selected.connect(func(_branch: int) -> void:
+		_preview_node(&"")
 		view.update_state(view.ranks, view.points, stage.keyboard_focus))
 	view.compact_changed.connect(_on_compact_changed)
 	details = PanelContainer.new()
@@ -107,6 +110,7 @@ func present(progress: TalentProgression, context: PlayerStats, templates: Array
 	count = pending
 	tab = "talent"
 	selected = StringName(str(state.cursor.get("id", "")))
+	previewed = &""
 	view.setup(stats.class_data.talent_tree, upgrades, details)
 	if stats.class_data.talent_tree.by_id(selected) == null: selected = _default_selection()
 	var node := stats.class_data.talent_tree.by_id(selected)
@@ -146,6 +150,7 @@ func _pick_free(key: StringName) -> void:
 
 func _select(id: StringName) -> void:
 	selected = id
+	previewed = &""
 	var node := stats.class_data.talent_tree.by_id(id)
 	if node != null and view.compact and node.branch != view.focus_branch:
 		view.focus_branch = node.branch
@@ -154,6 +159,12 @@ func _select(id: StringName) -> void:
 	refresh()
 	var focused := view.button(id)
 	if focused != null and focused.visible: focused.grab_focus()
+
+func _preview_node(id: StringName) -> void:
+	var next := &"" if id == selected else id
+	if not is_instance_valid(stats) or previewed == next: return
+	previewed = next
+	_refresh_detail(state.draft_ranks())
 
 func _save_cursor() -> void:
 	state.cursor = {"tab": "talent", "id": str(selected)}
@@ -198,27 +209,30 @@ func refresh() -> void:
 
 func _refresh_detail(ranks: Dictionary) -> void:
 	var tree := stats.class_data.talent_tree
-	var node := tree.by_id(selected)
+	var id := previewed if previewed != &"" else selected
+	var inspecting := id != selected
+	var node := tree.by_id(id)
 	details.visible = node != null
 	if node == null: return
 	var rank := int(ranks.get(str(node.id), 0))
-	var reason := state.reason(selected, stats, upgrades, count)
+	var reason := state.reason(id, stats, upgrades, count)
 	var preview := state.preview_stats(stats, upgrades)
 	if node.free_attribute:
 		var binding := state.bound_stat(node.id)
 		var options := state.free_choices(stats, upgrades, node)
-		if binding != &"": free_stat = binding
-		elif free_stat not in options and not options.is_empty(): free_stat = options[0]
-		var picked := state.stat_choice(free_stat, stats, upgrades) if free_stat in options else null
-		var picked_template := TalentProgression.template_for(upgrades, free_stat)
+		var attribute := binding if binding != &"" else free_stat
+		if attribute not in options and not options.is_empty(): attribute = options[0]
+		if not inspecting: free_stat = attribute
+		var picked := state.stat_choice(attribute, stats, upgrades) if attribute in options else null
+		var picked_template := TalentProgression.template_for(upgrades, attribute)
 		var stat_name := picked_template.display_name if picked_template != null else ""
 		detail_title.text = stat_name if binding != &"" else ("Freie Wurzel · %s" % stat_name if not stat_name.is_empty() else "Freie Wurzel")
 		detail_kind.text = "%s · %s · Rang %d/%d" % ["Gebundene Wurzel" if binding != &"" else "Freie Wurzel", tree.branches[node.branch], rank, node.max_ranks]
 		detail_text.text = (picked.effect_text() + "\n" + DentiAttributes.upgrade_preview_text(preview, DentiAttributes.from_key(picked.stat), picked.amount)) if picked != null else ""
-		if binding == &"" and free_stat != &"":
+		if binding == &"" and attribute != &"":
 			detail_text.text += "\nDer erste Punkt bindet diese Wurzel."
-		if free_stat != &"":
-			var bund := state.bund_count(free_stat) + (0 if binding != &"" else 1)
+		if attribute != &"":
+			var bund := state.bund_count(attribute) + (0 if binding != &"" else 1)
 			detail_text.text += "\nWurzelbund %d/%d" % [mini(bund, TalentProgression.BUND_SIZE), TalentProgression.BUND_SIZE]
 	elif node.is_attribute():
 		var template := TalentProgression.template_for(upgrades, node.stat)
@@ -234,12 +248,13 @@ func _refresh_detail(ranks: Dictionary) -> void:
 		if reason.is_empty():
 			for key in node.stat_changes:
 				detail_text.text += "\n" + DentiAttributes.upgrade_preview_text(preview, DentiAttributes.from_key(StringName(key)), float(node.stat_changes[key]))
-	_build_choices(node)
+	if inspecting: choice_row.hide()
+	else: _build_choices(node)
 	preview.free()
 	detail_reason.text = reason
 	detail_reason.visible = not detail_reason.text.is_empty()
 	buy_button.text = "Skillen" if node.cost == 1 else "Skillen · %d" % node.cost
-	buy_button.disabled = not reason.is_empty()
+	buy_button.disabled = inspecting or not reason.is_empty()
 
 ## Free nodes: one icon per class-usable attribute; spent attributes at their cap are disabled.
 func _build_choices(node: TalentNodeData) -> void:

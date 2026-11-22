@@ -32,17 +32,20 @@ var category_label: Label
 var stat_font_size := 17
 var secondary_font_size := 14
 var compact_catalog := false
+var aligned_catalog := true
 var fit_queued := false
+var shown_offer: ShopOfferData
 
-func set_catalog_layout(vertical: bool, dense: bool = false, compact_grid: bool = false) -> void:
+func set_catalog_layout(vertical: bool, dense: bool = false, compact_grid: bool = false, inline_actions: bool = false, aligned_columns: bool = true) -> void:
 	compact_catalog = compact_grid
+	aligned_catalog = aligned_columns
 	content.vertical = vertical
 	action_box.vertical = not vertical
 	action_spacer.visible = vertical
 	action_box.size_flags_vertical = Control.SIZE_SHRINK_END
 	info_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	info_box.alignment = BoxContainer.ALIGNMENT_BEGIN
-	catalog_header.visible = false
+	_place_catalog_parts(inline_actions)
 	var action_height := 44.0
 	buy_button.custom_minimum_size = Vector2(80, action_height)
 	reserve_button.custom_minimum_size = Vector2(action_height, action_height)
@@ -50,11 +53,12 @@ func set_catalog_layout(vertical: bool, dense: bool = false, compact_grid: bool 
 	reserve_button.size_flags_horizontal = Control.SIZE_SHRINK_END
 	buy_button.size_flags_vertical = Control.SIZE_SHRINK_END
 	reserve_button.size_flags_vertical = Control.SIZE_SHRINK_END
-	catalog_minimum_height = 272.0 if compact_grid else (356.0 if dense else 436.0)
+	catalog_minimum_height = (104.0 if inline_actions else 132.0) if compact_grid else (356.0 if dense else 436.0)
 	custom_minimum_size.y = catalog_minimum_height
-	icon_rect.custom_minimum_size = Vector2(88, 88) if dense or compact_grid else Vector2(112, 112)
+	icon_rect.custom_minimum_size = Vector2(40, 40) if compact_grid else (Vector2(88, 88) if dense else Vector2(112, 112))
 	icon_rect.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	name_label.add_theme_font_size_override("font_size", 18 if compact_grid else (17 if dense else 20))
+	icon_rect.size_flags_vertical = Control.SIZE_SHRINK_CENTER if compact_grid else Control.SIZE_FILL
+	name_label.add_theme_font_size_override("font_size", 17 if dense else (18 if compact_grid else 20))
 	effect_label.add_theme_font_size_override("font_size", 13 if dense else 14)
 	stat_font_size = 14 if dense else 17
 	secondary_font_size = 13 if dense else 14
@@ -66,23 +70,68 @@ func set_catalog_layout(vertical: bool, dense: bool = false, compact_grid: bool 
 					child.add_theme_font_size_override("font_size", stat_font_size if bool(cell.get_meta("primary", true)) else secondary_font_size)
 	# Desktop cards reserve common text slots; compact rows remove empty fields.
 	name_label.custom_minimum_size.y = 2.0 * ceilf(name_label.get_theme_font("font").get_height(name_label.get_theme_font_size("font_size"))) + name_label.get_theme_constant("line_spacing")
-	effect_label.custom_minimum_size.y = (2.0 if dense else 3.0) * ceilf(effect_label.get_theme_font("font").get_height(effect_label.get_theme_font_size("font_size")))
+	effect_label.custom_minimum_size.y = 2.0 * ceilf(effect_label.get_theme_font("font").get_height(effect_label.get_theme_font_size("font_size")))
 	name_label.vertical_alignment = VERTICAL_ALIGNMENT_TOP
-	catalog_header.custom_minimum_size.y = name_label.custom_minimum_size.y if dense else 0.0
-	effect_label.max_lines_visible = 2 if dense else 3
+	effect_label.max_lines_visible = -1
 	info_box.add_theme_constant_override("separation", 6 if compact_grid or dense else 8)
 	content.add_theme_constant_override("separation", 6 if compact_grid or dense else 8)
 	action_box.add_theme_constant_override("separation", 4)
 	if summary_row != null:
 		summary_row.custom_minimum_size.y = 56 if dense else 60
 	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	effect_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	effect_label.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
 	for edge in ["left", "right"]:
 		card_margin.add_theme_constant_override("margin_" + edge, 10 if dense else 14)
 	for edge in ["top", "bottom"]:
-		card_margin.add_theme_constant_override("margin_" + edge, 10 if dense or compact_grid else 16)
+		card_margin.add_theme_constant_override("margin_" + edge, 6 if compact_grid else (10 if dense else 16))
+	_update_catalog_title()
 	_sync_catalog_slots()
+	_queue_fit()
 
+func _place_catalog_parts(inline_actions: bool) -> void:
+	if compact_catalog:
+		_move_part(icon_rect, catalog_header, 0)
+		_move_part(name_label, catalog_header, 1)
+		_move_part(action_box, catalog_header if inline_actions else content, 2 if inline_actions else 1)
+		_move_part(info_badge, catalog_header, 3)
+		name_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		action_box.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		action_spacer.visible = not inline_actions
+	else:
+		_move_part(icon_rect, content, 1)
+		_move_part(name_label, info_box, 0)
+		_move_part(action_box, content, content.get_child_count())
+		name_label.size_flags_vertical = Control.SIZE_FILL
+		if info_badge.get_parent() != self:
+			info_badge.reparent(self, false)
+			_position_info_badge()
+	catalog_header.visible = compact_catalog
+	info_badge.visible = selection_only and shown_offer != null and not inline_actions
+
+func _move_part(part: Control, parent: Container, index: int) -> void:
+	if part.get_parent() != parent: part.reparent(parent)
+	parent.move_child(part, mini(index, parent.get_child_count() - 1))
+
+func _position_info_badge() -> void:
+	info_badge.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	info_badge.offset_left = -32
+	info_badge.offset_right = -12
+	info_badge.offset_top = 10
+	info_badge.offset_bottom = 30
+
+
+func _update_catalog_title() -> void:
+	if shown_offer == null: return
+	var weapon := shown_offer.weapon_data
+	name_label.text = shown_offer.display_name
+	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if compact_catalog or weapon == null else TextServer.AUTOWRAP_OFF
+	category_label.text = ""
+	if weapon != null:
+		var tier := WeaponPresentation.tier_text(weapon, shown_offer.weapon_tier)
+		var category := "%s\n%s · %s" % [weapon.scaling_label(), weapon.roots_text(), weapon.damage_type_label()]
+		if compact_catalog: category = "%s · %s · %s\n%s" % [tier, weapon.roots_text(), weapon.damage_type_label(), weapon.scaling_label()]
+		else: name_label.text += "\n" + tier
+		category_label.text = category
 
 
 func _ready() -> void:
@@ -123,6 +172,7 @@ func controller_actions() -> Dictionary:
 
 
 func show_offer(offer: ShopOfferData, coins: int, available: bool = true, _owned_count: int = 0, dps: float = 0.0) -> void:
+	shown_offer = offer
 	if offer == null:
 		content.visible = false
 		info_badge.visible = false
@@ -132,17 +182,15 @@ func show_offer(offer: ShopOfferData, coins: int, available: bool = true, _owned
 		DentiUIStyle.style_button(self)
 		return
 	content.visible = true
-	info_badge.visible = selection_only
+	info_badge.visible = selection_only and action_box.get_parent() != catalog_header
 	text = ""
 	icon_rect.texture = offer.weapon_data.sprite if offer.weapon_data != null else (offer.icon_texture if offer.icon_texture != null else ICONS.item(offer.icon_index))
-	name_label.text = offer.display_name + ("\n" + WeaponPresentation.tier_text(offer.weapon_data, offer.weapon_tier) if offer.weapon_data != null else "")
-	name_label.autowrap_mode = TextServer.AUTOWRAP_OFF if offer.weapon_data != null else TextServer.AUTOWRAP_WORD_SMART
+	_update_catalog_title()
 	rarity_label.text = "%s" % DentiRarity.name_for(offer.rarity_tier)
 	if offer.weapon_data != null:
 		rarity_label.text += " · %s\n%s" % [["I", "II", "III", "IV"][offer.weapon_tier - 1], offer.weapon_data.damage_type_label().to_upper()]
 	rarity_label.visible = false
 	category_label.visible = selection_only
-	category_label.text = "%s\n%s · %s" % [offer.weapon_data.scaling_label(), offer.weapon_data.roots_text(), offer.weapon_data.damage_type_label()] if offer.weapon_data != null else ""
 	category_label.tooltip_text = offer.weapon_data.scaling_description() if offer.weapon_data != null else ""
 	effect_label.text = offer.weapon_data.stats_text(offer.weapon_tier) if offer.weapon_data != null else offer.effect_text()
 	_show_summary(offer)
@@ -202,8 +250,8 @@ func _queue_fit() -> void:
 
 func _fit_content() -> void:
 	fit_queued = false
-	if selection_only:
-		if compact_catalog:
+	if selection_only and shown_offer != null:
+		if not aligned_catalog:
 			# Clipped labels report no automatic height. Reserve exactly their
 			# visible wrapped lines rather than a blank two-line slot on each item.
 			var line_height := ceilf(name_label.get_theme_font("font").get_height(name_label.get_theme_font_size("font_size")))
@@ -218,16 +266,15 @@ func _sync_catalog_slots() -> void:
 		return
 	# Desktop columns share text baselines. Compact rows use only the fields
 	# present on the offer; empty metadata/stats must not create vertical gaps.
-	category_label.visible = not compact_catalog or not category_label.text.is_empty()
-	effect_label.visible = not compact_catalog or not effect_label.text.is_empty()
-	if compact_catalog:
+	category_label.visible = aligned_catalog or not category_label.text.is_empty()
+	effect_label.visible = aligned_catalog or not effect_label.text.is_empty()
+	if not aligned_catalog:
 		name_label.custom_minimum_size.y = ceilf(name_label.get_theme_font("font").get_height(name_label.get_theme_font_size("font_size")))
 		category_label.custom_minimum_size.y = 0
 		effect_label.custom_minimum_size.y = 0
-		effect_label.max_lines_visible = 2
 	if summary_row != null:
-		summary_row.visible = not compact_catalog or summary_row.get_child_count() > 0
-		if compact_catalog:
+		summary_row.visible = aligned_catalog or summary_row.get_child_count() > 0
+		if not aligned_catalog:
 			summary_row.custom_minimum_size.y = 0
 
 
@@ -246,12 +293,10 @@ func _build_content() -> void:
 	info.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	info.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	info.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	info.custom_minimum_size = Vector2(18, 18)
+	info.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	add_child(info)
-	info.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
-	info.offset_left = -32
-	info.offset_right = -12
-	info.offset_top = 10
-	info.offset_bottom = 30
+	_position_info_badge()
 	card_margin = MarginContainer.new()
 	card_margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	card_margin.add_theme_constant_override("margin_left", 13)
@@ -411,7 +456,7 @@ func _show_summary(offer: ShopOfferData) -> void:
 
 
 func show_weapon_values(data: WeaponData, tier: int, player: Player) -> void:
-	effect_label.text = WeaponPresentation.card_effect(data, tier)
+	effect_label.text = WeaponPresentation.card_effect(data, tier).get_slice("\n", 0)
 	for child in summary_row.get_children():
 		summary_row.remove_child(child)
 		child.queue_free()
