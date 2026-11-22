@@ -40,6 +40,11 @@ const SKIN_TICK := 0.5
 const SKIN_BURN := 8.0
 const SKIN_HEAL_CAP := 3
 const DASH_HEAT := 15.0
+## Vulkanherz: heat kept per nova kill, capped so it never erupts on its own.
+const VOLCANO_HEAT := 10.0
+const VOLCANO_CAP := 60.0
+## Glutzange: share of a weapon hit added as burn while overheated.
+const TONGS_BURN := 0.4
 const EMBER := Color(1.0, 0.5, 0.18)
 const HOT := Color(1.0, 0.25, 0.15)
 const CORE_STYLE: SkillCloudStyle = preload("res://data/vfx/skill_clouds/ember.tres")
@@ -96,6 +101,9 @@ func erupt(strength: float, overheats: bool) -> void:
 		while cores.size() > 3: cores.pop_front()
 	if power("core_sparks") > 0.0: _sparks(amount * SPARK_SHARE)
 	heat = 0.0
+	if relic(&"ember_volcano_heart"):
+		var kills := targets.filter(func(enemy: Enemy) -> bool: return enemy.health <= 0.0).size()
+		heat = minf(kills * VOLCANO_HEAT, VOLCANO_CAP)
 	if overheats: overheat = overheat_seconds()
 	flash(at, radius, EMBER)
 	ElementImpactBatch.emit_from(player, &"fire", at, Vector2.RIGHT, radius, true)
@@ -111,8 +119,12 @@ func _sparks(amount: float) -> void:
 		beam(player.global_position, enemy.global_position, EMBER, 2.5)
 		count += 1
 
-func on_weapon_hit(_enemy: Enemy, _weapon: WeaponData, dealt: float) -> void:
-	if not active() or dealt <= 0.0 or hit_heat_window >= HIT_HEAT_CAP: return
+func on_weapon_hit(enemy: Enemy, _weapon: WeaponData, dealt: float) -> void:
+	if not active() or dealt <= 0.0: return
+	if overheat > 0.0 and relic(&"ember_tongs") and enemy.health > 0.0:
+		var burn: Array[Dictionary] = [{"id": "fire", "damage": dealt * TONGS_BURN, "proc_id": "ember_tongs"}]
+		enemy.take_damage(0, null, false, &"ember_tongs", burn)
+	if hit_heat_window >= HIT_HEAT_CAP: return
 	hit_heat_window += HIT_HEAT
 	add_heat(HIT_HEAT)
 

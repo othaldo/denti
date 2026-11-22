@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/relic_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"fairy_crescent"
+display_name = "Mondsichel"
+description = "Kritische Lichtsplitter entladen sich in einem Lichtkreis und treffen Gegner daneben mit halbem Schaden."
+tags = Array[StringName]([&"crit", &"luck"])
+class_id = &"tooth_fairy"
+talent_icon = 65

@@ -32,6 +32,9 @@ func active() -> bool:
 func power(id: String) -> float:
 	return player.class_combat.power(id) if player != null else 0.0
 
+func relic(id: StringName) -> bool:
+	return player != null and player.has_class_relic(id)
+
 func items() -> ItemInventory:
 	return player.items
 

@@ -95,7 +95,7 @@ func _run() -> void:
 		load("res://data/upgrades/glanz.tres").with_tier(3),
 		load("res://data/upgrades/fernschaden.tres").with_tier(4),
 	]
-	var relics: Array[RelicData] = [RelicCatalog.CATALOG[0], RelicCatalog.CATALOG[1], RelicCatalog.CATALOG[2]]
+	var relics: Array[RelicData] = [RelicCatalog.CATALOG[0], RelicCatalog.CATALOG[1], RelicCatalog.CATALOG[2], RelicCatalog.CATALOG[3]]
 	game.player.loadout.restore([
 		{"id": "magic_toothbrush", "tier": 4, "affix_slots": 2, "affixes": [{"id": "fire", "rarity": 3, "damage": 14}, {"id": "ice", "rarity": 2, "damage": 7}]},
 		{"id": "uv_lamp", "tier": 3}, {"id": "turbo_drill", "tier": 2}, {"id": "prophylaxis_polisher", "tier": 1},

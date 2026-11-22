@@ -149,6 +149,11 @@ static func stat(index: int) -> Texture2D:
 	return _framed_region(STAT_ATLAS, STAT_REGIONS[clampi(index, 0, STAT_REGIONS.size() - 1)], STAT_FRAME_SIZE)
 
 
+static func relic_icon(relic: RelicData) -> Texture2D:
+	if relic.talent_icon >= 0: return talent(relic.talent_icon)
+	return relic(relic.icon_index)
+
+
 static func relic(index: int) -> Texture2D:
 	if index == 5: return _poison_icon(2)
 	return _region(RELIC_ATLAS, clampi(index, 0, 4), 3, 2)

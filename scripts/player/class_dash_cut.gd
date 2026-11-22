@@ -145,6 +145,7 @@ func _enemies_in(trail: Dictionary) -> Array[Enemy]:
 func _field_tick(trail: Dictionary) -> void:
 	var share := rules().trail_field_share
 	var slows := power("trail_nerve") > 0.0 or player.items.power(&"poison_nerve") > 0.0
+	var exposes := player.has_class_relic(&"assassin_nightshade")
 	var touched := 0
 	for enemy in _enemies_in(trail):
 		if not enemy.is_targetable() or enemy.data.is_boss and enemy.boss_phase_timer > 0: continue
@@ -152,11 +153,16 @@ func _field_tick(trail: Dictionary) -> void:
 		player.assassin_skills.mark(enemy)
 		enemy.take_damage(0, null, false, PROC_ID, additions)
 		touched += 1
+		# Nachtschatten: lasts until the next field tick.
+		if exposes and enemy.health > 0.0: player.assassin_skills.expose(enemy, nightshade_seconds())
 		if slows and enemy.affix_effects.depot.nerve_lock <= 0:
 			enemy.affix_effects.depot.nerve_time = PoisonDepotState.RULES.nerve_duration
 			enemy.queue_redraw()
 	if touched > 0:
 		player.items.enchantment_support.emit(&"class_trail_field_ticks", touched)
+
+func nightshade_seconds() -> float:
+	return rules().trail_field_interval + 0.1
 
 func _cross_burst(at: Vector2, factor: float) -> void:
 	for enemy in player.nearby_enemies(at, rules().trail_cross_radius):
