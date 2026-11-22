@@ -2,9 +2,14 @@ class_name ClassCatalog
 extends RefCounted
 
 const DEFAULT: PlayerClassData = preload("res://data/classes/good_old_molar.tres")
+const NECRODENT_ID := &"necrodent"
+const MASTERY_CLASSES: Array[StringName] = [
+	&"good_old_molar", &"assassin", &"tooth_fairy", &"ember", &"rinser", &"frost_warden",
+]
 static var profiles: Array[PlayerClassData] = [DEFAULT, preload("res://data/classes/assassin.tres"),
 	preload("res://data/classes/tooth_fairy.tres"), preload("res://data/classes/ember.tres"),
-	preload("res://data/classes/rinser.tres"), preload("res://data/classes/frost_warden.tres")]
+	preload("res://data/classes/rinser.tres"), preload("res://data/classes/frost_warden.tres"),
+	preload("res://data/classes/necrodent.tres")]
 
 static func by_id(id: StringName) -> PlayerClassData:
 	for profile in profiles:

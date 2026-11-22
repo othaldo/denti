@@ -30,6 +30,7 @@ var style_box: VBoxContainer
 var skills_title: Label
 var skills: HFlowContainer
 var keyboard_focus := false
+@onready var session: Node = get_node("/root/GameSession")
 
 func _ready() -> void:
 	gallery_scroll = ScrollContainer.new()
@@ -43,10 +44,14 @@ func _ready() -> void:
 	for profile in ClassCatalog.profiles:
 		var button := RunSetupChoice.new()
 		button.tooltip_text = profile.display_name
-		button.set_meta("controller_details", func() -> void: details_requested.emit(profile.display_name, DentipediaData.class_body(profile)))
+		button.set_meta("controller_details", func() -> void: _show_class_details(profile))
 		gallery.add_child(button)
 		button.show_artwork(profile.portrait)
+		if profile.id == ClassCatalog.NECRODENT_ID: _add_unlock_progress(button)
 		button.pressed.connect(func() -> void:
+			if not session.class_unlocked(profile.id):
+				_show_class_details(profile)
+				return
 			selected_id = profile.id
 			refresh()
 			DentiUIMotion.reveal(preview)
@@ -88,17 +93,58 @@ func _label(parent: Node, font_size: int) -> Label:
 	parent.add_child(label)
 	return label
 
+func _add_unlock_progress(button: RunSetupChoice) -> void:
+	var progress := PanelContainer.new()
+	progress.name = "UnlockProgress"
+	progress.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	progress.add_theme_stylebox_override("panel", MenuStyle.box(DentiUIStyle.PANEL, DentiUIStyle.LINE, 8, 1))
+	button.add_child(progress)
+	progress.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	progress.offset_left = -51.0
+	progress.offset_top = -28.0
+	progress.offset_right = -6.0
+	progress.offset_bottom = -6.0
+	var row := HBoxContainer.new()
+	row.name = "ProgressRow"
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	progress.add_child(row)
+	var lock := TextureRect.new()
+	lock.texture = preload("res://assets/ui/setup_lock.svg")
+	lock.custom_minimum_size = Vector2(12, 12)
+	lock.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	lock.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	lock.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(lock)
+	var count := _label(row, 12)
+	count.name = "Count"
+	count.autowrap_mode = TextServer.AUTOWRAP_OFF
+
+
 func profile() -> PlayerClassData:
 	return ClassCatalog.by_id(selected_id) if ClassCatalog.by_id(selected_id) != null else ClassCatalog.DEFAULT
+
+func _show_class_details(data: PlayerClassData) -> void:
+	if session.class_unlocked(data.id):
+		details_requested.emit(data.display_name, DentipediaData.class_body(data))
+		return
+	var missing: PackedStringArray = []
+	for id in ClassCatalog.MASTERY_CLASSES:
+		if str(id) not in session.progression_data.class_wins:
+			missing.append(ClassCatalog.by_id(id).display_name)
+	details_requested.emit("Die dritten Zähne", "Besiege Welle 20 auf Hard oder Hell mit jeder dieser Klassen.\n\nOffen · " + ", ".join(missing))
+
 
 ## Facts derived from the class data, never duplicated as free text.
 static func fact_rows(data: PlayerClassData) -> Array[Dictionary]:
 	var dash := data.dash_config()
 	var health := 100.0 + float(data.starting_stats.get("max_health", 0.0))
 	var dashes := maxi(floori(dash.capacity / maxf(dash.cost, 1.0)), 1)
+	var allowed := "Kontaktwaffen" if not data.allowed_weapon_roles.is_empty() else "Alle Waffen"
+	if data.exclusive_weapon_id != &"": allowed = WeaponCatalog.by_id(data.exclusive_weapon_id).display_name
 	return [
-		{"icon": null, "text": "%d Wurzeln" % data.root_capacity, "tip": "Ausrüstungsplätze für Waffen"},
-		{"icon": DentiUIIcons.stat(8 if not data.allowed_weapon_roles.is_empty() else 0), "text": "Kontaktwaffen" if not data.allowed_weapon_roles.is_empty() else "Alle Waffen", "tip": "Erlaubte Waffen"},
+		{"icon": null, "text": "%d %s" % [data.root_capacity, "Wurzel" if data.root_capacity == 1 else "Wurzeln"], "tip": "Ausrüstungsplätze für Waffen"},
+		{"icon": DentiUIIcons.stat(8 if not data.allowed_weapon_roles.is_empty() else 0), "text": allowed, "tip": "Erlaubte Waffen"},
 		{"icon": DentiUIIcons.stat(2), "text": "%d Schmelz" % roundi(health), "tip": "Startleben"},
 		{"icon": DentiUIIcons.stat(11), "text": "%d %s" % [dashes, "Dash" if dashes == 1 else "Dashes"], "tip": "Dashes aus vollem Vorrat"},
 	]
@@ -114,10 +160,18 @@ func refresh() -> void:
 	keyboard_focus = get_node("/root/GameInput").navigation_active
 	for index in buttons.size():
 		var choice: RunSetupChoice = buttons[index]
-		choice.selected = ClassCatalog.profiles[index].id == selected_id
+		var entry := ClassCatalog.profiles[index]
+		var unlocked: bool = session.class_unlocked(entry.id)
+		choice.selected = entry.id == selected_id
 		choice.keyboard_focus = keyboard_focus
+		choice.artwork.modulate.a = 1.0 if unlocked else 0.45
+		var progress := choice.get_node_or_null("UnlockProgress") as Control
+		if progress != null:
+			progress.visible = not unlocked
+			var count: Label = progress.get_node("ProgressRow/Count")
+			count.text = "%d/%d" % [session.progression_data.class_wins.size(), ClassCatalog.MASTERY_CLASSES.size()]
 		choice.refresh()
-		choice.set_meta("controller_action_label", ClassCatalog.profiles[index].display_name)
+		choice.set_meta("controller_action_label", entry.display_name)
 	var data := profile()
 	title_label.text = data.display_name
 	tagline_label.text = data.tagline

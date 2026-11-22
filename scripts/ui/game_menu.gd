@@ -748,14 +748,16 @@ func _visit_setup_step(id: StringName) -> void:
 
 func _advance_setup() -> void:
 	if setup == null or not session.can_select_difficulty(setup.difficulty_id): return
+	if setup.step == &"class" and not session.class_unlocked(setup.class_id): return
 	setup.next_step()
 	_show_setup_step()
 
 func _select_setup_class(id: StringName) -> void:
-	if setup == null or not setup.select_class(id): return
+	if setup == null or not session.class_unlocked(id) or not setup.select_class(id): return
 	setup_selector.class_profile = ClassCatalog.by_id(setup.class_id)
 	setup_selector.brand_text.text = setup_selector.class_profile.display_name
 	setup_selector.brand_text.tooltip_text = setup_selector.class_profile.description
+	setup_selector._apply_class_art()
 	setup.save_to(_draft_path())
 
 
@@ -767,6 +769,8 @@ func _setup_back() -> void:
 
 
 func _show_setup_step() -> void:
+	if not setup.resume_pending and not session.class_unlocked(setup.class_id):
+		setup.select_class(ClassCatalog.DEFAULT.id)
 	match setup.step:
 		&"difficulty": _show_difficulty()
 		&"class":
@@ -785,8 +789,10 @@ func _show_setup_weapons() -> void:
 	setup_selector.visible = true
 	var options: Array[WeaponData] = []
 	var locked := {}
-	for weapon in WeaponCatalog.ALL:
-		if not WeaponEligibility.starter(weapon, ClassCatalog.by_id(setup.class_id), setup.root_capacity): continue
+	var profile := ClassCatalog.by_id(setup.class_id)
+	if profile.exclusive_weapon_id != &"": setup.weapon_id = profile.exclusive_weapon_id
+	for weapon in WeaponCatalog.starters_for(profile):
+		if not WeaponEligibility.starter(weapon, profile, setup.root_capacity): continue
 		options.append(weapon)
 		if not session.weapon_unlocked(weapon.id): locked[weapon.id] = WeaponUnlocks.requirement(weapon.id)
 	setup.mark_reached(page)
@@ -810,7 +816,7 @@ func _start_new_game(difficulty_id: StringName) -> void:
 
 
 func _launch_prepared_run(weapon: WeaponData) -> void:
-	if launching_run or setup == null or weapon not in WeaponCatalog.ALL or not session.weapon_unlocked(weapon.id) or ClassCatalog.by_id(setup.class_id) == null or not WeaponEligibility.starter(weapon, ClassCatalog.by_id(setup.class_id), setup.root_capacity):
+	if launching_run or setup == null or not WeaponCatalog.is_starter(weapon) or not session.weapon_unlocked(weapon.id) or not session.class_unlocked(setup.class_id) or not WeaponEligibility.starter(weapon, ClassCatalog.by_id(setup.class_id), setup.root_capacity):
 		return
 	if not session.select_difficulty(setup.difficulty_id):
 		_show_difficulty()

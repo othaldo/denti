@@ -35,6 +35,8 @@ func present(recap: Dictionary) -> void:
 
 	if recap.get("hell_unlocked_now", false):
 		_add_notice("Hell", "Schwierigkeit freigeschaltet", HELL_ART, DentiUIStyle.MINT)
+	if recap.get("necrodent_unlocked_now", false):
+		_add_notice("Die dritten Zähne", "Nekrodent freigeschaltet", ClassCatalog.by_id(ClassCatalog.NECRODENT_ID).portrait, DentiUIStyle.MINT)
 
 	# The wave-20 results already celebrated the starter's seals and their unlocks.
 	var after_victory := bool(recap.get("endless_enabled", false)) and bool(recap.get("base_victory", false))

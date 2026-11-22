@@ -231,6 +231,26 @@ func discover_fusion(id: StringName) -> bool:
 func _save_progression() -> Error:
 	return progression_data.save_to(progression_path)
 
+func class_unlocked(id: StringName) -> bool:
+	return ClassCatalog.by_id(id) != null and (id != ClassCatalog.NECRODENT_ID
+		or progression_data.class_wins.size() == ClassCatalog.MASTERY_CLASSES.size())
+
+
+func record_class_victory(id: StringName, difficulty: StringName, eligible: bool) -> bool:
+	if not eligible or test_scenario_id != &"" or id not in ClassCatalog.MASTERY_CLASSES:
+		return false
+	if WeaponMasteries.difficulty_rank(difficulty) < WeaponMasteries.difficulty_rank(&"hard"):
+		return false
+	var key := str(id)
+	if key in progression_data.class_wins:
+		return false
+	progression_data.class_wins.append(key)
+	if _save_progression() != OK:
+		progression_data.class_wins.erase(key)
+		return false
+	return class_unlocked(ClassCatalog.NECRODENT_ID)
+
+
 func record_weapon_mastery(id: StringName, flags: int) -> Array[String]:
 	if test_scenario_id != &"" or not WeaponMasteries.valid_weapon(id): return []
 	var before := mastery_flags(id)

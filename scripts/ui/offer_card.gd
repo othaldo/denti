@@ -212,7 +212,10 @@ func show_offer(offer: ShopOfferData, coins: int, available: bool = true, _owned
 	reserve_button.visible = selection_only
 	disabled = (coins < offer.price or not available) and not selection_only
 	if offer.weapon_data != null:
-		tooltip_text = "%s\n%s\n%s\n%s\n%s\nca. %.1f DPS pro Ziel" % [offer.display_name, offer.description, offer.weapon_data.combat_text().replace(" · " + offer.weapon_data.scaling_text(), ""), offer.weapon_data.scaling_description(), offer.weapon_data.stats_text(offer.weapon_tier), dps]
+		if offer.weapon_data.attack_mode == &"command":
+			tooltip_text = "%s\n%s\n%s" % [offer.display_name, offer.description, offer.weapon_data.stats_text(offer.weapon_tier)]
+		else:
+			tooltip_text = "%s\n%s\n%s\n%s\n%s\nca. %.1f DPS pro Ziel" % [offer.display_name, offer.description, offer.weapon_data.combat_text().replace(" · " + offer.weapon_data.scaling_text(), ""), offer.weapon_data.scaling_description(), offer.weapon_data.stats_text(offer.weapon_tier), dps]
 		if not available:
 			tooltip_text += "\nAusrüstung voll: Platz schaffen oder passende Waffe verschmelzen"
 	else:
@@ -463,6 +466,10 @@ func show_weapon_values(data: WeaponData, tier: int, player: Player) -> void:
 		summary_row.remove_child(child)
 		child.queue_free()
 	var values := WeaponPresentation.values(data, tier, player)
+	if data.attack_mode == &"command":
+		_stat_cell(ICONS.RANGE, "%d" % roundi(values.range), "Befehlsreichweite", true)
+		_sync_catalog_slots()
+		return
 	for entry in [[ICONS.stat(0), "%.1f" % values.damage, "Trefferschaden", "damage", true], [ICONS.hud(5), "%.2f s" % values.pause, "Angriffspause", "interval", true], [ICONS.stat(4), "%d %%" % roundi(values.crit * 100), "Krit-Chance", "crit", false], [ICONS.RANGE, "%d" % roundi(values.range), "Reichweite", "range", false]]:
 		var row := _stat_cell(entry[0], entry[1], entry[2], entry[4])
 		if not data.rolls.is_empty():

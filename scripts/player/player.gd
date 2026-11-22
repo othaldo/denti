@@ -239,18 +239,18 @@ func skill_module(id: StringName) -> ClassSkillModule:
 		if module.class_id() == id: return module
 	return null
 
-func save_skill_modules() -> Dictionary:
+func save_skill_modules(enemy_indices: Dictionary = {}) -> Dictionary:
 	var result := {}
 	for module in skill_modules:
-		var state := module.save_data()
+		var state := module.save_with_enemies(enemy_indices)
 		if not state.is_empty(): result[module.state_key()] = state
 	return result
 
-func restore_skill_modules(saved: Variant) -> void:
+func restore_skill_modules(saved: Variant, enemies: Array[Node] = []) -> void:
 	var states: Dictionary = saved if saved is Dictionary else {}
 	for module in skill_modules:
 		var state: Variant = states.get(module.state_key(), {})
-		module.restore(state if state is Dictionary else {})
+		module.restore_with_enemies(state if state is Dictionary else {}, enemies)
 
 
 func movement_direction() -> Vector2:

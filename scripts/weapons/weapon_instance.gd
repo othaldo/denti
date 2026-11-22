@@ -146,7 +146,7 @@ func _physics_process(delta: float) -> void:
 			strike.tick(self, previous, 1.0 if attack_time <= 0.0 else progress())
 		queue_redraw()
 	update_visual()
-	if cooldown > 0.0 or attack_time > 0.0:
+	if data.attack_mode == &"command" or cooldown > 0.0 or attack_time > 0.0:
 		return
 	if evolution != null and evolution.charge_time > 0:
 		return
@@ -175,6 +175,7 @@ func attack_interval() -> float:
 ## reach or while this weapon is still mid-swing. The extra attack never counts
 ## toward skill triggers, so skills cannot chain into themselves.
 func force_attack(boost: float, guaranteed_crit: bool = false) -> bool:
+	if data.attack_mode == &"command": return false
 	if attack_time > 0.0 or (evolution != null and evolution.charge_time > 0): return false
 	var nearest := EnemySpatialIndex.nearest(get_tree(), player.enemy_index, anchor_position(), data.range_at_tier(tier), true)
 	if nearest == null: return false

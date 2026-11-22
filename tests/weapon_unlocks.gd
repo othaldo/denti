@@ -45,9 +45,9 @@ func _rules() -> void:
 	_check(reachable.size() == WeaponCatalog.ALL.size(), "some weapons can never be unlocked")
 	for profile in ClassCatalog.profiles:
 		var starts := 0
-		for weapon in WeaponCatalog.ALL:
+		for weapon in WeaponCatalog.starters_for(profile):
 			if WeaponEligibility.starter(weapon, profile, profile.root_capacity) and WeaponUnlocks.unlocked(weapon.id, {}): starts += 1
-		_check(starts >= 2, "class lacks fresh starters: " + str(profile.id))
+		_check(starts >= (2 if profile.exclusive_weapon_id == &"" else 1), "class lacks fresh starters: " + str(profile.id))
 	# Chains: exam on the toothbrush opens the mirror; Bronze on the mirror opens UV.
 	_check(WeaponUnlocks.unlocked(&"enamel_mirror", {"magic_toothbrush": exam}), "exam seal did not unlock the mirror")
 	_check(not WeaponUnlocks.unlocked(&"uv_lamp", {"enamel_mirror": exam}), "UV opened without Bronze")

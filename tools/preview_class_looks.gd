@@ -12,13 +12,16 @@ func _run() -> void:
 	var session: Node = root.get_node("GameSession")
 	session.save_path = "user://class_look_preview.json"
 	session.reduced_ui_motion = true
+	for id in ClassCatalog.MASTERY_CLASSES:
+		if str(id) not in session.progression_data.class_wins:
+			session.progression_data.class_wins.append(str(id))
 	root.content_scale_size = Vector2i(1280, 720)
 	root.size = root.content_scale_size
 	for profile in ClassCatalog.profiles:
 		session.clear_run()
 		session.pending_start_class_id = profile.id
 		session.pending_start_weapon_id = &"turbo_drill"
-		for weapon in WeaponCatalog.ALL:
+		for weapon in WeaponCatalog.starters_for(profile):
 			if WeaponEligibility.starter(weapon, profile, profile.root_capacity):
 				session.pending_start_weapon_id = weapon.id
 				break

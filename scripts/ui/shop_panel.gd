@@ -489,7 +489,7 @@ func _render_selection() -> void:
 		details.enchant_button.visible = enchant_available
 		if player != null:
 			details.show_evolutions(player.loadout.ready_evolutions(selected_index, player.items))
-		details.sell_button.visible = true
+		details.sell_button.visible = data.required_class_id == &""
 		details.sell_button.text = "Verkaufen · +%d Münzen" % int(entry.refund)
 		details.merge_button.visible = true
 		details.merge_button.disabled = not bool(entry.mergeable)
@@ -546,6 +546,8 @@ func _render_selection() -> void:
 	_queue_popup_layout()
 
 func _fusion_comparison(result: WeaponData, tier: int, previous: WeaponData, previous_tier: int) -> String:
+	if result.attack_mode == &"command":
+		return WeaponPresentation.comparison(result, tier, previous, previous_tier, player)
 	var before := WeaponPresentation.values(previous, previous_tier, player)
 	var after := WeaponPresentation.values(result, tier, player)
 	return WeaponPresentation.comparison(result, tier, previous, previous_tier, player) + "\nCrit %.1f → %.1f %%" % [before.crit * 100.0, after.crit * 100.0]

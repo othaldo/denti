@@ -163,7 +163,12 @@ func used_slots() -> int:
 func can_acquire(data: WeaponData, tier: int = 1) -> bool:
 	if not weapon_allowed(data) or data.evolution_kind != &"":
 		return false
-	return used_slots() + data.hands <= capacity or (tier < MAX_TIER and _find_tier(data.id, tier) != null)
+	return _fits_free_roots(data) or (tier < MAX_TIER and _find_tier(data.id, tier) != null)
+
+
+func _fits_free_roots(data: WeaponData) -> bool:
+	var occupied := used_slots()
+	return occupied + data.hands <= capacity and (data.required_class_id == &"" or occupied == 0)
 
 
 func weapon_allowed(data: WeaponData) -> bool:
@@ -174,7 +179,7 @@ func acquire(data: WeaponData, tier: int = 1, paid_coins: int = -1) -> bool:
 	if not can_acquire(data, tier):
 		return false
 	var value := paid_coins if paid_coins >= 0 else _legacy_value(data, tier)
-	if used_slots() + data.hands <= capacity:
+	if _fits_free_roots(data):
 		_add(data, tier, value)
 	else:
 		var matching := purchase_fusion_target(data, tier)
@@ -187,7 +192,7 @@ func acquire(data: WeaponData, tier: int = 1, paid_coins: int = -1) -> bool:
 
 
 func purchase_fusion_target(data: WeaponData, tier: int = 1) -> WeaponInstance:
-	if not weapon_allowed(data) or tier >= MAX_TIER or used_slots() + data.hands <= capacity:
+	if not weapon_allowed(data) or tier >= MAX_TIER or _fits_free_roots(data):
 		return null
 	return _best_fusion_partner(data, tier)
 
@@ -256,7 +261,7 @@ func restore(saved: Array, enforce_capacity: bool = true) -> bool:
 		if not entry is Dictionary:
 			continue
 		var data := WeaponCatalog.by_id(StringName(str(entry.get("id", ""))))
-		if weapon_allowed(data) and (not enforce_capacity or used_slots() + data.hands <= capacity):
+		if weapon_allowed(data) and (not enforce_capacity or _fits_free_roots(data)):
 			var tier := clampi(int(entry.get("tier", 1)), 1, MAX_TIER)
 			var weapon := _add(WeaponRolls.resolve(data, entry.get("rolls", {}), entry.get("upgrades", {})), tier, maxi(int(entry.get("invested_coins", _legacy_value(data, tier))), 0))
 			weapon.affixes = WeaponAffixes.sanitize(entry.get("affixes", []))
@@ -281,6 +286,7 @@ func sell(index: int) -> int:
 	if index < 0 or index >= weapons.size():
 		return 0
 	var weapon := weapons[index]
+	if weapon.data.required_class_id != &"" and weapon_allowed(weapon.data): return 0
 	var refund := refund_for(index)
 	weapon.free()
 	_refresh_positions()
@@ -289,7 +295,7 @@ func sell(index: int) -> int:
 
 func refund_for(index: int) -> int:
 	var weapons := equipped()
-	if index < 0 or index >= weapons.size():
+	if index < 0 or index >= weapons.size() or weapons[index].data.required_class_id != &"":
 		return 0
 	var weapon := weapons[index]
 	return roundi(float(weapon.invested_coins) * 0.5)

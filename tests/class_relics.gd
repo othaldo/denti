@@ -44,7 +44,8 @@ func _run() -> void:
 
 func _catalog() -> void:
 	_check(RelicCatalog.OFFER_COUNT == 4, "milestone bosses should offer four relics")
-	for profile in ClassCatalog.profiles:
+	for class_id in ClassCatalog.MASTERY_CLASSES:
+		var profile := ClassCatalog.by_id(class_id)
 		var own: Array[StringName] = []
 		for relic in RelicCatalog.CATALOG:
 			if relic.class_id == profile.id: own.append(relic.id)

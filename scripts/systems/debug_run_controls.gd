@@ -18,7 +18,8 @@ func add_weapon(id: StringName, tier: int) -> bool:
 	var data := WeaponCatalog.by_id(id)
 	if not allowed() or data == null or game.player.loadout.used_slots() + data.hands > game.player.loadout.capacity:
 		return false
-	game.player.loadout.acquire(data, clampi(tier, 1, WeaponLoadout.MAX_TIER), 0)
+	if not game.player.loadout.acquire(data, clampi(tier, 1, WeaponLoadout.MAX_TIER), 0):
+		return false
 	changed()
 	return true
 
@@ -92,6 +93,8 @@ func set_class(id: StringName) -> String:
 		if not player.loadout.weapon_allowed(equipped[index].data):
 			removed_weapons.append(WeaponPresentation.weapon_name(equipped[index]))
 			player.loadout.sell(index)
+	if profile.exclusive_weapon_id != &"" and player.loadout.equipped().is_empty():
+		player.loadout.acquire(WeaponCatalog.by_id(profile.exclusive_weapon_id), 1, 0)
 	player.dash.config = profile.dash_config()
 	player.dash.charge = minf(player.dash.charge, player.dash.capacity)
 	game.talents.enabled = profile.talent_tree != null

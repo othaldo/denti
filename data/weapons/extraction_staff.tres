@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/weapons/extraction_staff.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"extraction_staff"
+required_class_id = &"necrodent"
+display_name = "Extraktionsstab"
+role = "Befehle für das Gebiss"
+description = "Markiert am Ende eines Dashs einen Gegner für deine untoten Zähne. Fusionen erhöhen die Befehlsreichweite."
+attack_mode = &"command"
+base_damage = 0.0
+stat_scaling = 0.0
+attack_range = 240.0
+range_tiers = PackedFloat32Array(240, 300, 360, 440)
+price = 9
+sprite = ExtResource("2")
+held_style = "staff"
+upright_at_rest = true
+visual_size = 80.0
+grip_anchor = Vector2(0.36, 0.65)
+tip_anchor = Vector2(0.86, 0.12)

@@ -90,10 +90,13 @@ func show_weapon(data: WeaponData, tier: int, player: Player, equipped: bool, eq
 	subtitle.tooltip_text = data.scaling_description()
 	var current := WeaponPresentation.values(data, tier, player)
 	_clear_values()
-	_rolled_value("Treffer", "%.1f" % current.damage, data, "damage")
-	_rolled_value("Angriffspause", "%.2f s" % current.pause, data, "interval")
-	_rolled_value("Reichweite", "%d" % roundi(current.range), data, "range")
-	_rolled_value(DentiAttributes.name_for(DentiAttributes.Type.CRIT_CHANCE), "%d %% · ×%.1f" % [roundi(current.crit * 100.0), current.multiplier], data, "crit")
+	if data.attack_mode == &"command":
+		_rolled_value("Befehlsreichweite", "%d" % roundi(current.range), data, "range")
+	else:
+		_rolled_value("Treffer", "%.1f" % current.damage, data, "damage")
+		_rolled_value("Angriffspause", "%.2f s" % current.pause, data, "interval")
+		_rolled_value("Reichweite", "%d" % roundi(current.range), data, "range")
+		_rolled_value(DentiAttributes.name_for(DentiAttributes.Type.CRIT_CHANCE), "%d %% · ×%.1f" % [roundi(current.crit * 100.0), current.multiplier], data, "crit")
 	if data.knockback_at_tier(tier) > 0:
 		_value("Rückstoß", "%d" % roundi(data.knockback_at_tier(tier)))
 	if data.splash_at_tier(tier) > 0:

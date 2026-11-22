@@ -3,6 +3,8 @@ extends RefCounted
 
 static func allowed(data: WeaponData, profile: PlayerClassData) -> bool:
 	if data == null: return false
+	if data.required_class_id != &"" and (profile == null or data.required_class_id != profile.id): return false
+	if profile != null and profile.exclusive_weapon_id != &"": return data.id == profile.exclusive_weapon_id
 	if profile == null or profile.allowed_weapon_roles.is_empty(): return true
 	for role in data.class_roles:
 		if role in profile.allowed_weapon_roles: return true

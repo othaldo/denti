@@ -130,8 +130,8 @@ func select_weapon(index: int, notify: bool = true) -> void:
 	var values := RunSetupPresentation.values(weapon)
 	for stat in 3:
 		stat_buttons[stat].value = values[stat]
-		stat_buttons[stat].tooltip_text = [weapon.scaling_description(), "Angriffspause", "Reichweite"][stat]
-		stat_buttons[stat].visible = requirement == ""
+		stat_buttons[stat].tooltip_text = [weapon.scaling_description(), "Angriffspause", "Befehlsreichweite" if weapon.attack_mode == &"command" else "Reichweite"][stat]
+		stat_buttons[stat].visible = requirement == "" and (weapon.attack_mode != &"command" or stat == 2)
 	refresh()
 	_layout()
 	if notify:
@@ -157,6 +157,9 @@ func focus_selection() -> void:
 func _stat_details(index: int) -> void:
 	var weapon := selected_weapon()
 	if weapon == null: return
+	if weapon.attack_mode == &"command":
+		details_requested.emit("Befehlsreichweite", weapon.stats_text(1) + "\n" + weapon.description)
+		return
 	var title: String = ["Grundschaden", "Angriffspause", "Reichweite"][index]
 	var text: String = ["Grundschaden auf Mk I: %d.\n%s\n%s" % [roundi(weapon.damage_at_tier(1)), weapon.scaling_description(), weapon.combat_text().replace(" · " + weapon.scaling_text(), "")],
 		"Zeit zwischen zwei Angriffen auf Mk I: %.2f Sekunden. Putzeifer verkürzt die Angriffspause." % weapon.interval_at_tier(1),

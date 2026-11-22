@@ -68,6 +68,8 @@ func pickup_factor() -> float: return 1.0
 
 func save_data() -> Dictionary: return {}
 func restore(_saved: Dictionary) -> void: reset_wave()
+func save_with_enemies(_indices: Dictionary) -> Dictionary: return save_data()
+func restore_with_enemies(saved: Dictionary, _enemies: Array[Node]) -> void: restore(saved)
 
 # --- Shared helpers ---------------------------------------------------------
 

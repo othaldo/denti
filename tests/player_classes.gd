@@ -29,7 +29,7 @@ func _conversion(source: StringName, target: StringName, factor: float) -> Class
 	return result
 
 func _run() -> void:
-	var shipped: Array[StringName] = [&"good_old_molar", &"assassin", &"tooth_fairy", &"ember", &"rinser", &"frost_warden"]
+	var shipped: Array[StringName] = [&"good_old_molar", &"assassin", &"tooth_fairy", &"ember", &"rinser", &"frost_warden", &"necrodent"]
 	var ids: Array[StringName] = []
 	for profile in ClassCatalog.profiles:
 		_check(profile.valid(), "shipping class invalid: " + str(profile.id))

@@ -29,6 +29,8 @@ Denti.pck
 !assets/classes/ember_portrait.png.import
 !assets/classes/rinser_portrait.png.import
 !assets/classes/frost_warden_portrait.png.import
+!assets/classes/necrodent_portrait.png.import
+!assets/weapons/extraction_staff.png.import
 !assets/vfx/element_hit_splats.png.import
 
 # The modular Count artwork uses mipmaps at combat sprite sizes.

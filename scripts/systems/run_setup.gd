@@ -59,7 +59,7 @@ static func load_from(path: String) -> RunSetup:
 	if result.step not in STEPS: result.step = STEPS[0]
 	result.difficulty_id = DifficultyCatalog.by_id(StringName(str(value.get("difficulty", "normal")))).id
 	var weapon := WeaponCatalog.by_id(StringName(str(value.get("weapon", ""))))
-	result.weapon_id = weapon.id if weapon in WeaponCatalog.ALL else &""
+	result.weapon_id = weapon.id if WeaponCatalog.is_starter(weapon) else &""
 	result.visited_step = StringName(str(value.get("visited_step", str(result.step))))
 	if result.visited_step not in STEPS: result.visited_step = STEPS[0]
 	result.mark_reached(result.step)

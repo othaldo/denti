@@ -2,6 +2,7 @@ class_name ShopController
 extends Node
 
 const WEAPON_OFFERS: Array[ShopOfferData] = [
+	preload("res://data/weapons/shop_extraction_staff.tres"),
 	preload("res://data/weapons/shop_magic_toothbrush.tres"),
 	preload("res://data/weapons/shop_turbo_drill.tres"),
 	preload("res://data/weapons/shop_floss_whip.tres"),
@@ -124,7 +125,7 @@ func _roll_offers(wave_number: int, luck: float, loadout: WeaponLoadout, items: 
 			offer = _pick_weapon(mini(tier, WeaponLoadout.MAX_TIER), loadout, true)
 		if offer != null:
 			offer = offer.duplicate() as ShopOfferData
-			if offer.weapon_data != null:
+			if offer.weapon_data != null and offer.weapon_data.attack_mode != &"command":
 				offer.weapon_data = WeaponRolls.resolve(offer.weapon_data, WeaponRolls.roll(wave_number, luck, rng))
 			offer.price = EconomyRules.shop_price(offer.price, wave_number)
 		offers[index] = offer
@@ -150,6 +151,11 @@ func _pick_item(tier: int, items: ItemInventory, loadout: WeaponLoadout) -> Shop
 
 
 func _pick_weapon(tier: int, loadout: WeaponLoadout, allow_unavailable: bool = false) -> ShopOfferData:
+	var equipped := loadout.equipped()
+	if not equipped.is_empty() and equipped[0].data.attack_mode == &"command":
+		var staff := equipped[0]
+		if staff.tier >= WeaponLoadout.MAX_TIER or _already_offered(staff.data.id, 0): return null
+		return weapon_offer(by_id(staff.data.id), staff.tier)
 	var candidates: Array[ShopOfferData] = []
 	for template in WEAPON_OFFERS:
 		if not _weapon_available(template.id, loadout): continue
@@ -159,7 +165,6 @@ func _pick_weapon(tier: int, loadout: WeaponLoadout, allow_unavailable: bool = f
 		return null
 	var matching: Array[ShopOfferData] = []
 	var same_mode: Array[ShopOfferData] = []
-	var equipped := loadout.equipped()
 	for candidate in candidates:
 		var has_mode := false
 		for weapon in equipped:

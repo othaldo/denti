@@ -93,7 +93,7 @@ func _enter_tree() -> void:
 	if not run.resume_requested:
 		talents.enabled = run.pending_talent_run
 		var profile := ClassCatalog.by_id(run.pending_start_class_id)
-		if profile != null and profile != ClassCatalog.DEFAULT:
+		if profile != null and profile != ClassCatalog.DEFAULT and run.class_unlocked(profile.id):
 			get_node("Player/Stats").begin_class(profile)
 	run.pending_start_class_id = ClassCatalog.DEFAULT.id
 	run.pending_talent_run = false
@@ -220,11 +220,14 @@ func _ready() -> void:
 		var saved: Dictionary = session.load_run()
 		if not saved.is_empty():
 			_restore_run(saved)
-			if starter_pending and prepared_weapon in WeaponCatalog.ALL:
+			if starter_pending and WeaponCatalog.is_starter(prepared_weapon):
 				_on_starter_chosen(prepared_weapon)
 			return
 	player.global_position = arena.arena_size / 2.0
-	if prepared_weapon in WeaponCatalog.ALL and session.weapon_unlocked(prepared_weapon.id) and player.loadout.acquire(prepared_weapon):
+	var exclusive_id := player.stats.class_data.exclusive_weapon_id
+	if exclusive_id != &"":
+		prepared_weapon = WeaponCatalog.by_id(exclusive_id)
+	if WeaponCatalog.is_starter(prepared_weapon) and session.weapon_unlocked(prepared_weapon.id) and player.loadout.acquire(prepared_weapon):
 		weapon_mastery.begin(prepared_weapon.id, session.test_scenario_id == &"")
 		if session.selected_story_mode:
 			story.start()
@@ -255,7 +258,7 @@ func _show_starters(selected_id: StringName = &"") -> void:
 	get_node("/root/SceneTransitions").present(&"starter")
 	starter_pending = true
 	var starters: Array[WeaponData] = []
-	for weapon in WeaponCatalog.ALL:
+	for weapon in WeaponCatalog.starters_for(player.stats.class_data):
 		if player.loadout.can_acquire(weapon) and session.weapon_unlocked(weapon.id):
 			starters.append(weapon)
 	choice_panel.starter_selection.class_profile = player.stats.class_data
@@ -312,7 +315,7 @@ func _on_story_travel_finished() -> void:
 func _on_starter_chosen(weapon: WeaponData) -> void:
 	if not starter_pending:
 		return
-	if weapon not in WeaponCatalog.ALL or not session.weapon_unlocked(weapon.id) or not player.loadout.acquire(weapon):
+	if not WeaponCatalog.is_starter(weapon) or not session.weapon_unlocked(weapon.id) or not player.loadout.acquire(weapon):
 		_show_starters()
 		return
 	starter_pending = false
@@ -1135,6 +1138,8 @@ func _finish_run() -> void:
 	_clear_arena(true)
 	var recap := _run_recap_data()
 	recap["hell_unlocked_now"] = wave.difficulty_id == &"hard" and session.unlock_hell()
+	recap["necrodent_unlocked_now"] = wave.current_wave == WaveController.MAX_WAVES and session.record_class_victory(
+		player.stats.class_data.id, wave.difficulty_id, weapon_mastery.eligible)
 	choice_panel.show_end(true, coins, recap)
 	_save_completed_report(true)
 	session.clear_run()

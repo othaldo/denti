@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="PlayerClassData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/player_class_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/talents/necrodent.tres" id="2"]
+[ext_resource type="Texture2D" path="res://assets/classes/necrodent_portrait.png" id="3"]
+[ext_resource type="Script" path="res://scripts/player/class_stat_rule_data.gd" id="4"]
+
+[sub_resource type="Resource" id="NoRanged"]
+script = ExtResource("4")
+stat = &"ranged_damage"
+gain_factor = 0.0
+penalty_factor = 0.0
+
+[resource]
+script = ExtResource("1")
+id = &"necrodent"
+display_name = "Nekrodent"
+tagline = "Die dritten Zähne gehen für dich auf die Jagd."
+description = "Beginnt mit einem untoten Zahn. Talente vergrößern das Gebiss zwischen den Wellen. Am Ende eines Dashs markiert der Extraktionsstab ein Ziel für die Zähne. Umgefallene Zähne stehen von selbst wieder auf."
+play_style = Array[String](["Bisse übernehmen den Schaden", "Dash lenkt die Gefolgschaft", "Weitere Zähne wachsen im Talentbaum"])
+portrait = ExtResource("3")
+combat_sprite = ExtResource("3")
+root_capacity = 1
+exclusive_weapon_id = &"extraction_staff"
+stat_rules = Array[ExtResource("4")]([SubResource("NoRanged")])
+preferred_tags = Array[StringName]([&"melee", &"bleed", &"crit"])
+talent_tree = ExtResource("2")

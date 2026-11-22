@@ -145,6 +145,8 @@ static func card_effect(data: WeaponData, tier: int) -> String:
 
 
 static func comparison(data: WeaponData, tier: int, other: WeaponData, other_tier: int, player: Player) -> String:
+	if data.attack_mode == &"command" and other.attack_mode == &"command":
+		return "Befehlsreichweite %d → %d" % [roundi(other.range_at_tier(other_tier)), roundi(data.range_at_tier(tier))]
 	var before := values(other, other_tier, player)
 	var after := values(data, tier, player)
 	return "Treffer %.1f → %.1f · Pause %.2f → %.2f s\nReichweite %d → %d · Wurzeln %d → %d" % [

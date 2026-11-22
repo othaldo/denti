@@ -18,6 +18,7 @@ extends Resource
 @export var conversions: Array[ClassStatConversionData] = []
 # Empty permits every weapon. Otherwise at least one explicit role must match.
 @export var allowed_weapon_roles: Array[StringName] = []
+@export var exclusive_weapon_id: StringName
 @export var preferred_tags: Array[StringName] = []
 @export var dash_override: DashData
 @export var talent_tree: TalentTreeData

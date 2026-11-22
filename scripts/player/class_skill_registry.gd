@@ -9,4 +9,5 @@ const MODULES: Array[Script] = [
 	preload("res://scripts/player/ember_skills.gd"),
 	preload("res://scripts/player/rinser_skills.gd"),
 	preload("res://scripts/player/frost_skills.gd"),
+	preload("res://scripts/player/necrodent_skills.gd"),
 ]

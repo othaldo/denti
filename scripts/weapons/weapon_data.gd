@@ -8,6 +8,7 @@ const WET_STATUS = preload("res://data/statuses/wet.tres")
 @export var rolls: Dictionary = {}
 @export var id: StringName
 @export var class_roles: Array[StringName] = []
+@export var required_class_id: StringName
 @export var display_name: String
 @export var role: String
 @export_multiline var description: String
@@ -120,6 +121,7 @@ func raw_damage_with_stats(tier: int, stats: PlayerStats) -> float:
 
 
 func damage_with_stats(tier: int, stats: PlayerStats, additional_bonus: float = 0.0) -> float:
+	if attack_mode == &"command": return 0.0
 	return stats.scale_damage(raw_damage_with_stats(tier, stats), additional_bonus)
 
 
@@ -128,6 +130,7 @@ func scaling_family() -> String:
 
 
 func scaling_label() -> String:
+	if attack_mode == &"command": return role
 	return "%s · %.0f %%" % [scaling_family(), stat_scaling * 100.0]
 
 
@@ -136,6 +139,7 @@ func scaling_text() -> String:
 
 
 func scaling_description() -> String:
+	if attack_mode == &"command": return "Verzauberungen wirken auf die Zähne. Reichweite gilt für den Befehl."
 	var stat_name := DentiAttributes.name_for(DentiAttributes.Type.MELEE_DAMAGE if damage_stat == "melee" else DentiAttributes.Type.RANGED_DAMAGE)
 	return "%s\n+1 %s ergibt +%s Basis-Schaden pro Treffer, vor Bisskraft." % [scaling_text(), stat_name, ("%.2f" % stat_scaling).replace(".", ",")]
 
@@ -165,6 +169,8 @@ func knockback_at_tier(tier: int) -> float:
 
 
 func stats_text(tier: int) -> String:
+	if attack_mode == &"command":
+		return "%d Befehlsreichweite" % roundi(range_at_tier(tier))
 	var result := "%d Basis-Schaden · %.2f s · %d Reichweite" % [roundi(damage_at_tier(tier)), interval_at_tier(tier), roundi(range_at_tier(tier))]
 	if projectile_count_tiers.size() > 0:
 		var count := projectile_count_at_tier(tier)
@@ -179,11 +185,13 @@ func stats_text(tier: int) -> String:
 
 
 func damage_type_label() -> String:
+	if attack_mode == &"command": return "Befehl"
 	# Keep the legacy resource/save value; distinguish the label from max HP.
 	return "Schmelzbruch" if damage_type == "Schmelz" else damage_type
 
 
 func combat_text() -> String:
+	if attack_mode == &"command": return description
 	var result := "Schadensart: %s · %s" % [damage_type_label(), scaling_text()]
 	if bleed_dps > 0.0:
 		result += " · Blutung %.1f Schaden/s (%.1f s)" % [bleed_dps, bleed_duration]
@@ -211,6 +219,7 @@ func combat_text() -> String:
 
 
 func estimated_dps(tier: int, stats: PlayerStats, item_interval_factor: float = 1.0, additional_bonus: float = 0.0) -> float:
+	if attack_mode == &"command": return 0.0
 	var chance := clampf(stats.crit_chance + crit_bonus, 0.0, 1.0)
 	if crit_cycle > 0:
 		chance = 1.0 / float(crit_cycle) + (1.0 - 1.0 / float(crit_cycle)) * chance
