@@ -135,6 +135,14 @@ func _run() -> void:
 	await _joy(JOY_BUTTON_B)
 	menu.setup_selector.confirm_selection()
 	_check(menu.page == &"class", "class selection is absent from controller preparation")
+	await _settle()
+	_graph(menu.setup_selector, "class selection")
+	var class_card: Button = menu.setup_selector.class_view.buttons[1]
+	class_card.grab_focus()
+	await _joy(JOY_BUTTON_RIGHT_STICK)
+	_check(menu.setup_selector.details.visible, "R3 does not inspect the focused class")
+	await _joy(JOY_BUTTON_B)
+	_check(class_card.has_focus(), "class inspection does not restore the class card")
 	menu.setup_selector.confirm_selection()
 	menu.setup_selector.select_weapon(1)
 	await _settle()
@@ -245,7 +253,7 @@ func _run() -> void:
 			await _settle()
 			_graph(game.choice_panel.stage, "item chest")
 			_check(input.action_bar.entries.any(func(entry: Dictionary) -> bool: return entry.action == &"ui_accept" and entry.label == "Behalten"), "item chest does not name its primary Keep action")
-			game.choice_panel.show_relics(RelicCatalog.CATALOG.slice(0, 3))
+			game.choice_panel.show_relics(RelicCatalog.CATALOG.slice(0, RelicCatalog.OFFER_COUNT))
 			await _settle()
 			_graph(game.choice_panel.stage, "relic reward")
 			game.choice_panel.hide()
@@ -285,6 +293,37 @@ func _run() -> void:
 	await _joy(JOY_BUTTON_B)
 	_check(game.story_travel.next_button.has_focus(), "pause does not restore the travel action")
 	game.story_travel.hide()
+	var free_node: TalentNodeData
+	for node: TalentNodeData in game.player.stats.class_data.talent_tree.nodes:
+		if node.free_attribute:
+			free_node = node
+			break
+	if free_node != null:
+		var talent_progress := TalentProgression.new()
+		talent_progress.prepare(1, 2, 0)
+		talent_progress.cursor = {"id": str(free_node.id)}
+		var talent: TalentPanel = game.talent_panel
+		talent.present(talent_progress, game.player.stats, game.UPGRADES, 1)
+		await _settle()
+		_check(talent.view.button(free_node.id).has_focus(), "talent tree does not focus the restored node")
+		var attribute: Button = talent.choice_row.get_child(1)
+		attribute.grab_focus()
+		var attribute_key := str(attribute.get_meta("controller_focus_key", ""))
+		await _joy(JOY_BUTTON_A)
+		var current_focus := root.gui_get_focus_owner()
+		_check(not attribute_key.is_empty() and ControllerFocus.contains(talent.choice_row, current_focus) and current_focus.get_meta("controller_focus_key", "") == attribute_key, "choosing a free-root attribute loses its rebuilt focus")
+		var talent_target := root.gui_get_focus_owner()
+		await _joy(JOY_BUTTON_START)
+		await _joy(JOY_BUTTON_B)
+		_check(talent_target.has_focus(), "returning from pause loses the talent attribute focus")
+		root.content_scale_size = Vector2i(568, 320)
+		root.size = root.content_scale_size
+		await _settle()
+		_check(talent.stage.body_scroll.get_global_rect().grow(1).encloses(talent_target.get_global_rect()), "compact talent tree clips its focused attribute")
+		_check(talent.stage.body_scroll.get_v_scroll_bar().visible, "short controller view cannot scroll to its clipped talent actions")
+		root.content_scale_size = Vector2i(1280, 720)
+		root.size = root.content_scale_size
+		talent.hide()
 	session.reduced_ui_motion = true
 	game.choice_panel.show_upgrades(game.UPGRADES.slice(0, 4), game.player.stats)
 	game.choice_panel.update_level_reroll(100, 2)
@@ -302,6 +341,17 @@ func _run() -> void:
 	_check(not input.action_bar.entries.any(func(entry: Dictionary) -> bool: return entry.action in [&"ui_accept", &"pause"]), "end credits advertise duplicate Back actions or an unavailable Pause")
 	await _joy(JOY_BUTTON_B)
 	_check(game.choice_panel.mode == &"end", "B does not return from end-screen credits")
+	root.content_scale_size = Vector2i(568, 320)
+	root.size = root.content_scale_size
+	game.choice_panel.show_end(true, 10, {"wave_reached": 20, "hell_unlocked_now": true, "weapon_mastery": {
+		"starter_id": "turbo_drill", "earned": ["exam", "bronze", "silver"], "unlocks": ["cavity_grinder", "interdental_brush"]}})
+	await _settle()
+	var results: Control = game.choice_panel.get_node("Root")
+	_graph(results, "run results with unlock notices")
+	var notices: VBoxContainer = game.choice_panel.end_notices.notices
+	notices.get_child(0).grab_focus()
+	await _joy(JOY_BUTTON_DPAD_DOWN)
+	_check(notices.get_child(1).has_focus() and not input.action_bar.entries.any(func(entry: Dictionary) -> bool: return entry.action == &"ui_accept"), "scrolling passive end notices advertises an unusable action or loses focus")
 	session.clear_run()
 	print("Controller views: reachable focus graphs, R3 inspection, modal priority, fusion workflow, reward actions and Back checked")
 	finish(0 if failures.is_empty() else 1)

@@ -25,7 +25,7 @@ static func collected_entries(items: ItemInventory, relics: RelicInventory, pref
 	for id in relics.owned:
 		var relic := RelicCatalog.by_id(StringName(id))
 		if relic != null:
-			result.append({"name": ("Relikt: " if prefix_relics else "") + relic.display_name, "count": 1, "description": DentiAttributes.resolve_text(relic.description), "tier": 4, "icon": DentiUIIcons.relic(relic.icon_index), "relic": true})
+			result.append({"name": ("Relikt: " if prefix_relics else "") + relic.display_name, "count": 1, "description": DentiAttributes.resolve_text(relic.description), "tier": 4, "icon": DentiUIIcons.relic_icon(relic), "relic": true})
 	return result
 
 

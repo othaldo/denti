@@ -22,6 +22,9 @@ var pending_talent_run := false
 var setup_requested := false
 var selected_difficulty_id: StringName = &"normal"
 var selected_story_mode: bool = false
+## Weapon meta unlocks apply to the shipped game. Scripted main loops (tests,
+## bots, benchmarks) keep the full catalog unless a test enables them.
+var weapon_locks_enabled := true
 var hell_unlocked: bool:
 	get: return progression_data.hell_unlocked
 	set(value): progression_data.hell_unlocked = value
@@ -67,6 +70,7 @@ var protected_run_context: Dictionary = {}
 
 
 func _ready() -> void:
+	weapon_locks_enabled = get_tree().get_script() == null
 	if DisplayServer.is_touchscreen_available():
 		_update_mobile_scale()
 		get_tree().root.size_changed.connect(_update_mobile_scale)
@@ -214,11 +218,14 @@ func clear_run() -> void:
 func load_progression() -> void:
 	progression_data.load_from(progression_path)
 
-func discover_fusion(id: StringName) -> void:
+func discover_fusion(id: StringName) -> bool:
 	if test_scenario_id != &"" or WeaponEvolutions.by_id(id) == null or discovered_fusions.has(str(id)):
-		return
+		return false
 	discovered_fusions.append(str(id))
-	_save_progression()
+	if _save_progression() != OK:
+		discovered_fusions.pop_back()
+		return false
+	return true
 
 
 func _save_progression() -> Error:
@@ -235,6 +242,11 @@ func record_weapon_mastery(id: StringName, flags: int) -> Array[String]:
 		else: progression_data.weapon_masteries.erase(str(id))
 		return []
 	return WeaponMasteries.ids_for(gained)
+
+
+func weapon_unlocked(id: StringName) -> bool:
+	if not weapon_locks_enabled or test_scenario_id != &"": return true
+	return WeaponUnlocks.unlocked(id, progression_data.weapon_masteries)
 
 
 func mastery_flags(id: StringName) -> int:
@@ -256,7 +268,9 @@ func unlock_hell() -> bool:
 	if test_scenario_id != &"" or hell_unlocked:
 		return false
 	hell_unlocked = true
-	_save_progression()
+	if _save_progression() != OK:
+		hell_unlocked = false
+		return false
 	return true
 
 

@@ -8,6 +8,8 @@ __pycache__/
 .codex-remote-*
 /build/
 /dist/
+Denti.exe
+Denti.pck
 
 # Upgrade capsule uses a small runtime import with mipmaps.
 !assets/loot/upgrade_capsule.png.import

@@ -31,22 +31,27 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Panel" type="PanelContainer" parent="Root/Center"]
+[node name="Results" type="BoxContainer" parent="Root/Center"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Panel" type="PanelContainer" parent="Root/Center/Results"]
+size_flags_vertical = 4
 custom_minimum_size = Vector2(900, 440)
 layout_mode = 2
 
-[node name="Margin" type="MarginContainer" parent="Root/Center/Panel"]
+[node name="Margin" type="MarginContainer" parent="Root/Center/Results/Panel"]
 layout_mode = 2
 theme_override_constants/margin_left = 28
 theme_override_constants/margin_top = 18
 theme_override_constants/margin_right = 28
 theme_override_constants/margin_bottom = 24
 
-[node name="Rows" type="VBoxContainer" parent="Root/Center/Panel/Margin"]
+[node name="Rows" type="VBoxContainer" parent="Root/Center/Results/Panel/Margin"]
 layout_mode = 2
 theme_override_constants/separation = 9
 
-[node name="Portrait" type="TextureRect" parent="Root/Center/Panel/Margin/Rows"]
+[node name="Portrait" type="TextureRect" parent="Root/Center/Results/Panel/Margin/Rows"]
 custom_minimum_size = Vector2(0, 108)
 layout_mode = 2
 mouse_filter = 2
@@ -54,12 +59,12 @@ texture = ExtResource("2")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Title" type="Label" parent="Root/Center/Panel/Margin/Rows"]
+[node name="Title" type="Label" parent="Root/Center/Results/Panel/Margin/Rows"]
 layout_mode = 2
 horizontal_alignment = 1
 text = "Denti steigt auf!"
 
-[node name="Subtitle" type="Label" parent="Root/Center/Panel/Margin/Rows"]
+[node name="Subtitle" type="Label" parent="Root/Center/Results/Panel/Margin/Rows"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 horizontal_alignment = 1
@@ -67,47 +72,47 @@ vertical_alignment = 1
 autowrap_mode = 3
 text = "Ein göttlicher Segen wurde gewährt."
 
-[node name="Cards" type="GridContainer" parent="Root/Center/Panel/Margin/Rows"]
+[node name="Cards" type="GridContainer" parent="Root/Center/Results/Panel/Margin/Rows"]
 layout_mode = 2
 columns = 3
 theme_override_constants/h_separation = 16
 theme_override_constants/v_separation = 16
 
-[node name="Choice1" type="Button" parent="Root/Center/Panel/Margin/Rows/Cards"]
+[node name="Choice1" type="Button" parent="Root/Center/Results/Panel/Margin/Rows/Cards"]
 custom_minimum_size = Vector2(235, 186)
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("3")
 
-[node name="Choice2" type="Button" parent="Root/Center/Panel/Margin/Rows/Cards"]
+[node name="Choice2" type="Button" parent="Root/Center/Results/Panel/Margin/Rows/Cards"]
 custom_minimum_size = Vector2(235, 186)
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("3")
 
-[node name="Choice3" type="Button" parent="Root/Center/Panel/Margin/Rows/Cards"]
+[node name="Choice3" type="Button" parent="Root/Center/Results/Panel/Margin/Rows/Cards"]
 custom_minimum_size = Vector2(235, 186)
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("3")
 
-[node name="Choice4" type="Button" parent="Root/Center/Panel/Margin/Rows/Cards"]
+[node name="Choice4" type="Button" parent="Root/Center/Results/Panel/Margin/Rows/Cards"]
 visible = false
 custom_minimum_size = Vector2(235, 186)
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("3")
 
-[node name="LevelActions" type="HBoxContainer" parent="Root/Center/Panel/Margin/Rows"]
+[node name="LevelActions" type="HBoxContainer" parent="Root/Center/Results/Panel/Margin/Rows"]
 visible = false
 layout_mode = 2
 
-[node name="Coins" type="Label" parent="Root/Center/Panel/Margin/Rows/LevelActions"]
+[node name="Coins" type="Label" parent="Root/Center/Results/Panel/Margin/Rows/LevelActions"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0 Münzen"
 
-[node name="Reroll" type="Button" parent="Root/Center/Panel/Margin/Rows/LevelActions"]
+[node name="Reroll" type="Button" parent="Root/Center/Results/Panel/Margin/Rows/LevelActions"]
 custom_minimum_size = Vector2(80, 36)
 layout_mode = 2
 text = "2"

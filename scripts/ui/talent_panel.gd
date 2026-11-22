@@ -41,10 +41,12 @@ func _ready() -> void:
 	stage.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	view = TalentTreeView.new()
 	view.node_pressed.connect(_on_node_pressed)
-	view.branch_selected.connect(func(_branch: int) -> void: stage.refresh_focus())
+	view.branch_selected.connect(func(_branch: int) -> void:
+		view.update_state(view.ranks, view.points, stage.keyboard_focus))
 	view.compact_changed.connect(_on_compact_changed)
 	details = PanelContainer.new()
 	DentiUIStyle.style_chip(details)
+	details.minimum_size_changed.connect(stage._schedule_layout)
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 8)
 	details.add_child(column)
@@ -111,6 +113,11 @@ func present(progress: TalentProgression, context: PlayerStats, templates: Array
 	if node != null: view.focus_branch = node.branch
 	show()
 	refresh()
+	if stage.keyboard_focus and ControllerFocus.active(stage):
+		var target := view.button(selected)
+		if ControllerFocus.available(target):
+			target.grab_focus()
+			ControllerFocus.reveal(target)
 
 func _default_selection() -> StringName:
 	var tree := stats.class_data.talent_tree
@@ -197,7 +204,6 @@ func _refresh_detail(ranks: Dictionary) -> void:
 	var rank := int(ranks.get(str(node.id), 0))
 	var reason := state.reason(selected, stats, upgrades, count)
 	var preview := state.preview_stats(stats, upgrades)
-	_build_choices(node)
 	if node.free_attribute:
 		var binding := state.bound_stat(node.id)
 		var options := state.free_choices(stats, upgrades, node)
@@ -228,6 +234,7 @@ func _refresh_detail(ranks: Dictionary) -> void:
 		if reason.is_empty():
 			for key in node.stat_changes:
 				detail_text.text += "\n" + DentiAttributes.upgrade_preview_text(preview, DentiAttributes.from_key(StringName(key)), float(node.stat_changes[key]))
+	_build_choices(node)
 	preview.free()
 	detail_reason.text = reason
 	detail_reason.visible = not detail_reason.text.is_empty()
@@ -253,6 +260,7 @@ func _build_choices(node: TalentNodeData) -> void:
 		pick.disabled = upgrade.stat not in options
 		RunSetupStyle.choice(pick, upgrade.stat == free_stat, keyboard, 10)
 		var key := upgrade.stat
+		ControllerFocus.tag(pick, "talent:attribute:%s" % key)
 		pick.pressed.connect(func() -> void: _pick_free(key))
 		choice_row.add_child(pick)
 

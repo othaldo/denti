@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/relic_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"molar_root_weave"
+display_name = "Wurzelgeflecht"
+description = "Treffen zwei verschiedene Waffen kurz nacheinander denselben Gegner, folgt ein Wurzelschlag mit 40 % des Treffers."
+tags = Array[StringName]([&"melee", &"ranged"])
+class_id = &"good_old_molar"
+talent_icon = 1

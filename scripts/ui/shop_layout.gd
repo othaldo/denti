@@ -98,7 +98,6 @@ static func build(view: ShopPanel) -> void:
 	view.offer_column.add_child(view.offers_section)
 	view.offers_header = header
 	view.reroll_button = DentiUIComponents.button(view.offers_header, "2")
-	view.reroll_button.clip_text = true
 	view.reroll_button.icon = ShopPanel.RELOAD_ICON
 	view.reroll_button.add_theme_constant_override("icon_max_width", 20)
 	view.reroll_button.size_flags_horizontal = Control.SIZE_SHRINK_END
@@ -222,7 +221,7 @@ static func build(view: ShopPanel) -> void:
 	view.details.sell_button.pressed.connect(view._confirm_sale)
 	view.details.enchant_button.pressed.connect(func() -> void: view.enchant_requested.emit(view.selected_uid))
 	view.details.confirm_button.pressed.connect(func() -> void: view.sell_requested.emit(view.selected_index))
-	view.details.cancel_button.pressed.connect(view._render_selection)
+	view.details.cancel_button.pressed.connect(view._cancel_sale)
 	view.details.compare.item_selected.connect(view._compare)
 	view.detail_actions = BoxContainer.new()
 	view.detail_column.add_child(view.detail_actions)

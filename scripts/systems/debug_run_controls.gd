@@ -54,6 +54,19 @@ func add_item(id: StringName, copies: int) -> int:
 	return added
 
 
+## Grants or removes a relic, including class relics of other classes.
+## Returns whether the relic is owned afterwards.
+func toggle_relic(id: StringName) -> bool:
+	if not allowed() or RelicCatalog.by_id(id) == null:
+		return false
+	if game.relics.has_relic(id):
+		game.relics.owned.erase(str(id))
+	else:
+		game.relics.acquire(id)
+	changed()
+	return game.relics.has_relic(id)
+
+
 ## Switches the class mid-run. Earned stats, weapons and items stay; class
 ## starting offsets, roots, dash, skill state and talent ranks follow the new
 ## class. Ranks of the old tree are dropped because they are invalid in the

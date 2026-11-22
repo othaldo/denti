@@ -119,6 +119,10 @@ func _run() -> void:
 	if not session.can_select_difficulty(&"hell") or not session.hell_unlocked:
 		_fail("Hard victory did not unlock Hell")
 		return
+	var notices: VBoxContainer = game.choice_panel.end_notices.notices
+	if notices.get_child_count() == 0 or not notices.get_child(0).tooltip_text.contains("Hell"):
+		_fail("first Hard victory did not announce the Hell unlock")
+		return
 	session.hell_unlocked = false
 	session.load_progression()
 	if not session.hell_unlocked or not session.select_difficulty(&"hell"):

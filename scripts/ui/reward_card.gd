@@ -68,7 +68,7 @@ func show_upgrade(upgrade: UpgradeData, stats: PlayerStats = null) -> void:
 func show_relic(relic: RelicData) -> void:
 	_restore_standard_content()
 	_kind = &"relic"
-	icon_rect.texture = ICONS.relic(relic.icon_index)
+	icon_rect.texture = ICONS.relic_icon(relic)
 	_name_source = relic.display_name
 	_effect_source = DentiAttributes.resolve_text(relic.description)
 	upgrade_description = _effect_source

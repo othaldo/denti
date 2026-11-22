@@ -38,6 +38,13 @@ const WALL_SHARD_BASE := 12.0
 const WALL_SHARD_PER_ARMOR := 4.0
 const WALL_HEAL_CAP := 6
 const FLASH_SECONDS := 0.45
+## Wurzelgeflecht: two different weapons on one enemy within the window.
+const WEAVE_WINDOW := 0.8
+const WEAVE_SHARE := 0.4
+const WEAVE_COOLDOWN := 0.1
+const WEAVE_TRACKED := 96
+## Kronen-Echo: a blocked shield hit makes every weapon attack.
+const ECHO_COOLDOWN := 3.0
 
 var player: Player
 var rehearsal_time := REHEARSAL_INTERVAL
@@ -49,6 +56,10 @@ var unison_haste: Dictionary = {}
 var wall_cooldown := 0.0
 var still_time := 0.0
 var flashes: Array[Dictionary] = []
+var clock := 0.0
+var weave_hits: Dictionary = {}
+var weave_cooldown := 0.0
+var echo_cooldown := 0.0
 
 func _ready() -> void:
 	top_level = true
@@ -68,6 +79,9 @@ func reset_wave() -> void:
 	wall_cooldown = 0.0
 	still_time = 0.0
 	flashes.clear()
+	weave_hits.clear()
+	weave_cooldown = 0.0
+	echo_cooldown = 0.0
 	queue_redraw()
 
 # --- Generalprobe -----------------------------------------------------------
@@ -157,7 +171,30 @@ func wall_radius() -> float:
 func wall_cooldown_seconds() -> float:
 	return WALL_ECHO_COOLDOWN if power("wall_echo") > 0.0 else WALL_COOLDOWN
 
+func relic(id: StringName) -> bool:
+	return player.stats.class_data.id == &"good_old_molar" and player.has_class_relic(id)
+
+## Wurzelgeflecht: a different weapon following up on the same enemy strikes again.
+func on_weapon_hit(enemy: Enemy, weapon: WeaponData, dealt: float) -> void:
+	if dealt <= 0.0 or weapon == null or not relic(&"molar_root_weave"): return
+	var id := enemy.get_instance_id()
+	var last: Dictionary = weave_hits.get(id, {})
+	if not last.is_empty() and last.weapon != weapon.id and clock - float(last.time) <= WEAVE_WINDOW and weave_cooldown <= 0.0 and enemy.health > 0.0:
+		weave_cooldown = WEAVE_COOLDOWN
+		weave_hits.erase(id)
+		enemy.take_damage(dealt * WEAVE_SHARE, null, false, &"molar_root_weave")
+		_flash(enemy.global_position, enemy.data.radius + 18.0, DentiUIStyle.GOLD)
+		return
+	if weave_hits.size() >= WEAVE_TRACKED and not weave_hits.has(id): weave_hits.clear()
+	weave_hits[id] = {"weapon": weapon.id, "time": clock}
+
 func on_shield_blocked() -> void:
+	if echo_cooldown <= 0.0 and relic(&"molar_crown_echo") and player.combat_active():
+		var attacked := false
+		for weapon in player.loadout.equipped(): attacked = weapon.force_attack(0.0) or attacked
+		if attacked:
+			echo_cooldown = ECHO_COOLDOWN
+			_flash(player.global_position, 110.0, DentiUIStyle.GOLD)
 	if power("skill_wall") <= 0.0 or not player.combat_active(): return
 	if wall_cooldown > wall_cooldown_seconds() - WALL_SHIELD_GAP: return
 	_wall()
@@ -195,6 +232,9 @@ func _wall() -> void:
 # --- Shared -----------------------------------------------------------------
 
 func advance(delta: float) -> void:
+	clock += delta
+	weave_cooldown = maxf(weave_cooldown - delta, 0.0)
+	echo_cooldown = maxf(echo_cooldown - delta, 0.0)
 	quickdraw_time = maxf(quickdraw_time - delta, 0.0)
 	wall_cooldown = maxf(wall_cooldown - delta, 0.0)
 	for key in unison_haste.keys():

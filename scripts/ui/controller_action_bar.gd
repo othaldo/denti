@@ -126,10 +126,10 @@ func _actions(scope: Control) -> Array[Dictionary]:
 	if focused_shortcut != null and focused_shortcut.action == &"ui_confirm":
 		shortcuts.erase(&"ui_confirm")
 		redundant = false
-	if ControllerFocus.contains(scope, focus) and ControllerFocus.available(focus) and not focus is Range and not focus is LineEdit and not redundant and not bool(focus.get_meta("controller_info_only", false)):
+	if ControllerFocus.accepts(scope, focus) and not redundant and not bool(focus.get_meta("controller_info_only", false)):
 		if focus.has_method("controller_actions"):
 			shortcuts.merge(focus.controller_actions(), true)
-		else:
+		elif focus is BaseButton:
 			shortcuts[&"ui_accept"] = _selection_label(focus)
 	if not input.using_controller:
 		# Escape represents Back where available, and Pause at the run's base.

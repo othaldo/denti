@@ -32,6 +32,8 @@ var item_copies: SpinBox
 var item_detail: Label
 var item_list: Array[ShopOfferData] = []
 var owned_rows: VBoxContainer
+## Relic id -> toggle button in the Relikte tab.
+var relic_buttons: Dictionary = {}
 var coin_amount: SpinBox
 var wave_number: SpinBox
 var difficulty_select: OptionButton
@@ -176,6 +178,21 @@ func _build_ui() -> void:
 		grid.add_child(label)
 		stats[field[0]] = _spin(grid, field[2], field[3], field[4], 0)
 	_button(stat_tab, "Übernehmen", _apply_stats)
+	var relic_tab := _tab(tabs, "Relikte")
+	for relic in RelicCatalog.CATALOG:
+		row = HBoxContainer.new()
+		relic_tab.add_child(row)
+		var icon := TextureRect.new()
+		icon.texture = _small_icon(DentiUIIcons.relic_icon(relic))
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		row.add_child(icon)
+		var name_label := _label(relic.display_name + ("" if relic.class_id == &"" else " · " + ClassCatalog.by_id(relic.class_id).display_name))
+		name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		name_label.tooltip_text = DentiAttributes.resolve_text(relic.description)
+		name_label.mouse_filter = Control.MOUSE_FILTER_STOP
+		row.add_child(name_label)
+		var id := relic.id
+		relic_buttons[id] = _button(row, "+", func() -> void: _toggle_relic(id))
 	var run := _tab(tabs, "Run")
 	row = HBoxContainer.new()
 	run.add_child(row)
@@ -298,6 +315,11 @@ func refresh() -> void:
 		var label := _label("%s ×%d" % [item["name"], item["count"]])
 		label.tooltip_text = item["description"]
 		owned_rows.add_child(label)
+	for id in relic_buttons:
+		var owned: bool = game.relics.has_relic(id)
+		relic_buttons[id].text = "Entfernen" if owned else "+"
+		var relic := RelicCatalog.by_id(id)
+		relic_buttons[id].tooltip_text = "Wirkt nur als " + ClassCatalog.by_id(relic.class_id).display_name if relic.class_id != &"" and relic.class_id != game.player.stats.class_data.id else ""
 	_refresh_weapon_button()
 	_refresh_item_detail()
 	wave_button.disabled = equipped.is_empty()
@@ -324,6 +346,12 @@ func _add_weapon() -> void:
 func _add_item() -> void:
 	var added := controls.add_item(item_list[item_select.selected].id, int(item_copies.value))
 	status.text = "+%d Items" % added if added > 0 else "Stack-Limit erreicht"
+	refresh()
+
+
+func _toggle_relic(id: StringName) -> void:
+	var owned := controls.toggle_relic(id)
+	status.text = ("Relikt: " if owned else "Entfernt: ") + RelicCatalog.by_id(id).display_name
 	refresh()
 
 

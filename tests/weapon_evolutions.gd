@@ -49,6 +49,7 @@ func _run() -> void:
 	game._open_shop()
 	paused = true
 	check(WeaponEvolutions.ALL.size() == 6, "six recipes missing")
+	var discoveries: Array[String] = []
 	for recipe in WeaponEvolutions.ALL:
 		fixture(recipe)
 		check(game.player.loadout.evolution_ready(0, recipe, game.items), "complete rare-variant recipe not accepted: " + str(recipe.id))
@@ -80,6 +81,8 @@ func _run() -> void:
 		button.pressed.emit()
 		check(game.weapon_fusion_panel.visible and game.player.loadout.equipped()[0].data.id == recipe.base_weapon, "evolution did not open a reversible preview")
 		game.weapon_fusion_panel.confirm_button.pressed.emit()
+		discoveries.append(str(recipe.id))
+		check(game.new_fusion_discoveries == discoveries and not session.discover_fusion(recipe.id), "confirmed discovery was not recorded exactly once")
 		check(game.player.loadout.equipped().size() == 1 and game.player.loadout.equipped()[0].data.id == recipe.result.id, "evolution failed or left ingredient weapon: " + str(recipe.id))
 		check(game.player.loadout.used_slots() == recipe.result.hands and game.items.owned == owned, "evolution changed items or root cost")
 		check(game.player.loadout.refund_for(0) == (75 if recipe.partner_weapon != &"" else 40), "evolution lost invested coin value")
@@ -91,8 +94,10 @@ func _run() -> void:
 		check(game.shop_panel.details.subtitle.text.contains("Mk IV") and game.shop_panel.details.merge_button.disabled and game.shop_panel.details.merge_button.text == "Waffe entwickelt", "special weapon details advertise obsolete Mk upgrades")
 		check(game.shop_panel.details_panel.get_theme_stylebox("panel").border_color == WeaponPresentation.special_color(game.player.loadout.equipped()[0].data), "special weapon details lose red color")
 		var saved: Dictionary = RunSnapshot.capture(game)
+		game.new_fusion_discoveries.clear()
 		RunSnapshot.restore(game, saved)
 		check(game.player.loadout.equipped()[0].data.id == recipe.result.id, "resume lost evolved weapon")
+		check(game.new_fusion_discoveries == discoveries, "resume lost new Dentipedia discoveries")
 		game.player.loadout.sell(0)
 		game.player.loadout.acquire(WeaponCatalog.by_id(recipe.base_weapon), 4)
 		if recipe.partner_weapon != &"":
@@ -220,6 +225,8 @@ func _run() -> void:
 					check(projectile.save_state(new_indices) == active_save.player_projectiles[projectile_index], "full snapshot changed projectile orbit/hit state")
 				projectile_index += 1
 		check(projectile_index == active_save.player_projectiles.size(), "full snapshot lost player projectiles")
+	game._on_player_died()
+	check(game.choice_panel.end_notices.notices.get_child_count() == discoveries.size(), "run result did not show every new Dentipedia discovery")
 	paused = false
 	session.clear_run()
 	if failures.is_empty():

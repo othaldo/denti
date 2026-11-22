@@ -101,7 +101,7 @@ func _controller_shortcuts() -> Dictionary:
 	if controller_focus.area == ShopControllerFocus.Area.OFFERS: result[&"ui_previous"] = "Mein Build"
 	else: result[&"ui_next"] = "Angebote"
 	var focus := get_viewport().gui_get_focus_owner()
-	if focus != null and focus != controller_focus.empty: result[&"ui_details"] = "Details"
+	if controller_focus.can_inspect(focus): result[&"ui_details"] = "Details"
 	return result
 
 func _sync_input_mode() -> void:
@@ -242,7 +242,11 @@ func _update_layout() -> void:
 			if large_icons:
 				card.icon_rect.custom_minimum_size = Vector2(152, 152)
 	_layout_inventory()
+	_refresh_focus_styles()
 	call_deferred("_size_offer_grid")
+
+func _refresh_focus_styles() -> void:
+	ControllerFocus.style_buttons($Root, get_node("/root/GameInput").navigation_active)
 
 func _refresh_header() -> void:
 	var extent: Vector2 = $Root.size
@@ -360,10 +364,12 @@ func present(model: ShopViewData) -> void:
 		for index in equipment.size():
 			if int(equipment[index].get("uid", 0)) == selected_uid:
 				found = index
-		selected_index = found
-		if found < 0:
-			selected_kind = "offer"
-			selected_index = 0
+		if found < 0 and expanded:
+			selected_index = mini(selected_index, equipment.size() - 1)
+			selected_uid = 0
+			close_details()
+		else:
+			selected_index = found
 	if expanded and selected_kind == "offer" and selected_index < offers.size() and offers[selected_index] == null:
 		close_details()
 	if expanded:
@@ -393,6 +399,7 @@ func _select(kind: String, index: int, info_only: bool = false) -> void:
 	selected_uid = int(equipment[index].get("uid", 0)) if kind == "equipment" else 0
 	_render_selection()
 	_sync_detail_layout()
+	_refresh_focus_styles()
 	DentiUIMotion.reveal(detail_popup)
 	details.close_button.grab_focus()
 
@@ -559,6 +566,13 @@ func _confirm_sale() -> void:
 	details.cancel_button.visible = true
 	details.action_hint.text = "Verkaufen? +%d Münzen" % int(equipment[selected_index].refund)
 	details.action_hint.visible = true
+	if get_node("/root/GameInput").navigation_active: details.cancel_button.grab_focus()
+	_queue_popup_layout()
+
+func _cancel_sale() -> void:
+	_render_selection()
+	_refresh_focus_styles()
+	if get_node("/root/GameInput").navigation_active: details.sell_button.grab_focus()
 	_queue_popup_layout()
 
 func _show_inventory(entries: Array[Dictionary], used_slots: int, capacity: int) -> void:
@@ -589,12 +603,19 @@ func close_details() -> void:
 	_sync_detail_layout()
 	if was_expanded:
 		_highlight_equipment()
+		_refresh_focus_styles()
+		var source: Control
 		if selected_kind == "offer" and selected_index >= 0 and selected_index < offer_buttons.size():
-			offer_buttons[selected_index].grab_focus()
+			source = offer_buttons[selected_index]
 		elif selected_kind == "equipment" and selected_index >= 0 and selected_index < equipment.size():
-			inventory_row.get_child(selected_index).get_child(0).grab_focus()
+			source = inventory_row.get_child(selected_index).get_child(0)
 		elif selected_kind == "item" and selected_index >= 0 and selected_index < items_row.get_child_count():
-			items_row.get_child(selected_index).grab_focus()
+			source = items_row.get_child(selected_index)
+		if ControllerFocus.available(source):
+			source.grab_focus()
+			ControllerFocus.reveal(source)
+		elif get_node("/root/GameInput").navigation_active:
+			get_node("/root/GameInput").navigation.ensure_focus.call_deferred()
 
 
 func _unhandled_input(event: InputEvent) -> void:

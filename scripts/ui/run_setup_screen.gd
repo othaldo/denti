@@ -168,12 +168,12 @@ func _focus_difficulty() -> void:
 	if is_inside_tree() and is_visible_in_tree() and current_step == &"difficulty":
 		(difficulty_view.buttons[current_difficulty] as Button).grab_focus()
 
-func show_preparation(setup: RunSetup, weapons: Array[WeaponData]) -> void:
+func show_preparation(setup: RunSetup, weapons: Array[WeaponData], locked: Dictionary = {}) -> void:
 	standalone = false
 	current_step = &"weapon"
 	current_difficulty = setup.difficulty_id
 	committed = false
-	weapon_view.show_options(weapons, setup.weapon_id)
+	weapon_view.show_options(weapons, setup.weapon_id, locked)
 	_show_step(setup)
 	weapon_view.focus_selection.call_deferred()
 
@@ -241,7 +241,7 @@ func _apply_class_art() -> void:
 	mascot.texture = art
 	if weapon_view.idle_art != art:
 		weapon_view.idle_art = art
-		if weapon_view.selected_id == &"": weapon_view.art.texture = art
+		if weapon_view.shown == null: weapon_view.art.texture = art
 
 func show_details() -> void:
 	var source := get_viewport().gui_get_focus_owner()

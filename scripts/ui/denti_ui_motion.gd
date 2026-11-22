@@ -70,15 +70,15 @@ static func pulse(control: Control) -> void:
 	control.add_to_group("denti_ui_motion")
 
 
-static func reveal(control: Control) -> void:
+static func reveal(control: Control, delay := 0.0, initial_alpha := 0.55) -> void:
 	_cancel(control)
 	control.modulate.a = 1.0
 	if not enabled(control) or not control.is_inside_tree():
 		return
-	control.modulate.a = 0.55
+	control.modulate.a = initial_alpha
 	var tween := control.create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	control.set_meta("denti_tween", tween)
-	tween.tween_property(control, "modulate:a", 1.0, 0.18)
+	tween.tween_property(control, "modulate:a", 1.0, 0.18).set_delay(delay)
 	control.add_to_group("denti_ui_motion")
 
 

@@ -89,7 +89,7 @@ pro Treffer und Ziel, nicht der Gesamtschaden eines Kegels oder einer Explosion.
 | Fluorid-Rakete | 70 | 2,40 s | 550 | 18 |
 
 Alle zehn Waffen sind im normalen Shop erhältlich und unterstützen vier Stufen,
-Fusion, Verkauf und Fortsetzen. Alle Standardwaffen stehen auch als Mk-I-Start zur Wahl.
+Fusion, Verkauf und Fortsetzen. Alle Standardwaffen stehen als Mk-I-Start zur Wahl, zehn davon nach einer [Freischaltung](META_PROGRESSION.md).
 Die Erweiterung nutzt individuelle Schadenskurven; Speer, Bürste, Sprüher,
 Turbine, UV-Lampe und Zahnseiden-Schneide gewinnen Reichweite. Schleuder und Rakete
 gewinnen Explosionsradius, Turbine Rückstoß, Fräse Bossbonus.

@@ -37,6 +37,8 @@ var reroll_cost: int = 2
 var reroll_step: int = 1
 var rerolls: int = 0
 var rng := RandomNumberGenerator.new()
+## Optional meta-unlock filter `func(id: StringName) -> bool`; owned weapons stay offered for fusion.
+var weapon_available: Callable
 
 
 func _ready() -> void:
@@ -150,6 +152,7 @@ func _pick_item(tier: int, items: ItemInventory, loadout: WeaponLoadout) -> Shop
 func _pick_weapon(tier: int, loadout: WeaponLoadout, allow_unavailable: bool = false) -> ShopOfferData:
 	var candidates: Array[ShopOfferData] = []
 	for template in WEAPON_OFFERS:
+		if not _weapon_available(template.id, loadout): continue
 		if loadout.weapon_allowed(template.weapon_data) and (allow_unavailable or loadout.can_acquire(template.weapon_data, tier)) and not _already_offered(template.id, tier):
 			candidates.append(template)
 	if candidates.is_empty():
@@ -173,6 +176,13 @@ func _pick_weapon(tier: int, loadout: WeaponLoadout, allow_unavailable: bool = f
 	elif roll < SAME_WEAPON_CHANCE + SAME_MODE_CHANCE and not same_mode.is_empty():
 		pool = same_mode
 	return weapon_offer(pool[rng.randi_range(0, pool.size() - 1)], tier)
+
+
+func _weapon_available(id: StringName, loadout: WeaponLoadout) -> bool:
+	if not weapon_available.is_valid() or bool(weapon_available.call(id)): return true
+	for weapon in loadout.equipped():
+		if weapon.data.id == id: return true
+	return false
 
 
 func _already_offered(id: StringName, tier: int) -> bool:

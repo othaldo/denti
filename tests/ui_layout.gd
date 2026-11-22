@@ -158,7 +158,7 @@ func _run() -> void:
 	if not _inside(game.choice_panel.dialog_panel.get_global_rect(), Vector2(720, 1280)):
 		_fail("portrait chest choice exceeds the phone viewport")
 		return
-	var relic_choices: Array[RelicData] = [RelicCatalog.CATALOG[0], RelicCatalog.CATALOG[1], RelicCatalog.CATALOG[2]]
+	var relic_choices: Array[RelicData] = [RelicCatalog.CATALOG[0], RelicCatalog.CATALOG[1], RelicCatalog.CATALOG[2], RelicCatalog.CATALOG[3]]
 	game.choice_panel.show_relics(relic_choices)
 	await process_frame
 	if not _inside(game.choice_panel.dialog_panel.get_global_rect(), Vector2(720, 1280)):

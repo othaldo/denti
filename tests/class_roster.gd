@@ -215,6 +215,23 @@ func _frost() -> void:
 	_check(frost.walls.is_empty(), "a boss did not break the ice wall")
 	boss.queue_free()
 	await _clear_enemies()
+	# Frostwelle: an expiring wall bursts into shards that pierce, chill and embrittle.
+	frost = _use(&"frost_warden", {"skill_frostwave": 1.0})
+	frost.walls.append({"a": origin + Vector2(0, -120), "b": origin + Vector2(0, 120), "time": 0.01})
+	var near := _enemy(Vector2(-30, 27))
+	var far := _enemy(Vector2(400, 0))
+	var near_health := near.health
+	frost.advance(0.02)
+	var count := frost.shards.size()
+	_check(count >= FrostSkills.SHARD_MIN and count <= FrostSkills.SHARD_MAX, "expiring wall did not burst into shards: %d" % count)
+	for tick in 30: frost.advance(1.0 / 60.0)
+	_check(near.health < near_health and near.chill_time > 0.0 and frost.brittle.has(near.get_instance_id()), "a shard did not hit, chill and embrittle a nearby enemy")
+	_check(far.health == 10000.0 and frost.shards.is_empty(), "shards flew beyond their range: %s %d" % [far.health, frost.shards.size()])
+	frost = _use(&"frost_warden", {"skill_frostwave": 1.0, "wave_avalanche": 1.0})
+	frost.walls.append({"a": origin + Vector2(0, -120), "b": origin + Vector2(0, 120), "time": 0.01})
+	frost.advance(0.02)
+	_check(frost.shards.size() == count * 2, "Lawine did not double the shards")
+	await _clear_enemies()
 
 func _snapshots() -> void:
 	var states: Dictionary = game.player.save_skill_modules()

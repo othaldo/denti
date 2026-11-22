@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/relic_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"frost_ice_flower"
+display_name = "Eisblume"
+description = "Stirbt ein spröder Gegner, werden bis zu vier Gegner daneben spröde."
+tags = Array[StringName]([&"area", &"crit"])
+class_id = &"frost_warden"
+talent_icon = 145

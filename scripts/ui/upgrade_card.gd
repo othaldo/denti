@@ -107,7 +107,7 @@ func show_relic(relic: RelicData) -> void:
 	custom_minimum_size.y = 230.0
 	text = ""
 	content.visible = true
-	icon_rect.texture = ICONS.relic(relic.icon_index)
+	icon_rect.texture = ICONS.relic_icon(relic)
 	name_label.text = relic.display_name.to_upper()
 	rarity_label.text = "GÖTTLICHES RELIKT"
 	DentiUIStyle.style_rarity_label(rarity_label, 4)

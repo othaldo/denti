@@ -17,7 +17,8 @@ Jede der 18 normalen Startwaffen besitzt vier Auszeichnungen, insgesamt 72.
 
 Ein höherer Sieg schließt alle niedrigeren Siegel ein. Ein erster Sieg direkt
 auf Hell kann damit alle vier Auszeichnungen dieser Startwaffe vergeben.
-Alle Standardwaffen bleiben verfügbar; die Siegel verleihen keine Statboni.
+Die Siegel verleihen keine Statboni. Zahnprüfung und Bronze schalten
+[weitere Startwaffen frei](META_PROGRESSION.md).
 
 Es zählt die ausdrücklich bestätigte Startwaffe. Verkauf, neue Waffen,
 Mk-Fusionen und Evolutionen ändern diese Zuordnung nicht. Arena- und Story-Runs

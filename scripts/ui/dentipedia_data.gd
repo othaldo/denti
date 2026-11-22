@@ -69,7 +69,7 @@ static func entries(category: int, discovered: Array[String]) -> Array[Dictionar
 				result.append({"title": item.display_name, "icon": item.icon_texture if item.icon_texture != null else DentiUIIcons.item(item.icon_index), "body": item.effect_text() + "\n\n" + item.limit_text(), "rarity_tier": item.rarity_tier})
 		2:
 			for relic in RelicCatalog.CATALOG:
-				result.append({"title": relic.display_name, "icon": DentiUIIcons.relic(relic.icon_index), "body": DentiAttributes.resolve_text(relic.description), "rarity_tier": 4, "rarity_caption": "Göttliches Relikt"})
+				result.append({"title": relic.display_name, "icon": DentiUIIcons.relic_icon(relic), "body": DentiAttributes.resolve_text(relic.description), "rarity_tier": 4, "rarity_caption": "Göttliches Relikt" if relic.class_id == &"" else "Relikt · " + ClassCatalog.by_id(relic.class_id).display_name})
 		3:
 			for type in DentiAttributes.ACTIVE:
 				result.append({"title": DentiAttributes.name_for(type), "icon": DentiUIIcons.stat(DentiAttributes.ICONS[type]), "body": DentiAttributes.meaning_for(type)})

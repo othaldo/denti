@@ -59,6 +59,7 @@ func _run() -> void:
 	game.wave.active = false
 	game.coins = 1000
 	game.player.loadout.restore([{"id": "floss_garrote", "tier": 4}, {"id": "turbo_drill", "tier": 1}])
+	game.items.acquire(ShopController.by_id(&"gold_probe"))
 	var target: WeaponInstance = game.player.loadout.equipped()[0]
 	var state: WeaponUpgradeState = game.rewards.weapon_upgrades
 	state.points = 20
@@ -82,13 +83,47 @@ func _run() -> void:
 				_check(root.gui_get_focus_owner() is OfferCard, "direction escaped the offer group")
 			shop.offer_buttons[2].grab_focus()
 			await _joy(JOY_BUTTON_LEFT_SHOULDER)
-			_check(shop.controller_focus.area == ShopControllerFocus.Area.BUILD and ControllerFocus.controls(scope).size() == 14, "build focus does not include the visible weapons and stats")
+			_check(shop.controller_focus.area == ShopControllerFocus.Area.BUILD and ControllerFocus.controls(scope).size() == 15, "build focus does not include the visible weapons, stats and collected item")
 			_check(shop.left_scroll.visible and shop.offer_scroll.visible and shop.stat_grid.visible and shop.inventory_scroll.visible, "focus switching hides comparison information")
+			var stat := shop.stat_chips[-1]
+			stat.grab_focus()
+			await _joy(JOY_BUTTON_DPAD_DOWN)
+			_check(root.gui_get_focus_owner() == shop.items_row.get_child(0), "Down skips collected items in the shop build")
+			await _joy(JOY_BUTTON_DPAD_UP)
+			_check(stat.has_focus(), "Up from collected items loses its build focus")
 			await _joy(JOY_BUTTON_RIGHT_SHOULDER)
 			_check(shop.offer_buttons[2].has_focus(), "switching areas lost the remembered offer")
 	root.size = Vector2i(1280, 720)
 	root.content_scale_size = root.size
 	await _settle()
+	await _joy(JOY_BUTTON_LEFT_SHOULDER)
+	var equipped := shop.inventory_row.get_child(0).get_child(0) as Button
+	equipped.grab_focus()
+	await _settle()
+	var weapon_icon := equipped.get_node("WeaponIcon") as TextureRect
+	var weapon_tier := equipped.get_node("WeaponTier") as Label
+	var icon_rect := weapon_icon.get_rect()
+	var tier_rect := weapon_tier.get_rect()
+	var key := InputEventKey.new()
+	key.physical_keycode = KEY_SHIFT
+	key.pressed = true
+	root.push_input(key)
+	await _settle()
+	_check(not input.controller_active and equipped.has_focus(), "controller to keyboard loses the equipped weapon")
+	_check(weapon_icon.get_rect().is_equal_approx(icon_rect) and weapon_tier.get_rect().is_equal_approx(tier_rect) and not equipped.has_node("WeaponName"), "equipped weapon changes presentation between keyboard and controller")
+	var click := InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.pressed = true
+	root.push_input(click)
+	click.pressed = false
+	root.push_input(click)
+	await _settle()
+	_check(not input.navigation_active and equipped.get_theme_stylebox("focus") is StyleBoxEmpty, "switching to the mouse leaves a navigation focus outline")
+	await _joy(JOY_BUTTON_DPAD_LEFT)
+	_check(input.controller_active and equipped.has_focus(), "controller reacquisition loses the leftmost equipped weapon")
+	await _joy(JOY_BUTTON_DPAD_DOWN)
+	_check(shop.inventory_row.get_child(1).get_child(0).has_focus(), "Down skips the next equipped row for an aligned stat")
+	await _joy(JOY_BUTTON_RIGHT_SHOULDER)
 	shop.offer_buttons[3].grab_focus()
 	await _joy(JOY_BUTTON_A)
 	_check(game.shop.offers[3] == null and shop.offer_buttons[2].has_focus(), "last-column purchase jumps to the first offer")
@@ -190,6 +225,17 @@ func _run() -> void:
 	await _joy(JOY_BUTTON_START)
 	_check(input.navigation.popup_open(), "closing pause does not restore native attribute details")
 	await _joy(JOY_BUTTON_B)
+	shop.inventory_row.get_child(0).get_child(0).grab_focus()
+	await _joy(JOY_BUTTON_A)
+	shop.details.sell_button.grab_focus()
+	await _joy(JOY_BUTTON_A)
+	_check(shop.details.cancel_button.has_focus(), "opening sale confirmation does not focus its safe action")
+	await _joy(JOY_BUTTON_A)
+	_check(shop.details.sell_button.has_focus() and game.player.loadout.equipped().size() == 2, "canceling the sale loses focus or sells the weapon")
+	await _joy(JOY_BUTTON_A)
+	shop.details.confirm_button.grab_focus()
+	await _joy(JOY_BUTTON_A)
+	_check(not shop.expanded and game.player.loadout.equipped().size() == 1 and shop.inventory_row.get_child(0).get_child(0).has_focus(), "sale confirmation loses the build and its next equipped weapon")
 	await _joy(JOY_BUTTON_RIGHT_SHOULDER)
 	for index in game.shop.offers.size(): game.shop.offers[index] = null
 	game._update_shop_panel()

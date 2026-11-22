@@ -26,8 +26,8 @@ func _run() -> void:
 		_fail("boss relic appeared before chest decision")
 		return
 	choose_panel(game.choice_panel, 1)
-	if game.rewards.step != PostWaveRewards.Step.RELICS or game.choice_panel.mode != &"relic" or game.rewards.pending_relics.size() != 3 or game.shop_panel.visible:
-		_fail("milestone boss did not offer three relics after other rewards")
+	if game.rewards.step != PostWaveRewards.Step.RELICS or game.choice_panel.mode != &"relic" or game.rewards.pending_relics.size() != RelicCatalog.OFFER_COUNT or game.shop_panel.visible:
+		_fail("milestone boss did not offer four relics after other rewards")
 		return
 	var wave_five_options: Array[String] = game.rewards.pending_relics.duplicate()
 	game._save_run()
@@ -52,8 +52,8 @@ func _run() -> void:
 		game.wave.current_wave = milestone
 		game.wave.active = false
 		game._begin_loot_collection()
-		if game.rewards.step != PostWaveRewards.Step.RELICS or game.rewards.pending_relics.size() != 3 or game.rewards.pending_relics.has(first_relic):
-			_fail("later milestone offered fewer than three choices or repeated an owned relic")
+		if game.rewards.step != PostWaveRewards.Step.RELICS or game.rewards.pending_relics.size() != RelicCatalog.OFFER_COUNT or game.rewards.pending_relics.has(first_relic):
+			_fail("later milestone offered fewer than four choices or repeated an owned relic")
 			return
 		choose_panel(game.choice_panel, 0)
 	if game.relics.owned.size() != 3 or game.relics.owned[0] == game.relics.owned[1] or game.relics.owned[1] == game.relics.owned[2]:

@@ -9,6 +9,10 @@ static func _follow_focus(node: Node) -> void:
 	if node is ScrollContainer: node.follow_focus = true
 	for child in node.get_children(): _follow_focus(child)
 
+static func style_buttons(node: Node, navigation_active: bool) -> void:
+	if node is BaseButton: MenuStyle.focus(node, navigation_active)
+	for child in node.get_children(): style_buttons(child, navigation_active)
+
 static func tag(control: Control, id: String) -> void:
 	control.set_meta("controller_focus_key", id)
 
@@ -22,6 +26,7 @@ static func visible(control: Control) -> bool:
 	if not is_instance_valid(control) or not control.is_inside_tree() or control.is_queued_for_deletion(): return false
 	var parent: Node = control
 	while parent != null:
+		if parent.is_queued_for_deletion(): return false
 		if parent is CanvasLayer and not parent.visible: return false
 		if parent is CanvasItem and not parent.visible: return false
 		parent = parent.get_parent()
@@ -87,7 +92,7 @@ static func neighbor(scope: Control, source: Control, side: Side) -> Control:
 		var target: Control = provider.call(source, side)
 		return target if accepts(scope, target) else null
 	var native := source.find_valid_focus_neighbor(side)
-	if contains(scope, native) and native != source and available(native): return native
+	if native != source and accepts(scope, native): return native
 	return spatial_neighbor(source, side, controls(scope))
 
 static func spatial_neighbor(source: Control, side: Side, candidates: Array[Control]) -> Control:

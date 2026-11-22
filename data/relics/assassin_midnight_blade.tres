@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/relic_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"assassin_midnight_blade"
+display_name = "Mitternachtsklinge"
+description = "Der erste Waffentreffer nach einem Dash überträgt die Hälfte des Gifts im Ziel auf bis zu vier Gegner daneben."
+tags = Array[StringName]([&"poison", &"mobility"])
+class_id = &"assassin"
+talent_icon = 20
