@@ -255,7 +255,9 @@ func _fit_content() -> void:
 			# Clipped labels report no automatic height. Reserve exactly their
 			# visible wrapped lines rather than a blank two-line slot on each item.
 			var line_height := ceilf(name_label.get_theme_font("font").get_height(name_label.get_theme_font_size("font_size")))
-			name_label.custom_minimum_size.y = line_height * clampi(name_label.get_line_count(), 1, 2)
+			# Compact cards hold price and pin right under the name: a fixed
+			# two-line name keeps them in place when a reroll changes the name.
+			name_label.custom_minimum_size.y = line_height * (2 if compact_catalog else clampi(name_label.get_line_count(), 1, 2))
 		var height := maxf(catalog_minimum_height, card_margin.get_combined_minimum_size().y)
 		if not is_equal_approx(custom_minimum_size.y, height):
 			custom_minimum_size.y = height
@@ -269,7 +271,7 @@ func _sync_catalog_slots() -> void:
 	category_label.visible = aligned_catalog or not category_label.text.is_empty()
 	effect_label.visible = aligned_catalog or not effect_label.text.is_empty()
 	if not aligned_catalog:
-		name_label.custom_minimum_size.y = ceilf(name_label.get_theme_font("font").get_height(name_label.get_theme_font_size("font_size")))
+		name_label.custom_minimum_size.y = ceilf(name_label.get_theme_font("font").get_height(name_label.get_theme_font_size("font_size"))) * (2.0 if compact_catalog else 1.0)
 		category_label.custom_minimum_size.y = 0
 		effect_label.custom_minimum_size.y = 0
 	if summary_row != null:

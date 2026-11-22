@@ -249,14 +249,17 @@ func _check_stable_actions(ui: ShopPanel, extent: Vector2i) -> bool:
 			var buy := Rect2(card.buy_button.global_position - card.global_position, card.buy_button.size)
 			var pin := Rect2(card.reserve_button.global_position - card.global_position, card.reserve_button.size)
 			# Desktop fields keep fixed baselines. Compact rows may shrink with
-			# their content, but price/pin stay anchored to the bottom corners.
+			# their content, but price/pin stay anchored: either to the bottom
+			# corners or, with actions under the name, to the top of the card.
 			var buy_anchor := Rect2(Vector2(buy.position.x, buy.position.y - card.size.y), buy.size)
 			var old_buy_anchor := Rect2(Vector2(buys[index].position.x, buys[index].position.y - card_sizes[index].y), buys[index].size)
 			var pin_anchor := Rect2(Vector2(pin.position.x, pin.position.y - card.size.y), pin.size)
 			var old_pin_anchor := Rect2(Vector2(pins[index].position.x, pins[index].position.y - card_sizes[index].y), pins[index].size)
 			var stable_actions := buy.is_equal_approx(buys[index]) and pin.is_equal_approx(pins[index]) and card.size.is_equal_approx(card_sizes[index])
 			if ui.compact:
-				stable_actions = buy_anchor.is_equal_approx(old_buy_anchor) and pin_anchor.is_equal_approx(old_pin_anchor)
+				var bottom_stable := buy_anchor.is_equal_approx(old_buy_anchor) and pin_anchor.is_equal_approx(old_pin_anchor)
+				var top_stable := buy.is_equal_approx(buys[index]) and pin.is_equal_approx(pins[index])
+				stable_actions = bottom_stable or top_stable
 			if not stable_actions or not card.scale.is_equal_approx(Vector2.ONE):
 				_fail("text, price or reservation moved/resized actions at %s: buy %s -> %s, pin %s -> %s" % [extent, buys[index], buy, pins[index], pin])
 				return false

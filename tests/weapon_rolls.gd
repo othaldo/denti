@@ -92,7 +92,9 @@ func _run() -> void:
 	var card: OfferCard = game.shop_panel.offer_buttons[0]
 	card.show_offer(mixed_offer, 9999)
 	card.show_weapon_values(mixed, 1, game.player)
-	assert(card.name_label.text.ends_with("Mk I"), "shop weapon name omits Mk")
+	# Desktop cards put the tier under the name; compact cards lead the category line with it.
+	var tier_shown: bool = card.name_label.text.ends_with("Mk I") or card.category_label.visible and card.category_label.text.begins_with("Mk I ·")
+	assert(tier_shown, "shop weapon card omits Mk")
 	assert(card.get_theme_stylebox("normal").border_color == DentiUIStyle.rarity_surface(1).border_color, "Mk I weapon inherits purple roll frame")
 	assert(card.summary_row.get_child(0).get_child(1).get_theme_color("font_color") == DentiUIStyle.rarity_text_color(4), "great damage roll has wrong color")
 	assert(card.summary_row.get_child(1).get_child(1).get_theme_color("font_color") == DentiUIStyle.rarity_text_color(1), "bad tempo roll inherits aggregate rarity")
