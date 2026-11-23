@@ -39,6 +39,7 @@ var wave_number: SpinBox
 var difficulty_select: OptionButton
 var class_select: OptionButton
 var necrodent_unlock_button: Button
+var unlock_all_button: Button
 var wave_button: Button
 var status: Label
 var stats: Dictionary = {}
@@ -209,6 +210,8 @@ func _build_ui() -> void:
 	_button(row, "Setzen", _set_class)
 	necrodent_unlock_button = _button(run, "Nekrodent freischalten", _unlock_necrodent)
 	necrodent_unlock_button.tooltip_text = "Schaltet die Klasse im lokalen Profil für neue Runs frei."
+	unlock_all_button = _button(run, "Alles freischalten", _unlock_all)
+	unlock_all_button.tooltip_text = "Öffnet alle Klassen und Waffen im lokalen Profil für neue Runs."
 	row = HBoxContainer.new()
 	run.add_child(row)
 	row.add_child(_label("Münzen"))
@@ -385,6 +388,11 @@ func _unlock_necrodent() -> void:
 	var result: Error = controls.game.session.debug_unlock_necrodent()
 	status.text = "Nekrodent im lokalen Profil freigeschaltet" if result == OK else "Freischaltung konnte nicht gespeichert werden"
 	_refresh_necrodent_unlock_button()
+
+
+func _unlock_all() -> void:
+	var result: Error = controls.game.session.debug_unlock_all()
+	status.text = "Alle Klassen und Waffen im lokalen Profil frei" if result == OK else "Freischaltung konnte nicht gespeichert werden"
 
 
 func _start_wave() -> void:

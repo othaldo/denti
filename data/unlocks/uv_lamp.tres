@@ -1,7 +1,10 @@
 [gd_resource type="Resource" script_class="WeaponUnlockData" load_steps=2 format=3]
+
 [ext_resource type="Script" path="res://scripts/systems/weapon_unlock_data.gd" id="1"]
+
 [resource]
 script = ExtResource("1")
 weapon_id = &"uv_lamp"
-source_ids = Array[StringName]([&"enamel_mirror", &"prophylaxis_polisher"])
-mastery_id = &"bronze"
+counter = &""
+amount = 0
+class_victory = &"tooth_fairy"

@@ -1,7 +1,7 @@
 class_name RunSaveData
 extends RefCounted
 
-const DICTIONARIES := ["player", "items", "relics", "telemetry", "rewards", "story", "weapon_mastery", "boss_stage_rewards", "poison_build", "talents", "class_combat"]
+const DICTIONARIES := ["player", "items", "relics", "telemetry", "rewards", "story", "weapon_mastery", "meta_progress", "boss_stage_rewards", "poison_build", "talents", "class_combat"]
 const ARRAYS := ["weapons", "owned_weapons", "enemies", "loot", "acid", "offers", "weapon_runtime", "player_projectiles", "upgrades", "horde_waves", "burst_times", "elite_times", "elite_counts", "new_fusion_discoveries"]
 const RECORD_ARRAYS := ["weapons", "enemies", "loot", "acid", "weapon_runtime", "player_projectiles"]
 
@@ -89,6 +89,7 @@ static func _valid_structure(value: Dictionary) -> bool:
 	# Check container contracts before passing JSON values to typed subsystem APIs.
 	var mastery: Dictionary = value.get("weapon_mastery", {})
 	if not _containers(mastery, [], ["earned", "pending", "unlocks", "pending_unlocks"]): return false
+	if not _containers(value.get("meta_progress", {}), ["pending"], ["unlocks", "pending_unlocks"]): return false
 	if mastery.has("eligible") and not mastery.eligible is bool: return false
 	if mastery.has("starter_id") and not mastery.starter_id is String: return false
 	for id in value.get("new_fusion_discoveries", []):

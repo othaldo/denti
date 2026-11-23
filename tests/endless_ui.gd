@@ -8,7 +8,8 @@ func _run() -> void:
 	root.add_child(panel)
 	root.get_node("GameSession").reduced_ui_motion = true
 	var recap := {"wave_reached": 20, "final_level": 40, "difficulty_id": "normal", "base_victory": true, "endless_enabled": false, "telemetry": {"elapsed": 1100, "kills": 2000, "coins_collected": 1500, "total_damage": 1000000, "weapon_damage": {"magic_toothbrush": 1000000}}}
-	recap.weapon_mastery = {"starter_id": "turbo_drill", "earned": ["exam", "bronze", "silver"], "unlocks": ["cavity_grinder", "interdental_brush"]}
+	recap.weapon_mastery = {"starter_id": "turbo_drill", "earned": ["exam", "bronze", "silver"]}
+	recap.weapon_unlocks = ["cavity_grinder", "interdental_brush"]
 	recap.new_fusion_discoveries = ["root_breaker"]
 	var notices := panel.end_notices
 	for extent in [Vector2i(320, 568), Vector2i(360, 640), Vector2i(568, 320), Vector2i(640, 360), Vector2i(600, 600), Vector2i(800, 600), Vector2i(1280, 720), Vector2i(1920, 1080)]:

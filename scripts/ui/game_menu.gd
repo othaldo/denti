@@ -805,7 +805,7 @@ func _show_setup_weapons() -> void:
 	for weapon in WeaponCatalog.starters_for(profile):
 		if not WeaponEligibility.starter(weapon, profile, setup.root_capacity): continue
 		options.append(weapon)
-		if not session.weapon_unlocked(weapon.id): locked[weapon.id] = WeaponUnlocks.requirement(weapon.id)
+		if not session.weapon_unlocked(weapon.id): locked[weapon.id] = WeaponUnlocks.requirement(weapon.id, session.progression_data)
 	setup.mark_reached(page)
 	setup_selector.show_preparation(setup, options, locked)
 	setup.weapon_id = setup_selector.selected_id
@@ -833,6 +833,8 @@ func _launch_prepared_run(weapon: WeaponData) -> void:
 		_show_difficulty()
 		return
 	launching_run = true
+	session.mark_seen("weapon:" + str(weapon.id))
+	session.mark_seen("class:" + str(setup.class_id))
 	session.selected_story_mode = setup.story_mode
 	session.pending_start_weapon_id = weapon.id
 	session.pending_start_class_id = setup.class_id

@@ -62,25 +62,19 @@ func _check_unlock() -> void:
 	var details: Array[String] = []
 	view.details_requested.connect(func(title: String, body: String) -> void: details.assign([title, body]))
 	necro_button.pressed.emit()
-	var count: Label = necro_button.get_node("UnlockProgress/ProgressRow/Count")
-	_check(count.text == "0/6" and view.selected_id == ClassCatalog.DEFAULT.id
-		and details.size() == 2 and details[1].contains("Frostwächter"), "locked tile lacks status or changed selection")
+	_check(necro_button.get_node("Lock").visible and view.selected_id == ClassCatalog.DEFAULT.id
+		and details.size() == 2 and details[1].contains("Blutungs- oder Gift-Waffe"), "locked tile lacks status or changed selection")
 	view.queue_free()
-	session.record_class_victory(&"good_old_molar", &"normal", true)
-	session.record_class_victory(&"assassin", &"hard", false)
-	_check(session.progression_data.class_wins.is_empty(), "unqualified runs count for class unlock")
-	var classes := ClassCatalog.MASTERY_CLASSES
-	for index in classes.size() - 1:
-		var difficulty := &"hell" if index == 1 else &"hard"
-		_check(not session.record_class_victory(classes[index], difficulty, true), "Nekrodent unlocked too early")
-	session.record_class_victory(classes[0], &"hell", true)
-	_check(session.progression_data.class_wins.size() == 5 and not session.class_unlocked(NECRO), "duplicate win counted")
-	await _start_game(classes.back())
+	session.record_class_victory(&"good_old_molar", &"hard", true)
+	_check(not session.class_unlocked(NECRO), "a class victory alone unlocked Nekrodent")
+	# A wave-20 victory on Normal with a poisoned weapon opens Nekrodent (and the Assassine).
+	await _start_game(ClassCatalog.DEFAULT.id)
+	game.player.loadout.equipped()[0].affixes.assign([{"id": "poison", "rarity": 1, "damage": 3.0}])
 	game.wave.current_wave = WaveController.MAX_WAVES
 	game.wave.difficulty_id = &"hard"
 	game._finish_run()
 	session.load_progression()
-	_check(session.class_unlocked(NECRO) and session.progression_data.class_wins.size() == 6, "sixth victory did not persist the unlock")
+	_check(session.class_unlocked(NECRO) and session.progression_data.unlocked_classes.has("necrodent"), "a poisoned wave-20 victory did not persist the unlock")
 	_check(session.hell_unlocked, "class progress interfered with Hell")
 	game.queue_free()
 	paused = false

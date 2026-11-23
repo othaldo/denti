@@ -231,10 +231,89 @@ func discover_fusion(id: StringName) -> bool:
 func _save_progression() -> Error:
 	return progression_data.save_to(progression_path)
 
+## Good Old Molar is always open; every other class follows ClassUnlocks.
+## Scripted runs (tests, bots) keep the regular classes open like weapons; the
+## Nekrodent stays locked there unless a test unlocks it explicitly.
 func class_unlocked(id: StringName) -> bool:
-	return ClassCatalog.by_id(id) != null and (id != ClassCatalog.NECRODENT_ID
-		or progression_data.necrodent_debug_unlocked
-		or progression_data.class_wins.size() == ClassCatalog.MASTERY_CLASSES.size())
+	if ClassCatalog.by_id(id) == null: return false
+	if ClassUnlocks.rule(id) == null or str(id) in progression_data.unlocked_classes: return true
+	if id == ClassCatalog.NECRODENT_ID: return progression_data.necrodent_debug_unlocked
+	return not weapon_locks_enabled or test_scenario_id != &""
+
+
+## Adds run counters and an optional class victory to the lifetime progress.
+## Returns weapons that opened through it; they are marked as fresh.
+func add_meta_progress(counts: Dictionary, victory_class: StringName = &"") -> Array[String]:
+	var gained: Array[String] = []
+	if test_scenario_id != &"": return gained
+	var before := progression_data.meta_snapshot()
+	for key in MetaCounters.KEYS:
+		var amount := int(counts.get(key, 0))
+		if amount > 0: progression_data.counters[key] = int(progression_data.counters.get(key, 0)) + amount
+	if victory_class != &"" and ClassCatalog.by_id(victory_class) != null and str(victory_class) not in progression_data.class_victories:
+		progression_data.class_victories.append(str(victory_class))
+	for id in WeaponUnlocks.newly_unlocked(before, progression_data):
+		gained.append(str(id))
+		_mark_fresh("weapon:" + str(id))
+	_save_progression()
+	return gained
+
+
+## Locked weapons and classes closest to opening by counters, for the run end.
+func near_unlocks(limit: int = 3) -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for entry in WeaponUnlocks.ALL:
+		if entry.counter == &"" or WeaponUnlocks.unlocked(entry.weapon_id, progression_data): continue
+		var progress := WeaponUnlocks.progress(entry.weapon_id, progression_data)
+		if progress.y <= 0 or progress.x <= 0: continue
+		result.append({"id": str(entry.weapon_id), "current": progress.x, "goal": progress.y,
+			"fraction": float(progress.x) / float(progress.y), "text": WeaponUnlocks.requirement(entry.weapon_id, progression_data)})
+	result.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.fraction > b.fraction)
+	return result.slice(0, limit)
+
+
+func is_fresh(key: String) -> bool:
+	return key in progression_data.fresh_unlocks
+
+
+## A fresh unlock was tried: drop its "Neu" badge.
+func mark_seen(key: String) -> void:
+	if progression_data.fresh_unlocks.has(key):
+		progression_data.fresh_unlocks.erase(key)
+		_save_progression()
+
+
+func _mark_fresh(key: String) -> void:
+	if not progression_data.fresh_unlocks.has(key): progression_data.fresh_unlocks.append(key)
+
+
+## Testmenü: open every class and weapon in the local profile.
+func debug_unlock_all() -> Error:
+	if not DebugRunControls.allowed() or test_scenario_id != &"": return ERR_UNAVAILABLE
+	for entry in WeaponUnlocks.ALL:
+		if entry.counter != &"":
+			progression_data.counters[str(entry.counter)] = maxi(int(progression_data.counters.get(str(entry.counter), 0)), entry.amount)
+		elif str(entry.class_victory) not in progression_data.class_victories:
+			progression_data.class_victories.append(str(entry.class_victory))
+	for entry in ClassUnlocks.ALL:
+		if str(entry.class_id) not in progression_data.unlocked_classes: progression_data.unlocked_classes.append(str(entry.class_id))
+	return _save_progression()
+
+
+## Stores every class a finished run qualifies for; returns the new ones.
+func record_class_unlocks(weapons: Array[WeaponInstance], wave: int, victory: bool, difficulty: StringName, eligible: bool) -> Array[String]:
+	var gained: Array[String] = []
+	if not eligible or test_scenario_id != &"": return gained
+	for id in ClassUnlocks.earned(progression_data.unlocked_classes, weapons, wave, victory, difficulty):
+		var was_open := class_unlocked(StringName(id))
+		progression_data.unlocked_classes.append(id)
+		if not was_open:
+			gained.append(id)
+			_mark_fresh("class:" + id)
+	if not gained.is_empty() and _save_progression() != OK:
+		for id in gained: progression_data.unlocked_classes.erase(id)
+		gained.clear()
+	return gained
 
 
 func debug_unlock_necrodent() -> Error:
@@ -280,7 +359,7 @@ func record_weapon_mastery(id: StringName, flags: int) -> Array[String]:
 
 func weapon_unlocked(id: StringName) -> bool:
 	if not weapon_locks_enabled or test_scenario_id != &"": return true
-	return WeaponUnlocks.unlocked(id, progression_data.weapon_masteries)
+	return WeaponUnlocks.unlocked(id, progression_data)
 
 
 func mastery_flags(id: StringName) -> int:

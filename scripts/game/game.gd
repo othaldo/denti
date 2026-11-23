@@ -54,6 +54,7 @@ var ended: bool:
 	set(value): run_flow.set_phase_flag(RunFlow.Phase.ENDED, value)
 var base_victory: bool = false
 var weapon_mastery := RunWeaponMastery.new()
+var meta_progress := RunMetaProgress.new()
 var new_fusion_discoveries: Array[String] = []
 var mastery_notice: WeaponMasteryNotice
 # Compatibility accessor: the phase is the only stored source of truth.
@@ -550,6 +551,7 @@ func _on_enemy_defeated(at: Vector2, data: EnemyData, treasure: bool = false) ->
 	if data.is_boss and not ended:
 		weapon_mastery.record(session, &"boss", wave.difficulty_id, wave.current_wave)
 	telemetry.record_kill(data.is_boss, data.is_elite)
+	if not ended: meta_progress.record_kill(data)
 	if not data.is_boss:
 		sound.play_cue(&"down")
 	var reward_drop: bool = wave.active and (data.is_elite or randf() < WaveController.loot_chance(wave.current_wave) * DifficultyCatalog.by_id(wave.difficulty_id).reward_chance_multiplier)
@@ -670,6 +672,7 @@ func _on_loot_collected(kind: StringName, amount: int, reward_id: StringName = &
 	sound.play_cue(&"pickup")
 	player.notify_loot(kind, amount, drop)
 	relics.on_loot_collected(kind)
+	if kind == &"coin": meta_progress.record_coins(amount)
 	if kind == &"chest":
 		if reward_id == WeaponAffixes.CHEST_ID and drop != null:
 			rewards.queue_affix_chest(drop.reward_data, items)
@@ -1011,6 +1014,7 @@ func _finish_loot_collection() -> void:
 		if dialogue_id != &"":
 			rewards.queue_story(dialogue_id)
 			story.completed_boss_wave = wave.current_wave
+	meta_progress.flush(session, weapon_mastery.eligible)
 	rewards.weapon_upgrades.points += rewards.upgrade_income.finish_wave(player.stats.luck, randf())
 	rewards.finish_collection(wave.current_wave >= WaveController.MAX_WAVES and not wave.endless_enabled)
 	_advance_post_wave_rewards()
@@ -1018,7 +1022,7 @@ func _finish_loot_collection() -> void:
 
 func _advance_post_wave_rewards() -> void:
 	if mastery_notice != null and rewards.step != PostWaveRewards.Step.END:
-		mastery_notice.present(weapon_mastery.starter_id, weapon_mastery.take_pending(), weapon_mastery.take_pending_unlocks())
+		mastery_notice.present(weapon_mastery.starter_id, weapon_mastery.take_pending(), meta_progress.take_pending_unlocks())
 	var progress := rewards.choice_progress()
 	if rewards.step in [PostWaveRewards.Step.LEVELS, PostWaveRewards.Step.CHESTS, PostWaveRewards.Step.RELICS, PostWaveRewards.Step.WEAPONS]:
 		get_node("/root/SceneTransitions").present(&"rewards")
@@ -1133,14 +1137,18 @@ func _finish_run() -> void:
 	base_victory = true
 	weapon_mastery.record(session, &"victory", wave.difficulty_id, wave.current_wave)
 	weapon_mastery.take_pending()
-	weapon_mastery.take_pending_unlocks()
 	boss_pending = false
 	_sync_music()
 	_clear_arena(true)
 	var recap := _run_recap_data()
 	recap["hell_unlocked_now"] = wave.difficulty_id == &"hard" and session.unlock_hell()
-	recap["necrodent_unlocked_now"] = wave.current_wave == WaveController.MAX_WAVES and session.record_class_victory(
-		player.stats.class_data.id, wave.difficulty_id, weapon_mastery.eligible)
+	if wave.current_wave == WaveController.MAX_WAVES:
+		session.record_class_victory(player.stats.class_data.id, wave.difficulty_id, weapon_mastery.eligible)
+	recap["class_unlocks"] = _record_class_unlocks(true)
+	meta_progress.record_run_end(false)
+	meta_progress.flush(session, weapon_mastery.eligible, player.stats.class_data.id)
+	meta_progress.take_pending_unlocks()
+	_add_meta_recap(recap)
 	choice_panel.show_end(true, coins, recap)
 	_save_completed_report(true)
 	session.clear_run()
@@ -1307,10 +1315,27 @@ func _on_player_died() -> void:
 	_sync_music()
 	_clear_arena(false)
 	shop_panel.visible = false
-	choice_panel.show_end(false, coins, _run_recap_data())
+	var recap := _run_recap_data()
+	recap["class_unlocks"] = _record_class_unlocks(base_victory)
+	meta_progress.record_run_end(true, not base_victory)
+	meta_progress.flush(session, weapon_mastery.eligible)
+	_add_meta_recap(recap)
+	choice_panel.show_end(false, coins, recap)
 	_save_completed_report(false)
 	session.clear_run()
 	get_tree().paused = true
+
+
+## Classes this finished run opens (ClassUnlocks); endless deaths after a
+## wave-20 victory still count as a victory.
+func _record_class_unlocks(victory: bool) -> Array[String]:
+	return session.record_class_unlocks(player.loadout.equipped(), wave.current_wave, victory, wave.difficulty_id, weapon_mastery.eligible)
+
+
+## Weapons this run opened and the closest next goals ("Fast geschafft").
+func _add_meta_recap(recap: Dictionary) -> void:
+	recap["weapon_unlocks"] = meta_progress.unlocks.duplicate()
+	recap["near_unlocks"] = session.near_unlocks() if weapon_mastery.eligible else []
 
 
 func _save_completed_report(won: bool) -> void:

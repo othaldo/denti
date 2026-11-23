@@ -2,7 +2,7 @@
 
 Stand: 22.10.2026, Freischaltungen 22.11.2026. Acht Standardwaffen sind sofort
 auswählbar; die übrigen zehn erscheinen gedimmt mit ihrer Bedingung und werden über
-[Meisterschafts-Siegel freigeschaltet](META_PROGRESSION.md).
+[Zähler aus allen Runs und Klassensiege freigeschaltet](META_PROGRESSION.md).
 Die Run-Vorbereitung nutzt eine gemeinsame native Auswahlbühne mit vier gemalten
 Schwierigkeitsmotiven, Iconraster und kompakter Waffenvorschau.
 [Gestaltungsgrundlage und Prüfregeln](UI_UX_PLAN.md).

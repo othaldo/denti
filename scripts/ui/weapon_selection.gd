@@ -83,6 +83,7 @@ func show_options(weapons: Array[WeaponData], selected: StringName = &"", locked
 		grid.add_child(button)
 		button.show_artwork(RunSetupPresentation.weapon_icon(options[index]))
 		if requirement != "": _mark_locked(button)
+		elif UnlockBadge.fresh("weapon:" + str(options[index].id)): UnlockBadge.attach(button)
 		icon_buttons.append(button)
 	art.texture = idle_art
 	art.modulate = Color.WHITE

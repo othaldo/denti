@@ -226,7 +226,7 @@ func _run() -> void:
 				projectile_index += 1
 		check(projectile_index == active_save.player_projectiles.size(), "full snapshot lost player projectiles")
 	game._on_player_died()
-	check(game.choice_panel.end_notices.notices.get_child_count() == discoveries.size(), "run result did not show every new Dentipedia discovery")
+	check(game.choice_panel.end_notices.count(&"fusion") == discoveries.size(), "run result did not show every new Dentipedia discovery")
 	paused = false
 	session.clear_run()
 	if failures.is_empty():

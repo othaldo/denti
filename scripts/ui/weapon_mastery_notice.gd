@@ -39,18 +39,27 @@ func _ready() -> void:
 	visible = false
 
 
+## Seals of the starter weapon and/or weapons the lifetime counters just opened.
 func present(id: StringName, awards: Array[String], unlocks: Array[String] = []) -> void:
-	if awards.is_empty() or not WeaponMasteries.valid_weapon(id): return
-	var definition := WeaponMasteries.by_id(StringName(awards[-1]))
-	if definition == null: return
-	icon.texture = WeaponMasteryIcons.icon(definition.icon_index)
-	source_title = "Zahnprüfung bestanden" if definition.id == &"exam" else definition.display_name + " erreicht"
-	source_weapon = WeaponCatalog.by_id(id).display_name
 	var unlocked: PackedStringArray = []
+	var first_unlock: WeaponData = null
 	for weapon_id in unlocks:
 		var weapon := WeaponCatalog.by_id(StringName(weapon_id))
-		if weapon != null: unlocked.append(weapon.display_name)
-	if not unlocked.is_empty(): source_weapon += "\nNeu: " + ", ".join(unlocked)
+		if weapon == null: continue
+		unlocked.append(weapon.display_name)
+		if first_unlock == null: first_unlock = weapon
+	var definition: WeaponMasteryData = WeaponMasteries.by_id(StringName(awards[-1])) if not awards.is_empty() and WeaponMasteries.valid_weapon(id) else null
+	if definition != null:
+		icon.texture = WeaponMasteryIcons.icon(definition.icon_index)
+		source_title = "Zahnprüfung bestanden" if definition.id == &"exam" else definition.display_name + " erreicht"
+		source_weapon = WeaponCatalog.by_id(id).display_name
+		if not unlocked.is_empty(): source_weapon += "\nNeu: " + ", ".join(unlocked)
+	elif first_unlock != null:
+		icon.texture = RunSetupPresentation.weapon_icon(first_unlock)
+		source_title = "Waffe freigeschaltet" if unlocked.size() == 1 else "Waffen freigeschaltet"
+		source_weapon = ", ".join(unlocked)
+	else:
+		return
 	remaining = 4.0
 	visible = true
 	_layout()

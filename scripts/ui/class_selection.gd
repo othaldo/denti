@@ -47,7 +47,7 @@ func _ready() -> void:
 		button.set_meta("controller_details", func() -> void: _show_class_details(profile))
 		gallery.add_child(button)
 		button.show_artwork(profile.portrait)
-		if profile.id == ClassCatalog.NECRODENT_ID: _add_unlock_progress(button)
+		if ClassUnlocks.rule(profile.id) != null: _add_lock(button)
 		button.pressed.connect(func() -> void:
 			if not session.class_unlocked(profile.id):
 				_show_class_details(profile)
@@ -93,32 +93,19 @@ func _label(parent: Node, font_size: int) -> Label:
 	parent.add_child(label)
 	return label
 
-func _add_unlock_progress(button: RunSetupChoice) -> void:
-	var progress := PanelContainer.new()
-	progress.name = "UnlockProgress"
-	progress.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	progress.add_theme_stylebox_override("panel", MenuStyle.box(DentiUIStyle.PANEL, DentiUIStyle.LINE, 8, 1))
-	button.add_child(progress)
-	progress.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
-	progress.offset_left = -51.0
-	progress.offset_top = -28.0
-	progress.offset_right = -6.0
-	progress.offset_bottom = -6.0
-	var row := HBoxContainer.new()
-	row.name = "ProgressRow"
-	row.alignment = BoxContainer.ALIGNMENT_CENTER
-	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	progress.add_child(row)
+func _add_lock(button: RunSetupChoice) -> void:
 	var lock := TextureRect.new()
+	lock.name = "Lock"
 	lock.texture = preload("res://assets/ui/setup_lock.svg")
-	lock.custom_minimum_size = Vector2(12, 12)
 	lock.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	lock.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	lock.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	row.add_child(lock)
-	var count := _label(row, 12)
-	count.name = "Count"
-	count.autowrap_mode = TextServer.AUTOWRAP_OFF
+	button.add_child(lock)
+	lock.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	lock.offset_left = -26
+	lock.offset_top = -26
+	lock.offset_right = -6
+	lock.offset_bottom = -6
 
 
 func profile() -> PlayerClassData:
@@ -128,11 +115,7 @@ func _show_class_details(data: PlayerClassData) -> void:
 	if session.class_unlocked(data.id):
 		details_requested.emit(data.display_name, DentipediaData.class_body(data))
 		return
-	var missing: PackedStringArray = []
-	for id in ClassCatalog.MASTERY_CLASSES:
-		if str(id) not in session.progression_data.class_wins:
-			missing.append(ClassCatalog.by_id(id).display_name)
-	details_requested.emit("Die dritten Zähne", "Besiege Welle 20 auf Hard oder Hell mit jeder dieser Klassen.\n\nOffen · " + ", ".join(missing))
+	details_requested.emit(data.display_name, ClassUnlocks.requirement(data.id))
 
 
 ## Facts derived from the class data, never duplicated as free text.
@@ -165,11 +148,11 @@ func refresh() -> void:
 		choice.selected = entry.id == selected_id
 		choice.keyboard_focus = keyboard_focus
 		choice.artwork.modulate.a = 1.0 if unlocked else 0.45
-		var progress := choice.get_node_or_null("UnlockProgress") as Control
-		if progress != null:
-			progress.visible = not unlocked
-			var count: Label = progress.get_node("ProgressRow/Count")
-			count.text = "%d/%d" % [session.progression_data.class_wins.size(), ClassCatalog.MASTERY_CLASSES.size()]
+		var lock := choice.get_node_or_null("Lock") as Control
+		if lock != null: lock.visible = not unlocked
+		var fresh: bool = unlocked and session.is_fresh("class:" + str(entry.id))
+		if fresh: UnlockBadge.attach(choice)
+		elif choice.has_node(UnlockBadge.NAME): choice.get_node(UnlockBadge.NAME).queue_free()
 		choice.refresh()
 		choice.set_meta("controller_action_label", entry.display_name)
 	var data := profile()

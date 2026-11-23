@@ -34,18 +34,19 @@ func present(recap: Dictionary) -> void:
 	scroll_vertical = 0
 
 	if recap.get("hell_unlocked_now", false):
-		_add_notice("Hell", "Schwierigkeit freigeschaltet", HELL_ART, DentiUIStyle.MINT)
-	if recap.get("necrodent_unlocked_now", false):
-		_add_notice("Die dritten Zähne", "Nekrodent freigeschaltet", ClassCatalog.by_id(ClassCatalog.NECRODENT_ID).portrait, DentiUIStyle.MINT)
+		_add_notice("Hell", "Schwierigkeit freigeschaltet", HELL_ART, DentiUIStyle.MINT, &"difficulty")
+	for id in recap.get("class_unlocks", []):
+		var profile := ClassCatalog.by_id(StringName(str(id)))
+		if profile != null: _add_notice(profile.display_name, "Klasse freigeschaltet", profile.portrait, DentiUIStyle.MINT, &"class")
 
 	# The wave-20 results already celebrated the starter's seals and their unlocks.
 	var after_victory := bool(recap.get("endless_enabled", false)) and bool(recap.get("base_victory", false))
 	if not after_victory:
 		var mastery: Dictionary = recap.get("weapon_mastery", {})
-		for id in mastery.get("unlocks", []):
+		for id in recap.get("weapon_unlocks", []):
 			var weapon := WeaponCatalog.by_id(StringName(id))
 			if weapon != null:
-				_add_notice(weapon.display_name, "Waffe freigeschaltet", RunSetupPresentation.weapon_icon(weapon), DentiUIStyle.MINT)
+				_add_notice(weapon.display_name, "Waffe freigeschaltet", RunSetupPresentation.weapon_icon(weapon), DentiUIStyle.MINT, &"weapon")
 		var starter := StringName(mastery.get("starter_id", ""))
 		if WeaponMasteries.valid_weapon(starter):
 			var weapon := WeaponCatalog.by_id(starter)
@@ -53,12 +54,29 @@ func present(recap: Dictionary) -> void:
 				var award := WeaponMasteries.by_id(StringName(id))
 				if award == null: continue
 				var title := "Zahnprüfung bestanden" if award.id == &"exam" else award.display_name + " erreicht"
-				_add_notice(title, weapon.display_name, WeaponMasteryIcons.icon(award.icon_index), DentiUIStyle.GOLD)
+				_add_notice(title, weapon.display_name, WeaponMasteryIcons.icon(award.icon_index), DentiUIStyle.GOLD, &"seal")
 
 	for id in recap.get("new_fusion_discoveries", []):
 		var recipe := WeaponEvolutions.by_id(StringName(id))
 		if recipe != null:
-			_add_notice(recipe.result.display_name, "Neu in der Dentipedia", RunSetupPresentation.weapon_icon(recipe.result), DentiUIStyle.MINT)
+			_add_notice(recipe.result.display_name, "Neu in der Dentipedia", RunSetupPresentation.weapon_icon(recipe.result), DentiUIStyle.MINT, &"fusion")
+
+	# The closest next goals keep "one more run" in view, even after a death.
+	# An endless death after the wave-20 result does not repeat them.
+	for goal: Dictionary in ([] if after_victory else recap.get("near_unlocks", [])):
+		var weapon := WeaponCatalog.by_id(StringName(str(goal.get("id", ""))))
+		if weapon == null: continue
+		var labels := _add_notice(weapon.display_name, "Fast geschafft · " + str(goal.get("text", "")), RunSetupPresentation.weapon_icon(weapon), DentiUIStyle.GOLD, &"goal")
+		var bar := ProgressBar.new()
+		bar.name = "GoalProgress"
+		bar.show_percentage = false
+		bar.custom_minimum_size = Vector2(0, 6)
+		bar.max_value = maxf(1.0, float(goal.get("goal", 1)))
+		bar.value = float(goal.get("current", 0))
+		bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		bar.add_theme_stylebox_override("background", MenuStyle.box(DentiUIStyle.BACKGROUND, Color.TRANSPARENT, 3, 0))
+		bar.add_theme_stylebox_override("fill", MenuStyle.box(DentiUIStyle.GOLD, Color.TRANSPARENT, 3, 0))
+		labels.add_child(bar)
 
 	if not has_entries() or not DentiUIMotion.enabled(self):
 		return
@@ -80,8 +98,14 @@ func fit(width: float, height: float) -> void:
 		card.focus_mode = Control.FOCUS_ALL if scrollable else Control.FOCUS_NONE
 
 
-func _add_notice(title: String, detail: String, texture: Texture2D, accent: Color) -> void:
+## Cards per kind (&"seal", &"weapon", &"class", &"fusion", &"goal", ...).
+func count(kind: StringName) -> int:
+	return notices.get_children().filter(func(card: Node) -> bool: return card.get_meta("notice_kind", &"") == kind).size()
+
+
+func _add_notice(title: String, detail: String, texture: Texture2D, accent: Color, kind: StringName = &"") -> VBoxContainer:
 	var card := PanelContainer.new()
+	card.set_meta("notice_kind", kind)
 	card.custom_minimum_size.y = CARD_HEIGHT
 	card.mouse_filter = Control.MOUSE_FILTER_PASS
 	var surface := MenuStyle.box(DentiUIStyle.PANEL.lerp(accent, 0.09), accent.darkened(0.32), 14, 1)
@@ -117,6 +141,7 @@ func _add_notice(title: String, detail: String, texture: Texture2D, accent: Colo
 	row.add_child(labels)
 	_add_label(labels, title, 15, DentiUIStyle.INK)
 	_add_label(labels, detail, 13, accent)
+	return labels
 
 
 func _add_label(parent: Control, value: String, font_size: int, color: Color) -> void:
