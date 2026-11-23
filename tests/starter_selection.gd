@@ -24,7 +24,7 @@ func _run() -> void:
 	current_scene = game
 	await _settle()
 	var view: StarterSelection = game.choice_panel.starter_selection
-	_check(view.options.size() == WeaponCatalog.ALL.size() and view.options.size() == 18, "starter catalog incomplete")
+	_check(view.options == WeaponCatalog.ALL, "starter catalog incomplete or out of order")
 	_check(view.selected_id == &"" and view.confirm_button.disabled, "new selection was implicitly confirmed")
 	_check(view.icon_buttons[0].has_focus(), "initial keyboard focus missing")
 	view.confirm_selection()

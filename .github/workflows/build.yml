@@ -46,6 +46,8 @@ jobs:
         run: |
           apt-get update -qq
           apt-get install -y -qq --no-install-recommends libfontconfig1 python3
+      - name: Run Python tool tests
+        run: python3 -m unittest discover -s tools/tests -v
       - name: Prepare Godot export templates
         run: |
           mkdir -p "$HOME/.local/share/godot/export_templates"
@@ -58,11 +60,10 @@ jobs:
         run: python3 tools/release_build.py stamp
       - name: Import project assets
         run: godot --headless --path . --editor --quit
-      - name: Run tests
+      - name: Run Godot tests
         env:
           TEST_SUITE: ${{ startsWith(github.ref, 'refs/tags/') && 'all' || inputs.test_suite || 'core' }}
         run: |
-          python3 -m unittest discover -s tools/tests -v
           # Full boss-route searches need headroom on shared runners under load.
           python3 tools/run_tests.py --godot godot --jobs 4 --suite "$TEST_SUITE" --timeout 300
       - name: Upload test logs and timings

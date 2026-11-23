@@ -36,8 +36,12 @@ def csv_values(value, allowed=None):
 
 
 def weapon_ids():
-    return re.findall(r'data/weapons/([a-z0-9_]+)\.tres',
-                      (ROOT / "scripts/weapons/weapon_catalog.gd").read_text(encoding="utf-8"))
+    catalog = (ROOT / "scripts/weapons/weapon_catalog.gd").read_text(encoding="utf-8")
+    # Comparison runs use the regular starter pool of the default class.
+    regular = re.search(r"^const ALL\b[^=\n]*=\s*\[(.*?)^\s*\]", catalog, re.MULTILINE | re.DOTALL)
+    if regular is None:
+        raise ValueError("Could not find the regular weapon catalog")
+    return re.findall(r'^\s*preload\("res://data/weapons/([a-z0-9_]+)\.tres"\)', regular[1], re.MULTILINE)
 
 
 def parse_args(argv=None):

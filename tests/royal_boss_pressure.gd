@@ -236,33 +236,31 @@ func _route(boss: Enemy, corner: Vector2, cycle: int) -> bool:
 		a._edict()
 		duration = a.edict_warning_duration() + a.profile.shots.lifetime + a.profile.impact_seconds
 	var saved := EnemySnapshot.capture(boss)
-	for radius in [140, 210, 230]:
-		for route in 32:
-			EnemySnapshot.restore(boss, saved)
-			player.global_position = corner
-			player.hurt_time = 0
-			player.stats.health = player.stats.max_health
-			var goal: Vector2 = (corner + Vector2.from_angle(route * TAU / 32) * radius).clamp(Vector2.ONE * 48, game.arena.arena_size - Vector2.ONE * 48)
-			var safe := true
-			for tick in ceili(duration / STEP):
-				var before := player.global_position
-				player.global_position = before.move_toward(goal, PlayerStats.BASE_MOVE_SPEED * 0.72 * STEP)
-				player.velocity = (player.global_position - before) / STEP
-				if Geometry2D.get_closest_point_to_segment(boss.global_position, before, player.global_position).distance_to(boss.global_position) <= boss.data.radius + 20:
-					safe = false
-					break
-				if boss.caramel_encounter != null:
-					var a := boss.caramel_encounter
-					if a.state == CaramelEncounter.State.HEART_WINDUP: a.advance(STEP)
-					else: a.hearts.advance(STEP, 0)
+	for goal in escape_goals(corner, game.arena.arena_size, [140, 210, 230]):
+		EnemySnapshot.restore(boss, saved)
+		player.global_position = corner
+		player.hurt_time = 0
+		player.stats.health = player.stats.max_health
+		var safe := true
+		for tick in ceili(duration / STEP):
+			var before := player.global_position
+			player.global_position = before.move_toward(goal, PlayerStats.BASE_MOVE_SPEED * 0.72 * STEP)
+			player.velocity = (player.global_position - before) / STEP
+			if Geometry2D.get_closest_point_to_segment(boss.global_position, before, player.global_position).distance_to(boss.global_position) <= boss.data.radius + 20:
+				safe = false
+				break
+			if boss.caramel_encounter != null:
+				var a := boss.caramel_encounter
+				if a.state == CaramelEncounter.State.HEART_WINDUP: a.advance(STEP)
+				else: a.hearts.advance(STEP, 0)
+			else:
+				var a := boss.crown_court_encounter
+				if a.state in [CrownCourtEncounter.State.EDICT_WARN, CrownCourtEncounter.State.EDICT_HIT]: a.advance(STEP)
 				else:
-					var a := boss.crown_court_encounter
-					if a.state in [CrownCourtEncounter.State.EDICT_WARN, CrownCourtEncounter.State.EDICT_HIT]: a.advance(STEP)
-					else:
-						a.shots.advance(STEP, 0)
-						a.lances.advance(STEP, 0)
-				if player.stats.health < player.stats.max_health:
-					safe = false
-					break
-			if safe: return true
+					a.shots.advance(STEP, 0)
+					a.lances.advance(STEP, 0)
+			if player.stats.health < player.stats.max_health:
+				safe = false
+				break
+		if safe: return true
 	return false

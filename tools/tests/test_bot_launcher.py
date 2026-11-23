@@ -30,11 +30,11 @@ class LauncherTests(unittest.TestCase):
     def test_all_weapon_comparison_has_every_regular_weapon_and_requested_seeds(self, _which):
         settings = self.settings(mode="comparison", weapons="*", skills="*", seeds="42,123", jobs="3")
         args = parse_args(settings.arguments())
-        self.assertEqual(set(args.weapons), set(weapons()))
-        self.assertEqual(len(args.weapons), 18)
+        self.assertEqual(args.weapons, list(weapons()))
+        self.assertNotIn("extraction_staff", args.weapons)
         self.assertEqual(args.jobs, 3)
         self.assertEqual(args.seeds, [42, 123])
-        self.assertEqual(settings.run_count(), 18 * 3 * 2)
+        self.assertEqual(settings.run_count(), len(args.weapons) * len(args.skills) * len(args.seeds))
         self.assertFalse(args.visible)
 
     @patch("bot_launcher.shutil.which", side_effect=lambda path: path)

@@ -54,13 +54,15 @@ func _run() -> void:
 	if view == null:
 		finish(1)
 		return
-	_check(view.cards.size() == 18 and view.total_label.text == "10/72", "catalogue or total mastery progress wrong")
+	var weapon_count := WeaponCatalog.ALL.size()
+	var mastery_count := weapon_count * WeaponMasteries.ALL.size()
+	_check(view.cards.size() == weapon_count and view.total_label.text == "10/%d" % mastery_count, "catalogue or total mastery progress wrong")
 	view.filter.select(2)
 	view.filter.item_selected.emit(2)
 	_check(view.cards.size() == 1 and view.cards[0].data.id == &"magic_toothbrush", "completed filter includes partial mastery")
 	view.filter.select(1)
 	view.filter.item_selected.emit(1)
-	_check(view.cards.size() == 17, "open filter hides partial progress")
+	_check(view.cards.size() == weapon_count - 1, "open filter hides partial progress")
 	view.filter.select(0)
 	view.search.text = "Garotte"
 	view.search.text_changed.emit(view.search.text)

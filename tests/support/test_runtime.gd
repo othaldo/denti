@@ -51,6 +51,25 @@ func _stop_audio(node: Node) -> void:
 		_stop_audio(child)
 
 
+## Check inward routes first. Outward angles often clamp to the same endpoint.
+static func escape_goals(corner: Vector2, arena_size: Vector2, radii: Array[int]) -> PackedVector2Array:
+	const DIRECTIONS := 32
+	const ANGLE_STEP := TAU / DIRECTIONS
+	const MARGIN := Vector2(48, 48)
+	var inward := roundi(corner.angle_to_point(arena_size * 0.5) / ANGLE_STEP)
+	var goals := PackedVector2Array()
+	var seen: Dictionary[Vector2, bool] = {}
+	for radius in radii:
+		for index in DIRECTIONS:
+			var offset := ceili(index * 0.5) * (1 if index % 2 else -1)
+			var angle := posmod(inward + offset, DIRECTIONS) * ANGLE_STEP
+			var goal := (corner + Vector2.from_angle(angle) * radius).clamp(MARGIN, arena_size - MARGIN)
+			if seen.has(goal): continue
+			seen[goal] = true
+			goals.append(goal)
+	return goals
+
+
 # Existing gameplay fixtures retain their original three starting loadouts.
 # Exercise the real preview + explicit confirmation flow before combat.
 func choose_panel(panel: ChoicePanel, index: int) -> void:

@@ -19,19 +19,19 @@ func _run() -> void:
 	choose_panel(game.choice_panel, 0)
 	game.wave.active = false
 	game.player.stats.crit_chance = 0.0
-	if WeaponCatalog.ALL.size() != 18 or WeaponCatalog.STARTERS != WeaponCatalog.ALL:
-		_fail("catalog or starter count changed incorrectly")
+	if WeaponCatalog.STARTERS != WeaponCatalog.ALL:
+		_fail("regular starters do not match the weapon catalog")
 		return
-	for index in range(8, 18):
-		var data := WeaponCatalog.ALL[index]
+	for data in WeaponCatalog.ALL:
 		var offer := ShopController.by_id(data.id)
-		if offer == null or offer.weapon_data != data or offer.price != data.price or not data.sprite is AtlasTexture:
-			_fail("missing shop or atlas integration: " + str(data.id))
+		if offer == null or offer.weapon_data != data or offer.price != data.price or data.sprite == null:
+			_fail("missing shop offer or weapon icon: " + str(data.id))
 			return
-		var atlas := data.sprite as AtlasTexture
-		if not atlas.filter_clip or not Rect2(Vector2.ZERO, atlas.atlas.get_size()).encloses(atlas.region):
-			_fail("invalid atlas region: " + str(data.id))
-			return
+		if data.sprite is AtlasTexture:
+			var atlas := data.sprite as AtlasTexture
+			if not atlas.filter_clip or not Rect2(Vector2.ZERO, atlas.atlas.get_size()).encloses(atlas.region):
+				_fail("invalid atlas region: " + str(data.id))
+				return
 		for tier in range(1, 5):
 			game.player.loadout.restore([{"id": str(data.id), "tier": tier, "invested_coins": 42}])
 			var saved_loadout: Array[Dictionary] = game.player.loadout.save_data()

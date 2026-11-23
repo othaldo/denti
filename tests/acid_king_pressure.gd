@@ -174,28 +174,26 @@ func _combined_route(boss: Enemy, corner: Vector2, channel_axis: int) -> bool:
 	attack._activate_fields(attack.stomp_warning_duration() + attack._stomp_duration() + attack.profile.recall_seconds)
 	attack._warn_stomp(-1)
 	var snapshot := EnemySnapshot.capture(boss)
-	for radius in [90, 130, 160, 210, 230]:
-		for route in 32:
-			EnemySnapshot.restore(boss, snapshot)
-			player.global_position = corner
-			player.velocity = Vector2.ZERO
-			player.stats.health = maximum
-			player.hurt_time = 0
-			var goal: Vector2 = (corner + Vector2.from_angle(route * TAU / 32) * radius).clamp(Vector2.ONE * 48, game.arena.arena_size - Vector2.ONE * 48)
-			var safe := true
-			for tick in ceili((attack.stomp_warning_duration() + attack._stomp_duration() + attack.profile.shards.lifetime) / STEP):
-				var previous := player.global_position
-				player.global_position = previous.move_toward(goal, PlayerStats.BASE_MOVE_SPEED * 0.72 * STEP)
-				player.velocity = (player.global_position - previous) / STEP
-				if Geometry2D.get_closest_point_to_segment(boss.global_position, previous, player.global_position).distance_to(boss.global_position) <= boss.data.radius + 20:
-					safe = false
-					break
-				if attack.state in [AcidKingEncounter.State.WARN_STOMP, AcidKingEncounter.State.STOMP]: attack.advance(STEP)
-				else:
-					attack._tick_fields(STEP, 0)
-					attack.volley.advance(STEP, 0)
-				if player.stats.health < maximum:
-					safe = false
-					break
-			if safe: return true
+	for goal in escape_goals(corner, game.arena.arena_size, [90, 130, 160, 210, 230]):
+		EnemySnapshot.restore(boss, snapshot)
+		player.global_position = corner
+		player.velocity = Vector2.ZERO
+		player.stats.health = maximum
+		player.hurt_time = 0
+		var safe := true
+		for tick in ceili((attack.stomp_warning_duration() + attack._stomp_duration() + attack.profile.shards.lifetime) / STEP):
+			var previous := player.global_position
+			player.global_position = previous.move_toward(goal, PlayerStats.BASE_MOVE_SPEED * 0.72 * STEP)
+			player.velocity = (player.global_position - previous) / STEP
+			if Geometry2D.get_closest_point_to_segment(boss.global_position, previous, player.global_position).distance_to(boss.global_position) <= boss.data.radius + 20:
+				safe = false
+				break
+			if attack.state in [AcidKingEncounter.State.WARN_STOMP, AcidKingEncounter.State.STOMP]: attack.advance(STEP)
+			else:
+				attack._tick_fields(STEP, 0)
+				attack.volley.advance(STEP, 0)
+			if player.stats.health < maximum:
+				safe = false
+				break
+		if safe: return true
 	return false
