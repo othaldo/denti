@@ -3,6 +3,21 @@ extends RefCounted
 
 const ALL: Array[ShopOfferData] = [
 	preload("res://data/items/poison_depot.tres"),
+	# Synergy expansion (docs/ITEM_SYNERGY_EXPANSION.md).
+	preload("res://data/items/flower_pot.tres"),
+	preload("res://data/items/fertilizer.tres"),
+	preload("res://data/items/root_net.tres"),
+	preload("res://data/items/pocket_bed.tres"),
+	preload("res://data/items/floss_trap.tres"),
+	preload("res://data/items/spring_coil.tres"),
+	preload("res://data/items/echo_crown.tres"),
+	preload("res://data/items/slide_wax.tres"),
+	preload("res://data/items/catalyst.tres"),
+	preload("res://data/items/thermos.tres"),
+	preload("res://data/items/storm_cloud.tres"),
+	preload("res://data/items/mint_bed.tres"),
+	preload("res://data/items/spicy_paste.tres"),
+	preload("res://data/items/compost.tres"),
 	preload("res://data/items/nerve_probe.tres"),
 	preload("res://data/items/metal_crown.tres"),
 	preload("res://data/items/fluoride_gel.tres"),

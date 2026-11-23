@@ -5,6 +5,7 @@ const ITEM_ATLAS: Texture2D = preload("res://assets/items/item_icons_atlas.png")
 const ITEM_EXPANSION: Texture2D = preload("res://assets/items/item_icons_expansion.png")
 const ITEM_EXPANSION_2: Texture2D = preload("res://assets/items/item_icons_expansion_2.png")
 const ITEM_ECONOMY: Texture2D = preload("res://assets/items/item_icons_economy.png")
+const ITEM_SYNERGY: Texture2D = preload("res://assets/items/item_icons_synergy.png")
 const ITEM_FAMILIES: Array[Texture2D] = [
 	preload("res://assets/items/item_icons_families_1_packed.png"),
 	preload("res://assets/items/item_icons_families_2_packed.png"),
@@ -101,7 +102,14 @@ const HUD_COLUMNS := 3
 const HUD_ROWS := 2
 
 
+const SYNERGY_ICON_START := 120
+const SYNERGY_COLUMNS := 7
+const SYNERGY_ROWS := 2
+
+
 static func item(index: int) -> Texture2D:
+	if index >= SYNERGY_ICON_START and index < SYNERGY_ICON_START + SYNERGY_COLUMNS * SYNERGY_ROWS:
+		return _region(ITEM_SYNERGY, index - SYNERGY_ICON_START, SYNERGY_COLUMNS, SYNERGY_ROWS)
 	if index >= 103 and index <= 105:
 		return _poison_icon(index - 103)
 	if index >= SUPPORT_ICON_START and index < SUPPORT_ICON_START + SUPPORT_REGIONS.size():

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"root_net"
+icon_index = 122
+display_name = "Wurzelnetz"
+description = "Jedes Gefolgsmitglied in deiner Nähe gibt 3 % Waffenschaden, höchstens 30 %."
+rarity_tier = 4
+price = 22
+effect_kind = &"summon_proximity"
+effect_value = 0.03
+max_stacks = 1
+tags = Array[StringName]([&"summon"])

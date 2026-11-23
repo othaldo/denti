@@ -70,7 +70,7 @@ func max_segments() -> int:
 	return SEGMENTS + 4 * roundi(power("rinse_hose"))
 
 func segment_seconds() -> float:
-	return SEGMENT_SECONDS + 1.5 * power("rinse_drip")
+	return (SEGMENT_SECONDS + 1.5 * power("rinse_drip")) * (1.0 + items().power(&"placed_duration"))
 
 func surge_factor() -> float:
 	return 1.5 if power("rinse_pressure") > 0.0 else 1.0

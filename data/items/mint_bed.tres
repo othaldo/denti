@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"mint_bed"
+icon_index = 131
+display_name = "Minzbeet"
+description = "Eliten und jeder 25. Kill lassen ein Minzblatt fallen, das heilt. Jede weitere Kopie: fünf Kills weniger."
+rarity_tier = 2
+price = 9
+effect_kind = &"mint_drops"
+effect_value = 1.0
+max_stacks = 4
+tags = Array[StringName]([&"heal", &"economy"])

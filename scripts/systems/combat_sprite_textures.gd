@@ -4,6 +4,7 @@ extends RefCounted
 # Small shared textures replace per-node circle tessellation/draw calls.
 const RESOLUTION := 2.0
 const UPGRADE_CAPSULE: Texture2D = preload("res://assets/loot/upgrade_capsule.png")
+const MINT_LEAF: Texture2D = preload("res://assets/loot/mint_leaf.png")
 static var textures: Dictionary[String, Texture2D] = {}
 const PREPARED = preload("res://scripts/systems/prepared_combat_textures.gd")
 
@@ -72,6 +73,8 @@ static func rocket_image(tint: Color) -> Image:
 static func loot(kind: StringName) -> Texture2D:
 	if kind == &"chest":
 		return UPGRADE_CAPSULE
+	if kind == &"mint":
+		return MINT_LEAF
 	if not textures.has("loot:xp"):
 		var kinds: Array[StringName] = [&"xp", &"coin", &"chest"]
 		var prepared: Texture2D = PREPARED.find("loot:xp")

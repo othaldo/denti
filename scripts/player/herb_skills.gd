@@ -169,11 +169,11 @@ func lifetime(kind: int, weapon: WeaponInstance = null) -> float:
 	var seconds := LIFETIME + LIFETIME_PER_TIER * float(_tier(weapon) - 1) + power("herb_life")
 	if kind == Kind.SHRUB and power("shrub_roots") > 0.0: seconds *= 2.0
 	if power("herb_monoculture") > 0.0: seconds *= MONOCULTURE_LIFE
-	return seconds
+	return seconds * (1.0 + items().power(&"placed_duration"))
 
 func plant_health(weapon: WeaponInstance = null) -> float:
 	if weapon == null: weapon = staff()
-	return (PLANT_HEALTH + PLANT_HEALTH_PER_TIER * float(_tier(weapon) - 1)) * (1.0 + power("herb_hedge"))
+	return (PLANT_HEALTH + PLANT_HEALTH_PER_TIER * float(_tier(weapon) - 1)) * (1.0 + power("herb_hedge")) * (1.0 + 2.0 * items().power(&"summon_power"))
 
 ## Next herb in the planting rotation.
 func next_kind() -> int:
@@ -361,6 +361,7 @@ func _shoot(entry: Dictionary, weapon: WeaponInstance, delta: float) -> void:
 		var target: Enemy = targets[index % targets.size()]
 		var base := data.raw_damage_with_stats(weapon.tier, player.stats) + scaled(power("herb_damage"))
 		if entry.kind == Kind.SHRUB: base *= SHRUB_SHARE
+		base *= 1.0 + items().power(&"summon_power")
 		var damage := player.stats.roll_critical_damage(base, data.crit_bonus, data.crit_multiplier)
 		var critical := player.stats.last_roll_critical
 		var projectile := pool.acquire(data, weapon.tier)
@@ -393,6 +394,8 @@ func _contact(entry: Dictionary, delta: float) -> void:
 	entry.health = maxf(float(entry.health) - damage, 0.0)
 
 func _wilt(entry: Dictionary, natural: bool) -> void:
+	var synergies := player.get_parent().get_node_or_null("Synergies") as SynergyItems
+	if synergies != null: synergies.on_summon_lost(entry.at)
 	if entry.kind == Kind.TOTEM and natural and power("totem_cutting") > 0.0:
 		var source := staff_of(entry)
 		plants.append({"kind": Kind.SAGE, "at": entry.at, "grow": GROW_SECONDS, "life": lifetime(Kind.SAGE, source), "health": plant_health(source),

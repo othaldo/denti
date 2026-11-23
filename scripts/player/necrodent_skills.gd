@@ -88,7 +88,15 @@ func roster_counts() -> PackedInt32Array:
 
 
 func tooth_max_health(kind: int) -> float:
-	return maxf(BASE_SCHMELZ[kind] + (player.stats.max_health - 100.0) * 0.5, 1.0)
+	# Dünger: summons endure more.
+	return maxf(BASE_SCHMELZ[kind] + (player.stats.max_health - 100.0) * 0.5, 1.0) * (1.0 + 2.0 * items().power(&"summon_power"))
+
+## Standing teeth (not recovering) within `radius`; Wurzelnetz counts them.
+func standing_near(at: Vector2, radius: float) -> int:
+	var count := 0
+	for tooth in teeth:
+		if tooth.health > 0.0 and tooth.recovery <= 0.0 and tooth.at.distance_squared_to(at) <= radius * radius: count += 1
+	return count
 
 
 static func for_player(denti: Player) -> NecrodentSkills:
@@ -297,6 +305,9 @@ func _check_contact(tooth: Tooth, delta: float) -> void:
 	tooth.contact_left = CONTACT_INTERVAL
 	tooth.health = maxf(tooth.health - damage, 0.0)
 	if tooth.health > 0.0: return
+	# Kompost: a fallen tooth may leave a mint leaf.
+	var synergies := player.get_parent().get_node_or_null("Synergies") as SynergyItems
+	if synergies != null: synergies.on_summon_lost(tooth.at)
 	tooth.recovery = RECOVERY_SECONDS
 	tooth.emerge_left = 0.0
 	tooth.target = null
@@ -327,7 +338,7 @@ static func enchantment_share(count: int) -> float:
 
 
 func _bite(tooth: Tooth, enemy: Enemy, staff: WeaponInstance) -> void:
-	var raw := _base_bite_damage(tooth.kind)
+	var raw := _base_bite_damage(tooth.kind) * (1.0 + items().power(&"summon_power"))
 	if enemy == marked and power("necro_focus") > 0.0:
 		raw *= 1.0 + minf(tooth.streak * 0.12, 0.60) * (1.0 + power("necro_focus_power"))
 	var data := staff.data if staff != null else WeaponCatalog.EXTRACTION_STAFF

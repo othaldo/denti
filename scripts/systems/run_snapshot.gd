@@ -191,7 +191,7 @@ static func restore(game, saved: Dictionary) -> void:
 			weapon.focus_time = clampf(float(entry.get("focus_time", 0.0)), 0.0, 30.0)
 	for entry in saved.get("loot", []):
 		var kind := StringName(str(entry.get("kind", "xp")))
-		if kind == &"xp" or kind == &"coin" or kind == &"chest" and (ShopController.by_id(StringName(str(entry.get("reward_id", "")))) != null or not WeaponAffixes.sanitize_chest(entry.get("reward_data", {})).is_empty()):
+		if kind == &"xp" or kind == &"coin" or kind == &"mint" or kind == &"chest" and (ShopController.by_id(StringName(str(entry.get("reward_id", "")))) != null or not WeaponAffixes.sanitize_chest(entry.get("reward_data", {})).is_empty()):
 			game._spawn_loot(SnapshotValues.read_vector(entry.get("position", [0.0, 0.0])), kind, maxi(int(entry.get("amount", 1)), 1), StringName(str(entry.get("reward_id", ""))), entry.get("reward_data", {}))
 	for entry in saved.get("acid", []):
 		var projectile := EnemyProjectilePatterns.acquire(game.get_node("EnemyProjectiles"))

@@ -1,6 +1,6 @@
 # Items und Builds
 
-Die Zahnklinik bietet **96 Items**: 17 Familien mit je vier Seltenheiten, 19 ergänzende Spezialitems und neun einmalige Mythics. Alle ursprünglichen 32 Items behalten ihre IDs, Effekte und Icons; 64 neue Items ergänzen den Pool. [Zahnflutsch](DODGE.md), [Giftpaket](POISON_PACKAGE.md).
+Die Zahnklinik bietet **110 Items**: 17 Familien mit je vier Seltenheiten, 19 ergänzende Spezialitems, 14 [Synergie-Items](#synergie-items-gefolge-dash-reaktionen-ernte) und neun einmalige Mythics. Alle ursprünglichen 32 Items behalten ihre IDs, Effekte und Icons; 64 neue Items ergänzen den Pool. [Zahnflutsch](DODGE.md), [Giftpaket](POISON_PACKAGE.md).
 
 **Common / Gewöhnlich**, **Uncommon / Ungewöhnlich**, **Rare / Selten** und **Legendary / Legendär** bieten verschiedene Kombinationen aus Bonus, Synergie und Nachteil. Seltenere Varianten sind eigene Items: Sie ersetzen vorhandene Exemplare nicht und fusionieren nicht. Das **Familienlimit liegt bei zwölf Exemplaren über alle vier Seltenheiten zusammen**. Frühe Käufe lassen damit Platz für spätere, seltenere Varianten. Spezialitems lassen sich in der Regel sechsmal stapeln. Goldsonde, Zahnfee-Pfand, Speichelkelch, Amalgamkern und Zuckerschock behalten wegen ihrer begrenzten Spezialeffekte zwei Exemplare; Göttliches Siegel und Mythics bleiben einmalig. Gespeicherte Builds behalten ihren Besitz.
 
@@ -238,6 +238,32 @@ Diese 16 bisherigen Items ergänzen die Familien mit eigenen Regeln. Ihre Stapel
 | Skalpellwachs | Rare | +35 % Schaden gegen blutende Gegner. | 6 | 12 |
 | Zuckerschock | Rare | Alle 12 Kills: 4 s +30 % Angriffstempo (max. +50 %), dann 3 s -25 %. -10 Leben. | 2 | 13 |
 | Göttliches Siegel | Legendary | Zu Wellenbeginn +2 Schilde. | 1 | 22 |
+
+## Synergie-Items: Gefolge, Dash, Reaktionen, Ernte
+
+Diese 14 Items verbinden die neueren Mechaniken: Gefolge (Kräuterzahn-Pflanzen,
+Nekrodent-Zähne), platzierte Felder, den Dash, Element-Reaktionen und die neue Beute
+**Minzblatt** (heilt beim Einsammeln). [Bauplan und Regeln](ITEM_SYNERGY_EXPANSION.md).
+
+| Item | Seltenheit | Effekt | Max. | Basispreis |
+| --- | --- | --- | ---: | ---: |
+| Blumentopf | Uncommon | Platzierte Pflanzen, Eiswände, Giftfelder, Spülspur und Pfützen halten 15 % länger. −3 % Bewegung. | 6 | 9 |
+| Dünger | Uncommon | Gefolge (Pflanzen, untote Zähne) verursacht 12 % mehr Schaden und hält 25 % mehr aus. | 6 | 9 |
+| Wurzelnetz | Legendary | Jedes Gefolgsmitglied in deiner Nähe gibt 3 % Waffenschaden, höchstens 30 %. | 1 | 22 |
+| Taschenbeet | Rare | Alle 10 Kills wächst kurz ein wilder Salbeitrieb bei dir, der mit deinem Fernschaden schießt. Jede weitere Kopie: zwei Kills weniger (mindestens 4). | 4 | 13 |
+| Zahnseidenfalle | Uncommon | Jeder Dash legt eine Falle, die beim ersten Gegner in der Nähe explodiert. | 6 | 9 |
+| Sprungfeder | Rare | +1 Dash-Ladung. −10 Schmelz. | 2 | 12 |
+| Nachhall-Krone | Rare | Am Ende eines Dashes greifen alle Waffen sofort an, höchstens alle 4 s. | 1 | 13 |
+| Rutschwachs | Uncommon | Kurz nach einem Dash verursachen Waffen 30 % mehr Schaden. | 3 | 8 |
+| Katalysator | Rare | Element-Reaktionen (Frost, Dampf, Giftstichflamme) verursachen 40 % mehr Schaden. | 3 | 13 |
+| Thermoskanne | Rare | Feuer auf einem gekühlten Gegner löst einen Thermoschock aus, der Gegner in der Nähe sofort trifft. | 3 | 12 |
+| Gewitterwolke | Uncommon | Elektro-Treffer machen Gegner kurz nass. | 3 | 9 |
+| Minzbeet | Uncommon | Eliten und jeder 25. Kill lassen ein Minzblatt fallen, das heilt. Jede weitere Kopie: fünf Kills weniger (mindestens 10). | 4 | 9 |
+| Scharfe Zahnpasta | Rare | Eingesammelte Minzblätter explodieren um dich; der Schaden wächst mit deinem Schmelz. | 3 | 13 |
+| Kompost | Uncommon | Verwelkte Pflanzen, gefallene Zähne und wilde Triebe lassen manchmal ein Minzblatt fallen (15 % je Kopie). | 3 | 8 |
+
+Die 14 gemalten Shop-Icons liegen in einem [eigenen Atlas](../assets/items/item_icons_synergy.png).
+Das [Minzblatt](../assets/loot/mint_leaf.png) erscheint als grünes Blatt in der Arena.
 
 ## Mythics
 

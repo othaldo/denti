@@ -59,7 +59,7 @@ Garten ausweichen.
 | Lebenszeit einer Pflanze | 8 s (+1,5 s je Mk-Stufe) → etwa 5 Pflanzen auf Mk I |
 | Dichtes Beet | +10 % Pflanztakt je Rang |
 | Wachstum bis zum ersten Schuss | 0,6 s |
-| Salbeischuss | 10 + 0,8 × Fernschaden, alle 0,8 s, mittlere Reichweite |
+| Salbeischuss | 10 + 1,5 × Fernschaden, alle 0,8 s, mittlere Reichweite. Viele kleine Schüsse: Fernschaden ist das Hauptattribut, Bisskraft der spätere Multiplikator. |
 | Startwerte | +20 Schmelz, +2 Härte (Denti kämpft nicht selbst) |
 | Bosse | zertrampeln Pflanzen mit dreifachem Kontaktschaden |
 

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"slide_wax"
+icon_index = 127
+display_name = "Rutschwachs"
+description = "Kurz nach einem Dash verursachen Waffen 30 % mehr Schaden."
+rarity_tier = 2
+price = 8
+effect_kind = &"dash_damage"
+effect_value = 0.3
+max_stacks = 3
+tags = Array[StringName]([&"mobility", &"sugar"])

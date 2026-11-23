@@ -277,6 +277,8 @@ func modify_damage(enemy: Enemy, weapon: WeaponData, base: float) -> float:
 	bonus += player.class_combat.damage_bonus(enemy, weapon)
 	bonus += player.module_damage_bonus(enemy, weapon)
 	bonus += relics.weapon_damage_bonus(enemy)
+	var synergies := get_node_or_null("../Synergies") as SynergyItems
+	if synergies != null: bonus += synergies.weapon_damage_bonus()
 	if enemy.data.is_boss:
 		bonus += power(&"boss_bonus") * 100.0
 	if enemy.has_bleeding():
@@ -332,7 +334,7 @@ func on_weapon_hit(enemy: Enemy, amount: float, weapon: WeaponData, critical: bo
 func create_puddle(at: Vector2) -> void:
 	if not ready_proc(&"water_puddle", 1.5):
 		return
-	puddles.append({"at": at, "life": PUDDLE_DURATION, "tick": 0.0})
+	puddles.append({"at": at, "life": PUDDLE_DURATION * (1.0 + power(&"placed_duration")), "tick": 0.0})
 	if puddles.size() > 4:
 		puddles.pop_front()
 	queue_redraw()
@@ -440,6 +442,7 @@ func restore(saved: Dictionary) -> void:
 func _rebuild_powers() -> void:
 	inventory_data.rebuild_powers()
 	cached_pickup_range = Loot.MAGNET_DISTANCE + power(&"magnet")
+	if is_instance_valid(player) and is_instance_valid(player.stats): player.stats.extra_dash_charges = roundi(power(&"dash_charge"))
 
 
 func power(effect_kind: StringName) -> float:

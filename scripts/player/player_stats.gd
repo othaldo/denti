@@ -31,6 +31,13 @@ var _class_initialized := false
 
 ## Extra roots from class talents (e.g. Kräuterzahn: second and third staff).
 ## Derived from the talent powers on every sync, never saved separately.
+## Sprungfeder: extra dash charges from items, synced from the item powers.
+var extra_dash_charges := 0:
+	set(value):
+		if extra_dash_charges == maxi(value, 0): return
+		extra_dash_charges = maxi(value, 0)
+		changed.emit()
+## Extra roots from class talents (e.g. Kräuterzahn: second and third staff).
 var talent_roots := 0:
 	set(value):
 		var normalized := maxi(value, 0)
@@ -249,7 +256,7 @@ func stamina_bonus() -> float:
 
 
 func max_stamina() -> float:
-	return class_data.dash_config().capacity + stamina_bonus()
+	return class_data.dash_config().capacity + stamina_bonus() + extra_dash_charges * class_data.dash_config().cost
 
 
 func stamina_text() -> String:

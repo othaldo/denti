@@ -55,6 +55,8 @@ var ended: bool:
 var base_victory: bool = false
 var weapon_mastery := RunWeaponMastery.new()
 var meta_progress := RunMetaProgress.new()
+## Synergy item systems (docs/ITEM_SYNERGY_EXPANSION.md).
+var synergies: SynergyItems
 var new_fusion_discoveries: Array[String] = []
 var mastery_notice: WeaponMasteryNotice
 # Compatibility accessor: the phase is the only stored source of truth.
@@ -151,6 +153,11 @@ func _ready() -> void:
 	player.stats.shield_blocked.connect(items.on_shield_blocked)
 	player.stats.shield_blocked.connect(relics.on_shield_blocked)
 	player.dash.started.connect(relics.on_dash_started)
+	synergies = SynergyItems.new()
+	synergies.name = "Synergies"
+	add_child(synergies)
+	player.dash.started.connect(synergies.on_dash_started)
+	player.dash_finished.connect(synergies.on_dash_ended)
 	player.stats.healed.connect(items.on_healed)
 	player.stats.healed.connect(telemetry.record_healing)
 	player.stats.dodged.connect(items.on_player_dodged)
@@ -340,6 +347,7 @@ func _start_combat_wave() -> void:
 	wave.start_next_wave()
 	items.on_wave_start()
 	relics.on_wave_start()
+	synergies.reset_wave()
 	_sync_music()
 	get_tree().paused = false
 	_refresh_hud()
@@ -551,7 +559,9 @@ func _on_enemy_defeated(at: Vector2, data: EnemyData, treasure: bool = false) ->
 	if data.is_boss and not ended:
 		weapon_mastery.record(session, &"boss", wave.difficulty_id, wave.current_wave)
 	telemetry.record_kill(data.is_boss, data.is_elite)
-	if not ended: meta_progress.record_kill(data)
+	if not ended:
+		meta_progress.record_kill(data)
+		synergies.on_kill(at, data)
 	if not data.is_boss:
 		sound.play_cue(&"down")
 	var reward_drop: bool = wave.active and (data.is_elite or randf() < WaveController.loot_chance(wave.current_wave) * DifficultyCatalog.by_id(wave.difficulty_id).reward_chance_multiplier)
@@ -673,6 +683,7 @@ func _on_loot_collected(kind: StringName, amount: int, reward_id: StringName = &
 	player.notify_loot(kind, amount, drop)
 	relics.on_loot_collected(kind)
 	if kind == &"coin": meta_progress.record_coins(amount)
+	if kind == &"mint": synergies.on_mint_collected(amount)
 	if kind == &"chest":
 		if reward_id == WeaponAffixes.CHEST_ID and drop != null:
 			rewards.queue_affix_chest(drop.reward_data, items)
@@ -1430,6 +1441,7 @@ func debug_start_wave(number: int) -> void:
 	wave.start_next_wave()
 	items.on_wave_start()
 	relics.on_wave_start()
+	synergies.reset_wave()
 	_sync_music()
 	_refresh_hud()
 	_save_run()

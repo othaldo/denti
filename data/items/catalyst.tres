@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"catalyst"
+icon_index = 128
+display_name = "Katalysator"
+description = "Element-Reaktionen (Frost, Dampf, Giftstichflamme) verursachen 40 % mehr Schaden."
+rarity_tier = 3
+price = 13
+effect_kind = &"reaction_damage"
+effect_value = 0.4
+max_stacks = 3
+tags = Array[StringName]([&"fire", &"ice", &"poison", &"water"])

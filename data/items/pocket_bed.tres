@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"pocket_bed"
+icon_index = 123
+display_name = "Taschenbeet"
+description = "Alle 10 Kills wächst kurz ein wilder Salbeitrieb bei dir, der mit deinem Fernschaden schießt. Jede weitere Kopie: zwei Kills weniger."
+rarity_tier = 3
+price = 13
+effect_kind = &"wild_sprout"
+effect_value = 1.0
+max_stacks = 4
+tags = Array[StringName]([&"ranged", &"summon"])

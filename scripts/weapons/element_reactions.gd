@@ -35,7 +35,8 @@ static func after_hit(effects: ItemEffectContext, source: Enemy, weapon: WeaponD
 		for other in candidates.slice(0, reaction.targets):
 			# Instant elemental damage still passes resistance, defense and boss
 			# guards. No weapon means no on-hit procs or recursive reactions.
-			var additions: Array[Dictionary] = [{"id": str(reaction.damage_element), "damage": power * reaction.damage_factor,
+			# Katalysator strengthens every reaction.
+			var additions: Array[Dictionary] = [{"id": str(reaction.damage_element), "damage": power * reaction.damage_factor * (1.0 + effects.power(&"reaction_damage")),
 				"instant": true, "proc_id": str(reaction.id)}]
 			other.take_damage(0, null, false, &"", additions)
 			ElementImpactBatch.emit_from(other, reaction.damage_element, other.global_position, Vector2.UP, 24)

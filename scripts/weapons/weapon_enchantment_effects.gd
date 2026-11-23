@@ -1,6 +1,11 @@
 class_name WeaponEnchantmentEffects
 extends RefCounted
 
+## Thermoskanne: share of the fire enchantment hit per copy, shared cooldown.
+const THERMAL_SHARE := 0.5
+const THERMAL_COOLDOWN := 0.3
+const THERMAL_RADIUS := 90.0
+
 # All follow-up hits omit a weapon and cannot enter the weapon hit pipeline.
 # Proc clocks persist in ItemInventory. Lifesteal is scoped to the weapon UID.
 static func packets(effects: ItemEffectContext, enemy: Enemy, weapon: WeaponData, affixes: Array[Dictionary], factor: float) -> Array[Dictionary]:
@@ -34,6 +39,18 @@ static func after_hit(effects: ItemEffectContext, enemy: Enemy, weapon: WeaponDa
 	var electric := WeaponAffixes.find(affixes, &"electric")
 	if electric >= 0:
 		_chain(effects, enemy, WeaponAffixes.effect_damage(float(affixes[electric].damage), &"electric", weapon, effects.player.stats) * factor)
+		# Gewitterwolke: shocks leave the target wet.
+		if effects.power(&"shock_wet") > 0 and enemy.health > 0: enemy.apply_wet(effects.power(&"shock_wet"))
+	# Thermoskanne: fire on a chilled target bursts into a thermal shock.
+	var fire := WeaponAffixes.find(affixes, &"fire")
+	if fire >= 0 and was_chilled and effects.power(&"thermal_shock") > 0 and effects.ready_proc(&"thermal_shock", THERMAL_COOLDOWN):
+		var heat := WeaponAffixes.effect_damage(float(affixes[fire].damage), &"fire", weapon, effects.player.stats) * factor
+		var shock := heat * THERMAL_SHARE * effects.power(&"thermal_shock")
+		for other in effects.player.nearby_enemies(enemy.global_position, THERMAL_RADIUS):
+			if not other.is_targetable(): continue
+			# Instant like a reaction burst, not a burn over time.
+			var burst: Array[Dictionary] = [{"id": "fire", "damage": shock, "instant": true, "proc_id": "thermal_shock"}]
+			other.take_damage(0, null, false, &"", burst)
 	if critical and was_chilled and enemy.affix_effects.ice_power > 0:
 		var ice := WeaponAffixes.by_id(&"ice")
 		if effects.ready_proc(&"enchantment_ice", ice.proc_cooldown):

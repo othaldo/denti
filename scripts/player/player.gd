@@ -2,6 +2,7 @@ class_name Player
 extends CharacterBody2D
 
 signal attack_performed(kind: StringName)
+signal dash_finished
 signal damaged(position: Vector2, amount: float)
 
 const MIN_IFRAMES := 0.2
@@ -172,6 +173,7 @@ func _physics_process(delta: float) -> void:
 			dash_cut.release()
 			_dash_pulse()
 			for module in skill_modules: module.on_dash_ended(dash_origin, motion_end)
+			dash_finished.emit()
 	is_moving = global_position.distance_squared_to(before_move) > 0.01
 	_animate_sprite(dash.direction if was_dashing else direction, delta)
 	hurt_time = maxf(hurt_time - delta, 0.0)

@@ -66,7 +66,7 @@ func reset_wave() -> void:
 
 func wall_seconds() -> float:
 	var seconds := WALL_SECONDS + power("frost_thick") + (1.5 if power("wall_lasting") > 0.0 else 0.0)
-	return seconds * (2.0 if power("frost_permafrost") > 0.0 else 1.0)
+	return seconds * (2.0 if power("frost_permafrost") > 0.0 else 1.0) * (1.0 + items().power(&"placed_duration"))
 
 func on_dash_started() -> void:
 	dash_start = player.global_position

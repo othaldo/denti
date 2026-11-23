@@ -43,7 +43,8 @@ func width() -> float:
 	return (rules().trail_width + power("trail_width")) * player.assassin_skills.width_factor()
 
 func field_duration() -> float:
-	return rules().trail_field + power("trail_field")
+	# Blumentopf lengthens placed fields.
+	return (rules().trail_field + power("trail_field")) * (1.0 + player.items.power(&"placed_duration"))
 
 func refund_cap() -> float:
 	return rules().trail_refund_cap + power("trail_refund_cap")

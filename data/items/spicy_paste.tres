@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShopOfferData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/shop_offer_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"spicy_paste"
+icon_index = 132
+display_name = "Scharfe Zahnpasta"
+description = "Eingesammelte Minzblätter explodieren um dich; der Schaden wächst mit deinem Schmelz."
+rarity_tier = 3
+price = 13
+effect_kind = &"mint_burst"
+effect_value = 1.0
+max_stacks = 3
+tags = Array[StringName]([&"heal", &"area", &"defense"])

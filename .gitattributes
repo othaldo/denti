@@ -1,0 +1,2 @@
+# Match the line endings Godot writes for its import settings.
+*.import text eol=lf
