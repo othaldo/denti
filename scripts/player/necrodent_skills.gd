@@ -17,7 +17,7 @@ const ROLE_FRAMES: Array[Rect2] = [
 ]
 const TOOTH_NAMES := ["Milchzahn", "Backenzahn", "Wachzahn"]
 const BASE_SCHMELZ := [75.0, 100.0, 140.0]
-const BASE_BITE := [27.0, 33.0, 24.0]
+const BASE_BITE := [32.0, 38.0, 28.0]
 const TOOTH_CONTACT_RADIUS := 16.0
 const CONTACT_INTERVAL := 0.8
 const CONTACT_SCAN_INTERVAL := 0.12
@@ -30,7 +30,7 @@ const SEEK_RANGE := 320.0
 const LEASH := 475.0
 const BITE_REACH := 17.0
 const BITE_INTERVAL := 0.70
-const RECOVERY_SECONDS := 1.8
+const RECOVERY_SECONDS := 1.3
 const COMMAND_SECONDS := 4.0
 const RETARGET_INTERVAL := 0.16
 const ESCORT_RANGE := 72.0
@@ -54,6 +54,8 @@ class Tooth:
 	var walking := false
 	var facing_left := false
 	var heading := Vector2.RIGHT
+	var emerge_left := 0.0
+	var emerge_at := Vector2.ZERO
 
 var teeth: Array[Tooth] = []
 var marked: Enemy
@@ -61,6 +63,7 @@ var command_left := 0.0
 var guard_left := 0.0
 var retarget_left := 0.0
 var dance_time := 0.0
+var cast_left := 0.0
 var escort_targets: Dictionary[int, Tooth] = {}
 
 
@@ -110,6 +113,7 @@ func reset_wave() -> void:
 	guard_left = 0.0
 	escort_targets.clear()
 	retarget_left = 0.0
+	cast_left = 0.0
 	if active(): _prepare_retinue()
 
 
@@ -118,6 +122,7 @@ func _prepare_retinue() -> void:
 	var roster := roster_counts()
 	if teeth.size() > count:
 		teeth.resize(count)
+	if teeth.size() < count: cast_left = NecrodentSummon.CAST_SECONDS
 	while teeth.size() < count:
 		var tooth := Tooth.new()
 		if teeth.size() >= roster[0] + roster[1]: tooth.kind = Kind.GUARD
@@ -125,6 +130,8 @@ func _prepare_retinue() -> void:
 		tooth.health = tooth_max_health(tooth.kind)
 		tooth.at = _formation(teeth.size())
 		tooth.cooldown = (teeth.size() % 4) * 0.07
+		tooth.emerge_at = tooth.at
+		tooth.emerge_left = NecrodentSummon.RISE_SECONDS + NecrodentSummon.FIRST_DELAY + NecrodentSummon.STAGGER * (teeth.size() % 7)
 		teeth.append(tooth)
 
 
@@ -163,6 +170,7 @@ func advance(delta: float) -> void:
 		return
 	if teeth.is_empty(): _prepare_retinue()
 	dance_time = fmod(dance_time + delta, TAU)
+	cast_left = maxf(cast_left - delta, 0.0)
 	command_left = maxf(command_left - delta, 0.0)
 	guard_left = maxf(guard_left - delta, 0.0)
 	retarget_left -= delta
@@ -245,6 +253,7 @@ func on_enemy_died(enemy: Enemy) -> void:
 
 
 func _advance_tooth(tooth: Tooth, index: int, staff: WeaponInstance, leash: float, delta: float) -> void:
+	tooth.emerge_left = maxf(tooth.emerge_left - delta, 0.0)
 	if tooth.recovery > 0.0:
 		var recovery_rate := 2.0 if guard_left > 0.0 and power("necro_guard_revive") > 0.0 else 1.0
 		tooth.recovery = maxf(tooth.recovery - delta * recovery_rate, 0.0)
@@ -289,6 +298,7 @@ func _check_contact(tooth: Tooth, delta: float) -> void:
 	tooth.health = maxf(tooth.health - damage, 0.0)
 	if tooth.health > 0.0: return
 	tooth.recovery = RECOVERY_SECONDS
+	tooth.emerge_left = 0.0
 	tooth.target = null
 	tooth.streak = 0
 	retarget_left = 0.0
@@ -363,17 +373,31 @@ func _revive(tooth: Tooth, index: int) -> void:
 	tooth.recovery = 0.0
 	tooth.snapping = 0.0
 	tooth.walking = false
-	flash(tooth.at, 18.0, MINT)
+	tooth.emerge_at = tooth.at
+	tooth.emerge_left = NecrodentSummon.RISE_SECONDS + NecrodentSummon.REVIVE_DELAY
+	if cast_left <= 0.0: cast_left = NecrodentSummon.CAST_SECONDS
 
 
 func _draw_tooth(tooth: Tooth, index: int) -> void:
 	var at := to_local(tooth.at)
+	var height := 1.0
+	var rise := 1.0
+	if tooth.emerge_left > 0.0:
+		rise = 1.0 - tooth.emerge_left / NecrodentSummon.RISE_SECONDS
+		var ground := to_local(tooth.emerge_at) + Vector2(0, 10)
+		NecrodentSummon.draw_ground(self, ground, rise, 16.0 if tooth.kind == Kind.MILK else 21.0, index)
+		# Combat stays live. A tooth that bites or takes a hit is immediately readable.
+		if tooth.snapping <= 0.0 and tooth.health >= tooth_max_health(tooth.kind):
+			height = smoothstep(0.01, 0.68, rise)
+			if height <= 0.0: return
+			at = (ground - Vector2(0, 10)).lerp(at, smoothstep(0.0, 0.85, rise))
 	draw_set_transform(at + Vector2(0, 8), 0.0, Vector2(1.0, 0.45))
 	draw_circle(Vector2.ZERO, 9.0, Color(0.16, 0.09, 0.19, 0.34), true, -1.0, true)
 	draw_set_transform(Vector2.ZERO)
 	var pose := Pose.IDLE
 	var color := Color.WHITE
 	var offset := Vector2(0, 10)
+	offset.y -= sin(PI * smoothstep(0.35, 1.0, rise)) * 6.0
 	if tooth.recovery > 0.0:
 		pose = Pose.DOWN
 		color = Color(0.83, 0.79, 0.86, 0.78)
@@ -395,9 +419,13 @@ func _draw_tooth(tooth: Tooth, index: int) -> void:
 		frame = ROLE_FRAMES[(tooth.kind - 1) * 4 + pose]
 		scale = 0.102
 	var extent := frame.size * scale
+	# Draw the crown first and uncover the roots as the tooth clears the floor.
+	frame.size.y *= height
+	extent.y *= height
 	draw_set_transform(at + offset, 0.0, Vector2(-1.0 if tooth.facing_left else 1.0, 1.0))
 	draw_texture_rect_region(atlas, Rect2(Vector2(-extent.x * 0.5, -extent.y), extent), frame, color)
 	draw_set_transform(Vector2.ZERO)
+	if height < 0.85: return
 	var bar := Rect2(at + Vector2(-11.0, -extent.y + offset.y - 5.0), Vector2(22.0, 3.0))
 	var ratio := clampf(tooth.health / tooth_max_health(tooth.kind), 0.0, 1.0)
 	if tooth.recovery > 0.0: ratio = 1.0 - tooth.recovery / RECOVERY_SECONDS
@@ -408,6 +436,20 @@ func _draw_tooth(tooth: Tooth, index: int) -> void:
 
 func _draw() -> void:
 	if not active(): return
+	if cast_left > 0.0:
+		var staff := _staff()
+		if staff != null:
+			var tip := to_local(staff.muzzle_position())
+			var lift := NecrodentSummon.lift(cast_left)
+			NecrodentSummon.draw_focus(self, tip, lift)
+			var wisps := 0
+			for tooth in teeth:
+				var rise := 1.0 - tooth.emerge_left / NecrodentSummon.RISE_SECONDS
+				var alpha := lift * smoothstep(-0.30, 0.03, rise) * (1.0 - smoothstep(0.1, 0.40, rise))
+				if alpha <= 0.0: continue
+				NecrodentSummon.draw_wisp(self, tip, to_local(tooth.emerge_at) + Vector2(0, 10), alpha)
+				wisps += 1
+				if wisps == 3: break
 	if guard_left > 0.0:
 		var origin := to_local(player.global_position)
 		var color := Color(MINT, 0.8 * minf(guard_left * 4.0, 1.0))
@@ -443,6 +485,8 @@ func _enemy_index(enemy: Variant, indices: Dictionary) -> int:
 func restore_with_enemies(saved: Dictionary, enemies: Array[Node]) -> void:
 	reset_wave()
 	if not active(): return
+	cast_left = 0.0
+	for tooth in teeth: tooth.emerge_left = 0.0
 	var members: Variant = saved.get("teeth", [])
 	if members is Array:
 		for index in mini(teeth.size(), members.size()):

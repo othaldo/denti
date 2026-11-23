@@ -5,6 +5,10 @@ const EVOLUTION_COLOR := Color("ff3038")
 const BITE_CONTEXT := "Bisswerte vor Gegnerresistenzen und Zielboni. Elementschaden kommt hinzu."
 
 
+static func tooth_base_values(kind: int) -> String:
+	return "%d Schmelz · %d Biss" % [NecrodentSkills.BASE_SCHMELZ[kind], NecrodentSkills.BASE_BITE[kind]]
+
+
 static func retinue_rows(data: WeaponData, player: Player) -> Array[Dictionary]:
 	if player == null or player.items == null: return []
 	var retinue := player.skill_module(ClassCatalog.NECRODENT_ID) as NecrodentSkills

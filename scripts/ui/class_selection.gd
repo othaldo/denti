@@ -188,8 +188,13 @@ func refresh() -> void:
 		chip.value = fact.text
 		chip.custom_minimum_size = Vector2(chip.value_label.get_minimum_size().x + (34 if fact.icon != null else 12) + 16, 40)
 	_clear(style_box)
-	for line in data.play_style:
-		_label(style_box, 16).text = "•  " + line
+	if data.id == ClassCatalog.NECRODENT_ID:
+		_label(style_box, 16).text = "Grundwerte je Zahn"
+		for kind in NecrodentSkills.TOOTH_NAMES.size():
+			_label(style_box, 16).text = "%s · %s" % [NecrodentSkills.TOOTH_NAMES[kind], WeaponPresentation.tooth_base_values(kind)]
+	else:
+		for line in data.play_style:
+			_label(style_box, 16).text = "•  " + line
 	_clear(skills)
 	var tree := data.talent_tree
 	for node in skill_nodes(data):

@@ -60,6 +60,7 @@ func _ready() -> void:
 	sprite = Sprite2D.new()
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	sprite.texture = data.held_texture()
+	sprite.material = WeaponSkins.staff_material(data)
 	sprite.offset = (Vector2(0.5, 0.5) - data.grip_anchor) * data.held_texture().get_size()
 	add_child(sprite)
 	if data.evolution_kind != &"":
@@ -122,13 +123,22 @@ func update_visual() -> void:
 	sprite.position = pose_data.position
 	sprite.rotation = pose_data.rotation
 	sprite.scale = pose_data.scale
+	var cast_lift := 0.0
+	if data.id == &"extraction_staff" and player != null:
+		var necrodent := NecrodentSkills.for_player(player)
+		if necrodent != null:
+			cast_lift = NecrodentSummon.lift(necrodent.cast_left)
+			var side := signf(sprite.scale.x)
+			sprite.position += Vector2(-4.0 * side, -16.0) * cast_lift
+			sprite.rotation -= 0.92 * side * cast_lift
 	if elastic != null:
 		elastic.set_progress(progress())
 	if floss_cut != null:
 		floss_cut.set_pose(pose_data, progress(), idle_time, visual_density)
 	# Denti's face stays readable even when a weapon aims across the body from its root.
 	var across := absf(home_position.x) > 12.0 and home_position.x * aim.x < 0.0
-	z_index = -1 if WeaponMotion.is_contact(data) or across or sprite.position.y < -12.0 else 1
+	var behind := WeaponMotion.is_contact(data) or across or sprite.position.y < -12.0
+	z_index = -1 if behind and cast_lift <= 0.0 else 1
 
 
 func _physics_process(delta: float) -> void:
@@ -371,6 +381,7 @@ func refresh_skin() -> void:
 	if sprite == null:
 		return
 	sprite.texture = data.held_texture()
+	sprite.material = WeaponSkins.staff_material(data)
 	sprite.offset = (Vector2(0.5, 0.5) - data.grip_anchor) * sprite.texture.get_size()
 	if working_head != null:
 		var angle := working_head.spin_angle

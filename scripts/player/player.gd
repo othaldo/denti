@@ -331,8 +331,10 @@ func _animate_sprite(direction: Vector2, delta: float) -> void:
 	var attack_pulse := sin(attack_time / ATTACK_ANIMATION_DURATION * PI)
 	var sway := sin(animation_time)
 	var stretch := sway * (0.035 if moving else 0.012)
-	sprite.position.y = -2.0 - absf(sway) * (2.5 if moving else 1.4) - attack_pulse * 4.0
-	sprite.scale = sprite_base_scale * Vector2(1.0 + stretch + attack_pulse * 0.12, 1.0 - stretch - attack_pulse * 0.09)
+	var necrodent := NecrodentSkills.for_player(self)
+	var cast_lift := NecrodentSummon.lift(necrodent.cast_left) if necrodent != null else 0.0
+	sprite.position.y = -2.0 - absf(sway) * (2.5 if moving else 1.4) - attack_pulse * 4.0 - cast_lift * 7.0
+	sprite.scale = sprite_base_scale * Vector2(1.0 + stretch + attack_pulse * 0.12 - cast_lift * 0.07, 1.0 - stretch - attack_pulse * 0.09 + cast_lift * 0.11)
 	var target_rotation := -direction.x * 0.08 + sway * 0.025 + attack_direction.x * attack_pulse * 0.14
 	sprite.rotation = lerp_angle(sprite.rotation, target_rotation, minf(delta * 14.0, 1.0))
 

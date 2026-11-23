@@ -19,6 +19,8 @@ var tree: TalentTreeData
 var detail: Control
 var buttons: Dictionary = {}
 var headers: Array[Label] = []
+var note_labels: Array[Label] = []
+var branch_notes := PackedStringArray()
 var tabs: Array[Button] = []
 var focus_branch := 0
 var compact := false
@@ -43,6 +45,8 @@ func setup(new_tree: TalentTreeData, upgrades: Array[UpgradeData], detail_contro
 	buttons.clear()
 	for label in headers: label.queue_free()
 	headers.clear()
+	for label in note_labels: label.queue_free()
+	note_labels.clear()
 	for tab in tabs: tab.queue_free()
 	tabs.clear()
 	for branch in TalentNodeData.BRANCHES:
@@ -53,6 +57,16 @@ func setup(new_tree: TalentTreeData, upgrades: Array[UpgradeData], detail_contro
 		label.clip_text = true
 		add_child(label)
 		headers.append(label)
+		var note := Label.new()
+		note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		note.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		note.mouse_filter = Control.MOUSE_FILTER_PASS
+		note.tooltip_text = "Grundwerte je Zahn"
+		note.add_theme_color_override("font_color", DentiUIStyle.MUTED)
+		note.add_theme_font_size_override("font_size", 13)
+		note.hide()
+		add_child(note)
+		note_labels.append(note)
 		var tab := Button.new()
 		tab.clip_text = true
 		ControllerFocus.tag(tab, "talent:branch:%d" % branch)
@@ -131,7 +145,6 @@ func layout_in(available: Vector2) -> void:
 	for branch in shown: row_count = maxi(row_count, tree.rows(branch))
 	var landscape := compact and available.x >= available.y * 1.35
 	var tab_height := (40.0 if landscape else TABS) if compact else 0.0
-	var header := 0.0 if compact else HEADER
 	var tree_width := available.x
 	var detail_width := available.x
 	if not compact:
@@ -140,11 +153,15 @@ func layout_in(available: Vector2) -> void:
 	elif landscape:
 		detail_width = clampf(available.x * 0.4, 200.0, 340.0)
 		tree_width -= detail_width + 12
+	var tab_width := (tree_width - 8 * (TalentNodeData.BRANCHES - 1)) / TalentNodeData.BRANCHES
+	var wrap_notes := compact and tab_width < 144.0
+	var note_height := 0.0 if branch_notes.is_empty() else (32.0 if wrap_notes else 22.0)
+	var header := 0.0 if compact else HEADER + note_height
 	var branch_width := (tree_width - BRANCH_GAP * (shown.size() - 1)) / shown.size()
 	var can_transpose := compact and branch_width >= row_count * MIN_CELL
 	var min_grid_height := (TalentNodeData.COLUMNS if can_transpose else row_count) * MIN_CELL
 	var details_below := compact and not landscape
-	var top := tab_height + (8.0 if details_below else (4.0 if landscape else 0.0))
+	var top := tab_height + (note_height if compact else 0.0) + (8.0 if details_below else (4.0 if landscape else 0.0))
 	var detail_minimum := detail.get_combined_minimum_size().y
 	var minimum_height := top + header + min_grid_height
 	var detail_height := detail_minimum
@@ -189,11 +206,15 @@ func layout_in(available: Vector2) -> void:
 		origins[branch] = Vector2(left + (branch_width - grid.x) * 0.5, area.position.y + header + leading)
 		headers[branch].position = Vector2(left, area.position.y)
 		headers[branch].size = Vector2(branch_width, HEADER)
-	var tabs_width := area.size.x if compact else available.x
-	var tab_width := (tabs_width - 8 * (TalentNodeData.BRANCHES - 1)) / TalentNodeData.BRANCHES
 	for branch in tabs.size():
 		tabs[branch].position = Vector2(branch * (tab_width + 8), 0)
 		tabs[branch].size = Vector2(tab_width, maxf(tab_height, 40.0))
+		var note := note_labels[branch]
+		note.visible = branch < branch_notes.size()
+		if not note.visible: continue
+		note.text = branch_notes[branch].replace(" · ", "\n") if wrap_notes else branch_notes[branch]
+		note.position = Vector2(tabs[branch].position.x, tab_height) if compact else headers[branch].position + Vector2(0, HEADER)
+		note.size = Vector2(tab_width if compact else branch_width, note_height)
 	_fit_branch_titles()
 	for key in buttons:
 		var node_button: TalentNodeButton = buttons[key]

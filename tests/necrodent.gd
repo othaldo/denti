@@ -46,6 +46,7 @@ func _run() -> void:
 	await _check_tooth_health()
 	await _check_shop()
 	await _check_enchantment_details()
+	_check_recruitment_comparison()
 	game.queue_free()
 	await process_frame
 	session.clear_run()
@@ -109,6 +110,8 @@ func _check_local_unlock() -> void:
 	root.add_child(view)
 	view.buttons.back().pressed.emit()
 	_check(view.selected_id == NECRO, "locally unlocked class is unavailable in regular selection")
+	_check(view.style_box.get_child_count() == 4 and view.style_box.get_child(2).text.contains(WeaponPresentation.tooth_base_values(NecrodentSkills.Kind.MOLAR)),
+		"class selection hid the tooth comparison")
 	_check(not session.record_class_victory(&"assassin", &"hard", true)
 		and session.progression_data.class_wins.has("assassin"), "local unlock prevented a real win or repeated the unlock notice")
 	view.queue_free()
@@ -247,6 +250,15 @@ func _check_tooth_health() -> void:
 	player.class_combat.powers = {"necro_teeth": 2.0, "necro_molar_teeth": 1.0, "necro_guard_teeth": 1.0}
 	module.reset_wave()
 	var tooth := module.teeth[0]
+	var staff := player.loadout.equipped()[0]
+	staff.update_visual()
+	var resting_tip := staff.muzzle_position()
+	_check(module.cast_left > 0.0 and tooth.emerge_left < module.teeth[1].emerge_left
+		and module.teeth[1].emerge_left < module.teeth[2].emerge_left, "wave start did not stagger the summon")
+	module.advance(0.2)
+	staff.update_visual()
+	_check(staff.muzzle_position().y < resting_tip.y - 15.0 and tooth.emerge_left < NecrodentSummon.RISE_SECONDS,
+		"staff did not rise as the tooth emerged")
 	_check(module.roster_counts() == PackedInt32Array([1, 1, 1])
 		and module.teeth[2].health > module.teeth[1].health
 		and module.bite_damage_before_target_bonuses(NecrodentSkills.Kind.MOLAR) > module.bite_damage_before_target_bonuses(),
@@ -256,17 +268,21 @@ func _check_tooth_health() -> void:
 	_check(tooth.recovery == 0.0 and is_equal_approx(tooth.health, module.tooth_max_health(tooth.kind)), "biting exhausted a healthy tooth")
 	enemy.simulation_enabled = true
 	enemy.contact_damage = 11.0
-	module.advance(0.01)
+	module.advance(NecrodentSkills.CONTACT_SCAN_INTERVAL)
 	var expected := module.tooth_max_health(tooth.kind) - 11.0
 	_check(is_equal_approx(tooth.health, expected), "contact did not hurt the tooth")
 	module.restore_with_enemies(module.save_with_enemies({}), [])
 	tooth = module.teeth[0]
 	_check(is_equal_approx(tooth.health, expected), "resume lost the tooth's current health")
+	_check(module.cast_left == 0.0 and tooth.emerge_left == 0.0, "resume replayed the wave opening summon")
 	enemy.contact_damage = 1000.0
 	module.advance(1.0)
 	_check(tooth.health == 0.0 and tooth.recovery > 0.0, "a fatal contact did not knock the tooth down")
-	module.advance(2.0)
+	module.advance(NecrodentSkills.RECOVERY_SECONDS - 0.05)
+	_check(tooth.recovery > 0.0, "tooth returned before its recovery time")
+	module.advance(0.1)
 	_check(tooth.recovery == 0.0 and is_equal_approx(tooth.health, module.tooth_max_health(tooth.kind)), "revived tooth did not recover health")
+	_check(module.cast_left > 0.0 and tooth.emerge_left > 0.0 and module.teeth.size() == 3, "revival did not summon the existing tooth")
 	enemy.queue_free()
 	await process_frame
 
@@ -303,6 +319,12 @@ func _check_enchantment_details() -> void:
 	]
 	staff.refresh_affix_stats()
 	_check(retinue.bite_interval(staff.data) < before, "staff tempo did not speed up bites")
+	_check(staff.data.element_skin == &"fire" and staff.sprite.material != null, "equipped element did not color the staff")
+	var preview_material := WeaponSkins.staff_material(WeaponSkins.with_element(staff.data, &"bleed"))
+	_check(preview_material.get_shader_parameter("element_color") == WeaponAffixes.by_id(&"bleed").color
+		and staff.data.element_skin == &"fire", "preview did not color the staff independently of equipment")
+	var no_affixes: Array[Dictionary] = []
+	_check(WeaponSkins.staff_material(WeaponRolls.with_affixes(staff.data, no_affixes)) == null, "cleared staff retained an elemental tint")
 	var enemy := _enemy(Vector2(96, 10))
 	var packets := WeaponEnchantmentEffects.packets(player.items.effect_context, enemy, staff.data, staff.affixes,
 		NecrodentSkills.enchantment_share(retinue.retinue_size()))
@@ -329,3 +351,17 @@ func _check_enchantment_details() -> void:
 		_check(menu.item_details.values_grid.get_child_count() == 10
 			and menu.item_details.heading.text.begins_with("Extraktionsstab"), "retinue details omitted live bite values")
 	menu.close_pause()
+
+
+func _check_recruitment_comparison() -> void:
+	var points := TalentProgression.new()
+	points.prepare(1, 2, 0.0)
+	var panel: TalentPanel = game.talent_panel
+	panel.present(points, game.player.stats, game.UPGRADES, 1)
+	for extent in [Vector2(296, 470), Vector2(1184, 560)]:
+		panel.view.layout_in(extent)
+		for kind in NecrodentSkills.TOOTH_NAMES.size():
+			var note := panel.view.note_labels[kind]
+			_check(note.visible and note.text.replace("\n", " · ") == WeaponPresentation.tooth_base_values(kind)
+				and note.get_rect().end.x <= extent.x, "first point omitted a tooth comparison")
+	panel.hide()

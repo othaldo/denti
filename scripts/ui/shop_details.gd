@@ -82,6 +82,7 @@ func show_weapon(data: WeaponData, tier: int, player: Player, equipped: bool, eq
 	clear_actions()
 	heading.text = data.display_name + " · " + WeaponPresentation.tier_text(data, tier)
 	icon.texture = data.sprite
+	icon.material = WeaponSkins.staff_material(data)
 	subtitle.text = "%s · %s · %s" % ["Ausgerüstet" if equipped else "Angebot", data.roots_text(), data.damage_type_label()]
 	subtitle.add_theme_color_override("font_color", WeaponPresentation.EVOLUTION_COLOR if data.evolution_kind != &"" else DentiUIStyle.INK)
 	if data.evolution_kind != &"":
@@ -141,6 +142,7 @@ func show_item(entry: Dictionary, owned: bool) -> void:
 	clear_actions()
 	heading.text = str(entry.get("name", "Item"))
 	icon.texture = entry.get("icon")
+	icon.material = null
 	subtitle.text = "×%d" % int(entry.get("count", 1)) if owned else "Item"
 	subtitle.tooltip_text = ""
 	subtitle.add_theme_color_override("font_color", DentiUIStyle.INK)

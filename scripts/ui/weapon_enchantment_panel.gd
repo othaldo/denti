@@ -327,12 +327,13 @@ func _weapon_card(index: int, rect: Rect2, compact: bool) -> void:
 	weapon_buttons.append(button)
 	if compact:
 		button.show_artwork(RunSetupPresentation.weapon_icon(data))
+		button.artwork.material = WeaponSkins.staff_material(data)
 		var copies := 0
 		for model in models:
 			if model.id == data.id: copies += 1
 		if copies > 1: _text(button, "#%d" % (index + 1), Rect2(4, rect.size.y - 24, 32, 22), 14)
 		return
-	_art(button, RunSetupPresentation.weapon_icon(data), Rect2(12, 12, 62, 76))
+	_art(button, RunSetupPresentation.weapon_icon(data), Rect2(12, 12, 62, 76)).material = WeaponSkins.staff_material(data)
 	var name_text := data.display_name.replace("-", "-\n") if data.display_name.length() > 16 else data.display_name
 	_text(button, name_text, Rect2(86, 5, rect.size.x - 98, 46), 16 if data.display_name.length() > 16 else 18, DentiUIStyle.INK, true)
 	_text(button, models[index].meta, Rect2(86, 51, rect.size.x - 98, 20), 14, DentiUIStyle.MUTED)
@@ -345,14 +346,15 @@ func _weapon_card(index: int, rect: Rect2, compact: bool) -> void:
 
 func _hero(rect: Rect2, compact: bool) -> void:
 	var data := current_data()
+	var staff_material := WeaponSkins.staff_material(data)
 	if compact:
-		_art(body, RunSetupPresentation.weapon_icon(data), Rect2(rect.position, Vector2(50, 60)))
+		_art(body, RunSetupPresentation.weapon_icon(data), Rect2(rect.position, Vector2(50, 60))).material = staff_material
 		_text(body, data.display_name, Rect2(rect.position + Vector2(64, 0), Vector2(rect.size.x - 64, 30)), 22)
 		_root_info(Rect2(rect.position + Vector2(64, 29), Vector2(rect.size.x - 64, 36)))
 		return
 	var art_height := minf(300, rect.size.y - 110)
 	var y := rect.position.y + (rect.size.y - art_height - 98) / 2
-	_art(body, RunSetupPresentation.weapon_icon(data), Rect2(rect.position.x + 28, y, rect.size.x - 56, art_height))
+	_art(body, RunSetupPresentation.weapon_icon(data), Rect2(rect.position.x + 28, y, rect.size.x - 56, art_height)).material = staff_material
 	var title := _text(body, data.display_name, Rect2(rect.position.x, y + art_height + 16, rect.size.x, 38), 28)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_root_info(Rect2(rect.position.x, y + art_height + 58, rect.size.x, 40))

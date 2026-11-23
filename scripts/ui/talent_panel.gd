@@ -112,6 +112,11 @@ func present(progress: TalentProgression, context: PlayerStats, templates: Array
 	selected = StringName(str(state.cursor.get("id", "")))
 	previewed = &""
 	view.setup(stats.class_data.talent_tree, upgrades, details)
+	var branch_notes := PackedStringArray()
+	if stats.class_data.id == ClassCatalog.NECRODENT_ID:
+		for kind in NecrodentSkills.TOOTH_NAMES.size():
+			branch_notes.append(WeaponPresentation.tooth_base_values(kind))
+	view.branch_notes = branch_notes
 	if stats.class_data.talent_tree.by_id(selected) == null: selected = _default_selection()
 	var node := stats.class_data.talent_tree.by_id(selected)
 	if node != null: view.focus_branch = node.branch

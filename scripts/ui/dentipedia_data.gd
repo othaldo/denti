@@ -97,6 +97,10 @@ static func class_body(profile: PlayerClassData) -> String:
 	if not style.is_empty(): lines.append("\n".join(style))
 	if profile.id == ClassCatalog.NECRODENT_ID:
 		lines.append("Gefolgschaft\n%s Der Balken zeigt den aktuellen Schmelz jedes Zahns. Zwei Punkte Schmelz auf Denti geben jedem Zahn einen Punkt. Milchzähne kommen in großer Zahl, Backenzähne beißen härter und Wachzähne haben am meisten Schmelz." % WeaponPresentation.retinue_health_text())
+		var tooth_values := PackedStringArray(["Grundwerte je Zahn"])
+		for kind in NecrodentSkills.TOOTH_NAMES.size():
+			tooth_values.append("%s · %s" % [NecrodentSkills.TOOTH_NAMES[kind], WeaponPresentation.tooth_base_values(kind)])
+		lines.append("\n".join(tooth_values))
 		lines.append("Stab und Bisse\nNahschaden erhöht den Grundbiss. Bisskraft verstärkt den Schaden, Putzeifer verkürzt die Bisspause und Glanz erhöht die Krit-Chance. Unter Pause → Stats → Gefolgschaft stehen die aktuellen Werte.")
 		lines.append("Verzauberungen\nElemente wirken bei den Bissen. Mit mehr Zähnen verteilt sich ihr Schaden auf mehr Bisse. Angriffstempo, Krit-Chance, Krit-Schaden und Wucht wirken auf die Zähne. Lebensraub heilt Denti in einem gemeinsamen Intervall. Reichweite und Fusionen erhöhen die Befehlsreichweite.")
 	var tree := profile.talent_tree
