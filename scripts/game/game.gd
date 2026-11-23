@@ -820,6 +820,7 @@ func _sync_talents() -> void:
 	player.class_combat.powers = powers
 	player.dash.cost_cut = float(powers.get("dash_cost_cut", 0))
 	player.dash.distance_bonus = float(powers.get("dash_distance", 0))
+	player.stats.talent_roots = int(powers.get("extra_roots", 0))
 	items.effect_context.extra_powers = powers
 
 func _on_talents_completed() -> void:

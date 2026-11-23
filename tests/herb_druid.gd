@@ -39,6 +39,7 @@ func _run() -> void:
 	_check(herbs.staff() != null and herbs.staff().data.id == &"planting_staff", "planting staff not equipped")
 	await _planting()
 	await _skills()
+	await _staffs()
 	await _combat()
 	_snapshot()
 	game.queue_free()
@@ -73,10 +74,12 @@ func _data() -> void:
 	_check(AffixPresentation.effect_description(&"tempo", staff_data).contains("pflanzt schneller"), "tempo text does not explain the garden")
 	_check(AffixPresentation.effect_description(&"fire", staff_data).begins_with("Salbeischüsse"), "fire text not about sage shots")
 	_check(WeaponPresentation.pause_label(staff_data) == "Pflanztakt", "pause label not Pflanztakt")
-	# Until painted forms exist the staff head is tinted in the element color.
-	var fiery := WeaponSkins.with_element(staff_data, &"fire")
-	_check(fiery.element_skin == &"fire" and WeaponSkins.staff_material(fiery) != null, "enchanted staff shows no element")
-	_check(WeaponSkins.staff_material(staff_data) == null, "plain staff got an element tint")
+	for element in [&"fire", &"ice", &"poison", &"electric", &"bleed", &"wet"]:
+		var form := WeaponSkins.with_element(staff_data, element)
+		_check(form.element_skin == element and form.held_texture() != staff_data.held_texture(), "missing painted staff form: %s" % element)
+		_check(form.grip_anchor == staff_data.grip_anchor and WeaponSkins.staff_material(form) == null, "painted staff form changed its grip or got a tint: %s" % element)
+	var fire: Array[Dictionary] = [WeaponUpgrades.next_entry({}, &"fire", staff_data, 1)]
+	_check(ProjectileEnchantmentSkins.base_texture(staff_data, 1, fire) == ProjectileEnchantmentSkins.HERB_SEED, "an enchanted sage shot lost its seed shape")
 
 
 func _enemy(offset: Vector2, data: EnemyData = WaveController.PLAQUE) -> Enemy:
@@ -119,7 +122,9 @@ func _planting() -> void:
 	for tick in 90: herbs.advance(1.0 / 60.0)
 	var flying := 0
 	for projectile in game.get_node("Projectiles").get_children():
-		if projectile is WeaponProjectile and projectile.visible: flying += 1
+		if projectile is WeaponProjectile and projectile.visible:
+			flying += 1
+			_check(projectile.body_sprite.texture == ProjectileEnchantmentSkins.HERB_SEED, "sage shot did not use its seed sprite")
 	_check(flying > 0 or target.health < 10000.0, "a grown sage sprout did not shoot")
 	herbs.plants[0].life = 0.01
 	herbs.advance(0.02)
@@ -147,6 +152,15 @@ func _skills() -> void:
 	_check(herbs.attack_speed_bonus() == 0.0, "an unripe totem gave haste")
 	herbs.advance(HerbSkills.GROW_SECONDS + 0.01)
 	_check(herbs.attack_speed_bonus() == HerbSkills.TOTEM_HASTE, "totem aura gave no haste")
+	_check(herbs.heal_pulse_left == 0.0, "totem showed healing at full health")
+	var stats: PlayerStats = game.player.stats
+	stats.health = stats.max_health - 10.0
+	var before := stats.health
+	herbs.advance(0.2)
+	_check(is_equal_approx(stats.health, before + 0.2) and herbs.heal_pulse_left > 0.0 and herbs.heal_origin.is_finite(), "totem did not heal and show a pulse from its position")
+	herbs.advance(0.51)
+	_check(herbs.heal_pending == 0.0, "totem healing feedback was not flushed")
+	stats.health = stats.max_health
 	await _clear()
 	# Clove: numbs enemies and bosses, weapon damage bonus through the module.
 	game.player.class_combat.powers = {"skill_clove": 1.0}
@@ -159,6 +173,46 @@ func _skills() -> void:
 	herbs.advance(0.01)
 	_check(game.player.module_damage_bonus(boss, herbs.staff().data) == HerbSkills.CLOVE_BONUS, "clove did not expose the boss")
 	_check(game.player.module_damage_bonus(far, herbs.staff().data) == 0.0, "clove reached a distant enemy")
+	await _clear()
+
+
+func _staffs() -> void:
+	var loadout: WeaponLoadout = game.player.loadout
+	var staff_data := WeaponCatalog.by_id(&"planting_staff")
+	# Talents open roots: extra_roots goes through the talent sync into the loadout.
+	game.player.class_combat.powers = {"extra_roots": 2.0}
+	game.player.stats.talent_roots = 2
+	_check(loadout.capacity == 3, "talent roots did not widen the loadout: %d" % loadout.capacity)
+	_check(loadout.acquire(staff_data, 1) and loadout.acquire(staff_data, 1), "second and third staff could not be equipped")
+	var all := herbs.staffs()
+	_check(all.size() == 3, "expected three staffs, got %d" % all.size())
+	# The shop offers no further staff without a free root, only a fusion.
+	game.shop.reroll(8, 0.0, loadout, game.items)
+	for offer: ShopOfferData in game.shop.offers:
+		if offer != null and offer.weapon_data != null:
+			_check(offer.id == &"planting_staff" and loadout.can_acquire(offer.weapon_data, offer.weapon_tier), "shop offered an unusable weapon: %s" % offer.id)
+	# Every staff keeps its own garden and cap.
+	all[1].affixes.assign([{"id": "fire", "rarity": 1, "damage": 3.0}])
+	all[2].tier = 3
+	for index in 20:
+		for weapon in all: herbs.plant(game.player.global_position + Vector2(index * 4, 0), weapon)
+	_check(herbs.garden_size(all[0]) == HerbSkills.CAPS[0] and herbs.garden_size(all[2]) == HerbSkills.CAPS[2], "per-staff caps wrong: %d / %d" % [herbs.garden_size(all[0]), herbs.garden_size(all[2])])
+	_check(herbs.plants.size() == HerbSkills.CAPS[0] * 2 + HerbSkills.CAPS[2], "garden total wrong: %d" % herbs.plants.size())
+	_check(herbs.element_color(all[1]).a > 0.0 and herbs.element_color(all[0]).a == 0.0, "staff elements mixed up")
+	var fiery := herbs.plants.filter(func(entry: Dictionary) -> bool: return entry.staff == all[1].instance_uid)
+	_check(herbs.staff_of(fiery[0]) == all[1], "herb lost its staff")
+	game.player.class_combat.powers = {"herb_cap": 2.0}
+	_check(herbs.capacity(all[0]) == HerbSkills.CAPS[0] + 2, "Dichtes Beet did not add herbs per staff")
+	# Resume keeps the owner of every herb.
+	var states: Dictionary = JSON.parse_string(JSON.stringify(game.player.save_skill_modules()))
+	_check(ClassSkillModule.valid_state(states), "multi-staff garden fails validation")
+	herbs.reset_wave()
+	game.player.restore_skill_modules(states)
+	_check(herbs.garden_size(all[1]) == HerbSkills.CAPS[0] and herbs.garden_size(all[2]) == HerbSkills.CAPS[2], "garden owners lost on resume")
+	# Removing staffs hands their herbs to the first.
+	loadout.restore([{"id": "planting_staff", "tier": 1, "uid": all[0].instance_uid}], false)
+	game.player.stats.talent_roots = 0
+	_check(herbs.staff_of(fiery[0]) == herbs.staff(), "orphaned herb kept a missing staff")
 	await _clear()
 
 

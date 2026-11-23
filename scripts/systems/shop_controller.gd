@@ -156,7 +156,13 @@ func _pick_weapon(tier: int, loadout: WeaponLoadout, allow_unavailable: bool = f
 	# Class staffs (Nekrodent, Kräuterzahn) are offered only as their own upgrade.
 	if not equipped.is_empty() and equipped[0].data.required_class_id != &"":
 		var staff := equipped[0]
-		if staff.tier >= WeaponLoadout.MAX_TIER or _already_offered(staff.data.id, 0): return null
+		if _already_offered(staff.data.id, 0): return null
+		# A free root (Kräuterzahn talents) offers another staff, otherwise a fusion.
+		if loadout.can_acquire(staff.data, 1) and loadout.used_slots() + staff.data.hands <= loadout.capacity:
+			return weapon_offer(by_id(staff.data.id), 1)
+		for candidate in equipped:
+			if candidate.tier < staff.tier: staff = candidate
+		if staff.tier >= WeaponLoadout.MAX_TIER: return null
 		return weapon_offer(by_id(staff.data.id), staff.tier)
 	var candidates: Array[ShopOfferData] = []
 	for template in WEAPON_OFFERS:

@@ -29,19 +29,25 @@ Kräuterzahns stehen fest. Er baut einen **Garten** und lockt die Horde hinein.
 Rand kreisen, damit neue Triebe die Lücken füllen → bei Druck in einen zweiten
 Garten ausweichen.
 
-## Pflanzstab (Exklusivwaffe)
+## Pflanzstäbe (Exklusivwaffe, bis zu drei)
 
-- 1 Wurzel, wie der Extraktionsstab des Nekrodenten. Andere Waffen kann der
-  Kräuterzahn nicht tragen.
+- Start mit einem Stab und 1 Wurzel. Andere Waffen kann der Kräuterzahn nicht tragen.
+- Die Talente **Zweiter Stab** (Salbeibeet, Reihe 2) und **Dritter Stab** (Reihe 4)
+  öffnen je eine Wurzel (`extra_roots` → `PlayerStats.talent_roots`). Ist eine Wurzel
+  frei, bietet der Shop einen weiteren Pflanzstab an, sonst die Fusion des
+  schwächsten Stabs.
+- **Jeder Stab pflegt seinen eigenen Garten:** eigene Obergrenze, eigener Pflanztakt,
+  eigenes Element, eigene Mk-Stufe und Verzauberungen. Ein voller Garten ersetzt die
+  älteste Pflanze desselben Stabs. Der Bodenschein zeigt das Element pro Pflanze.
 - Angriffstakt = Pflanztakt (Putzeifer verkürzt ihn).
 - Shop-Fusion Mk II–IV: Pflanzen leben länger, Obergrenze steigt, Salbei schießt weiter.
-- Verzauberungen: ein Element pro Stab, wirkt auf alle Salbeischüsse.
+- Fällt ein Stab weg (Fusion, Klassenwechsel), übernimmt der erste Stab seine Pflanzen.
 
 | Wert (Mk I, Startschätzung) | |
 | --- | --- |
 | Pflanztakt | 1,6 s |
-| Lebenszeit einer Pflanze | 12 s → etwa 7 Pflanzen gleichzeitig |
-| Obergrenze | 10 (Mk IV: 16) |
+| Lebenszeit einer Pflanze | 12 s (+1,5 s je Mk-Stufe) |
+| Obergrenze pro Stab | 5 / 6 / 7 / 8 je Mk-Stufe, +1 je Rang „Dichtes Beet“ |
 | Wachstum bis zum ersten Schuss | 0,6 s |
 | Salbeischuss | 6 + 0,6 × Fernschaden, alle 0,9 s, mittlere Reichweite |
 
@@ -57,11 +63,12 @@ Skills wechselt der Stab reihum: zum Beispiel Salbei, Kamille, Salbei, Nelke.
 ### Ast 1: Salbeibeet (Angriff) → Skill **Salbeistrauch**
 
 - Talente: **Dornen** (Salbeischüsse durchbohren einen Gegner), **Dichtes Beet**
-  (+1 Obergrenze je Rang), **Bitterkraut** (+Salbeischaden je Rang).
+  (+1 Pflanze pro Stab je Rang), **Zweiter Stab** (Reihe 2) und **Dritter Stab**
+  (Reihe 4) öffnen je eine Wurzel für einen weiteren Pflanzstab.
 - **Skill Salbeistrauch:** Jeder fünfte Trieb wächst zu einem großen Strauch, der
   statt Einzelschüssen eine kurze Salve auf mehrere Gegner feuert.
 - Modifikatoren: **Wildwuchs** (jeder vierte statt jeder fünfte), **Samenschuss**
-  (Strauch-Salve platzt in kleine Samen), **Tiefe Wurzeln** (Sträucher leben doppelt so lang).
+  (Strauch-Salve platzt in kleine Samen).
 - Schlüsselstein **Monokultur:** Nur noch Salbei, keine Kamille und Nelke mehr; dafür
   +50 % Obergrenze.
 

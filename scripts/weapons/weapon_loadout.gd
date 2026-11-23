@@ -12,7 +12,7 @@ var stats: PlayerStats:
 		if is_instance_valid(stats) and not stats.root_capacity_changed.is_connected(refresh_roots):
 			stats.root_capacity_changed.connect(refresh_roots)
 var capacity: int:
-	get: return stats.root_capacity if is_instance_valid(stats) else PlayerStats.DEFAULT_ROOT_CAPACITY
+	get: return stats.root_capacity + stats.talent_roots if is_instance_valid(stats) else PlayerStats.DEFAULT_ROOT_CAPACITY
 
 
 func evolution_ready(index: int, recipe: WeaponEvolutionRecipe, items: ItemInventory) -> bool:
@@ -168,7 +168,9 @@ func can_acquire(data: WeaponData, tier: int = 1) -> bool:
 
 func _fits_free_roots(data: WeaponData) -> bool:
 	var occupied := used_slots()
-	return occupied + data.hands <= capacity and (data.required_class_id == &"" or occupied == 0)
+	# A class weapon shares its roots only with copies of class weapons (Kräuterzahn staffs).
+	return occupied + data.hands <= capacity and (data.required_class_id == &"" or occupied == 0
+		or equipped().all(func(weapon: WeaponInstance) -> bool: return weapon.data.required_class_id == data.required_class_id))
 
 
 func weapon_allowed(data: WeaponData) -> bool:

@@ -152,3 +152,41 @@ Use case: background-extraction. Image 1 is the edit target. Change only the bac
 ```
 
 Die Pflanzen sind in 256 × 256 px großen Zellen mit gemeinsamer Wurzelhöhe gepackt. Die drei Icon-Bögen lesen sich jeweils links nach rechts, erst oben, dann unten und ergeben je eine Atlaszeile. Alle Zellen haben transparente Ränder. Sichtprüfung bei 30 px fürs Porträt, 60 px für den Stab, 30–40 px für die Pflanzen und 28 px für die Icons.
+
+---
+
+## Nachtrag 23.11.2026: zwei neue Talent-Icons
+
+Der Kräuterzahn kann jetzt bis zu drei Pflanzstäbe tragen. Zwei Talente im Ast
+**Salbeibeet** wurden ersetzt; ihre Atlasfelder zeigen noch die alten Motive.
+Bitte nur diese **zwei Zellen** in `assets/classes/herb_druid_talent_icons.png`
+neu malen, alle anderen 22 Zellen unverändert lassen (gleiche Zellgröße 192 × 192,
+gleiche Polsterung, Stil wie die Nachbarzellen derselben Zeile).
+
+| Zelle (Zeile 1, 0-basiert) | Alt | Neu | Motiv |
+| --- | --- | --- | --- |
+| Spalte 2 | Bitterkraut | **Zweiter Stab** | zwei schlanke Pflanzstäbe gekreuzt, jeder mit einem leuchtenden Samen im Wurzelkopf, einer grün, einer bernsteinfarben |
+| Spalte 6 | Tiefe Wurzeln | **Dritter Stab** | drei Pflanzstäbe fächerförmig nebeneinander in einem kleinen Erdhügel, Samen in drei Farben (grün, bernstein, eisblau) |
+
+```text
+Use case: precise-object-edit. Image 1 is the existing Kräuterzahn talent atlas (8 columns x 3 rows, 192 px cells). Repaint ONLY two cells of the first row and leave every other cell pixel-identical: row 1 column 3 (0-based column 2) and row 1 column 7 (0-based column 6). Match the neighbouring icons exactly in warm ivory and glossy gold, sage-green palette, slight brush texture, bold dark-brown outlines and chunky toy-like shapes, with the same padding and transparent background. New cell at column 2: two slender wooden planting staffs crossed in an X, each with a gold ferrule and a curled root head holding one glowing seed, one seed green and one amber. New cell at column 6: three planting staffs fanned out side by side, stuck into a small mound of dark soil, their seeds glowing green, amber and ice-blue. No text, no numbers, readable at 28 px, genuine RGBA.
+```
+
+### Ergebnis
+
+Beide Motive wurden mit dem eingebauten `image_gen.imagegen` und echtem Alpha
+einzeln erzeugt und in die Zellen 402 und 406 des Talent-Atlas gepackt. Die 22
+übrigen Zellen sind pixelgleich. Beide Icons wurden in Godot bei 28 px und im
+Talentbaum geprüft.
+
+**Zweiter Stab** aus `exec-c5c5f6d2-fcd5-4ddb-976a-0199971f182a.png`
+
+```text
+Use case: stylized-concept. Asset type: a single square talent icon to pack into its own 192 px cell of the supplied 8 by 3 game atlas. Image 1 is for style only: match the sage branch along the top with rounded glossy hand-painted shapes, gold metal, warm ivory highlights, dark brown edges, warm directional lighting and slight brushwork. Image 2 is the Pflanzstab silhouette reference: reddish-brown wood, golden ferrule, curled living root head holding a plump glowing seed with a sprouting leaf, and a golden digging point. Use a slightly chunkier root head and strong distinct color blocks to remain unmistakable at 28px. Render only this one centered square icon, with transparent padding of roughly 12% on all sides and genuine zero-alpha RGBA outside the silhouette. No text, numbers, plaque, border, grid, backdrop, cast shadow, haze, stray particles or other icons. Zweiter Stab: exactly TWO slender wooden planting staves crossed into a symmetrical X at their mid-shafts, each with one gold ferrule and a curved wooden root head holding ONE luminous leafy seed. The two distinct heads sit upper left and upper right with clear empty separation. The left seed is vivid fresh sage green and the right seed is warm bright amber orange. Both small gold digging tips sit visibly apart at bottom left and bottom right. The combined X has a compact, roughly square outer silhouette and reads at 28px.
+```
+
+**Dritter Stab** aus `exec-0c77a3fb-a00f-4653-b0e3-7a73ab98864b.png`
+
+```text
+Use case: stylized-concept. Asset type: a single square talent icon to pack into its own 192 px cell of the supplied 8 by 3 game atlas. Image 1 is for style only: match the sage branch along the top with rounded glossy hand-painted shapes, gold metal, warm ivory highlights, dark brown edges, warm directional lighting and slight brushwork. Image 2 is the Pflanzstab silhouette reference: reddish-brown wood, golden ferrule, curled living root head holding a plump glowing seed with a sprouting leaf, and a golden digging point. Use a slightly chunkier root head and strong distinct color blocks to remain unmistakable at 28px. Render only this one centered square icon, with transparent padding of roughly 12% on all sides and genuine zero-alpha RGBA outside the silhouette. No text, numbers, plaque, border, grid, backdrop, cast shadow, haze, stray particles or other icons. Dritter Stab: exactly THREE slender wooden planting staves fanned from a small rounded mound of dark potting soil. Each has its own golden collar, a visible wooden shaft segment and its own curled wooden root head. The one in the center stands upright and a little taller, the outer ones tilt visibly outward. Three distinctly spaced heads with separate luminous leafy seeds: left sage green, center warm bright amber orange, right luminous ice blue. All three bases are planted in the same small soil mound, a low dark accent confined to the very bottom of the icon. Keep the silhouette noticeably wider at the top, with visible transparent gaps between the three heads and shafts.
+```

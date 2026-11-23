@@ -29,6 +29,16 @@ var _raw_values: Dictionary = {"max_health": 100.0, "damage_bonus": 0.0, "melee_
 var class_data: PlayerClassData = ClassCatalog.DEFAULT
 var _class_initialized := false
 
+## Extra roots from class talents (e.g. Kräuterzahn: second and third staff).
+## Derived from the talent powers on every sync, never saved separately.
+var talent_roots := 0:
+	set(value):
+		var normalized := maxi(value, 0)
+		if talent_roots == normalized: return
+		talent_roots = normalized
+		root_capacity_changed.emit()
+		changed.emit()
+
 @export_range(1, 64, 1, "or_greater") var root_capacity: int = DEFAULT_ROOT_CAPACITY:
 	set(value):
 		var normalized := maxi(value, 1)

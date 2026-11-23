@@ -4,8 +4,10 @@ extends ClassSkillModule
 ## Kräuterzahn: "Erst säen, dann ernten". The planting staff does not attack:
 ## in its attack rhythm it plants a herb where Denti stands. Herbs grow,
 ## fight and wilt after their lifetime, so the garden size follows the
-## planting speed (lifetime / interval) up to a cap. Sage sprouts shoot with
-## the staff's damage, enchantments and crits. Skills add herbs to the
+## planting speed (lifetime / interval) up to a cap. Talents open roots for a
+## second and third staff; every staff tends its own garden with its own cap,
+## element, Mk tier and enchantments. Sage sprouts shoot with the damage,
+## enchantments and crits of the staff that planted them. Skills add herbs to the
 ## planting rotation: Salbeistrauch (salvo bush), Kamillentotem (aura) and
 ## Nelkenknospe (numbing debuff). Enemies wear herbs down on contact, bosses
 ## trample them. Herb art: assets/classes/herb_druid_plants.png (4 x 2), drawn
@@ -18,7 +20,8 @@ const PLANTS_PATH := "res://assets/classes/herb_druid_plants.png"
 const GROW_SECONDS := 0.6
 const LIFETIME := 12.0
 const LIFETIME_PER_TIER := 1.5
-const CAPS: Array[int] = [10, 12, 14, 16]
+## Herbs per staff by Mk tier; "Dichtes Beet" adds one per rank.
+const CAPS: Array[int] = [5, 6, 7, 8]
 const MONOCULTURE_CAP := 1.5
 const SHOT_INTERVAL := 0.9
 const SHRUB_INTERVAL := 1.6
@@ -26,6 +29,8 @@ const SHRUB_SHOTS := 3
 const SHRUB_EVERY := 5
 const SHRUB_WILD_EVERY := 4
 const SHRUB_SHARE := 0.8
+const SAGE_MUZZLE_HEIGHT := 44.0
+const SHRUB_MUZZLE_HEIGHT := 51.0
 const PLANT_HEALTH := 40.0
 const PLANT_HEALTH_PER_TIER := 12.0
 const PLANT_RADIUS := 16.0
@@ -37,6 +42,9 @@ const TOTEM_RADIUS := 110.0
 const TOTEM_WREATH := 1.5
 const TOTEM_HASTE := 20.0
 const TOTEM_HEAL := 1.0
+const HEAL_FEEDBACK_SECONDS := 0.7
+const HEAL_PULSE_SECONDS := 0.55
+const HEAL_COLOR := Color(0.64, 1.0, 0.72)
 const TOTEM_SHOT_FACTOR := 0.75
 const TOTEM_TEA := 8.0
 const CEREMONY_SLOW := 0.8
@@ -49,7 +57,7 @@ const CLOVE_BURST := 20.0
 const CLOVE_BURST_RANGED := 0.8
 const SNARE_SECONDS := 0.8
 const NUMB_SECONDS := 0.6
-const MAX_SAVED := 24
+const MAX_SAVED := 48
 const SAGE := Color(0.55, 0.78, 0.48)
 const CHAMOMILE := Color(1.0, 0.93, 0.55)
 const CLOVE := Color(0.62, 0.32, 0.22)
@@ -62,6 +70,10 @@ var plantings := 0
 var sage_plantings := 0
 var clove_tick := 0.0
 var tea_cooldown := 0.0
+var heal_pending := 0.0
+var heal_feedback_left := 0.0
+var heal_pulse_left := 0.0
+var heal_origin := Vector2.INF
 ## Enemy instance id -> seconds of clove numbing left (refreshed every tick).
 var numbed: Dictionary = {}
 ## Enemy instance id -> [position, seconds] while a Würgeranke holds it.
@@ -85,6 +97,10 @@ func reset_wave() -> void:
 	sage_plantings = 0
 	clove_tick = 0.0
 	tea_cooldown = 0.0
+	heal_pending = 0.0
+	heal_feedback_left = 0.0
+	heal_pulse_left = 0.0
+	heal_origin = Vector2.INF
 	numbed.clear()
 	snared.clear()
 	snared_once.clear()
@@ -92,28 +108,47 @@ func reset_wave() -> void:
 static func for_player(denti: Player) -> HerbSkills:
 	return denti.skill_module(&"herb_druid") as HerbSkills if denti != null else null
 
+## First planting staff (tests, previews, dash sprouts).
 func staff() -> WeaponInstance:
+	var all := staffs()
+	return all[0] if not all.is_empty() else null
+
+func staffs() -> Array[WeaponInstance]:
+	var result: Array[WeaponInstance] = []
 	for weapon in player.loadout.equipped():
-		if weapon.data.attack_mode == &"plant": return weapon
-	return null
+		if weapon.data.attack_mode == &"plant": result.append(weapon)
+	return result
+
+## Staff that planted a herb; a sold or fused staff hands its herbs to the first.
+func staff_of(entry: Dictionary) -> WeaponInstance:
+	for weapon in staffs():
+		if weapon.instance_uid == str(entry.get("staff", "")): return weapon
+	return staff()
+
+func _tier(weapon: WeaponInstance) -> int:
+	return clampi(weapon.tier if weapon != null else 1, 1, CAPS.size())
 
 # --- Garden size --------------------------------------------------------------
 
-func capacity() -> int:
-	var weapon := staff()
-	var tier := weapon.tier if weapon != null else 1
-	var cap := CAPS[clampi(tier, 1, CAPS.size()) - 1] + roundi(power("herb_cap"))
+## Herbs one staff keeps at once.
+func capacity(weapon: WeaponInstance = null) -> int:
+	if weapon == null: weapon = staff()
+	var cap := CAPS[_tier(weapon) - 1] + roundi(power("herb_cap"))
 	return roundi(cap * MONOCULTURE_CAP) if power("herb_monoculture") > 0.0 else cap
 
-func lifetime(kind: int) -> float:
-	var weapon := staff()
-	var seconds := LIFETIME + LIFETIME_PER_TIER * float((weapon.tier if weapon != null else 1) - 1) + power("herb_life")
+func garden_size(weapon: WeaponInstance) -> int:
+	var uid := weapon.instance_uid if weapon != null else ""
+	return plants.filter(func(entry: Dictionary) -> bool: return str(entry.get("staff", "")) == uid).size()
+
+func lifetime(kind: int, weapon: WeaponInstance = null) -> float:
+	if weapon == null: weapon = staff()
+	var seconds := LIFETIME + LIFETIME_PER_TIER * float(_tier(weapon) - 1) + power("herb_life")
 	if kind == Kind.SHRUB and power("shrub_roots") > 0.0: seconds *= 2.0
 	return seconds
 
-func plant_health() -> float:
-	var weapon := staff()
-	return (PLANT_HEALTH + PLANT_HEALTH_PER_TIER * float((weapon.tier if weapon != null else 1) - 1)) * (1.0 + power("herb_hedge"))
+func plant_health(weapon: WeaponInstance = null) -> float:
+	if weapon == null: weapon = staff()
+	return (PLANT_HEALTH + PLANT_HEALTH_PER_TIER * float(_tier(weapon) - 1)) * (1.0 + power("herb_hedge"))
 
 ## Next herb in the planting rotation.
 func next_kind() -> int:
@@ -128,19 +163,26 @@ func _sage_kind() -> int:
 	var every := SHRUB_WILD_EVERY if power("shrub_wild") > 0.0 else SHRUB_EVERY
 	return Kind.SHRUB if (sage_plantings + 1) % every == 0 else Kind.SAGE
 
-## Called by the planting staff in its attack rhythm.
-func plant(at: Vector2 = Vector2.INF) -> void:
+## Called by a planting staff in its attack rhythm.
+func plant(at: Vector2 = Vector2.INF, source: WeaponInstance = null) -> void:
 	if not active(): return
 	var kind := next_kind()
 	plantings += 1
 	if kind in [Kind.SAGE, Kind.SHRUB]: sage_plantings += 1
-	_add_plant(kind, player.global_position if at == Vector2.INF else at)
+	_add_plant(kind, player.global_position if at == Vector2.INF else at, source)
 
-func _add_plant(kind: int, at: Vector2) -> void:
-	# A full garden replaces its oldest herb, so it follows Denti.
-	while plants.size() >= capacity(): plants.pop_front()
-	plants.append({"kind": kind, "at": at, "grow": GROW_SECONDS, "life": lifetime(kind), "health": plant_health(),
-		"shot": randf_range(0.0, SHOT_INTERVAL), "contact": 0.0})
+func _add_plant(kind: int, at: Vector2, source: WeaponInstance = null) -> void:
+	if source == null: source = staff()
+	var uid := source.instance_uid if source != null else ""
+	# A full garden replaces this staff's oldest herb, so it follows Denti.
+	var cap := capacity(source)
+	while garden_size(source) >= cap:
+		for index in plants.size():
+			if str(plants[index].get("staff", "")) == uid:
+				plants.remove_at(index)
+				break
+	plants.append({"kind": kind, "at": at, "grow": GROW_SECONDS, "life": lifetime(kind, source), "health": plant_health(source),
+		"shot": randf_range(0.0, SHOT_INTERVAL), "contact": 0.0, "staff": uid})
 	support(&"class_herb_plantings")
 
 func grown(plant_entry: Dictionary) -> bool:
@@ -168,7 +210,6 @@ func advance(delta: float) -> void:
 		tea_cooldown = maxf(tea_cooldown - delta, 0.0)
 		_tick_numbing(delta)
 		_hold_snared(delta)
-		var weapon := staff()
 		var soothing := 0
 		for index in range(plants.size() - 1, -1, -1):
 			var entry := plants[index]
@@ -180,15 +221,37 @@ func advance(delta: float) -> void:
 				continue
 			if not grown(entry): continue
 			_contact(entry, delta)
+			var weapon := staff_of(entry)
 			if weapon != null and entry.kind in [Kind.SAGE, Kind.SHRUB]: _shoot(entry, weapon, delta)
 			if power("herb_soothe") > 0.0 and entry.at.distance_squared_to(player.global_position) <= SOOTHE_RADIUS * SOOTHE_RADIUS: soothing += 1
-		if soothing > 0: player.stats.heal(SOOTHE_HEAL * mini(soothing, SOOTHE_CAP) * delta)
-		if _in_aura(player.global_position):
-			player.stats.heal(TOTEM_HEAL * _ceremony() * delta)
+		var healed := 0.0
+		if soothing > 0: healed = player.stats.heal(SOOTHE_HEAL * mini(soothing, SOOTHE_CAP) * delta)
+		var totem := _aura_source(player.global_position)
+		var healed_by_totem := 0.0
+		if totem.is_finite():
+			healed_by_totem = player.stats.heal(TOTEM_HEAL * _ceremony() * delta)
 			if power("totem_tea") > 0.0 and tea_cooldown <= 0.0:
 				tea_cooldown = TOTEM_TEA
 				player.stats.grant_shield(1)
+		_healing_feedback(healed + healed_by_totem, totem if healed_by_totem > 0.0 else Vector2.INF, delta)
 	super.advance(delta)
+
+
+func _healing_feedback(amount: float, source: Vector2, delta: float) -> void:
+	heal_pulse_left = maxf(heal_pulse_left - delta, 0.0)
+	if amount > 0.0:
+		heal_pending += amount
+		if heal_feedback_left <= 0.0:
+			heal_feedback_left = HEAL_FEEDBACK_SECONDS
+			heal_pulse_left = HEAL_PULSE_SECONDS
+			heal_origin = source
+	if heal_feedback_left <= 0.0: return
+	heal_feedback_left = maxf(heal_feedback_left - delta, 0.0)
+	if heal_feedback_left == 0.0:
+		if heal_pending >= 0.05:
+			var label := "+%s" % DentiAttributes.number(heal_pending).replace(".", ",")
+			items().effect_context.announce(label, player.global_position, HEAL_COLOR)
+		heal_pending = 0.0
 
 # --- Plants in combat -----------------------------------------------------------
 
@@ -210,13 +273,13 @@ func _shoot(entry: Dictionary, weapon: WeaponInstance, delta: float) -> void:
 	var data := _shot_data(weapon.data)
 	var pool := player.get_parent().get_node_or_null("Projectiles") as PlayerProjectilePool
 	if pool == null: return
+	var muzzle: Vector2 = entry.at - Vector2(0, SHRUB_MUZZLE_HEIGHT if entry.kind == Kind.SHRUB else SAGE_MUZZLE_HEIGHT)
 	for index in shots:
 		var target: Enemy = targets[index % targets.size()]
 		var base := data.raw_damage_with_stats(weapon.tier, player.stats) + scaled(power("herb_damage"))
 		if entry.kind == Kind.SHRUB: base *= SHRUB_SHARE
 		var damage := player.stats.roll_critical_damage(base, data.crit_bonus, data.crit_multiplier)
 		var critical := player.stats.last_roll_critical
-		var muzzle: Vector2 = entry.at + Vector2(0, -14)
 		var projectile := pool.acquire(data, weapon.tier)
 		projectile.launch(muzzle, muzzle.direction_to(target.global_position), damage, data, player.items, critical, weapon.tier, weapon.affixes, 1.0, weapon.instance_uid)
 	if power("herb_numb") > 0.0:
@@ -250,8 +313,9 @@ func _contact(entry: Dictionary, delta: float) -> void:
 
 func _wilt(entry: Dictionary, natural: bool) -> void:
 	if entry.kind == Kind.TOTEM and natural and power("totem_cutting") > 0.0:
-		plants.append({"kind": Kind.SAGE, "at": entry.at, "grow": GROW_SECONDS, "life": lifetime(Kind.SAGE), "health": plant_health(),
-			"shot": SHOT_INTERVAL, "contact": 0.0})
+		var source := staff_of(entry)
+		plants.append({"kind": Kind.SAGE, "at": entry.at, "grow": GROW_SECONDS, "life": lifetime(Kind.SAGE, source), "health": plant_health(source),
+			"shot": SHOT_INTERVAL, "contact": 0.0, "staff": str(entry.get("staff", ""))})
 	if entry.kind == Kind.CLOVE and power("clove_burst") > 0.0:
 		var amount := scaled(CLOVE_BURST + maxf(player.stats.ranged_damage, 0.0) * CLOVE_BURST_RANGED)
 		for enemy in player.nearby_enemies(entry.at, CLOVE_RADIUS):
@@ -267,10 +331,13 @@ func totem_radius() -> float:
 	return TOTEM_RADIUS * (TOTEM_WREATH if power("totem_wreath") > 0.0 else 1.0)
 
 func _in_aura(at: Vector2) -> bool:
+	return _aura_source(at).is_finite()
+
+func _aura_source(at: Vector2) -> Vector2:
 	var radius := totem_radius()
 	for entry in plants:
-		if entry.kind == Kind.TOTEM and grown(entry) and entry.at.distance_squared_to(at) <= radius * radius: return true
-	return false
+		if entry.kind == Kind.TOTEM and grown(entry) and entry.at.distance_squared_to(at) <= radius * radius: return entry.at
+	return Vector2.INF
 
 func _tick_numbing(delta: float) -> void:
 	for id in numbed.keys():
@@ -315,8 +382,10 @@ func _hold_snared(delta: float) -> void:
 func _draw() -> void:
 	if not active(): return
 	var radius := totem_radius()
-	var glow := element_color()
+	var glows := {}
+	for weapon in staffs(): glows[weapon.instance_uid] = element_color(weapon)
 	for entry in plants:
+		var glow: Color = glows.get(str(entry.get("staff", "")), Color.TRANSPARENT)
 		var at := to_local(entry.at)
 		var growth := 1.0 - float(entry.grow) / GROW_SECONDS
 		var fade := clampf(float(entry.life), 0.0, 1.0)
@@ -329,11 +398,32 @@ func _draw() -> void:
 		if glow.a > 0.0 and grown(entry):
 			draw_circle(at + Vector2(0, -4), 13.0 * DRAW_SCALE, Color(glow, 0.22 * fade))
 		_draw_plant(at, int(entry.kind), growth, fade)
+	if heal_pulse_left > 0.0: _draw_heal_pulse()
 	draw_effects()
 
-## Element color of the staff's enchantment, transparent without one.
-func element_color() -> Color:
-	var weapon := staff()
+func _draw_heal_pulse() -> void:
+	var age := 1.0 - heal_pulse_left / HEAL_PULSE_SECONDS
+	var center := to_local(player.global_position)
+	var source := to_local(heal_origin) + Vector2(0, -34) if heal_origin.is_finite() else center + Vector2(0, 16)
+	var wave := sin(age * PI)
+	var ring_radius := lerpf(19, 36, age)
+	draw_set_transform(center + Vector2(0, 28), 0.0, Vector2(1, 0.45))
+	draw_arc(Vector2.ZERO, ring_radius, 0.0, TAU, 32, Color(0.2, 0.34, 0.25, wave * 0.6), 5.0, true)
+	draw_arc(Vector2.ZERO, ring_radius, 0.0, TAU, 32, Color(HEAL_COLOR, wave * 0.92), 3.0, true)
+	for index in 5:
+		var step := clampf(age * 1.4 - index * 0.09, 0.0, 1.0)
+		var fade := sin(step * PI)
+		var spread := Vector2.from_angle(index * TAU / 5.0) * 12.0
+		var at := source.lerp(center + Vector2(0, -24), step) + (spread + Vector2.UP * 12.0) * fade
+		draw_set_transform(at, index * 1.26, Vector2(1.55, 0.85))
+		draw_circle(Vector2.ZERO, 3.7, Color(0.41, 0.29, 0.18, fade * 0.85), true, -1.0, true)
+		draw_circle(Vector2.ZERO, 2.9, Color(CHAMOMILE, fade), true, -1.0, true)
+		draw_circle(Vector2(-0.7, -0.65), 1.25, Color(1, 0.99, 0.92, fade), true, -1.0, true)
+	draw_set_transform(Vector2.ZERO)
+
+## Element color of a staff's enchantment, transparent without one.
+func element_color(weapon: WeaponInstance = null) -> Color:
+	if weapon == null: weapon = staff()
 	if weapon == null: return Color.TRANSPARENT
 	var element: StringName = WeaponAffixes.element(weapon.affixes)
 	var definition := WeaponAffixes.by_id(element) if element != &"" else null
@@ -378,7 +468,7 @@ func save_data() -> Dictionary:
 	var saved: Array = []
 	for entry in plants.slice(maxi(plants.size() - MAX_SAVED, 0)):
 		saved.append({"kind": int(entry.kind), "at": SnapshotValues.vector_data(entry.at), "grow": float(entry.grow),
-			"life": float(entry.life), "health": float(entry.health), "shot": float(entry.shot)})
+			"life": float(entry.life), "health": float(entry.health), "shot": float(entry.shot), "staff": str(entry.get("staff", ""))})
 	return {"plants": saved, "plantings": plantings, "sage": sage_plantings, "tea": tea_cooldown}
 
 func restore(saved: Dictionary) -> void:
@@ -392,8 +482,11 @@ func restore(saved: Dictionary) -> void:
 	for entry in entries:
 		if not entry is Dictionary or not SnapshotValues.is_vector(entry.get("at")): continue
 		var kind := clampi(int(entry.get("kind", 0)), Kind.SAGE, Kind.CLOVE)
+		var owner: String = entry.get("staff", "") if entry.get("staff", "") is String else ""
+		var source := staff_of({"staff": owner})
+		if source != null: owner = source.instance_uid
 		plants.append({"kind": kind, "at": SnapshotValues.read_vector(entry.at), "grow": clampf(float(entry.get("grow", 0)), 0.0, GROW_SECONDS),
-			"life": clampf(float(entry.get("life", 0)), 0.0, lifetime(kind)), "health": clampf(float(entry.get("health", 1)), 0.0, plant_health()),
-			"shot": clampf(float(entry.get("shot", 0)), 0.0, SHRUB_INTERVAL), "contact": 0.0})
+			"life": clampf(float(entry.get("life", 0)), 0.0, lifetime(kind, source)), "health": clampf(float(entry.get("health", 1)), 0.0, plant_health(source)),
+			"shot": clampf(float(entry.get("shot", 0)), 0.0, SHRUB_INTERVAL), "contact": 0.0, "staff": owner})
 		if plants.size() >= MAX_SAVED: break
 	queue_redraw()

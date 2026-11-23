@@ -31,7 +31,7 @@ max_ranks = 4
 script = ExtResource("2")
 id = &"herb_dense"
 display_name = "Dichtes Beet"
-description = "Ein Salbeitrieb mehr gleichzeitig je Rang."
+description = "Jeder Pflanzstab hält eine Pflanze mehr gleichzeitig. Je Rang."
 row = 1
 max_ranks = 2
 effects = {"herb_cap": 1.0}
@@ -52,12 +52,11 @@ column = 0
 max_ranks = 5
 [sub_resource type="Resource" id="N7"]
 script = ExtResource("2")
-id = &"herb_bitter"
-display_name = "Bitterkraut"
-description = "+3 Salbeischaden je Rang."
+id = &"herb_staff_two"
+display_name = "Zweiter Stab"
+description = "Öffnet eine Wurzel für einen weiteren Pflanzstab aus dem Shop. Jeder Stab pflegt seinen eigenen Garten mit eigenem Element."
 row = 2
-max_ranks = 3
-effects = {"herb_damage": 3.0}
+effects = {"extra_roots": 1.0}
 icon_index = 402
 [sub_resource type="Resource" id="N8"]
 script = ExtResource("2")
@@ -112,14 +111,13 @@ effects = {"shrub_seeds": 2.0}
 icon_index = 405
 [sub_resource type="Resource" id="N14"]
 script = ExtResource("2")
-id = &"shrub_roots"
-display_name = "Tiefe Wurzeln"
-description = "Sträucher leben doppelt so lang."
-kind = &"modifier"
+id = &"herb_staff_three"
+display_name = "Dritter Stab"
+description = "Öffnet eine weitere Wurzel für einen dritten Pflanzstab."
 row = 4
 column = 2
-parent = &"herb_shrub"
-effects = {"shrub_roots": 1.0}
+parent = &"herb_staff_two"
+effects = {"extra_roots": 1.0}
 icon_index = 406
 [sub_resource type="Resource" id="N15"]
 script = ExtResource("2")

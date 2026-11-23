@@ -184,7 +184,7 @@ func _plant() -> void:
 	if herbs == null or EnemySpatialIndex.nearest(get_tree(), player.enemy_index, player.global_position, data.range_at_tier(tier), true) == null:
 		engagement_pending = true
 		return
-	herbs.plant()
+	herbs.plant(Vector2.INF, self)
 	cooldown = attack_interval()
 	attack_duration = maxf(minf(data.animation_duration, cooldown * 0.85), 0.035)
 	attack_time = attack_duration
