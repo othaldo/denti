@@ -97,8 +97,8 @@ func show_weapon(data: WeaponData, tier: int, player: Player, equipped: bool, eq
 				_value(row.label, row.value)
 		_rolled_value("Befehlsreichweite", "%d" % roundi(current.range), data, "range")
 	else:
-		_rolled_value("Treffer", "%.1f" % current.damage, data, "damage")
-		_rolled_value("Angriffspause", "%.2f s" % current.pause, data, "interval")
+		_rolled_value("Salbeischuss" if data.attack_mode == &"plant" else "Treffer", "%.1f" % current.damage, data, "damage")
+		_rolled_value(WeaponPresentation.pause_label(data), "%.2f s" % current.pause, data, "interval")
 		_rolled_value("Reichweite", "%d" % roundi(current.range), data, "range")
 		_rolled_value(DentiAttributes.name_for(DentiAttributes.Type.CRIT_CHANCE), "%d %% · ×%.1f" % [roundi(current.crit * 100.0), current.multiplier], data, "crit")
 	if data.knockback_at_tier(tier) > 0:
@@ -199,9 +199,9 @@ func _rolled_value(key: String, value: String, data: WeaponData, attribute: Stri
 func _value(key: String, value: String) -> Label:
 	var type := DentiAttributes.NAMES.find(key)
 	var texture: Texture2D
-	if key == "Treffer":
+	if key in ["Treffer", "Salbeischuss"]:
 		texture = DentiUIIcons.stat(0)
-	elif key == "Angriffspause":
+	elif key in ["Angriffspause", "Pflanztakt"]:
 		texture = DentiUIIcons.hud(5)
 	elif key == "Reichweite":
 		texture = DentiUIIcons.RANGE

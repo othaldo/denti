@@ -315,6 +315,7 @@ func _hold_snared(delta: float) -> void:
 func _draw() -> void:
 	if not active(): return
 	var radius := totem_radius()
+	var glow := element_color()
 	for entry in plants:
 		var at := to_local(entry.at)
 		var growth := 1.0 - float(entry.grow) / GROW_SECONDS
@@ -324,8 +325,20 @@ func _draw() -> void:
 			draw_arc(at, radius, 0.0, TAU, 48, Color(CHAMOMILE, 0.45 * fade), 2.0, true)
 		elif entry.kind == Kind.CLOVE and grown(entry):
 			draw_arc(at, CLOVE_RADIUS, 0.0, TAU, 40, Color(CLOVE.lightened(0.3), 0.45 * fade), 2.0, true)
+		# The staff's element shows on every herb as a soft ground glow.
+		if glow.a > 0.0 and grown(entry):
+			draw_circle(at + Vector2(0, -4), 13.0 * DRAW_SCALE, Color(glow, 0.22 * fade))
 		_draw_plant(at, int(entry.kind), growth, fade)
 	draw_effects()
+
+## Element color of the staff's enchantment, transparent without one.
+func element_color() -> Color:
+	var weapon := staff()
+	if weapon == null: return Color.TRANSPARENT
+	var element: StringName = WeaponAffixes.element(weapon.affixes)
+	var definition := WeaponAffixes.by_id(element) if element != &"" else null
+	if definition == null or not definition.elemental: return Color.TRANSPARENT
+	return WeaponSkins.STAFF_WATER_COLOR if element == &"wet" else definition.color
 
 func _draw_plant(at: Vector2, kind: int, growth: float, fade: float) -> void:
 	if plant_art != null:

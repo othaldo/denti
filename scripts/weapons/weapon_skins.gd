@@ -7,10 +7,13 @@ const STAFF_ELEMENTS := preload("res://scripts/weapons/extraction_staff_element.
 const STAFF_WATER_COLOR := Color(0.16, 0.45, 1.0)
 static var _skins: Dictionary[String, WeaponSkinData] = {}
 static var _staff_materials: Dictionary[StringName, ShaderMaterial] = {}
+## Class staffs tinted by the element shader while they have no painted forms,
+## with the recolored head region in UV.
+const TINTED_STAFFS := {&"extraction_staff": Vector4(0.8, 0.047, 0.945, 0.183), &"planting_staff": Vector4(0.76, 0.08, 0.92, 0.23)}
 
 
 static func with_element(data: WeaponData, element: StringName) -> WeaponData:
-	if data.id == &"extraction_staff":
+	if TINTED_STAFFS.has(data.id) and data.element_skins.is_empty():
 		if data.element_skin == element: return data
 		var staff := data.duplicate() as WeaponData
 		staff.element_skin = element
@@ -29,15 +32,17 @@ static func with_element(data: WeaponData, element: StringName) -> WeaponData:
 
 
 static func staff_material(data: WeaponData) -> ShaderMaterial:
-	if data.id != &"extraction_staff": return null
+	if not TINTED_STAFFS.has(data.id) or not data.element_skins.is_empty(): return null
 	var element := data.element_skin
 	if element == &"": return null
-	if not _staff_materials.has(element):
+	var key := StringName("%s:%s" % [data.id, element])
+	if not _staff_materials.has(key):
 		var definition := WeaponAffixes.by_id(element)
 		if definition == null or not definition.elemental: return null
 		var material := ShaderMaterial.new()
 		material.shader = STAFF_ELEMENTS
 		# Match the blue water icon and keep it distinct from the pale ice crystal.
 		material.set_shader_parameter("element_color", STAFF_WATER_COLOR if element == &"wet" else definition.color)
-		_staff_materials[element] = material
-	return _staff_materials[element]
+		material.set_shader_parameter("head_rect", TINTED_STAFFS[data.id])
+		_staff_materials[key] = material
+	return _staff_materials[key]

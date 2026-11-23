@@ -67,6 +67,16 @@ func _data() -> void:
 	_check(not ClassUnlocks.earned([], ranged.slice(0, 2), 15, false, &"normal").has("herb_druid"), "two ranged weapons opened the class")
 	_check(not ClassUnlocks.earned([], ranged, 14, false, &"normal").has("herb_druid"), "wave 14 opened the class")
 	for weapon in ranged: weapon.free()
+	# Texts describe the effect on the herbs, not a generic weapon.
+	var staff_data := WeaponCatalog.by_id(&"planting_staff")
+	_check(AffixPresentation.damage_unit(&"electric", null, staff_data) == "Schaden/Salbeischuss", "damage unit not about sage shots")
+	_check(AffixPresentation.effect_description(&"tempo", staff_data).contains("pflanzt schneller"), "tempo text does not explain the garden")
+	_check(AffixPresentation.effect_description(&"fire", staff_data).begins_with("Salbeischüsse"), "fire text not about sage shots")
+	_check(WeaponPresentation.pause_label(staff_data) == "Pflanztakt", "pause label not Pflanztakt")
+	# Until painted forms exist the staff head is tinted in the element color.
+	var fiery := WeaponSkins.with_element(staff_data, &"fire")
+	_check(fiery.element_skin == &"fire" and WeaponSkins.staff_material(fiery) != null, "enchanted staff shows no element")
+	_check(WeaponSkins.staff_material(staff_data) == null, "plain staff got an element tint")
 
 
 func _enemy(offset: Vector2, data: EnemyData = WaveController.PLAQUE) -> Enemy:

@@ -37,8 +37,14 @@ static func _decimal(value: float) -> String:
 	return DentiAttributes.number(value).replace(".", ",")
 
 
+## "Pflanztakt" for the planting staff, otherwise "Angriffspause".
+static func pause_label(data: WeaponData) -> String:
+	return "Pflanztakt" if data != null and data.attack_mode == &"plant" else "Angriffspause"
+
+
 static func ascension_effect(data: WeaponData) -> String:
 	if data.attack_mode == &"command": return "+3 % Biss-Tempo und Befehlsreichweite"
+	if data.attack_mode == &"plant": return "+10 % Salbeischaden · +3 % Pflanztakt und Reichweite"
 	return "+10 % Basisschaden · +3 % Tempo und Reichweite"
 
 

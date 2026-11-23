@@ -502,5 +502,16 @@
       0.18
     ],
     "combat_visible_size": 62.336066
+  },
+  "planting_staff": {
+    "grip": [
+      0.32,
+      0.66
+    ],
+    "tip": [
+      0.88,
+      0.1
+    ],
+    "combat_visible_size": 80.0
   }
 }

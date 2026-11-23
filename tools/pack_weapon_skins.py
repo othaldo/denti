@@ -251,13 +251,17 @@ def update_weapon(weapon_id, fields, icon_region):
 def main():
     layout = json.loads((DATA / "rigs.json").read_text(encoding="utf-8"))
     expected = {p.parent.name for p in SOURCE.glob("*/manifest.json")}
-    assert set(layout) == expected and len(layout) == 24, "Every approved weapon needs an explicit rig"
+    assert expected <= set(layout), "Every approved weapon needs an explicit rig"
+    # A rig may be prepared before its paintings exist (e.g. a new class staff).
     result = {}
     for weapon_id, rig in layout.items():
+        if weapon_id not in expected:
+            print("Waiting for paintings:", weapon_id)
+            continue
         result[weapon_id] = build_pack(weapon_id, rig)
         print("Packed", weapon_id)
     (DATA / "build_manifest.json").write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n', encoding="utf-8")
-    print("PASS: 168 runtime forms plus matching animation parts; source paintings preserved.")
+    print("PASS: %d runtime forms plus matching animation parts; source paintings preserved." % (len(result) * len(KINDS)))
 
 
 if __name__ == "__main__":

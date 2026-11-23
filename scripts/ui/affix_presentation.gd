@@ -51,6 +51,7 @@ static func damage_unit(kind: StringName, items: ItemInventory = null, weapon: W
 		return (data.stat_unit + " " if not data.stat_unit.is_empty() else "") + ("Rückstoß" if data.id == &"knockback" else data.display_name)
 	if data.dot_duration > 0:
 		return "Gesamtschaden über %.0f s" % dot_duration(kind, items)
+	if weapon != null and weapon.attack_mode == &"plant": return "Schaden/Salbeischuss"
 	return "Schaden/Biss" if weapon != null and weapon.attack_mode == &"command" else "Schaden/Treffer"
 
 
@@ -71,6 +72,21 @@ static func effect_description(kind: StringName, weapon: WeaponData = null) -> S
 			&"electric": return "Bisse lösen Kettenblitze aus. Nässe und Kettenitems erlauben weitere Sprünge."
 			&"wet": return "Bisse verursachen Wasserschaden und machen Gegner nass."
 			&"holy": return "Drei kritische Bisse auf ein markiertes Ziel lösen einen Lichtstoß aus."
+	if weapon != null and weapon.attack_mode == &"plant":
+		match kind:
+			&"range": return "Salbeitriebe schießen weiter, und der Stab pflanzt schon, wenn Gegner weiter weg sind."
+			&"tempo": return "Der Stab pflanzt schneller. Dadurch stehen mehr Pflanzen gleichzeitig; die Schüsse selbst werden nicht schneller."
+			&"crit": return "Salbeischüsse treffen häufiger kritisch."
+			&"crit_damage": return "Kritische Salbeischüsse verursachen mehr Schaden."
+			&"knockback": return "Salbeischüsse stoßen Gegner zurück, weg von deinen Pflanzen."
+			&"leech": return "Salbeischüsse heilen Denti."
+			&"fire": return "Salbeischüsse entzünden Gegner. Beim Tod kann die Glut überspringen."
+			&"ice": return "Salbeischüsse kühlen Gegner. Kritische Schüsse auf gekühlte Ziele lösen Eissplitter aus."
+			&"poison": return "Salbeischüsse vergiften. Wiederholte Treffer bauen Giftstufen auf."
+			&"bleed": return "Salbeischüsse lassen Gegner bluten. Blutungsitems verstärken den Effekt."
+			&"electric": return "Salbeischüsse lösen Kettenblitze aus. Nässe und Kettenitems erlauben weitere Sprünge."
+			&"wet": return "Salbeischüsse verursachen Wasserschaden und machen Gegner nass."
+			&"holy": return "Kritische Salbeischüsse können einen Lichtstoß auslösen."
 	if not data.description.is_empty():
 		return data.description
 	if data.stat_key == &"range":

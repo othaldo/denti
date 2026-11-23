@@ -470,7 +470,7 @@ func show_weapon_values(data: WeaponData, tier: int, player: Player) -> void:
 		_stat_cell(ICONS.RANGE, "%d" % roundi(values.range), "Befehlsreichweite", true)
 		_sync_catalog_slots()
 		return
-	for entry in [[ICONS.stat(0), "%.1f" % values.damage, "Trefferschaden", "damage", true], [ICONS.hud(5), "%.2f s" % values.pause, "Angriffspause", "interval", true], [ICONS.stat(4), "%d %%" % roundi(values.crit * 100), "Krit-Chance", "crit", false], [ICONS.RANGE, "%d" % roundi(values.range), "Reichweite", "range", false]]:
+	for entry in [[ICONS.stat(0), "%.1f" % values.damage, "Trefferschaden", "damage", true], [ICONS.hud(5), "%.2f s" % values.pause, WeaponPresentation.pause_label(data), "interval", true], [ICONS.stat(4), "%d %%" % roundi(values.crit * 100), "Krit-Chance", "crit", false], [ICONS.RANGE, "%d" % roundi(values.range), "Reichweite", "range", false]]:
 		var row := _stat_cell(entry[0], entry[1], entry[2], entry[4])
 		if not data.rolls.is_empty():
 			var quality := WeaponRolls.attribute_quality(data, entry[3])

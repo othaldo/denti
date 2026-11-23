@@ -131,7 +131,7 @@ func select_weapon(index: int, notify: bool = true) -> void:
 	var values := RunSetupPresentation.values(weapon)
 	for stat in 3:
 		stat_buttons[stat].value = values[stat]
-		stat_buttons[stat].tooltip_text = [weapon.scaling_description(), "Angriffspause", "Befehlsreichweite" if weapon.attack_mode == &"command" else "Reichweite"][stat]
+		stat_buttons[stat].tooltip_text = [weapon.scaling_description(), WeaponPresentation.pause_label(weapon),"Befehlsreichweite" if weapon.attack_mode == &"command" else "Reichweite"][stat]
 		stat_buttons[stat].visible = requirement == "" and (weapon.attack_mode != &"command" or stat == 2)
 	refresh()
 	_layout()
@@ -165,6 +165,11 @@ func _stat_details(index: int) -> void:
 	var text: String = ["Grundschaden auf Mk I: %d.\n%s\n%s" % [roundi(weapon.damage_at_tier(1)), weapon.scaling_description(), weapon.combat_text().replace(" · " + weapon.scaling_text(), "")],
 		"Zeit zwischen zwei Angriffen auf Mk I: %.2f Sekunden. Putzeifer verkürzt die Angriffspause." % weapon.interval_at_tier(1),
 		"Zielreichweite auf Mk I: %d." % roundi(weapon.range_at_tier(1))][index]
+	if weapon.attack_mode == &"plant":
+		title = ["Salbeischuss", "Pflanztakt", "Reichweite"][index]
+		text = ["Schaden eines Salbeischusses auf Mk I: %d.\n%s" % [roundi(weapon.damage_at_tier(1)), weapon.scaling_description()],
+			"Der Stab pflanzt auf Mk I alle %.2f Sekunden. Putzeifer verkürzt den Pflanztakt; dadurch stehen mehr Pflanzen gleichzeitig." % weapon.interval_at_tier(1),
+			"Salbeitriebe schießen auf Gegner in mittlerer Entfernung. Höhere Mk-Stufen und Reichweite-Verzauberungen vergrößern sie."][index]
 	details_requested.emit(title, text)
 
 func _layout() -> void:

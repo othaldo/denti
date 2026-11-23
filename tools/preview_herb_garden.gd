@@ -1,4 +1,4 @@
-extends SceneTree
+﻿extends SceneTree
 ## Renders the Kräuterzahn with a small garden (sage, shrub, totem, clove) and
 ## a few enemies to .godot/herb_preview/garden.png for a visual check.
 
@@ -30,6 +30,12 @@ func _run() -> void:
 	game.wave.set_process(false)
 	game.wave.active = true
 	var herbs := HerbSkills.for_player(game.player)
+	var element := OS.get_environment("HERB_ELEMENT")
+	if element != "":
+		var staff := herbs.staff()
+		staff.affixes.assign([{"id": element, "rarity": 2, "damage": 6.0}])
+		staff.data = WeaponRolls.with_affixes(WeaponCatalog.by_id(&"planting_staff"), staff.affixes)
+		staff.refresh_skin()
 	game.player.class_combat.powers = {"skill_shrub": 1.0, "skill_totem": 1.0, "skill_clove": 1.0}
 	var origin: Vector2 = game.player.global_position
 	var spots := [Vector2(-90, -40), Vector2(-40, 60), Vector2(30, -70), Vector2(80, 30), Vector2(-120, 50), Vector2(10, 10), Vector2(120, -20), Vector2(-60, -100)]
@@ -39,6 +45,6 @@ func _run() -> void:
 		game._create_enemy(WaveController.PLAQUE, origin + Vector2(260, -120 + index * 50))
 	for frame in 60: await process_frame
 	await RenderingServer.frame_post_draw
-	root.get_texture().get_image().save_png(ProjectSettings.globalize_path(OUTPUT + "garden.png"))
+	root.get_texture().get_image().save_png(ProjectSettings.globalize_path(OUTPUT + ("garden_%s.png" % element if element != "" else "garden.png")))
 	session.clear_run()
 	quit()

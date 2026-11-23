@@ -168,4 +168,11 @@ Heilerklasse, sind diese Synergie-Items denkbar:
   Schaden, Angriffspause und Reichweite in Shop und Verzauberung gelten für die
   Salbeischüsse beziehungsweise den Pflanztakt.
 - Klasse und Baum: `python tools/generate_class_roster.py herb_druid`.
-- Test: `tests/herb_druid.gd`.
+- Texte: Verzauberungen, Schadenseinheit („Schaden/Salbeischuss“), „Pflanztakt“ statt
+  „Angriffspause“ und die Startauswahl beschreiben die Wirkung auf die Pflanzen.
+- Elemente: Bis die gemalten Varianten da sind
+  ([Auftrag](../assets/weapons/planting_staff_elements.prompt.md)), tönt
+  `WeaponSkins.TINTED_STAFFS` den Samen im Stabkopf in der Elementfarbe. Die Pflanzen
+  tragen einen Bodenschein in derselben Farbe.
+- Test: `tests/herb_druid.gd`. Vorschau: `tools/preview_herb_garden.gd`
+  (`HERB_ELEMENT=fire` für einen verzauberten Garten).
