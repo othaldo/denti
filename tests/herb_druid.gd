@@ -41,6 +41,7 @@ func _run() -> void:
 	await _skills()
 	await _staffs()
 	await _combat()
+	await _caramel_heart()
 	_snapshot()
 	game.queue_free()
 	await process_frame
@@ -92,7 +93,15 @@ func _enemy(offset: Vector2, data: EnemyData = WaveController.PLAQUE) -> Enemy:
 	return enemy
 
 
+## Staffs plant on their own during a wave; tests drive them explicitly.
+func _hold_staffs() -> void:
+	for weapon in herbs.staffs():
+		weapon.set_physics_process(false)
+		weapon.attack_time = 0.0
+
+
 func _clear() -> void:
+	_hold_staffs()
 	for enemy in game.get_node("Enemies").get_children(): enemy.queue_free()
 	for projectile in game.get_node("Projectiles").get_children():
 		if projectile is WeaponProjectile: projectile.visible = false
@@ -102,17 +111,53 @@ func _clear() -> void:
 
 
 func _planting() -> void:
+	_hold_staffs()
+	herbs.reset_wave()
 	var staff := herbs.staff()
-	staff._physics_process(0.0)
-	_check(herbs.plants.is_empty(), "planted without enemies near")
-	var target := _enemy(Vector2(120, 0))
+	# Outside combat nothing is planted; during a wave the staff plants even
+	# without enemies near, so the garden can be prepared.
+	game.wave.active = false
 	staff.cooldown = 0.0
 	staff._physics_process(0.0)
+	_check(herbs.plants.is_empty(), "planted outside combat")
+	game.wave.active = true
+	_check(game.player.combat_active(), "test not in combat: paused %s, phase %s, health %s" % [paused, game.run_flow.phase, game.player.stats.health])
+	# Entering combat first waits for the staff's root phase, then plants.
+	staff.cooldown = 0.0
+	staff._physics_process(0.0)
+	if herbs.plants.is_empty():
+		staff.cooldown = 0.0
+		staff.attack_time = 0.0
+		staff._physics_process(0.0)
 	_check(herbs.plants.size() == 1 and staff.cooldown > 0.0, "staff did not plant in its rhythm")
+	var interval := staff.attack_interval()
+	_check(staff.cooldown >= interval * (1.0 - WeaponInstance.PLANT_JITTER) - 0.001 and staff.cooldown <= interval * (1.0 + WeaponInstance.PLANT_JITTER) + 0.001, "planting interval jitter out of range")
+	# New herbs land around Denti, not on one spot.
+	var spot: Vector2 = herbs.plants[0].at
+	var distance := spot.distance_to(game.player.global_position)
+	_check(distance >= HerbSkills.SPREAD_MIN - 0.01 and distance <= HerbSkills.SPREAD_MAX + 0.01, "herb not planted in the ring around Denti: %.1f" % distance)
+	var start: Vector2 = game.player.global_position
+	var corner := Vector2.ONE * DentiArena.PLAYER_MARGIN
+	game.player.global_position = corner
+	for sample in 12:
+		spot = herbs.planting_spot()
+		_check(spot.x >= corner.x and spot.y >= corner.y, "planting point left the arena at a corner")
+		_check(spot.distance_to(corner) >= HerbSkills.SPREAD_MIN - 0.01, "planting point collapsed onto Denti at a corner")
+	game.player.global_position = start
+	var target := _enemy(Vector2(120, 0))
 	_check(not staff.force_attack(0.0), "skills forced a planting staff attack")
-	# Garden size: lifetime / interval, capped; a full garden replaces its oldest herb.
-	for index in 30: herbs.plant(game.player.global_position + Vector2(index * 3, 0))
-	_check(herbs.plants.size() == herbs.capacity() and herbs.capacity() == HerbSkills.CAPS[0], "garden ignored its cap: %d" % herbs.plants.size())
+	# Planting animation: the staff jabs and the seed starts at its head.
+	_check(herbs.cast_left(staff.instance_uid) > 0.0 and herbs.plants[0].tip.is_finite(), "planting started no animation")
+	herbs.advance(0.1)
+	_check(HerbPlanting.plunge(herbs.cast_left(staff.instance_uid)) > 0.0, "staff did not jab while planting")
+	herbs.advance(HerbPlanting.CAST_SECONDS)
+	_check(herbs.cast_left(staff.instance_uid) == 0.0, "planting animation did not end")
+	# No gameplay cap: only the performance guard limits a staff's garden, and
+	# beyond it the oldest herb makes room.
+	for index in HerbSkills.SAFETY_CAP: herbs.plant(game.player.global_position + Vector2(index + 1, 0))
+	_check(herbs.plants.size() == HerbSkills.SAFETY_CAP, "garden ignored its safety guard: %d" % herbs.plants.size())
+	# Natural garden size: lifetime / planting interval, about five herbs on Mk I.
+	_check(absf(herbs.expected_garden(staff) - HerbSkills.LIFETIME / staff.attack_interval()) < 0.01 and herbs.expected_garden(staff) > 4.0 and herbs.expected_garden(staff) < 6.0, "start garden size off: %.2f" % herbs.expected_garden(staff))
 	var first: Dictionary = herbs.plants[0]
 	_check(first.at.x > game.player.global_position.x, "full garden did not replace the oldest herb")
 	await _clear()
@@ -142,7 +187,7 @@ func _skills() -> void:
 	_check(kinds.count(HerbSkills.Kind.SHRUB) == 0 or kinds.count(HerbSkills.Kind.SHRUB) == 1, "shrub frequency wrong: %s" % [kinds])
 	await _clear()
 	game.player.class_combat.powers = {"herb_monoculture": 1.0, "skill_totem": 1.0}
-	_check(herbs.next_kind() == HerbSkills.Kind.SAGE and herbs.capacity() == roundi(HerbSkills.CAPS[0] * HerbSkills.MONOCULTURE_CAP), "Monokultur did not keep only sage")
+	_check(herbs.next_kind() == HerbSkills.Kind.SAGE and is_equal_approx(herbs.lifetime(HerbSkills.Kind.SAGE), HerbSkills.LIFETIME * HerbSkills.MONOCULTURE_LIFE), "Monokultur did not keep only sage with longer lives")
 	await _clear()
 	# Totem aura: haste for Denti while grown and near.
 	game.player.class_combat.powers = {"skill_totem": 1.0}
@@ -184,8 +229,19 @@ func _staffs() -> void:
 	game.player.stats.talent_roots = 2
 	_check(loadout.capacity == 3, "talent roots did not widen the loadout: %d" % loadout.capacity)
 	_check(loadout.acquire(staff_data, 1) and loadout.acquire(staff_data, 1), "second and third staff could not be equipped")
+	_hold_staffs()
+	herbs.reset_wave()
 	var all := herbs.staffs()
 	_check(all.size() == 3, "expected three staffs, got %d" % all.size())
+	# Staffs entering a wave keep their root phase, so they never jab in unison.
+	var phases := {}
+	for weapon in all:
+		weapon.engagement_pending = true
+		weapon.cooldown = 0.0
+		weapon._physics_process(0.0)
+		phases[snappedf(weapon.cooldown, 0.001)] = true
+	_check(phases.size() >= 2, "staffs started in unison")
+	herbs.reset_wave()
 	# The shop offers no further staff without a free root, only a fusion.
 	game.shop.reroll(8, 0.0, loadout, game.items)
 	for offer: ShopOfferData in game.shop.offers:
@@ -194,21 +250,24 @@ func _staffs() -> void:
 	# Every staff keeps its own garden and cap.
 	all[1].affixes.assign([{"id": "fire", "rarity": 1, "damage": 3.0}])
 	all[2].tier = 3
-	for index in 20:
+	for index in 4:
 		for weapon in all: herbs.plant(game.player.global_position + Vector2(index * 4, 0), weapon)
-	_check(herbs.garden_size(all[0]) == HerbSkills.CAPS[0] and herbs.garden_size(all[2]) == HerbSkills.CAPS[2], "per-staff caps wrong: %d / %d" % [herbs.garden_size(all[0]), herbs.garden_size(all[2])])
-	_check(herbs.plants.size() == HerbSkills.CAPS[0] * 2 + HerbSkills.CAPS[2], "garden total wrong: %d" % herbs.plants.size())
+	herbs.plant(game.player.global_position, all[2])
+	_check(herbs.garden_size(all[0]) == 4 and herbs.garden_size(all[2]) == 5, "per-staff gardens mixed: %d / %d" % [herbs.garden_size(all[0]), herbs.garden_size(all[2])])
+	_check(herbs.lifetime(HerbSkills.Kind.SAGE, all[2]) > herbs.lifetime(HerbSkills.Kind.SAGE, all[0]), "Mk tier did not lengthen herb lives")
 	_check(herbs.element_color(all[1]).a > 0.0 and herbs.element_color(all[0]).a == 0.0, "staff elements mixed up")
 	var fiery := herbs.plants.filter(func(entry: Dictionary) -> bool: return entry.staff == all[1].instance_uid)
 	_check(herbs.staff_of(fiery[0]) == all[1], "herb lost its staff")
-	game.player.class_combat.powers = {"herb_cap": 2.0}
-	_check(herbs.capacity(all[0]) == HerbSkills.CAPS[0] + 2, "Dichtes Beet did not add herbs per staff")
+	var before := all[0].attack_interval()
+	game.player.class_combat.powers = {"herb_rate": 2.0}
+	_check(is_equal_approx(all[0].attack_interval(), before / 1.2), "Dichtes Beet did not speed up planting")
+	game.player.class_combat.powers = {}
 	# Resume keeps the owner of every herb.
 	var states: Dictionary = JSON.parse_string(JSON.stringify(game.player.save_skill_modules()))
 	_check(ClassSkillModule.valid_state(states), "multi-staff garden fails validation")
 	herbs.reset_wave()
 	game.player.restore_skill_modules(states)
-	_check(herbs.garden_size(all[1]) == HerbSkills.CAPS[0] and herbs.garden_size(all[2]) == HerbSkills.CAPS[2], "garden owners lost on resume")
+	_check(herbs.garden_size(all[1]) == 4 and herbs.garden_size(all[2]) == 5, "garden owners lost on resume")
 	# Removing staffs hands their herbs to the first.
 	loadout.restore([{"id": "planting_staff", "tier": 1, "uid": all[0].instance_uid}], false)
 	game.player.stats.talent_roots = 0
@@ -225,17 +284,47 @@ func _combat() -> void:
 	# Enemies wear herbs down; bosses trample them.
 	var biter := _enemy(Vector2(0, 0))
 	biter.contact_damage = 1000.0
-	herbs.plant()
+	herbs.plant(game.player.global_position)
 	herbs.advance(HerbSkills.GROW_SECONDS + 0.01)
 	herbs.advance(0.02)
 	_check(herbs.plants.is_empty(), "contact did not wear the herb down")
 	await _clear()
 	var boss := _enemy(Vector2(0, 0), WaveController.BOSS)
-	boss.contact_damage = 0.0
-	herbs.plant()
+	# Bosses trample with tripled contact damage: one hit that a normal enemy
+	# survives finishes the herb.
+	boss.contact_damage = herbs.plant_health() / HerbSkills.BOSS_TRAMPLE + 1.0
+	herbs.plant(game.player.global_position)
 	herbs.advance(HerbSkills.GROW_SECONDS + 0.01)
 	herbs.advance(0.02)
 	_check(herbs.plants.is_empty(), "a boss did not trample the herb")
+	await _clear()
+
+
+func _caramel_heart() -> void:
+	var boss := _enemy(Vector2(300, 0), EnemyCatalog.CAVITY_PRINCE)
+	boss.boss_phase = 2
+	boss.boss_phase_timer = 0.0
+	var ritual := boss.caramel_encounter.overload
+	ritual.begin()
+	var heart := ritual.live_pylons()[0]
+	var start: Vector2 = game.player.global_position
+	game.player.global_position = heart.global_position + Vector2.RIGHT * (ritual.opening_distance + 100.0)
+	var spot := heart.global_position + Vector2.DOWN * ritual.opening_distance * 0.5
+	herbs.plant(spot)
+	var sage := herbs.plants[0]
+	boss.caramel_encounter.advance(ritual.profile.warning_seconds)
+	_check(ritual.state == CaramelOverload.State.ACTIVE and not heart.is_targetable(), "a sprout opened a heart while Denti was away")
+	sage.shot = 0.0
+	herbs.advance(HerbSkills.GROW_SECONDS + 0.01)
+	_check(heart.is_targetable(), "grown sage did not open a nearby heart while Denti was away")
+	var before := heart.health
+	for projectile in game.get_node("Projectiles").get_children():
+		if projectile is WeaponProjectile and projectile.visible: projectile._physics_process(0.25)
+	_check(heart.health < before, "sage projectile did not hit the open heart from the garden")
+	sage.life = 0.01
+	herbs.advance(0.02)
+	_check(not heart.is_targetable(), "heart stayed open after the nearby sage wilted")
+	game.player.global_position = start
 	await _clear()
 
 

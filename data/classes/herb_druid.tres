@@ -13,6 +13,6 @@ display_name = "Kräuterzahn"
 description = "Der Kräuterzahn trägt nur Pflanzstäbe, Talente öffnen Wurzeln für bis zu drei. Im Angriffstakt pflanzt er dort, wo er steht, einen Salbeitrieb, der selbstständig schießt. Pflanzen verwelken nach einer Weile; je schneller er pflanzt, desto größer wird sein Garten. Gegner nutzen Pflanzen bei Kontakt ab, Bosse zertrampeln sie."
 root_capacity = 1
 exclusive_weapon_id = &"planting_staff"
-starting_stats = {}
+starting_stats = {"max_health": 20.0, "armor": 2.0}
 preferred_tags = Array[StringName]([&"ranged", &"area", &"crit"])
 talent_tree = ExtResource("2")

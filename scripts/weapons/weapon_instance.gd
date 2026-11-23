@@ -22,6 +22,8 @@ var home_position: Vector2 = Vector2.ZERO
 var hold_position: Vector2 = Vector2.ZERO
 var visual_density: float = 1.0
 var attack_phase: float = 0.0
+## Pflanzstab: random spread of each planting interval.
+const PLANT_JITTER := 0.08
 var engagement_pending: bool = true
 var aim_distance: float = 1000.0
 var hit_point: Vector2 = Vector2.ZERO
@@ -131,6 +133,14 @@ func update_visual() -> void:
 			var side := signf(sprite.scale.x)
 			sprite.position += Vector2(-4.0 * side, -16.0) * cast_lift
 			sprite.rotation -= 0.92 * side * cast_lift
+	elif data.attack_mode == &"plant" and player != null:
+		# Kräuterzahn: the staff jabs its dibber tip into the ground while planting.
+		var herbs := HerbSkills.for_player(player)
+		if herbs != null:
+			var jab := HerbPlanting.plunge(herbs.cast_left(instance_uid))
+			var side := signf(sprite.scale.x)
+			sprite.position += Vector2(5.0 * side, 13.0) * jab
+			sprite.rotation += 0.55 * side * jab
 	if elastic != null:
 		elastic.set_progress(progress())
 	if floss_cut != null:
@@ -178,14 +188,21 @@ func _physics_process(delta: float) -> void:
 	_begin_attack([nearest])
 
 
-## Pflanzstab: plant a herb in the attack rhythm while enemies are near.
+## Pflanzstab: plant a herb in the attack rhythm throughout a wave, so the
+## garden can be prepared before the horde arrives. Several staffs keep their
+## root phase offset and a little jitter, so they never jab in unison.
 func _plant() -> void:
 	var herbs := HerbSkills.for_player(player)
-	if herbs == null or EnemySpatialIndex.nearest(get_tree(), player.enemy_index, player.global_position, data.range_at_tier(tier), true) == null:
+	if herbs == null or not player.combat_active():
 		engagement_pending = true
 		return
+	if engagement_pending:
+		engagement_pending = false
+		cooldown = attack_interval() * attack_phase
+		if cooldown > 0.0:
+			return
 	herbs.plant(Vector2.INF, self)
-	cooldown = attack_interval()
+	cooldown = attack_interval() * randf_range(1.0 - PLANT_JITTER, 1.0 + PLANT_JITTER)
 	attack_duration = maxf(minf(data.animation_duration, cooldown * 0.85), 0.035)
 	attack_time = attack_duration
 	player.play_attack_animation(aim, &"brush")

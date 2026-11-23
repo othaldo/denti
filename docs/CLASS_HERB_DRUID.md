@@ -9,7 +9,7 @@ Platzhalter-Talentsymbole). Grundlage sind
 [Talentbaum v3](TALENT_TREE_V3_PLAN.md) mit drei Ästen, je einem Skill in Reihe 3.
 
 **Idee:** Denti trägt keine Kampfwaffe, sondern einen Pflanzstab. Jeder „Angriff“
-setzt eine Heilpflanze dorthin, wo Denti steht. Pflanzen wachsen, kämpfen und
+setzt eine Heilpflanze in Dentis Umgebung. Pflanzen wachsen, kämpfen und
 verwelken nach einer Weile. Je schneller Denti pflanzt, desto mehr Pflanzen stehen
 gleichzeitig auf dem Feld. Alle Pflanzen sind echte Zahnheilkräuter: Salbei,
 Kamille, Gewürznelke.
@@ -21,7 +21,7 @@ Kräuterzahns stehen fest. Er baut einen **Garten** und lockt die Horde hinein.
 
 | Teil | Inhalt |
 | --- | --- |
-| **Verb** | Pflanzen statt schießen. Der Pflanzstab setzt im Angriffstakt einen Salbeitrieb an Dentis Standort. Salbeitriebe schießen selbstständig auf Gegner in Reichweite. Pflanzen verwelken nach einer festen Lebenszeit; so viele stehen gleichzeitig, wie in diese Zeit hineinpassen (Lebenszeit ÷ Pflanztakt), höchstens bis zu einer Obergrenze. |
+| **Verb** | Pflanzen statt schießen. Der Pflanzstab setzt im Angriffstakt einen Salbeitrieb in Dentis Umgebung. Salbeitriebe schießen selbstständig auf Gegner in ihrer Reichweite. Wie viele Pflanzen gleichzeitig stehen, ergibt sich aus Lebenszeit ÷ Pflanztakt. |
 | **Linse** | **Putzeifer** (schneller pflanzen = größerer Garten), **Fernschaden** (Salbeischuss), **Glanz** (Salbei-Krits). Element-Verzauberungen des Pflanzstabs gehen auf die Salbeischüsse über, wie beim Nekrodent auf die Bisse. Flächen- und Pfützen-Items wirken im Garten doppelt gut, weil die Horde dort steht. |
 | **Verzicht** | Denti selbst macht keinen Schaden. Wer flieht, lässt seinen Garten zurück und kämpft mit leeren Händen. Der Garten braucht Anlaufzeit: Zu Wellenbeginn und nach einem Rückzug ist der Kräuterzahn schwach. |
 
@@ -36,20 +36,36 @@ Garten ausweichen.
   öffnen je eine Wurzel (`extra_roots` → `PlayerStats.talent_roots`). Ist eine Wurzel
   frei, bietet der Shop einen weiteren Pflanzstab an, sonst die Fusion des
   schwächsten Stabs.
-- **Jeder Stab pflegt seinen eigenen Garten:** eigene Obergrenze, eigener Pflanztakt,
-  eigenes Element, eigene Mk-Stufe und Verzauberungen. Ein voller Garten ersetzt die
-  älteste Pflanze desselben Stabs. Der Bodenschein zeigt das Element pro Pflanze.
-- Angriffstakt = Pflanztakt (Putzeifer verkürzt ihn).
-- Shop-Fusion Mk II–IV: Pflanzen leben länger, Obergrenze steigt, Salbei schießt weiter.
+- **Jeder Stab pflegt seinen eigenen Garten:** eigener Pflanztakt, eigenes Element,
+  eigene Mk-Stufe und Verzauberungen. Der Bodenschein zeigt das Element pro Pflanze.
+- **Keine feste Obergrenze:** Wie viele Pflanzen stehen, ergibt sich aus Lebensdauer ÷
+  Pflanztakt (Mk I: etwa 5). Putzeifer, „Dichtes Beet“ und Mk-Stufen lassen den Garten
+  wachsen. Nur eine Sicherheitsgrenze von 30 Pflanzen pro Stab schützt die Leistung.
+- Angriffstakt = Pflanztakt (Putzeifer verkürzt ihn). Stäbe pflanzen während der ganzen
+  Welle, auch ohne Gegner in der Nähe, mit Versatz untereinander und leichter Streuung.
+- Neue Pflanzen landen zufällig im Umkreis um Denti, bevorzugt an freien Stellen.
+- **Fokusfeuer:** Jeder Trieb bevorzugt unter den Gegnern in seiner Reichweite die,
+  die Denti am nächsten sind.
+- **Don Karamello:** Eine ausgewachsene Pflanze hält ein Karamellherz in ihrer Nähe
+  offen, auch wenn Denti weiter weg ist.
+- **Ernte:** Beute neben einer ausgewachsenen Pflanze fliegt zu Denti, damit Kills auf
+  Entfernung XP und Münzen bringen.
+- Shop-Fusion Mk II–IV: Pflanzen leben länger, Salbei schießt weiter und stärker.
 - Fällt ein Stab weg (Fusion, Klassenwechsel), übernimmt der erste Stab seine Pflanzen.
 
 | Wert (Mk I, Startschätzung) | |
 | --- | --- |
 | Pflanztakt | 1,6 s |
-| Lebenszeit einer Pflanze | 12 s (+1,5 s je Mk-Stufe) |
-| Obergrenze pro Stab | 5 / 6 / 7 / 8 je Mk-Stufe, +1 je Rang „Dichtes Beet“ |
+| Lebenszeit einer Pflanze | 8 s (+1,5 s je Mk-Stufe) → etwa 5 Pflanzen auf Mk I |
+| Dichtes Beet | +10 % Pflanztakt je Rang |
 | Wachstum bis zum ersten Schuss | 0,6 s |
-| Salbeischuss | 6 + 0,6 × Fernschaden, alle 0,9 s, mittlere Reichweite |
+| Salbeischuss | 10 + 0,8 × Fernschaden, alle 0,8 s, mittlere Reichweite |
+| Startwerte | +20 Schmelz, +2 Härte (Denti kämpft nicht selbst) |
+| Bosse | zertrampeln Pflanzen mit dreifachem Kontaktschaden |
+
+Bot-Proben (`tools/benchmark_herb_druid.gd`, Normal) gaben den Ausschlag für
+Fokusfeuer, Ernte, höheren Salbeischaden und die Startwerte: Ohne Ernte sammelte der
+Kräuterzahn nur ein Viertel der XP und Münzen von Good Old Molar.
 
 Die Werte sind Schätzungen und werden über die bestehenden Wellenproben eingestellt.
 
@@ -63,14 +79,14 @@ Skills wechselt der Stab reihum: zum Beispiel Salbei, Kamille, Salbei, Nelke.
 ### Ast 1: Salbeibeet (Angriff) → Skill **Salbeistrauch**
 
 - Talente: **Dornen** (Salbeischüsse durchbohren einen Gegner), **Dichtes Beet**
-  (+1 Pflanze pro Stab je Rang), **Zweiter Stab** (Reihe 2) und **Dritter Stab**
+  (+10 % Pflanztakt je Rang), **Zweiter Stab** (Reihe 2) und **Dritter Stab**
   (Reihe 4) öffnen je eine Wurzel für einen weiteren Pflanzstab.
 - **Skill Salbeistrauch:** Jeder fünfte Trieb wächst zu einem großen Strauch, der
   statt Einzelschüssen eine kurze Salve auf mehrere Gegner feuert.
 - Modifikatoren: **Wildwuchs** (jeder vierte statt jeder fünfte), **Samenschuss**
   (Strauch-Salve platzt in kleine Samen).
 - Schlüsselstein **Monokultur:** Nur noch Salbei, keine Kamille und Nelke mehr; dafür
-  +50 % Obergrenze.
+  leben Pflanzen 50 % länger.
 
 ### Ast 2: Kamillenhain (Unterstützung) → Skill **Kamillentotem**
 

@@ -71,7 +71,14 @@ func blocks_damage() -> bool:
 	return pending() or state in [State.WARNING, State.ACTIVE, State.BLAST]
 
 func objective_open(pylon: Enemy) -> bool:
-	return state == State.ACTIVE and (trial().kind == CaramelTrialData.Kind.COURIERS or pylon.global_position.distance_to(encounter.enemy.target.global_position) <= opening_distance)
+	if state != State.ACTIVE: return false
+	if trial().kind == CaramelTrialData.Kind.COURIERS: return true
+	var player := encounter.enemy.target
+	if not is_instance_valid(player): return false
+	var at := pylon.global_position
+	if at.distance_squared_to(player.global_position) <= opening_distance * opening_distance: return true
+	var herbs := HerbSkills.for_player(player)
+	return herbs != null and herbs.has_grown_plant_near(at, opening_distance)
 
 func live_pylons() -> Array[Enemy]:
 	var result: Array[Enemy] = []

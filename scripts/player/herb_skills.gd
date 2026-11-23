@@ -18,12 +18,15 @@ enum Kind { SAGE, SHRUB, TOTEM, CLOVE }
 const STAFF_ID := &"planting_staff"
 const PLANTS_PATH := "res://assets/classes/herb_druid_plants.png"
 const GROW_SECONDS := 0.6
-const LIFETIME := 12.0
+## Garden size follows lifetime / planting interval; no gameplay cap.
+const LIFETIME := 8.0
 const LIFETIME_PER_TIER := 1.5
-## Herbs per staff by Mk tier; "Dichtes Beet" adds one per rank.
-const CAPS: Array[int] = [5, 6, 7, 8]
-const MONOCULTURE_CAP := 1.5
-const SHOT_INTERVAL := 0.9
+## Performance guard per staff, far above what planting speed normally reaches.
+const SAFETY_CAP := 30
+const MONOCULTURE_LIFE := 1.5
+## Dichtes Beet: planting speed per rank.
+const RATE_PER_RANK := 0.1
+const SHOT_INTERVAL := 0.8
 const SHRUB_INTERVAL := 1.6
 const SHRUB_SHOTS := 3
 const SHRUB_EVERY := 5
@@ -35,6 +38,14 @@ const PLANT_HEALTH := 40.0
 const PLANT_HEALTH_PER_TIER := 12.0
 const PLANT_RADIUS := 16.0
 const CONTACT_INTERVAL := 0.5
+const BOSS_TRAMPLE := 3.0
+## New herbs land in a ring around Denti, preferring free spots.
+const SPREAD_MIN := 18.0
+const SPREAD_MAX := 62.0
+const SPREAD_TRIES := 6
+## Ernte: loot near a grown herb flies to Denti, so kills at range still pay.
+const HARVEST_RADIUS := 90.0
+const HARVEST_TICK := 0.25
 const SOOTHE_RADIUS := 130.0
 const SOOTHE_HEAL := 0.25
 const SOOTHE_CAP := 4
@@ -82,6 +93,9 @@ var snared_once: Dictionary = {}
 var pierce_data: WeaponData
 var pierce_source: WeaponData
 var plant_art: Texture2D
+## Staff uid -> remaining planting animation (HerbPlanting.CAST_SECONDS).
+var casts: Dictionary = {}
+var harvest_tick := 0.0
 
 func class_id() -> StringName:
 	return &"herb_druid"
@@ -104,6 +118,7 @@ func reset_wave() -> void:
 	numbed.clear()
 	snared.clear()
 	snared_once.clear()
+	casts.clear()
 
 static func for_player(denti: Player) -> HerbSkills:
 	return denti.skill_module(&"herb_druid") as HerbSkills if denti != null else null
@@ -126,15 +141,24 @@ func staff_of(entry: Dictionary) -> WeaponInstance:
 	return staff()
 
 func _tier(weapon: WeaponInstance) -> int:
-	return clampi(weapon.tier if weapon != null else 1, 1, CAPS.size())
+	return clampi(weapon.tier if weapon != null else 1, 1, WeaponLoadout.MAX_TIER)
 
 # --- Garden size --------------------------------------------------------------
 
-## Herbs one staff keeps at once.
-func capacity(weapon: WeaponInstance = null) -> int:
+## Safety limit per staff; the garden normally stays far below it.
+func capacity(_weapon: WeaponInstance = null) -> int:
+	return SAFETY_CAP
+
+## Herbs a staff keeps alive at its current planting speed.
+func expected_garden(weapon: WeaponInstance = null) -> float:
 	if weapon == null: weapon = staff()
-	var cap := CAPS[_tier(weapon) - 1] + roundi(power("herb_cap"))
-	return roundi(cap * MONOCULTURE_CAP) if power("herb_monoculture") > 0.0 else cap
+	if weapon == null: return 0.0
+	return lifetime(Kind.SAGE, weapon) / maxf(weapon.attack_interval(), 0.05)
+
+## Dichtes Beet: staffs plant faster.
+func weapon_interval_factor(weapon: WeaponInstance) -> float:
+	if not active() or weapon.data.attack_mode != &"plant": return 1.0
+	return 1.0 / (1.0 + RATE_PER_RANK * power("herb_rate"))
 
 func garden_size(weapon: WeaponInstance) -> int:
 	var uid := weapon.instance_uid if weapon != null else ""
@@ -144,6 +168,7 @@ func lifetime(kind: int, weapon: WeaponInstance = null) -> float:
 	if weapon == null: weapon = staff()
 	var seconds := LIFETIME + LIFETIME_PER_TIER * float(_tier(weapon) - 1) + power("herb_life")
 	if kind == Kind.SHRUB and power("shrub_roots") > 0.0: seconds *= 2.0
+	if power("herb_monoculture") > 0.0: seconds *= MONOCULTURE_LIFE
 	return seconds
 
 func plant_health(weapon: WeaponInstance = null) -> float:
@@ -169,9 +194,39 @@ func plant(at: Vector2 = Vector2.INF, source: WeaponInstance = null) -> void:
 	var kind := next_kind()
 	plantings += 1
 	if kind in [Kind.SAGE, Kind.SHRUB]: sage_plantings += 1
-	_add_plant(kind, player.global_position if at == Vector2.INF else at, source)
+	if source == null: source = staff()
+	var ground := planting_spot() if at == Vector2.INF else at
+	var tip := Vector2.INF
+	if source != null:
+		casts[source.instance_uid] = HerbPlanting.CAST_SECONDS
+		tip = source.muzzle_position()
+	_add_plant(kind, ground, source, tip)
 
-func _add_plant(kind: int, at: Vector2, source: WeaponInstance = null) -> void:
+## A spot in the ring around Denti, as far as possible from other herbs.
+func planting_spot() -> Vector2:
+	var centre := player.global_position
+	var lower := Vector2.ONE * DentiArena.PLAYER_MARGIN
+	var upper := player.arena.arena_size - lower
+	var best := centre
+	var best_gap := -1.0
+	for attempt in SPREAD_TRIES:
+		var offset := Vector2.from_angle(randf() * TAU) * randf_range(SPREAD_MIN, SPREAD_MAX)
+		var spot := centre + offset
+		# Reflect outward throws back into the arena without shortening the spread.
+		if spot.x < lower.x or spot.x > upper.x: spot.x = centre.x - offset.x
+		if spot.y < lower.y or spot.y > upper.y: spot.y = centre.y - offset.y
+		var gap := INF
+		for entry in plants: gap = minf(gap, spot.distance_squared_to(entry.at))
+		if gap > best_gap:
+			best_gap = gap
+			best = spot
+	return best
+
+## Remaining planting animation of one staff, 0 when idle.
+func cast_left(uid: String) -> float:
+	return float(casts.get(uid, 0.0))
+
+func _add_plant(kind: int, at: Vector2, source: WeaponInstance = null, tip: Vector2 = Vector2.INF) -> void:
 	if source == null: source = staff()
 	var uid := source.instance_uid if source != null else ""
 	# A full garden replaces this staff's oldest herb, so it follows Denti.
@@ -182,11 +237,19 @@ func _add_plant(kind: int, at: Vector2, source: WeaponInstance = null) -> void:
 				plants.remove_at(index)
 				break
 	plants.append({"kind": kind, "at": at, "grow": GROW_SECONDS, "life": lifetime(kind, source), "health": plant_health(source),
-		"shot": randf_range(0.0, SHOT_INTERVAL), "contact": 0.0, "staff": uid})
+		"shot": randf_range(0.0, SHOT_INTERVAL), "contact": 0.0, "staff": uid, "tip": tip, "seed": randi() % 7})
 	support(&"class_herb_plantings")
 
 func grown(plant_entry: Dictionary) -> bool:
 	return float(plant_entry.grow) <= 0.0
+
+func has_grown_plant_near(at: Vector2, radius: float) -> bool:
+	if not active(): return false
+	var radius_squared := radius * radius
+	for entry in plants:
+		if grown(entry) and entry.life > 0.0 and entry.health > 0.0 and at.distance_squared_to(entry.at) <= radius_squared:
+			return true
+	return false
 
 # --- Hooks ----------------------------------------------------------------------
 
@@ -206,8 +269,15 @@ func damage_bonus(enemy: Enemy, _weapon: WeaponData) -> float:
 	return CLOVE_OIL_BONUS if power("clove_oil") > 0.0 else CLOVE_BONUS
 
 func advance(delta: float) -> void:
+	for uid in casts.keys():
+		casts[uid] = float(casts[uid]) - delta
+		if casts[uid] <= 0.0: casts.erase(uid)
 	if active():
 		tea_cooldown = maxf(tea_cooldown - delta, 0.0)
+		harvest_tick -= delta
+		if harvest_tick <= 0.0:
+			harvest_tick = HARVEST_TICK
+			_harvest()
 		_tick_numbing(delta)
 		_hold_snared(delta)
 		var soothing := 0
@@ -253,6 +323,16 @@ func _healing_feedback(amount: float, source: Vector2, delta: float) -> void:
 			items().effect_context.announce(label, player.global_position, HEAL_COLOR)
 		heal_pending = 0.0
 
+## Herbs hand their harvest to Denti: loot beside a grown herb flies over.
+func _harvest() -> void:
+	if plants.is_empty() or not player.combat_active(): return
+	var index := player.get_parent().get_node_or_null("Loot") as LootSpatialIndex
+	if index == null: return
+	for entry in plants:
+		if not grown(entry): continue
+		for drop in index.in_circle(entry.at, HARVEST_RADIUS):
+			if not drop.wave_collecting and drop.kind != &"chest": drop.begin_wave_collection()
+
 # --- Plants in combat -----------------------------------------------------------
 
 func _shoot(entry: Dictionary, weapon: WeaponInstance, delta: float) -> void:
@@ -262,10 +342,13 @@ func _shoot(entry: Dictionary, weapon: WeaponInstance, delta: float) -> void:
 	var reach := weapon.data.range_at_tier(weapon.tier)
 	var targets: Array[Enemy] = []
 	var shots := 1 if entry.kind == Kind.SAGE else SHRUB_SHOTS + roundi(power("shrub_seeds"))
+	# Focus fire: every herb shoots at the enemies closest to Denti, so threats
+	# die instead of many enemies being scratched, and loot falls near Denti.
+	var denti := player.global_position
 	for enemy in player.nearby_enemies(entry.at, reach):
-		if not enemy.is_targetable(): continue
-		targets.append(enemy)
-		if targets.size() >= shots: break
+		if enemy.is_targetable(): targets.append(enemy)
+	targets.sort_custom(func(a: Enemy, b: Enemy) -> bool: return a.global_position.distance_squared_to(denti) < b.global_position.distance_squared_to(denti))
+	if targets.size() > shots: targets.resize(shots)
 	if targets.is_empty():
 		entry.shot = 0.15
 		return
@@ -303,10 +386,8 @@ func _contact(entry: Dictionary, delta: float) -> void:
 	var damage := 0.0
 	for enemy in player.nearby_enemies(entry.at, PLANT_RADIUS):
 		if not enemy.is_targetable(): continue
-		if enemy.data.is_boss:
-			entry.health = 0.0 # Bosses trample herbs.
-			return
-		damage = maxf(damage, enemy.contact_damage)
+		# Bosses trample herbs with heavy contact damage instead of instantly.
+		damage = maxf(damage, enemy.contact_damage * (BOSS_TRAMPLE if enemy.data.is_boss else 1.0))
 	if damage <= 0.0: return
 	entry.contact = CONTACT_INTERVAL
 	entry.health = maxf(float(entry.health) - damage, 0.0)
@@ -394,10 +475,18 @@ func _draw() -> void:
 			draw_arc(at, radius, 0.0, TAU, 48, Color(CHAMOMILE, 0.45 * fade), 2.0, true)
 		elif entry.kind == Kind.CLOVE and grown(entry):
 			draw_arc(at, CLOVE_RADIUS, 0.0, TAU, 40, Color(CLOVE.lightened(0.3), 0.45 * fade), 2.0, true)
+		# Planting: the seed arcs from the staff head, then the soil bursts open.
+		if not grown(entry):
+			var elapsed := GROW_SECONDS - float(entry.grow)
+			var tip: Vector2 = entry.get("tip", Vector2.INF)
+			if tip.is_finite(): HerbPlanting.draw_seed(self, to_local(tip), at + Vector2(0, -6), elapsed / HerbPlanting.SEED_SECONDS, glow)
+			HerbPlanting.draw_sprout(self, at, (elapsed - HerbPlanting.SEED_SECONDS * 0.5) / (GROW_SECONDS - HerbPlanting.SEED_SECONDS * 0.5), glow, int(entry.get("seed", 0)))
 		# The staff's element shows on every herb as a soft ground glow.
 		if glow.a > 0.0 and grown(entry):
 			draw_circle(at + Vector2(0, -4), 13.0 * DRAW_SCALE, Color(glow, 0.22 * fade))
-		_draw_plant(at, int(entry.kind), growth, fade)
+		# The sprout appears once the seed has landed.
+		var in_flight: bool = Vector2(entry.get("tip", Vector2.INF)).is_finite() and GROW_SECONDS - float(entry.grow) < HerbPlanting.SEED_SECONDS * 0.8
+		if not in_flight: _draw_plant(at, int(entry.kind), growth, fade)
 	if heal_pulse_left > 0.0: _draw_heal_pulse()
 	draw_effects()
 

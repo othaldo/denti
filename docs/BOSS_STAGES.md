@@ -95,8 +95,9 @@ Die Herzgrafik kommt aus dem vorhandenen Prinzen-Atlas; normale Wellengegner
 werden nicht als Platzhalter verwendet. Alle Ziele behalten 32 Basisleben;
 mehr Prüfungen und Druck kommen aus Verhalten und Abfolge.
 
-- Ein Herz öffnet sich in Dentis Nähe. Der Ring wechselt von Blau zu Gold;
-  automatische Waffen wählen offene Herzen und ignorieren den immunen Boss.
+- Ein Herz öffnet sich in Dentis Nähe oder neben einer ausgewachsenen Pflanze
+  des Kräuterzahns. Der Ring wechselt von Blau zu Gold. Automatische Waffen
+  wählen offene Herzen und ignorieren den immunen Boss.
   Alle normalen Waffen und Verzauberungen verwenden ihren bestehenden Trefferpfad.
 - Jedes Herz kündigt eigene gezielte Salven an. Seine Zerstörung entfernt auch
   seine fliegenden Geschosse und verschafft unmittelbar Luft für den nächsten Weg.
