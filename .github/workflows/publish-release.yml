@@ -46,9 +46,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: python3 tools/prepare_pages.py --require-stable
       - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v4
-        with:
-          path: build/site
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v5
+        uses: ./.github/actions/publish-pages
