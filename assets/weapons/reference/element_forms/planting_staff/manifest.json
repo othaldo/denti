@@ -1,0 +1,245 @@
+{
+  "schema_version": 1,
+  "weapon_id": "planting_staff",
+  "display_name": "Pflanzstab",
+  "canvas": {
+    "width": 1024,
+    "height": 1536,
+    "format": "PNG",
+    "mode": "RGBA",
+    "background": "transparent"
+  },
+  "reference": "assets/weapons/planting_staff.png",
+  "reference_resource": "data/weapons/planting_staff.tres",
+  "normal_provenance": "ImageGen portrait reframe and alpha cleanup of the original square planting staff",
+  "prompts": "prompts.json",
+  "preview_region": [
+    80,
+    210,
+    975,
+    1380
+  ],
+  "preview_size_px": 60,
+  "status": "complete_for_review",
+  "integrated_into_game": true,
+  "variants": [
+    {
+      "id": "normal",
+      "label": "Normal",
+      "description": "Grüner Samen im Wurzelkopf",
+      "file": "normal.png",
+      "sha256": "2c495c82d599a1cd70f7baaecf1b9a6b04fbbd96c74484a3084ecbfa6b0be79b",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        116,
+        249,
+        944,
+        1352
+      ],
+      "solid_bounds_alpha128": [
+        117,
+        249,
+        944,
+        1351
+      ],
+      "grip_center_px": [
+        360.0,
+        977
+      ],
+      "grip_shift_px": 0.0,
+      "source": "imagegen:exec-e395f3c4-dcc2-44ec-86a4-13a358a8cac6.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "fire",
+      "label": "Feuer",
+      "description": "Glutsamen mit Flammenkeim und verkohlter Wurzel",
+      "file": "fire.png",
+      "sha256": "4c251303a7f538f2138c655c4a14732ec34b5c566d3276e156efa97a3b50e103",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        115,
+        247,
+        945,
+        1353
+      ],
+      "solid_bounds_alpha128": [
+        116,
+        248,
+        945,
+        1352
+      ],
+      "grip_center_px": [
+        359.0,
+        977
+      ],
+      "grip_shift_px": 1.0,
+      "source": "imagegen:exec-61a21584-83bf-4429-a1e3-5f0ef8287340.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "ice",
+      "label": "Eis",
+      "description": "Eiskristall mit Frost und Eiszapfen",
+      "file": "ice.png",
+      "sha256": "e65f7bd1493f71dbf8e7c80f5ed07388ef8a41b4f0656d3b11b3f995c802df69",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        115,
+        247,
+        945,
+        1353
+      ],
+      "solid_bounds_alpha128": [
+        116,
+        247,
+        945,
+        1352
+      ],
+      "grip_center_px": [
+        358.5,
+        977
+      ],
+      "grip_shift_px": 1.5,
+      "source": "imagegen:exec-77173297-bbdf-4711-baf3-8d6ed73e2e3a.png",
+      "origin": "built_in_imagegen_edit",
+      "processing": "One corner pixel with alpha 1/255 set to zero."
+    },
+    {
+      "id": "poison",
+      "label": "Gift",
+      "description": "Giftgrüner Samen mit violetter Ranke",
+      "file": "poison.png",
+      "sha256": "c56c882e7425ffd286addc5a85e282cf8e9c12cd70b1e6e48f5fdcdcecc5529b",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        117,
+        249,
+        945,
+        1351
+      ],
+      "solid_bounds_alpha128": [
+        118,
+        249,
+        945,
+        1351
+      ],
+      "grip_center_px": [
+        360.0,
+        977
+      ],
+      "grip_shift_px": 0.0,
+      "source": "imagegen:exec-6e6d8f56-b050-42ed-afee-3f38382843df.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "electric",
+      "label": "Elektro",
+      "description": "Gelber Blitzsamen in einer Kupferspule",
+      "file": "electric.png",
+      "sha256": "522427ce2913e589008c11d64393a781039f1b37aa46719be8b994e5e5add55d",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        116,
+        247,
+        947,
+        1352
+      ],
+      "solid_bounds_alpha128": [
+        116,
+        248,
+        947,
+        1351
+      ],
+      "grip_center_px": [
+        359.5,
+        977
+      ],
+      "grip_shift_px": 0.5,
+      "source": "imagegen:exec-dafa07c0-d234-4082-b7b7-5b80e3d26fe3.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "bleed",
+      "label": "Blutung",
+      "description": "Rote Hagebutte mit Dornranke",
+      "file": "bleed.png",
+      "sha256": "07de6a6715add1d9b3f5ba524696a6f802380f42bfa0fca3b0f0162fff2a6814",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        117,
+        248,
+        945,
+        1352
+      ],
+      "solid_bounds_alpha128": [
+        117,
+        248,
+        945,
+        1352
+      ],
+      "grip_center_px": [
+        358.0,
+        977
+      ],
+      "grip_shift_px": 2.0,
+      "source": "imagegen:exec-97d83a58-f578-42e7-b262-5d9184b98f8d.png",
+      "origin": "built_in_imagegen_edit"
+    },
+    {
+      "id": "wet",
+      "label": "Wasser",
+      "description": "Blauer Tropfensamen mit nasser Ranke",
+      "file": "wet.png",
+      "sha256": "06647733e05ddd5c9d443d017579ab7391c5b343cfeda4dd95b4fde930700ad8",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "visible_bounds_alpha32": [
+        116,
+        248,
+        949,
+        1352
+      ],
+      "solid_bounds_alpha128": [
+        116,
+        248,
+        948,
+        1352
+      ],
+      "grip_center_px": [
+        358.0,
+        977
+      ],
+      "grip_shift_px": 2.0,
+      "source": "imagegen:exec-534fd3c1-115f-4721-82ca-c81db4e7885e.png",
+      "origin": "built_in_imagegen_edit"
+    }
+  ]
+}

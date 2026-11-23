@@ -27,7 +27,7 @@ func prepare(weapon: WeaponData, tier: int, count: int = PREPARE_PER_STYLE) -> v
 func prepare_loadout(weapons: Array[WeaponInstance]) -> void:
 	var wanted: Dictionary[WeaponData, Array] = {}
 	for weapon in weapons:
-		if weapon.data.attack_mode != &"projectile":
+		if weapon.data.attack_mode not in [&"projectile", &"plant"]:
 			continue
 		if not wanted.has(weapon.data):
 			wanted[weapon.data] = []

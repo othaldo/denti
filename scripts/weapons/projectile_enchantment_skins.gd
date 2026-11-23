@@ -6,6 +6,7 @@ extends RefCounted
 const PAGE_SIZE := Vector2i(2048, 1024)
 const MAX_STYLES := 6
 const MAX_PAGES := 1
+const HERB_SEED: Texture2D = preload("res://assets/vfx/herb_seed_projectile.png")
 static var fallback: ProjectileEnchantmentSkins
 var entries: Dictionary[String, Array] = {}
 var pages: Array[Dictionary] = []
@@ -26,6 +27,9 @@ static func mask(values: Array[Dictionary]) -> int:
 	return result
 
 static func base_texture(data: WeaponData, tier: int, affixes: Array[Dictionary] = []) -> Texture2D:
+	if data.projectile_shape == &"seed":
+		# Keep the plant shape while the usual affix frames add elemental particles.
+		return HERB_SEED
 	var elemental := WeaponElementVisuals.projectile(data, tier, affixes)
 	if elemental != null:
 		return elemental
@@ -35,6 +39,7 @@ static func base_texture(data: WeaponData, tier: int, affixes: Array[Dictionary]
 	return CombatSpriteTextures.projectile(data.projectile_color, radius)
 
 static func visual_radius(data: WeaponData, tier: int) -> float:
+	if data.projectile_shape == &"seed": return 9.0
 	return 13.0 if data.projectile_shape == &"rocket" else (11.0 if data.splash_at_tier(tier) > 0 or data.pierce_at_tier(tier) > 0 else 7.0)
 
 static func unmanaged_frames(base: Texture2D, values: Array[Dictionary], radius: float) -> Array[Texture2D]:
@@ -51,7 +56,7 @@ func prepare(weapons: Array[WeaponInstance]) -> void:
 	var wanted: Dictionary[String, Dictionary] = {}
 	var has_enchantment := false
 	for weapon in weapons:
-		if weapon.data.attack_mode != &"projectile":
+		if weapon.data.attack_mode not in [&"projectile", &"plant"]:
 			continue
 		var bits := mask(weapon.affixes)
 		has_enchantment = has_enchantment or bits != 0

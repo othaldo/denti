@@ -1,6 +1,6 @@
 # Auftrag an Codex: Element-Varianten des Pflanzstabs
 
-**Status: offen.** Gleiches Verfahren wie bei den 24 Waffenpaketen
+**Status: umgesetzt.** Gleiches Verfahren wie bei den anderen Waffenpaketen
 ([Format](reference/element_forms/README.md), [Laufzeit](../../docs/WEAPON_SKINS.md)).
 
 ## Was zu tun ist
@@ -19,8 +19,6 @@
    `element_skins` in `data/weapons/planting_staff.tres` ein.
 4. Die Varianten bei Spielgröße prüfen (Waffe ~60 px, Shop-Karte, Verzauberungsbild)
    und hier unter „Ergebnis“ eintragen.
-
-Bis die Bilder da sind, tönt das Spiel den Pflanzstab in der Elementfarbe.
 
 ## Referenz und Aufbau
 
@@ -58,4 +56,22 @@ Use case: precise-object-edit. Asset type: one standalone transparent 2D weapon 
 
 ## Ergebnis
 
-_Bitte nach dem Erzeugen ausfüllen._
+Normalform und sechs Elementformen wurden mit ImageGen als transparente PNGs
+erzeugt und für den Pflanzstab gepackt. Die Originalreferenz bleibt erhalten.
+Die [Prompts](reference/element_forms/planting_staff/prompts.json) dokumentieren
+die Erzeugung. Das [Manifest](reference/element_forms/planting_staff/manifest.json)
+enthält Maße, Alphagrenzen, Prüfsummen und den Griffversatz von höchstens zwei
+Pixeln auf der Vorlage. Die Laufzeitbilder nutzen einen gemeinsamen Griffpunkt.
+
+Die Varianten wurden in Godot bei 60 Pixeln, auf der Shopkarte, in der
+Verzauberungsvorschau und in der Arena geprüft.
+
+Salbeitrieb und Strauch schießen jetzt gemalte [Salbeikörner](../vfx/herb_seed_projectile.png).
+Die Verzauberung färbt die Partikel am Geschoss. Wird Denti geheilt, zeigen
+Blütenblätter und eine grüne Zahl die wiederhergestellten HP an.
+
+### Prompt für das Salbeikorn
+
+```text
+Use case: stylized-concept. Create a new small standalone projectile sprite for a cozy painted cartoon dental arena game. Image 1 is the style and botany reference ONLY: borrow the small lime green seed bud from the sage on the upper left of that plant sheet. Draw ONE glossy almond-shaped sage seed with a warm dark green-brown outline, moss-and-lime body, a single broad cream-green specular highlight, two small pointed velvety sage-leaf fins swept backward at its tail, and a pointed body nose aiming exactly to the RIGHT. Horizontal action silhouette, approximately twice as wide as it is tall, recognizable as something a sage plant shoots even when shrunk to 22 pixels wide. Larger chunky silhouette and restrained gradients, no thin detail. Hand-painted game sprite with real transparent alpha. Center it with generous border clearance. No light streak, haze, aura, detached details, shadow, ground, text or other objects. Keep the silhouette surrounded by pixels of alpha zero.
+```

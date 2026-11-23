@@ -1,7 +1,12 @@
-[gd_resource type="Resource" script_class="WeaponData" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="WeaponData" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/weapons/planting_staff.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/weapons/element_forms/planting_staff/normal.png" id="2"]
+
+[sub_resource type="AtlasTexture" id="Icon_skin"]
+atlas = ExtResource("2")
+region = Rect2(77, 20, 356, 472)
+filter_clip = true
 
 [resource]
 script = ExtResource("1")
@@ -22,11 +27,22 @@ range_tiers = PackedFloat32Array(260, 290, 320, 360)
 damage_tiers = PackedFloat32Array(1.0, 1.35, 1.8, 2.4)
 projectile_speed = 440.0
 projectile_color = Color(0.55, 0.85, 0.45, 1)
-projectile_shape = &"orb"
+projectile_shape = &"seed"
 price = 9
-sprite = ExtResource("2")
 held_style = "staff"
 upright_at_rest = true
 visual_size = 80.0
-grip_anchor = Vector2(0.36, 0.65)
-tip_anchor = Vector2(0.86, 0.12)
+
+grip_anchor = Vector2(0.375203, 0.645389)
+tip_anchor = Vector2(0.757080, 0.136527)
+sprite = SubResource("Icon_skin")
+held_sprite = ExtResource("2")
+held_scale = 1.156539
+element_skins = {
+"fire": "res://data/weapon_skins/planting_staff/fire.tres",
+"ice": "res://data/weapon_skins/planting_staff/ice.tres",
+"poison": "res://data/weapon_skins/planting_staff/poison.tres",
+"electric": "res://data/weapon_skins/planting_staff/electric.tres",
+"bleed": "res://data/weapon_skins/planting_staff/bleed.tres",
+"wet": "res://data/weapon_skins/planting_staff/wet.tres"
+}
