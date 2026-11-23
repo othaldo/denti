@@ -33,7 +33,11 @@ Denti.pck
 !assets/classes/necrodent_retinue.png.import
 !assets/classes/necrodent_talent_icons.png.import
 !assets/classes/necrodent_tooth_roles.png.import
+!assets/classes/herb_druid_portrait.png.import
+!assets/classes/herb_druid_plants.png.import
+!assets/classes/herb_druid_talent_icons.png.import
 !assets/weapons/extraction_staff.png.import
+!assets/weapons/planting_staff.png.import
 !assets/vfx/element_hit_splats.png.import
 
 # The modular Count artwork uses mipmaps at combat sprite sizes.

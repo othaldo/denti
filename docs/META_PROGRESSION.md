@@ -67,6 +67,7 @@ Element zählen die Schadensart (Wasser, Licht) und jede Element-Verzauberung
 | Frostwächter | Eis-Waffe |
 | Zahnfee | Elektro-Waffe |
 | Nekrodent | Welle 20 auf Normal oder höher gewinnen, mit einer Blutungs- oder Gift-Waffe |
+| Kräuterzahn | Run ab Welle 15 mit drei Fernkampfwaffen beenden |
 
 ## Regeln
 

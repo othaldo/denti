@@ -25,10 +25,13 @@ const ALL: Array[WeaponData] = [
 # Compatibility alias: starters always follow the regular catalog, never evolutions.
 const STARTERS: Array[WeaponData] = ALL
 const EXTRACTION_STAFF: WeaponData = preload("res://data/weapons/extraction_staff.tres")
+const PLANTING_STAFF: WeaponData = preload("res://data/weapons/planting_staff.tres")
+## Exclusive class weapons outside the regular catalog.
+const CLASS_WEAPONS: Array[WeaponData] = [EXTRACTION_STAFF, PLANTING_STAFF]
 
 
 static func is_starter(weapon: WeaponData) -> bool:
-	return weapon in ALL or weapon == EXTRACTION_STAFF
+	return weapon in ALL or weapon in CLASS_WEAPONS
 
 
 static func starters_for(profile: PlayerClassData) -> Array[WeaponData]:
@@ -36,7 +39,8 @@ static func starters_for(profile: PlayerClassData) -> Array[WeaponData]:
 
 
 static func by_id(id: StringName) -> WeaponData:
-	if id == EXTRACTION_STAFF.id: return EXTRACTION_STAFF
+	for weapon in CLASS_WEAPONS:
+		if weapon.id == id: return weapon
 	for weapon in ALL:
 		if weapon.id == id:
 			return weapon

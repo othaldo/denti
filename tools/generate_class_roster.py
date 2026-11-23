@@ -4,7 +4,8 @@ Writes data/classes/<id>.tres and data/talents/<id>.tres for Zahnfee, Glutzahn,
 Spültechniker and Frostwächter. Each tree has three branches of 18 grid cells
 (6 rows x 3 columns): attributes and free roots, entry talents, the branch
 skill in row 3, three skill modifiers in row 4 and a keystone in row 5.
-Usage: python tools/generate_class_roster.py
+Usage: python tools/generate_class_roster.py [class_id ...]
+Without arguments every class is written; with ids only those.
 Portraits and atlas indices are assigned here so regeneration preserves art.
 """
 import os
@@ -12,12 +13,14 @@ import os
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PLACEHOLDER_PORTRAIT = "res://assets/denti/denti_unarmed.png"
 ## Painted class portraits; until a file exists the placeholder is used.
-PORTRAITS = {class_id: "assets/classes/%s_portrait.png" % class_id for class_id in ["tooth_fairy", "ember", "rinser", "frost_warden"]}
+PORTRAITS = {class_id: "assets/classes/%s_portrait.png" % class_id for class_id in ["tooth_fairy", "ember", "rinser", "frost_warden", "herb_druid"]}
 ## First DentiUIIcons.talent() index of each class atlas (8 columns x 3 rows,
 ## one row per branch, nodes left to right in tree order). The existing atlases
 ## reserve 32 + 15 + 14 cells, including Assassin's unused final cell.
 ATLAS_COLUMNS = 8
-ATLAS_BASE = {"tooth_fairy": 61, "ember": 85, "rinser": 109, "frost_warden": 133}
+ATLAS_BASE = {"tooth_fairy": 61, "ember": 85, "rinser": 109, "frost_warden": 133,
+    # Kräuterzahn: own atlas loaded at runtime (DentiUIIcons.HERB_TALENT_FIRST).
+    "herb_druid": 400}
 
 
 def a(stat, ranks):
@@ -167,6 +170,37 @@ CLASSES = {
              f(), k("frost_fortress", "Festung", "+6 Härte, −15 % Bewegung.", stats={"armor": 6, "speed_bonus": -15}), f()],
         ],
     },
+    "herb_druid": {
+        "name": "Kräuterzahn",
+        "tagline": "Erst säen, dann ernten: Heilkräuter kämpfen für dich.",
+        "style": ["Der Pflanzstab setzt im Angriffstakt Salbeitriebe, die auf Gegner schießen", "Putzeifer lässt den Garten wachsen, Fernschaden stärkt die Schüsse", "Denti selbst kämpft nicht; wer flieht, lässt seinen Garten zurück"],
+        "description": "Der Kräuterzahn trägt nur den Pflanzstab. Im Angriffstakt pflanzt er dort, wo er steht, einen Salbeitrieb, der selbstständig schießt. Pflanzen verwelken nach einer Weile; je schneller er pflanzt, desto größer wird sein Garten. Gegner nutzen Pflanzen bei Kontakt ab, Bosse zertrampeln sie.",
+        "roots": 1,
+        "exclusive": "planting_staff",
+        "starting": {},
+        "tags": ["ranged", "area", "crit"],
+        "branches": ["Salbeibeet", "Kamillenhain", "Nelkenhecke"],
+        "tree": [
+            [a("ranged_damage", 8), t("herb_thorns", "Dornen", "Salbeischüsse durchbohren einen weiteren Gegner.", 1, {"herb_pierce": 1}), a("attack_speed", 4),
+             a("crit_chance", 4), t("herb_dense", "Dichtes Beet", "Ein Salbeitrieb mehr gleichzeitig je Rang.", 2, {"herb_cap": 1}), f(),
+             f(), t("herb_bitter", "Bitterkraut", "+3 Salbeischaden je Rang.", 3, {"herb_damage": 3}), a("ranged_damage", 6),
+             f(), s("herb_shrub", "Salbeistrauch", "Jeder fünfte Salbeitrieb wächst zu einem Strauch, der eine Salve auf mehrere Gegner feuert.", {"skill_shrub": 1}), a("damage_bonus", 6),
+             m("shrub_wild", "Wildwuchs", "Schon jeder vierte Salbeitrieb wird ein Strauch.", {"shrub_wild": 1}), m("shrub_seeds", "Samenschuss", "Strauch-Salven feuern zwei Samen mehr.", {"shrub_seeds": 2}), m("shrub_roots", "Tiefe Wurzeln", "Sträucher leben doppelt so lang.", {"shrub_roots": 1}),
+             f(), k("herb_monoculture", "Monokultur", "Nur noch Salbei, keine Kamille und Nelke; dafür 50 % mehr Pflanzen gleichzeitig.", {"herb_monoculture": 1}), f()],
+            [a("regen", 10), t("herb_soothe", "Beruhigend", "Pflanzen in deiner Nähe heilen dich langsam.", 1, {"herb_soothe": 1}), a("max_health", 10),
+             a("attack_speed", 4), t("herb_can", "Gießkanne", "Pflanzen leben 2 s länger je Rang.", 2, {"herb_life": 2}), f(),
+             f(), t("herb_pollen", "Blütenstaub", "+5 % Putzeifer je Rang.", 3, stats={"attack_speed": 5}), a("armor", 8),
+             f(), s("herb_totem", "Kamillentotem", "Jede vierte Pflanzung ist ein Kamillentotem. Seine Aura gibt dir mehr Angriffstempo, lässt Salbeitriebe darin schneller schießen und heilt dich langsam.", {"skill_totem": 1}), a("regen", 8),
+             m("totem_wreath", "Großer Kranz", "Die Totem-Aura wird deutlich größer.", {"totem_wreath": 1}), m("totem_tea", "Kamillentee", "In einer Totem-Aura erhältst du alle 8 s einen Schild.", {"totem_tea": 1}), m("totem_cutting", "Ableger", "Verwelkt ein Totem, wächst an seiner Stelle ein Salbeitrieb.", {"totem_cutting": 1}),
+             f(), k("herb_ceremony", "Teezeremonie", "Totems wirken doppelt so stark, aber du bist in ihrer Aura langsamer.", {"herb_ceremony": 1}), f()],
+            [a("armor", 10), t("herb_numb", "Betäubung", "Salbeischüsse verlangsamen kurz.", 1, {"herb_numb": 1}), a("max_health", 10),
+             a("speed_bonus", 5), t("herb_tendril", "Ranken", "Jeder Dash setzt an seinem Startpunkt einen Salbeitrieb.", 1, {"herb_tendril": 1}), f(),
+             f(), t("herb_hedge", "Hecke", "Pflanzen halten 50 % mehr Gegnerkontakt aus je Rang.", 2, {"herb_hedge": 0.5}), a("dodge_chance", 4),
+             f(), s("herb_clove", "Nelkenknospe", "Jede vierte Pflanzung ist eine Nelkenknospe. Gegner in ihrer Nähe sind verlangsamt und nehmen 15 % mehr Waffenschaden, auch Bosse.", {"skill_clove": 1}), a("dash_recovery_bonus", 6),
+             m("clove_oil", "Nelkenöl", "Nelkenknospen betäuben stärker: 25 % mehr Waffenschaden.", {"clove_oil": 1}), m("clove_burst", "Platzende Knospe", "Eine verwelkende Nelkenknospe platzt und trifft Gegner in ihrer Nähe.", {"clove_burst": 1}), m("clove_snare", "Würgeranke", "Gegner, die zum ersten Mal an eine Nelkenknospe geraten, bleiben kurz hängen. Bosse nicht.", {"clove_snare": 1}),
+             f(), k("herb_poison_garden", "Giftgarten", "Nelkenknospen vergiften statt zu verlangsamen.", {"herb_poison_garden": 1}), f()],
+        ],
+    },
 }
 
 
@@ -263,6 +297,7 @@ def write_class(class_id, spec):
               ] + (['combat_sprite = ExtResource("3")'] if portrait_path(class_id) != PLACEHOLDER_PORTRAIT else []) + [
               'display_name = "%s"' % spec["name"], 'description = "%s"' % spec["description"],
               "root_capacity = %d" % spec["roots"],
+              ] + (['exclusive_weapon_id = &"%s"' % spec["exclusive"]] if spec.get("exclusive") else []) + [
               "starting_stats = %s" % fmt(spec["starting"]),
               "preferred_tags = Array[StringName]([%s])" % ", ".join('&"%s"' % tag for tag in spec["tags"])]
     if dash: lines.append('dash_override = SubResource("Dash")')
@@ -272,7 +307,10 @@ def write_class(class_id, spec):
 
 
 if __name__ == "__main__":
+    import sys
+    selected = sys.argv[1:] or list(CLASSES)
     for class_id, spec in CLASSES.items():
+        if class_id not in selected: continue
         write_tree(class_id, spec)
         write_class(class_id, spec)
         print(class_id, len(tree_nodes(class_id, spec)), "nodes")

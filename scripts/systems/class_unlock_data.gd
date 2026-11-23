@@ -10,3 +10,7 @@ extends Resource
 @export var victory := false
 ## Minimum difficulty id for victory rules; empty = any.
 @export var min_difficulty: StringName = &""
+## Alternative to elements: at least `role_count` equipped weapons of `role`
+## (WeaponData.class_roles, e.g. &"ranged").
+@export var role: StringName = &""
+@export var role_count := 0

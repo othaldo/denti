@@ -9,7 +9,7 @@ const MASTERY_CLASSES: Array[StringName] = [
 static var profiles: Array[PlayerClassData] = [DEFAULT, preload("res://data/classes/assassin.tres"),
 	preload("res://data/classes/tooth_fairy.tres"), preload("res://data/classes/ember.tres"),
 	preload("res://data/classes/rinser.tres"), preload("res://data/classes/frost_warden.tres"),
-	preload("res://data/classes/necrodent.tres")]
+	preload("res://data/classes/necrodent.tres"), preload("res://data/classes/herb_druid.tres")]
 
 static func by_id(id: StringName) -> PlayerClassData:
 	for profile in profiles:

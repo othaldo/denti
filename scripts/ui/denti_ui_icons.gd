@@ -35,6 +35,10 @@ const ROSTER_TALENT_ATLASES: Array[Texture2D] = [
 ]
 const NECRO_TALENT_ATLAS: Texture2D = preload("res://assets/classes/necrodent_talent_icons.png")
 const NECRO_TALENT_FIRST := 157
+## Kräuterzahn atlas (8 x 3, one row per branch). Loaded when the painted file
+## exists; until then the tree draws its placeholder symbols.
+const HERB_TALENT_FIRST := 400
+const HERB_TALENT_PATH := "res://assets/classes/herb_druid_talent_icons.png"
 const NECRO_TALENT_REGIONS: Array[Rect2] = [
 	Rect2(26, 50, 314, 289), Rect2(418, 70, 246, 254), Rect2(758, 70, 255, 249), Rect2(1104, 47, 318, 290),
 	Rect2(45, 398, 267, 297), Rect2(395, 407, 285, 266), Rect2(745, 403, 314, 274), Rect2(1134, 388, 268, 306),
@@ -128,6 +132,9 @@ static func hud(index: int) -> Texture2D:
 
 static func talent(index: int) -> Texture2D:
 	if index < 0: return null
+	if index >= HERB_TALENT_FIRST:
+		if index >= HERB_TALENT_FIRST + 24 or not ResourceLoader.exists(HERB_TALENT_PATH): return null
+		return _region(load(HERB_TALENT_PATH), index - HERB_TALENT_FIRST, 8, 3)
 	if index >= NECRO_TALENT_FIRST:
 		var cell_index := index - NECRO_TALENT_FIRST
 		if cell_index >= NECRO_TALENT_REGIONS.size(): return null

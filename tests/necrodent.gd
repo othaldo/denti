@@ -58,7 +58,7 @@ func _run() -> void:
 func _check_unlock() -> void:
 	var view := ClassSelection.new()
 	root.add_child(view)
-	var necro_button: Button = view.buttons.back()
+	var necro_button: Button = view.buttons[ClassCatalog.profiles.find(ClassCatalog.by_id(NECRO))]
 	var details: Array[String] = []
 	view.details_requested.connect(func(title: String, body: String) -> void: details.assign([title, body]))
 	necro_button.pressed.emit()
@@ -102,7 +102,7 @@ func _check_local_unlock() -> void:
 		"local unlock did not persist independently of earned wins")
 	var view := ClassSelection.new()
 	root.add_child(view)
-	view.buttons.back().pressed.emit()
+	view.buttons[ClassCatalog.profiles.find(ClassCatalog.by_id(NECRO))].pressed.emit()
 	_check(view.selected_id == NECRO, "locally unlocked class is unavailable in regular selection")
 	_check(view.style_box.get_child_count() == 4 and view.style_box.get_child(2).text.contains(WeaponPresentation.tooth_base_values(NecrodentSkills.Kind.MOLAR)),
 		"class selection hid the tooth comparison")

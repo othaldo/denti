@@ -77,7 +77,8 @@ func _draw() -> void:
 		var arm := extent * 0.2
 		draw_line(centre - Vector2(arm, 0), centre + Vector2(arm, 0), ink, 3.0, true)
 		draw_line(centre - Vector2(0, arm), centre + Vector2(0, arm), ink, 3.0, true)
-	elif node.has_placeholder_icon():
+	elif node.has_placeholder_icon() or not node.is_attribute():
+		# No painted icon yet (unassigned or atlas file still missing).
 		_placeholder(centre, extent, locked)
 	_badge(extent)
 

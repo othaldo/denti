@@ -158,6 +158,9 @@ func _physics_process(delta: float) -> void:
 	update_visual()
 	if data.attack_mode == &"command" or cooldown > 0.0 or attack_time > 0.0:
 		return
+	if data.attack_mode == &"plant":
+		_plant()
+		return
 	if evolution != null and evolution.charge_time > 0:
 		return
 	var reach := data.range_at_tier(tier)
@@ -175,6 +178,19 @@ func _physics_process(delta: float) -> void:
 	_begin_attack([nearest])
 
 
+## Pflanzstab: plant a herb in the attack rhythm while enemies are near.
+func _plant() -> void:
+	var herbs := HerbSkills.for_player(player)
+	if herbs == null or EnemySpatialIndex.nearest(get_tree(), player.enemy_index, player.global_position, data.range_at_tier(tier), true) == null:
+		engagement_pending = true
+		return
+	herbs.plant()
+	cooldown = attack_interval()
+	attack_duration = maxf(minf(data.animation_duration, cooldown * 0.85), 0.035)
+	attack_time = attack_duration
+	player.play_attack_animation(aim, &"brush")
+
+
 func attack_interval() -> float:
 	var interval := data.cooldown_at_tier(tier, player.stats.attack_interval, player.items.attack_interval_factor())
 	if player.molar_skills != null: interval *= player.molar_skills.weapon_interval_factor(self)
@@ -185,7 +201,7 @@ func attack_interval() -> float:
 ## reach or while this weapon is still mid-swing. The extra attack never counts
 ## toward skill triggers, so skills cannot chain into themselves.
 func force_attack(boost: float, guaranteed_crit: bool = false) -> bool:
-	if data.attack_mode == &"command": return false
+	if data.attack_mode in [&"command", &"plant"]: return false
 	if attack_time > 0.0 or (evolution != null and evolution.charge_time > 0): return false
 	var nearest := EnemySpatialIndex.nearest(get_tree(), player.enemy_index, anchor_position(), data.range_at_tier(tier), true)
 	if nearest == null: return false
