@@ -100,10 +100,10 @@ func begin() -> void:
 	var enemy := encounter.enemy
 	var player := enemy.target
 	framing.begin(player.get_node("Camera2D"), enemy.get_viewport_rect().size)
-	var visible := enemy.get_canvas_transform().affine_inverse() * enemy.get_viewport_rect()
+	var visible := DentiArena.visible_world_rect(enemy)
 	var top := minf(140, visible.size.y * 0.28)
 	var bottom := minf(185, visible.size.y * 0.47)
-	var safe := Rect2(visible.position + Vector2(60, top), visible.size - Vector2(120, top + bottom)).intersection(Rect2(Vector2.ONE * 75, player.arena.arena_size - Vector2.ONE * 150))
+	var safe := Rect2(visible.position + Vector2(60, top), visible.size - Vector2(120, top + bottom)).intersection(player.arena.inner_rect(75))
 	var extent := profile.layout_extent.min(safe.size)
 	if visible.size.y < 400: extent.x = minf(extent.x, visible.size.x * 0.46)
 	var center := player.global_position.clamp(safe.position + extent * 0.5, safe.end - extent * 0.5)

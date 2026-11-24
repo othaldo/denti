@@ -245,7 +245,7 @@ func _whirl() -> void:
 	for enemy in player().nearby_enemies(at, WHIRL_RADIUS):
 		if not enemy.is_targetable(): continue
 		var offset := (at - enemy.global_position).limit_length(WHIRL_PULL)
-		enemy.global_position += offset * (1.0 - clampf(enemy.data.knockback_resistance, 0.0, 1.0))
+		enemy.apply_push(offset)
 		moved += 1
 	if moved > 0: relics._ring(at, WHIRL_RADIUS, WATER)
 

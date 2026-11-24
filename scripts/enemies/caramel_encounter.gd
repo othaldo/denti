@@ -109,12 +109,12 @@ func _lock_bomb(seconds_in_frame: float) -> void:
 	var at := HazardGeometry.player_at(enemy.target, seconds_in_frame) if seconds_in_frame >= 0 else enemy.target.global_position
 	if throw_index % 2 == 1:
 		at += (enemy.target.velocity * profile.followup_lead_seconds).limit_length(profile.maximum_lead)
-	var margin := DentiArena.PLAYER_MARGIN
-	destination = at.clamp(Vector2.ONE * margin, enemy.target.arena.arena_size - Vector2.ONE * margin)
-	var view := enemy.get_canvas_transform().affine_inverse() * enemy.get_viewport_rect()
+	var arena := enemy.target.arena
+	destination = arena.clamp_player(at)
+	var view := DentiArena.visible_world_rect(enemy)
 	var padding := minf(profile.impact_radius, minf(view.size.x, view.size.y) * 0.25)
 	var visible_aim := view.grow(-padding)
-	destination = destination.clamp(visible_aim.position, visible_aim.end).clamp(Vector2.ONE * margin, enemy.target.arena.arena_size - Vector2.ONE * margin)
+	destination = arena.clamp_player(destination.clamp(visible_aim.position, visible_aim.end))
 	enemy.special_phase = Enemy.SpecialPhase.COOLDOWN
 	enemy.attack_performed.emit(&"boss_warning")
 
@@ -253,8 +253,7 @@ func _warn_rush(seconds_in_frame: float) -> void:
 	aim = rush_origin.direction_to(target_position)
 	if aim.is_zero_approx(): aim = Vector2.DOWN
 	var distance := minf(profile.rush_distance, rush_origin.distance_to(target_position) + profile.rush_overshoot)
-	var margin := DentiArena.WALL_WIDTH + enemy.data.radius + 6
-	rush_end = (rush_origin + aim * distance).clamp(Vector2.ONE * margin, enemy.target.arena.arena_size - Vector2.ONE * margin)
+	rush_end = enemy.target.arena.clamp_enemy(rush_origin + aim * distance, enemy.data.radius)
 	aim = rush_origin.direction_to(rush_end)
 	rush_hit = false
 	enemy.attack_performed.emit(&"boss_warning")
@@ -358,8 +357,7 @@ func _move(delta: float, speed_factor: float = 1.0) -> void:
 		if cost < score:
 			score = cost
 			desired = candidate
-	var margin := DentiArena.WALL_WIDTH + enemy.data.radius + 6
-	desired = desired.clamp(Vector2.ONE * margin, enemy.target.arena.arena_size - Vector2.ONE * margin)
+	desired = enemy.target.arena.clamp_enemy(desired, enemy.data.radius)
 	var next := enemy.global_position.move_toward(desired, enemy._movement_speed() * profile.move_factor * speed_factor * delta)
 	var closest := Geometry2D.get_closest_point_to_segment(player_at, enemy.global_position, next)
 	var clearance := minf(enemy.global_position.distance_to(player_at), enemy.data.radius + HazardGeometry.PLAYER_RADIUS + 8)
@@ -367,7 +365,7 @@ func _move(delta: float, speed_factor: float = 1.0) -> void:
 		enemy.global_position = next
 
 func _cooking_bounds() -> Rect2:
-	var visible := enemy.get_canvas_transform().affine_inverse() * enemy.get_viewport_rect()
+	var visible := DentiArena.visible_world_rect(enemy)
 	var inset := Vector2(minf(110, visible.size.x * 0.3), minf(120, visible.size.y * 0.3))
 	return Rect2(visible.position + inset, visible.size - inset * 2)
 

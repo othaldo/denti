@@ -34,7 +34,7 @@ func pause_attack() -> void:
 
 func _bounded(at: Vector2) -> Vector2:
 	var bounds := enemy.boss_objective_owner.acid_king_encounter._visible_bounds()
-	bounds = bounds.intersection(Rect2(Vector2.ONE * 60, enemy.target.arena.arena_size - Vector2.ONE * 120))
+	bounds = bounds.intersection(enemy.target.arena.inner_rect(60))
 	return at.clamp(bounds.position, bounds.end)
 
 func advance(delta: float) -> void:

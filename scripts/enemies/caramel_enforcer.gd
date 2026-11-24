@@ -65,7 +65,7 @@ func _strike(touched: bool) -> void:
 
 func _bounded(at: Vector2) -> Vector2:
 	var bounds := enemy.boss_objective_owner.caramel_encounter._cooking_bounds()
-	bounds = bounds.intersection(Rect2(Vector2.ONE * 60, enemy.target.arena.arena_size - Vector2.ONE * 120))
+	bounds = bounds.intersection(enemy.target.arena.inner_rect(60))
 	return at.clamp(bounds.position, bounds.end)
 
 func _next() -> void:

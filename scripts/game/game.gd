@@ -458,21 +458,17 @@ func _spawn_elite(data: EnemyData) -> void:
 	_create_enemy(data, at)
 	if data.escort_data == null or data.escort_count <= 0:
 		return
-	var lower := Vector2.ONE * (DentiArena.WALL_WIDTH + 8.0)
-	var upper := arena.arena_size - lower
 	for index in data.escort_count:
 		if $Enemies.get_child_count() >= MAX_ACTIVE_ENEMIES:
 			telemetry.record_spawn_blocked(data.escort_count - index)
 			break
 		var offset := Vector2.RIGHT.rotated(TAU * float(index) / float(data.escort_count)) * (data.radius + data.escort_data.radius + 12.0)
-		_create_enemy(data.escort_data, (at + offset).clamp(lower, upper))
+		_create_enemy(data.escort_data, arena.clamp_inside(at + offset, DentiArena.SPAWN_MARGIN))
 
 
 func _spawn_horde(data: EnemyData, count: int) -> void:
 	var edge := _spawn_edge()
 	var center := _spawn_position(edge)
-	var lower := Vector2.ONE * (DentiArena.WALL_WIDTH + 8.0)
-	var upper := arena.arena_size - lower
 	var limit := MAX_ACTIVE_ENEMIES - maxi(wave.elite_reserved_slots(), 1) - wave.goblin_reserved_slots()
 	for index in count:
 		if $Enemies.get_child_count() >= limit:
@@ -480,12 +476,12 @@ func _spawn_horde(data: EnemyData, count: int) -> void:
 			break
 		var offset := (float(index) - float(count - 1) / 2.0) * (data.radius * 2.5)
 		var at := center + (Vector2(offset, 0.0) if edge % 2 == 0 else Vector2(0.0, offset))
-		_create_enemy(data, at.clamp(lower, upper))
+		_create_enemy(data, arena.clamp_inside(at, DentiArena.SPAWN_MARGIN))
 
 
 func _spawn_edge() -> int:
 	var half_view := get_viewport_rect().size * 0.5
-	var lower := DentiArena.WALL_WIDTH + 8.0
+	var lower := DentiArena.SPAWN_MARGIN
 	var edges: Array[int] = []
 	if player.global_position.y - half_view.y - SPAWN_PADDING >= lower:
 		edges.append(0)
@@ -500,7 +496,7 @@ func _spawn_edge() -> int:
 
 func _spawn_position(edge: int) -> Vector2:
 	var half_view := get_viewport_rect().size * 0.5
-	var lower := Vector2.ONE * (DentiArena.WALL_WIDTH + 8.0)
+	var lower := Vector2.ONE * DentiArena.SPAWN_MARGIN
 	var upper := arena.arena_size - lower
 	var center := player.global_position
 	match edge:

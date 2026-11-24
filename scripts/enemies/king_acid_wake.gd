@@ -17,7 +17,7 @@ func add_beam(from: Vector2, to: Vector2) -> void:
 	var direction := from.direction_to(to)
 	var distance := from.distance_to(to)
 	if distance <= profile.acid_inner_gap: return
-	var arena := Rect2(Vector2.ONE * 48, encounter.enemy.target.arena.arena_size - Vector2.ONE * 96)
+	var arena := encounter.enemy.target.arena.inner_rect(DentiArena.PLAYER_MARGIN)
 	for axis in 2:
 		if absf(direction[axis]) < 0.0001: continue
 		var edge := arena.end[axis] if direction[axis] > 0 else arena.position[axis]

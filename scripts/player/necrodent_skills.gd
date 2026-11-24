@@ -366,7 +366,7 @@ func _bite(tooth: Tooth, enemy: Enemy, staff: WeaponInstance) -> void:
 				ElementImpactBatch.emit_from(enemy, element, enemy.global_position, direction, 20.0)
 			WeaponEnchantmentEffects.after_hit(items().effect_context, enemy, data, staff.affixes, critical, dealt, affix_share, was_chilled, staff.instance_uid, staff.tier)
 			if _usable(enemy):
-				enemy.global_position += direction * data.knockback_at_tier(staff.tier) * (1.0 - enemy.data.knockback_resistance)
+				enemy.apply_push(direction * data.knockback_at_tier(staff.tier))
 		var accent := FOCUS_GOLD if enemy == marked and power("necro_focus") > 0.0 else MINT
 		flash(tooth.at.lerp(enemy.global_position, 0.48), 13.0, accent)
 	tooth.streak = mini(tooth.streak + 1, 5)

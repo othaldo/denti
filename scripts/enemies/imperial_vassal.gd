@@ -60,9 +60,8 @@ func _move(delta: float) -> void:
 	var desired := player + away * profile.preferred_distance
 	if profile.role == ImperialVassalData.Role.KEEPER:
 		desired = enemy.boss_objective_owner.global_position + away * 200
-	var margin := Vector2.ONE * 60
-	desired = desired.clamp(margin, enemy.target.arena.arena_size - margin)
-	var visible := enemy.get_canvas_transform().affine_inverse() * enemy.get_viewport_rect()
+	desired = enemy.target.arena.clamp_inside(desired, 60)
+	var visible := DentiArena.visible_world_rect(enemy)
 	var inset := Vector2(minf(80, visible.size.x * 0.2), minf(160, visible.size.y * 0.3))
 	desired = desired.clamp(visible.position + inset, visible.end - inset)
 	enemy.global_position = enemy.global_position.move_toward(desired, enemy._movement_speed() * delta)
@@ -76,7 +75,7 @@ func _next() -> void:
 			aim = origin.direction_to(enemy.target.global_position)
 			if aim.is_zero_approx(): aim = Vector2.DOWN
 			destination = enemy.target.global_position if profile.role == ImperialVassalData.Role.JUSTICIAR else origin + aim * minf(maxf(origin.distance_to(enemy.target.global_position), 160), profile.dash_distance)
-			destination = destination.clamp(Vector2.ONE * 55, enemy.target.arena.arena_size - Vector2.ONE * 55)
+			destination = enemy.target.arena.clamp_inside(destination, 55)
 			hit = false
 			fired = false
 			enemy.attack_performed.emit(&"boss_warning")

@@ -39,6 +39,5 @@ static func hit(enemy: Enemy, weapon: WeaponData, tier: int, damage: float, crit
 		items.player.notify_weapon_hit(enemy, weapon, dealt)
 		WeaponEnchantmentEffects.after_hit(items.effect_context, enemy, weapon, affixes, critical, dealt, affix_factor, was_chilled, source_uid, tier)
 	if enemy.health > 0.0:
-		var push := weapon.knockback_at_tier(tier) * (1.0 - enemy.data.knockback_resistance)
-		enemy.global_position += direction * push
+		enemy.apply_push(direction * weapon.knockback_at_tier(tier))
 	return dealt

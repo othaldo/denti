@@ -207,7 +207,7 @@ func _pull(enemy: Enemy, toward: Vector2) -> void:
 	var pull := power("trail_pull")
 	if pull <= 0.0 or enemy.health <= 0.0: return
 	var offset := (toward - enemy.global_position).limit_length(pull)
-	enemy.global_position += offset * (1.0 - clampf(enemy.data.knockback_resistance, 0.0, 1.0))
+	enemy.apply_push(offset)
 
 func _refund(trail: Dictionary) -> void:
 	if power("trail_kill_reset") > 0.0: player.dash.cooldown = 0.0

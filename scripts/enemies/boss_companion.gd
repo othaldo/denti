@@ -42,7 +42,7 @@ func advance(delta: float) -> void:
 	remaining = maxf(remaining - delta, 0)
 	if remaining > 0: return
 	var bounds: Rect2 = bounds_for_spawn.call()
-	bounds = bounds.intersection(Rect2(Vector2.ONE * 60, owner_enemy.target.arena.arena_size - Vector2.ONE * 120))
+	bounds = bounds.intersection(owner_enemy.target.arena.inner_rect(60))
 	var at := owner_enemy.target.global_position
 	var away := owner_enemy.global_position.direction_to(at).orthogonal()
 	if away.is_zero_approx(): away = Vector2.RIGHT

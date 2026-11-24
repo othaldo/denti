@@ -154,7 +154,7 @@ func _flood() -> void:
 	for enemy in player.nearby_enemies(player.global_position, SURGE_PUSH_RADIUS):
 		if not enemy.is_targetable() or enemy.wet_time <= 0.0: continue
 		var direction := dash_direction if power("flood_suction") <= 0.0 else enemy.global_position.direction_to(player.global_position)
-		enemy.global_position += direction * SURGE_PUSH * (1.0 - clampf(enemy.data.knockback_resistance, 0.0, 1.0))
+		enemy.apply_push(direction * SURGE_PUSH)
 
 ## Notdusche: one emergency wave at low health, then a cooldown.
 func _shower() -> void:

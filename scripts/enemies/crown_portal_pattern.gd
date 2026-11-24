@@ -13,9 +13,8 @@ static func plan(encounter: CrownCourtEncounter, seconds: float) -> void:
 		at += (enemy.target.velocity * intercept_seconds).limit_length(profile.portal_lead_distance)
 	var along := direction.rotated(PI * 0.5 + (encounter.step_index % 2) * profile.portal_angle_step_radians)
 	if along.is_zero_approx(): along = Vector2.RIGHT
-	var margin := Vector2.ONE * DentiArena.PLAYER_MARGIN
-	var visible := enemy.get_canvas_transform().affine_inverse() * enemy.get_viewport_rect()
+	var visible := DentiArena.visible_world_rect(enemy)
 	var inset := Vector2(minf(50, visible.size.x * 0.16), minf(100, visible.size.y * 0.20))
-	var bounds := Rect2(visible.position + inset, visible.size - inset * 2).intersection(Rect2(margin, enemy.target.arena.arena_size - margin * 2))
+	var bounds := Rect2(visible.position + inset, visible.size - inset * 2).intersection(enemy.target.arena.inner_rect(DentiArena.PLAYER_MARGIN))
 	encounter.portal_a = (at - along * profile.portal_half_length).clamp(bounds.position, bounds.end)
 	encounter.portal_b = (at + along * profile.portal_half_length).clamp(bounds.position, bounds.end)

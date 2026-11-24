@@ -359,12 +359,11 @@ func _move(delta: float, speed_factor: float = 1.0) -> void:
 	var wanted := minf(profile.court_approach_distance, court_start_distance()) if closing_for_court else profile.preferred_distance
 	# Close distant gaps without retreating from a player who stays in melee.
 	var distance := clampf(enemy.global_position.distance_to(target), enemy.data.radius + HazardGeometry.PLAYER_RADIUS + 5, wanted)
-	var visible := enemy.get_canvas_transform().affine_inverse() * enemy.get_viewport_rect()
+	var visible := DentiArena.visible_world_rect(enemy)
 	var inset := Vector2(minf(130, visible.size.x * 0.28), minf(140, visible.size.y * 0.28))
 	var bounds := Rect2(visible.position + inset, visible.size - inset * 2)
 	var desired := (target + (away if closing_for_court else away.rotated(0.22)) * distance).clamp(bounds.position, bounds.end)
-	var margin := Vector2.ONE * (DentiArena.WALL_WIDTH + enemy.data.radius + 6)
-	desired = desired.clamp(margin, enemy.target.arena.arena_size - margin)
+	desired = enemy.target.arena.clamp_enemy(desired, enemy.data.radius)
 	var next := enemy.global_position.move_toward(desired, enemy._movement_speed() * profile.movement_factor * speed_factor * delta)
 	var clearance := minf(enemy.global_position.distance_to(target), enemy.data.radius + HazardGeometry.PLAYER_RADIUS + 5)
 	if Geometry2D.get_closest_point_to_segment(target, enemy.global_position, next).distance_to(target) >= clearance - 0.01:

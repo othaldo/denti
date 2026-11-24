@@ -100,7 +100,7 @@ func push_from(at: Vector2, radius: float, distance: float) -> void:
 		if not enemy.is_targetable(): continue
 		var away := at.direction_to(enemy.global_position)
 		if away.is_zero_approx(): away = Vector2.RIGHT
-		enemy.global_position += away * distance * (1.0 - clampf(enemy.data.knockback_resistance, 0.0, 1.0))
+		enemy.apply_push(away * distance)
 
 func shatter_projectiles(at: Vector2, radius: float) -> int:
 	var count := 0

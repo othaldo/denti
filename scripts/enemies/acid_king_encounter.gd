@@ -216,7 +216,7 @@ func _next(seconds: float) -> void:
 			remaining = profile.approach_seconds
 
 func _visible_bounds() -> Rect2:
-	var rect := enemy.get_canvas_transform().affine_inverse() * enemy.get_viewport_rect()
+	var rect := DentiArena.visible_world_rect(enemy)
 	var inset := Vector2(minf(115, rect.size.x * 0.28), minf(125, rect.size.y * 0.28))
 	return Rect2(rect.position + inset, rect.size - inset * 2)
 
@@ -237,8 +237,7 @@ func _move(delta: float, speed_factor: float = 1.0, preferred_distance: float = 
 	var distance := clampf(enemy.global_position.distance_to(target), enemy.data.radius + 45, wanted)
 	var bounds := _visible_bounds()
 	var desired := (target + away.rotated(0.25 + 0.12 * profile.action_bonus) * distance).clamp(bounds.position, bounds.end)
-	var margin := Vector2.ONE * (DentiArena.WALL_WIDTH + enemy.data.radius + 6)
-	desired = desired.clamp(margin, enemy.target.arena.arena_size - margin)
+	desired = enemy.target.arena.clamp_enemy(desired, enemy.data.radius)
 	var next := enemy.global_position.move_toward(desired, enemy._movement_speed() * profile.move_factor * speed_factor * delta)
 	var near := Geometry2D.get_closest_point_to_segment(target, enemy.global_position, next)
 	var clearance := minf(enemy.global_position.distance_to(target), enemy.data.radius + HazardGeometry.PLAYER_RADIUS + 5)
@@ -248,8 +247,8 @@ func _move(delta: float, speed_factor: float = 1.0, preferred_distance: float = 
 
 func _plan_channels(shift: bool, seconds: float = -1.0) -> void:
 	pending.clear()
-	var visible := enemy.get_canvas_transform().affine_inverse() * enemy.get_viewport_rect()
-	var arena := Rect2(Vector2.ONE * DentiArena.PLAYER_MARGIN, enemy.target.arena.arena_size - Vector2.ONE * DentiArena.PLAYER_MARGIN * 2)
+	var visible := DentiArena.visible_world_rect(enemy)
+	var arena := enemy.target.arena.inner_rect(DentiArena.PLAYER_MARGIN)
 	var area := visible.grow(80).intersection(arena)
 	if shift:
 		# Reacquire before the warning, never while its geometry is visible.

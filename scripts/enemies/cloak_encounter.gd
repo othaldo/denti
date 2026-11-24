@@ -156,8 +156,7 @@ func _placement_goal(reserved := false) -> Vector2:
 	if reserved: radius = maxf(radius, 260.0)
 	var away := target_position.direction_to(enemy.global_position)
 	if away.is_zero_approx(): away = -direction
-	var margin := DentiArena.WALL_WIDTH + enemy.data.radius + 6
-	var low := Vector2.ONE * margin
+	var low := Vector2.ONE * DentiArena.enemy_margin(enemy.data.radius)
 	var high := arena - low
 	var best := (target_position + away * radius).clamp(low, high)
 	var shortest := INF
@@ -177,8 +176,7 @@ func _placement_goal(reserved := false) -> Vector2:
 
 func _move_toward(goal: Vector2, delta: float, speed_factor := 1.0) -> void:
 	var next := enemy.global_position.move_toward(goal, enemy._movement_speed() * profile.chase_factor * speed_factor * delta)
-	var margin := DentiArena.WALL_WIDTH + enemy.data.radius + 6
-	enemy.global_position = next.clamp(Vector2.ONE * margin, enemy.target.arena.arena_size - Vector2.ONE * margin)
+	enemy.global_position = enemy.target.arena.clamp_enemy(next, enemy.data.radius)
 
 func _stage_elapsed() -> float:
 	match state:

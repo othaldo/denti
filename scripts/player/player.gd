@@ -162,7 +162,7 @@ func _physics_process(delta: float) -> void:
 	if not was_dashing:
 		velocity = direction * stats.move_speed * floor_movement_factor()
 		move_and_slide()
-	global_position = global_position.clamp(Vector2.ONE * DentiArena.PLAYER_MARGIN, arena.arena_size - Vector2.ONE * DentiArena.PLAYER_MARGIN)
+	global_position = arena.clamp_player(global_position)
 	motion_end = global_position
 	if dash_moved:
 		dash_trail.add_segment(motion_start, motion_end)
@@ -189,7 +189,7 @@ func _dash_pulse() -> void:
 		if not enemy.is_targetable(): continue
 		var away := global_position.direction_to(enemy.global_position)
 		if away.is_zero_approx(): away = dash.direction
-		enemy.global_position += away * push * (1.0 - clampf(enemy.data.knockback_resistance, 0.0, 1.0))
+		enemy.apply_push(away * push)
 	ElementImpactBatch.emit_from(self, &"water", global_position, dash.direction, DASH_PULSE_RADIUS, true)
 	items.enchantment_support.emit(&"class_dash_pulses", 1)
 

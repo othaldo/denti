@@ -106,8 +106,7 @@ static func warning_lane_end(enemy: Enemy) -> Vector2:
 		EnemyData.SpecialAttack.DASH:
 			if enemy.target == null:
 				return Vector2.ZERO
-			var margin := DentiArena.WALL_WIDTH + enemy.data.radius + 6.0
-			return (enemy.global_position + enemy.special_direction * enemy.data.attack_speed * enemy.overtime_speed_factor() * enemy.data.attack_duration).clamp(Vector2.ONE * margin, enemy.target.arena.arena_size - Vector2.ONE * margin) - enemy.global_position
+			return enemy.target.arena.clamp_enemy(enemy.global_position + enemy.special_direction * enemy.data.attack_speed * enemy.overtime_speed_factor() * enemy.data.attack_duration, enemy.data.radius) - enemy.global_position
 		EnemyData.SpecialAttack.BOSS:
 			return enemy.boss_dash_end - enemy.global_position
 		EnemyData.SpecialAttack.LANE, EnemyData.SpecialAttack.SPACE_ORB:

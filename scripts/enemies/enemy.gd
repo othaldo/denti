@@ -436,8 +436,7 @@ func _process_special(delta: float, direction: Vector2) -> void:
 				global_position = global_position.move_toward(boss_dash_end, data.attack_speed * difficulty.boss_movement_multiplier * overtime_speed_factor() * delta)
 			else:
 				global_position += special_direction * data.attack_speed * overtime_speed_factor() * delta
-				var margin := DentiArena.WALL_WIDTH + data.radius + 6.0
-				global_position = global_position.clamp(Vector2.ONE * margin, target.arena.arena_size - Vector2.ONE * margin)
+				global_position = target.arena.clamp_enemy(global_position, data.radius)
 			special_timer -= delta
 			# The local trail of an ordinary dash is constant; moving the node
 			# already moves it. Boss trails have a fixed world origin.
@@ -479,6 +478,17 @@ func overtime_attack_factor() -> float:
 
 func overtime_defense_factor() -> float:
 	return 1.0 + data.overtime_defense_per_second * overtime_seconds
+
+
+## Knockback, pulls and shoves: scaled by resistance and kept inside the arena walls.
+func apply_push(offset: Vector2) -> void:
+	global_position += offset * (1.0 - clampf(data.knockback_resistance, 0.0, 1.0))
+	confine_to_arena()
+
+
+func confine_to_arena() -> void:
+	if target == null or target.arena == null: return
+	global_position = target.arena.clamp_enemy(global_position, data.radius)
 
 
 func _movement_speed() -> float:

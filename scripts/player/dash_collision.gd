@@ -17,7 +17,7 @@ static func circle_fraction(start: Vector2, travel: Vector2, centre: Vector2, ra
 
 static func move(player: Player, travel: Vector2, seconds: float) -> bool:
 	var start := player.global_position
-	var destination := (start + travel).clamp(Vector2.ONE * DentiArena.PLAYER_MARGIN, player.arena.arena_size - Vector2.ONE * DentiArena.PLAYER_MARGIN)
+	var destination := player.arena.clamp_player(start + travel)
 	var wall := player.move_and_collide(destination - start)
 	var movement := player.global_position - start
 	var used := seconds * minf(movement.length() / travel.length(), 1.0) if not travel.is_zero_approx() else 0.0
@@ -54,7 +54,6 @@ static func _charge_movement(enemy: Enemy, seconds: float) -> Vector2:
 		distance *= enemy.difficulty.boss_movement_multiplier
 		return enemy.global_position.move_toward(enemy.boss_dash_end, distance) - enemy.global_position
 	if enemy.active_special_attack == EnemyData.SpecialAttack.DASH:
-		var margin := DentiArena.WALL_WIDTH + enemy.data.radius + 6
-		var destination := (enemy.global_position + enemy.special_direction * distance).clamp(Vector2.ONE * margin, enemy.target.arena.arena_size - Vector2.ONE * margin)
+		var destination := enemy.target.arena.clamp_enemy(enemy.global_position + enemy.special_direction * distance, enemy.data.radius)
 		return destination - enemy.global_position
 	return Vector2.ZERO

@@ -94,9 +94,9 @@ func begin() -> void:
 	framing.begin(player.get_node("Camera2D"), enemy.get_viewport_rect().size)
 	frame_center = player.global_position
 	framing.follow(frame_center)
-	var visible := enemy.get_canvas_transform().affine_inverse() * enemy.get_viewport_rect()
+	var visible := DentiArena.visible_world_rect(enemy)
 	var margin := Vector2(minf(130, visible.size.x * 0.25), minf(160, visible.size.y * 0.28))
-	var bounds := Rect2(visible.position + margin, visible.size - margin * 2).intersection(Rect2(Vector2.ONE * 90, player.arena.arena_size - Vector2.ONE * 180))
+	var bounds := Rect2(visible.position + margin, visible.size - margin * 2).intersection(player.arena.inner_rect(90))
 	anchor = (player.global_position - Vector2(0, minf(140, bounds.size.y * 0.3))).clamp(bounds.position, bounds.end)
 	arrival = enemy.global_position
 	var extent := profile.spawn_extent.min(bounds.size * 0.42)

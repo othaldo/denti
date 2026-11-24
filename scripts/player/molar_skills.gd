@@ -175,7 +175,7 @@ func _wall() -> void:
 		if not enemy.is_targetable(): continue
 		var away := at.direction_to(enemy.global_position)
 		if away.is_zero_approx(): away = Vector2.RIGHT
-		enemy.global_position += away * WALL_PUSH * (1.0 - clampf(enemy.data.knockback_resistance, 0.0, 1.0))
+		enemy.apply_push(away * WALL_PUSH)
 		if damage > 0.0: enemy.take_damage(damage, null, false, &"class_wall")
 	var shattered := 0
 	var projectiles := player.get_parent().get_node_or_null("EnemyProjectiles")

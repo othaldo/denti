@@ -71,10 +71,9 @@ func advance(delta: float) -> void:
 			begin()
 		else:
 			var preferred := Vector2.RIGHT if cycle % 2 == 0 else Vector2.UP
-			var margin := DentiArena.WALL_WIDTH + enemy.data.radius + 6
 			var anchor := enemy.global_position
 			for side in [preferred, preferred.orthogonal(), -preferred, -preferred.orthogonal()]:
-				var candidate: Vector2 = (enemy.target.global_position + side * profile.anchor_distance).clamp(Vector2.ONE * margin, enemy.target.arena.arena_size - Vector2.ONE * margin)
+				var candidate: Vector2 = enemy.target.arena.clamp_enemy(enemy.target.global_position + side * profile.anchor_distance, enemy.data.radius)
 				if candidate.distance_to(enemy.target.global_position) >= profile.anchor_distance * 0.9:
 					anchor = candidate
 					break

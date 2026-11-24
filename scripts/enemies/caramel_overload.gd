@@ -108,11 +108,11 @@ func begin() -> void:
 	lane_remaining = profile.lane_pause_seconds
 	var enemy := encounter.enemy
 	var player := enemy.target
-	var visible := enemy.get_canvas_transform().affine_inverse() * enemy.get_viewport_rect()
+	var visible := DentiArena.visible_world_rect(enemy)
 	# Keep objective silhouettes clear of the boss HUD and the bottom tooth HUD.
 	var top := minf(135, visible.size.y * 0.28)
 	var bottom := minf(190, visible.size.y * (0.47 if visible.size.y < 400 else 0.375))
-	var safe := Rect2(visible.position + Vector2(60, top), visible.size - Vector2(120, top + bottom)).intersection(Rect2(Vector2.ONE * 70, player.arena.arena_size - Vector2.ONE * 140))
+	var safe := Rect2(visible.position + Vector2(60, top), visible.size - Vector2(120, top + bottom)).intersection(player.arena.inner_rect(70))
 	var extent := profile.layout_extent.min(safe.size)
 	if visible.size.y < 400: extent.x = minf(extent.x, visible.size.x * 0.46)
 	opening_distance = minf(profile.opening_distance, extent.length() * 0.35)

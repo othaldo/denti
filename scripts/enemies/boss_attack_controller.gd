@@ -39,8 +39,7 @@ static func advance_overtime(enemy: Enemy, seconds: int) -> void:
 
 
 static func boss_dash_target(enemy: Enemy, direction: Vector2) -> Vector2:
-	var margin := DentiArena.WALL_WIDTH + enemy.data.radius + 6.0
-	return (enemy.global_position + direction * enemy.data.attack_speed * enemy.difficulty.boss_movement_multiplier * enemy.data.attack_duration).clamp(Vector2.ONE * margin, enemy.target.arena.arena_size - Vector2.ONE * margin)
+	return enemy.target.arena.clamp_enemy(enemy.global_position + direction * enemy.data.attack_speed * enemy.difficulty.boss_movement_multiplier * enemy.data.attack_duration, enemy.data.radius)
 
 
 static func fire_phase_burst(enemy: Enemy) -> void:
