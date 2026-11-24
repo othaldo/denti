@@ -1,10 +1,9 @@
 class_name CaramelEncounter
-extends Node2D
+extends BossFight
 ## One clock owns each locked aim, ballistic flight, impact and expiring floor pool.
 
 enum State { APPROACH, WINDUP, FLIGHT, FOLLOWUP, RECOVERY, HEART_WINDUP, HEART_RELEASE, RUSH_WINDUP, RUSH_ACTIVE, BURST_WINDUP, BURST_RELEASE, BOMB_SEQUENCE }
 const SAVE_VERSION := 5
-var enemy: Enemy
 var profile: CaramelEncounterData
 var rig: PrinceCaramelRig
 var hearts: CaramelHeartVolley
@@ -59,6 +58,36 @@ func _ready() -> void:
 		bodyguard.encounter = self
 		add_child(bodyguard)
 	sync_visual()
+
+func blocks_contact() -> bool:
+	return overload != null and overload.busy()
+
+func blocks_damage() -> bool:
+	return overload != null and overload.blocks_damage()
+
+func charging() -> bool:
+	return state == State.RUSH_ACTIVE
+
+func opening_open() -> bool:
+	return overload != null and overload.state == CaramelOverload.State.RECOVERY
+
+func modify_damage(applied: float, _incoming: Vector2, _proc_id: StringName, opening: bool) -> float:
+	if opening: applied *= overload.profile.vulnerability
+	if overload != null: applied = minf(applied, overload.damage_limit())
+	return applied
+
+func spend_opening(counted: float, _proc_id: StringName) -> void:
+	overload.spend_opening_damage(counted)
+
+func guard_recharge_factor() -> float:
+	return profile.guard_recharge_multiplier
+
+## Health phases keep the bomb pools on the floor.
+func begin_health_phase() -> void:
+	cancel(false)
+
+func live_minions() -> Array[Enemy]:
+	return bodyguard.live_minions() if bodyguard != null else ([] as Array[Enemy])
 
 func cancel(clear_pools := true) -> void:
 	if bodyguard != null:

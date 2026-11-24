@@ -365,13 +365,7 @@ func update_bosses(bosses: Array[Enemy]) -> void:
 	var minions: Array[Enemy] = []
 	for boss in bosses:
 		if not is_instance_valid(boss) or boss.health <= 0: continue
-		if boss.caramel_encounter != null and boss.caramel_encounter.bodyguard != null:
-			minions.append_array(boss.caramel_encounter.bodyguard.live_minions())
-		if boss.acid_king_encounter != null and boss.acid_king_encounter.companion != null:
-			minions.append_array(boss.acid_king_encounter.companion.live_minions())
-		if boss.crown_court_encounter != null:
-			var retinue := boss.crown_court_encounter.retinue
-			if retinue != null: minions.append_array(retinue.live_minions())
+		if boss.encounter != null: minions.append_array(boss.encounter.live_minions())
 	retinue_display.show_members(minions)
 
 

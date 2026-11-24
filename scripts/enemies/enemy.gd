@@ -85,11 +85,19 @@ var spawn_wave: int = 1
 var active_special_attack: int = EnemyData.SpecialAttack.NONE
 var active_trigger_range: float = 0.0
 var inflammation_aura: BossInflammationAura
-var pillow_encounter: PillowEncounter
-var cloak_encounter: CloakEncounter
-var caramel_encounter: CaramelEncounter
-var acid_king_encounter: AcidKingEncounter
-var crown_court_encounter: CrownCourtEncounter
+## The scripted boss fight, if this boss has one. Typed views below are for
+## boss-specific callers; Enemy itself only uses the BossFight hooks.
+var encounter: BossFight
+var pillow_encounter: PillowEncounter:
+	get: return encounter as PillowEncounter
+var cloak_encounter: CloakEncounter:
+	get: return encounter as CloakEncounter
+var caramel_encounter: CaramelEncounter:
+	get: return encounter as CaramelEncounter
+var acid_king_encounter: AcidKingEncounter:
+	get: return encounter as AcidKingEncounter
+var crown_court_encounter: CrownCourtEncounter:
+	get: return encounter as CrownCourtEncounter
 var loot_goblin: LootGoblin
 var inflicted_statuses: Array[Dictionary] = []
 var spatial_index: EnemySpatialIndex
@@ -190,31 +198,34 @@ func _ready() -> void:
 		inflammation_aura = BossInflammationAura.new()
 		inflammation_aura.configure(data)
 		add_child(inflammation_aura)
-		if data.crown_court_profile != null:
-			crown_court_encounter = CrownCourtEncounter.new()
-			crown_court_encounter.enemy = self
-			crown_court_encounter.profile = data.crown_court_profile.for_difficulty(difficulty)
-			add_child(crown_court_encounter)
-		elif data.acid_king_profile != null:
-			acid_king_encounter = AcidKingEncounter.new()
-			acid_king_encounter.enemy = self
-			acid_king_encounter.profile = data.acid_king_profile.for_difficulty(difficulty)
-			add_child(acid_king_encounter)
-		elif data.caramel_profile != null:
-			caramel_encounter = CaramelEncounter.new()
-			caramel_encounter.enemy = self
-			caramel_encounter.profile = data.caramel_profile.for_difficulty(difficulty)
-			add_child(caramel_encounter)
-		elif data.cloak_profile != null:
-			cloak_encounter = CloakEncounter.new()
-			cloak_encounter.enemy = self
-			cloak_encounter.profile = data.cloak_profile.for_difficulty(difficulty)
-			add_child(cloak_encounter)
-		elif data.pillow_profile != null:
-			pillow_encounter = PillowEncounter.new()
-			pillow_encounter.enemy = self
-			pillow_encounter.profile = data.pillow_profile
-			add_child(pillow_encounter)
+		encounter = _create_boss_encounter()
+		if encounter != null:
+			encounter.enemy = self
+			add_child(encounter)
+
+
+func _create_boss_encounter() -> BossFight:
+	if data.crown_court_profile != null:
+		var court := CrownCourtEncounter.new()
+		court.profile = data.crown_court_profile.for_difficulty(difficulty)
+		return court
+	if data.acid_king_profile != null:
+		var king := AcidKingEncounter.new()
+		king.profile = data.acid_king_profile.for_difficulty(difficulty)
+		return king
+	if data.caramel_profile != null:
+		var caramel := CaramelEncounter.new()
+		caramel.profile = data.caramel_profile.for_difficulty(difficulty)
+		return caramel
+	if data.cloak_profile != null:
+		var cloak := CloakEncounter.new()
+		cloak.profile = data.cloak_profile.for_difficulty(difficulty)
+		return cloak
+	if data.pillow_profile != null:
+		var pillow := PillowEncounter.new()
+		pillow.profile = data.pillow_profile
+		return pillow
+	return null
 
 
 func _notification(what: int) -> void:
@@ -283,13 +294,13 @@ func _physics_process(delta: float) -> void:
 	if data.is_boss and data.boss_guard_recharge_seconds > 0.0:
 		var was_low_guard := boss_damage_budget <= max_health * 0.01
 		var guard_seconds := data.boss_guard_recharge_seconds
-		if caramel_encounter != null: guard_seconds *= caramel_encounter.profile.guard_recharge_multiplier
+		if encounter != null: guard_seconds *= encounter.guard_recharge_factor()
 		boss_damage_budget = minf(boss_damage_budget + max_health * delta / guard_seconds, max_health * data.boss_guard_burst_fraction)
 		if was_low_guard != (boss_damage_budget <= max_health * 0.01):
 			queue_redraw()
 		if boss_phase_timer > 0.0:
 			boss_phase_timer = maxf(boss_phase_timer - delta, 0.0)
-			if pillow_encounter == null and cloak_encounter == null and caramel_encounter == null and acid_king_encounter == null and crown_court_encounter == null and not boss_phase_burst_fired and boss_phase_timer <= data.boss_phase_duration * 0.5:
+			if encounter == null and not boss_phase_burst_fired and boss_phase_timer <= data.boss_phase_duration * 0.5:
 				boss_phase_burst_fired = true
 				_fire_phase_burst()
 		if boss_radial_volleys_remaining > 0:
@@ -358,14 +369,12 @@ func _physics_process(delta: float) -> void:
 
 func try_contact_hit(during_dash: bool = false) -> void:
 	if data.is_boss_objective: return
-	if caramel_encounter != null and caramel_encounter.overload != null and caramel_encounter.overload.busy(): return
-	if acid_king_encounter != null and acid_king_encounter.pressure != null and acid_king_encounter.pressure.busy(): return
-	if crown_court_encounter != null and crown_court_encounter.retinue != null and crown_court_encounter.retinue.busy(): return
+	if encounter != null and encounter.blocks_contact(): return
 	if loot_goblin != null: return
 	if contact_timer > 0.0 or health <= 0.0 or is_queued_for_deletion() or target == null:
 		return
 	var charging := special_phase == SpecialPhase.ACTIVE and (active_special_attack == EnemyData.SpecialAttack.DASH or active_special_attack == EnemyData.SpecialAttack.BOSS and boss_move == BossMove.CHARGE)
-	charging = charging or caramel_encounter != null and caramel_encounter.state == CaramelEncounter.State.RUSH_ACTIVE
+	charging = charging or encounter != null and encounter.charging()
 	contact_timer = 0.8 / overtime_attack_factor()
 	target.take_contact_hit(attack_damage if charging else contact_damage, inflicted_statuses, during_dash)
 
@@ -378,20 +387,8 @@ func _update_sprite_facing(direction: Vector2) -> void:
 
 
 func _process_special(delta: float, direction: Vector2) -> void:
-	if crown_court_encounter != null:
-		crown_court_encounter.advance(delta)
-		return
-	if acid_king_encounter != null:
-		acid_king_encounter.advance(delta)
-		return
-	if caramel_encounter != null:
-		caramel_encounter.advance(delta)
-		return
-	if cloak_encounter != null:
-		cloak_encounter.advance(delta)
-		return
-	if pillow_encounter != null:
-		pillow_encounter.advance(delta)
+	if encounter != null:
+		encounter.advance(delta)
 		return
 	if data.is_boss and boss_phase_timer > 0.0:
 		return
@@ -673,26 +670,17 @@ func take_damage(amount: float, weapon: WeaponData = null, critical: bool = fals
 		return 0.0
 	additions = direct
 	var applied := maxf(total * (1.0 - damage_reduction) / overtime_defense_factor(), 1.0 if amount > 0 else 0.0)
-	if acid_king_encounter != null: applied *= acid_king_encounter.damage_factor()
-	if crown_court_encounter != null: applied *= crown_court_encounter.damage_factor(incoming_direction, proc_id.is_empty())
-	var overload_open := caramel_encounter != null and caramel_encounter.overload != null and caramel_encounter.overload.state == CaramelOverload.State.RECOVERY
-	var king_open := acid_king_encounter != null and acid_king_encounter.pressure != null and acid_king_encounter.pressure.state == KingPressureTrial.State.EXPOSED
-	var court_open := crown_court_encounter != null and crown_court_encounter.retinue != null and crown_court_encounter.retinue.state == ImperialRetinue.State.OPEN
-	if overload_open: applied *= caramel_encounter.overload.profile.vulnerability
-	if caramel_encounter != null and caramel_encounter.overload != null:
-		applied = minf(applied, caramel_encounter.overload.damage_limit())
-	if acid_king_encounter != null and acid_king_encounter.pressure != null:
-		applied = minf(applied, acid_king_encounter.pressure.damage_limit(proc_id == &"king_backfire"))
-	if crown_court_encounter != null and crown_court_encounter.retinue != null: applied = minf(applied, crown_court_encounter.retinue.damage_limit())
+	var opening := encounter != null and encounter.opening_open()
+	if encounter != null: applied = encounter.modify_damage(applied, incoming_direction, proc_id, opening)
 	if imperial_vassal != null: applied = imperial_vassal.limit(applied)
 	if caramel_enforcer != null: applied = caramel_enforcer.limit(applied)
 	if acid_collector != null: applied = acid_collector.limit(applied)
-	if (overload_open or king_open or court_open) and boss_phase < 2:
+	if opening and boss_phase < 2:
 		applied = minf(applied, maxf(health - _boss_phase_floor(), 0.0))
 	if applied <= 0:
 		if data.is_boss: _guard_boss_hit()
 		return 0.0
-	if data.is_boss and data.boss_guard_recharge_seconds > 0.0 and not (overload_open or king_open or court_open):
+	if data.is_boss and data.boss_guard_recharge_seconds > 0.0 and not opening:
 		if boss_phase_timer > 0.0:
 			_guard_boss_hit()
 			return 0.0
@@ -714,9 +702,7 @@ func take_damage(amount: float, weapon: WeaponData = null, critical: bool = fals
 	if imperial_vassal != null: imperial_vassal.spend(counted)
 	if caramel_enforcer != null: caramel_enforcer.spend(counted)
 	if acid_collector != null: acid_collector.spend(counted)
-	if overload_open: caramel_encounter.overload.spend_opening_damage(counted)
-	if court_open: crown_court_encounter.retinue.opening_left = maxf(crown_court_encounter.retinue.opening_left - counted, 0)
-	if king_open and proc_id != &"king_backfire": acid_king_encounter.pressure.spend_opening_damage(counted)
+	if opening: encounter.spend_opening(counted, proc_id)
 	if health > 0:
 		for addition in delayed:
 			affix_effects.apply(StringName(addition.id), addition.damage, addition.can_spread, addition.duration)
@@ -765,9 +751,7 @@ func take_damage(amount: float, weapon: WeaponData = null, critical: bool = fals
 
 func is_targetable() -> bool:
 	if health <= 0 or dying or is_queued_for_deletion(): return false
-	if caramel_encounter != null and caramel_encounter.overload != null and caramel_encounter.overload.blocks_damage(): return false
-	if acid_king_encounter != null and acid_king_encounter.pressure != null and acid_king_encounter.pressure.blocks_damage(): return false
-	if crown_court_encounter != null and crown_court_encounter.retinue != null and crown_court_encounter.retinue.blocks_damage(): return false
+	if encounter != null and encounter.blocks_damage(): return false
 	if data.is_boss_objective:
 		if acid_collector != null: return not acid_collector.suspended()
 		if caramel_enforcer != null: return not caramel_enforcer.suspended() and is_instance_valid(boss_objective_owner) and boss_objective_owner.health > 0
@@ -781,16 +765,8 @@ func _finish_death(amount: float, delayed: Array[Dictionary]) -> void:
 		return
 	death_resolved = true
 	health = 0.0
-	if pillow_encounter != null:
-		pillow_encounter.cancel()
-	if cloak_encounter != null:
-		cloak_encounter.cancel()
-	if caramel_encounter != null:
-		caramel_encounter.cancel()
-	if acid_king_encounter != null:
-		acid_king_encounter.cancel()
-	if crown_court_encounter != null:
-		crown_court_encounter.cancel()
+	if encounter != null:
+		encounter.cancel()
 	for addition in delayed:
 		if addition.id == &"fire":
 			affix_effects.remember_fire(addition.damage, addition.can_spread)

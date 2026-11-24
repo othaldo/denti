@@ -1,10 +1,9 @@
 class_name PillowEncounter
-extends Node2D
+extends BossFight
 
 const ART: Texture2D = preload("res://assets/enemies/count_pillow_atlas.png")
 static var pillow_art: AtlasTexture
 static var fold_art: AtlasTexture
-var enemy: Enemy
 var profile: PillowEncounterData
 var active := false
 var elapsed := 0.0

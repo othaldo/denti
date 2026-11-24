@@ -1,5 +1,5 @@
 class_name AcidKingEncounter
-extends Node2D
+extends BossFight
 ## The encounter clock owns warnings, field transitions, staggered stomps and recovery.
 
 # Append states so existing save-state numbers retain their meaning.
@@ -7,7 +7,6 @@ enum State { POSITION, WARN_CHANNEL, FLOW, WARN_SHIFT, WARN_STOMP, STOMP, RECALL
 enum Attack { CHANNELS, STOMP, TIDE }
 const SAVE_VERSION := 4
 const MAX_FIELDS := 2
-var enemy: Enemy
 var profile: AcidKingData
 var rig: KingAcidRig
 var volley: BossPaintedVolley
@@ -80,6 +79,26 @@ func companion_suspended() -> bool:
 func damage_factor() -> float:
 	if pressure != null and pressure.state == KingPressureTrial.State.EXPOSED: return pressure.profile.exposure_damage_factor / maxf(1 - enemy.damage_reduction, 0.01)
 	return profile.open_damage_factor if state == State.OPEN else profile.closed_damage_factor
+
+func blocks_contact() -> bool:
+	return pressure != null and pressure.busy()
+
+func blocks_damage() -> bool:
+	return pressure != null and pressure.blocks_damage()
+
+func opening_open() -> bool:
+	return pressure != null and pressure.state == KingPressureTrial.State.EXPOSED
+
+func modify_damage(applied: float, _incoming: Vector2, proc_id: StringName, _opening: bool) -> float:
+	applied *= damage_factor()
+	if pressure != null: applied = minf(applied, pressure.damage_limit(proc_id == &"king_backfire"))
+	return applied
+
+func spend_opening(counted: float, proc_id: StringName) -> void:
+	if proc_id != &"king_backfire": pressure.spend_opening_damage(counted)
+
+func live_minions() -> Array[Enemy]:
+	return companion.live_minions() if companion != null else ([] as Array[Enemy])
 
 func cancel() -> void:
 	if acid_wake != null: acid_wake.clear()

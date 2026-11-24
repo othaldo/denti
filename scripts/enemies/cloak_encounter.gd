@@ -1,11 +1,10 @@
 class_name CloakEncounter
-extends Node2D
+extends BossFight
 ## One authoritative clock drives warnings, damage and the sampled skeletal pose.
 
 enum State { APPROACH, WARNING, STRIKE, STEP, RECOVERY }
 const SAVE_VERSION := 1
 const RIG: PackedScene = preload("res://scenes/enemies/count_cloak_rig.tscn")
-var enemy: Enemy
 var profile: CloakEncounterData
 var rig: CountCloakRig
 var state := State.APPROACH

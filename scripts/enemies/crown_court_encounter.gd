@@ -1,11 +1,10 @@
 class_name CrownCourtEncounter
-extends Node2D
+extends BossFight
 ## One clock owns guard turns, fixed judgments, portal releases and pulse cadence.
 # Append new states; existing save-state numbers keep their meaning.
 enum State { POSITION, TURN, EDICT_WARN, EDICT_HIT, PORTAL_WARN, PORTAL_FLIGHT, NERVE_WARN, NERVE_RELEASE, OPEN, RECOVERY, REPOSITION }
 enum Attack { EDICT, PORTAL, NERVE }
 const SAVE_VERSION := 3
-var enemy: Enemy
 var profile: CrownCourtData
 var rig: EmperorCourtRig
 var shots: BossPaintedVolley
@@ -80,6 +79,26 @@ func damage_factor(incoming: Vector2, directional: bool = true) -> float:
 	if not directional: return 1.0
 	var toward := -incoming.normalized() if not incoming.is_zero_approx() else enemy.global_position.direction_to(enemy.target.global_position)
 	return profile.guard_damage_factor if facing.dot(toward) >= cos(deg_to_rad(profile.guard_half_angle)) else 1.0
+
+func blocks_contact() -> bool:
+	return retinue != null and retinue.busy()
+
+func blocks_damage() -> bool:
+	return retinue != null and retinue.blocks_damage()
+
+func opening_open() -> bool:
+	return retinue != null and retinue.state == ImperialRetinue.State.OPEN
+
+func modify_damage(applied: float, incoming: Vector2, proc_id: StringName, _opening: bool) -> float:
+	applied *= damage_factor(incoming, proc_id.is_empty())
+	if retinue != null: applied = minf(applied, retinue.damage_limit())
+	return applied
+
+func spend_opening(counted: float, _proc_id: StringName) -> void:
+	retinue.opening_left = maxf(retinue.opening_left - counted, 0)
+
+func live_minions() -> Array[Enemy]:
+	return retinue.live_minions() if retinue != null else ([] as Array[Enemy])
 
 func cancel(clear_retinue: bool = true) -> void:
 	if retinue != null and clear_retinue: retinue.cancel()
