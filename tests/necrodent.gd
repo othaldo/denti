@@ -39,6 +39,7 @@ func _run() -> void:
 	await _check_tooth_health()
 	await _check_shop()
 	await _check_enchantment_details()
+	await _check_staff_scaling_and_support()
 	_check_recruitment_comparison()
 	game.queue_free()
 	await process_frame
@@ -286,6 +287,20 @@ func _check_shop() -> void:
 		check(offer.id == STAFF and offer.weapon_tier == 1, "shop offered an unusable weapon")
 		offer_index = index
 	check(offer_index >= 0, "shop did not supply a staff for fusion")
+	# Class items: summon items fit the Nekrodent, placed-object items do not.
+	var items: ItemInventory = game.player.items
+	var pot := ItemCatalog.by_id(&"flower_pot")
+	check(items.fits_build(ItemCatalog.by_id(&"fertilizer")) and items.fits_build(ItemCatalog.by_id(&"root_net"))
+		and not items.fits_build(pot) and items.fits_build(ItemCatalog.by_id(&"pocket_bed")), "class item filter misjudged the Nekrodent")
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 7
+	var offered_pot := false
+	for roll in 300:
+		if ChestRewards.roll_item(12, 200.0, items, rng).get("item_id", "") == "flower_pot": offered_pot = true
+	check(not offered_pot, "chest offered an item for other classes")
+	items.owned["rinse_valve"] = 1
+	check(items.fits_build(pot), "an enabling item did not open the class item")
+	items.owned.erase("rinse_valve")
 	if offer_index >= 0:
 		game._on_shop_buy(offer_index)
 		var weapons: Array[WeaponInstance] = game.player.loadout.equipped()
@@ -314,7 +329,7 @@ func _check_enchantment_details() -> void:
 	check(WeaponSkins.staff_material(WeaponRolls.with_affixes(staff.data, no_affixes)) == null, "cleared staff retained an elemental tint")
 	var enemy := _enemy(Vector2(96, 10))
 	var packets := WeaponEnchantmentEffects.packets(player.items.effect_context, enemy, staff.data, staff.affixes,
-		NecrodentSkills.enchantment_share(retinue.retinue_size()))
+		retinue.current_enchantment_share())
 	var preview := AffixPresentation.display_value(float(staff.affixes[0].damage), &"fire", staff.data, player.stats, player.items)
 	check(packets.size() == 1 and is_equal_approx(float(packets[0].damage), preview),
 		"staff preview did not show the elemental power per bite")
@@ -323,7 +338,7 @@ func _check_enchantment_details() -> void:
 		"the actual bite did not use staff fire and cadence")
 	var upgrade_model := WeaponUpgradePresentation.equipment(
 		WeaponUpgradeState.new(), player.loadout, player.stats, player.items)[0]
-	check(str(upgrade_model.root_info).contains("Bisspause") and str(upgrade_model.root_info).contains("36 %"),
+	check(str(upgrade_model.root_info).contains("Bisspause") and str(upgrade_model.root_info).contains("%.0f %%" % (NecrodentSkills.enchantment_share(retinue.retinue_size(), staff.tier) * 100.0)),
 		"staff details omitted bite cadence or the elemental share")
 	var reach: Dictionary = upgrade_model.options.filter(func(option: Dictionary) -> bool: return option.id == &"range")[0]
 	check(str(reach.description).contains("markieren"), "staff range preview describes a weapon hit")
@@ -338,6 +353,87 @@ func _check_enchantment_details() -> void:
 		check(menu.item_details.values_grid.get_child_count() == 10
 			and menu.item_details.heading.text.begins_with("Extraktionsstab"), "retinue details omitted live bite values")
 	menu.close_pause()
+
+
+func _check_staff_scaling_and_support() -> void:
+	var player: Player = game.player
+	var staff := player.loadout.equipped()[0]
+	var module := player.skill_module(NECRO) as NecrodentSkills
+	# Mk strengthens bites; the element share grows toward 1/sqrt(n).
+	var tier := staff.tier
+	player.class_combat.powers = {"necro_teeth": 5.0, "necro_molar_teeth": 2.0, "necro_guard_teeth": 2.0}
+	module.reset_wave()
+	staff.tier = 1
+	var mk_one := module.bite_damage_before_target_bonuses()
+	staff.tier = 4
+	check(is_equal_approx(module.bite_damage_before_target_bonuses(), mk_one * 1.9), "staff Mk IV did not strengthen bites")
+	check(is_equal_approx(NecrodentSkills.enchantment_share(6, 1), 1.0 / 4.2)
+		and is_equal_approx(NecrodentSkills.enchantment_share(6, 4), 1.0 / sqrt(6.0))
+		and NecrodentSkills.enchantment_share(12, 4) * 12 > NecrodentSkills.enchantment_share(6, 4) * 6,
+		"Mk did not let a larger retinue add elemental damage")
+	check(is_equal_approx(module.current_enchantment_share(), NecrodentSkills.enchantment_share(6, 4)), "current share ignored the staff Mk")
+	staff.tier = tier
+	# The extraction staff enchants to 15/15, ordinary weapons stop at 10/10.
+	check(WeaponUpgrades.max_level(staff.data) == 15 and WeaponUpgrades.max_level(WeaponCatalog.by_id(&"turbo_drill")) == 10,
+		"enchantment caps differ from the design")
+	var values: Array[Dictionary] = []
+	for rank in 16:
+		var next := WeaponUpgrades.advance(values, &"fire", staff.data, 4)
+		if next.is_empty(): break
+		values = next
+	check(WeaponUpgrades.level(values[0]) == 15 and WeaponUpgrades.power(&"fire", 15, staff.data, 4) > WeaponUpgrades.power(&"fire", 10, staff.data, 4),
+		"extraction staff did not enchant past 10")
+	var drill := WeaponCatalog.by_id(&"turbo_drill")
+	var drill_values: Array[Dictionary] = []
+	for rank in 12:
+		var next := WeaponUpgrades.advance(drill_values, &"fire", drill, 4)
+		if next.is_empty(): break
+		drill_values = next
+	check(WeaponUpgrades.level(drill_values[0]) == 10, "ordinary weapon enchanted past 10")
+	check(WeaponUpgrades.advance(values, &"ice", staff.data, 4).is_empty(), "staff accepted a second element")
+	# Blutsauger: molar bites heal Denti, capped per bite; milk teeth do not.
+	player.class_combat.powers = {"necro_teeth": 2.0, "necro_molar_teeth": 1.0, "necro_molar_leech": 1.0}
+	module.reset_wave()
+	var enemy := _enemy(Vector2(40, 0))
+	enemy.max_health = 100000.0
+	enemy.health = enemy.max_health
+	player.stats.health = player.stats.max_health - 20.0
+	var before := player.stats.health
+	var milk: NecrodentSkills.Tooth = module.teeth.filter(func(t: NecrodentSkills.Tooth) -> bool: return t.kind == NecrodentSkills.Kind.MILK)[0]
+	var molar: NecrodentSkills.Tooth = module.teeth.filter(func(t: NecrodentSkills.Tooth) -> bool: return t.kind == NecrodentSkills.Kind.MOLAR)[0]
+	module._bite(milk, enemy, staff)
+	check(is_equal_approx(player.stats.health, before), "a milk tooth leeched")
+	module._bite(molar, enemy, staff)
+	var gained := player.stats.health - before
+	check(gained > 0.0 and gained <= NecrodentSkills.MOLAR_LEECH_CAP + 0.001, "molar leech did not heal within its cap")
+	# Staff Lebensraub: the interval shrinks with sqrt(teeth), floored at 0.2 s.
+	check(is_equal_approx(NecrodentSkills.leech_interval(1), 0.6) and is_equal_approx(NecrodentSkills.leech_interval(4), 0.3)
+		and is_equal_approx(NecrodentSkills.leech_interval(19), NecrodentSkills.LEECH_MIN_INTERVAL), "leech interval ignored the retinue")
+	staff.affixes = [WeaponUpgrades.next_entry({}, &"leech", staff.data, staff.tier)]
+	player.class_combat.powers = {"necro_teeth": 3.0}
+	module.reset_wave()
+	player.items.effect_context.cooldowns.clear()
+	player.stats.health = player.stats.max_health - 20.0
+	before = player.stats.health
+	module._bite(module.teeth[0], enemy, staff)
+	check(player.stats.health > before, "staff leech did not heal on a bite")
+	var key := "enchantment_leech:" + staff.instance_uid
+	check(is_equal_approx(float(player.items.effect_context.cooldowns.get(key, 0.0)), 0.3), "staff leech did not use the retinue interval")
+	staff.affixes = []
+	# Zahnschild: a standing guard grants one shield charge per interval.
+	player.class_combat.powers = {"necro_teeth": 1.0, "necro_guard_teeth": 1.0, "necro_guard_shield": 1.0}
+	module.reset_wave()
+	player.stats.shield_charges = 0
+	module.advance(NecrodentSkills.GUARD_SHIELD_SECONDS - 0.1)
+	check(player.stats.shield_charges == 0, "guard shield came too early")
+	module.advance(0.2)
+	check(player.stats.shield_charges == 1, "standing guard did not grant a shield")
+	module.advance(3.0)
+	module.restore_with_enemies(module.save_with_enemies({}), [])
+	check(is_equal_approx(module.shield_left, NecrodentSkills.GUARD_SHIELD_SECONDS - 3.0), "resume lost the guard shield clock")
+	player.stats.shield_charges = 0
+	enemy.queue_free()
+	await process_frame
 
 
 func _check_recruitment_comparison() -> void:

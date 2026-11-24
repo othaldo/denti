@@ -42,7 +42,7 @@ func configure(primary: WeaponInstance, partner: WeaponInstance, result: WeaponD
 	# Transfer purchased root budgets, not free ranks across weapon sizes.
 	for index in range(candidates.size() - 1, -1, -1):
 		var entry := candidates[index]
-		var ranks := mini(int(effect_points[str(entry.id)]) / WeaponUpgrades.cost(result_data), WeaponUpgrades.MAX_LEVEL)
+		var ranks := mini(int(effect_points[str(entry.id)]) / WeaponUpgrades.cost(result_data), WeaponUpgrades.max_level(result_data))
 		if ranks == 0:
 			candidates.remove_at(index)
 		elif entry.has("level") or ranks != WeaponUpgrades.level(entry):

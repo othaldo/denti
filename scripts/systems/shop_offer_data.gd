@@ -18,6 +18,10 @@ extends Resource
 @export var tags: Array[StringName] = []
 @export var family_id: StringName = &""
 @export_range(0, 99) var family_limit: int = 0
+## Shop and chests offer this item only to these classes (empty: every class)
+## or once the run owns one of `enabling_item_ids` (e.g. a summon source).
+@export var class_ids: Array[StringName] = []
+@export var enabling_item_ids: Array[StringName] = []
 
 
 func effect_text() -> String:

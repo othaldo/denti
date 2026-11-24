@@ -2,6 +2,22 @@
 
 Die Versionsnummer wird zentral in `project.godot` gepflegt und im Hauptmenü angezeigt. 0.1.0 wurde rückblickend anhand der Git-Historie dokumentiert; 0.2.0 bündelt die seitdem entstandenen Änderungen. Die Einträge beschreiben implementierte Funktionen. Weitere Pläne stehen in der [Roadmap](docs/ROADMAP.md).
 
+## 0.9.0 — 24.11.2026
+
+- **Bonusklasse Nekrodent:** Denti kämpft nicht selbst, sondern führt ein Gefolge aus Milch-, Backen- und Wachzähnen. Der Extraktionsstab markiert nach dem Dash ein Ziel, Elemente wirken bei den Bissen. Freischaltung: Welle 20 auf Normal oder höher mit einer Blutungs- oder Gift-Waffe gewinnen.
+
+- **Neue Klasse Kräuterzahn:** Der Pflanzstab setzt Salbei, Kamille und Nelke in Dentis Umgebung. Bis zu drei Stäbe pflegen je einen eigenen Garten mit eigenem Element. [Klassenkonzept](docs/CLASS_HERB_DRUID.md).
+
+- **Nekrodent-Balance:** Stab-Fusionen verstärken jeden Biss (×1,25 bis ×1,9) und erhöhen den Elementanteil pro Biss, sodass ein großes Gefolge auch mehr Elementschaden macht. Der Extraktionsstab lässt sich bis 15/15 verzaubern. Lebensraub auf dem Stab löst mit mehr Zähnen häufiger aus. Neue Talente: **Blutsauger** (Backenzähne heilen Denti) und **Zahnschild** (Wachzähne geben alle 8 Sekunden einen Schild).
+
+- **14 Synergie-Items** für Gefolge, Dash, Element-Reaktionen und die neue Beute Minzblatt. Klassen-Items wie Dünger oder Blumentopf erscheinen in Shop und Truhen nur, wenn sie zum Run passen. [Items](docs/items.md).
+
+- **Freischaltungen:** Klassen und Waffen öffnen sich über Run-Zähler, Klassensiege, Element-Waffen und Meistersiegel-Ketten. Jede Klasse hat zwei eigene Relikte, Bosse bieten vier Relikte zur Wahl. Das Run-Ende zeigt neue Freischaltungen.
+
+- **Shop und Belohnungen:** Kompaktere Shop-Aktionen, Verzauberungsauswahl ohne Scrollen auf dem Desktop, Sieg-Anzeige vor den Upgrades. Waffen sitzen auf festen Wurzelplätzen um Denti.
+
+- **Technik:** Bosse und ihre Leutnants laufen über gemeinsame Schnittstellen, gestoßene Gegner bleiben in der Arena, die Tests laufen im CI in drei parallelen Teilen, und frische Checkouts importieren ohne irreführende Ladefehler.
+
 ## 0.8.1 — 21.11.2026
 
 - **Kein Autosave-Ruckler mehr im Kampf:** Der Kampf speichert weiterhin alle acht Sekunden, schreibt JSON und Datei aber im Hintergrund. In einer vollen 4K-Arena sinkt die Zeit im Hauptthread von etwa 15 auf 7–9 ms. Laden, Löschen, weitere Saves und das Beenden warten einen laufenden Hintergrund-Save ab; der Web-Export speichert wie bisher synchron. [Messung und Grenzen](docs/PERFORMANCE_AUDIT.md).

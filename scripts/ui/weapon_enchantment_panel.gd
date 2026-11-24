@@ -8,7 +8,6 @@ signal ascension_requested(uid: String)
 signal undo_requested
 signal selection_changed
 
-const MAX_LEVEL := 10
 const SLOT_COUNT := 4
 const CAPSULE: Texture2D = preload("res://assets/loot/upgrade_capsule.png")
 
@@ -417,6 +416,7 @@ func _slots(rect: Rect2, compact: bool, row_height: float) -> float:
 		var effect: Dictionary = effects[index]
 		var data := WeaponAffixes.by_id(effect.id)
 		var level := int(effect.level)
+		var cap := WeaponUpgrades.max_level(models[selected_weapon].data)
 		var panel := focus_row
 		var icon := _button(panel, "", Rect2(8, 12 if compact else 22, 50, 48))
 		MenuStyle.quiet(icon)
@@ -427,30 +427,30 @@ func _slots(rect: Rect2, compact: bool, row_height: float) -> float:
 		var action_width := 72.0 if compact else 106.0
 		var text_width := row.size.x - 90 - action_width
 		_text(panel, data.display_name, Rect2(72, 3 if compact else 9, text_width if compact else text_width - 48, 25), 16 if compact else 19)
-		var rank := _text(panel, "%d/10" % level, Rect2(row.size.x - action_width - 12 if compact else row.size.x - action_width - 66, 0 if compact else 10, action_width if compact else 52, 22 if compact else 24), 13 if compact else 16, DentiUIStyle.MINT if level == MAX_LEVEL else DentiUIStyle.INK)
+		var rank := _text(panel, "%d/%d" % [level, cap], Rect2(row.size.x - action_width - 12 if compact else row.size.x - action_width - 66, 0 if compact else 10, action_width if compact else 52, 22 if compact else 24), 13 if compact else 16, DentiUIStyle.MINT if level >= cap else DentiUIStyle.INK)
 		rank.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		for pip in MAX_LEVEL:
+		for pip in cap:
 			var cell := ColorRect.new()
 			cell.color = data.color if pip < level else DentiUIStyle.LINE
 			cell.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			panel.add_child(cell)
-			_place(cell, Rect2(73 + pip * (text_width / 10), 31 if compact else 42, text_width / 10 - 3, 3 if compact else 4))
+			_place(cell, Rect2(73 + pip * (text_width / cap), 31 if compact else 42, text_width / cap - 3, 3 if compact else 4))
 		var preview := str(effect.preview)
 		if very_narrow: preview = preview.trim_suffix(" " + str(effect.unit)) + "\n" + str(effect.unit)
 		var preview_height := 50.0 if very_narrow else (36.0 if compact else 28.0)
 		var preview_top := 37.0 if compact else minf(53, row_height - 32)
 		var preview_label := _text(panel, preview, Rect2(72, preview_top, text_width + 4, preview_height), 13 if compact else 14, DentiUIStyle.MUTED, true)
-		focus_row.blocked_reason = "Maximalstufe erreicht" if level == MAX_LEVEL else _points_blocked()
+		focus_row.blocked_reason = "Maximalstufe erreicht" if level >= cap else _points_blocked()
 		focus_row.action_label = "+ Rang · %d" % _cost()
 		focus_row.details_title = data.display_name
 		focus_row.details_text = (focus_row.blocked_reason + "\n\n" if not focus_row.blocked_reason.is_empty() else "") + str(effect.details)
 		focus_row.status_label = preview_label
 		focus_row.original_status = preview
 		focus_row.pressed.connect(upgrade.bind(index))
-		var action := _button(panel, "MAX" if level == MAX_LEVEL else ("+ · %d" if compact else "+ Rang · %d") % _cost(), Rect2(row.size.x - action_width - 12, 25, action_width, 44 if compact else 48))
+		var action := _button(panel, "MAX" if level >= cap else ("+ · %d" if compact else "+ Rang · %d") % _cost(), Rect2(row.size.x - action_width - 12, 25, action_width, 44 if compact else 48))
 		action.add_theme_font_size_override("font_size", 16)
-		action.tooltip_text = "Maximalstufe erreicht" if level == MAX_LEVEL else "%s: %d/10 → %d/10 · kostet %d Punkte" % [data.display_name, level, level + 1, _cost()]
-		action.disabled = level == MAX_LEVEL or remaining < _cost()
+		action.tooltip_text = "Maximalstufe erreicht" if level >= cap else "%s: %d/%d → %d/%d · kostet %d Punkte" % [data.display_name, level, cap, level + 1, cap, _cost()]
+		action.disabled = level >= cap or remaining < _cost()
 		action.pressed.connect(upgrade.bind(index))
 		ControllerFocus.tag(action, "upgrade:%d" % index)
 		upgrade_buttons.append(action)
@@ -520,7 +520,7 @@ func _picker(rect: Rect2, available := 0.0) -> float:
 		selection_preview = Control.new()
 		body.add_child(selection_preview)
 		_place(selection_preview, Rect2(rect.position + Vector2(0, bottom), Vector2(rect.size.x, preview_height)))
-		_text(selection_preview, "%s · 1/10" % data.display_name, Rect2(0, 4, rect.size.x, 30), 22)
+		_text(selection_preview, "%s · 1/%d" % [data.display_name, WeaponUpgrades.max_level(models[selected_weapon].data)], Rect2(0, 4, rect.size.x, 30), 22)
 		var y := 36.0
 		# The hero already names the weapon and Mk; only copies need telling apart.
 		if not target_line.is_empty():
@@ -594,7 +594,7 @@ func open_picker(slot: int) -> void:
 func upgrade(slot: int) -> void:
 	if picking_slot >= 0: return
 	if remaining < _cost() or slot < 0 or slot >= models[selected_weapon].effects.size(): return
-	if int(models[selected_weapon].effects[slot].level) >= MAX_LEVEL: return
+	if int(models[selected_weapon].effects[slot].level) >= WeaponUpgrades.max_level(models[selected_weapon].data): return
 	focus_after_layout = "upgrade:%d" % slot
 	upgrade_requested.emit(str(models[selected_weapon].uid), StringName(models[selected_weapon].effects[slot].id))
 

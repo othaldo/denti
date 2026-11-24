@@ -231,7 +231,7 @@ func merge_conflict_reason(index: int) -> String:
 	if not merge_affix_conflict(index): return ""
 	var weapon := equipped()[index]
 	var partner := _find_tier(weapon.data.id, weapon.tier, weapon)
-	var reason := WeaponUpgrades.fusion_block_reason(weapon.affixes, partner.affixes)
+	var reason := WeaponUpgrades.fusion_block_reason(weapon.affixes, partner.affixes, weapon.data)
 	return reason if not reason.is_empty() else "Nicht genug Verzauberungsplätze"
 
 
@@ -318,7 +318,7 @@ func _affixes_fit(primary: WeaponInstance, partner: WeaponInstance) -> bool:
 		if not kinds.has(str(affix.id)):
 			kinds.append(str(affix.id))
 	var capacity_after := maxi(WeaponUpgrades.slots(primary.tier + 1), maxi(primary.affix_slots, partner.affix_slots))
-	return kinds.size() <= capacity_after and WeaponUpgrades.fusion_fits(primary.affixes, partner.affixes)
+	return kinds.size() <= capacity_after and WeaponUpgrades.fusion_fits(primary.affixes, partner.affixes, primary.data)
 
 
 func _combined_affixes(primary: WeaponInstance, partner: WeaponInstance) -> Array[Dictionary]:

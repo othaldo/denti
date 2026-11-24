@@ -36,6 +36,8 @@ var element_skin: StringName = &""
 @export var visual_angle_degrees: float = 45.0
 @export var price: int = 8
 @export var damage_tiers: PackedFloat32Array
+## Highest enchantment rank per effect on this weapon (WeaponUpgrades.LEVEL_LIMIT at most).
+@export var enchantment_max_level: int = 10
 @export var range_tiers: PackedFloat32Array
 @export var projectile_count_tiers: PackedInt32Array
 @export var pierce_tiers: PackedInt32Array

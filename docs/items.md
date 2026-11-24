@@ -245,6 +245,13 @@ Diese 14 Items verbinden die neueren Mechaniken: Gefolge (Kräuterzahn-Pflanzen,
 Nekrodent-Zähne), platzierte Felder, den Dash, Element-Reaktionen und die neue Beute
 **Minzblatt** (heilt beim Einsammeln). [Bauplan und Regeln](ITEM_SYNERGY_EXPANSION.md).
 
+Klassen-Items erscheinen in Shop und Truhen nur, wenn sie zum Run passen
+(`ShopOfferData.class_ids`, `enabling_item_ids`):
+
+- **Dünger, Kompost, Wurzelnetz:** Nekrodent und Kräuterzahn, sonst erst mit Taschenbeet.
+- **Blumentopf:** Assassine, Frostwächter, Spültechniker und Kräuterzahn, sonst erst mit
+  Spülventil (Pfützen).
+
 | Item | Seltenheit | Effekt | Max. | Basispreis |
 | --- | --- | --- | ---: | ---: |
 | Blumentopf | Uncommon | Platzierte Pflanzen, Eiswände, Giftfelder, Spülspur und Pfützen halten 15 % länger. −3 % Bewegung. | 6 | 9 |

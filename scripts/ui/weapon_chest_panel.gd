@@ -212,7 +212,7 @@ func _select_weapon(index: int, reset_replace: bool = true) -> void:
 		var effect := DentiUIComponents.label(text_rows, "%s +%s%s" % [data.display_name, AffixPresentation.value_text(float(affix.damage), data.id, weapon.data, stats, item_context), unit], 16)
 		effect.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		effect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		var rarity := DentiUIComponents.label(text_rows, AffixPresentation.progress_text(affix), 14)
+		var rarity := DentiUIComponents.label(text_rows, AffixPresentation.progress_text(affix, weapon.data), 14)
 		rarity.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		rarity.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		# The whole replacement card already conveys rarity; no nested badge.

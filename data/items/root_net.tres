@@ -14,3 +14,5 @@ effect_kind = &"summon_proximity"
 effect_value = 0.03
 max_stacks = 1
 tags = Array[StringName]([&"summon"])
+class_ids = Array[StringName]([&"necrodent", &"herb_druid"])
+enabling_item_ids = Array[StringName]([&"pocket_bed"])

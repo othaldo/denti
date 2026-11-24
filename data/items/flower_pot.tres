@@ -15,3 +15,5 @@ effect_kind = &"placed_duration"
 effect_value = 0.15
 max_stacks = 6
 tags = Array[StringName]([&"area", &"summon"])
+class_ids = Array[StringName]([&"assassin", &"frost_warden", &"rinser", &"herb_druid"])
+enabling_item_ids = Array[StringName]([&"rinse_valve"])

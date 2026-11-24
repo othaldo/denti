@@ -45,7 +45,7 @@ static func sanitize(values: Array) -> Array[Dictionary]:
 			continue
 		var entry := {"id": str(value.id), "damage": damage, "rarity": clampi(int(value.get("rarity", 1)), 1, 4), "stacks": maxi(int(value.get("stacks", 1)), 1), "rank": clampi(int(value.get("rank", 1)), 1, MAX_RANK), "bonus": maxf(float(value.get("bonus", 0)), 0), "progress": clampf(float(value.get("progress", 0)), 0, 0.999999)}
 		if value.has("level"):
-			entry["level"] = clampi(int(value.level), 1, WeaponUpgrades.MAX_LEVEL)
+			entry["level"] = clampi(int(value.level), 1, WeaponUpgrades.LEVEL_LIMIT)
 			var floor_value := float(value.get("legacy_floor", 0))
 			entry["legacy_floor"] = maxf(floor_value, 0) if is_finite(floor_value) else 0.0
 		var index := find(result, StringName(entry.id))
@@ -73,7 +73,7 @@ static func progress_weight(current: Dictionary, option: Dictionary) -> float:
 
 static func nominal(value: Dictionary) -> float:
 	if value.has("level"):
-		return by_id(StringName(value.id)).upgrade_steps[WeaponUpgrades.level(value) - 1]
+		return WeaponUpgrades.step(by_id(StringName(value.id)), WeaponUpgrades.level(value))
 	var rarity := int(value.get("rarity", 1))
 	var rank := int(value.get("rank", 1))
 	var base := rank_damage(StringName(value.id), rarity, rank) + float(value.get("bonus", 0))
@@ -106,7 +106,7 @@ static func upgraded(current: Dictionary, option: Dictionary) -> Dictionary:
 
 static func merge_entries(first: Dictionary, second: Dictionary) -> Dictionary:
 	if first.has("level") or second.has("level"):
-		return {"id": str(first.id), "level": mini(WeaponUpgrades.level(first) + WeaponUpgrades.level(second), WeaponUpgrades.MAX_LEVEL),
+		return {"id": str(first.id), "level": mini(WeaponUpgrades.level(first) + WeaponUpgrades.level(second), WeaponUpgrades.LEVEL_LIMIT),
 			"damage": maxf(float(first.damage), float(second.damage)), "rarity": 1, "rank": 1, "progress": 0.0, "bonus": 0.0,
 			"stacks": int(first.get("stacks", 1)) + int(second.get("stacks", 1)),
 			"legacy_floor": maxf(float(first.get("legacy_floor", 0)) if first.has("level") else float(first.damage), float(second.get("legacy_floor", 0)) if second.has("level") else float(second.damage))}

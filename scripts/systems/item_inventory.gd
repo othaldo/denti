@@ -111,6 +111,18 @@ func can_acquire(item: ShopOfferData) -> bool:
 	return inventory_data.can_acquire(item)
 
 
+## Shop and chest rolls: acquirable and useful for the current class or build.
+func can_offer(item: ShopOfferData) -> bool:
+	return can_acquire(item) and fits_build(item)
+
+
+func fits_build(item: ShopOfferData) -> bool:
+	if item.class_ids.is_empty(): return true
+	var profile := player.stats.class_data if player != null and player.stats != null else null
+	if profile != null and item.class_ids.has(profile.id): return true
+	return item.enabling_item_ids.any(func(id: StringName) -> bool: return count(id) > 0)
+
+
 func family_count(family_id: StringName) -> int:
 	return inventory_data.family_count(family_id)
 

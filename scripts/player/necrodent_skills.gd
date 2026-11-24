@@ -39,6 +39,14 @@ const CROWD_DISTANCE := 76.0
 const TARGET_HOLD_DISTANCE := 34.0
 const SWARM_LUNGE := 0.32
 const SWARM_BITE_DELAY := 0.12
+## Blutsauger: share of a molar bite that heals Denti, capped per bite.
+const MOLAR_LEECH_SHARE := 0.03
+const MOLAR_LEECH_CAP := 0.5
+const MOLAR_LEECH_COLOR := Color(1.0, 0.45, 0.5)
+## Staff Lebensraub: the healing interval shrinks with the retinue, bounded.
+const LEECH_MIN_INTERVAL := 0.2
+## Zahnschild: standing guard teeth grant Denti one shield charge this often.
+const GUARD_SHIELD_SECONDS := 8.0
 
 class Tooth:
 	var at: Vector2
@@ -65,6 +73,7 @@ var retarget_left := 0.0
 var dance_time := 0.0
 var cast_left := 0.0
 var escort_targets: Dictionary[int, Tooth] = {}
+var shield_left := GUARD_SHIELD_SECONDS
 
 
 func _ready() -> void:
@@ -122,6 +131,7 @@ func reset_wave() -> void:
 	escort_targets.clear()
 	retarget_left = 0.0
 	cast_left = 0.0
+	shield_left = GUARD_SHIELD_SECONDS
 	if active(): _prepare_retinue()
 
 
@@ -192,7 +202,22 @@ func advance(delta: float) -> void:
 		_assign_targets()
 	for index in teeth.size():
 		_advance_tooth(teeth[index], index, staff, leash, delta)
+	_advance_guard_shield(delta)
 	super.advance(delta)
+
+
+func _advance_guard_shield(delta: float) -> void:
+	if power("necro_guard_shield") <= 0.0: return
+	shield_left -= delta
+	if shield_left > 0.0: return
+	shield_left = GUARD_SHIELD_SECONDS
+	var standing: Array[Tooth] = []
+	for tooth in teeth:
+		if tooth.kind == Kind.GUARD and tooth.health > 0.0 and tooth.recovery <= 0.0: standing.append(tooth)
+	if standing.is_empty(): return
+	player.stats.grant_shield(1)
+	for tooth in standing: beam(tooth.at, player.global_position, MINT)
+	flash(player.global_position, 34.0, MINT)
 
 
 func _usable(enemy: Variant) -> bool:
@@ -315,8 +340,15 @@ func _check_contact(tooth: Tooth, delta: float) -> void:
 	retarget_left = 0.0
 
 
+## Mk tiers of the extraction staff strengthen every bite (staff `damage_tiers`).
+func staff_bite_factor(staff: WeaponInstance = null) -> float:
+	if staff == null: staff = _staff()
+	if staff == null or staff.data.damage_tiers.is_empty(): return 1.0
+	return staff.data.damage_tiers[clampi(staff.tier, 1, staff.data.damage_tiers.size()) - 1]
+
+
 func _base_bite_damage(kind: int = Kind.MILK) -> float:
-	var factor := 1.0
+	var factor := staff_bite_factor()
 	if power("necro_small") > 0.0: factor *= 0.8
 	if power("necro_heavy") > 0.0: factor *= 1.42
 	return (BASE_BITE[kind] + player.stats.melee_damage) * factor
@@ -333,8 +365,21 @@ func bite_interval(data: WeaponData) -> float:
 	return maxf(interval * items().attack_interval_factor(), 0.19)
 
 
-static func enchantment_share(count: int) -> float:
-	return 1.0 / maxf(float(count) * 0.7, 1.0)
+## Mk I splits the staff element across the retinue; each Mk step moves the
+## split toward 1/sqrt(n), so a larger retinue also adds elemental damage.
+static func enchantment_share(count: int, tier: int = 1) -> float:
+	var split := 1.0 / maxf(float(count) * 0.7, 1.0)
+	var root := 1.0 / sqrt(maxf(float(count), 1.0))
+	return minf(lerpf(split, root, clampf((tier - 1) / 3.0, 0.0, 1.0)), 1.0)
+
+
+static func leech_interval(count: int) -> float:
+	return maxf(WeaponAffixes.by_id(&"leech").proc_cooldown / sqrt(maxf(float(count), 1.0)), LEECH_MIN_INTERVAL)
+
+
+func current_enchantment_share() -> float:
+	var staff := _staff()
+	return enchantment_share(teeth.size() if not teeth.is_empty() else retinue_size(), staff.tier if staff != null else 1)
 
 
 func _bite(tooth: Tooth, enemy: Enemy, staff: WeaponInstance) -> void:
@@ -350,7 +395,7 @@ func _bite(tooth: Tooth, enemy: Enemy, staff: WeaponInstance) -> void:
 	if not direction.is_zero_approx(): tooth.heading = direction
 	if absf(direction.x) > 0.15: tooth.facing_left = direction.x < 0.0
 	var packets: Array[Dictionary] = []
-	var affix_share := enchantment_share(teeth.size())
+	var affix_share := enchantment_share(teeth.size(), staff.tier if staff != null else 1)
 	if staff != null:
 		packets = WeaponEnchantmentEffects.packets(items().effect_context, enemy, data, staff.affixes, affix_share)
 	if power("necro_bleeding") > 0.0:
@@ -360,11 +405,14 @@ func _bite(tooth: Tooth, enemy: Enemy, staff: WeaponInstance) -> void:
 	var dealt := enemy.take_damage(damage, null, critical, &"class_necrodent_bite", packets, direction)
 	if dealt > 0.0:
 		items().on_weapon_hit(enemy, dealt, data, critical)
+		if tooth.kind == Kind.MOLAR and power("necro_molar_leech") > 0.0:
+			var healed := player.stats.heal(minf(dealt * MOLAR_LEECH_SHARE, MOLAR_LEECH_CAP))
+			if healed > 0.0: beam(enemy.global_position, player.global_position, MOLAR_LEECH_COLOR, 2.0)
 		if staff != null:
 			var element := WeaponElementVisuals.element(data, staff.affixes)
 			if element != &"":
 				ElementImpactBatch.emit_from(enemy, element, enemy.global_position, direction, 20.0)
-			WeaponEnchantmentEffects.after_hit(items().effect_context, enemy, data, staff.affixes, critical, dealt, affix_share, was_chilled, staff.instance_uid, staff.tier)
+			WeaponEnchantmentEffects.after_hit(items().effect_context, enemy, data, staff.affixes, critical, dealt, affix_share, was_chilled, staff.instance_uid, staff.tier, leech_interval(teeth.size()))
 			if _usable(enemy):
 				enemy.apply_push(direction * data.knockback_at_tier(staff.tier))
 		var accent := FOCUS_GOLD if enemy == marked and power("necro_focus") > 0.0 else MINT
@@ -486,7 +534,7 @@ func save_with_enemies(indices: Dictionary) -> Dictionary:
 		members.append({"at": [tooth.at.x, tooth.at.y], "bite": tooth.cooldown, "rest": tooth.recovery,
 			"health": tooth.health, "contact": tooth.contact_left, "streak": tooth.streak,
 			"target": _enemy_index(tooth.target, indices), "lunge": tooth.lunge})
-	return {"teeth": members, "mark": _enemy_index(marked, indices), "command": command_left, "guard": guard_left, "retarget": retarget_left}
+	return {"teeth": members, "mark": _enemy_index(marked, indices), "command": command_left, "guard": guard_left, "retarget": retarget_left, "shield": shield_left}
 
 
 func _enemy_index(enemy: Variant, indices: Dictionary) -> int:
@@ -517,6 +565,7 @@ func restore_with_enemies(saved: Dictionary, enemies: Array[Node]) -> void:
 	command_left = clampf(float(saved.get("command", 0.0)), 0.0, COMMAND_SECONDS)
 	guard_left = clampf(float(saved.get("guard", 0.0)), 0.0, 4.0)
 	retarget_left = clampf(float(saved.get("retarget", 0.0)), 0.0, RETARGET_INTERVAL)
+	shield_left = clampf(float(saved.get("shield", GUARD_SHIELD_SECONDS)), 0.0, GUARD_SHIELD_SECONDS)
 	queue_redraw()
 
 

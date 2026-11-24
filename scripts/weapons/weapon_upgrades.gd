@@ -1,7 +1,9 @@
 class_name WeaponUpgrades
 extends RefCounted
 
+## Default rank cap. Single weapons may raise theirs up to LEVEL_LIMIT.
 const MAX_LEVEL := 10
+const LEVEL_LIMIT := 15
 const KIND := "weapon_upgrade"
 const POINTS_PER_CAPSULE := 2
 const ECONOMY_VERSION := 2
@@ -19,8 +21,21 @@ static func slots(tier: int) -> int:
 	return clampi(tier, 1, WeaponAffixes.MAX_SLOTS)
 
 
+static func max_level(data: WeaponData = null) -> int:
+	return clampi(data.enchantment_max_level, 1, LEVEL_LIMIT) if data != null else MAX_LEVEL
+
+
+## Ranks past the authored table continue with its last step.
+static func step(definition: WeaponAffixData, rank: int) -> float:
+	var steps := definition.upgrade_steps
+	var count := steps.size()
+	if rank <= count: return steps[maxi(rank, 1) - 1]
+	var increment := steps[count - 1] - steps[count - 2] if count > 1 else steps[count - 1]
+	return steps[count - 1] + increment * (rank - count)
+
+
 static func level(entry: Dictionary) -> int:
-	if entry.has("level"): return clampi(int(entry.level), 1, MAX_LEVEL)
+	if entry.has("level"): return clampi(int(entry.level), 1, LEVEL_LIMIT)
 	# Historic power is preserved, including formerly unbounded legendary effects.
 	var steps := WeaponAffixes.by_id(StringName(entry.id)).upgrade_steps
 	for index in steps.size():
@@ -30,7 +45,7 @@ static func level(entry: Dictionary) -> int:
 
 static func power(id: StringName, rank: int, data: WeaponData, tier: int) -> float:
 	var definition := WeaponAffixes.by_id(id)
-	var value := definition.upgrade_steps[clampi(rank, 1, MAX_LEVEL) - 1]
+	var value := step(definition, clampi(rank, 1, max_level(data)))
 	var roots := float(data.hands)
 	if definition.stat_key != &"" or definition.effect_kind == "leech":
 		# Percentages already apply to the whole weapon. Healing is weighted once,
@@ -47,7 +62,7 @@ static func power(id: StringName, rank: int, data: WeaponData, tier: int) -> flo
 
 static func next_entry(current: Dictionary, id: StringName, data: WeaponData, tier: int) -> Dictionary:
 	var rank := 1 if current.is_empty() else level(current) + 1
-	if rank > MAX_LEVEL: return {}
+	if rank > max_level(data): return {}
 	var floor_value := float(current.get("legacy_floor", 0))
 	if not current.is_empty() and not current.has("level"):
 		floor_value = maxf(floor_value, float(current.damage))
@@ -57,7 +72,7 @@ static func next_entry(current: Dictionary, id: StringName, data: WeaponData, ti
 
 static func advance(values: Array[Dictionary], id: StringName, data: WeaponData, tier: int) -> Array[Dictionary]:
 	var result: Array[Dictionary] = values.duplicate(true)
-	if not blocked_reason(values, id, tier).is_empty(): return []
+	if not blocked_reason(values, id, tier, data).is_empty(): return []
 	var index := WeaponAffixes.find(result, id)
 	var next := next_entry(result[index] if index >= 0 else {}, id, data, tier)
 	if next.is_empty(): return []
@@ -66,12 +81,13 @@ static func advance(values: Array[Dictionary], id: StringName, data: WeaponData,
 	return result
 
 
-static func blocked_reason(values: Array[Dictionary], id: StringName, tier: int) -> String:
+static func blocked_reason(values: Array[Dictionary], id: StringName, tier: int, data: WeaponData = null) -> String:
 	var definition := WeaponAffixes.by_id(id)
 	if definition == null: return "Unbekannter Effekt"
 	var index := WeaponAffixes.find(values, id)
 	if index >= 0:
-		return "Bereits 10/10" if level(values[index]) >= MAX_LEVEL else ""
+		var cap := max_level(data)
+		return "Bereits %d/%d" % [cap, cap] if level(values[index]) >= cap else ""
 	if not definition.selectable: return "Nicht mehr verfügbar"
 	var current := WeaponAffixes.element(values)
 	if definition.elemental and current != &"":
@@ -86,11 +102,11 @@ static func refresh(values: Array[Dictionary], data: WeaponData, tier: int) -> v
 			entry.damage = maxf(power(StringName(entry.id), level(entry), data, tier), float(entry.get("legacy_floor", 0)))
 
 
-static func fusion_fits(first: Array[Dictionary], second: Array[Dictionary]) -> bool:
-	return fusion_block_reason(first, second).is_empty()
+static func fusion_fits(first: Array[Dictionary], second: Array[Dictionary], data: WeaponData = null) -> bool:
+	return fusion_block_reason(first, second, data).is_empty()
 
 
-static func fusion_block_reason(first: Array[Dictionary], second: Array[Dictionary]) -> String:
+static func fusion_block_reason(first: Array[Dictionary], second: Array[Dictionary], data: WeaponData = null) -> String:
 	var elements: Array[StringName] = []
 	for entry in first + second:
 		var id := StringName(entry.id)
@@ -101,6 +117,7 @@ static func fusion_block_reason(first: Array[Dictionary], second: Array[Dictiona
 		var index := WeaponAffixes.find(second, StringName(left.id))
 		if index < 0: continue
 		var right := second[index]
-		if (left.has("level") or right.has("level")) and level(left) + level(right) > MAX_LEVEL:
-			return "Verzauberung würde 10/10 überschreiten"
+		var cap := max_level(data)
+		if (left.has("level") or right.has("level")) and level(left) + level(right) > cap:
+			return "Verzauberung würde %d/%d überschreiten" % [cap, cap]
 	return ""

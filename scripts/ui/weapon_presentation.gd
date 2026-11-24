@@ -72,7 +72,7 @@ static func enchantment_list(weapon: WeaponInstance) -> String:
 	var parts: PackedStringArray = []
 	for affix in weapon.affixes:
 		if affix.has("level"):
-			parts.append("%s %d/10" % [WeaponAffixes.by_id(StringName(affix.id)).display_name, WeaponUpgrades.level(affix)])
+			parts.append("%s %d/%d" % [WeaponAffixes.by_id(StringName(affix.id)).display_name, WeaponUpgrades.level(affix), WeaponUpgrades.max_level(weapon.data)])
 			continue
 		parts.append("%s %s" % [WeaponAffixes.by_id(StringName(affix.id)).display_name,
 			["I", "II", "III"][clampi(int(affix.get("rank", 1)), 1, WeaponAffixes.MAX_RANK) - 1] + ("+" if float(affix.get("bonus", 0)) > 0 else "")])

@@ -28,7 +28,7 @@ static func equipment(state: WeaponUpgradeState, loadout: WeaponLoadout, stats: 
 			var existing := WeaponAffixes.find(values, definition.id) >= 0
 			options.append({"id": definition.id, "value": number(AffixPresentation.display_value(float(entry.damage), definition.id, weapon.data, stats, items)) + " " + unit_text(definition.id, items, weapon.data),
 				"description": AffixPresentation.effect_description(definition.id, weapon.data), "existing": existing,
-				"blocked": "Bereits auf dieser Waffe" if existing else WeaponUpgrades.blocked_reason(values, definition.id, weapon.tier)})
+				"blocked": "Bereits auf dieser Waffe" if existing else WeaponUpgrades.blocked_reason(values, definition.id, weapon.tier, weapon.data)})
 		var roots_info := "%s · %d/%d Plätze\n\nMk I: 1 Platz\nMk II: 2 Plätze\nMk III: 3 Plätze\nMk IV: 4 Plätze\n\nAktivieren startet bei 1/10. Jeder Schritt kostet %d Punkt(e) nach den Wurzelkosten. Eine Kapsel gibt 2 Punkte.\nSchadenseffekte teilen ihr Wurzelbudget auf die Basis-Angriffspause und die anfänglichen Projektile auf. Kontroll- und Heileffekte behalten ihre eigenen Obergrenzen." % [weapon.data.roots_text(), values.size(), WeaponUpgrades.slots(weapon.tier), WeaponUpgrades.cost(weapon.data)]
 		if weapon.data.attack_mode == &"command":
 			roots_info = "%s · %d/%d Plätze\n\n%s" % [weapon.data.roots_text(), values.size(), WeaponUpgrades.slots(weapon.tier), retinue_details(preview_data, weapon.tier, items)]
@@ -50,10 +50,10 @@ static func retinue_details(data: WeaponData, tier: int, items: ItemInventory) -
 	var retinue := player.skill_module(ClassCatalog.NECRODENT_ID) as NecrodentSkills if player != null else null
 	if retinue != null and retinue.active() and retinue.retinue_size() > 1:
 		var count := retinue.retinue_size()
-		lines.append("Bei %d Zähnen zeigt die Vorschau pro Biss %.0f %% der vollen Elementstärke." % [count, NecrodentSkills.enchantment_share(count) * 100.0])
+		lines.append("Bei %d Zähnen zeigt die Vorschau pro Biss %.0f %% der vollen Elementstärke." % [count, NecrodentSkills.enchantment_share(count, tier) * 100.0])
 	else:
 		lines.append("Deine Zähne tragen das Element bei ihren Bissen auf.")
-	lines.append("Jeder Rang kostet einen Punkt. Ab Mk II kommt je Stufe ein Platz dazu, bis maximal vier.")
+	lines.append("Jeder Rang kostet einen Punkt, bis %d/%d. Ab Mk II kommt je Stufe ein Platz dazu, bis maximal vier." % [WeaponUpgrades.max_level(data), WeaponUpgrades.max_level(data)])
 	return "\n".join(lines)
 
 

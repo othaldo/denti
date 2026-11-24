@@ -157,7 +157,7 @@ func _layout(extent: Vector2) -> void:
 		button.modulate.a = 0.5 if button.disabled else 1.0
 		_art(button, DentiUIIcons.item(definition.icon_index), Rect2(8, 7, 32, 36))
 		_text(button, definition.display_name, Rect2(48, 2, cell - 104, 46), 16)
-		_text(button, "%d/10" % WeaponUpgrades.level(entry), Rect2(cell - 52, 2, 48, 46), 15, DentiUIStyle.GOLD if chosen else DentiUIStyle.MUTED)
+		_text(button, "%d/%d" % [WeaponUpgrades.level(entry), WeaponUpgrades.max_level(plan.result_data)], Rect2(cell - 52, 2, 48, 46), 15, DentiUIStyle.GOLD if chosen else DentiUIStyle.MUTED)
 		button.tooltip_text = ("Alle %d Plätze belegt\n" % WeaponUpgrades.slots(plan.tier) if button.disabled else "") + AffixPresentation.effect_description(id)
 		button.pressed.connect(toggle.bind(id))
 		ControllerFocus.tag(button, "fusion:%s" % id)

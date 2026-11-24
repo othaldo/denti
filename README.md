@@ -2,7 +2,7 @@
 
 Ein kleiner 2D-Arena-Survivor über einen göttlichen Backenzahn, der Plaque, Zucker und Karies den Kampf ansagt. Du steuerst Denti direkt; seine Waffen greifen automatisch an. Zwischen den Wellen entscheiden Levelaufstiege und Einkäufe, wie der nächste Kampf läuft.
 
-**Aktuelle Version: 0.8.1.** Alle Änderungen seit 0.1 stehen in der [Patchnote-Historie](CHANGELOG.md).
+**Aktuelle Version: 0.9.0.** Alle Änderungen seit 0.1 stehen in der [Patchnote-Historie](CHANGELOG.md).
 
 GitHub Actions testet und baut **Web und Windows**. Testpakete stehen bei den
 [Actions-Läufen](https://github.com/othaldo/denti/actions) zum Download bereit;
@@ -109,7 +109,7 @@ Das Spiel ist ein **spielbarer Prototyp**. Balancing, Effekte und weitere Inhalt
 
 **Kräuterzahn.** Beende einen Run ab Welle 15 mit drei Fernkampfwaffen. Der Kräuterzahn trägt nur den Pflanzstab: Im Angriffstakt pflanzt er Salbeitriebe, die selbstständig schießen; Talente bringen Salbeisträucher, Kamillentotems (Aura) und Nelkenknospen (Betäubung) dazu. [Konzept](docs/CLASS_HERB_DRUID.md).
 
-**Bonusklasse Nekrodent.** Gewinne Welle 20 auf Normal oder höher mit einer Blutungs- oder Gift-Waffe. Der Nekrodent startet mit einem Milchzahn und dem Extraktionsstab. Talente rekrutieren Milchzähne, kräftigere Backenzähne und robuste Wachzähne. Zähne verlieren eigenen Schmelz bei Gegnerkontakt. Geleit lenkt nahe Nahkämpfer ab, und der Stab kann nach dem Dash ein Ziel markieren. Unter **Pause → Stats → Gefolgschaft** findest du Schmelz und Bissschaden pro Zahntyp sowie die aktuellen Verzauberungswerte. Stab-Fusionen vergrößern die Befehlsreichweite, Elemente wirken beim Biss.
+**Bonusklasse Nekrodent.** Gewinne Welle 20 auf Normal oder höher mit einer Blutungs- oder Gift-Waffe. Der Nekrodent startet mit einem Milchzahn und dem Extraktionsstab. Talente rekrutieren Milchzähne, kräftigere Backenzähne und robuste Wachzähne. Zähne verlieren eigenen Schmelz bei Gegnerkontakt. Geleit lenkt nahe Nahkämpfer ab, und der Stab kann nach dem Dash ein Ziel markieren. Unter **Pause → Stats → Gefolgschaft** findest du Schmelz und Bissschaden pro Zahntyp sowie die aktuellen Verzauberungswerte. Stab-Fusionen vergrößern die Befehlsreichweite, verstärken jeden Biss und erhöhen den Elementanteil pro Biss, damit ein großes Gefolge auch mehr Elementschaden macht. Der Extraktionsstab lässt sich bis 15/15 statt 10/10 verzaubern. Im Backenzahn-Ast saugt **Blutsauger** bei Bissen Schmelz für Denti ab, im Wachzahn-Ast gibt **Zahnschild** alle 8 Sekunden einen Schild, solange ein Wachzahn steht.
 
 **0.7.0** ergänzt Controller-Steuerung mit Xbox-/PlayStation-Symbolen, ein gemeinsames Tastenschema und gezielte Fokusführung in Shop, Verzaubern und Dentipedia. Einstellbare Controller-Modi schützen vor Eingaben angeschlossener Lenkräder und Simulator-Panels. Waffenmeisterschaften, gezielte Aufstiege ab Mk V und aktivere Bossangriffe bündeln die weiteren Änderungen seit 0.6.0. [Controller-Steuerung und Ansichten](docs/CONTROLLER_SUPPORT.md), [Waffenaufstiege](docs/WEAPON_ASCENSION.md) und [Patchnotes](CHANGELOG.md).
 

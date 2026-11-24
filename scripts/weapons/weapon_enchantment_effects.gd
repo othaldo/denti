@@ -18,7 +18,8 @@ static func packets(effects: ItemEffectContext, enemy: Enemy, weapon: WeaponData
 	return result
 
 
-static func after_hit(effects: ItemEffectContext, enemy: Enemy, weapon: WeaponData, affixes: Array[Dictionary], critical: bool, dealt: float, factor: float, was_chilled: bool, source_uid: String = "", tier: int = 1) -> void:
+## `leech_wait` overrides the weapon's healing interval (negative: the affix default).
+static func after_hit(effects: ItemEffectContext, enemy: Enemy, weapon: WeaponData, affixes: Array[Dictionary], critical: bool, dealt: float, factor: float, was_chilled: bool, source_uid: String = "", tier: int = 1, leech_wait: float = -1.0) -> void:
 	if dealt <= 0:
 		return
 	ElementReactions.after_hit(effects, enemy, weapon, affixes)
@@ -63,7 +64,7 @@ static func after_hit(effects: ItemEffectContext, enemy: Enemy, weapon: WeaponDa
 		var key := StringName("enchantment_leech:" + source_uid) if not source_uid.is_empty() else &"enchantment_leech"
 		# Respect an old save's remaining shared clock. Historic in-flight shots
 		# without an owner UID keep that conservative fallback until they expire.
-		if float(effects.cooldowns.get("enchantment_leech", 0)) <= 0 and effects.ready_proc(key, definition.proc_cooldown):
+		if float(effects.cooldowns.get("enchantment_leech", 0)) <= 0 and effects.ready_proc(key, definition.proc_cooldown if leech_wait < 0.0 else leech_wait):
 			var healed := effects.player.stats.heal(minf(WeaponAffixes.utility_value(affixes[leech], weapon.hands), dealt * definition.proc_factor))
 			if healed > 0:
 				effects.enchantment_support.emit(&"leech_healing", healed)

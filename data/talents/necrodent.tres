@@ -265,12 +265,14 @@ parent = &"necro_focus"
 
 [sub_resource type="Resource" id="N29"]
 script = ExtResource("2")
-id = &"necro_b1_flex_3"
+id = &"necro_molar_leech"
 branch = 1
 row = 3
 column = 2
-free_attribute = true
-max_ranks = 6
+display_name = "Blutsauger"
+description = "Backenzähne saugen bei jedem Biss ein wenig Schmelz ab und geben ihn Denti."
+effects = {"necro_molar_leech": 1}
+icon_index = 162
 
 [sub_resource type="Resource" id="N30"]
 script = ExtResource("2")
@@ -438,12 +440,14 @@ parent = &"necro_guard"
 
 [sub_resource type="Resource" id="N47"]
 script = ExtResource("2")
-id = &"necro_b2_flex_3"
+id = &"necro_guard_shield"
 branch = 2
 row = 3
 column = 2
-free_attribute = true
-max_ranks = 6
+display_name = "Zahnschild"
+description = "Solange ein Wachzahn steht, bekommt Denti alle 8 Sekunden einen Schild."
+effects = {"necro_guard_shield": 1}
+icon_index = 166
 
 [sub_resource type="Resource" id="N48"]
 script = ExtResource("2")

@@ -139,7 +139,7 @@ func _pick_item(tier: int, items: ItemInventory, loadout: WeaponLoadout) -> Shop
 		var pool: Array[ShopOfferData] = []
 		var tagged: Array[ShopOfferData] = []
 		for template in ItemCatalog.ALL:
-			if template.weapon_data == null and template.rarity_tier == candidate_tier and not _already_offered(template.id, 0) and (items == null or items.can_acquire(template)):
+			if template.weapon_data == null and template.rarity_tier == candidate_tier and not _already_offered(template.id, 0) and (items == null or items.can_offer(template)):
 				pool.append(template)
 				for tag in template.tags:
 					if wanted_tags.has(tag):

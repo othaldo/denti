@@ -24,7 +24,7 @@ static func roll_item(wave_number: int, luck: float, inventory: ItemInventory, r
 	for candidate_tier in range(tier, 0, -1):
 		var pool: Array[ShopOfferData] = []
 		for item in ItemCatalog.ALL:
-			if item.weapon_data == null and item.rarity_tier == candidate_tier and inventory.can_acquire(item):
+			if item.weapon_data == null and item.rarity_tier == candidate_tier and inventory.can_offer(item):
 				pool.append(item)
 		if not pool.is_empty():
 			var index := rng.randi_range(0, pool.size() - 1) if rng != null else randi_range(0, pool.size() - 1)

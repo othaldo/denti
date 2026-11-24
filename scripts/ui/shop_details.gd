@@ -131,7 +131,7 @@ func show_affixes(weapon: WeaponInstance, stats: PlayerStats, items: ItemInvento
 		var label := DentiUIComponents.label(affix_rows, "%s +%s %s" % [data.display_name, AffixPresentation.value_text(float(affix.damage), data.id, weapon.data, stats, items), AffixPresentation.damage_unit(data.id, items, weapon.data)], 14)
 		label.tooltip_text = (AffixPresentation.effect_description(data.id, weapon.data) + "\n" + AffixPresentation.mechanics_text(data.id, weapon.data)).strip_edges()
 		label.add_theme_color_override("font_color", data.color)
-		var rarity := DentiUIComponents.label(affix_rows, AffixPresentation.progress_text(affix), 12)
+		var rarity := DentiUIComponents.label(affix_rows, AffixPresentation.progress_text(affix, weapon.data), 12)
 		if affix.has("level"):
 			rarity.add_theme_color_override("font_color", DentiUIStyle.MUTED)
 		else:

@@ -2,8 +2,8 @@ class_name AffixPresentation
 extends RefCounted
 
 
-static func progress_text(value: Dictionary) -> String:
-	if value.has("level"): return "%d/10" % WeaponUpgrades.level(value)
+static func progress_text(value: Dictionary, weapon: WeaponData = null) -> String:
+	if value.has("level"): return "%d/%d" % [WeaponUpgrades.level(value), WeaponUpgrades.max_level(weapon)]
 	var text := "%s %s%s" % [DentiRarity.name_for(value.rarity), ["I", "II", "III"][clampi(int(value.get("rank", 1)), 1, WeaponAffixes.MAX_RANK) - 1], "+" if float(value.get("bonus", 0)) > 0 else ""]
 	return text + (" · %.1f %%" % (float(value.get("progress", 0)) * 100.0) if float(value.get("progress", 0)) > 0 else "")
 
@@ -18,7 +18,7 @@ static func display_value(value: float, kind: StringName, weapon: WeaponData, st
 	if weapon.attack_mode == &"command" and items != null:
 		var retinue := items.player.skill_module(ClassCatalog.NECRODENT_ID) as NecrodentSkills
 		if retinue != null and retinue.active():
-			power *= NecrodentSkills.enchantment_share(retinue.retinue_size())
+			power *= retinue.current_enchantment_share()
 	return power
 
 
@@ -31,7 +31,7 @@ static func summary(weapon: WeaponInstance, stats: PlayerStats = null, items: It
 	var lines: PackedStringArray = []
 	for affix in weapon.affixes:
 		var data := WeaponAffixes.by_id(StringName(affix.id))
-		lines.append("%s +%s %s · %s" % [data.display_name, value_text(float(affix.damage), data.id, weapon.data, stats, items), damage_unit(data.id, items, weapon.data), progress_text(affix)])
+		lines.append("%s +%s %s · %s" % [data.display_name, value_text(float(affix.damage), data.id, weapon.data, stats, items), damage_unit(data.id, items, weapon.data), progress_text(affix, weapon.data)])
 	return "Verzauberungen · %d/%d Plätze" % [weapon.affixes.size(), maxi(WeaponUpgrades.slots(weapon.tier), weapon.affixes.size())] + ("\n" + "\n".join(lines) if not lines.is_empty() else "")
 
 
@@ -64,7 +64,7 @@ static func effect_description(kind: StringName, weapon: WeaponData = null) -> S
 			&"crit": return "Die Zähne treffen häufiger kritisch."
 			&"crit_damage": return "Kritische Bisse verursachen mehr direkten Bissschaden."
 			&"knockback": return "Bisse stoßen Gegner weiter zurück."
-			&"leech": return "Bisse heilen Denti. Die Zähne teilen ein Heilintervall."
+			&"leech": return "Bisse heilen Denti. Mehr Zähne verkürzen das Heilintervall."
 			&"fire": return "Bisse entzünden Gegner. Beim Tod kann die Glut überspringen."
 			&"ice": return "Bisse kühlen Gegner. Kritische Bisse auf gekühlte Ziele lösen Eissplitter aus."
 			&"poison": return "Bisse vergiften. Wiederholte Bisse bauen Giftstufen auf."
@@ -123,7 +123,7 @@ static func comparison(weapon: WeaponInstance, option: Dictionary, stats: Player
 		var unit := "Schaden / %.0f s" % dot_duration(data.id, items) if data.dot_duration > 0 else damage_unit(data.id, items, weapon.data)
 		result = effect_description(data.id, weapon.data) + "\n" + ("+%s → +%s" % [value_before, value_after] if index >= 0 else "+%s" % value_after) + " " + unit
 		if index >= 0:
-			result += "\n%s → %s" % [progress_text(weapon.affixes[index]), progress_text(WeaponAffixes.upgraded(weapon.affixes[index], option))]
+			result += "\n%s → %s" % [progress_text(weapon.affixes[index], weapon.data), progress_text(WeaponAffixes.upgraded(weapon.affixes[index], option), weapon.data)]
 		elif weapon.affixes.size() >= weapon.affix_slots:
 			result += "\nErsetzt: " + (WeaponAffixes.by_id(StringName(weapon.affixes[replace].id)).display_name if replace >= 0 and replace < weapon.affixes.size() else "Bitte Ersatz wählen")
 		if data.slow_fraction > 0:
@@ -134,7 +134,7 @@ static func comparison(weapon: WeaponInstance, option: Dictionary, stats: Player
 	else:
 		result += "\nAuf dieser Waffe: +%s %s" % [value_after, damage_unit(data.id, items, weapon.data)]
 	if index >= 0:
-		result += "\n%s → %s" % [progress_text(weapon.affixes[index]), progress_text(WeaponAffixes.upgraded(weapon.affixes[index], option))]
+		result += "\n%s → %s" % [progress_text(weapon.affixes[index], weapon.data), progress_text(WeaponAffixes.upgraded(weapon.affixes[index], option), weapon.data)]
 		result += "\nFortschritt: +%.1f %% · danach %.1f %%" % [WeaponAffixes.progress_weight(weapon.affixes[index], option) * 100, float(WeaponAffixes.upgraded(weapon.affixes[index], option).get("progress", 0)) * 100]
 	elif weapon.affixes.size() >= weapon.affix_slots:
 		result += "\nErsetzt: " + (WeaponAffixes.by_id(StringName(weapon.affixes[replace].id)).display_name if replace >= 0 and replace < weapon.affixes.size() else "Bitte Effekt wählen")
@@ -148,7 +148,7 @@ static func comparison(weapon: WeaponInstance, option: Dictionary, stats: Player
 static func mechanics_text(kind: StringName, weapon: WeaponData = null) -> String:
 	var data := WeaponAffixes.by_id(kind)
 	if kind == &"leech" and weapon != null and weapon.attack_mode == &"command":
-		return "Bis zu %.0f %% des tatsächlichen Bissschadens als Heilung. Höchstens %.1f HP je Impuls bei einer Wurzel. Zwischen Impulsen liegen mindestens %.2f s." % [data.proc_factor * 100, data.utility_cap, data.proc_cooldown]
+		return "Bis zu %.0f %% des tatsächlichen Bissschadens als Heilung. Höchstens %.1f HP je Impuls bei einer Wurzel. Intervall %.2f s geteilt durch die Wurzel der Zahnzahl, mindestens %.2f s." % [data.proc_factor * 100, data.utility_cap, data.proc_cooldown, NecrodentSkills.LEECH_MIN_INTERVAL]
 	match kind:
 		&"fire":
 			return "Glut: %.0f %% eines Trefferbudgets an bis zu %d Ziele im Radius %.0f. Intervall %.2f s; übertragene Glut verbreitet sich nicht erneut." % [data.proc_factor * 100, data.proc_targets, data.proc_radius, data.proc_cooldown]

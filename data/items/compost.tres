@@ -14,3 +14,5 @@ effect_kind = &"summon_mint"
 effect_value = 0.15
 max_stacks = 3
 tags = Array[StringName]([&"summon", &"heal"])
+class_ids = Array[StringName]([&"necrodent", &"herb_druid"])
+enabling_item_ids = Array[StringName]([&"pocket_bed"])
