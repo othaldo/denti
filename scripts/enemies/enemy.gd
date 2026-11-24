@@ -29,9 +29,15 @@ const WET_STATUS = preload("res://data/statuses/wet.tres")
 
 var data: EnemyData
 var difficulty: DifficultyData
-var imperial_vassal: ImperialVassal
-var caramel_enforcer: CaramelEnforcer
-var acid_collector: AcidCollector
+## The lieutenant role a boss summon plays, if any. Typed views below are for
+## role-specific callers; Enemy itself only uses the BossMinion hooks.
+var boss_minion: BossMinion
+var imperial_vassal: ImperialVassal:
+	get: return boss_minion as ImperialVassal
+var caramel_enforcer: CaramelEnforcer:
+	get: return boss_minion as CaramelEnforcer
+var acid_collector: AcidCollector:
+	get: return boss_minion as AcidCollector
 var target: Player
 var health: float
 var max_health: float
@@ -169,24 +175,11 @@ func _ready() -> void:
 	sprite.scale = Vector2.ONE * (data.radius * 2.35 / side)
 	if data.imperial_vassal_profile != null: sprite.scale *= data.imperial_vassal_profile.visual_scale
 	sprite_base_scale = sprite.scale
-	if data.imperial_vassal_profile != null:
+	boss_minion = _create_boss_minion()
+	if boss_minion != null:
 		sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-		imperial_vassal = ImperialVassal.new()
-		imperial_vassal.enemy = self
-		imperial_vassal.profile = data.imperial_vassal_profile.for_difficulty(difficulty)
-		add_child(imperial_vassal)
-	if data.caramel_enforcer_profile != null:
-		sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-		caramel_enforcer = CaramelEnforcer.new()
-		caramel_enforcer.enemy = self
-		caramel_enforcer.profile = data.caramel_enforcer_profile.for_difficulty(difficulty)
-		add_child(caramel_enforcer)
-	if data.acid_collector_profile != null:
-		sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-		acid_collector = AcidCollector.new()
-		acid_collector.enemy = self
-		acid_collector.profile = data.acid_collector_profile.for_difficulty(difficulty)
-		add_child(acid_collector)
+		boss_minion.enemy = self
+		add_child(boss_minion)
 	animation_time = randf_range(0.0, TAU)
 	if data.loot_goblin_profile != null:
 		loot_goblin = LootGoblin.new()
@@ -202,6 +195,22 @@ func _ready() -> void:
 		if encounter != null:
 			encounter.enemy = self
 			add_child(encounter)
+
+
+func _create_boss_minion() -> BossMinion:
+	if data.imperial_vassal_profile != null:
+		var vassal := ImperialVassal.new()
+		vassal.profile = data.imperial_vassal_profile.for_difficulty(difficulty)
+		return vassal
+	if data.caramel_enforcer_profile != null:
+		var enforcer := CaramelEnforcer.new()
+		enforcer.profile = data.caramel_enforcer_profile.for_difficulty(difficulty)
+		return enforcer
+	if data.acid_collector_profile != null:
+		var collector := AcidCollector.new()
+		collector.profile = data.acid_collector_profile.for_difficulty(difficulty)
+		return collector
+	return null
 
 
 func _create_boss_encounter() -> BossFight:
@@ -672,9 +681,7 @@ func take_damage(amount: float, weapon: WeaponData = null, critical: bool = fals
 	var applied := maxf(total * (1.0 - damage_reduction) / overtime_defense_factor(), 1.0 if amount > 0 else 0.0)
 	var opening := encounter != null and encounter.opening_open()
 	if encounter != null: applied = encounter.modify_damage(applied, incoming_direction, proc_id, opening)
-	if imperial_vassal != null: applied = imperial_vassal.limit(applied)
-	if caramel_enforcer != null: applied = caramel_enforcer.limit(applied)
-	if acid_collector != null: applied = acid_collector.limit(applied)
+	if boss_minion != null: applied = boss_minion.limit(applied)
 	if opening and boss_phase < 2:
 		applied = minf(applied, maxf(health - _boss_phase_floor(), 0.0))
 	if applied <= 0:
@@ -699,9 +706,7 @@ func take_damage(amount: float, weapon: WeaponData = null, critical: bool = fals
 		elite_damage_budget = maxf(elite_damage_budget - applied, 0.0)
 	var counted := minf(applied, health)
 	health -= applied
-	if imperial_vassal != null: imperial_vassal.spend(counted)
-	if caramel_enforcer != null: caramel_enforcer.spend(counted)
-	if acid_collector != null: acid_collector.spend(counted)
+	if boss_minion != null: boss_minion.spend(counted)
 	if opening: encounter.spend_opening(counted, proc_id)
 	if health > 0:
 		for addition in delayed:
@@ -753,9 +758,7 @@ func is_targetable() -> bool:
 	if health <= 0 or dying or is_queued_for_deletion(): return false
 	if encounter != null and encounter.blocks_damage(): return false
 	if data.is_boss_objective:
-		if acid_collector != null: return not acid_collector.suspended()
-		if caramel_enforcer != null: return not caramel_enforcer.suspended() and is_instance_valid(boss_objective_owner) and boss_objective_owner.health > 0
-		if imperial_vassal != null: return is_instance_valid(boss_objective_owner) and boss_objective_owner.health > 0
+		if boss_minion != null: return boss_minion.targetable()
 		return is_instance_valid(boss_objective_owner) and boss_objective_owner.caramel_encounter != null and boss_objective_owner.caramel_encounter.overload.objective_open(self)
 	return true
 

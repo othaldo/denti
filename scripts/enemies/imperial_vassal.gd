@@ -1,15 +1,13 @@
 class_name ImperialVassal
-extends Node2D
+extends BossMinion
 ## A unique lieutenant. The Emperor's retinue owns this clock, including tails.
 
 enum State { FOLLOW, WARNING, ACTIVE, RECOVERY }
-var enemy: Enemy
 var profile: ImperialVassalData
 var shots: BossPaintedVolley
 var state := State.FOLLOW
 var remaining := 0.9
 var elapsed := 0.0
-var budget := 0.0
 var aim := Vector2.DOWN
 var origin := Vector2.ZERO
 var destination := Vector2.ZERO
@@ -26,12 +24,6 @@ func _ready() -> void:
 	shots.orient_to_velocity = true
 	add_child(shots)
 	enemy.died.connect(func(_enemy: Enemy, _amount: float) -> void: shots.clear())
-
-func limit(amount: float) -> float:
-	return minf(amount, budget)
-
-func spend(amount: float) -> void:
-	budget = maxf(budget - amount, 0)
 
 func advance(delta: float) -> void:
 	if enemy.health <= 0 or enemy.is_queued_for_deletion():

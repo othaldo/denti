@@ -1,13 +1,11 @@
 class_name AcidCollector
-extends Node2D
+extends BossMinion
 ## Schlacko lobs fixed, warned acid globules. Its owner advances every hazard.
 
 enum State { ARRIVAL, FOLLOW, WARNING, FLIGHT, RECOVERY }
-var enemy: Enemy
 var profile: AcidCollectorData
 var state := State.ARRIVAL
 var remaining := 1.2
-var budget := 0.0
 var origin := Vector2.ZERO
 var destination := Vector2.ZERO
 var pools: Array[Dictionary] = []
@@ -23,8 +21,8 @@ func suspended() -> bool:
 	var owner := enemy.boss_objective_owner
 	return not is_instance_valid(owner) or owner.health <= 0 or owner.acid_king_encounter.companion_suspended()
 
-func limit(amount: float) -> float: return minf(amount, budget)
-func spend(amount: float) -> void: budget = maxf(budget - amount, 0)
+func targetable() -> bool:
+	return not suspended()
 
 func pause_attack() -> void:
 	state = State.FOLLOW
@@ -33,9 +31,7 @@ func pause_attack() -> void:
 	queue_redraw()
 
 func _bounded(at: Vector2) -> Vector2:
-	var bounds := enemy.boss_objective_owner.acid_king_encounter._visible_bounds()
-	bounds = bounds.intersection(enemy.target.arena.inner_rect(60))
-	return at.clamp(bounds.position, bounds.end)
+	return bounded_to(at, enemy.boss_objective_owner.acid_king_encounter._visible_bounds())
 
 func advance(delta: float) -> void:
 	if enemy.health <= 0 or enemy.is_queued_for_deletion(): return

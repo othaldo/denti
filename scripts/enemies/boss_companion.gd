@@ -36,7 +36,7 @@ func bind(actor: Enemy) -> void:
 
 func advance(delta: float) -> void:
 	if not live_minions().is_empty():
-		minion.get(behavior).advance(delta)
+		minion.boss_minion.advance(delta)
 		return
 	if legacy or spawned >= int(profile.get("max_summons")) or challenge_active.call(): return
 	remaining = maxf(remaining - delta, 0)
@@ -54,7 +54,7 @@ func advance(delta: float) -> void:
 	owner_enemy.attack_performed.emit(&"boss_warning")
 
 func pause_attack() -> void:
-	if not live_minions().is_empty(): minion.get(behavior).pause_attack()
+	if not live_minions().is_empty(): minion.boss_minion.pause_attack()
 
 func clear() -> void:
 	if is_instance_valid(minion) and not minion.is_queued_for_deletion(): minion.queue_free()

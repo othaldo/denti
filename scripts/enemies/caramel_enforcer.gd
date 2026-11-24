@@ -1,14 +1,12 @@
 class_name CaramelEnforcer
-extends Node2D
+extends BossMinion
 ## Brösel chases, commits to a warned rush, then throws fixed ground punches.
 ## The owning caramel encounter advances this clock through every boss phase.
 
 enum State { ARRIVAL, FOLLOW, CHARGE_WARN, CHARGE, PUNCH_WARN, PUNCH, RECOVERY }
-var enemy: Enemy
 var profile: CaramelEnforcerData
 var state := State.ARRIVAL
 var remaining := 1.1
-var budget := 0.0
 var origin := Vector2.ZERO
 var destination := Vector2.ZERO
 var punches_left := 0
@@ -23,8 +21,8 @@ func suspended() -> bool:
 	var owner := enemy.boss_objective_owner
 	return not is_instance_valid(owner) or owner.health <= 0 or owner.dying
 
-func limit(amount: float) -> float: return minf(amount, budget)
-func spend(amount: float) -> void: budget = maxf(budget - amount, 0)
+func targetable() -> bool:
+	return not suspended() and super()
 
 func pause_attack() -> void:
 	state = State.FOLLOW
@@ -64,9 +62,7 @@ func _strike(touched: bool) -> void:
 		enemy.target.take_hit(enemy.attack_damage * profile.damage_factor)
 
 func _bounded(at: Vector2) -> Vector2:
-	var bounds := enemy.boss_objective_owner.caramel_encounter._cooking_bounds()
-	bounds = bounds.intersection(enemy.target.arena.inner_rect(60))
-	return at.clamp(bounds.position, bounds.end)
+	return bounded_to(at, enemy.boss_objective_owner.caramel_encounter._cooking_bounds())
 
 func _next() -> void:
 	match state:
