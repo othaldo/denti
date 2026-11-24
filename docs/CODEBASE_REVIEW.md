@@ -205,7 +205,7 @@ Jeder Schritt soll als eigene überprüfbare Änderung spielbar bleiben. Reine U
 ## Prüfungen der ursprünglichen Bestandsaufnahme
 
 ```bash
-godot --headless --path . --editor --quit
+python3 tools/import_project.py --godot godot
 python3 -m unittest discover -s tools/tests -v
 python3 tools/run_tests.py --godot godot --jobs 4
 ```

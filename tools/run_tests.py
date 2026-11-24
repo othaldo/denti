@@ -174,7 +174,7 @@ def main() -> int:
     except ValueError as error:
         parser.error(str(error))
     if not (ROOT / ".godot" / "global_script_class_cache.cfg").exists():
-        parser.error("Import assets first: godot --headless --path . --editor --quit")
+        parser.error("Import assets first: python tools/import_project.py --godot <godot>")
     report_path = ROOT / ".godot" / "test_results.json"
     durations = {}
     baselines = [ROOT / "docs" / "test_runtime_serial.json", ROOT / "docs" / "test_runtime_core.json",

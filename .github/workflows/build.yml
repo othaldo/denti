@@ -59,7 +59,8 @@ jobs:
           key: godot-import-4.7.2-${{ hashFiles('project.godot', '**/*.import', '**/*.png', '**/*.svg', '**/*.webp', '**/*.wav', '**/*.mp3') }}
           restore-keys: godot-import-4.7.2-
       - name: Import project assets
-        run: godot --headless --path . --editor --quit
+        # Imports once without autoloads; the normal start must then be error-free.
+        run: python3 tools/import_project.py --godot godot
       - name: Run Godot tests
         env:
           TEST_SUITE: ${{ startsWith(github.ref, 'refs/tags/') && 'all' || inputs.test_suite || 'core' }}
@@ -120,7 +121,8 @@ jobs:
         id: metadata
         run: python3 tools/release_build.py stamp
       - name: Import project assets
-        run: godot --headless --path . --editor --quit
+        # Imports once without autoloads; the normal start must then be error-free.
+        run: python3 tools/import_project.py --godot godot
       - name: Export release binaries
         run: |
           mkdir -p build/web build/windows

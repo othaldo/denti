@@ -162,9 +162,10 @@ Putzeifer und Bewegung verwenden additive Prozentboni; Speichel zählt Regenerat
 
 Level-up-Karten zeigen den aktuellen Attributwert und den wirksamen Wert nach der Auswahl. Bei Zahnflutsch, Glanz und Wurzelkraft steht die Obergrenze dabei; erreicht die Auswahl sie, erscheint **MAX**.
 
-Nach dem ersten Godot-Import lassen sich die Tests so ausführen:
+Ein frischer Checkout wird einmal importiert. `tools/import_project.py` importiert dabei zuerst ohne Autoloads, damit Godot sie nicht vor den Bildern und Tönen kompiliert und Hunderte irreführende Ladefehler meldet; der anschließende normale Start muss fehlerfrei sein. Danach lassen sich die Tests so ausführen:
 
 ```bash
+python3 tools/import_project.py --godot godot
 python3 tools/run_tests.py --godot godot
 ```
 

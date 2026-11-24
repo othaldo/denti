@@ -171,7 +171,7 @@ PowerShell, aus dem Checkout, mit vom Spiel getrennten Benutzerdaten:
 $previousDentiAppData = $env:APPDATA
 try {
     $env:APPDATA = Join-Path (Get-Location) '.godot/boss_comparison_userdata'
-    Godot_v4.7.2-stable_win64_console.exe --headless --path . --editor --quit
+    python tools/import_project.py --godot Godot_v4.7.2-stable_win64_console.exe
     Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . --script res://tools/benchmark_boss_comparison.gd
 } finally {
     $env:APPDATA = $previousDentiAppData
