@@ -128,6 +128,22 @@ else:
         with self.assertRaisesRegex(ValueError, "unique"):
             runner.select_tests(self.root, [], "all")
 
+    def test_shards_cover_every_test_once_with_balanced_durations(self):
+        tests = [Path(f"tests/t{index}.gd") for index in range(10)]
+        durations = {f"t{index}": float(index + 1) for index in range(9)}  # t9 has no baseline
+        shards = [runner.shard_tests(tests, durations, index, 3) for index in (1, 2, 3)]
+        self.assertEqual(sorted(t.stem for shard in shards for t in shard), sorted(t.stem for t in tests))
+        loads = [sum(durations.get(t.stem, 5.0) for t in shard) for shard in shards]
+        self.assertLessEqual(max(loads) - min(loads), 2.0)
+        self.assertEqual(shards, [runner.shard_tests(list(reversed(tests)), durations, index, 3) for index in (1, 2, 3)])
+        self.assertEqual(runner.shard_tests(tests, durations, 1, 1), tests)
+
+    def test_shard_argument_is_one_based_and_bounded(self):
+        self.assertEqual(runner.parse_shard("2/3"), (2, 3))
+        for value in ["0/3", "4/3", "1/0", "2", "a/b"]:
+            with self.assertRaises(runner.argparse.ArgumentTypeError):
+                runner.parse_shard(value)
+
     def test_godot_receives_the_nested_resource_path(self):
         test = self.root / "tests" / "extended" / "boss_routes.gd"
         command = self.original_command("godot", test, self.run_dir / "engine.log")

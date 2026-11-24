@@ -40,6 +40,38 @@ def select_tests(root: Path, patterns: list[str], suite: str = "core") -> list[P
     return tests
 
 
+def parse_shard(value: str) -> tuple[int, int]:
+    """Parse "index/count" (1-based), e.g. "2/3"."""
+    try:
+        index_text, count_text = value.split("/")
+        index, count = int(index_text), int(count_text)
+    except ValueError:
+        raise argparse.ArgumentTypeError("use INDEX/COUNT, e.g. 2/3") from None
+    if count < 1 or not 1 <= index <= count:
+        raise argparse.ArgumentTypeError("INDEX must be between 1 and COUNT")
+    return index, count
+
+
+def shard_tests(tests: list[Path], durations: dict[str, float], index: int, count: int) -> list[Path]:
+    """Deterministically split tests into `count` groups of similar total duration.
+
+    Every shard computes the same assignment from the same baseline, so the
+    shards together run each selected test exactly once.
+    """
+    if count == 1:
+        return list(tests)
+    known = sorted(seconds for seconds in durations.values() if seconds > 0)
+    fallback = known[len(known) // 2] if known else 1.0
+    loads = [0.0] * count
+    assigned: list[list[Path]] = [[] for _ in range(count)]
+    # Longest first onto the lightest shard; names break ties reproducibly.
+    for test in sorted(tests, key=lambda test: (-durations.get(test.stem, fallback), test.stem)):
+        target = min(range(count), key=lambda shard: (loads[shard], shard))
+        assigned[target].append(test)
+        loads[target] += durations.get(test.stem, fallback)
+    return assigned[index - 1]
+
+
 def isolated_environment(directory: Path) -> dict[str, str]:
     environment = os.environ.copy()
     directory.mkdir(parents=True, exist_ok=True)
@@ -130,6 +162,8 @@ def main() -> int:
     parser.add_argument("--suite", choices=["core", "extended", "all"], default="core",
                         help="core gameplay/UI (default), extended checks only, or all tests")
     parser.add_argument("--filter", action="append", default=[], help="test name/glob, repeatable")
+    parser.add_argument("--shard", type=parse_shard, default=(1, 1), metavar="INDEX/COUNT",
+                        help="run only one of COUNT duration-balanced groups, e.g. 2/3 (for CI)")
     args = parser.parse_args()
     godot = shutil.which(args.godot)
     if godot is None:
@@ -143,21 +177,26 @@ def main() -> int:
         parser.error("Import assets first: godot --headless --path . --editor --quit")
     report_path = ROOT / ".godot" / "test_results.json"
     durations = {}
-    # Fresh CI jobs use the recorded baseline; local timings override it.
-    for timing_path in [ROOT / "docs" / "test_runtime_serial.json",
-                        ROOT / "docs" / "test_runtime_core.json", report_path]:
+    baselines = [ROOT / "docs" / "test_runtime_serial.json", ROOT / "docs" / "test_runtime_core.json",
+                 ROOT / "docs" / "test_runtime_extended.json"]
+    shard_index, shard_count = args.shard
+    # Shards must agree on one split, so they use only the committed baseline.
+    # Unsharded runs let local timings override it for the start order.
+    for timing_path in baselines + ([report_path] if shard_count == 1 else []):
         try:
             previous = json.loads(timing_path.read_text(encoding="utf-8"))
             durations.update({result["test"]: result["seconds"] for result in previous["results"]})
         except (OSError, ValueError, KeyError, TypeError):
             pass
+    tests = shard_tests(tests, durations, shard_index, shard_count)
+    shard_label = f" shard {shard_index}/{shard_count}" if shard_count > 1 else ""
     # Start previously slow tests first to avoid a long tail with idle workers.
     tests.sort(key=lambda test: -durations.get(test.stem, 0))
     run_dir = ROOT / ".godot" / "test_runs" / (time.strftime("%Y%m%d-%H%M%S-") + uuid.uuid4().hex[:8])
     run_dir.mkdir(parents=True)
     started = time.perf_counter()
     results = []
-    print(f"Running {len(tests)} {args.suite} tests with {args.jobs} workers "
+    print(f"Running {len(tests)} {args.suite}{shard_label} tests with {args.jobs} workers "
           "(fixed delta 1/60 s).", flush=True)
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.jobs) as executor:
         futures = {executor.submit(run_one, godot, test, run_dir, args.timeout): test for test in tests}
@@ -174,6 +213,7 @@ def main() -> int:
     results.sort(key=lambda result: result["test"])
     failed = sum(not result["passed"] for result in results)
     report = {"seconds": elapsed, "jobs": args.jobs, "suite": args.suite,
+              "shard": f"{shard_index}/{shard_count}",
               "count": len(results), "failed": failed,
               "godot": godot, "results": results}
     encoded = json.dumps(report, indent=2) + "\n"
@@ -186,7 +226,7 @@ def main() -> int:
     summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
     if summary_path:
         with open(summary_path, "a", encoding="utf-8") as summary:
-            summary.write(f"### Godot tests ({args.suite})\n\n{len(results) - failed}/{len(results)} passed "
+            summary.write(f"### Godot tests ({args.suite}{shard_label})\n\n{len(results) - failed}/{len(results)} passed "
                           f"in {elapsed:.2f}s with {args.jobs} workers.\n\n"
                           "| Test | Seconds |\n| --- | ---: |\n")
             for result in sorted(results, key=lambda result: result["seconds"], reverse=True)[:10]:

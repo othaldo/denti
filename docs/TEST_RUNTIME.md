@@ -1,6 +1,6 @@
 # Schnellere Testausführung
 
-`tools/run_tests.py` startet standardmäßig die 178 Kernprüfungen mit bis zu vier parallelen Prozessen. Spielfluss, Save/Resume und Migration, Schaden/Status, Waffen und Synergien, Belohnungen, Shop/Economy, Schwierigkeitsskalierung und bedienbare UI bleiben Bestandteil jedes normalen CI-Builds. Kurze Ausweichtests und die Verhaltens-/Speichertests aller Bosse bleiben ebenfalls enthalten. Der Simulationsschritt bleibt `--fixed-fps 60`.
+`tools/run_tests.py` startet standardmäßig die 193 Kernprüfungen mit bis zu vier parallelen Prozessen. Spielfluss, Save/Resume und Migration, Schaden/Status, Waffen und Synergien, Belohnungen, Shop/Economy, Schwierigkeitsskalierung und bedienbare UI bleiben Bestandteil jedes normalen CI-Builds. Kurze Ausweichtests und die Verhaltens-/Speichertests aller Bosse bleiben ebenfalls enthalten. Der Simulationsschritt bleibt `--fixed-fps 60`.
 
 ## Auswahl nach Zweck
 
@@ -51,7 +51,7 @@ Die unveränderten Erstlauf- und Nachlaufberichte liegen unter
 
 Am 31. Oktober 2026: **150/150 bestanden in 220,93 Sekunden**, Windows, Godot 4.7.2, vier parallele Prozesse. Zusätzlich bestanden alle zehn Runner-Tests und der zusammengefasste Boden-/Angriffsatlastest über den echten `extended`-Aufruf. Die lediglich verschobenen Tests behielten ihre Inhalte und UIDs; die umfangreichen Suchmatrizen wurden für die Umordnung nicht erneut ausgeführt.
 
-Die [aktuelle Kernmessung](test_runtime_core.json) dient zugleich als Startreihenfolge für frische CI-Läufe: lange Kernprüfungen zuerst. Lokale Zeiten überschreiben diese Vorgabe, wenn vorhanden. Die Laufzeit misst den Godot-Testschritt; Import, Exporte und Deployment kommen im CI hinzu. Der aufgezeichnete Lauf entstand vor Verwendung dieser neuen Sortiervorgabe; eine zusätzliche Beschleunigung durch die Reihenfolge ist darin nicht gemessen.
+Die [aktuelle Kernmessung](test_runtime_core.json) (24. November 2026: 193/193 in 407,11 Sekunden, Windows, vier Prozesse) dient zugleich als Startreihenfolge und als Grundlage der CI-Aufteilung: lange Kernprüfungen zuerst. Lokale Zeiten überschreiben die Startreihenfolge, wenn vorhanden. Die Laufzeit misst den Godot-Testschritt; Import, Exporte und Deployment kommen im CI hinzu. Der aufgezeichnete Lauf entstand vor Verwendung dieser neuen Sortiervorgabe; eine zusätzliche Beschleunigung durch die Reihenfolge ist darin nicht gemessen.
 
 ## Historischer Vergleich der parallelen Ausführung
 
@@ -74,13 +74,21 @@ Jeder Test erhält ein frisches, eigenes Godot-Benutzerdatenverzeichnis unter `.
 
 Assets müssen zuvor einmal importiert sein. Nach dem Verschieben von Testdateien einmal neu importieren. Während der Tests wird kein Editor-Import gestartet; alle Prozesse lesen denselben Import-Cache. Jeder Test behält eine eigene SceneTree-/Autoload-Instanz und einen festen Simulationsschritt.
 
-Nicht-null Exit-Code, `SCRIPT ERROR:`, Engine-`ERROR:` auch bei Exit-Code null, Leak-Warnungen und ein Timeout von lokal standardmäßig 180 Sekunden (CI: 300 Sekunden) lassen den Testlauf fehlschlagen. Normale Warnungen, etwa bekannte Atlas-Rundungshinweise, bleiben sichtbar und werden nicht pauschal als Fehler gewertet. Beim Timeout wird der gestartete Prozess einschließlich seiner Kinder beendet. Die anderen Tests liefern weiterhin ihre Ergebnisse. Zehn Python-Tests prüfen Parallel-Isolation, Exit-/Skript-/Engine-Fehler, Leak-Warnungen, Prozess-Timeouts, Filter sowie vollständige Suite-Auswahl, Unterverzeichnispfade und Berichte ohne versehentlich leere Auswahl.
+Nicht-null Exit-Code, `SCRIPT ERROR:`, Engine-`ERROR:` auch bei Exit-Code null, Leak-Warnungen und ein Timeout von lokal standardmäßig 180 Sekunden (CI: 300 Sekunden) lassen den Testlauf fehlschlagen. Normale Warnungen, etwa bekannte Atlas-Rundungshinweise, bleiben sichtbar und werden nicht pauschal als Fehler gewertet. Beim Timeout wird der gestartete Prozess einschließlich seiner Kinder beendet. Die anderen Tests liefern weiterhin ihre Ergebnisse. Zwölf Python-Tests prüfen Parallel-Isolation, die Aufteilung für das CI, Exit-/Skript-/Engine-Fehler, Leak-Warnungen, Prozess-Timeouts, Filter sowie vollständige Suite-Auswahl, Unterverzeichnispfade und Berichte ohne versehentlich leere Auswahl.
 
-Pro Test bleiben Ausgabe- und Engine-Logs erhalten. `.godot/test_results.json` enthält den letzten Lauf einschließlich Einzelzeiten; jeder Lauf erhält zusätzlich seine eigene `results.json`. Die zehn langsamsten Tests erscheinen im Terminal und in der GitHub-Jobzusammenfassung. CI lädt Logs und Zeiten auch bei einem fehlgeschlagenen Test als `godot-test-results` hoch (sieben Tage Aufbewahrung). Die längsten Tests werden zuerst gestartet: frische CI-Jobs verwenden die eingecheckte Zeitmessung, lokale Läufe bevorzugen ihre letzten Einzelzeiten. Dadurch warten am Ende weniger Prozesse ungenutzt auf einen langen Test.
+Pro Test bleiben Ausgabe- und Engine-Logs erhalten. `.godot/test_results.json` enthält den letzten Lauf einschließlich Einzelzeiten; jeder Lauf erhält zusätzlich seine eigene `results.json`. Die zehn langsamsten Tests erscheinen im Terminal und in der GitHub-Jobzusammenfassung. CI lädt Logs und Zeiten auch bei einem fehlgeschlagenen Test je Teiljob als `godot-test-results-1` bis `-3` hoch (sieben Tage Aufbewahrung). Die längsten Tests werden zuerst gestartet: frische CI-Jobs verwenden die eingecheckte Zeitmessung, lokale Läufe bevorzugen ihre letzten Einzelzeiten. Dadurch warten am Ende weniger Prozesse ungenutzt auf einen langen Test.
+
+## Aufteilung im CI
+
+`--shard 2/3` führt nur einen von drei Teilen der gewählten Suite aus. Die Teile werden nach den eingecheckten Laufzeiten ([Kern](test_runtime_core.json), [erweitert](test_runtime_extended.json)) so verteilt, dass ihre Summen etwa gleich sind; Tests ohne Messwert zählen mit dem Median. Alle Teile berechnen dieselbe Zuordnung, weil sie nur die eingecheckten Zeiten verwenden und lokale Ergebnisse ignorieren. Zusammen führen sie jeden Test genau einmal aus.
+
+Der Workflow startet drei Testjobs (`Godot tests (n/3)`) parallel zum Web-/Windows-Export. Veröffentlichung und Release-Entwürfe warten auf alle drei. Test- und Exportjobs stellen `.godot` und die erzeugten `.import`-Dateien aus dem Actions-Cache wieder her; der Schlüssel hängt an `project.godot`, den eingecheckten `.import`-Dateien und allen Bild- und Tondateien. Bei einem Teiltreffer importiert Godot nur geänderte Quellen neu.
+
+Nach größeren Teständerungen sollten die beiden Zeitdateien aus einem lokalen Lauf (`.godot/test_runs/<lauf>/results.json`) erneuert werden, damit die Teile ausgeglichen bleiben.
 
 ## Gemeinsamer Testabschluss
 
-`tests/support/test_runtime.gd` stellt `finish(exit_code)` und `new_stats()` bereit. Die Unterstützung liegt außerhalb des vom Runner entdeckten Musters `tests/*.gd`. `finish()` stoppt Audio, gibt losgelöste Test-Stats und Szenen frei und lässt die aufgeschobene Bereinigung und den Audiomixer abschließen. Das ist bei `--fixed-fps 60` nötig, weil Simulationsframes wesentlich schneller als die reale Audioverarbeitung laufen können. Tests verwenden auch bei Fehlern diesen Abschluss. Der Waffen-DPS-Benchmark nutzt denselben Ablauf, weil ein Verhaltenstest darauf aufbaut.
+`tests/support/test_runtime.gd` stellt `finish(exit_code)` und `new_stats()` bereit. Für Erwartungen gibt es `check(bedingung, meldung)`: Ein Fehlschlag wird in `failures` gesammelt und gemeldet, ohne den Test abzubrechen. `finish_checks()` beendet den Test und lässt ihn fehlschlagen, sobald ein `check()` nicht hielt. Die Unterstützung liegt außerhalb des vom Runner entdeckten Musters `tests/*.gd`. `finish()` stoppt Audio, gibt losgelöste Test-Stats und Szenen frei und lässt die aufgeschobene Bereinigung und den Audiomixer abschließen. Das ist bei `--fixed-fps 60` nötig, weil Simulationsframes wesentlich schneller als die reale Audioverarbeitung laufen können. Tests verwenden auch bei Fehlern diesen Abschluss. Der Waffen-DPS-Benchmark nutzt denselben Ablauf, weil ein Verhaltenstest darauf aufbaut.
 
 Szenen können während eines Resume-Tests weiterhin bewusst ersetzt werden. Der letzte noch aktive Szenenbaum wird vom gemeinsamen Abschluss bereinigt. Isolierte Regeltests wie `run_storage` und `catalogs` benötigen keine Spielszene. Die bisherigen Kampf-, Layout- und JSON-Roundtrip-Prüfungen bleiben erhalten.
 
