@@ -62,7 +62,7 @@ func _run() -> void:
 		return
 	file.store_string(JSON.stringify(report, "\t") + "\n")
 	file.close()
-	finish(1 if failures else 0)
+	finish_checks()
 
 func probe_player_script() -> Script:
 	return PILOT_PLAYER

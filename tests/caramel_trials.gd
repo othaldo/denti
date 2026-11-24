@@ -28,41 +28,41 @@ func _run() -> void:
 			boss.boss_phase = 2 if definition.health_fraction < 0.34 else 1
 			boss.boss_phase_timer = 0
 			attack.advance(0.01)
-			_check(ritual.state == CaramelOverload.State.WARNING and ritual.trial_index == index and ritual.live_pylons().size() == definition.objectives, "wrong trial/order/count on " + str(difficulty))
+			check(ritual.state == CaramelOverload.State.WARNING and ritual.trial_index == index and ritual.live_pylons().size() == definition.objectives, "wrong trial/order/count on " + str(difficulty))
 			attack.advance(ritual.profile.warning_seconds + 0.01)
 			if definition.kind == CaramelTrialData.Kind.COURIERS:
 				var at := ritual.live_pylons()[0].position
 				attack.advance(0.05)
-				_check(ritual.live_pylons()[0].position != at, "courier remained a stationary pylon")
+				check(ritual.live_pylons()[0].position != at, "courier remained a stationary pylon")
 			for pylon in ritual.live_pylons():
 				game.player.global_position = pylon.global_position + Vector2(55, 0)
 				pylon.take_damage(10000)
 			attack.advance(0.01)
-			_check(ritual.state == CaramelOverload.State.RECOVERY and ritual.completed_mask & (1 << index), "successful trial did not mark only its checkpoint complete")
+			check(ritual.state == CaramelOverload.State.RECOVERY and ritual.completed_mask & (1 << index), "successful trial did not mark only its checkpoint complete")
 			var opening_before := ritual.opening_left
 			var counterattack := boss.take_damage(10)
-			_check(counterattack > 0 and is_equal_approx(ritual.opening_left, opening_before - counterattack), "counterattack did not spend the bounded opening")
+			check(counterattack > 0 and is_equal_approx(ritual.opening_left, opening_before - counterattack), "counterattack did not spend the bounded opening")
 			if index < ritual.profile.trials.size() - 1:
 				# Strong burst damage can reach the next check, but cannot skip it
 				# through the reward window or kill the boss across phase floors.
 				boss.boss_damage_budget = boss.max_health
 				var burst := boss.take_damage(1e9)
-				_check(burst + counterattack <= boss.max_health * ritual.profile.opening_damage_fraction + 0.01, "opening exceeded its damage budget")
-				_check(not boss.dying and boss.health > 0, "vulnerability burst skipped a later mandatory trial")
+				check(burst + counterattack <= boss.max_health * ritual.profile.opening_damage_fraction + 0.01, "opening exceeded its damage budget")
+				check(not boss.dying and boss.health > 0, "vulnerability burst skipped a later mandatory trial")
 			var checkpoint := EnemySnapshot.capture(boss)
 			var expected := ritual.save_data()
 			EnemySnapshot.restore(boss, checkpoint)
-			_check(ritual.save_data() == expected, "trial progress or per-heart clocks changed on snapshot restore")
+			check(ritual.save_data() == expected, "trial progress or per-heart clocks changed on snapshot restore")
 			attack.advance(ritual.profile.recovery_seconds + boss.boss_phase_timer + 0.1)
-			_check(boss.boss_damage_budget == 0 and not ritual.blocks_damage(), "opening failed to resume targetable normal combat with a reset guard")
+			check(boss.boss_damage_budget == 0 and not ritual.blocks_damage(), "opening failed to resume targetable normal combat with a reset guard")
 			# Manually sampled tests may already have entered the next warning
 			# after the forced burst. Keep that checkpoint and inspect it next.
 			if ritual.busy():
 				attack.cancel()
 			count += 1
 		counts.append(count)
-		_check(ritual.used and count == (1 if difficulty in [&"easy", &"normal"] else 2), "difficulty trial plan did not finish exactly once")
-	_check(counts == [1, 1, 2, 2], "reduced examination plan lost the hard-tier courier challenge")
+		check(ritual.used and count == (1 if difficulty in [&"easy", &"normal"] else 2), "difficulty trial plan did not finish exactly once")
+	check(counts == [1, 1, 2, 2], "reduced examination plan lost the hard-tier courier challenge")
 	# A surviving heart owns its volley: breaking another opens a clean route.
 	game.wave.difficulty_id = &"normal"
 	await _fresh(10)
@@ -74,7 +74,7 @@ func _run() -> void:
 	boss.boss_phase_timer = 0
 	attack.advance(0.01)
 	attack.advance(ritual.profile.warning_seconds + 1.8)
-	_check(not attack.hearts.entries.is_empty(), "active ritual hearts never attacked")
+	check(not attack.hearts.entries.is_empty(), "active ritual hearts never attacked")
 	var pylon: Enemy = ritual.live_pylons()[0]
 	var broken_source := ritual.pressure.source(pylon.boss_objective_slot)
 	game.player.global_position = pylon.global_position + Vector2(50, 0)
@@ -82,9 +82,9 @@ func _run() -> void:
 	ritual.pressure.advance(0)
 	var other_shots := 0
 	for shot in attack.hearts.entries:
-		_check(shot.source != broken_source, "breaking a heart left its dangerous projectiles behind")
+		check(shot.source != broken_source, "breaking a heart left its dangerous projectiles behind")
 		other_shots += 1
-	_check(other_shots > 0, "breaking one heart silently removed every other heart's pressure")
+	check(other_shots > 0, "breaking one heart silently removed every other heart's pressure")
 	# Real save/reload after one death must preserve stable owner/slot indices.
 	game._save_run()
 	var expected_pressure := ritual.pressure.save_data()
@@ -98,10 +98,10 @@ func _run() -> void:
 	game.get_node("Enemies").set_physics_process(false)
 	game.player.set_physics_process(false)
 	ritual = game.boss.caramel_encounter.overload
-	_check(ritual.live_pylons().size() == 3, "reload resurrected a destroyed trial heart")
+	check(ritual.live_pylons().size() == 3, "reload resurrected a destroyed trial heart")
 	for entry in ritual.pressure.entries:
-		_check(ritual.pressure.pylon_for(entry.slot) != null, "reload changed a surviving heart's source/slot identity")
-	_check(ritual.pressure.entries.size() == expected_pressure.shots.size(), "reload duplicated/lost independent heart clocks")
+		check(ritual.pressure.pylon_for(entry.slot) != null, "reload changed a surviving heart's source/slot identity")
+	check(ritual.pressure.entries.size() == expected_pressure.shots.size(), "reload duplicated/lost independent heart clocks")
 	# Missing couriers resolve into an announced attack; no permanent immunity.
 	game.wave.difficulty_id = &"hard"
 	await _fresh(10)
@@ -113,7 +113,7 @@ func _run() -> void:
 	boss.boss_phase_timer = 0
 	attack.advance(0.01)
 	attack.advance(ritual.profile.warning_seconds + ritual.duration + 2)
-	_check(ritual.escaped > 0 and ritual.missed > 0 and not ritual.blocks_damage() and not ritual.used, "courier leakage stalled the campaign or skipped remaining trials")
+	check(ritual.escaped > 0 and ritual.missed > 0 and not ritual.blocks_damage() and not ritual.used, "courier leakage stalled the campaign or skipped remaining trials")
 	# An old saved middle opening finishes safely; its stable definition/index
 	# remains loadable even though new fights no longer schedule that lesson.
 	await _fresh(10)
@@ -124,11 +124,11 @@ func _run() -> void:
 	boss.boss_phase_timer = 0
 	boss.health = boss.max_health * 0.5
 	ritual.restore({"version": 2, "state": CaramelOverload.State.RECOVERY, "trial_index": 1, "completed_mask": 3, "remaining": 1.0})
-	_check(ritual.trial().objectives == 2 and ritual.opening_left > 0 and not ritual.trial().enabled, "old middle-trial save lost its definition or usable opening")
+	check(ritual.trial().objectives == 2 and ritual.opening_left > 0 and not ritual.trial().enabled, "old middle-trial save lost its definition or usable opening")
 	attack.advance(1.1)
-	_check(not ritual.busy() and not ritual.blocks_damage() and not ritual.used, "old opening replayed a removed trial or lost the final examination")
+	check(not ritual.busy() and not ritual.blocks_damage() and not ritual.used, "old opening replayed a removed trial or lost the final examination")
 	for bad in [{"pressure": {"shots": "bad"}}, {"pressure": {"shots": [{"position": [1]}]}}, {"completed_mask": "bad"}, {"opening_left": NAN}, {"opening_left": "bad"}]:
-		_check(not CaramelOverload.valid(bad), "malformed trial-pressure snapshot was accepted")
+		check(not CaramelOverload.valid(bad), "malformed trial-pressure snapshot was accepted")
 	session.clear_run()
 	if failures.is_empty(): print("PASS caramel_trials: 1/1/2/2 trials, bounded openings and reset guard, independent heart pressure, courier movement/leaks, current and legacy save persistence")
-	finish(0 if failures.is_empty() else 1)
+	finish_checks()

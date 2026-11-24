@@ -1,7 +1,6 @@
 extends "res://tests/support/test_runtime.gd"
 
 var game: Node2D
-var failures: Array[String] = []
 var audit_sheet: Image
 var audit_index: int = 0
 var audit_element: StringName = &""
@@ -9,11 +8,6 @@ var audit_directory := "res://.godot/weapon-audit"
 
 func _initialize() -> void:
 	call_deferred("_run")
-
-func check(ok: bool, message: String) -> void:
-	if not ok:
-		failures.append(message)
-		push_error(message)
 
 func target(at: Vector2) -> Enemy:
 	game._create_enemy(WaveController.PLAQUE, at)
@@ -161,4 +155,4 @@ func _run() -> void:
 		audit_sheet.save_png(audit_directory + "/all-weapons.png")
 	if failures.is_empty():
 		print("PASS weapon_visual_contract: 24 weapons, 5 directions, 2 densities; tracking, resume and impact")
-	finish(0 if failures.is_empty() else 1)
+	finish_checks()

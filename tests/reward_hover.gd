@@ -1,16 +1,8 @@
 extends "res://tests/support/test_runtime.gd"
 
-var failures: Array[String] = []
-
 
 func _initialize() -> void:
 	_run.call_deferred()
-
-
-func _check(value: bool, message: String) -> void:
-	if not value:
-		failures.append(message)
-		push_error(message)
 
 
 func _settle() -> void:
@@ -74,18 +66,18 @@ func _run() -> void:
 		panel.show_upgrades(upgrades)
 		await _settle()
 		panel.stage.refresh_focus()
-		_check(root.get_node("GameInput").navigation_active, "keyboard did not enable reward navigation")
+		check(root.get_node("GameInput").navigation_active, "keyboard did not enable reward navigation")
 		for card in panel.buttons:
-			_check(card.get_theme_stylebox("hover") == card.get_theme_stylebox("normal"), "parked pointer highlights a second keyboard choice")
+			check(card.get_theme_stylebox("hover") == card.get_theme_stylebox("normal"), "parked pointer highlights a second keyboard choice")
 		for index in panel.buttons.size():
 			var card := panel.buttons[index]
 			await _pointer(card.get_global_rect().get_center())
 			var hover := card.get_theme_stylebox("hover") as StyleBoxFlat
-			_check(card.is_hovered(), "mouse did not reach reward card %d" % index)
-			_check(hover.bg_color.is_equal_approx(expected[index].bg_color) and hover.border_color.is_equal_approx(expected[index].border_color), "reward hover kept an old rarity in cycle %d, tier %d" % [cycle, index + 1])
-			_check(card.rarity_label.text == DentiRarity.name_for(index + 1), "reward rarity caption changed on hover")
+			check(card.is_hovered(), "mouse did not reach reward card %d" % index)
+			check(hover.bg_color.is_equal_approx(expected[index].bg_color) and hover.border_color.is_equal_approx(expected[index].border_color), "reward hover kept an old rarity in cycle %d, tier %d" % [cycle, index + 1])
+			check(card.rarity_label.text == DentiRarity.name_for(index + 1), "reward rarity caption changed on hover")
 			if cycle == 1 and index == 2:
 				await _capture("reused_hover")
 	if failures.is_empty():
 		print("Reward hover preserves all rarities after rerolls and repeated keyboard/mouse switches")
-	finish(0 if failures.is_empty() else 1)
+	finish_checks()

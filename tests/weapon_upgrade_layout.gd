@@ -1,7 +1,5 @@
 extends "res://tests/support/test_runtime.gd"
 
-var failures := 0
-
 
 func _initialize() -> void:
 	call_deferred("_run")
@@ -36,10 +34,10 @@ func _run() -> void:
 			panel.select_weapon(target)
 			await _settle()
 			_check_text(panel.body)
-			_check(panel.weapon_buttons.size() == 6 and panel.upgrade_buttons.size() == 4, "equipment or slots disappeared")
-			_check(panel.upgrade_buttons[3].disabled and panel.upgrade_buttons[3].text == "MAX", "maximum-rank state disappeared")
-			_check(panel.stage.panel.get_global_rect().encloses(panel.finish_button.get_global_rect()), "completion is outside the stage")
-			_check(panel.stage.body_scroll.get_h_scroll_bar().max_value <= panel.stage.body_scroll.size.x + 1, "view needs horizontal scrolling")
+			check(panel.weapon_buttons.size() == 6 and panel.upgrade_buttons.size() == 4, "equipment or slots disappeared")
+			check(panel.upgrade_buttons[3].disabled and panel.upgrade_buttons[3].text == "MAX", "maximum-rank state disappeared")
+			check(panel.stage.panel.get_global_rect().encloses(panel.finish_button.get_global_rect()), "completion is outside the stage")
+			check(panel.stage.body_scroll.get_h_scroll_bar().max_value <= panel.stage.body_scroll.size.x + 1, "view needs horizontal scrolling")
 		# Catalogue, four Mk gates and the empty-inventory state use the same view.
 		loadout.restore([{"id": "magic_toothbrush", "tier": 3}])
 		panel.show_upgrades(state, loadout, game.player.stats, game.items)
@@ -51,51 +49,45 @@ func _run() -> void:
 		panel._refresh()
 		await _settle()
 		_check_text(panel.body)
-		_check(panel.effect_buttons.size() == 12, "catalogue needs six elements and six supports")
-		_check(is_instance_valid(panel.selection_preview) and panel.stage.body_scroll.get_global_rect().intersects(panel.selection_preview.get_global_rect()), "selected value is outside the scroll viewport")
+		check(panel.effect_buttons.size() == 12, "catalogue needs six elements and six supports")
+		check(is_instance_valid(panel.selection_preview) and panel.stage.body_scroll.get_global_rect().intersects(panel.selection_preview.get_global_rect()), "selected value is outside the scroll viewport")
 		if extent.x >= 1280 and extent.y >= 720:
 			# Desktop (the project stretch keeps at least 720 logical rows) fits the
 			# catalogue and selected detail without the view jumping.
 			var scroll := panel.stage.body_scroll
-			_check(scroll.scroll_vertical == 0 and scroll.get_v_scroll_bar().max_value <= scroll.size.y + 1, "desktop picker scrolls at %s" % extent)
-			_check(scroll.get_global_rect().grow(1).encloses(panel.selection_preview.get_global_rect()), "desktop selection detail is cut off at %s" % extent)
+			check(scroll.scroll_vertical == 0 and scroll.get_v_scroll_bar().max_value <= scroll.size.y + 1, "desktop picker scrolls at %s" % extent)
+			check(scroll.get_global_rect().grow(1).encloses(panel.selection_preview.get_global_rect()), "desktop selection detail is cut off at %s" % extent)
 		panel._back()
 		await _settle()
-		_check(panel.upgrade_buttons[3].disabled and panel.upgrade_buttons[3].text == "Ab Mk IV", "Mk IV lock disappeared")
+		check(panel.upgrade_buttons[3].disabled and panel.upgrade_buttons[3].text == "Ab Mk IV", "Mk IV lock disappeared")
 		_check_text(panel.body)
 		loadout.restore(equipment)
 	loadout.restore([])
 	panel.show_upgrades(state, loadout, game.player.stats, game.items)
 	await _settle()
-	_check(not panel.finish_button.disabled and panel.upgrade_buttons.is_empty(), "empty equipment traps banked points")
+	check(not panel.finish_button.disabled and panel.upgrade_buttons.is_empty(), "empty equipment traps banked points")
 	_check_text(panel.body)
 	# Reject malformed cursor/action containers before any typed restore call.
 	var saved := RunSnapshot.capture(game)
 	for broken in [{"points": []}, {"cursor": []}, {"actions": {}}, {"actions": true}, {"actions": "bad"}, {"actions": [[]]}, {"economy_version": []}, {"actions": [{"cost": []}]}]:
 		var invalid := saved.duplicate(true)
 		invalid.rewards["weapon_upgrades"] = broken
-		_check(RunSaveData.normalize(invalid).is_empty(), "malformed weapon draft entered the restore path")
+		check(RunSaveData.normalize(invalid).is_empty(), "malformed weapon draft entered the restore path")
 	session.clear_run()
 	paused = false
 	print("PASS weapon upgrade layout: seven extents, six copies, four filled slots, Mk locks, catalogue, text/glyph bounds and empty equipment")
-	finish(1 if failures > 0 else 0)
+	finish_checks()
 
 
 func _check_text(parent: Control) -> void:
 	for child in parent.get_children():
 		if child is Label:
-			_check(Rect2(Vector2.ZERO, parent.size).grow(1).encloses(child.get_rect()), "text escapes its surface: " + child.text)
+			check(Rect2(Vector2.ZERO, parent.size).grow(1).encloses(child.get_rect()), "text escapes its surface: " + child.text)
 			var font: Font = child.get_theme_font("font")
 			for index in child.text.length():
 				var code: int = child.text.unicode_at(index)
-				if code > 32: _check(font.has_char(code), "bundled fonts miss U+%04X in %s" % [code, child.text])
+				if code > 32: check(font.has_char(code), "bundled fonts miss U+%04X in %s" % [code, child.text])
 		if child is Control: _check_text(child)
-
-
-func _check(ok: bool, message: String) -> void:
-	if not ok:
-		failures += 1
-		push_error(message)
 
 
 func _settle() -> void:

@@ -2,19 +2,11 @@ extends "res://tests/support/test_runtime.gd"
 
 const GAME_SCENE: PackedScene = preload("res://scenes/game/game.tscn")
 
-var failures: Array[String] = []
 var cases: int = 0
 
 
 func _initialize() -> void:
 	call_deferred("_run")
-
-
-func _check(condition: bool, message: String) -> bool:
-	if not condition:
-		failures.append(message)
-		push_error(message)
-	return condition
 
 
 func _run() -> void:
@@ -33,7 +25,7 @@ func _run() -> void:
 		if item.weapon_data == null:
 			game.items.acquire(item)
 	game.items.acquire(ShopController.by_id(&"metal_crown"))
-	_check(is_equal_approx(game.player.stats.crit_chance, 0.65), "late-run fixture no longer reproduces the crit cap")
+	check(is_equal_approx(game.player.stats.crit_chance, 0.65), "late-run fixture no longer reproduces the crit cap")
 	var baseline: Dictionary = game.player.stats.to_save_data()
 	var templates: Array[UpgradeData] = game.UPGRADES
 	for template in templates:
@@ -63,13 +55,13 @@ func _run() -> void:
 				root.add_child(game)
 				current_scene = game
 				var label := "%s tier=%d initial_crit=%.2f" % [template.stat, tier, crit]
-				if not _check(game.choice_panel.current_upgrades.size() == 4 and game.choice_panel.mode == &"upgrade" and paused, "resume lost four-choice screen: " + label):
+				if not check(game.choice_panel.current_upgrades.size() == 4 and game.choice_panel.mode == &"upgrade" and paused, "resume lost four-choice screen: " + label):
 					_finish(game, session)
 					return
 				for index in 4:
 					var restored: UpgradeData = game.choice_panel.current_upgrades[index]
 					var offered := choices[index]
-					_check(restored.stat == offered.stat and restored.display_name == offered.display_name and restored.tier == offered.tier and is_equal_approx(restored.amount, offered.amount), "resume changed choice %d: %s" % [index, label])
+					check(restored.stat == offered.stat and restored.display_name == offered.display_name and restored.tier == offered.tier and is_equal_approx(restored.amount, offered.amount), "resume changed choice %d: %s" % [index, label])
 				_check_stats(game.player.stats.to_save_data(), before, "resume changed build: " + label)
 				var chosen := choices[3]
 				var expected := before.duplicate()
@@ -80,14 +72,14 @@ func _run() -> void:
 					expected["health"] = minf(float(before["health"]) + chosen.amount, float(expected["max_health"]))
 				choose_panel(game.choice_panel, 3)
 				_check_stats(game.player.stats.to_save_data(), expected, "fourth choice effect differs: " + label)
-				_check(game.rewards.pending_levels == 0 and game.in_shop and game.shop_panel.visible, "fourth choice did not resolve before shop: " + label)
+				check(game.rewards.pending_levels == 0 and game.in_shop and game.shop_panel.visible, "fourth choice did not resolve before shop: " + label)
 				cases += 1
 	_finish(game, session)
 
 
 func _check_stats(actual: Dictionary, expected: Dictionary, context: String) -> void:
 	for key in expected:
-		_check(is_equal_approx(float(actual[key]), float(expected[key])), "%s / %s expected=%.4f actual=%.4f" % [context, key, float(expected[key]), float(actual[key])])
+		check(is_equal_approx(float(actual[key]), float(expected[key])), "%s / %s expected=%.4f actual=%.4f" % [context, key, float(expected[key]), float(actual[key])])
 
 
 func _finish(game: Node2D, session: Node) -> void:
@@ -96,4 +88,4 @@ func _finish(game: Node2D, session: Node) -> void:
 	game.free()
 	if failures.is_empty():
 		print("Denti upgrade resume test passed: %d deterministic cases" % cases)
-	finish(0 if failures.is_empty() else 1)
+	finish_checks()

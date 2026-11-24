@@ -31,8 +31,7 @@ func _run() -> void:
 				# JSON report numbers are floats; normalize in-memory integer fields
 				# before deep comparison without dropping any equipment/item values.
 				if JSON.parse_string(JSON.stringify(start[key])) != checkpoint[key]:
-					push_error("Boss control changed the starting checkpoint: " + str(key))
-					failures += 1
+					check(false, "Boss control changed the starting checkpoint: " + str(key))
 			result.policy_revision = revision
 			result.strategy = entry.strategy
 			result.pilot = controller.metrics()
@@ -45,7 +44,7 @@ func _run() -> void:
 	var file := FileAccess.open(str(_arguments("output", ["res://.godot/boss_pilot_replay.json"])[0]), FileAccess.WRITE)
 	file.store_string(JSON.stringify(report, "\t") + "\n")
 	file.close()
-	finish(1 if failures else 0)
+	finish_checks()
 
 func make_run(build: String, difficulty: StringName, sample_seed: int):
 	var game = super.make_run(build, difficulty, sample_seed)

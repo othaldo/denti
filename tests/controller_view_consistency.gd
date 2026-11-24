@@ -1,15 +1,9 @@
 extends "res://tests/support/test_runtime.gd"
 
-var failures: Array[String] = []
 var input: Node
 
 func _initialize() -> void:
 	_run.call_deferred()
-
-func _check(value: bool, message: String) -> void:
-	if not value:
-		failures.append(message)
-		push_error(message)
 
 func _settle() -> void:
 	for frame in 12: await process_frame
@@ -37,7 +31,7 @@ func _confirm() -> void:
 
 func _graph(scope: Control, label: String) -> void:
 	var controls := ControllerFocus.controls(scope)
-	_check(not controls.is_empty(), label + ": no focus target")
+	check(not controls.is_empty(), label + ": no focus target")
 	if controls.is_empty(): return
 	var visited: Array[Control] = [controls[0]]
 	var index := 0
@@ -45,10 +39,10 @@ func _graph(scope: Control, label: String) -> void:
 		for side: Side in [SIDE_LEFT, SIDE_TOP, SIDE_RIGHT, SIDE_BOTTOM]:
 			var neighbor := ControllerFocus.neighbor(scope, visited[index], side)
 			if neighbor == null: continue
-			_check(neighbor in controls, label + ": direction escapes the active scope")
+			check(neighbor in controls, label + ": direction escapes the active scope")
 			if neighbor in controls and neighbor not in visited: visited.append(neighbor)
 		index += 1
-	_check(visited.size() == controls.size(), "%s: %d/%d reachable focus targets" % [label, visited.size(), controls.size()])
+	check(visited.size() == controls.size(), "%s: %d/%d reachable focus targets" % [label, visited.size(), controls.size()])
 
 func _visible_targets(scope: Control, label: String) -> void:
 	for control in ControllerFocus.controls(scope):
@@ -57,7 +51,7 @@ func _visible_targets(scope: Control, label: String) -> void:
 		for frame in 3: await process_frame
 		var safe := ControllerActionBar.content_rect(scope, Rect2(Vector2.ZERO, root.get_visible_rect().size))
 		if control.size.y <= safe.size.y:
-			_check(safe.grow(1).encloses(control.get_global_rect()), label + ": focused action is outside the visible screen")
+			check(safe.grow(1).encloses(control.get_global_rect()), label + ": focused action is outside the visible screen")
 
 func _run() -> void:
 	var session := root.get_node("GameSession")
@@ -91,67 +85,67 @@ func _run() -> void:
 			var card: Button = menu.achievements_view.cards[2]
 			card.grab_focus()
 			await _joy(JOY_BUTTON_RIGHT_STICK)
-			_check(menu.achievement_details.visible, "R3 does not inspect a mastery card")
+			check(menu.achievement_details.visible, "R3 does not inspect a mastery card")
 			if menu.achievement_details.visible:
 				await _joy(JOY_BUTTON_B)
-				_check(card.has_focus(), "closing mastery details loses its source")
+				check(card.has_focus(), "closing mastery details loses its source")
 			menu._show_dentipedia()
 			await _settle()
 			_graph(menu.stage, "dentipedia")
 			var row: Button = menu.dentipedia.listing.get_child(2)
 			row.grab_focus()
 			await _joy(JOY_BUTTON_RIGHT_STICK)
-			_check(menu.dentipedia.detail_open and menu.dentipedia.selected == row.get_meta("entry"), "R3 does not inspect the focused encyclopedia entry")
+			check(menu.dentipedia.detail_open and menu.dentipedia.selected == row.get_meta("entry"), "R3 does not inspect the focused encyclopedia entry")
 			if menu.dentipedia.portrait and menu.dentipedia.detail_open:
 				await _joy(JOY_BUTTON_B)
-				_check(row.has_focus(), "portrait encyclopedia Back loses the selected row")
+				check(row.has_focus(), "portrait encyclopedia Back loses the selected row")
 			await _joy(JOY_BUTTON_RIGHT_SHOULDER)
-			_check(menu.dentipedia.category_index == 1 and ControllerFocus.contains(menu.dentipedia.listing, root.gui_get_focus_owner()), "R1/RB does not switch to the next encyclopedia tab and its entries")
-			_check(root.gui_get_focus_owner().get_theme_stylebox("focus") is StyleBoxFlat, "rebuilt encyclopedia entries have no visible controller focus")
-			_check(input.action_bar.entries.any(func(entry: Dictionary) -> bool: return entry.action == &"ui_previous") and input.action_bar.entries.any(func(entry: Dictionary) -> bool: return entry.action == &"ui_next"), "encyclopedia shoulder mappings are missing from the action bar")
+			check(menu.dentipedia.category_index == 1 and ControllerFocus.contains(menu.dentipedia.listing, root.gui_get_focus_owner()), "R1/RB does not switch to the next encyclopedia tab and its entries")
+			check(root.gui_get_focus_owner().get_theme_stylebox("focus") is StyleBoxFlat, "rebuilt encyclopedia entries have no visible controller focus")
+			check(input.action_bar.entries.any(func(entry: Dictionary) -> bool: return entry.action == &"ui_previous") and input.action_bar.entries.any(func(entry: Dictionary) -> bool: return entry.action == &"ui_next"), "encyclopedia shoulder mappings are missing from the action bar")
 			await _joy(JOY_BUTTON_LEFT_SHOULDER)
-			_check(menu.dentipedia.category_index == 0 and str(root.gui_get_focus_owner().get_meta("entry", {}).get("title", "")) == str(menu.dentipedia.entries[2].title), "L1/LB does not restore the remembered entry")
+			check(menu.dentipedia.category_index == 0 and str(root.gui_get_focus_owner().get_meta("entry", {}).get("title", "")) == str(menu.dentipedia.entries[2].title), "L1/LB does not restore the remembered entry")
 			await _joy(JOY_BUTTON_LEFT_SHOULDER)
-			_check(menu.dentipedia.category_index == 0, "left shoulder wraps unexpectedly at the first encyclopedia tab")
+			check(menu.dentipedia.category_index == 0, "left shoulder wraps unexpectedly at the first encyclopedia tab")
 			for step in DentipediaData.CATEGORIES.size(): await _joy(JOY_BUTTON_RIGHT_SHOULDER)
-			_check(menu.dentipedia.category_index == DentipediaData.CATEGORIES.size() - 1 and not input.action_bar.entries.any(func(entry: Dictionary) -> bool: return entry.action == &"ui_next"), "last encyclopedia tab does not stop at its boundary")
+			check(menu.dentipedia.category_index == DentipediaData.CATEGORIES.size() - 1 and not input.action_bar.entries.any(func(entry: Dictionary) -> bool: return entry.action == &"ui_next"), "last encyclopedia tab does not stop at its boundary")
 			var category: int = menu.dentipedia.category_index
 			await _confirm()
-			_check(menu.dentipedia.category_index == category, "R2/RT is also mapped to encyclopedia navigation")
+			check(menu.dentipedia.category_index == category, "R2/RT is also mapped to encyclopedia navigation")
 			menu.dentipedia.search.text = "no_matching_entry_9382"
 			await _settle()
 			var last_tab := DentipediaData.CATEGORIES.size() - 1
 			menu.dentipedia.category_buttons[last_tab].grab_focus()
 			await _joy(JOY_BUTTON_LEFT_SHOULDER)
-			_check(menu.dentipedia.category_buttons[last_tab - 1].has_focus() and menu.dentipedia.listing.get_child_count() == 0, "empty filtered tabs lose their controller focus")
+			check(menu.dentipedia.category_buttons[last_tab - 1].has_focus() and menu.dentipedia.listing.get_child_count() == 0, "empty filtered tabs lose their controller focus")
 			menu._show_options()
 			await _settle()
-			_check(not input.action_bar.entries.any(func(entry: Dictionary) -> bool: return entry.action in [&"ui_previous", &"ui_next"]), "encyclopedia tab hints leak into another menu")
+			check(not input.action_bar.entries.any(func(entry: Dictionary) -> bool: return entry.action in [&"ui_previous", &"ui_next"]), "encyclopedia tab hints leak into another menu")
 	menu._new_game()
 	await _settle()
 	menu.setup_selector.difficulty_view.buttons[&"hell"].grab_focus()
 	await _joy(JOY_BUTTON_RIGHT_STICK)
-	_check(menu.setup_selector.details.heading.text == "Hell" and menu.setup_selector.current_difficulty == &"normal", "setup R3 describes the selected difficulty instead of the focused locked card")
+	check(menu.setup_selector.details.heading.text == "Hell" and menu.setup_selector.current_difficulty == &"normal", "setup R3 describes the selected difficulty instead of the focused locked card")
 	await _joy(JOY_BUTTON_B)
 	menu.setup_selector.confirm_selection()
-	_check(menu.page == &"class", "class selection is absent from controller preparation")
+	check(menu.page == &"class", "class selection is absent from controller preparation")
 	await _settle()
 	_graph(menu.setup_selector, "class selection")
 	var class_card: Button = menu.setup_selector.class_view.buttons[1]
 	class_card.grab_focus()
 	await _joy(JOY_BUTTON_RIGHT_STICK)
-	_check(menu.setup_selector.details.visible, "R3 does not inspect the focused class")
+	check(menu.setup_selector.details.visible, "R3 does not inspect the focused class")
 	await _joy(JOY_BUTTON_B)
-	_check(class_card.has_focus(), "class inspection does not restore the class card")
+	check(class_card.has_focus(), "class inspection does not restore the class card")
 	menu.setup_selector.confirm_selection()
 	menu.setup_selector.select_weapon(1)
 	await _settle()
 	var starter: Button = menu.setup_selector.weapon_view.icon_buttons[3]
 	starter.grab_focus()
 	await _joy(JOY_BUTTON_RIGHT_STICK)
-	_check(menu.setup_selector.details.heading.text == menu.setup_selector.weapon_view.options[3].display_name and menu.setup_selector.weapon_view.selected_id == menu.setup_selector.weapon_view.options[1].id, "R3 does not describe the focused weapon without changing selection")
+	check(menu.setup_selector.details.heading.text == menu.setup_selector.weapon_view.options[3].display_name and menu.setup_selector.weapon_view.selected_id == menu.setup_selector.weapon_view.options[1].id, "R3 does not describe the focused weapon without changing selection")
 	await _joy(JOY_BUTTON_B)
-	_check(starter.has_focus(), "setup details return to the footer instead of the inspected weapon")
+	check(starter.has_focus(), "setup details return to the footer instead of the inspected weapon")
 	menu.queue_free()
 	await _settle()
 	session.pending_start_weapon_id = &"magic_toothbrush"
@@ -173,18 +167,18 @@ func _run() -> void:
 		await _settle()
 		_graph(fusion.stage, "fusion")
 		for button in fusion.slot_buttons:
-			_check(not ControllerFocus.available(button), "fusion has duplicate or empty slot focus targets")
+			check(not ControllerFocus.available(button), "fusion has duplicate or empty slot focus targets")
 		fusion.effect_buttons[0].grab_focus()
 		await _joy(JOY_BUTTON_RIGHT_STICK)
-		_check(input.navigation.popup_open(), "R3 does not describe a fusion effect")
+		check(input.navigation.popup_open(), "R3 does not describe a fusion effect")
 		if input.navigation.popup_open(): await _joy(JOY_BUTTON_B)
 		fusion.effect_buttons[0].grab_focus()
 		await _joy(JOY_BUTTON_A)
-		_check(fusion.effect_buttons[0].has_focus(), "fusion toggle/reflow loses its effect row")
+		check(fusion.effect_buttons[0].has_focus(), "fusion toggle/reflow loses its effect row")
 	var fusion_confirmed := [false]
 	fusion.confirmed.connect(func(_plan: WeaponFusionPlan) -> void: fusion_confirmed[0] = true)
 	await _confirm()
-	_check(fusion_confirmed[0], "RT does not complete the fusion workflow")
+	check(fusion_confirmed[0], "RT does not complete the fusion workflow")
 	fusion.hide()
 	game.shop_panel.hide()
 	game.weapon_enchantment_panel.show_upgrades(game.rewards.weapon_upgrades, game.player.loadout, game.player.stats, game.items)
@@ -193,13 +187,13 @@ func _run() -> void:
 	details.present("Prüfung", "Details hinter Pause", game.weapon_enchantment_panel.focus_rows[0])
 	await _joy(JOY_BUTTON_START)
 	await _joy(JOY_BUTTON_B)
-	_check(not game.game_menu.visible and details.visible, "B reaches a detail modal behind pause")
+	check(not game.game_menu.visible and details.visible, "B reaches a detail modal behind pause")
 	if game.game_menu.visible: game.game_menu.close_pause()
 	details.hide()
 	game.weapon_enchantment_panel.exit_dialog.present()
 	await _joy(JOY_BUTTON_START)
 	await _joy(JOY_BUTTON_B)
-	_check(not game.game_menu.visible and game.weapon_enchantment_panel.exit_dialog.visible, "B reaches an exit decision behind pause")
+	check(not game.game_menu.visible and game.weapon_enchantment_panel.exit_dialog.visible, "B reaches an exit decision behind pause")
 	if game.game_menu.visible: game.game_menu.close_pause()
 	game.weapon_enchantment_panel.exit_dialog.hide()
 	game.weapon_enchantment_panel.hide()
@@ -215,8 +209,8 @@ func _run() -> void:
 	equipped.grab_focus()
 	await _joy(JOY_BUTTON_RIGHT_STICK)
 	await _joy(JOY_BUTTON_B)
-	_check(game.game_menu.page == &"stats" and game.game_menu.item_details == null, "B skips the build page when leaving weapon details")
-	_check(game.game_menu.rows.get_node("WeaponScroll").get_child(0).get_child(0).has_focus(), "returning to the build loses the inspected weapon")
+	check(game.game_menu.page == &"stats" and game.game_menu.item_details == null, "B skips the build page when leaving weapon details")
+	check(game.game_menu.rows.get_node("WeaponScroll").get_child(0).get_child(0).has_focus(), "returning to the build loses the inspected weapon")
 	for item in ShopController.CATALOG:
 		if item.weapon_data == null: game.items.acquire(item)
 	game.relics.acquire(&"tidal_seal")
@@ -228,7 +222,7 @@ func _run() -> void:
 		await _visible_targets(game.game_menu.root_control, "pause items")
 	game.game_menu._return_home()
 	await _settle()
-	_check(game.game_menu.actions[&"build"].has_focus(), "leaving the build loses its pause-menu entry")
+	check(game.game_menu.actions[&"build"].has_focus(), "leaving the build loses its pause-menu entry")
 	game.game_menu.close_pause()
 	game.player.loadout.restore([{"id": "magic_toothbrush", "tier": 4, "affixes": [{"id": "fire", "level": 10, "damage": 1.0}, {"id": "leech", "level": 10, "damage": 1.0}, {"id": "crit", "level": 10, "damage": 1.0}, {"id": "tempo", "level": 10, "damage": 1.0}]}])
 	for extent in [Vector2i(1280, 720), Vector2i(320, 568), Vector2i(568, 320)]:
@@ -240,19 +234,19 @@ func _run() -> void:
 			game.choice_panel.update_level_reroll(100, 2)
 			await _settle()
 			_graph(game.choice_panel.stage, "level reward")
-			_check(ControllerFocus.controls(game.choice_panel.stage).size() == 4 and not ControllerFocus.available(game.choice_panel.reroll_button), "level reward has a duplicate reroll focus target beside X")
+			check(ControllerFocus.controls(game.choice_panel.stage).size() == 4 and not ControllerFocus.available(game.choice_panel.reroll_button), "level reward has a duplicate reroll focus target beside X")
 			game.choice_panel.buttons[1].grab_focus()
 			await _joy(JOY_BUTTON_RIGHT_STICK)
-			_check(input.navigation.popup_open(), "R3 does not inspect a level reward")
+			check(input.navigation.popup_open(), "R3 does not inspect a level reward")
 			if input.navigation.popup_open(): await _joy(JOY_BUTTON_B)
-			_check(game.choice_panel.buttons[1].has_focus(), "reward details lost the inspected choice")
+			check(game.choice_panel.buttons[1].has_focus(), "reward details lost the inspected choice")
 			await _confirm()
 			await _joy(JOY_BUTTON_B)
-			_check(game.choice_panel.visible and game.choice_panel.mode == &"upgrade", "RT or B resolves a mandatory reward without a choice")
+			check(game.choice_panel.visible and game.choice_panel.mode == &"upgrade", "RT or B resolves a mandatory reward without a choice")
 			game.choice_panel.show_chest(ShopController.by_id(&"metal_crown"), 5)
 			await _settle()
 			_graph(game.choice_panel.stage, "item chest")
-			_check(input.action_bar.entries.any(func(entry: Dictionary) -> bool: return entry.action == &"ui_accept" and entry.label == "Behalten"), "item chest does not name its primary Keep action")
+			check(input.action_bar.entries.any(func(entry: Dictionary) -> bool: return entry.action == &"ui_accept" and entry.label == "Behalten"), "item chest does not name its primary Keep action")
 			game.choice_panel.show_relics(RelicCatalog.CATALOG.slice(0, RelicCatalog.OFFER_COUNT))
 			await _settle()
 			_graph(game.choice_panel.stage, "relic reward")
@@ -262,9 +256,9 @@ func _run() -> void:
 			_graph(game.weapon_chest_panel.stage, "legacy capsule")
 			game.weapon_chest_panel.weapon_buttons[0].grab_focus()
 			await _joy(JOY_BUTTON_RIGHT_STICK)
-			_check(input.navigation.popup_open(), "R3 does not inspect a capsule's target weapon")
+			check(input.navigation.popup_open(), "R3 does not inspect a capsule's target weapon")
 			for window in root.get_embedded_subwindows():
-				if window.visible: _check(Rect2(Vector2.ZERO, Vector2(extent)).encloses(Rect2(Vector2(window.position), Vector2(window.size))), "native weapon details overflow the viewport")
+				if window.visible: check(Rect2(Vector2.ZERO, Vector2(extent)).encloses(Rect2(Vector2(window.position), Vector2(window.size))), "native weapon details overflow the viewport")
 			if input.navigation.popup_open(): await _joy(JOY_BUTTON_B)
 			game.weapon_chest_panel.hide()
 	session.reduced_ui_motion = false
@@ -275,9 +269,9 @@ func _run() -> void:
 	var cursor: int = game.story_dialogue.cursor
 	await _joy(JOY_BUTTON_START)
 	game.story_dialogue._process(1.0)
-	_check(game.story_dialogue.cursor == cursor, "dialogue reveals text behind pause")
+	check(game.story_dialogue.cursor == cursor, "dialogue reveals text behind pause")
 	await _joy(JOY_BUTTON_B)
-	_check(game.story_dialogue.next_button.has_focus(), "pause does not restore the dialogue action")
+	check(game.story_dialogue.next_button.has_focus(), "pause does not restore the dialogue action")
 	game.story_dialogue.hide()
 	var travel := StoryProgress.new()
 	travel.travel_target = 1
@@ -289,9 +283,9 @@ func _run() -> void:
 	_graph(game.story_travel.root_control, "story travel")
 	await _joy(JOY_BUTTON_START)
 	game.story_travel._process(StoryTravel.DURATION)
-	_check(is_equal_approx(travel.travel_progress, 0.2), "travel reaches its destination behind pause")
+	check(is_equal_approx(travel.travel_progress, 0.2), "travel reaches its destination behind pause")
 	await _joy(JOY_BUTTON_B)
-	_check(game.story_travel.next_button.has_focus(), "pause does not restore the travel action")
+	check(game.story_travel.next_button.has_focus(), "pause does not restore the travel action")
 	game.story_travel.hide()
 	var free_node: TalentNodeData
 	for node: TalentNodeData in game.player.stats.class_data.talent_tree.nodes:
@@ -305,11 +299,11 @@ func _run() -> void:
 		var talent: TalentPanel = game.talent_panel
 		talent.present(talent_progress, game.player.stats, game.UPGRADES, 1)
 		await _settle()
-		_check(talent.view.button(free_node.id).has_focus(), "talent tree does not focus the restored node")
+		check(talent.view.button(free_node.id).has_focus(), "talent tree does not focus the restored node")
 		var next_node: TalentNodeData = talent.stats.class_data.talent_tree.nodes[0]
 		talent.view.button(next_node.id).grab_focus()
 		await _settle()
-		_check(talent.selected == free_node.id and talent.previewed == next_node.id and talent.buy_button.disabled and talent.detail_text.text.contains("→"), "focus does not preview the next talent without applying it")
+		check(talent.selected == free_node.id and talent.previewed == next_node.id and talent.buy_button.disabled and talent.detail_text.text.contains("→"), "focus does not preview the next talent without applying it")
 		talent.view.button(free_node.id).grab_focus()
 		await _settle()
 		var attribute: Button = talent.choice_row.get_child(1)
@@ -317,16 +311,16 @@ func _run() -> void:
 		var attribute_key := str(attribute.get_meta("controller_focus_key", ""))
 		await _joy(JOY_BUTTON_A)
 		var current_focus := root.gui_get_focus_owner()
-		_check(not attribute_key.is_empty() and ControllerFocus.contains(talent.choice_row, current_focus) and current_focus.get_meta("controller_focus_key", "") == attribute_key, "choosing a free-root attribute loses its rebuilt focus")
+		check(not attribute_key.is_empty() and ControllerFocus.contains(talent.choice_row, current_focus) and current_focus.get_meta("controller_focus_key", "") == attribute_key, "choosing a free-root attribute loses its rebuilt focus")
 		var talent_target := root.gui_get_focus_owner()
 		await _joy(JOY_BUTTON_START)
 		await _joy(JOY_BUTTON_B)
-		_check(talent_target.has_focus(), "returning from pause loses the talent attribute focus")
+		check(talent_target.has_focus(), "returning from pause loses the talent attribute focus")
 		root.content_scale_size = Vector2i(568, 320)
 		root.size = root.content_scale_size
 		await _settle()
-		_check(talent.stage.body_scroll.get_global_rect().grow(1).encloses(talent_target.get_global_rect()), "compact talent tree clips its focused attribute")
-		_check(talent.stage.body_scroll.get_v_scroll_bar().visible, "short controller view cannot scroll to its clipped talent actions")
+		check(talent.stage.body_scroll.get_global_rect().grow(1).encloses(talent_target.get_global_rect()), "compact talent tree clips its focused attribute")
+		check(talent.stage.body_scroll.get_v_scroll_bar().visible, "short controller view cannot scroll to its clipped talent actions")
 		root.content_scale_size = Vector2i(1280, 720)
 		root.size = root.content_scale_size
 		talent.hide()
@@ -339,14 +333,14 @@ func _run() -> void:
 	var choices := [0]
 	game.choice_panel.upgrade_chosen.connect(func(_upgrade: UpgradeData) -> void: choices[0] += 1)
 	await _joy(JOY_BUTTON_A)
-	_check(choices[0] == 0 and game.choice_panel.visible, "controller acquisition on desktop Reroll accidentally chooses a reward")
+	check(choices[0] == 0 and game.choice_panel.visible, "controller acquisition on desktop Reroll accidentally chooses a reward")
 	game.ended = true
 	game.choice_panel.show_end(false, 10)
 	game.choice_panel._show_credits()
 	await _settle()
-	_check(not input.action_bar.entries.any(func(entry: Dictionary) -> bool: return entry.action in [&"ui_accept", &"pause"]), "end credits advertise duplicate Back actions or an unavailable Pause")
+	check(not input.action_bar.entries.any(func(entry: Dictionary) -> bool: return entry.action in [&"ui_accept", &"pause"]), "end credits advertise duplicate Back actions or an unavailable Pause")
 	await _joy(JOY_BUTTON_B)
-	_check(game.choice_panel.mode == &"end", "B does not return from end-screen credits")
+	check(game.choice_panel.mode == &"end", "B does not return from end-screen credits")
 	root.content_scale_size = Vector2i(568, 320)
 	root.size = root.content_scale_size
 	game.choice_panel.show_end(true, 10, {"wave_reached": 20, "hell_unlocked_now": true, "weapon_mastery": {
@@ -357,7 +351,7 @@ func _run() -> void:
 	var notices: VBoxContainer = game.choice_panel.end_notices.notices
 	notices.get_child(0).grab_focus()
 	await _joy(JOY_BUTTON_DPAD_DOWN)
-	_check(notices.get_child(1).has_focus() and not input.action_bar.entries.any(func(entry: Dictionary) -> bool: return entry.action == &"ui_accept"), "scrolling passive end notices advertises an unusable action or loses focus")
+	check(notices.get_child(1).has_focus() and not input.action_bar.entries.any(func(entry: Dictionary) -> bool: return entry.action == &"ui_accept"), "scrolling passive end notices advertises an unusable action or loses focus")
 	session.clear_run()
 	print("Controller views: reachable focus graphs, R3 inspection, modal priority, fusion workflow, reward actions and Back checked")
-	finish(0 if failures.is_empty() else 1)
+	finish_checks()

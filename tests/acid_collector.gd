@@ -1,10 +1,6 @@
 extends "res://tests/support/test_runtime.gd"
 
-var failures: Array[String] = []
 func _initialize() -> void: call_deferred("_run")
-func _check(ok: bool, message: String) -> void:
-	if not ok: failures.append(message); push_error(message)
-
 func _run() -> void:
 	root.get_node("SceneTransitions").enabled = false
 	var session := root.get_node("GameSession")
@@ -36,31 +32,31 @@ func _run() -> void:
 		boss.set_simulation_enabled(false)
 		var companion := boss.acid_king_encounter.companion
 		companion.advance(5.01)
-		_check(companion.live_minions().size() == (1 if difficulty in [&"hard", &"hell"] else 0), "collector difficulty plan changed Easy/Normal or omitted Hard/Hell")
+		check(companion.live_minions().size() == (1 if difficulty in [&"hard", &"hell"] else 0), "collector difficulty plan changed Easy/Normal or omitted Hard/Hell")
 	var boss: Enemy = game.boss
 	var court := boss.acid_king_encounter
 	var companion := court.companion
 	var actor := companion.minion
 	var ai := actor.acid_collector
-	_check(actor.data == EnemyCatalog.ACID_COLLECTOR and actor.is_targetable() and not actor.data.is_boss and actor.contact_damage == 0, "Schlacko reused trash or became a second stage boss")
+	check(actor.data == EnemyCatalog.ACID_COLLECTOR and actor.is_targetable() and not actor.data.is_boss and actor.contact_damage == 0, "Schlacko reused trash or became a second stage boss")
 	await _check_combination(game, boss, actor)
 	actor.take_damage(1e9)
-	_check(actor.health > 0 and actor.health < actor.max_health, "Schlacko is a one-hit minion")
+	check(actor.health > 0 and actor.health < actor.max_health, "Schlacko is a one-hit minion")
 	ai.advance(ai.remaining + ai.profile.follow_seconds + 0.01)
-	_check(ai.state == AcidCollector.State.WARNING, "collector did not announce its acid glob")
+	check(ai.state == AcidCollector.State.WARNING, "collector did not announce its acid glob")
 	var locked := ai.destination
 	game.player.global_position += Vector2(160, 100)
 	ai.advance(ai.remaining + ai.profile.flight_seconds + 0.01)
-	_check(ai.pools.size() == 1 and ai.destination == locked and game.player.stats.health == 10000, "glob tracked its target, hit early or did not leave a pool")
+	check(ai.pools.size() == 1 and ai.destination == locked and game.player.stats.health == 10000, "glob tracked its target, hit early or did not leave a pool")
 	game.player.global_position = locked
 	game.player.hurt_time = 0
 	ai.advance(ai.profile.pool_tick_seconds + 0.01)
-	_check(game.player.stats.health < 10000, "collector acid pool is harmless")
+	check(game.player.stats.health < 10000, "collector acid pool is harmless")
 	game._refresh_hud()
-	_check(game.hud.retinue_display.labels[0].text == "Schlacko" and game.hud.retinue_display.visible, "collector has no named miniboss bar")
+	check(game.hud.retinue_display.labels[0].text == "Schlacko" and game.hud.retinue_display.visible, "collector has no named miniboss bar")
 	# Actual root reload preserves owned actor and its active acid pool.
 	game._save_run()
-	_check(not session.load_run().is_empty(), "collector snapshot failed root validation")
+	check(not session.load_run().is_empty(), "collector snapshot failed root validation")
 	var saved := ai.save_data()
 	session.resume_requested = true
 	paused = false
@@ -75,55 +71,55 @@ func _run() -> void:
 	game.get_node("Enemies").set_physics_process(false)
 	court = boss.acid_king_encounter
 	companion = court.companion
-	_check(companion.live_minions().size() == 1 and companion.spawned == 1, "collector was lost or duplicated on reload")
+	check(companion.live_minions().size() == 1 and companion.spawned == 1, "collector was lost or duplicated on reload")
 	actor = companion.minion
 	ai = actor.acid_collector
-	_check(actor.boss_objective_owner == boss and ai.destination == locked and ai.pools.size() == 1 and ai.pools[0].at == SnapshotValues.read_vector(saved.pools[0].position) and ai.pools[0].life <= saved.pools[0].life, "reload changed ownership, locked aim or acid-pool geometry")
+	check(actor.boss_objective_owner == boss and ai.destination == locked and ai.pools.size() == 1 and ai.pools[0].at == SnapshotValues.read_vector(saved.pools[0].position) and ai.pools[0].life <= saved.pools[0].life, "reload changed ownership, locked aim or acid-pool geometry")
 	var frozen := ai.save_data()
 	await process_frame
 	await process_frame
-	_check(ai.save_data() == frozen, "pause advanced Schlacko's pools")
+	check(ai.save_data() == frozen, "pause advanced Schlacko's pools")
 	var attack_before := ai.save_data()
 	boss._start_boss_phase()
-	_check(ai.save_data() == attack_before and actor.is_targetable(), "boss phase cancelled Schlacko's pool or made him immune")
+	check(ai.save_data() == attack_before and actor.is_targetable(), "boss phase cancelled Schlacko's pool or made him immune")
 	for phase in [KingPressureTrial.State.INTRODUCTION, KingPressureTrial.State.TRACKING, KingPressureTrial.State.LOCKED, KingPressureTrial.State.FIRING, KingPressureTrial.State.EXPOSED]:
 		court.pressure.state = phase
-		_check(actor.is_targetable() and not ai.suspended(), "Schlacko became inactive during the shield trial")
+		check(actor.is_targetable() and not ai.suspended(), "Schlacko became inactive during the shield trial")
 	court.pressure.state = KingPressureTrial.State.TRACKING
 	var health: float = game.player.stats.health
 	game.player.hurt_time = 0
 	ai.advance(0.05)
-	_check(not ai.pools.is_empty() and actor.is_targetable() and actor.take_damage(5) > 0, "Schlacko cleared his pool or became immune in the shield trial")
+	check(not ai.pools.is_empty() and actor.is_targetable() and actor.take_damage(5) > 0, "Schlacko cleared his pool or became immune in the shield trial")
 	ai.state = AcidCollector.State.FOLLOW
 	ai.remaining = 0
 	ai.advance(0.01)
 	game.player.global_position = ai.destination
 	game.player.hurt_time = 0
 	companion.advance(ai.remaining + ai.profile.flight_seconds + 0.01)
-	_check(game.player.stats.health < health, "Schlacko stopped firing during the shield trial")
+	check(game.player.stats.health < health, "Schlacko stopped firing during the shield trial")
 	game._refresh_hud()
-	_check(game.hud.retinue_display.rows[0].modulate.a == 1, "active Schlacko retained an invulnerable HUD tint")
+	check(game.hud.retinue_display.rows[0].modulate.a == 1, "active Schlacko retained an invulnerable HUD tint")
 	court.pressure.state = KingPressureTrial.State.FINISHED
 	court.pressure.used = true
-	_check(actor.is_targetable(), "collector stayed invulnerable after the trial")
+	check(actor.is_targetable(), "collector stayed invulnerable after the trial")
 	var loot_before: int = game.get_node("Loot").get_child_count()
 	for call in int(companion.profile.get("max_summons")):
 		companion.minion.acid_collector.budget = companion.minion.max_health
 		companion.minion.take_damage(1e9)
 		companion.advance(float(companion.profile.get("reinforcement_delay")) + 0.01)
 		await process_frame
-	_check(companion.spawned == 3 and companion.live_minions().is_empty() and game.get_node("Loot").get_child_count() == loot_before, "collector reinforcements or rewards are unbounded")
+	check(companion.spawned == 3 and companion.live_minions().is_empty() and game.get_node("Loot").get_child_count() == loot_before, "collector reinforcements or rewards are unbounded")
 	companion.spawned = 0
 	companion.remaining = 0
 	companion.advance(0.01)
 	boss.health = 0
 	court.cancel()
 	game._refresh_hud()
-	_check(companion.live_minions().is_empty() and not game.hud.retinue_display.visible and court.acid_wake.streams.is_empty(), "boss death retained a collector or acid hazard")
-	_check(not AcidCollector.valid({"pools": [{"position": [1], "life": 3, "cooldown": 0}]}), "invalid collector pool passed validation")
+	check(companion.live_minions().is_empty() and not game.hud.retinue_display.visible and court.acid_wake.streams.is_empty(), "boss death retained a collector or acid hazard")
+	check(not AcidCollector.valid({"pools": [{"position": [1], "life": 3, "cooldown": 0}]}), "invalid collector pool passed validation")
 	session.clear_run()
 	if failures.is_empty(): print("PASS acid_collector: continuous targetable shield-phase pressure, fixed glob/pool, named HUD, real reload, pause, finite reinforcements and cleanup")
-	finish(0 if failures.is_empty() else 1)
+	finish_checks()
 
 func _check_combination(game: Node2D, boss: Enemy, actor: Enemy) -> void:
 	var court := boss.acid_king_encounter
@@ -178,7 +174,7 @@ func _check_combination(game: Node2D, boss: Enemy, actor: Enemy) -> void:
 				if not crossed and game.player.stats.health == 10000:
 					safe = true
 					break
-			_check(safe, "Hell collector/stomp combination has no observed slowed corner escape: %s / close=%s" % [corner, close])
+			check(safe, "Hell collector/stomp combination has no observed slowed corner escape: %s / close=%s" % [corner, close])
 	court.cancel()
 	court.pressure.used = false
 	boss.boss_phase = 0

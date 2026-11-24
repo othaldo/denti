@@ -3,7 +3,6 @@ extends "res://tests/support/test_runtime.gd"
 
 const PROBE_PLAYER = preload("res://tools/balance/comparison_player.gd")
 const PILOT = preload("res://tools/balance/king_pressure_pilot.gd")
-var failures: Array[String] = []
 
 func _initialize() -> void: call_deferred("_run")
 
@@ -78,4 +77,4 @@ func _run() -> void:
 	file.close()
 	print("KING PRESSURE COMBAT ", JSON.stringify(results))
 	root.get_node("GameSession").clear_run()
-	finish(0 if failures.is_empty() else 1)
+	finish_checks()

@@ -1,16 +1,10 @@
 extends "res://tests/support/test_runtime.gd"
 
-var failures: Array[String] = []
 var game: Node2D
 var boss: Enemy
 var attack: CrownCourtEncounter
 
 func _initialize() -> void: call_deferred("_run")
-func _check(ok: bool, message: String) -> void:
-	if ok: return
-	failures.append(message)
-	push_error(message)
-
 func _fresh(kind: int = 0, phase: int = 0) -> void:
 	attack.cancel()
 	attack.cycle = 0
@@ -49,8 +43,8 @@ func _run() -> void:
 	boss.set_simulation_enabled(false)
 	game.get_node("Enemies").set_physics_process(false)
 	paused = true
-	_check(attack != null and attack.rig.bones.size() == 8, "Emperor modular court was not connected")
-	for bone: Bone2D in attack.rig.bones.values(): _check(bone.scale == Vector2.ONE, "Emperor art was stretched")
+	check(attack != null and attack.rig.bones.size() == 8, "Emperor modular court was not connected")
+	for bone: Bone2D in attack.rig.bones.values(): check(bone.scale == Vector2.ONE, "Emperor art was stretched")
 	# Every new floor attack aims its dangerous sector at Denti, across the
 	# whole arena. The combined nerve attack must use the same targeting rule.
 	for kind in [CrownCourtEncounter.Attack.EDICT, CrownCourtEncounter.Attack.NERVE]:
@@ -59,15 +53,15 @@ func _run() -> void:
 			game.player.global_position = boss.global_position + Vector2.from_angle(index * TAU / 8) * 250
 			attack.begin(kind)
 			var toward := attack.origin.direction_to(game.player.global_position)
-			_check(absf(Vector2.from_angle(attack.edict_angle).angle_to(toward)) < 0.0001, "new court warning did not aim its damaging sector at Denti")
+			check(absf(Vector2.from_angle(attack.edict_angle).angle_to(toward)) < 0.0001, "new court warning did not aim its damaging sector at Denti")
 			var locked := attack.edict_angle
 			var fixed_origin := attack.origin
 			var saved_warning := attack.save_data()
 			game.player.global_position = attack.origin + toward.rotated(PI * 0.5) * 250
 			attack.advance(0.3)
-			_check(attack.edict_angle == locked and attack.origin == fixed_origin, "court warning chased Denti after locking")
+			check(attack.edict_angle == locked and attack.origin == fixed_origin, "court warning chased Denti after locking")
 			attack.restore(saved_warning)
-			_check(attack.edict_angle == locked and attack.origin == fixed_origin, "restoring a court warning retargeted it")
+			check(attack.edict_angle == locked and attack.origin == fixed_origin, "restoring a court warning retargeted it")
 	# A warning beginning partway through a dash uses the position at its birth.
 	for kind in [CrownCourtEncounter.Attack.EDICT, CrownCourtEncounter.Attack.NERVE]:
 		_fresh(kind, 2)
@@ -79,18 +73,18 @@ func _run() -> void:
 		game.player.dash_moved = true
 		attack.begin(kind, 0.1)
 		var expected := attack.origin.direction_to(HazardGeometry.player_at(game.player, 0.1))
-		_check(absf(Vector2.from_angle(attack.edict_angle).angle_to(expected)) < 0.0001, "court aimed at the end of the frame instead of warning birth")
+		check(absf(Vector2.from_angle(attack.edict_angle).angle_to(expected)) < 0.0001, "court aimed at the end of the frame instead of warning birth")
 	_fresh()
 	var fixed_angle := attack.edict_angle
-	_check(HazardGeometry.circle_sector(game.player.global_position, attack.origin, Vector2.from_angle(fixed_angle), attack.profile.court_radius, deg_to_rad(attack.profile.court_half_angle)), "stationary Denti starts outside the targeted verdict")
+	check(HazardGeometry.circle_sector(game.player.global_position, attack.origin, Vector2.from_angle(fixed_angle), attack.profile.court_radius, deg_to_rad(attack.profile.court_half_angle)), "stationary Denti starts outside the targeted verdict")
 	attack.advance(attack.profile.warning_seconds - 0.001)
-	_check(game.player.stats.health == 100000 and attack.shots.entries.is_empty() and attack.needles.entries.is_empty(), "court hit during its warning")
+	check(game.player.stats.health == 100000 and attack.shots.entries.is_empty() and attack.needles.entries.is_empty(), "court hit during its warning")
 	attack.advance(0.011)
-	_check(game.player.stats.health < 100000 and attack.verdict_hit, "announced court sector missed stationary Denti")
-	_check(not attack.needles.entries.is_empty(), "new court failed to release its warned fast fan")
+	check(game.player.stats.health < 100000 and attack.verdict_hit, "announced court sector missed stationary Denti")
+	check(not attack.needles.entries.is_empty(), "new court failed to release its warned fast fan")
 	for entry in attack.needles.entries:
 		var angular_distance := minf(absf(Vector2.from_angle(fixed_angle).angle_to(entry.velocity)), absf(Vector2.from_angle(fixed_angle + PI).angle_to(entry.velocity)))
-		_check(angular_distance <= deg_to_rad(attack.profile.court_half_angle) + 0.0001, "court fan exceeded its announced angular footprint")
+		check(angular_distance <= deg_to_rad(attack.profile.court_half_angle) + 0.0001, "court fan exceeded its announced angular footprint")
 	var health: float = game.player.stats.health
 	attack.shots.clear()
 	attack.needles.clear()
@@ -98,29 +92,29 @@ func _run() -> void:
 	attack.restore(save)
 	game.player.hurt_time = 0
 	attack.advance(0.02)
-	_check(game.player.stats.health == health, "resume replayed a resolved verdict hit")
+	check(game.player.stats.health == health, "resume replayed a resolved verdict hit")
 	_fresh()
 	game.player.global_position += Vector2(-280, 180)
 	attack.advance(0.5)
-	_check(attack.edict_angle == fixed_angle, "court retargeted its announced angle after Denti moved")
+	check(attack.edict_angle == fixed_angle, "court retargeted its announced angle after Denti moved")
 	attack.advance(attack.remaining + attack.profile.impact_seconds + attack.profile.reposition_seconds)
 	var new_target := attack.origin.direction_to(game.player.global_position)
-	_check(attack.state == CrownCourtEncounter.State.EDICT_WARN and absf(Vector2.from_angle(attack.edict_angle).angle_to(new_target)) < 0.0001, "follow-up verdict did not acquire Denti's new position")
+	check(attack.state == CrownCourtEncounter.State.EDICT_WARN and absf(Vector2.from_angle(attack.edict_angle).angle_to(new_target)) < 0.0001, "follow-up verdict did not acquire Denti's new position")
 	_fresh(CrownCourtEncounter.Attack.PORTAL)
 	var a := attack.portal_a
 	var b := attack.portal_b
 	attack.advance(attack.profile.portal_warning_seconds - 0.001)
-	_check(attack.lances.entries.is_empty() and game.player.stats.health == 100000, "portal fired prematurely")
+	check(attack.lances.entries.is_empty() and game.player.stats.health == 100000, "portal fired prematurely")
 	game.player.global_position += Vector2(0, 400)
 	attack.advance(0.121)
-	_check(attack.portal_a == a and attack.portal_b == b, "portal warning retargeted after Denti moved")
-	_check(attack.lances.entries[0].at.is_equal_approx(a + a.direction_to(b) * attack.profile.lance.speed * 0.12), "long frame advanced a portal lance before birth")
+	check(attack.portal_a == a and attack.portal_b == b, "portal warning retargeted after Denti moved")
+	check(attack.lances.entries[0].at.is_equal_approx(a + a.direction_to(b) * attack.profile.lance.speed * 0.12), "long frame advanced a portal lance before birth")
 	var flight_save := attack.save_data()
 	attack.restore(flight_save)
-	_check(attack.save_data() == flight_save, "portal resume changed lance speed, destination or pose")
+	check(attack.save_data() == flight_save, "portal resume changed lance speed, destination or pose")
 	_fresh(CrownCourtEncounter.Attack.PORTAL)
 	attack.advance(1.0 + 0.35)
-	_check(game.player.stats.health < 100000, "portal lance did not hit Denti on its announced path")
+	check(game.player.stats.health < 100000, "portal lance did not hit Denti on its announced path")
 	# A dash crossing a live verdict must not tunnel through both clear endpoints.
 	_fresh()
 	attack.advance(attack.profile.warning_seconds)
@@ -133,17 +127,17 @@ func _run() -> void:
 	game.player.dash_motion_seconds = 0.16
 	game.player.dash_moved = true
 	attack.advance(0.16)
-	_check(game.player.stats.health < 100000, "dash tunneled through a court sector")
+	check(game.player.stats.health < 100000, "dash tunneled through a court sector")
 	_fresh(CrownCourtEncounter.Attack.NERVE)
 	var shots_before := attack.shots.fired
 	attack.advance(attack.nerve_warning_duration() + 0.01)
-	_check(attack.shots.fired - shots_before == attack.profile.rays(0), "nerve ring omitted rays or silently capped its volley")
+	check(attack.shots.fired - shots_before == attack.profile.rays(0), "nerve ring omitted rays or silently capped its volley")
 	var pulse_before := attack.pulses_fired
 	boss.boss_phase = 2
 	boss.health = boss.max_health
 	boss.boss_damage_budget = boss.max_health
 	for hit in 40: boss.take_damage(1)
-	_check(attack.pulses_fired == pulse_before, "individual weapon hits manufactured extra nerve pulses")
+	check(attack.pulses_fired == pulse_before, "individual weapon hits manufactured extra nerve pulses")
 	_fresh()
 	boss.boss_phase = 2
 	boss.health = boss.max_health
@@ -153,7 +147,7 @@ func _run() -> void:
 	var rear := boss.take_damage(20, null, false, &"", [], Vector2.RIGHT)
 	attack.state = CrownCourtEncounter.State.OPEN
 	var open_hit := boss.take_damage(20, null, false, &"", [], Vector2.LEFT)
-	_check(rear > front * 1.7 and open_hit > rear, "crown guard ignores real hit direction or core exposure")
+	check(rear > front * 1.7 and open_hit > rear, "crown guard ignores real hit direction or core exposure")
 	# Each difficulty owns independent data and all three attack clocks survive pause.
 	var previous_projectiles := -1
 	var measurements: Array[Dictionary] = []
@@ -163,17 +157,17 @@ func _run() -> void:
 		attack.profile = EnemyCatalog.CAVITY_EMPEROR.crown_court_profile.for_difficulty(difficulty)
 		attack.shots.profile = attack.profile.shots
 		attack.lances.profile = attack.profile.lance
-		_check(attack.profile.shots != EnemyCatalog.CAVITY_EMPEROR.crown_court_profile.shots and attack.profile.shots.speed == 225 * difficulty.boss_projectile_speed_multiplier, "Emperor shared projectile data across difficulties")
-		_check(attack.profile.warning_seconds == 1.05 and attack.profile.portal_warning_seconds == 1 and attack.profile.nerve_warning_seconds == 1.05, "difficulty shortened Emperor reaction windows")
+		check(attack.profile.shots != EnemyCatalog.CAVITY_EMPEROR.crown_court_profile.shots and attack.profile.shots.speed == 225 * difficulty.boss_projectile_speed_multiplier, "Emperor shared projectile data across difficulties")
+		check(attack.profile.warning_seconds == 1.05 and attack.profile.portal_warning_seconds == 1 and attack.profile.nerve_warning_seconds == 1.05, "difficulty shortened Emperor reaction windows")
 		for kind in [0, 1, 2]:
 			_fresh(kind, 2)
 			if kind != CrownCourtEncounter.Attack.PORTAL:
-				_check(absf(Vector2.from_angle(attack.edict_angle).angle_to(attack.origin.direction_to(game.player.global_position))) < 0.0001, "court targeting differs by difficulty")
+				check(absf(Vector2.from_angle(attack.edict_angle).angle_to(attack.origin.direction_to(game.player.global_position))) < 0.0001, "court targeting differs by difficulty")
 			for seconds in [0.2, 0.8, 0.3, 0.5, 1.0, 1.2]:
 				attack.advance(seconds)
 				var before := attack.save_data()
 				EnemySnapshot.restore(boss, EnemySnapshot.capture(boss))
-				_check(before == attack.save_data(), "difficulty-specific court snapshot changed live hazards")
+				check(before == attack.save_data(), "difficulty-specific court snapshot changed live hazards")
 		_fresh(0, 2)
 		var fired := attack.shots.fired + attack.needles.fired
 		var warned := attack.warnings
@@ -186,29 +180,29 @@ func _run() -> void:
 			attack.advance(1.0 / 60)
 			kinds[attack.attack_kind] = true
 			peak = maxi(peak, attack.shots.entries.size() + attack.needles.entries.size())
-			_check(attack.shots.entries.size() <= attack.profile.shots.maximum and attack.needles.entries.size() <= attack.profile.needles.maximum and attack.lances.entries.size() <= attack.profile.lance.maximum, "court exceeded its hazard budgets")
+			check(attack.shots.entries.size() <= attack.profile.shots.maximum and attack.needles.entries.size() <= attack.profile.needles.maximum and attack.lances.entries.size() <= attack.profile.lance.maximum, "court exceeded its hazard budgets")
 		var total := attack.shots.fired + attack.needles.fired - fired
-		_check(kinds.size() == 3 and total > previous_projectiles, "actual Emperor repertoire/pressure did not scale between difficulties")
+		check(kinds.size() == 3 and total > previous_projectiles, "actual Emperor repertoire/pressure did not scale between difficulties")
 		previous_projectiles = total
 		measurements.append({"difficulty": str(difficulty.id), "seconds": 60, "projectiles": total, "portals": attack.portals_fired - portaled, "warnings": attack.warnings - warned, "movement": snappedf(attack.movement - stepped, 0.1), "peak_shots": peak})
 	print("EMPEROR PRESSURE: ", JSON.stringify(measurements))
 	var frozen := attack.save_data()
 	await process_frame
 	await process_frame
-	_check(attack.save_data() == frozen, "pause advanced the court clock")
+	check(attack.save_data() == frozen, "pause advanced the court clock")
 	for bad in [{"combo": []}, {"state": "bad"}, {"portal_a": [1]}, {"shots": [{"position": [1, 2], "velocity": [0, "bad"], "life": 1, "damage": 1}]}]:
-		_check(RunSaveData.normalize({"wave": 20, "player": {}, "enemies": [{"crown_court": bad}]}).is_empty(), "invalid Emperor save entered runtime")
+		check(RunSaveData.normalize({"wave": 20, "player": {}, "enemies": [{"crown_court": bad}]}).is_empty(), "invalid Emperor save entered runtime")
 	attack.restore({})
-	_check(attack.state == CrownCourtEncounter.State.POSITION and attack.shots.entries.is_empty(), "legacy Emperor save immediately unleashed new hazards")
+	check(attack.state == CrownCourtEncounter.State.POSITION and attack.shots.entries.is_empty(), "legacy Emperor save immediately unleashed new hazards")
 	# Two Emperors sharing a player cannot layer independent court sequences.
 	_fresh()
 	var second: Enemy = preload("res://scenes/enemies/enemy.tscn").instantiate()
 	second.configure(EnemyCatalog.CAVITY_EMPEROR, game.player, 20, &"hell")
 	game.get_node("Enemies").add_child(second)
 	second.set_simulation_enabled(false)
-	_check(second.crown_court_encounter._reserved(), "double Emperors did not reserve the active court sequence")
+	check(second.crown_court_encounter._reserved(), "double Emperors did not reserve the active court sequence")
 	second.crown_court_encounter.advance(0.8)
-	_check(not second.crown_court_encounter.active, "second Emperor ignored a reserved warning")
+	check(not second.crown_court_encounter.active, "second Emperor ignored a reserved warning")
 	second.free()
 	# Actual load during a warning, not just in-memory serialization.
 	_fresh(CrownCourtEncounter.Attack.PORTAL)
@@ -229,16 +223,16 @@ func _run() -> void:
 	game.get_node("Enemies").set_physics_process(false)
 	game.player.set_physics_process(false)
 	paused = true
-	_check(attack.state == CrownCourtEncounter.State.PORTAL_WARN and attack.portal_a == SnapshotValues.read_vector(actual_save.portal_a), "actual continue lost the portal's locked warning")
+	check(attack.state == CrownCourtEncounter.State.PORTAL_WARN and attack.portal_a == SnapshotValues.read_vector(actual_save.portal_a), "actual continue lost the portal's locked warning")
 	BossAttackController.start_boss_phase(boss)
-	_check(attack.shots.entries.is_empty() and attack.lances.entries.is_empty() and boss.boss_phase_burst_fired, "phase retained court hazards or added generic salvos")
+	check(attack.shots.entries.is_empty() and attack.lances.entries.is_empty() and boss.boss_phase_burst_fired, "phase retained court hazards or added generic salvos")
 	_fresh(CrownCourtEncounter.Attack.NERVE, 2)
 	attack.advance(attack.profile.nerve_warning_seconds + 0.1)
 	boss.health = 1
 	attack.retinue.used = true # Death cleanup fixture; retinue has a dedicated suite.
 	boss.boss_damage_budget = boss.max_health
 	boss.take_damage(1000)
-	_check(boss.dying and attack.shots.entries.is_empty() and attack.lances.entries.is_empty(), "dead Emperor retained damaging owned projectiles")
+	check(boss.dying and attack.shots.entries.is_empty() and attack.lances.entries.is_empty(), "dead Emperor retained damaging owned projectiles")
 	session.clear_run()
 	if failures.is_empty(): print("PASS crown_court_encounter: directional guard, fixed judgments, portals, full nerve rings, cadence, all tiers, snapshots, real continue, pause and legacy migration")
-	finish(0 if failures.is_empty() else 1)
+	finish_checks()

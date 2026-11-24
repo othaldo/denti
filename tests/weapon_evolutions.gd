@@ -1,15 +1,9 @@
 extends "res://tests/support/test_runtime.gd"
 
-var failures: Array[String] = []
 var game: Node2D
 
 func _initialize() -> void:
 	call_deferred("_run")
-
-func check(condition: bool, message: String) -> void:
-	if not condition:
-		failures.append(message)
-		push_error(message)
 
 func fixture(recipe: WeaponEvolutionRecipe) -> void:
 	game.player.loadout.restore([])
@@ -231,4 +225,4 @@ func _run() -> void:
 	session.clear_run()
 	if failures.is_empty():
 		print("Denti weapon evolutions test passed")
-	finish(0 if failures.is_empty() else 1)
+	finish_checks()

@@ -1,16 +1,10 @@
 extends "res://tests/support/test_runtime.gd"
 
-var failures := 0
 const MAGIC: WeaponData = preload("res://data/weapons/magic_toothbrush.tres")
 const ROCKET: WeaponData = preload("res://data/weapons/fluoride_rocket.tres")
 
 func _initialize() -> void:
 	call_deferred("_run")
-
-func _check(condition: bool, message: String) -> void:
-	if not condition:
-		failures += 1
-		push_error(message)
 
 func _values(ids: Array) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
@@ -21,9 +15,9 @@ func _values(ids: Array) -> Array[Dictionary]:
 func _run() -> void:
 	_check_images_and_bounds()
 	_check_live_pool()
-	if failures == 0:
+	if failures.is_empty():
 		print("Animated enchantments: combined effects, shared atlas, bounded cache, pooling, preparation and save/resume passed")
-	finish(0 if failures == 0 else 1)
+	finish_checks()
 
 func _check_images_and_bounds() -> void:
 	var cache := ProjectileEnchantmentSkins.new()
@@ -33,29 +27,29 @@ func _check_images_and_bounds() -> void:
 	for definition in WeaponAffixes.ALL:
 		var index := definition.projectile_effect_index
 		if index < 0:
-			_check(definition.stat_key != &"", "damage effect is missing its projectile visuals")
-			_check(ProjectileEnchantmentSkins.mask(_values([str(definition.id)])) == 0, "support without VFX created an element mask")
+			check(definition.stat_key != &"", "damage effect is missing its projectile visuals")
+			check(ProjectileEnchantmentSkins.mask(_values([str(definition.id)])) == 0, "support without VFX created an element mask")
 			continue
-		_check(index >= 0 and not indices.has(index), "enchantment has no unique particle effect")
+		check(index >= 0 and not indices.has(index), "enchantment has no unique particle effect")
 		indices.append(index)
 		var changed := false
 		for frame in ProjectileParticleFrames.COUNT:
 			changed = changed or cache.compose(base, 1 << index, 7, frame).get_data() != base_data
-		_check(changed, "particle effect was hidden/omitted: " + str(definition.id))
+		check(changed, "particle effect was hidden/omitted: " + str(definition.id))
 	var values := _values(["fire", "ice", "poison", "electric"])
 	var bits := ProjectileEnchantmentSkins.mask(values)
 	var reverse := values.duplicate(true)
 	reverse.reverse()
 	reverse[0].damage = 9999
 	reverse[0].rarity = 4
-	_check(bits == ProjectileEnchantmentSkins.mask(reverse), "order/strength needlessly creates a new visual combination")
-	_check(cache.compose(base, bits, 7, 0).get_data() != cache.compose(base, bits, 7, 4).get_data(), "particle frames do not animate")
+	check(bits == ProjectileEnchantmentSkins.mask(reverse), "order/strength needlessly creates a new visual combination")
+	check(cache.compose(base, bits, 7, 0).get_data() != cache.compose(base, bits, 7, 4).get_data(), "particle frames do not animate")
 	for value in values:
 		var removed := bits & ~(1 << WeaponAffixes.by_id(StringName(value.id)).projectile_effect_index)
 		var contributed := false
 		for frame in ProjectileParticleFrames.COUNT:
 			contributed = contributed or cache.compose(base, bits, 7, frame).get_data() != cache.compose(base, removed, 7, frame).get_data()
-		_check(contributed, "four-effect combination hides an enchantment: " + str(value.id))
+		check(contributed, "four-effect combination hides an enchantment: " + str(value.id))
 	var weapons: Array[WeaponInstance] = []
 	for index in 6:
 		var weapon := WeaponInstance.new()
@@ -63,22 +57,22 @@ func _check_images_and_bounds() -> void:
 		weapon.affixes = _values([str(WeaponAffixes.ALL[index].id)])
 		weapons.append(weapon)
 	cache.prepare(weapons)
-	_check(cache.entries.size() == 6 and cache.pages.size() == 1 and cache.uploads_total == 1, "six largest equipped styles were not packed/uploaded together")
+	check(cache.entries.size() == 6 and cache.pages.size() == 1 and cache.uploads_total == 1, "six largest equipped styles were not packed/uploaded together")
 	var old_frames := cache.frames(ProjectileEnchantmentSkins.base_texture(ROCKET, 4, weapons[0].affixes), ProjectileEnchantmentSkins.mask(weapons[0].affixes), 13)
 	var old_atlas := (old_frames[0] as AtlasTexture).atlas
 	for weapon in weapons:
 		var frames := cache.frames(ProjectileEnchantmentSkins.base_texture(ROCKET, 4, weapon.affixes), ProjectileEnchantmentSkins.mask(weapon.affixes), 13)
-		_check(frames.size() == ProjectileParticleFrames.COUNT, "equipped style lost animation frames")
+		check(frames.size() == ProjectileParticleFrames.COUNT, "equipped style lost animation frames")
 		for texture in frames:
-			_check((texture as AtlasTexture).atlas == old_atlas, "animation changes texture page and breaks batching")
+			check((texture as AtlasTexture).atlas == old_atlas, "animation changes texture page and breaks batching")
 	var count := cache.composed_total
 	cache.prepare(weapons)
-	_check(cache.composed_total == count and cache.uploads_total == 1, "unchanged equipment regenerated/reuploaded particle frames")
+	check(cache.composed_total == count and cache.uploads_total == 1, "unchanged equipment regenerated/reuploaded particle frames")
 	for definition in WeaponAffixes.ALL:
 		if definition.projectile_effect_index < 0: continue
 		cache.frames(base, 1 << definition.projectile_effect_index, 7)
-		_check(cache.entries.size() <= cache.MAX_STYLES and cache.pages.size() <= cache.MAX_PAGES, "skin cache exceeds its memory bound")
-	_check((old_frames[0] as AtlasTexture).atlas == old_atlas and old_atlas.get_size() == Vector2(cache.PAGE_SIZE), "eviction overwrote an old in-flight atlas")
+		check(cache.entries.size() <= cache.MAX_STYLES and cache.pages.size() <= cache.MAX_PAGES, "skin cache exceeds its memory bound")
+	check((old_frames[0] as AtlasTexture).atlas == old_atlas and old_atlas.get_size() == Vector2(cache.PAGE_SIZE), "eviction overwrote an old in-flight atlas")
 	for weapon in weapons:
 		weapon.free()
 
@@ -105,7 +99,7 @@ func _check_live_pool() -> void:
 	var created := pool.created
 	var undecorated := _shoot(pool, weapons[2])
 	var enchanted := _shoot(pool, weapons[0])
-	_check((undecorated.body_sprite.texture as AtlasTexture).atlas == (enchanted.body_sprite.texture as AtlasTexture).atlas, "mixing plain and enchanted equipment breaks texture batching")
+	check((undecorated.body_sprite.texture as AtlasTexture).atlas == (enchanted.body_sprite.texture as AtlasTexture).atlas, "mixing plain and enchanted equipment breaks texture batching")
 	undecorated.retire()
 	enchanted.retire()
 	for cycle in 100:
@@ -114,23 +108,23 @@ func _check_live_pool() -> void:
 		for frame in ProjectileParticleFrames.COUNT:
 			shot.animation_time = float(frame) / ProjectileParticleFrames.FPS
 			shot._sync_visuals()
-			_check(shot.get_child_count() == 1, "enchantments added child effect nodes")
+			check(shot.get_child_count() == 1, "enchantments added child effect nodes")
 		shot.retire()
-	_check(pool.skins.composed_total == baked and pool.skins.uploads_total == uploaded and pool.created == created, "prepared salvos generated images/uploads/nodes during combat")
+	check(pool.skins.composed_total == baked and pool.skins.uploads_total == uploaded and pool.created == created, "prepared salvos generated images/uploads/nodes during combat")
 	var old := _shoot(pool, weapons[0])
 	var old_frames := old.visual_frames
 	var old_texture := old.body_sprite.texture
-	_check(WeaponAffixes.apply(weapons[0], {"id": "poison", "rarity": 2, "damage": 8.0}), "fixture could not add its new enchantment")
-	_check(old.visual_frames == old_frames and old.body_sprite.texture == old_texture and old.affixes.size() == 2, "equipment change altered an in-flight projectile")
+	check(WeaponAffixes.apply(weapons[0], {"id": "poison", "rarity": 2, "damage": 8.0}), "fixture could not add its new enchantment")
+	check(old.visual_frames == old_frames and old.body_sprite.texture == old_texture and old.affixes.size() == 2, "equipment change altered an in-flight projectile")
 	var new_shot := _shoot(pool, weapons[0])
-	_check(new_shot.visual_frames != old_frames and new_shot.affixes.size() == 3, "new shot reused its previous owner's enchantment look")
+	check(new_shot.visual_frames != old_frames and new_shot.affixes.size() == 3, "new shot reused its previous owner's enchantment look")
 	var saved := RunSnapshot.capture(game)
-	_check(JSON.stringify(saved).find("visual_frames") == -1, "save serialized derived textures")
+	check(JSON.stringify(saved).find("visual_frames") == -1, "save serialized derived textures")
 	old.retire()
-	_check(old.visual_frames.is_empty(), "retired old-generation shot pins an obsolete atlas")
+	check(old.visual_frames.is_empty(), "retired old-generation shot pins an obsolete atlas")
 	var plain := pool.acquire(weapons[0].data, 1)
 	plain.launch(Vector2(400, 300), Vector2.RIGHT, 10, weapons[0].data)
-	_check(plain.visual_frames.size() == 1 and plain.affixes.is_empty() and plain.get_child_count() == 1, "plain recycled projectile retained enchantment graphics")
+	check(plain.visual_frames.size() == 1 and plain.affixes.is_empty() and plain.get_child_count() == 1, "plain recycled projectile retained enchantment graphics")
 	plain.retire()
 	game.free()
 	game = load("res://scenes/game/game.tscn").instantiate()
@@ -138,15 +132,15 @@ func _check_live_pool() -> void:
 	current_scene = game
 	RunSnapshot.restore(game, saved)
 	pool = game.get_node("Projectiles")
-	_check(pool.get_child_count() == 2, "resume lost mixed old/new enchanted projectiles")
+	check(pool.get_child_count() == 2, "resume lost mixed old/new enchanted projectiles")
 	for index in pool.get_child_count():
 		var shot: WeaponProjectile = pool.get_child(index)
-		_check(shot.affixes.size() == saved.player_projectiles[index].affixes.size() and shot.visual_frames.size() == ProjectileParticleFrames.COUNT and shot.get_child_count() == 1, "resume lost enchantments or single-sprite animation")
+		check(shot.affixes.size() == saved.player_projectiles[index].affixes.size() and shot.visual_frames.size() == ProjectileParticleFrames.COUNT and shot.get_child_count() == 1, "resume lost enchantments or single-sprite animation")
 	baked = pool.skins.composed_total
 	uploaded = pool.skins.uploads_total
 	for weapon in game.player.loadout.equipped():
 		_shoot(pool, weapon).retire()
-	_check(pool.skins.composed_total == baked and pool.skins.uploads_total == uploaded, "first resumed attacks regenerate equipped particle graphics")
+	check(pool.skins.composed_total == baked and pool.skins.uploads_total == uploaded, "first resumed attacks regenerate equipped particle graphics")
 	session.clear_run()
 	game.free()
 	paused = false

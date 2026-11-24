@@ -3,6 +3,21 @@ extends SceneTree
 var _finish_requested: bool = false
 var _finish_code: int = 0
 var _owned_stats: Array[PlayerStats] = []
+## Messages of failed check() calls; the test fails if any were recorded.
+var failures: Array[String] = []
+
+
+## Records a failed expectation without stopping the test.
+func check(condition: bool, message: String = "check failed") -> bool:
+	if not condition:
+		failures.append(message)
+		push_error(message)
+	return condition
+
+
+## Ends the test, failing it if any check() did not hold.
+func finish_checks() -> void:
+	finish(0 if failures.is_empty() else 1)
 
 
 func new_stats() -> PlayerStats:

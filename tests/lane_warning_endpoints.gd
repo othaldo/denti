@@ -1,9 +1,6 @@
 extends "res://tests/support/test_runtime.gd"
 const BATCH := preload("res://scripts/vfx/telegraph_batch.gd")
-var failures := 0
 func _initialize() -> void: call_deferred("_run")
-func _check(value: bool, message: String) -> void:
-	if not value: failures += 1; push_error(message)
 func _shapes(canvas: CanvasItem) -> Array[int]:
 	var result: Array[int] = []
 	if not canvas.has_meta(BATCH.META): return result
@@ -57,7 +54,7 @@ func _run() -> void:
 				spatial._process(0)
 				await _settle()
 				var shapes := _shapes(spatial if shared else enemy)
-				_check(shapes.count(BATCH.Shape.LANE) == 1 and not shapes.has(BATCH.Shape.CIRCLE), "lane retained an endpoint circle: attack %s, shared %s" % [row[1], shared])
+				check(shapes.count(BATCH.Shape.LANE) == 1 and not shapes.has(BATCH.Shape.CIRCLE), "lane retained an endpoint circle: attack %s, shared %s" % [row[1], shared])
 			if row[1] == EnemyData.SpecialAttack.BOSS:
 				enemy.boss_phase = 2
 				enemy.boss_phase_timer = 1
@@ -65,12 +62,12 @@ func _run() -> void:
 				enemy.queue_redraw()
 				await _settle()
 				var preview := _shapes(enemy)
-				_check(preview.has(BATCH.Shape.LANE) and not preview.has(BATCH.Shape.CIRCLE), "boss orb preview retained an endpoint circle")
+				check(preview.has(BATCH.Shape.LANE) and not preview.has(BATCH.Shape.CIRCLE), "boss orb preview retained an endpoint circle")
 			enemy.free()
 			spatial._process(0)
 			await _settle()
 	game.free()
 	paused = false
 	session.clear_run()
-	if failures == 0: print("PASS lane_warning_endpoints: sugar/boss charges, orb and projectile lanes, boss preview, local/shared drawing and two charge stages")
-	finish(0 if failures == 0 else 1)
+	if failures.is_empty(): print("PASS lane_warning_endpoints: sugar/boss charges, orb and projectile lanes, boss preview, local/shared drawing and two charge stages")
+	finish_checks()

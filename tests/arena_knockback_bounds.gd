@@ -3,16 +3,9 @@ extends "res://tests/support/test_runtime.gd"
 ## Knockback, pulls and shoves must never move enemies through the arena walls.
 
 var game: Node2D
-var failures := 0
 
 
 func _initialize() -> void: call_deferred("_run")
-
-
-func _check(condition: bool, message: String) -> void:
-	if not condition:
-		failures += 1
-		push_error(message)
 
 
 func _run() -> void:
@@ -40,8 +33,8 @@ func _run() -> void:
 	for direction: Vector2 in cases:
 		var enemy := _enemy(cases[direction])
 		enemy.apply_push(direction * 5000.0)
-		_check(_inside(enemy), "push moved an enemy through the wall: %s -> %s" % [direction, enemy.global_position])
-		_check(enemy.global_position.distance_to(cases[direction]) > 1.0, "push next to a wall did not move the enemy at all: %s" % direction)
+		check(_inside(enemy), "push moved an enemy through the wall: %s -> %s" % [direction, enemy.global_position])
+		check(enemy.global_position.distance_to(cases[direction]) > 1.0, "push next to a wall did not move the enemy at all: %s" % direction)
 	# A weapon hit at the wall uses the same bounded push.
 	var weapon: WeaponData = load("res://data/weapons/turbo_drill.tres").duplicate(true)
 	weapon.knockback = 5000.0
@@ -49,30 +42,30 @@ func _run() -> void:
 	var target := _enemy(Vector2(size.x - near, size.y / 2.0))
 	var start := target.global_position
 	WeaponAttackShapes.hit(target, weapon, 1, 1.0, false, null, Vector2.RIGHT, [], 1.0, false)
-	_check(target.global_position.x > start.x, "weapon knockback fixture did not push")
-	_check(_inside(target), "weapon knockback moved an enemy through the wall: " + str(target.global_position))
+	check(target.global_position.x > start.x, "weapon knockback fixture did not push")
+	check(_inside(target), "weapon knockback moved an enemy through the wall: " + str(target.global_position))
 	# Resistant enemies still stand firm.
 	var anchor := _enemy(size / 2.0)
 	anchor.data = anchor.data.duplicate(true)
 	anchor.data.knockback_resistance = 1.0
 	anchor.apply_push(Vector2.RIGHT * 300.0)
-	_check(anchor.global_position.is_equal_approx(size / 2.0), "fully resistant enemy was pushed")
+	check(anchor.global_position.is_equal_approx(size / 2.0), "fully resistant enemy was pushed")
 	_arena_helpers(game.arena)
 	session.clear_run()
-	if failures == 0:
+	if failures.is_empty():
 		print("PASS arena knockback bounds: pushes, pulls and weapon knockback stay inside the walls")
-	finish(1 if failures else 0)
+	finish_checks()
 
 
 func _arena_helpers(arena: DentiArena) -> void:
 	var size := arena.arena_size
 	var wall := DentiArena.enemy_margin(20)
-	_check(is_equal_approx(wall, DentiArena.WALL_WIDTH + 20 + DentiArena.ENEMY_WALL_GAP), "enemy margin changed its formula")
-	_check(arena.clamp_enemy(Vector2(-500, size.y + 500), 20).is_equal_approx(Vector2(wall, size.y - wall)), "enemy clamp left the floor")
-	_check(arena.clamp_player(size * 2).is_equal_approx(size - Vector2.ONE * DentiArena.PLAYER_MARGIN), "player clamp left the floor")
-	_check(arena.clamp_inside(size / 2, 60).is_equal_approx(size / 2), "clamp moved a central point")
+	check(is_equal_approx(wall, DentiArena.WALL_WIDTH + 20 + DentiArena.ENEMY_WALL_GAP), "enemy margin changed its formula")
+	check(arena.clamp_enemy(Vector2(-500, size.y + 500), 20).is_equal_approx(Vector2(wall, size.y - wall)), "enemy clamp left the floor")
+	check(arena.clamp_player(size * 2).is_equal_approx(size - Vector2.ONE * DentiArena.PLAYER_MARGIN), "player clamp left the floor")
+	check(arena.clamp_inside(size / 2, 60).is_equal_approx(size / 2), "clamp moved a central point")
 	var inner := arena.inner_rect(60)
-	_check(inner.position.is_equal_approx(Vector2.ONE * 60) and inner.end.is_equal_approx(size - Vector2.ONE * 60), "inner rect has the wrong edges")
+	check(inner.position.is_equal_approx(Vector2.ONE * 60) and inner.end.is_equal_approx(size - Vector2.ONE * 60), "inner rect has the wrong edges")
 
 
 func _enemy(at: Vector2) -> Enemy:

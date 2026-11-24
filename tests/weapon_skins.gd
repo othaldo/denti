@@ -1,17 +1,10 @@
 extends "res://tests/support/test_runtime.gd"
 
 var game: Node2D
-var failures: Array[String] = []
 
 
 func _initialize() -> void:
 	call_deferred("_run")
-
-
-func check(ok: bool, message: String) -> void:
-	if not ok:
-		failures.append(message)
-		push_error(message)
 
 
 func _run() -> void:
@@ -109,7 +102,7 @@ func _run() -> void:
 	paused = false
 	if failures.is_empty():
 		print("PASS weapon_skins: 24 weapons, 168 forms, live rigs, drafts, isolation, fusion and resume")
-	finish(0 if failures.is_empty() else 1)
+	finish_checks()
 
 
 func _paint_bounds(image: Image) -> Rect2i:

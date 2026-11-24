@@ -1,16 +1,10 @@
 extends "res://tests/support/test_runtime.gd"
 
-var failures: Array[String] = []
 var legacy_events: Array[String] = []
 var central_events: Array[String] = []
 
 func _initialize() -> void:
 	call_deferred("_run")
-
-func _check(ok: bool, message: String) -> void:
-	if not ok:
-		failures.append(message)
-		push_error(message)
 
 func _fixture(events: Array[String]) -> Node2D:
 	seed(92917)
@@ -98,7 +92,7 @@ func _run() -> void:
 	var central := _fixture(central_events)
 	var index: EnemySpatialIndex = central.get_node("Enemies")
 	for enemy: Enemy in index.get_children():
-		_check(not enemy.is_physics_processing() and enemy.simulation_enabled, "managed enemy still has an individual fixed-step callback")
+		check(not enemy.is_physics_processing() and enemy.simulation_enabled, "managed enemy still has an individual fixed-step callback")
 	for tick in 300:
 		# Match randomness consumed by attack effects, status chances and spawns.
 		current_scene = legacy
@@ -120,9 +114,9 @@ func _run() -> void:
 					for field in actual[key][number]:
 						if actual[key][number][field] != expected[key][number][field]:
 							print("DIFFERENCE %s %d %s: expected %s, actual %s" % [key, number, field, expected[key][number][field], actual[key][number][field]])
-			_check(actual[key] == expected[key], "central motion changed %s at tick %d" % [key, tick])
-		_check(central.player.stats.health == legacy.player.stats.health and central.player.hurt_time == legacy.player.hurt_time, "central motion changed contact damage/order at tick %d" % tick)
-		_check(central_events == legacy_events, "central motion changed attack timing/order at tick %d" % tick)
+			check(actual[key] == expected[key], "central motion changed %s at tick %d" % [key, tick])
+		check(central.player.stats.health == legacy.player.stats.health and central.player.hurt_time == legacy.player.hurt_time, "central motion changed contact damage/order at tick %d" % tick)
+		check(central_events == legacy_events, "central motion changed attack timing/order at tick %d" % tick)
 		if not failures.is_empty():
 			break
 		await process_frame
@@ -135,15 +129,15 @@ func _run() -> void:
 	var last_order := -1
 	for enemy in index.motion.enemies:
 		if enemy != null:
-			_check(enemy.spatial_order > last_order and index.motion.enemies[enemy.motion_slot] == enemy, "compaction reordered enemies or assigned stale slots")
+			check(enemy.spatial_order > last_order and index.motion.enemies[enemy.motion_slot] == enemy, "compaction reordered enemies or assigned stale slots")
 			last_order = enemy.spatial_order
 	for enemy in index.get_children():
 		enemy.free()
-	_check(index.motion.enemies.is_empty() and index.motion.positions.is_empty() and not index.is_physics_processing(), "combat cleanup left active motion entries")
+	check(index.motion.enemies.is_empty() and index.motion.positions.is_empty() and not index.is_physics_processing(), "combat cleanup left active motion entries")
 	session.clear_run()
 	legacy.free()
 	central.free()
 	paused = false
 	if failures.is_empty():
 		print("Denti central enemy motion matches individual simulation")
-	finish(0 if failures.is_empty() else 1)
+	finish_checks()

@@ -1,13 +1,5 @@
 extends "res://tools/benchmark_weapon_dps.gd"
 
-var failures := 0
-
-
-func _check(condition: bool, message: String) -> void:
-	if not condition:
-		failures += 1
-		push_error(message)
-
 
 func _run() -> void:
 	_setup()
@@ -24,21 +16,21 @@ func _run() -> void:
 			if data.attack_animation == "floss_cut":
 				# Anchored floss is a piercing line, paid for by hitting successive targets.
 				var lane := _measure(data, tier, "lane")
-				_check(float(lane.dps_per_root) >= reference * 2.0, "%s tier %d lacks piercing-line payoff" % [data.id, tier])
+				check(float(lane.dps_per_root) >= reference * 2.0, "%s tier %d lacks piercing-line payoff" % [data.id, tier])
 			elif data.attack_mode in [&"melee", &"thrust"]:
-				_check(dps >= reference * 1.25, "%s tier %d lacks melee risk premium" % [data.id, tier])
+				check(dps >= reference * 1.25, "%s tier %d lacks melee risk premium" % [data.id, tier])
 			else:
 				var pack := _measure(data, tier, "pack")
-				_check(float(pack.dps_per_root) >= reference * 2.0, "%s tier %d lacks crowd-clear payoff" % [data.id, tier])
+				check(float(pack.dps_per_root) >= reference * 2.0, "%s tier %d lacks crowd-clear payoff" % [data.id, tier])
 			if previous.has(data.id):
-				_check(dps > float(previous[data.id]) * 1.25, "%s tier %d has a weak fusion step" % [data.id, tier])
+				check(dps > float(previous[data.id]) * 1.25, "%s tier %d has a weak fusion step" % [data.id, tier])
 			previous[data.id] = dps
 	# Existing evolution upgrades inherit the improved direct weapon chassis.
 	for recipe in WeaponEvolutions.ALL:
 		var base := WeaponCatalog.by_id(recipe.base_weapon)
-		_check(recipe.result.damage_at_tier(4) >= base.damage_at_tier(4), "evolution loses base damage: " + str(recipe.id))
-		_check(recipe.result.interval_at_tier(4) <= base.interval_at_tier(4), "evolution loses base cadence: " + str(recipe.id))
+		check(recipe.result.damage_at_tier(4) >= base.damage_at_tier(4), "evolution loses base damage: " + str(recipe.id))
+		check(recipe.result.interval_at_tier(4) <= base.interval_at_tier(4), "evolution loses base cadence: " + str(recipe.id))
 	_cleanup()
-	if failures == 0:
+	if failures.is_empty():
 		print("PASS weapon_dps_balance: live tier I-IV contact throughput, risk premium, AoE payoff and evolution chassis")
-	finish(0 if failures == 0 else 1)
+	finish_checks()

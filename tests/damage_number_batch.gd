@@ -1,15 +1,9 @@
 extends "res://tests/support/test_runtime.gd"
 
 const SCENE := preload("res://scenes/ui/damage_number.tscn")
-var failures := 0
 
 func _initialize() -> void:
 	call_deferred("_run")
-
-func check(ok: bool, message: String) -> void:
-	if not ok:
-		failures += 1
-		push_error(message)
 
 func _run() -> void:
 	var batch := DamageNumberBatch.new()
@@ -73,9 +67,9 @@ func _run() -> void:
 	check(not is_instance_id_valid(reserved_id), "arena exit leaked pooled damage text")
 	if DisplayServer.get_name() != "headless":
 		await _render_comparison()
-	if failures == 0:
+	if failures.is_empty():
 		print("Denti shared damage text test passed")
-	finish(0 if failures == 0 else 1)
+	finish_checks()
 
 func _render_comparison() -> void:
 	var viewport := SubViewport.new()

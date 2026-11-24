@@ -7,7 +7,6 @@ const MEASURED_STRIKE = preload("res://tools/balance/measured_strike.gd")
 const BUILDS := ["turbo_drill", "floss_garrote", "uv_lamp", "water_turbine", "interdental_brush"]
 const STAPLES := ["health_1", "armor_2", "damage_1", "regen_1", "tempo_2", "xp_heal_1"]
 const MAX_REROLLS := 4
-var failures := 0
 
 
 func _run() -> void:
@@ -32,7 +31,7 @@ func _run() -> void:
 		return
 	file.store_string(JSON.stringify(report, "\t") + "\n")
 	file.close()
-	finish(1 if failures else 0)
+	finish_checks()
 
 
 func make_run(build: String, difficulty: StringName, sample_seed: int):
@@ -234,11 +233,9 @@ func resolve_intermission(game) -> void:
 				if run_aborted(): return
 				game._on_relic_chosen(relic_id)
 			_:
-				push_error("Unexpected earned-run intermission step: " + str(game.rewards.step))
-				failures += 1
+				check(false, "Unexpected earned-run intermission step: " + str(game.rewards.step))
 				return
-	push_error("Earned progression did not finish its actual reward queue")
-	failures += 1
+	check(false, "Earned progression did not finish its actual reward queue")
 
 
 func level_choice(game) -> UpgradeData:
@@ -253,8 +250,7 @@ func spend_talent_points(game) -> void:
 		if game.talents.used(game.player.stats.class_data.talent_tree) >= game.rewards.pending_levels: break
 		var selected := fallback_talent_stat(game)
 		if selected == &"" or not game.talents.plan_stat(selected, game.player.stats, game.UPGRADES, game.rewards.pending_levels):
-			push_error("Earned progression cannot allocate a level point")
-			failures += 1
+			check(false, "Earned progression cannot allocate a level point")
 			return
 	game._on_talents_completed()
 
@@ -272,8 +268,7 @@ func spend_upgrade_points(game) -> void:
 	for action in weapon_upgrade_actions(game):
 		var detail: String = plan_weapon_upgrade(game, action)
 		if detail.is_empty():
-			push_error("Cannot apply the planned bot enchantment step")
-			failures += 1
+			check(false, "Cannot apply the planned bot enchantment step")
 			return
 		await before_intermission_action(game, "Verzauberungen", detail)
 		if run_aborted(): return

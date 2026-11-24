@@ -1,14 +1,8 @@
 extends "res://tests/support/test_runtime.gd"
 
-var failures: Array[String] = []
 var game: Node2D
 
 func _initialize() -> void: call_deferred("_run")
-func _check(ok: bool, message: String) -> void:
-	if ok: return
-	failures.append(message)
-	push_error(message)
-
 func _spawn(difficulty: DifficultyData) -> Enemy:
 	game.wave.difficulty_id = difficulty.id
 	game.player.global_position = Vector2(1050, 650)
@@ -52,13 +46,13 @@ func _run() -> void:
 		var boss := _spawn(difficulty)
 		var attack := boss.acid_king_encounter
 		var profile := attack.profile
-		_check(profile != original and profile.shards != original.shards and original.shards.speed == 210, "difficulty modified the shared King resource")
-		_check(profile.warning_seconds == original.warning_seconds and profile.shift_warning_seconds == original.shift_warning_seconds, "difficulty changed unrelated channel warnings")
-		_check(profile.stomp_near_warning_seconds < previous_near_warning and profile.stomp_warning_seconds < previous_far_warning and profile.stomp_near_warning_seconds >= 0.6, "stone wave windup did not scale readably with difficulty")
+		check(profile != original and profile.shards != original.shards and original.shards.speed == 210, "difficulty modified the shared King resource")
+		check(profile.warning_seconds == original.warning_seconds and profile.shift_warning_seconds == original.shift_warning_seconds, "difficulty changed unrelated channel warnings")
+		check(profile.stomp_near_warning_seconds < previous_near_warning and profile.stomp_warning_seconds < previous_far_warning and profile.stomp_near_warning_seconds >= 0.6, "stone wave windup did not scale readably with difficulty")
 		previous_near_warning = profile.stomp_near_warning_seconds
 		previous_far_warning = profile.stomp_warning_seconds
-		_check(profile.rows(2) == 4 + difficulty.boss_volley_bonus and profile.shard_count(2) == 7 + difficulty.boss_volley_bonus * 2, "King action/projectile counts ignore difficulty")
-		_check(is_equal_approx(profile.shards.speed, 210 * difficulty.boss_projectile_speed_multiplier), "King shard speed ignores difficulty")
+		check(profile.rows(2) == 4 + difficulty.boss_volley_bonus and profile.shard_count(2) == 7 + difficulty.boss_volley_bonus * 2, "King action/projectile counts ignore difficulty")
+		check(is_equal_approx(profile.shards.speed, 210 * difficulty.boss_projectile_speed_multiplier), "King shard speed ignores difficulty")
 		var warnings := [0]
 		boss.attack_performed.connect(func(kind: StringName):
 			if kind == &"boss_warning": warnings[0] += 1)
@@ -71,9 +65,9 @@ func _run() -> void:
 			if attack.active: kinds[attack.attack_kind] = true
 			peak_fields = maxi(peak_fields, attack.fields.size())
 			peak_shards = maxi(peak_shards, attack.volley.entries.size())
-			_check(attack.fields.size() <= 2 and attack.volley.entries.size() <= profile.shards.maximum and attack.spit.entries.size() <= profile.spit.maximum, "King exceeded a hazard budget")
+			check(attack.fields.size() <= 2 and attack.volley.entries.size() <= profile.shards.maximum and attack.spit.entries.size() <= profile.spit.maximum, "King exceeded a hazard budget")
 		results.append({"difficulty": str(difficulty.id), "seconds": 60, "warnings": warnings[0], "channels": attack.channels_created, "rows": attack.rows_fired, "projectiles": attack.volley.fired + attack.spit.fired, "spit_projectiles": attack.spit.fired, "movement": snappedf(attack.movement, 0.1), "damage_acid": snappedf(attack.damage_by_source.acid, 0.1), "damage_stomp": snappedf(attack.damage_by_source.stomp, 0.1), "damage_shards": snappedf(attack.volley.damage_dealt, 0.1), "damage_spit": snappedf(attack.spit.damage_dealt, 0.1), "peak_fields": peak_fields, "peak_shards": peak_shards, "kinds": kinds.size()})
-		_check(kinds.size() == 3, "King did not use its whole repertoire")
+		check(kinds.size() == 3, "King did not use its whole repertoire")
 		# Every difficulty/attack/state preserves its actual announced geometry.
 		for kind in [0, 1, 2]:
 			attack.cancel()
@@ -82,7 +76,7 @@ func _run() -> void:
 				attack.advance(seconds)
 				var before := attack.save_data()
 				EnemySnapshot.restore(boss, EnemySnapshot.capture(boss))
-				_check(attack.save_data() == before, "difficulty-specific King resume changed a live attack")
+				check(attack.save_data() == before, "difficulty-specific King resume changed a live attack")
 		# Real slowed routes from all four corners; no lane is removed for Denti.
 		for corner: Vector2 in [Vector2(48, 48), Vector2(game.player.arena.arena_size.x - 48, 48), Vector2(48, game.player.arena.arena_size.y - 48), game.player.arena.arena_size - Vector2.ONE * 48]:
 			for kind in [AcidKingEncounter.Attack.CHANNELS, AcidKingEncounter.Attack.STOMP]:
@@ -116,22 +110,22 @@ func _run() -> void:
 					if not body and game.player.stats.health == 100000:
 						safe = true
 						break
-				_check(safe, "%s King attack %d has no slowed route from %s" % [difficulty.id, kind, corner])
+				check(safe, "%s King attack %d has no slowed route from %s" % [difficulty.id, kind, corner])
 		boss.free()
 	for index in range(1, results.size()):
-		_check(results[index].projectiles > results[index - 1].projectiles, "actual King projectile pressure did not rise with every difficulty")
+		check(results[index].projectiles > results[index - 1].projectiles, "actual King projectile pressure did not rise with every difficulty")
 	print("KING PRESSURE: ", JSON.stringify(results))
 	# Double Kings take turns; floor fields and projectiles clear on interruption.
 	var first := _spawn(DifficultyCatalog.HELL)
 	var second := _spawn(DifficultyCatalog.HELL)
 	first.acid_king_encounter.begin(AcidKingEncounter.Attack.CHANNELS)
-	_check(second.acid_king_encounter._reserved(), "two Kings failed to coordinate their warning starts")
+	check(second.acid_king_encounter._reserved(), "two Kings failed to coordinate their warning starts")
 	first.acid_king_encounter.advance(1.1)
-	_check(first.acid_king_encounter.fields.size() + second.acid_king_encounter.fields.size() <= 2, "two Kings duplicated the floor budget")
+	check(first.acid_king_encounter.fields.size() + second.acid_king_encounter.fields.size() <= 2, "two Kings duplicated the floor budget")
 	BossAttackController.start_boss_phase(first)
-	_check(first.acid_king_encounter.fields.is_empty(), "phase change retained acid under the other King's attack")
+	check(first.acid_king_encounter.fields.is_empty(), "phase change retained acid under the other King's attack")
 	first.free()
 	second.free()
 	session.clear_run()
 	if failures.is_empty(): print("PASS acid_king_difficulty: all tiers, measured pressure, timed geometry, slowed corner routes, shared resources, save/resume and double Kings")
-	finish(0 if failures.is_empty() else 1)
+	finish_checks()

@@ -2,16 +2,10 @@ extends "res://tests/support/test_runtime.gd"
 ## A close enemy must not shrink the advertised round sweep for other targets.
 
 var game: Node2D
-var failures: Array[String] = []
 ## Enemy offsets are measured from the brush's root anchor.
 var origin := Vector2.ZERO
 
 func _initialize() -> void: call_deferred("_run")
-
-func _check(ok: bool, message: String) -> void:
-	if ok: return
-	failures.append(message)
-	push_error(message)
 
 func _enemy(offset: Vector2, scaled_health := false) -> Enemy:
 	game._create_enemy(EnemyCatalog.BACTERIA, game.player.global_position + origin + offset)
@@ -37,26 +31,26 @@ func _sweep(tier: int, direction: Vector2, density: float, element: StringName =
 	origin = weapon.home_position
 	var pose_data := WeaponMotion.pose(weapon.data, tier, weapon.home_position, direction, 0.47, 0, 35, density)
 	var blade := WeaponMotion.segment(weapon.data, pose_data)
-	_check(is_equal_approx((blade[1] - weapon.home_position).length(), weapon.data.range_at_tier(tier)), "visible brush does not reach its advertised radius")
+	check(is_equal_approx((blade[1] - weapon.home_position).length(), weapon.data.range_at_tier(tier)), "visible brush does not reach its advertised radius")
 	var near := _enemy(direction * 35)
 	var targets: Array[Enemy] = [near]
 	for index in 8:
 		targets.append(_enemy(direction.rotated(index * TAU / 8) * weapon.data.range_at_tier(tier)))
 	var outside := _enemy(-direction * (weapon.data.range_at_tier(tier) + near.data.radius + weapon.data.attack_width + 5))
 	weapon._physics_process(0.001)
-	_check(targets.all(func(enemy: Enemy) -> bool: return enemy.health == 10000), "brush dealt damage before windup")
+	check(targets.all(func(enemy: Enemy) -> bool: return enemy.health == 10000), "brush dealt damage before windup")
 	var left := weapon.attack_duration
 	while left > 0.000001:
 		var step := minf(1.0 / 60, left) if fixed_steps else left
 		weapon._physics_process(step)
 		left -= step
 	for index in targets.size():
-		_check(targets[index].health < 10000, "brush missed tier %d direction %s density %.2f element %s target %d" % [tier, direction, density, element, index])
-	_check(outside.health == 10000, "brush hit beyond its advertised reach")
+		check(targets[index].health < 10000, "brush missed tier %d direction %s density %.2f element %s target %d" % [tier, direction, density, element, index])
+	check(outside.health == 10000, "brush hit beyond its advertised reach")
 	var health := targets.map(func(enemy: Enemy) -> float: return enemy.health)
 	weapon.strike.tick(weapon, WeaponMotion.ACTIVE_START, WeaponMotion.ACTIVE_END)
 	for index in targets.size():
-		_check(targets[index].health == health[index], "brush hit twice in one sweep")
+		check(targets[index].health == health[index], "brush hit twice in one sweep")
 
 func _resume() -> void:
 	_clear()
@@ -77,9 +71,9 @@ func _resume() -> void:
 	weapon.set_physics_process(false)
 	weapon._physics_process(weapon.attack_time)
 	var actual: Array = game.get_node("Enemies").get_children().map(func(enemy: Enemy) -> float: return enemy.health)
-	_check(actual.size() == expected.size(), "resumed brush lost a target")
+	check(actual.size() == expected.size(), "resumed brush lost a target")
 	for index in mini(actual.size(), expected.size()):
-		_check(is_equal_approx(actual[index], expected[index]), "resumed brush changed target %d: %s instead of %s" % [index, actual[index], expected[index]])
+		check(is_equal_approx(actual[index], expected[index]), "resumed brush changed target %d: %s instead of %s" % [index, actual[index], expected[index]])
 
 func _run() -> void:
 	root.get_node("SceneTransitions").enabled = false
@@ -108,4 +102,4 @@ func _run() -> void:
 	_clear()
 	session.clear_run()
 	if failures.is_empty(): print("PASS interdental brush: simultaneous close/outer contacts, all directions/tiers/elements, compact builds, windup, range, one hit and JSON resume")
-	finish(0 if failures.is_empty() else 1)
+	finish_checks()

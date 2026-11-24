@@ -1,14 +1,8 @@
 extends "res://tests/support/test_runtime.gd"
 
-var failures: Array[String] = []
 var game: Node2D
 
 func _initialize() -> void: call_deferred("_run")
-
-func _check(condition: bool, message: String) -> void:
-	if not condition:
-		failures.append(message)
-		push_error(message)
 
 func _run() -> void:
 	root.get_node("SceneTransitions").enabled = false
@@ -33,7 +27,7 @@ func _run() -> void:
 			planner.start_next_wave()
 			for tick in 241: planner._process(0.25)
 			planner._process(10000)
-			_check(counts.bosses == (2 if number in [30, 40] else 1) and counts.trash == 0 and counts.finished == 0 and planner.active and planner.remaining == planner.duration, "boss stage spawned trash or retained a timed finish/inflammation: %s/%d" % [difficulty, number])
+			check(counts.bosses == (2 if number in [30, 40] else 1) and counts.trash == 0 and counts.finished == 0 and planner.active and planner.remaining == planner.duration, "boss stage spawned trash or retained a timed finish/inflammation: %s/%d" % [difficulty, number])
 			planner.free()
 	game = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(game)
@@ -47,20 +41,20 @@ func _run() -> void:
 	boss.boss_phase = 2
 	boss.boss_phase_timer = 0
 	var health := boss.health
-	_check(boss.take_damage(10000) == 0 and boss.health == health, "threshold gap allowed skipping the objective phase")
+	check(boss.take_damage(10000) == 0 and boss.health == health, "threshold gap allowed skipping the objective phase")
 	attack.advance(0.01)
-	_check(ritual.state == CaramelOverload.State.WARNING and ritual.live_pylons().size() == 4, "ritual did not create exactly four unique hearts")
-	_check(not boss.is_targetable(), "immune Prince remained an automatic weapon target")
+	check(ritual.state == CaramelOverload.State.WARNING and ritual.live_pylons().size() == 4, "ritual did not create exactly four unique hearts")
+	check(not boss.is_targetable(), "immune Prince remained an automatic weapon target")
 	for pylon in ritual.live_pylons():
-		_check(pylon.data == EnemyCatalog.CARAMEL_HEART and pylon.contact_damage == 0 and pylon.inflicted_statuses.is_empty(), "heart inherited a trash role/status/contact attack")
+		check(pylon.data == EnemyCatalog.CARAMEL_HEART and pylon.contact_damage == 0 and pylon.inflicted_statuses.is_empty(), "heart inherited a trash role/status/contact attack")
 	attack.advance(ritual.profile.warning_seconds)
-	_check(ritual.state == CaramelOverload.State.ACTIVE, "ritual preparation did not enter active task")
+	check(ritual.state == CaramelOverload.State.ACTIVE, "ritual preparation did not enter active task")
 	game._on_boss_reinforcements(8)
-	_check(game.get_node("Enemies").get_child_count() == 5, "health phase recycled normal enemies as minions")
+	check(game.get_node("Enemies").get_child_count() == 5, "health phase recycled normal enemies as minions")
 	# A boss wave has no running clock, also during a live task.
 	game.wave.remaining = 0.01
 	game.wave._process(10000)
-	_check(game.wave.active and not game.boss_pending and not boss.overtime_active and ritual.live_pylons().size() == 4 and not game.collecting_wave_loot, "boss wave clock still ended/inflamed the fight or removed objectives")
+	check(game.wave.active and not game.boss_pending and not boss.overtime_active and ritual.live_pylons().size() == 4 and not game.collecting_wave_loot, "boss wave clock still ended/inflamed the fight or removed objectives")
 	# Root-level save/resume must link exactly the same four targets and clocks.
 	var expected := ritual.save_data()
 	var first: Enemy = ritual.live_pylons()[0]
@@ -68,7 +62,7 @@ func _run() -> void:
 	first.take_damage(5)
 	var first_health := first.health
 	game._save_run()
-	_check(not session.load_run().is_empty(), "complete objective snapshot failed validation")
+	check(not session.load_run().is_empty(), "complete objective snapshot failed validation")
 	session.resume_requested = true
 	paused = false
 	change_scene_to_file("res://scenes/game/game.tscn")
@@ -81,30 +75,30 @@ func _run() -> void:
 	boss = game.boss
 	attack = boss.caramel_encounter
 	ritual = attack.overload
-	_check(ritual.state == CaramelOverload.State.ACTIVE and ritual.live_pylons().size() == 4 and game.get_node("Enemies").get_child_count() == 5, "resume lost/duplicated ritual objectives")
-	_check(absf(ritual.remaining - float(expected.remaining)) < 0.1 and absf(ritual.live_pylons()[0].health - first_health) < 0.01, "resume reset objective health or task deadline")
+	check(ritual.state == CaramelOverload.State.ACTIVE and ritual.live_pylons().size() == 4 and game.get_node("Enemies").get_child_count() == 5, "resume lost/duplicated ritual objectives")
+	check(absf(ritual.remaining - float(expected.remaining)) < 0.1 and absf(ritual.live_pylons()[0].health - first_health) < 0.01, "resume reset objective health or task deadline")
 	var frozen := ritual.save_data()
 	await process_frame
 	await process_frame
-	_check(ritual.save_data() == frozen, "pause advanced task/hazard clocks")
+	check(ritual.save_data() == frozen, "pause advanced task/hazard clocks")
 	# Immune targets do not absorb normal weapon/projectile queries.
 	game.player.global_position = boss.global_position
-	_check(not game.get_node("Enemies").in_circle(boss.global_position, 1).has(boss), "spatial query kept the immune boss as a hit target")
+	check(not game.get_node("Enemies").in_circle(boss.global_position, 1).has(boss), "spatial query kept the immune boss as a hit target")
 	for pylon in ritual.live_pylons():
 		game.player.global_position = pylon.global_position + Vector2(55, 0)
-		_check(pylon.is_targetable(), "approaching a heart did not open its shell")
+		check(pylon.is_targetable(), "approaching a heart did not open its shell")
 		pylon.take_damage(1000)
 	attack.advance(0.01)
-	_check(ritual.state == CaramelOverload.State.RECOVERY and ritual.live_pylons().is_empty() and boss.is_targetable(), "last heart did not immediately break the shield")
+	check(ritual.state == CaramelOverload.State.RECOVERY and ritual.live_pylons().is_empty() and boss.is_targetable(), "last heart did not immediately break the shield")
 	var recovered := ritual.save_data()
 	EnemySnapshot.restore(boss, EnemySnapshot.capture(boss))
-	_check(ritual.save_data() == recovered and boss.is_targetable(), "snapshot reset the earned vulnerability window")
+	check(ritual.save_data() == recovered and boss.is_targetable(), "snapshot reset the earned vulnerability window")
 	health = boss.health
 	boss.boss_damage_budget = 0
 	var dealt := boss.take_damage(10)
-	_check(dealt > 10 and boss.health < health, "success window retained the boss guard or lost vulnerability")
+	check(dealt > 10 and boss.health < health, "success window retained the boss guard or lost vulnerability")
 	attack.advance(ritual.profile.recovery_seconds + 0.1)
-	_check(ritual.used and ritual.state == CaramelOverload.State.FINISHED, "completed task repeated or left permanent immunity")
+	check(ritual.used and ritual.state == CaramelOverload.State.FINISHED, "completed task repeated or left permanent immunity")
 	# Failure releases warned, dodgeable projectiles, then restores normal combat.
 	await _fresh(10)
 	boss = game.boss
@@ -114,12 +108,12 @@ func _run() -> void:
 	boss.boss_phase_timer = 0
 	attack.advance(0.01)
 	attack.advance(ritual.profile.warning_seconds + ritual.duration)
-	_check(ritual.state == CaramelOverload.State.BLAST and ritual.missed == 4, "deadline did not announce the unfinished finisher")
+	check(ritual.state == CaramelOverload.State.BLAST and ritual.missed == 4, "deadline did not announce the unfinished finisher")
 	var blast_warning := ritual.save_data()
 	EnemySnapshot.restore(boss, EnemySnapshot.capture(boss))
-	_check(ritual.save_data() == blast_warning and attack.hearts.entries.is_empty(), "resume skipped the finisher warning")
+	check(ritual.save_data() == blast_warning and attack.hearts.entries.is_empty(), "resume skipped the finisher warning")
 	attack.advance(ritual.profile.blast_warning_seconds + 0.01)
-	_check(ritual.state == CaramelOverload.State.FINISHED and boss.is_targetable() and not attack.hearts.entries.is_empty(), "failure stalled invulnerability instead of resuming combat")
+	check(ritual.state == CaramelOverload.State.FINISHED and boss.is_targetable() and not attack.hearts.entries.is_empty(), "failure stalled invulnerability instead of resuming combat")
 	# Small viewports and slow builds retain reachable, fixed world-space targets.
 	for extent in [Vector2i(320, 568), Vector2i(568, 320), Vector2i(1280, 720)]:
 		root.size = extent
@@ -136,49 +130,49 @@ func _run() -> void:
 		ritual = attack.overload
 		var visible := boss.get_canvas_transform().affine_inverse() * boss.get_viewport_rect()
 		for pylon in ritual.live_pylons():
-			_check(visible.has_point(pylon.global_position), "objective spawned outside the visible arena")
-		_check(ritual.duration >= ritual.profile.minimum_seconds and ritual.duration <= ritual.profile.maximum_seconds, "route-derived deadline escaped bounds")
+			check(visible.has_point(pylon.global_position), "objective spawned outside the visible arena")
+		check(ritual.duration >= ritual.profile.minimum_seconds and ritual.duration <= ritual.profile.maximum_seconds, "route-derived deadline escaped bounds")
 	root.size = Vector2i(1280, 720)
 	root.content_scale_size = root.size
 	# Early victory, exact fixed budget and collection before mandatory choices.
 	await _fresh(5)
 	boss = game.boss
 	var stage_xp: int = game.wave.boss_rewards.stage_xp(game)
-	_check(stage_xp == BossStageRewards.xp_for_levels(game, 4) and stage_xp > 30, "boss stage budget is not four level points")
+	check(stage_xp == BossStageRewards.xp_for_levels(game, 4) and stage_xp > 30, "boss stage budget is not four level points")
 	game.wave.boss_rewards.release_phase(game, game.player.global_position, 1)
 	game.wave.boss_rewards.release_phase(game, game.player.global_position, 1)
 	game.wave.boss_rewards.release_phase(game, game.player.global_position, 2)
 	_kill(boss)
 	await process_frame
 	await process_frame
-	_check(game.collecting_wave_loot and not game.wave.active and game.wave.remaining > 0 and not game.shop_panel.visible, "early boss death waited for timer or skipped loot collection")
+	check(game.collecting_wave_loot and not game.wave.active and game.wave.remaining > 0 and not game.shop_panel.visible, "early boss death waited for timer or skipped loot collection")
 	var totals := _loot_totals()
-	_check(totals.xp == stage_xp and totals.coins == 32 and totals.chests == 1, "phase fragments and boss completion did not share one fixed budget")
+	check(totals.xp == stage_xp and totals.coins == 32 and totals.chests == 1, "phase fragments and boss completion did not share one fixed budget")
 	game.wave.boss_rewards.deliver(game, game.player.global_position)
-	_check(_loot_totals() == totals, "completion budget paid twice")
+	check(_loot_totals() == totals, "completion budget paid twice")
 	for drop: Loot in game.get_node("Loot").get_children():
 		if not drop.is_queued_for_deletion(): drop.advance_collection(0.01, drop.global_position, 0)
 	await process_frame
 	await process_frame
-	_check(game.rewards.pending_levels == 4 and game.rewards.step == PostWaveRewards.Step.LEVELS and not game.shop_panel.visible, "boss XP did not queue exactly four levels after complete collection")
-	_check(game.telemetry.wave_xp == stage_xp and game.telemetry.wave_coins == 32, "boss payouts bypassed loot telemetry")
-	_check(game.wave.boss_rewards.save_data().paid, "paid state was not captured")
+	check(game.rewards.pending_levels == 4 and game.rewards.step == PostWaveRewards.Step.LEVELS and not game.shop_panel.visible, "boss XP did not queue exactly four levels after complete collection")
+	check(game.telemetry.wave_xp == stage_xp and game.telemetry.wave_coins == 32, "boss payouts bypassed loot telemetry")
+	check(game.wave.boss_rewards.save_data().paid, "paid state was not captured")
 	var resumed := BossStageRewards.new()
 	resumed.restore(game.wave.boss_rewards.save_data())
-	_check(resumed.xp_budget == stage_xp, "resume lost the decided boss stage budget")
+	check(resumed.xp_budget == stage_xp, "resume lost the decided boss stage budget")
 	# Endlessly many boss/minion kills cannot generate additional stage budgets.
 	await _fresh(30)
 	var endless_xp: int = game.wave.boss_rewards.stage_xp(game)
 	var bosses := BossEncounter.remaining(game.get_node("Enemies"))
-	_check(bosses.size() == 2, "endless stage lost the second boss")
+	check(bosses.size() == 2, "endless stage lost the second boss")
 	_kill(bosses[0])
 	await process_frame
 	await process_frame
-	_check(not game.collecting_wave_loot and not game.wave.boss_rewards.paid, "first double-boss death finished/payed the stage")
+	check(not game.collecting_wave_loot and not game.wave.boss_rewards.paid, "first double-boss death finished/payed the stage")
 	_kill(bosses[1])
 	await process_frame
 	await process_frame
-	_check(game.collecting_wave_loot and _loot_totals().xp == endless_xp, "last double-boss death failed the single shared budget")
+	check(game.collecting_wave_loot and _loot_totals().xp == endless_xp, "last double-boss death failed the single shared budget")
 	# Completion also recovers when the last boss disappears without its normal
 	# defeat callback; no timer wait or lost stage budget.
 	await _fresh(15)
@@ -189,7 +183,7 @@ func _run() -> void:
 	paused = false
 	game._process(1.0 / 60)
 	paused = true
-	_check(game.collecting_wave_loot and not game.wave.active and game.wave.boss_rewards.paid and _loot_totals().xp == king_xp, "empty boss stage waited for its timer or lost its payout")
+	check(game.collecting_wave_loot and not game.wave.active and game.wave.boss_rewards.paid and _loot_totals().xp == king_xp, "empty boss stage waited for its timer or lost its payout")
 	# Old saves keep their earned/lying loot and receive only the missing budget.
 	await _fresh(5)
 	game.telemetry.wave_xp = 10
@@ -200,12 +194,12 @@ func _run() -> void:
 	game.wave.boss_rewards.restore({})
 	var legacy_xp: int = game.wave.boss_rewards.stage_xp(game)
 	game.wave.boss_rewards.deliver(game, game.player.global_position)
-	_check(_loot_totals().xp == legacy_xp - 10 and _loot_totals().coins == 20 and _loot_totals().chests == 0, "legacy boss save duplicated prior loot instead of topping up the fixed budget")
+	check(_loot_totals().xp == legacy_xp - 10 and _loot_totals().coins == 20 and _loot_totals().chests == 0, "legacy boss save duplicated prior loot instead of topping up the fixed budget")
 	for bad in [{"state": "bad"}, {"anchor": [0]}, {"used": 1}]:
-		_check(RunSaveData.normalize({"wave": 10, "player": {}, "enemies": [{"caramel": {"overload": bad}}]}).is_empty(), "malformed ritual passed run validation")
+		check(RunSaveData.normalize({"wave": 10, "player": {}, "enemies": [{"caramel": {"overload": bad}}]}).is_empty(), "malformed ritual passed run validation")
 	session.clear_run()
 	if failures.is_empty(): print("PASS boss_stages: isolated encounters, task success/failure, targeting, pause/resume, inflammation, reachable layouts, early victory, fixed loot and double bosses")
-	finish(0 if failures.is_empty() else 1)
+	finish_checks()
 
 func _fresh(number: int) -> void:
 	paused = true

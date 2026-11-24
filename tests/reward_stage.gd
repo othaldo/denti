@@ -1,7 +1,5 @@
 extends "res://tests/support/test_runtime.gd"
 
-var failures: Array[String] = []
-
 
 func _initialize() -> void:
 	call_deferred("_run")
@@ -16,24 +14,18 @@ func _physical_rect(control: Control) -> Rect2:
 	return root.get_screen_transform() * control.get_global_rect()
 
 
-func _check(condition: bool, message: String) -> void:
-	if not condition:
-		failures.append(message)
-		push_error(message)
-
-
 func _touch_target(control: Control, name: String) -> void:
 	var bounds := _physical_rect(control)
-	_check(bounds.size.x >= 47.9 and bounds.size.y >= 47.9,
+	check(bounds.size.x >= 47.9 and bounds.size.y >= 47.9,
 		"reward project stretch shrank %s below a 48 px touch target: %s" % [name, bounds.size])
 
 
 func _check_stage(stage: RewardStage, extent: Vector2i) -> void:
 	var screen := Rect2(Vector2.ZERO, Vector2(extent)).grow(0.5)
-	_check(screen.encloses(_physical_rect(stage.panel)), "reward stage escapes the physical screen at %s" % extent)
-	_check(not stage.body_scroll.get_h_scroll_bar().visible, "reward content needs horizontal scrolling at %s" % extent)
-	_check(stage.title_label.is_visible_in_tree(), "reward title disappeared at %s" % extent)
-	_check(screen.encloses(_physical_rect(stage.title_label)), "reward title leaves the physical screen at %s" % extent)
+	check(screen.encloses(_physical_rect(stage.panel)), "reward stage escapes the physical screen at %s" % extent)
+	check(not stage.body_scroll.get_h_scroll_bar().visible, "reward content needs horizontal scrolling at %s" % extent)
+	check(stage.title_label.is_visible_in_tree(), "reward title disappeared at %s" % extent)
+	check(screen.encloses(_physical_rect(stage.title_label)), "reward title leaves the physical screen at %s" % extent)
 
 
 func _check_choices(stage: RewardStage, cards: Array[UpgradeCard], extent: Vector2i) -> void:
@@ -46,16 +38,16 @@ func _check_choices(stage: RewardStage, cards: Array[UpgradeCard], extent: Vecto
 		var rect := _physical_rect(card)
 		var content_rect := Rect2(card.position, card.size)
 		for previous in rectangles:
-			_check(not content_rect.intersects(previous), "reward choices overlap at %s" % extent)
+			check(not content_rect.intersects(previous), "reward choices overlap at %s" % extent)
 		rectangles.append(content_rect)
 		for control in [card.icon_rect, card.name_label, card.rarity_label, card.effect_label, reward_card.preview_label, reward_card.detail_label, card.keep_label, card.progress_bar]:
 			if control.is_visible_in_tree():
-				_check(rect.grow(0.5).encloses(_physical_rect(control)), "reward content leaves its card at %s" % extent)
+				check(rect.grow(0.5).encloses(_physical_rect(control)), "reward content leaves its card at %s" % extent)
 		stage.body_scroll.ensure_control_visible(card)
 		await _settle()
 		var scroll_bounds := _physical_rect(stage.body_scroll)
 		if rect.size.y <= scroll_bounds.size.y:
-			_check(scroll_bounds.grow(1.0).encloses(_physical_rect(card)), "reward choice cannot be reached by scrolling at %s" % extent)
+			check(scroll_bounds.grow(1.0).encloses(_physical_rect(card)), "reward choice cannot be reached by scrolling at %s" % extent)
 		else:
 			# Short landscape can show only part of a tall description at once.
 			# Its final decision text must still be reachable through one scroll.
@@ -65,7 +57,7 @@ func _check_choices(stage: RewardStage, cards: Array[UpgradeCard], extent: Vecto
 				elif reward_card.preview_label.is_visible_in_tree(): last = reward_card.preview_label
 			stage.body_scroll.ensure_control_visible(last)
 			await _settle()
-			_check(scroll_bounds.grow(1.0).encloses(_physical_rect(last)), "the last reward line is unreachable at %s" % extent)
+			check(scroll_bounds.grow(1.0).encloses(_physical_rect(last)), "the last reward line is unreachable at %s" % extent)
 	stage.body_scroll.scroll_vertical = 0
 	await _settle()
 
@@ -110,50 +102,50 @@ func _run() -> void:
 		panel.update_level_reroll(100, 5, 12)
 		await _settle()
 		_check_stage(panel.stage, extent)
-		_check(panel.dialog_panel == panel.stage.panel, "modern reward dialog ref points at the hidden legacy dialog")
-		_check(not panel.subtitle_label.is_visible_in_tree() or panel.subtitle_label.text.is_empty(), "level choices regained a recurring instruction sentence")
+		check(panel.dialog_panel == panel.stage.panel, "modern reward dialog ref points at the hidden legacy dialog")
+		check(not panel.subtitle_label.is_visible_in_tree() or panel.subtitle_label.text.is_empty(), "level choices regained a recurring instruction sentence")
 		_touch_target(panel.reroll_button, "level reroll")
-		_check(Rect2(Vector2.ZERO, Vector2(extent)).grow(0.5).encloses(_physical_rect(panel.reroll_button)), "level reroll is not fixed on screen")
+		check(Rect2(Vector2.ZERO, Vector2(extent)).grow(0.5).encloses(_physical_rect(panel.reroll_button)), "level reroll is not fixed on screen")
 		await _check_choices(panel.stage, panel.buttons, extent)
 		if extent.x == 1280:
 			for card in panel.buttons:
-				_check(is_equal_approx(card.icon_rect.get_global_rect().get_center().y, panel.buttons[0].icon_rect.get_global_rect().get_center().y), "desktop stat art has inconsistent vertical alignment")
-				_check(is_equal_approx(card.effect_label.get_global_rect().position.y, panel.buttons[0].effect_label.get_global_rect().position.y), "desktop stat values do not share a comparison row")
-		_check(Rect2(Vector2.ZERO, Vector2(extent)).grow(0.5).encloses(_physical_rect(panel.reroll_button)), "scrolling choices hid the reroll action")
+				check(is_equal_approx(card.icon_rect.get_global_rect().get_center().y, panel.buttons[0].icon_rect.get_global_rect().get_center().y), "desktop stat art has inconsistent vertical alignment")
+				check(is_equal_approx(card.effect_label.get_global_rect().position.y, panel.buttons[0].effect_label.get_global_rect().position.y), "desktop stat values do not share a comparison row")
+		check(Rect2(Vector2.ZERO, Vector2(extent)).grow(0.5).encloses(_physical_rect(panel.reroll_button)), "scrolling choices hid the reroll action")
 		panel.show_relics(relics)
 		await _settle()
 		_check_stage(panel.stage, extent)
-		_check(not panel.level_actions.is_visible_in_tree(), "relic choices inherited the level reroll footer")
+		check(not panel.level_actions.is_visible_in_tree(), "relic choices inherited the level reroll footer")
 		# Four relics form one row or a 2 x 2 grid, never three plus a stray card.
 		var relic_columns: int = panel.reward_view.cards.columns
-		_check(relic_columns in [1, 2, 4], "four relics split into an uneven grid: %d columns at %s" % [relic_columns, extent])
+		check(relic_columns in [1, 2, 4], "four relics split into an uneven grid: %d columns at %s" % [relic_columns, extent])
 		if extent.x >= 1280:
-			_check(relic_columns == 4, "desktop relic choice is not one row at %s" % extent)
+			check(relic_columns == 4, "desktop relic choice is not one row at %s" % extent)
 			var viewport := Rect2(Vector2.ZERO, Vector2(extent)).grow(0.5)
 			for card in panel.buttons:
-				_check(viewport.encloses(_physical_rect(card)), "desktop relic card needs scrolling at %s" % extent)
+				check(viewport.encloses(_physical_rect(card)), "desktop relic card needs scrolling at %s" % extent)
 		await _check_choices(panel.stage, panel.buttons, extent)
 		panel.show_chest(ShopController.by_id(&"metal_crown"), 7)
 		await _settle()
 		_check_stage(panel.stage, extent)
 		_touch_target(panel.buttons[1], "item capsule scrap")
-		_check(panel.stage.footer.is_ancestor_of(panel.buttons[1]), "item scrap no longer sits in the fixed footer")
+		check(panel.stage.footer.is_ancestor_of(panel.buttons[1]), "item scrap no longer sits in the fixed footer")
 		var reward_cards: Array[UpgradeCard] = [panel.buttons[0]]
 		await _check_choices(panel.stage, reward_cards, extent)
-		_check(Rect2(Vector2.ZERO, Vector2(extent)).grow(0.5).encloses(_physical_rect(panel.buttons[1])), "scrolling an item hid its scrap action")
+		check(Rect2(Vector2.ZERO, Vector2(extent)).grow(0.5).encloses(_physical_rect(panel.buttons[1])), "scrolling an item hid its scrap action")
 		panel.hide()
 		capsule.show_chest(chest.duplicate(true), game.player.loadout, game.player.stats, 7, game.items)
 		await _settle()
 		_check_stage(capsule.stage, extent)
 		_touch_target(capsule.scrap_button, "weapon capsule scrap")
-		_check(capsule.stage.footer.is_ancestor_of(capsule.scrap_button), "weapon scrap no longer sits in the fixed footer")
+		check(capsule.stage.footer.is_ancestor_of(capsule.scrap_button), "weapon scrap no longer sits in the fixed footer")
 		for selector in capsule.weapon_buttons:
 			_touch_target(selector, "weapon target")
 		for replacement in capsule.replacement_buttons:
 			_touch_target(replacement, "replacement effect")
 		await _check_choices(capsule.stage, capsule.buttons, extent)
-		_check(Rect2(Vector2.ZERO, Vector2(extent)).grow(0.5).encloses(_physical_rect(capsule.scrap_button)), "scrolling enchantments hid the scrap action")
+		check(Rect2(Vector2.ZERO, Vector2(extent)).grow(0.5).encloses(_physical_rect(capsule.scrap_button)), "scrolling enchantments hid the scrap action")
 	session.clear_run()
 	if failures.is_empty():
 		print("Denti shared reward stage, physical targets, rotation and fixed actions test passed")
-	finish(0 if failures.is_empty() else 1)
+	finish_checks()

@@ -1,7 +1,6 @@
 extends "res://tests/support/test_runtime.gd"
 
 var game: Node2D
-var failures := 0
 ## Enemy offsets are measured from this root anchor, where the weapon aims from.
 var origin := Vector2.ZERO
 
@@ -25,8 +24,8 @@ func _run() -> void:
 		_clear_enemies()
 		var weapon := _equip(id)
 		var double: bool = id == &"floss_garrote"
-		_check(not weapon.sprite.visible and weapon.floss_cut != null, "old rigid floss assembly still renders")
-		_check(weapon.floss_cut.strands.size() == (2 if double else 1), "wrong number of connected strands")
+		check(not weapon.sprite.visible and weapon.floss_cut != null, "old rigid floss assembly still renders")
+		check(weapon.floss_cut.strands.size() == (2 if double else 1), "wrong number of connected strands")
 		var near := _enemy(Vector2(55, 0))
 		var middle := _enemy(Vector2(115, 0))
 		var distant := _enemy(Vector2(weapon.data.attack_range - 5, 0))
@@ -35,15 +34,15 @@ func _run() -> void:
 		var grips := _grips(weapon)
 		weapon._begin_attack([near])
 		weapon._physics_process(weapon.attack_duration * 0.2)
-		_check(near.health == 10000 and distant.health == 10000, "floss caused damage during windup")
+		check(near.health == 10000 and distant.health == 10000, "floss caused damage during windup")
 		weapon._physics_process(weapon.attack_duration)
-		_check(near.health < 10000 and middle.health < 10000 and distant.health < 10000, "forward floss missed enemies along its path")
-		_check(side.health == 10000 and behind.health == 10000, "forward shot still uses an invisible front fan or roundabout attack")
-		_check(near.bleed_stacks == 1 and middle.bleed_stacks == 1 and distant.bleed_stacks == 1, "two strands duplicated damage/bleeding, or one target was missed")
-		_check(_grips(weapon) == grips, "grips moved away from their root positions during a shot")
-		_check(not game.element_impacts.events.is_empty(), "plain floss has no visible blood impact")
+		check(near.health < 10000 and middle.health < 10000 and distant.health < 10000, "forward floss missed enemies along its path")
+		check(side.health == 10000 and behind.health == 10000, "forward shot still uses an invisible front fan or roundabout attack")
+		check(near.bleed_stacks == 1 and middle.bleed_stacks == 1 and distant.bleed_stacks == 1, "two strands duplicated damage/bleeding, or one target was missed")
+		check(_grips(weapon) == grips, "grips moved away from their root positions during a shot")
+		check(not game.element_impacts.events.is_empty(), "plain floss has no visible blood impact")
 		if double:
-			_check(distant.global_position.x > game.player.global_position.x + origin.x + weapon.data.attack_range - 5, "double floss lost its outward knockback")
+			check(distant.global_position.x > game.player.global_position.x + origin.x + weapon.data.attack_range - 5, "double floss lost its outward knockback")
 		# Both painted grips stay put throughout the complete cast in every aim direction.
 		for density in [1.0, WeaponLayout.density_scale(6)]:
 			weapon.visual_density = density
@@ -52,13 +51,13 @@ func _run() -> void:
 				for phase in [-1.0, 0.0, 0.15, 0.3, 0.5, 0.7, 0.9]:
 					weapon.attack_time = 0 if phase < 0 else weapon.attack_duration * (1 - phase)
 					weapon.update_visual()
-					_check(_grips(weapon) == grips, "aim or animation phase dislodged a grip")
+					check(_grips(weapon) == grips, "aim or animation phase dislodged a grip")
 					_check_connections(weapon)
 		# Moving Denti carries the grips, never dragging them toward the enemy.
 		var before := weapon.floss_cut.left.global_position
 		game.player.global_position += Vector2(14, -8)
 		weapon.update_visual()
-		_check(weapon.floss_cut.left.global_position.is_equal_approx(before + Vector2(14, -8)), "grip did not follow Denti")
+		check(weapon.floss_cut.left.global_position.is_equal_approx(before + Vector2(14, -8)), "grip did not follow Denti")
 		game.player.global_position -= Vector2(14, -8)
 		# Save after a near hit but before the distant target: restore must not double-hit.
 		_clear_enemies()
@@ -68,22 +67,22 @@ func _run() -> void:
 		weapon._begin_attack([near])
 		weapon._physics_process(weapon.attack_duration * 0.5)
 		var after_near := near.health
-		_check(after_near < 10000 and distant.health == 10000, "floss dealt its distant damage before reaching that target")
+		check(after_near < 10000 and distant.health == 10000, "floss dealt its distant damage before reaching that target")
 		var curve_before := weapon.floss_cut.points
 		var saved: Dictionary = RunSnapshot.capture(game)
 		RunSnapshot.restore(game, saved)
 		weapon = game.player.loadout.equipped()[0]
 		weapon.set_physics_process(false)
-		_check(weapon.floss_cut.points == curve_before, "resume changed the extending strand")
+		check(weapon.floss_cut.points == curve_before, "resume changed the extending strand")
 		weapon._physics_process(weapon.attack_time)
-		_check(game.get_node("Enemies").get_child(0).health == after_near, "resume repeated a prior strand hit")
-		_check(game.get_node("Enemies").get_child(1).health < 10000, "resume lost the farther hit")
+		check(game.get_node("Enemies").get_child(0).health == after_near, "resume repeated a prior strand hit")
+		check(game.get_node("Enemies").get_child(1).health < 10000, "resume lost the farther hit")
 		# Retraction is visual only, even when a new enemy steps into the rope.
 		_clear_enemies()
 		weapon.attack_time = weapon.attack_duration * (1 - 0.8)
 		var recovery_target := _enemy(Vector2(120, 0))
 		weapon._physics_process(weapon.attack_time)
-		_check(recovery_target.health == 10000, "retracting floss dealt a second attack")
+		check(recovery_target.health == 10000, "retracting floss dealt a second attack")
 		# Seven forms use their own handle artwork, with exactly one/two live strands.
 		for element in [&"", &"fire", &"ice", &"poison", &"electric", &"bleed", &"wet"]:
 			var data := WeaponCatalog.by_id(id)
@@ -93,15 +92,15 @@ func _run() -> void:
 			weapon = game.player.loadout.equipped()[0]
 			weapon.set_physics_process(false)
 			var tag := "normal" if element == &"" else str(element)
-			_check(weapon.floss_cut.left.texture.resource_path.ends_with("/%s_left_grip.png" % tag), "element uses stale handle artwork")
-			_check((weapon.floss_cut.right != null) == double, "single whip acquired a second handle")
+			check(weapon.floss_cut.left.texture.resource_path.ends_with("/%s_left_grip.png" % tag), "element uses stale handle artwork")
+			check((weapon.floss_cut.right != null) == double, "single whip acquired a second handle")
 			if double:
-				_check(weapon.floss_cut.right.texture.resource_path.ends_with("/%s_right_grip.png" % tag), "element uses stale second handle")
-			_check(weapon.floss_cut.strands.size() == (2 if double else 1), "skin swap changed strand count")
+				check(weapon.floss_cut.right.texture.resource_path.ends_with("/%s_right_grip.png" % tag), "element uses stale second handle")
+			check(weapon.floss_cut.strands.size() == (2 if double else 1), "skin swap changed strand count")
 	session.clear_run()
 	paused = false
 	print("PASS floss: fixed grips, one/two connected forward strands, near/far groups, no side/rear hits, once per attack, knockback, recovery, resume, six elements and two densities")
-	finish(1 if failures > 0 else 0)
+	finish_checks()
 
 
 func _equip(id: StringName) -> WeaponInstance:
@@ -125,7 +124,7 @@ func _check_connections(weapon: WeaponInstance) -> void:
 		var tip := weapon.data.floss_left_tip if index == 0 else weapon.data.floss_right_tip
 		var at := grip.to_global((tip - anchor) * grip.texture.get_size())
 		var drawn := weapon.to_global(weapon.floss_cut.strands[index][0])
-		_check(at.distance_to(drawn) < 0.01, "animated strand detached from its painted eyelet")
+		check(at.distance_to(drawn) < 0.01, "animated strand detached from its painted eyelet")
 
 
 func _enemy(offset: Vector2) -> Enemy:
@@ -142,7 +141,3 @@ func _clear_enemies() -> void:
 	game.element_impacts.clear()
 
 
-func _check(ok: bool, message: String) -> void:
-	if not ok:
-		failures += 1
-		push_error(message)

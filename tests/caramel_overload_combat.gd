@@ -3,7 +3,6 @@ extends "res://tests/support/test_runtime.gd"
 
 const PROFILES = preload("res://tools/balance/build_comparison_profiles.gd")
 const PROBE_PLAYER = preload("res://tools/balance/comparison_player.gd")
-var failures: Array[String] = []
 
 func _initialize() -> void: call_deferred("_run")
 
@@ -71,4 +70,4 @@ func _run() -> void:
 	file.close()
 	print("OVERLOAD COMBAT ", JSON.stringify(results))
 	root.get_node("GameSession").clear_run()
-	finish(0 if failures.is_empty() else 1)
+	finish_checks()

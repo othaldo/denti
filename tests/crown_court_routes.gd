@@ -22,7 +22,7 @@ func _run() -> void:
 	game.player.stats.dodge_chance = 0
 	game.get_node("Enemies").set_physics_process(false)
 	paused = true
-	var failures: Array[String] = []
+	var route_failures: Array[String] = []
 	for difficulty: DifficultyData in DifficultyCatalog.ALL:
 		game.wave.difficulty_id = difficulty.id
 		game._create_enemy(EnemyCatalog.CAVITY_EMPEROR, Vector2(770, 620))
@@ -57,9 +57,9 @@ func _run() -> void:
 					if not body and game.player.stats.health == 100000:
 						safe = true
 						break
-				if not safe: failures.append("%s court attack %d has no slowed first-event route from %s" % [difficulty.id, kind, corner])
+				if not safe: route_failures.append("%s court attack %d has no slowed first-event route from %s" % [difficulty.id, kind, corner])
 		boss.free()
 	session.clear_run()
-	for message in failures: push_error(message)
-	if failures.is_empty(): print("PASS crown_court_routes: four tiers/corners, 72% movement, actual court/portal/combined-nerve first events; no body crossing")
-	finish(0 if failures.is_empty() else 1)
+	for message in route_failures: push_error(message)
+	if route_failures.is_empty(): print("PASS crown_court_routes: four tiers/corners, 72% movement, actual court/portal/combined-nerve first events; no body crossing")
+	finish(0 if route_failures.is_empty() else 1)

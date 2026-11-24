@@ -2,8 +2,6 @@ extends "res://tests/support/test_runtime.gd"
 ## Animated skill clouds are stateless, deterministic and cosmetic: the same
 ## age and seed always draw the same cloud, and the life cycle fades cleanly.
 
-var failures: Array[String] = []
-
 
 class Canvas extends Node2D:
 	var style: SkillCloudStyle
@@ -25,31 +23,25 @@ func _initialize() -> void:
 	call_deferred("_run")
 
 
-func _check(ok: bool, message: String) -> void:
-	if not ok:
-		failures.append(message)
-		push_error(message)
-
-
 func _run() -> void:
 	var style: SkillCloudStyle = load("res://data/vfx/skill_clouds/poison.tres")
-	_check(style != null and style.puffs > 0, "Poison cloud style must load")
+	check(style != null and style.puffs > 0, "Poison cloud style must load")
 
 	# Life cycle: billows up, holds, dissolves to nothing.
 	var start := SkillPuffs.lifecycle(style, 0.0, 2.5)
 	var settled := SkillPuffs.lifecycle(style, 1.0, 1.5)
 	var gone := SkillPuffs.lifecycle(style, 2.5, 0.0)
-	_check(is_zero_approx(start.y) and start.x < 0.5, "A fresh cloud starts small and invisible")
-	_check(is_equal_approx(settled.x, 1.0) and is_equal_approx(settled.y, 1.0), "A settled cloud has full size and opacity")
-	_check(is_zero_approx(gone.y), "An expired cloud is fully transparent")
+	check(is_zero_approx(start.y) and start.x < 0.5, "A fresh cloud starts small and invisible")
+	check(is_equal_approx(settled.x, 1.0) and is_equal_approx(settled.y, 1.0), "A settled cloud has full size and opacity")
+	check(is_zero_approx(gone.y), "An expired cloud is fully transparent")
 
 	# Determinism: hashes depend only on their inputs.
-	_check(SkillPuffs.hash01(42, 3, 1) == SkillPuffs.hash01(42, 3, 1), "Puff layout must be deterministic")
-	_check(SkillPuffs.hash01(42, 3, 1) != SkillPuffs.hash01(43, 3, 1), "Different clouds must vary")
+	check(SkillPuffs.hash01(42, 3, 1) == SkillPuffs.hash01(42, 3, 1), "Puff layout must be deterministic")
+	check(SkillPuffs.hash01(42, 3, 1) != SkillPuffs.hash01(43, 3, 1), "Different clouds must vary")
 	for index in 50:
 		var value := SkillPuffs.hash01(index * 977, index, 5)
-		_check(value >= 0.0 and value <= 1.0, "Hash values must stay in 0..1")
-	_check(SkillPuffs.seed_for(Vector2(10.2, 20.1)) == SkillPuffs.seed_for(Vector2(10.2, 20.1)), "Seed from position must be stable")
+		check(value >= 0.0 and value <= 1.0, "Hash values must stay in 0..1")
+	check(SkillPuffs.seed_for(Vector2(10.2, 20.1)) == SkillPuffs.seed_for(Vector2(10.2, 20.1)), "Seed from position must be stable")
 
 	# Sparing graphics draw fewer puffs, never none.
 	SkillPuffs.economy = false
@@ -57,9 +49,9 @@ func _run() -> void:
 	SkillPuffs.economy = true
 	var sparing := SkillPuffs.puff_count(style)
 	SkillPuffs.economy = false
-	_check(sparing < full and sparing >= 2, "Economy mode must reduce puffs")
-	_check(SkillPuffs.puff_region(5) == SkillPuffs.puff_region(1), "Puff variants wrap around the atlas")
-	_check(SkillPuffs.ATLAS.get_size() == Vector2(SkillPuffs.PUFF_CELL * SkillPuffs.PUFF_VARIANTS, SkillPuffs.PUFF_CELL + SkillPuffs.SMALL_CELL), "Atlas layout must match the baker")
+	check(sparing < full and sparing >= 2, "Economy mode must reduce puffs")
+	check(SkillPuffs.puff_region(5) == SkillPuffs.puff_region(1), "Puff variants wrap around the atlas")
+	check(SkillPuffs.ATLAS.get_size() == Vector2(SkillPuffs.PUFF_CELL * SkillPuffs.PUFF_VARIANTS, SkillPuffs.PUFF_CELL + SkillPuffs.SMALL_CELL), "Atlas layout must match the baker")
 
 	# Drawing works through a real canvas across the whole life.
 	var canvas := Canvas.new()
@@ -67,7 +59,7 @@ func _run() -> void:
 	root.add_child(canvas)
 	for id in ["poison", "ember", "frost", "poison_lane", "foam"]:
 		var each: SkillCloudStyle = load("res://data/vfx/skill_clouds/%s.tres" % id)
-		_check(each != null, "Style %s must load" % id)
+		check(each != null, "Style %s must load" % id)
 		canvas.style = each
 		for lane in [false, true]:
 			canvas.lane = lane
@@ -79,13 +71,13 @@ func _run() -> void:
 				# Headless runs still dispatch canvas draw callbacks on the next frame.
 				await process_frame
 				await process_frame
-				_check(canvas.drawn, "%s must draw at age %s (lane %s)" % [id, stage[0], lane])
+				check(canvas.drawn, "%s must draw at age %s (lane %s)" % [id, stage[0], lane])
 
 	# The assassin cloud uses the style and keeps its saved fields unchanged.
 	var skills := AssassinSkills.new()
-	_check(skills.CLOUD_STYLE == style, "Assassin poison clouds use the poison style")
+	check(skills.CLOUD_STYLE == style, "Assassin poison clouds use the poison style")
 	skills.free()
-	_check(EmberSkills.CORE_STYLE.rise_sparkles, "Ember cores rise sparks, not bubbles")
-	_check(FrostSkills.WALL_STYLE != null and RinserSkills.FOAM_STYLE != null and ClassDashCut.FIELD_STYLE != null, "Frost, rinser and assassin lanes have styles")
+	check(EmberSkills.CORE_STYLE.rise_sparkles, "Ember cores rise sparks, not bubbles")
+	check(FrostSkills.WALL_STYLE != null and RinserSkills.FOAM_STYLE != null and ClassDashCut.FIELD_STYLE != null, "Frost, rinser and assassin lanes have styles")
 	canvas.queue_free()
-	finish(1 if not failures.is_empty() else 0)
+	finish_checks()

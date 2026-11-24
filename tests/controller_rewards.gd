@@ -1,14 +1,8 @@
 extends "res://tests/support/test_runtime.gd"
 
-var failures: Array[String] = []
 
 func _initialize() -> void:
 	call_deferred("_run")
-
-func _check(value: bool, message: String) -> void:
-	if not value:
-		failures.append(message)
-		push_error(message)
 
 func _settle() -> void:
 	for frame in 8: await process_frame
@@ -46,7 +40,7 @@ func _run() -> void:
 	game._on_loot_collected(&"chest", 4, &"metal_crown")
 	game._on_loot_collected(&"chest", 5, &"fluoride_gel")
 	game.rewards.queue_affix_chest(WeaponAffixes.roll_chest(3, 0, game.player.loadout))
-	_check(not paused and not game.choice_panel.visible and game.rewards.pending_levels == 3, "combat rewards interrupted controller movement")
+	check(not paused and not game.choice_panel.visible and game.rewards.pending_levels == 3, "combat rewards interrupted controller movement")
 	game.wave.active = false
 	game.coins = 100
 	game.rewards.begin_collection()
@@ -54,42 +48,42 @@ func _run() -> void:
 	game._advance_post_wave_rewards()
 	await _settle()
 	await _joy(JOY_BUTTON_X)
-	_check(game.coins < 100 and game.rewards.pending_levels == 3, "X did not reroll only the current level choice")
+	check(game.coins < 100 and game.rewards.pending_levels == 3, "X did not reroll only the current level choice")
 	await _button(JOY_BUTTON_A, true)
 	var after_press: int = game.rewards.pending_levels
 	await _button(JOY_BUTTON_A, true)
 	for frame in 50: await process_frame
-	_check(game.rewards.pending_levels == after_press, "holding A skipped reward choices")
+	check(game.rewards.pending_levels == after_press, "holding A skipped reward choices")
 	await _button(JOY_BUTTON_A, false)
 	await _settle()
-	_check(game.rewards.pending_levels == 2, "A did not resolve exactly one earned level")
+	check(game.rewards.pending_levels == 2, "A did not resolve exactly one earned level")
 	for index in 2: await _joy(JOY_BUTTON_A)
-	_check(game.choice_panel.mode == &"chest" and not game.shop_panel.visible, "level choices did not lead to the item chest")
+	check(game.choice_panel.mode == &"chest" and not game.shop_panel.visible, "level choices did not lead to the item chest")
 	await _joy(JOY_BUTTON_B)
-	_check(game.choice_panel.mode == &"chest" and game.rewards.pending_chests.size() == 3, "B skipped a mandatory chest decision")
+	check(game.choice_panel.mode == &"chest" and game.rewards.pending_chests.size() == 3, "B skipped a mandatory chest decision")
 	await _joy(JOY_BUTTON_A)
-	_check(game.items.count(&"metal_crown") == 1 and game.rewards.pending_chests.size() == 2, "A did not keep the chest item")
+	check(game.items.count(&"metal_crown") == 1 and game.rewards.pending_chests.size() == 2, "A did not keep the chest item")
 	game.choice_panel.buttons[1].grab_focus()
 	var coins_before: int = game.coins
 	await _joy(JOY_BUTTON_A)
-	_check(game.coins == coins_before + 5 and game.items.count(&"fluoride_gel") == 0, "A did not scrap the second chest")
+	check(game.coins == coins_before + 5 and game.items.count(&"fluoride_gel") == 0, "A did not scrap the second chest")
 	var capsule: WeaponChestPanel = game.weapon_chest_panel
-	_check(capsule.visible and capsule.weapon_buttons[0].has_focus(), "legacy upgrade capsule has no initial controller target")
+	check(capsule.visible and capsule.weapon_buttons[0].has_focus(), "legacy upgrade capsule has no initial controller target")
 	capsule.buttons[0].grab_focus()
 	await _joy(JOY_BUTTON_A)
-	_check(not capsule.visible and game.shop_panel.visible, "capsule choice did not advance to the shop")
+	check(not capsule.visible and game.shop_panel.visible, "capsule choice did not advance to the shop")
 	game.shop_panel.controller_focus.change(-1)
 	await _settle()
 	var stat := game.shop_panel.stat_chips[0] as Button
 	stat.grab_focus()
 	await _joy(JOY_BUTTON_A)
 	var popups := stat.get_children().filter(func(node: Node) -> bool: return node is PopupPanel)
-	_check(not popups.is_empty() and popups[0].visible, "controller cannot inspect an attribute")
+	check(not popups.is_empty() and popups[0].visible, "controller cannot inspect an attribute")
 	coins_before = game.coins
 	await _joy(JOY_BUTTON_X)
-	_check(game.coins == coins_before, "X rerolled behind a native attribute popup")
+	check(game.coins == coins_before, "X rerolled behind a native attribute popup")
 	await _joy(JOY_BUTTON_B)
-	_check(popups.is_empty() or not is_instance_valid(popups[0]) or not popups[0].visible, "B does not close an attribute popup")
+	check(popups.is_empty() or not is_instance_valid(popups[0]) or not popups[0].visible, "B does not close an attribute popup")
 	game.player.loadout.restore([
 		{"id": "magic_toothbrush", "tier": 1, "affixes": [{"id": "fire", "level": 7, "damage": 1.0}]},
 		{"id": "magic_toothbrush", "tier": 1, "affixes": [{"id": "fire", "level": 6, "damage": 1.0}]}])
@@ -101,13 +95,13 @@ func _run() -> void:
 	await _joy(JOY_BUTTON_A)
 	game.shop_panel.details.merge_button.grab_focus()
 	await _joy(JOY_BUTTON_A)
-	_check(game.weapon_fusion_panel.visible and game.weapon_fusion_panel.cancel_button.has_focus(), "fusion preview has no safe controller focus")
+	check(game.weapon_fusion_panel.visible and game.weapon_fusion_panel.cancel_button.has_focus(), "fusion preview has no safe controller focus")
 	await _joy(JOY_BUTTON_B)
-	_check(not game.weapon_fusion_panel.visible and game.shop_panel.expanded, "B did not return from fusion to weapon details")
+	check(not game.weapon_fusion_panel.visible and game.shop_panel.expanded, "B did not return from fusion to weapon details")
 	game.shop_panel.details.merge_button.grab_focus()
 	await _joy(JOY_BUTTON_A)
 	game.weapon_fusion_panel.confirm_button.grab_focus()
 	await _joy(JOY_BUTTON_A)
-	_check(game.player.loadout.equipped().size() == 1 and game.player.loadout.equipped()[0].tier == 2 and not game.weapon_fusion_panel.visible, "A did not commit the fusion")
+	check(game.player.loadout.equipped().size() == 1 and game.player.loadout.equipped()[0].tier == 2 and not game.weapon_fusion_panel.visible, "A did not commit the fusion")
 	print("Controller level/chest queue, held buttons, capsule compatibility and fusion checked")
-	finish(0 if failures.is_empty() else 1)
+	finish_checks()

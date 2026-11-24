@@ -1,16 +1,8 @@
 extends "res://tests/support/test_runtime.gd"
 
-var failures := 0
-
 
 func _initialize() -> void:
 	call_deferred("_run")
-
-
-func check(ok: bool, message: String) -> void:
-	if not ok:
-		failures += 1
-		push_error(message)
 
 
 func values(id: StringName) -> Array[Dictionary]:
@@ -75,6 +67,6 @@ func _run() -> void:
 	pool.free()
 	for weapon in styles:
 		weapon.free()
-	if failures == 0:
+	if failures.is_empty():
 		print("PASS weapon_element_visuals: six distinct cores, 120 effect frames, collision origins, prepared pooling and resume")
-	finish(0 if failures == 0 else 1)
+	finish_checks()

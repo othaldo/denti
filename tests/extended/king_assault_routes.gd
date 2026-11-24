@@ -4,7 +4,6 @@ const STEP := 1.0 / 60
 const SPEED := PlayerStats.BASE_MOVE_SPEED * 0.72
 const HEALTH := 100000.0
 var game: Node2D
-var failures: Array[String] = []
 func _initialize() -> void: call_deferred("_run")
 
 func _warning(a: AcidKingEncounter) -> bool:
@@ -127,4 +126,4 @@ func _run() -> void:
 	session.clear_run()
 	for message in failures: push_error(message)
 	if failures.is_empty(): print("PASS king_assault_routes: %d complete fan/river/stomp sequences, 72%% speed, all tiers, corners and three viewports, including projectile tails and body clearance" % cases)
-	finish(0 if failures.is_empty() else 1)
+	finish_checks()

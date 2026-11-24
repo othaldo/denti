@@ -5,7 +5,6 @@ const PROFILES = preload("res://tools/balance/build_comparison_profiles.gd")
 const PROBE_GAME = preload("res://tools/balance/comparison_game.gd")
 const PROBE_PLAYER = preload("res://tools/balance/comparison_player.gd")
 const PILOT = preload("res://tools/balance/king_pressure_pilot.gd")
-var failures: Array[String] = []
 func _initialize() -> void: call_deferred("_run")
 
 func _run() -> void:
@@ -76,4 +75,4 @@ func _run() -> void:
 	file.close()
 	root.get_node("GameSession").clear_run()
 	print("ACID COLLECTOR COMBAT ", JSON.stringify(rows))
-	finish(0 if failures.is_empty() else 1)
+	finish_checks()

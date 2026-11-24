@@ -1,14 +1,8 @@
 extends "res://tests/support/test_runtime.gd"
 
-var failures: Array[String] = []
 
 func _initialize() -> void:
 	call_deferred("_run")
-
-func check(ok: bool, message: String) -> void:
-	if not ok:
-		failures.append(message)
-		push_error(message)
 
 func _run() -> void:
 	# Godot 4.7 scroll containers use emulated mouse events for touch scrolling.
@@ -248,4 +242,4 @@ func _run() -> void:
 	check(main_entry and main_menu.page == &"dentipedia", "main menu Dentipedia entry missing")
 	if failures.is_empty():
 		print("Denti Dentipedia test passed")
-	finish(0 if failures.is_empty() else 1)
+	finish_checks()

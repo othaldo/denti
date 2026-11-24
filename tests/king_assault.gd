@@ -1,10 +1,7 @@
 extends "res://tests/support/test_runtime.gd"
 const STEP := 1.0 / 60
 var game: Node2D
-var failures: Array[String] = []
 func _initialize() -> void: call_deferred("_run")
-func _check(ok: bool, message: String) -> void:
-	if not ok: failures.append(message); push_error(message)
 func _place(boss: Enemy) -> void:
 	boss.acid_king_encounter.cancel()
 	boss.boss_phase_timer = 0
@@ -44,9 +41,9 @@ func _run() -> void:
 		var a := boss.acid_king_encounter
 		a.pressure.used = true # Ordinary attack fixture; shield progression has its own suite.
 		var p := a.profile
-		_check(p.spit != EnemyCatalog.CAVITY_KING.acid_king_profile.spit and EnemyCatalog.CAVITY_KING.acid_king_profile.spit.speed == 370, "difficulty mutated the shared spit resource")
-		_check(p.spit_count() == 5 + difficulty.boss_volley_bonus * 2 and is_equal_approx(p.spit.speed, 370 * difficulty.boss_projectile_speed_multiplier), "spit count/speed ignores difficulty")
-		_check(p.stomp_sequences == (2 if difficulty.boss_volley_bonus >= 1 else 1) and p.spit_warning_seconds == 0.75, "stomp pressure or warning scales incorrectly")
+		check(p.spit != EnemyCatalog.CAVITY_KING.acid_king_profile.spit and EnemyCatalog.CAVITY_KING.acid_king_profile.spit.speed == 370, "difficulty mutated the shared spit resource")
+		check(p.spit_count() == 5 + difficulty.boss_volley_bonus * 2 and is_equal_approx(p.spit.speed, 370 * difficulty.boss_projectile_speed_multiplier), "spit count/speed ignores difficulty")
+		check(p.stomp_sequences == (2 if difficulty.boss_volley_bonus >= 1 else 1) and p.spit_warning_seconds == 0.75, "stomp pressure or warning scales incorrectly")
 		# The close blind spot was larger than a melee weapon's whole reach.
 		# Circling at the same close range must be punished; moving out must
 		# remain possible at 72% baseline speed, without dash.
@@ -57,16 +54,16 @@ func _run() -> void:
 			var plan := a.rows.duplicate(true)
 			var first := EnemySnapshot.capture(boss)
 			a.advance(a.stomp_warning_duration() - 0.001)
-			_check(game.player.stats.health == 100000, "near stone wave hit before its warning")
+			check(game.player.stats.health == 100000, "near stone wave hit before its warning")
 			a.advance(0.002 + a._stomp_duration())
-			_check(game.player.stats.health < 100000, "standing in melee range ignored the entire stone wave")
+			check(game.player.stats.health < 100000, "standing in melee range ignored the entire stone wave")
 			EnemySnapshot.restore(boss, first)
 			game.player.stats.health = 100000
 			game.player.hurt_time = 0
 			for tick in ceili((a.stomp_warning_duration() + 0.02) / STEP):
 				game.player.global_position = boss.global_position + Vector2.from_angle(tick * STEP * PlayerStats.BASE_MOVE_SPEED / distance) * distance
 				a.advance(STEP)
-			_check(game.player.stats.health < 100000, "circling in melee still ignored the near stomp")
+			check(game.player.stats.health < 100000, "circling in melee still ignored the near stomp")
 			var escaped := false
 			for direction in 32:
 				EnemySnapshot.restore(boss, first)
@@ -85,52 +82,52 @@ func _run() -> void:
 				if clear and game.player.stats.health == 100000:
 					escaped = true
 					break
-			_check(escaped, "%s near stomp at %.0f had no slowed escape without dash" % [difficulty.id, distance])
-			_check(a.rows.is_empty() or a.rows[0].at == plan[0].at, "near stomp moved after showing its warning")
+			check(escaped, "%s near stomp at %.0f had no slowed escape without dash" % [difficulty.id, distance])
+			check(a.rows.is_empty() or a.rows[0].at == plan[0].at, "near stomp moved after showing its warning")
 		_place(boss)
 		a.begin(a.Attack.CHANNELS)
 		a.advance(p.warning_seconds)
-		_check(a.state == a.State.WARN_SPIT and a.spit.entries.is_empty() and a.spit_rays.size() == p.spit_count(), "river failed to announce its aimed fan")
+		check(a.state == a.State.WARN_SPIT and a.spit.entries.is_empty() and a.spit_rays.size() == p.spit_count(), "river failed to announce its aimed fan")
 		var origin := a.spit_origin
 		var rays := a.spit_rays.duplicate()
 		var lead: Vector2 = game.player.global_position + (game.player.velocity * p.spit_lead_seconds).limit_length(p.spit_lead_distance)
-		_check(rays[rays.size() / 2].is_equal_approx(origin.direction_to(lead)), "fan retained an obsolete target")
+		check(rays[rays.size() / 2].is_equal_approx(origin.direction_to(lead)), "fan retained an obsolete target")
 		var warning := a.save_data()
 		a.restore(warning)
-		_check(a.save_data() == warning and AcidKingSnapshot.valid(warning), "new fan warning failed snapshot roundtrip")
+		check(a.save_data() == warning and AcidKingSnapshot.valid(warning), "new fan warning failed snapshot roundtrip")
 		game.player.global_position += Vector2(400, 200)
 		a.advance(p.spit_warning_seconds - 0.001)
-		_check(a.spit.entries.is_empty() and a.spit_rays == rays and boss.global_position == origin, "fan tracked the player, moved origin or fired early")
+		check(a.spit.entries.is_empty() and a.spit_rays == rays and boss.global_position == origin, "fan tracked the player, moved origin or fired early")
 		a.advance(0.201)
-		_check(a.spit.entries.size() == p.spit_count(), "long frame lost fan rays")
+		check(a.spit.entries.size() == p.spit_count(), "long frame lost fan rays")
 		for entry in a.spit.entries:
-			_check(is_equal_approx(entry.life, p.spit.lifetime - 0.2) and is_equal_approx(entry.at.distance_to(origin), p.spit.speed * 0.2), "fan projectile advanced before its birth")
+			check(is_equal_approx(entry.life, p.spit.lifetime - 0.2) and is_equal_approx(entry.at.distance_to(origin), p.spit.speed * 0.2), "fan projectile advanced before its birth")
 		var flying := a.save_data()
 		a.restore(flying)
-		_check(a.save_data() == flying, "flying acid fan changed on restore")
+		check(a.save_data() == flying, "flying acid fan changed on restore")
 		# Phase changes cancel both warning geometry and actual projectile batches.
 		BossAttackController.start_boss_phase(boss)
-		_check(a.spit.entries.is_empty() and a.spit_rays.is_empty() and a.fields.is_empty(), "phase interruption retained fan/river hazards")
+		check(a.spit.entries.is_empty() and a.spit_rays.is_empty() and a.fields.is_empty(), "phase interruption retained fan/river hazards")
 		_place(boss)
 		a.begin(a.Attack.STOMP)
 		a.advance(a.stomp_warning_duration() + a._stomp_duration())
 		if p.stomp_sequences == 2:
-			_check(a.state == a.State.CHASE_STOMP and a.stomp_index == 1, "Hard/Hell omitted the second stomp")
+			check(a.state == a.State.CHASE_STOMP and a.stomp_index == 1, "Hard/Hell omitted the second stomp")
 			var chase := a.save_data()
 			a.restore(chase)
-			_check(a.save_data() == chase, "follow-up chase failed snapshot roundtrip")
+			check(a.save_data() == chase, "follow-up chase failed snapshot roundtrip")
 			game.player.global_position += Vector2(90, 130)
 			var distance := boss.global_position.distance_to(game.player.global_position)
 			a.advance(p.stomp_chase_seconds)
-			_check(a.state == a.State.WARN_STOMP and is_equal_approx(a.remaining, a.stomp_warning_duration()) and boss.global_position.distance_to(game.player.global_position) < distance, "second stomp omitted pursuit/full new warning")
+			check(a.state == a.State.WARN_STOMP and is_equal_approx(a.remaining, a.stomp_warning_duration()) and boss.global_position.distance_to(game.player.global_position) < distance, "second stomp omitted pursuit/full new warning")
 			var fixed := a.rows.duplicate(true)
 			var retargeted := boss.global_position.direction_to(game.player.global_position)
-			_check(a.aim.is_equal_approx(retargeted), "second stomp did not reacquire Denti")
+			check(a.aim.is_equal_approx(retargeted), "second stomp did not reacquire Denti")
 			game.player.global_position += Vector2(150, -90)
 			a.advance(a.remaining - 0.001)
-			_check(a.rows == fixed, "follow-up stomp tracked Denti during its warning")
+			check(a.rows == fixed, "follow-up stomp tracked Denti during its warning")
 			a.advance(0.001 + a._stomp_duration())
-		_check(a.state == a.State.RECALL and a.stomp_index == p.stomp_sequences, "stomp chain failed to finish")
+		check(a.state == a.State.RECALL and a.stomp_index == p.stomp_sequences, "stomp chain failed to finish")
 		# v1 serial saves complete the announced single sequence as before.
 		_place(boss)
 		a.begin(a.Attack.STOMP)
@@ -139,11 +136,11 @@ func _run() -> void:
 		for key in ["stomp_total", "stomp_index", "spit_origin", "spit_rays", "spit_projectiles"]: old.erase(key)
 		a.restore(old)
 		a.advance(a.remaining + a._stomp_duration())
-		_check(a.state == a.State.RECALL and a.spit.entries.is_empty(), "old save gained an unannounced extra attack")
+		check(a.state == a.State.RECALL and a.spit.entries.is_empty(), "old save gained an unannounced extra attack")
 		_place(boss)
 		boss.global_position = game.player.global_position + Vector2(-600, 0)
 		a.advance(p.approach_seconds + 0.001)
-		_check(a.state == a.State.POSITION, "distant King started an ineffective fan before approaching")
+		check(a.state == a.State.POSITION, "distant King started an ineffective fan before approaching")
 		boss.free()
 	# Real save/scene reload with an active aimed warning.
 	game.wave.difficulty_id = &"hell"
@@ -171,18 +168,18 @@ func _run() -> void:
 	paused = true
 	var loaded := a.save_data()
 	var advanced: float = loaded.elapsed - before.elapsed
-	_check(loaded.state == a.State.WARN_SPIT and loaded.spit_origin == before.spit_origin and loaded.spit_rays == before.spit_rays and absf(loaded.remaining - before.remaining + advanced) < 0.00001 and advanced >= 0 and advanced <= STEP * 2 + 0.000001, "real reload lost fixed fan warning/timing")
+	check(loaded.state == a.State.WARN_SPIT and loaded.spit_origin == before.spit_origin and loaded.spit_rays == before.spit_rays and absf(loaded.remaining - before.remaining + advanced) < 0.00001 and advanced >= 0 and advanced <= STEP * 2 + 0.000001, "real reload lost fixed fan warning/timing")
 	for bad in [{"spit_rays": [[0]]}, {"spit_projectiles": [{}]}, {"stomp_total": "bad"}, {"spit_origin": [INF, 0]}]:
-		_check(not AcidKingSnapshot.valid(bad), "invalid assault snapshot entered runtime")
+		check(not AcidKingSnapshot.valid(bad), "invalid assault snapshot entered runtime")
 	a.advance(a.remaining + 0.1)
 	boss.health = 1
 	boss.boss_damage_budget = boss.max_health
 	boss.boss_phase = 2
 	boss.take_damage(1000000)
-	_check(boss.dying and a.spit.entries.is_empty() and a.spit_rays.is_empty() and a.fields.is_empty(), "death retained new hazards")
+	check(boss.dying and a.spit.entries.is_empty() and a.spit_rays.is_empty() and a.fields.is_empty(), "death retained new hazards")
 	boss.free()
 	game.free()
 	paused = false
 	session.clear_run()
 	if failures.is_empty(): print("PASS king_assault: four-tier attacks, fixed full warnings, chase/reaim, projectile birth times, save/real reload, v1 migration, phase/death cleanup")
-	finish(0 if failures.is_empty() else 1)
+	finish_checks()

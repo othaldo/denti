@@ -1,14 +1,8 @@
 extends "res://tests/support/test_runtime.gd"
 
-var failures := 0
 
 func _initialize() -> void:
 	call_deferred("_run")
-
-func _check(condition: bool, message: String) -> void:
-	if not condition:
-		failures += 1
-		push_error(message)
 
 func _settle() -> void:
 	for frame in 3:
@@ -33,7 +27,7 @@ func _run() -> void:
 	enemy.set_simulation_enabled(false)
 	enemy.special_timer = 0
 	enemy._physics_process(0.0)
-	_check(enemy.special_phase == Enemy.SpecialPhase.WARNING, "batch test did not enter warning")
+	check(enemy.special_phase == Enemy.SpecialPhase.WARNING, "batch test did not enter warning")
 	var counts := {"enemy": 0, "batch": 0}
 	enemy.draw.connect(func(): counts.enemy += 1)
 	index.draw.connect(func(): counts.batch += 1)
@@ -43,10 +37,10 @@ func _run() -> void:
 		enemy._process_special(0, enemy.special_direction)
 		index._process(0)
 		await _settle()
-	_check(counts.enemy == own_count and counts.batch >= 5, "indexed warning still rebuilds each enemy's unrelated status drawing")
-	_check(enemy._warning_rays(EnemyData.SpecialAttack.SHOOT, 3) == EnemyProjectilePatterns.fan_directions(enemy.special_direction, 3), "cached fan warning differs from attack spread")
+	check(counts.enemy == own_count and counts.batch >= 5, "indexed warning still rebuilds each enemy's unrelated status drawing")
+	check(enemy._warning_rays(EnemyData.SpecialAttack.SHOOT, 3) == EnemyProjectilePatterns.fan_directions(enemy.special_direction, 3), "cached fan warning differs from attack spread")
 	enemy.special_direction = Vector2.UP
-	_check(enemy._warning_rays(EnemyData.SpecialAttack.RADIAL, 12) == EnemyProjectilePatterns.radial_directions(12, enemy.special_direction.angle() + PI), "warning cache retained the wrong mode/direction/count")
+	check(enemy._warning_rays(EnemyData.SpecialAttack.RADIAL, 12) == EnemyProjectilePatterns.radial_directions(12, enemy.special_direction.angle() + PI), "warning cache retained the wrong mode/direction/count")
 	# Exact old swept-contact oracle: include high-speed crossings, distant
 	# misses, tangencies and stationary overlaps. Broad phase may only reject.
 	game.player.stats.max_health = 1e9
@@ -83,14 +77,14 @@ func _run() -> void:
 		enemy._physics_process(0.1)
 		var closest := Geometry2D.get_closest_point_to_segment(game.player.global_position, start, enemy.global_position)
 		var expected := closest.distance_squared_to(game.player.global_position) < pow(data.radius + 20, 2)
-		_check((game.player.stats.health < before) == expected, "contact broad phase changed swept hit/miss in trial %s" % trial)
+		check((game.player.stats.health < before) == expected, "contact broad phase changed swept hit/miss in trial %s" % trial)
 	enemy.free()
 	index._process(0)
 	await _settle()
-	_check(index.shadow_batch.enemies.is_empty() and not index.had_attack_visuals and not index.is_processing(), "cleanup left attack geometry processing")
+	check(index.shadow_batch.enemies.is_empty() and not index.had_attack_visuals and not index.is_processing(), "cleanup left attack geometry processing")
 	game.free()
 	session.clear_run()
 	paused = false
-	if failures == 0:
+	if failures.is_empty():
 		print("Denti batched attack visuals and swept contacts test passed")
-	finish(0 if failures == 0 else 1)
+	finish_checks()

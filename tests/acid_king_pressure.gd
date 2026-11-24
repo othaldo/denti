@@ -4,14 +4,8 @@ extends "res://tests/support/test_runtime.gd"
 const STEP := 1.0 / 60
 const ENEMY_SCENE := preload("res://scenes/enemies/enemy.tscn")
 var game: Node2D
-var failures: Array[String] = []
 
 func _initialize() -> void: call_deferred("_run")
-
-func _check(ok: bool, message: String) -> void:
-	if not ok:
-		failures.append(message)
-		push_error(message)
 
 func _spawn(difficulty: DifficultyData) -> Enemy:
 	var player: Player = game.player
@@ -55,29 +49,29 @@ func _run() -> void:
 		boss.boss_phase = 1
 		attack.begin(AcidKingEncounter.Attack.TIDE)
 		attack.advance(attack.profile.warning_seconds + attack.profile.shift_flow_seconds)
-		_check(attack.state == AcidKingEncounter.State.PURSUE and attack.pending.is_empty(), "pursuit announced lanes before acquiring its new target")
+		check(attack.state == AcidKingEncounter.State.PURSUE and attack.pending.is_empty(), "pursuit announced lanes before acquiring its new target")
 		game.player.global_position += Vector2(180, 100)
 		game.player.velocity = Vector2(200, 50)
 		game.player.get_node("Camera2D").force_update_scroll()
 		var distance := boss.global_position.distance_to(game.player.global_position)
 		attack.advance(attack.profile.pursuit_seconds * 0.5)
-		_check(boss.global_position.distance_to(game.player.global_position) < distance, "pursuit did not close distance to a moving target")
+		check(boss.global_position.distance_to(game.player.global_position) < distance, "pursuit did not close distance to a moving target")
 		var mid := attack.save_data()
 		EnemySnapshot.restore(boss, EnemySnapshot.capture(boss))
-		_check(attack.save_data() == mid and attack.state == AcidKingEncounter.State.PURSUE, "snapshot lost the appended pursuit state")
+		check(attack.save_data() == mid and attack.state == AcidKingEncounter.State.PURSUE, "snapshot lost the appended pursuit state")
 		var old_axis := attack.axis
 		attack.advance(attack.remaining)
 		var expected: Vector2 = game.player.global_position + (game.player.velocity * attack.profile.shift_lead_seconds).limit_length(attack.profile.shift_lead_distance)
-		_check(attack.state == AcidKingEncounter.State.WARN_SHIFT and attack.anchor.is_equal_approx(expected), "shift retained an obsolete target instead of reacquiring before its warning")
-		_check(attack.axis == (1 - old_axis if attack.profile.alternate_shift_axis else old_axis), "shift ignored its difficulty-specific axis change")
+		check(attack.state == AcidKingEncounter.State.WARN_SHIFT and attack.anchor.is_equal_approx(expected), "shift retained an obsolete target instead of reacquiring before its warning")
+		check(attack.axis == (1 - old_axis if attack.profile.alternate_shift_axis else old_axis), "shift ignored its difficulty-specific axis change")
 		var fixed := attack.pending.duplicate(true)
 		var origin := boss.global_position
 		game.player.global_position += Vector2(-160, 120)
 		game.player.velocity = Vector2(-200, 0)
 		attack.advance(attack.profile.shift_warning_seconds - 0.001)
-		_check(attack.pending == fixed and boss.global_position == origin and attack.fields.is_empty(), "reacquired warning tracked Denti, moved the boss or activated early")
+		check(attack.pending == fixed and boss.global_position == origin and attack.fields.is_empty(), "reacquired warning tracked Denti, moved the boss or activated early")
 		attack.advance(0.001)
-		_check(attack.fields[0].at == fixed[0].at, "reacquired river differs from the geometry that was warned")
+		check(attack.fields[0].at == fixed[0].at, "reacquired river differs from the geometry that was warned")
 		for phase in [0, 1, 2]:
 			for kind in [AcidKingEncounter.Attack.CHANNELS, AcidKingEncounter.Attack.TIDE]:
 				attack.cancel()
@@ -91,7 +85,7 @@ func _run() -> void:
 						saw_combo = not attack.fields.is_empty() and attack.remaining > attack.stomp_warning_duration() - STEP
 						break
 					if attack.state == AcidKingEncounter.State.RECALL: break
-				_check(saw_combo == (phase >= attack.profile.combined_phase), "combined stomp entered the wrong health phase or lost its full warning/rivers")
+				check(saw_combo == (phase >= attack.profile.combined_phase), "combined stomp entered the wrong health phase or lost its full warning/rivers")
 		for extent in [Vector2i(1280, 720), Vector2i(320, 568), Vector2i(568, 320)]:
 			root.size = extent
 			root.content_scale_size = extent
@@ -104,7 +98,7 @@ func _run() -> void:
 				for corner: Vector2 in [Vector2(48, 48), Vector2(game.arena.arena_size.x - 48, 48), Vector2(48, game.arena.arena_size.y - 48), game.arena.arena_size - Vector2.ONE * 48]:
 					for axis in [0, 1]:
 						route_cases += 1
-						_check(_combined_route(boss, corner, axis), "%s phase %d combined stomp has no slowed bank route from %s, axis %d at %s" % [difficulty.id, phase, corner, axis, extent])
+						check(_combined_route(boss, corner, axis), "%s phase %d combined stomp has no slowed bank route from %s, axis %d at %s" % [difficulty.id, phase, corner, axis, extent])
 		root.size = Vector2i(1280, 720)
 		root.content_scale_size = root.size
 		await process_frame
@@ -120,7 +114,7 @@ func _run() -> void:
 			capped._physics_process(STEP)
 			if tick % 6 == 0: capped.take_damage(100000)
 			if capped.dying: break
-		_check(capped.dying and combined_releases[0] > 0, "%s maximum-DPS probe: dying=%s health=%.2f/%.2f combined_impacts=%d phase=%d state=%d seconds=%.2f" % [difficulty.id, capped.dying, capped.health, capped.max_health, combined_releases[0], capped.boss_phase, capped.acid_king_encounter.state, kill_frames * STEP])
+		check(capped.dying and combined_releases[0] > 0, "%s maximum-DPS probe: dying=%s health=%.2f/%.2f combined_impacts=%d phase=%d state=%d seconds=%.2f" % [difficulty.id, capped.dying, capped.health, capped.max_health, combined_releases[0], capped.boss_phase, capped.acid_king_encounter.state, kill_frames * STEP])
 		capped.free()
 	# Real scene reload must retain the new state, not only its RefCounted snapshot.
 	game.wave.difficulty_id = &"hell"
@@ -145,13 +139,13 @@ func _run() -> void:
 	var restored: Dictionary = game.boss.acid_king_encounter.save_data()
 	# The real scene can run one native physics tick during the unpaused reload.
 	var advanced := float(restored.elapsed) - float(before.elapsed)
-	_check(restored.state == AcidKingEncounter.State.PURSUE and advanced >= 0 and advanced <= STEP * 2 and absf(restored.remaining - before.remaining + advanced) < 0.00001, "actual reload lost pursuit timing")
-	_check(restored.anchor == before.anchor and restored.axis == before.axis and restored.shift_index == before.shift_index and restored.fields.size() == before.fields.size(), "actual reload lost the pursuit target or hazards")
+	check(restored.state == AcidKingEncounter.State.PURSUE and advanced >= 0 and advanced <= STEP * 2 and absf(restored.remaining - before.remaining + advanced) < 0.00001, "actual reload lost pursuit timing")
+	check(restored.anchor == before.anchor and restored.axis == before.axis and restored.shift_index == before.shift_index and restored.fields.size() == before.fields.size(), "actual reload lost the pursuit target or hazards")
 	for index in restored.fields.size():
-		_check(restored.fields[index].at == before.fields[index].at and absf(restored.fields[index].life - before.fields[index].life + advanced) < 0.00001, "reload moved or restarted a draining river")
+		check(restored.fields[index].at == before.fields[index].at and absf(restored.fields[index].life - before.fields[index].life + advanced) < 0.00001, "reload moved or restarted a draining river")
 	session.clear_run()
 	if failures.is_empty(): print("PASS acid_king_pressure: reacquisition, fixed full warnings, earlier combos, pursuit reload and %d slowed corner/bank routes" % route_cases)
-	finish(0 if failures.is_empty() else 1)
+	finish_checks()
 
 func _combined_route(boss: Enemy, corner: Vector2, channel_axis: int) -> bool:
 	var attack := boss.acid_king_encounter

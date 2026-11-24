@@ -1,11 +1,7 @@
 extends "res://tests/support/test_runtime.gd"
 
-var failures: Array[String] = []
 
 func _initialize() -> void: call_deferred("_run")
-
-func _check(ok: bool, reason: String) -> void:
-	if not ok: failures.append(reason); push_error(reason)
 
 func _run() -> void:
 	var session: Node = root.get_node("GameSession")
@@ -30,7 +26,7 @@ func _run() -> void:
 		if mob == thief: continue
 		var closest := Geometry2D.get_closest_point_to_segment(mob.position, game.player.position, cover)
 		if closest.distance_to(mob.position) <= mob.data.radius + 28: blockers += 1
-	_check(blockers > 0 and cover.distance_to(game.player.position) > thief.position.distance_to(game.player.position), "goblin did not put the existing mob group between itself and Denti")
+	check(blockers > 0 and cover.distance_to(game.player.position) > thief.position.distance_to(game.player.position), "goblin did not put the existing mob group between itself and Denti")
 	game._clear_combat()
 	await process_frame
 	for difficulty in DifficultyCatalog.ALL:
@@ -44,19 +40,19 @@ func _run() -> void:
 			game.get_node("Enemies").motion.step(game.get_node("Enemies"), 1.0 / 60)
 			game.player.position = game.player.position.move_toward(thief.position, PlayerStats.BASE_MOVE_SPEED / 60)
 			if game.player.position.distance_to(thief.position) < 95: windows += 1
-		_check(windows >= 30, "%s goblin has no sustained melee opportunity in a 12 second pursuit" % difficulty.id)
+		check(windows >= 30, "%s goblin has no sustained melee opportunity in a 12 second pursuit" % difficulty.id)
 		var index := game.get_node("Enemies") as EnemySpatialIndex
-		_check(index.in_circle(thief.position, 1).has(thief), "custom movement left the targeting index stale")
+		check(index.in_circle(thief.position, 1).has(thief), "custom movement left the targeting index stale")
 		var normal_speed := thief._movement_speed()
 		thief.apply_wet(2)
-		_check(thief._movement_speed() < normal_speed, "wet cannot help pursue the goblin")
+		check(thief._movement_speed() < normal_speed, "wet cannot help pursue the goblin")
 		var hp: float = game.player.stats.health
 		game.player.stats.shield_charges = 2
 		thief.try_contact_hit()
-		_check(game.player.stats.health == hp and game.player.stats.shield_charges == 2, "harmless goblin contact consumed health or shields")
+		check(game.player.stats.health == hp and game.player.stats.shield_charges == 2, "harmless goblin contact consumed health or shields")
 		thief.free()
 	session.clear_run()
 	game.free()
 	paused = false
 	if failures.is_empty(): print("Denti goblin cover, central motion, four-difficulty melee pursuit and wet test passed")
-	finish(0 if failures.is_empty() else 1)
+	finish_checks()

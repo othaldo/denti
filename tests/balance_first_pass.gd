@@ -2,17 +2,10 @@ extends "res://tests/support/test_runtime.gd"
 
 const STEP := 1.0 / 60.0
 var game: Node2D
-var failures := 0
 
 
 func _initialize() -> void:
 	call_deferred("_run")
-
-
-func _check(condition: bool, message: String) -> void:
-	if not condition:
-		failures += 1
-		push_error(message)
 
 
 func _run() -> void:
@@ -34,7 +27,7 @@ func _run() -> void:
 	_verdict_prediction()
 	session.clear_run()
 	print("PASS first balance pass: brush reach/radial space/one-hit contact, bounded fixed verdict prediction, Easy/legacy behavior, JSON resume and readable escape")
-	finish(1 if failures else 0)
+	finish_checks()
 
 
 func _brush_space() -> void:
@@ -52,16 +45,16 @@ func _brush_space() -> void:
 		targets.append(enemy)
 		starts.append(enemy.global_position)
 	weapon._physics_process(0.001)
-	_check(targets[0].health == 10000 and targets[1].health == 10000, "brush hit before its windup")
+	check(targets[0].health == 10000 and targets[1].health == 10000, "brush hit before its windup")
 	weapon._physics_process(weapon.attack_duration)
 	for index in targets.size():
 		var enemy := targets[index]
 		var outward: Vector2 = (starts[index] - game.player.global_position).normalized()
-		_check(enemy.health < 10000, "brush missed its moving blade at useful close range")
-		_check((enemy.global_position - starts[index]).dot(outward) > 0, "spin pushed an enemy through Denti instead of away")
+		check(enemy.health < 10000, "brush missed its moving blade at useful close range")
+		check((enemy.global_position - starts[index]).dot(outward) > 0, "spin pushed an enemy through Denti instead of away")
 		var health := enemy.health
 		weapon.strike.tick(weapon, WeaponMotion.ACTIVE_START, WeaponMotion.ACTIVE_END)
-		_check(enemy.health == health, "spin hit an enemy twice in one attack")
+		check(enemy.health == health, "spin hit an enemy twice in one attack")
 	for enemy in targets: enemy.free()
 	game.player.loadout.restore([])
 
@@ -75,15 +68,15 @@ func _leech_growth() -> void:
 		affixes = WeaponUpgrades.advance(affixes, &"leech", small, 4)
 		var affix := affixes[0]
 		var heal := WeaponAffixes.utility_value(affix)
-		_check(heal > previous, "a lifesteal rank no longer improves healing")
+		check(heal > previous, "a lifesteal rank no longer improves healing")
 		if rank <= 4:
-			_check(is_equal_approx(heal, 0.25 + float(affix.damage) * 0.04), "early lifesteal was reduced")
-		_check(is_equal_approx(heal * 6, WeaponAffixes.utility_value(affix, 2) * 3), "soft scaling broke root parity")
-		_check(is_equal_approx(AffixPresentation.display_value(float(affix.damage), &"leech", large), heal * 2), "lifesteal card and combat disagree")
+			check(is_equal_approx(heal, 0.25 + float(affix.damage) * 0.04), "early lifesteal was reduced")
+		check(is_equal_approx(heal * 6, WeaponAffixes.utility_value(affix, 2) * 3), "soft scaling broke root parity")
+		check(is_equal_approx(AffixPresentation.display_value(float(affix.damage), &"leech", large), heal * 2), "lifesteal card and combat disagree")
 		var restored: Dictionary = JSON.parse_string(JSON.stringify(affix))
-		_check(is_equal_approx(WeaponAffixes.utility_value(restored), heal), "JSON changed lifesteal scaling")
+		check(is_equal_approx(WeaponAffixes.utility_value(restored), heal), "JSON changed lifesteal scaling")
 		previous = heal
-	_check(is_equal_approx(previous, 1.11), "max lifesteal missed its bounded healing budget")
+	check(is_equal_approx(previous, 1.11), "max lifesteal missed its bounded healing budget")
 
 
 func _verdict_prediction() -> void:
@@ -96,32 +89,32 @@ func _verdict_prediction() -> void:
 	game.player.velocity = Vector2(0, 230)
 	attack.begin(CrownCourtEncounter.Attack.EDICT)
 	var expected := boss.global_position.direction_to(game.player.global_position + (game.player.velocity * attack.profile.verdict_lead_seconds).limit_length(attack.profile.verdict_lead_distance))
-	_check(Vector2.from_angle(attack.edict_angle).dot(expected) > 0.9999, "verdict did not warn its bounded intercept")
-	_check(attack.remaining >= 1.0, "first verdict lost its readable reaction time")
+	check(Vector2.from_angle(attack.edict_angle).dot(expected) > 0.9999, "verdict did not warn its bounded intercept")
+	check(attack.remaining >= 1.0, "first verdict lost its readable reaction time")
 	var origin := attack.origin
 	var angle := attack.edict_angle
 	game.player.global_position += Vector2(-30, -60)
 	game.player.velocity = Vector2(0, -230)
 	attack.advance(0.1)
-	_check(attack.origin == origin and attack.edict_angle == angle, "verdict tracked after the warning was drawn")
+	check(attack.origin == origin and attack.edict_angle == angle, "verdict tracked after the warning was drawn")
 	var snapshot: Dictionary = JSON.parse_string(JSON.stringify(attack.save_data()))
 	attack.restore(snapshot)
-	_check(is_equal_approx(attack.edict_angle, angle) and attack.origin == origin, "save/resume re-aimed an announced verdict")
+	check(is_equal_approx(attack.edict_angle, angle) and attack.origin == origin, "save/resume re-aimed an announced verdict")
 	attack.cancel()
 	game.player.global_position = Vector2(960, 540)
 	game.player.velocity = Vector2(0, 10000)
 	attack._lock_verdict()
 	expected = origin.direction_to(game.player.global_position + Vector2(0, attack.profile.verdict_lead_distance))
-	_check(Vector2.from_angle(attack.edict_angle).dot(expected) > 0.9999, "fast movement exceeded the prediction-distance limit")
+	check(Vector2.from_angle(attack.edict_angle).dot(expected) > 0.9999, "fast movement exceeded the prediction-distance limit")
 	attack.legacy_sequence = true
 	attack._lock_verdict()
-	_check(absf(attack.edict_angle) < 0.001, "legacy attacks acquired new aim prediction")
+	check(absf(attack.edict_angle) < 0.001, "legacy attacks acquired new aim prediction")
 	attack.legacy_sequence = false
 	var easy := EnemyCatalog.CAVITY_EMPEROR.crown_court_profile.for_difficulty(DifficultyCatalog.EASY)
-	_check(easy.verdict_lead_seconds == 0 and easy.verdict_lead_distance == 0, "Easy inherited the new intercept pressure")
-	_check(EnemyCatalog.CAVITY_EMPEROR.crown_court_profile.verdict_lead_seconds > 0, "difficulty cloning mutated the shared profile")
-	_check(_route(boss, Vector2.DOWN) > 0, "continuing the warned route never incurred pressure")
-	_check(_route(boss, Vector2.UP) == 0, "reading the warning and changing direction did not escape")
+	check(easy.verdict_lead_seconds == 0 and easy.verdict_lead_distance == 0, "Easy inherited the new intercept pressure")
+	check(EnemyCatalog.CAVITY_EMPEROR.crown_court_profile.verdict_lead_seconds > 0, "difficulty cloning mutated the shared profile")
+	check(_route(boss, Vector2.DOWN) > 0, "continuing the warned route never incurred pressure")
+	check(_route(boss, Vector2.UP) == 0, "reading the warning and changing direction did not escape")
 	boss.free()
 
 

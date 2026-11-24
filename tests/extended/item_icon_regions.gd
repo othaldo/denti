@@ -1,16 +1,8 @@
 extends "res://tests/support/test_runtime.gd"
 
-var failures: Array[String] = []
-
 
 func _initialize() -> void:
 	call_deferred("_run")
-
-
-func _check(condition: bool, message: String) -> void:
-	if not condition:
-		failures.append(message)
-		push_error(message)
 
 
 func _painted_pixels(image: Image) -> int:
@@ -55,7 +47,7 @@ func _run() -> void:
 	for item in ItemCatalog.ALL:
 		var icon: Texture2D = item.icon_texture if item.icon_texture != null else DentiUIIcons.item(item.icon_index)
 		if item.icon_texture == null:
-			_check(icon is AtlasTexture and icon.filter_clip, "item atlas filtering is not isolated: " + str(item.id))
+			check(icon is AtlasTexture and icon.filter_clip, "item atlas filtering is not isolated: " + str(item.id))
 	# Check every legacy motif, including the original scaler not currently sold.
 	for index in 28:
 		var icon := DentiUIIcons.item(index) as AtlasTexture
@@ -63,24 +55,24 @@ func _run() -> void:
 		for previous: Rect2 in regions.get(icon.atlas, []):
 			var overlap := icon.region.intersection(previous)
 			if overlap.has_area():
-				_check(_painted_pixels(source.get_region(Rect2i(overlap))) == 0, "neighboring icons share painted source pixels")
+				check(_painted_pixels(source.get_region(Rect2i(overlap))) == 0, "neighboring icons share painted source pixels")
 		if not regions.has(icon.atlas):
 			regions[icon.atlas] = []
 		regions[icon.atlas].append(icon.region)
 		var selected := source.get_region(Rect2i(icon.region))
 		var used := selected.get_used_rect()
-		_check(icon.get_size().x == icon.get_size().y, "item frame is not square: %d" % index)
+		check(icon.get_size().x == icon.get_size().y, "item frame is not square: %d" % index)
 		var visible := Rect2(used).grow(4)
 		visible.position += icon.margin.position
-		_check(Rect2(Vector2.ZERO, icon.get_size()).encloses(visible), "item is cut off or lacks breathing room: %d" % index)
+		check(Rect2(Vector2.ZERO, icon.get_size()).encloses(visible), "item is cut off or lacks breathing room: %d" % index)
 		counts[icon.atlas] = int(counts.get(icon.atlas, 0)) + _painted_pixels(selected)
 		if index == 7:
-			_check(_solid_components(selected) == 1, "ceramic shell contains a fragment from another motif")
+			check(_solid_components(selected) == 1, "ceramic shell contains a fragment from another motif")
 	for atlas: Texture2D in counts:
-		_check(int(counts[atlas]) == _painted_pixels(atlas.get_image()), "source artwork was omitted or selected twice: " + atlas.resource_path)
+		check(int(counts[atlas]) == _painted_pixels(atlas.get_image()), "source artwork was omitted or selected twice: " + atlas.resource_path)
 	for index in 6:
-		_check((DentiUIIcons.hud(index) as AtlasTexture).filter_clip, "HUD atlas filtering is not isolated")
+		check((DentiUIIcons.hud(index) as AtlasTexture).filter_clip, "HUD atlas filtering is not isolated")
 	for index in 5:
-		_check((DentiUIIcons.relic(index) as AtlasTexture).filter_clip, "relic atlas filtering is not isolated")
+		check((DentiUIIcons.relic(index) as AtlasTexture).filter_clip, "relic atlas filtering is not isolated")
 	print("Denti item icon isolation and complete artwork test passed" if failures.is_empty() else "%d icon region failures" % failures.size())
-	finish(0 if failures.is_empty() else 1)
+	finish_checks()

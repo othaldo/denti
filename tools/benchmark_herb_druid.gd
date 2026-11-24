@@ -35,7 +35,7 @@ func _run() -> void:
 	var output := str(_arguments("output", ["res://.godot/herb_druid_earned.json"])[0])
 	var file := FileAccess.open(output, FileAccess.WRITE)
 	file.store_string(JSON.stringify(report, "\t") + "\n")
-	finish(1 if failures else 0)
+	finish_checks()
 
 
 func make_run(build: String, difficulty: StringName, sample_seed: int):
@@ -58,8 +58,7 @@ func spend_talent_points(game) -> void:
 			var key := fallback_talent_stat(game)
 			planned = key != &"" and game.talents.plan_stat(key, game.player.stats, game.UPGRADES, game.rewards.pending_levels)
 		if not planned:
-			push_error("Herb policy cannot allocate an earned level point")
-			failures += 1
+			check(false, "Herb policy cannot allocate an earned level point")
 			return
 	game._on_talents_completed()
 

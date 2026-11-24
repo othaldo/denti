@@ -5,7 +5,6 @@ const RESERVE_PLAYER = preload("res://tools/balance/boss_pressure_player.gd")
 const SENSOR = preload("res://tools/balance/boss_pressure_observation.gd")
 const PROFILES = preload("res://tools/balance/build_comparison_profiles.gd")
 const SOUND = preload("res://tools/balance/boss_pressure_sound.gd")
-var failures := 0
 
 func _initialize() -> void: call_deferred("_run")
 
@@ -20,17 +19,15 @@ func _run() -> void:
 	sound.play_cue(&"hit")
 	sound.play_cue(&"pickup")
 	if randf() != expected:
-		push_error("Audit sound callbacks consumed combat RNG")
-		failures += 1
+		check(false, "Audit sound callbacks consumed combat RNG")
 	sound.queue_free()
 	var baseline := await measure(false)
 	var reserve := await measure(true)
 	if baseline != reserve or baseline.hurt_time != Player.MAX_IFRAMES or baseline.second_hit != 0 or baseline.damage != 50:
-		push_error("Diagnostic reserve changed normal hit protection: %s / %s" % [baseline, reserve])
-		failures += 1
+		check(false, "Diagnostic reserve changed normal hit protection: %s / %s" % [baseline, reserve])
 	for wave in [10, 15, 20]: await check_sensor(wave)
 	root.get_node("GameSession").clear_run()
-	finish(failures)
+	finish_checks()
 
 func measure(use_reserve: bool) -> Dictionary:
 	var session := root.get_node("GameSession")
@@ -57,7 +54,7 @@ func measure(use_reserve: bool) -> Dictionary:
 	var second: float = game.player.take_hit(30)
 	game.player._physics_process(0.2)
 	game.player.take_hit(20)
-	if use_reserve and (game.player.stats.max_health != 100000 or game.player.stats.health != 99950): failures += 1
+	if use_reserve: check(game.player.stats.max_health == 100000 and game.player.stats.health == 99950, "Diagnostic reserve did not absorb the audit hit")
 	var result := {"hurt_time": protection, "second_hit": second, "damage": damage[0]}
 	_stop_audio(game)
 	game.queue_free()
@@ -110,8 +107,7 @@ func check_sensor(wave: int) -> void:
 		r.remaining = 1
 	var world: Dictionary = SENSOR.new().capture(game, 0)
 	if world.hazards.is_empty() or world.projectiles.is_empty() or world.enemies.size() != 1:
-		push_error("Audit sensor wave %d: hazards=%d, shots=%d, contact bodies=%d" % [wave, world.hazards.size(), world.projectiles.size(), world.enemies.size()])
-		failures += 1
+		check(false, "Audit sensor wave %d: hazards=%d, shots=%d, contact bodies=%d" % [wave, world.hazards.size(), world.projectiles.size(), world.enemies.size()])
 	game._clear_arena(false)
 	_stop_audio(game)
 	game.queue_free()

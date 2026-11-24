@@ -1,6 +1,5 @@
 extends "res://tests/support/test_runtime.gd"
 
-var failures: Array[String] = []
 var events: Array[int] = []
 var game: Node2D
 
@@ -12,11 +11,6 @@ class CountingLoot extends Loot:
 
 func _initialize() -> void:
 	call_deferred("_run")
-
-func _check(condition: bool, message: String) -> void:
-	if not condition:
-		failures.append(message)
-		push_error(message)
 
 func _run() -> void:
 	var session: Node = root.get_node("GameSession")
@@ -43,7 +37,7 @@ func _run() -> void:
 		drops.append(drop)
 		expected[id] = position_world
 		order.append(id)
-		_check(not drop.is_physics_processing(), "ground loot still runs an individual per-tick callback")
+		check(not drop.is_physics_processing(), "ground loot still runs an individual per-tick callback")
 	# Boundary cases and a same-frame teleport across cells.
 	drops[0].global_position = Vector2(667, 360)
 	expected[order[0]] = drops[0].global_position
@@ -84,19 +78,19 @@ func _run() -> void:
 				expected[id] = position_world.move_toward(at, 200.0 / 60)
 		events.clear()
 		grid._physics_process(1.0 / 60)
-		_check(events == expected_events, "grid changed pickup timing/order or emitted a pickup twice at tick %d" % tick)
+		check(events == expected_events, "grid changed pickup timing/order or emitted a pickup twice at tick %d" % tick)
 		for drop in drops:
 			if is_instance_valid(drop) and expected.has(drop.get_instance_id()):
 				# World/local conversion under nonuniform scale accumulates float rounding.
 				if drop.global_position.distance_to(expected[drop.get_instance_id()]) > 0.01:
-					_check(false, "grid changed magnet/sweep movement at tick %d: actual %s, expected %s" % [tick, drop.global_position, expected[drop.get_instance_id()]])
+					check(false, "grid changed magnet/sweep movement at tick %d: actual %s, expected %s" % [tick, drop.global_position, expected[drop.get_instance_id()]])
 					game.free()
 					finish(1)
 					return
 		await process_frame
 	for drop in grid.get_children():
 		drop.free()
-	_check(grid.cells.is_empty() and grid.membership.is_empty() and grid.collecting.is_empty() and not grid.is_physics_processing(), "freed loot leaked grid entries or active processing")
+	check(grid.cells.is_empty() and grid.membership.is_empty() and grid.collecting.is_empty() and not grid.is_physics_processing(), "freed loot leaked grid entries or active processing")
 	# A far-away chest sleeps, wakes on teleport, and retains its exact reward.
 	game.rotation = 0
 	game.scale = Vector2.ONE
@@ -110,15 +104,15 @@ func _run() -> void:
 	grid._physics_process(1.0 / 60)
 	for tick in 60:
 		grid._physics_process(1.0 / 60)
-	_check(sleeping.checks == 1, "stationary ground loot keeps repeating distance checks")
+	check(sleeping.checks == 1, "stationary ground loot keeps repeating distance checks")
 	game.player.position.x += 1
 	grid._physics_process(1.0 / 60)
-	_check(sleeping.checks == 2, "player movement did not wake nearby loot")
+	check(sleeping.checks == 2, "player movement did not wake nearby loot")
 	game.items.cached_pickup_range = 235
 	var before := sleeping.position
 	grid._physics_process(1.0 / 60)
 	grid._physics_process(1.0 / 60)
-	_check(sleeping.checks == 4 and sleeping.position.distance_to(before) > 6, "magnet change did not wake loot or attraction stopped while standing")
+	check(sleeping.checks == 4 and sleeping.position.distance_to(before) > 6, "magnet change did not wake loot or attraction stopped while standing")
 	game.items.cached_pickup_range = 110
 	sleeping.position = Vector2(750, 470)
 	grid._physics_process(1.0 / 60)
@@ -127,26 +121,26 @@ func _run() -> void:
 	# Same-cell movement changes distance without changing grid membership.
 	sleeping.position = Vector2(649, 387)
 	grid._physics_process(1.0 / 60)
-	_check(sleeping.checks == checks_before_teleport + 1 and sleeping.position.y < 387, "same-cell teleport did not wake collection")
+	check(sleeping.checks == checks_before_teleport + 1 and sleeping.position.y < 387, "same-cell teleport did not wake collection")
 	sleeping.free()
 	var added := CountingLoot.new()
 	added.position = game.player.position
 	added.configure(&"coin", 1, game.player)
 	grid.add_child(added)
 	grid._physics_process(1.0 / 60)
-	_check(added.checks == 1 and added.is_queued_for_deletion(), "new loot did not wake a stationary query")
+	check(added.checks == 1 and added.is_queued_for_deletion(), "new loot did not wake a stationary query")
 	await process_frame
 	game._spawn_loot(Vector2(-10000, 20000), &"chest", 7, &"metal_crown")
 	var chest: Loot = grid.get_child(0)
 	grid._physics_process(1.0 / 60)
-	_check(grid.last_candidates == 0 and not chest.is_queued_for_deletion(), "distant chest still needs a per-tick distance check")
+	check(grid.last_candidates == 0 and not chest.is_queued_for_deletion(), "distant chest still needs a per-tick distance check")
 	chest.global_position = game.player.global_position
 	grid._physics_process(1.0 / 60)
 	grid._physics_process(1.0 / 60)
-	_check(game.rewards.pending_chests.size() == 1 and game.rewards.current_chest().item_id == "metal_crown" and game.rewards.current_chest().scrap_coins == 7, "teleported chest lost its reward or was collected twice")
+	check(game.rewards.pending_chests.size() == 1 and game.rewards.current_chest().item_id == "metal_crown" and game.rewards.current_chest().scrap_coins == 7, "teleported chest lost its reward or was collected twice")
 	session.clear_run()
 	game.free()
 	paused = false
 	if failures.is_empty():
 		print("Denti loot spatial index regression test passed")
-	finish(0 if failures.is_empty() else 1)
+	finish_checks()

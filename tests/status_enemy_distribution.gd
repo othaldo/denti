@@ -1,14 +1,8 @@
 extends "res://tests/support/test_runtime.gd"
 
-var failures := 0
 
 func _initialize() -> void:
 	call_deferred("_run")
-
-func _check(ok: bool, message: String) -> void:
-	if not ok:
-		failures += 1
-		push_error(message)
 
 func _run() -> void:
 	var last_traits := -1
@@ -22,22 +16,22 @@ func _run() -> void:
 		for index in 3000:
 			rng.seed = index + 9800
 			var attacks := EnemyStatusRules.attacks_for(WaveController.PLAQUE, 20, difficulty, rng)
-			_check(attacks.size() <= 1, "ordinary enemy acquired multiple traits")
+			check(attacks.size() <= 1, "ordinary enemy acquired multiple traits")
 			if not attacks.is_empty():
 				trait_count += 1
 				poison_count += int(attacks[0]["kind"] == DentiStatus.Type.POISON)
 				bleed_count += int(attacks[0]["kind"] == DentiStatus.Type.BLEED)
-		_check(trait_count > last_traits and poison_count > 0 and bleed_count > 0, "status distribution did not rise with difficulty or omitted one trait")
+		check(trait_count > last_traits and poison_count > 0 and bleed_count > 0, "status distribution did not rise with difficulty or omitted one trait")
 		last_traits = trait_count
-		_check(WaveController.PLAQUE.inflicted_statuses.is_empty(), "per-instance trait mutated shared enemy resource")
-		_check(EnemyStatusRules.attacks_for(WaveController.BACTERIA, difficulty.status_trait_first_wave - 1, difficulty, rng).is_empty(), "ordinary traits appeared too early")
-		_check(EnemyStatusRules.attacks_for(WaveController.CAVITY_EMPEROR, 100, difficulty, rng).is_empty(), "random traits altered boss mechanics")
-		_check(EnemyStatusRules.trait_chance(100000, difficulty) <= difficulty.status_trait_chance_cap and EnemyStatusRules.trait_chance(100000, difficulty, true) <= 0.45, "endless trait probability escaped its cap")
+		check(WaveController.PLAQUE.inflicted_statuses.is_empty(), "per-instance trait mutated shared enemy resource")
+		check(EnemyStatusRules.attacks_for(WaveController.BACTERIA, difficulty.status_trait_first_wave - 1, difficulty, rng).is_empty(), "ordinary traits appeared too early")
+		check(EnemyStatusRules.attacks_for(WaveController.CAVITY_EMPEROR, 100, difficulty, rng).is_empty(), "random traits altered boss mechanics")
+		check(EnemyStatusRules.trait_chance(100000, difficulty) <= difficulty.status_trait_chance_cap and EnemyStatusRules.trait_chance(100000, difficulty, true) <= 0.45, "endless trait probability escaped its cap")
 		var poison_attacks := EnemyStatusRules.attacks_for(WaveController.POISON_GERM, 20, difficulty)
 		var potency: float = poison_attacks[0]["damage"]
-		_check(potency > last_potency and poison_attacks[0]["duration"] <= 6.0, "difficulty did not scale specialist damage/duration")
+		check(potency > last_potency and poison_attacks[0]["duration"] <= 6.0, "difficulty did not scale specialist damage/duration")
 		last_potency = potency
-		_check(EnemyStatusRules.damage_factor(100000, difficulty) < 3.0, "endless status damage grew without bound")
+		check(EnemyStatusRules.damage_factor(100000, difficulty) < 3.0, "endless status damage grew without bound")
 		var wave := WaveController.new()
 		wave.difficulty_id = difficulty.id
 		wave.current_wave = difficulty.poison_first_wave - 1
@@ -46,14 +40,14 @@ func _run() -> void:
 		seed(7429)
 		for roll in 1000:
 			var enemy := wave._choose_enemy()
-			_check(enemy != WaveController.POISON_GERM and enemy != WaveController.GUM_BITER, "specialist spawned before first wave")
+			check(enemy != WaveController.POISON_GERM and enemy != WaveController.GUM_BITER, "specialist spawned before first wave")
 		wave.current_wave = 20
 		var specialists := 0
 		seed(7429)
 		for roll in 4000:
 			var enemy := wave._choose_enemy()
 			specialists += int(enemy == WaveController.POISON_GERM or enemy == WaveController.GUM_BITER)
-		_check(specialists > last_specialists and specialists < 2000, "difficulty did not distribute specialists or replaced most trash with them")
+		check(specialists > last_specialists and specialists < 2000, "difficulty did not distribute specialists or replaced most trash with them")
 		last_specialists = specialists
 		wave.free()
 	var session: Node = root.get_node("GameSession")
@@ -72,37 +66,37 @@ func _run() -> void:
 	game._create_enemy(WaveController.GUM_BITER, game.player.position + Vector2(-180, 0))
 	var shooter: Enemy = game.get_node("Enemies").get_child(0)
 	var biter: Enemy = game.get_node("Enemies").get_child(1)
-	_check(shooter.inflicted_statuses.size() == 1 and biter.inflicted_statuses.size() == 1 and shooter.data.sprite != biter.data.sprite, "specialists lack traits or independent art")
+	check(shooter.inflicted_statuses.size() == 1 and biter.inflicted_statuses.size() == 1 and shooter.data.sprite != biter.data.sprite, "specialists lack traits or independent art")
 	shooter.special_direction = Vector2.LEFT
 	shooter._activate_special()
-	_check(game.get_node("EnemyProjectiles").get_child_count() == 3, "poison specialist did not fire its fixed readable fan")
+	check(game.get_node("EnemyProjectiles").get_child_count() == 3, "poison specialist did not fire its fixed readable fan")
 	var projectile: AcidProjectile = game.get_node("EnemyProjectiles").get_child(0)
-	_check(projectile.inflicted_statuses == shooter.inflicted_statuses and projectile.projectile_color == DentiStatus.COLORS[DentiStatus.Type.POISON], "projectile lost owner payload or status color")
+	check(projectile.inflicted_statuses == shooter.inflicted_statuses and projectile.projectile_color == DentiStatus.COLORS[DentiStatus.Type.POISON], "projectile lost owner payload or status color")
 	# A landed real projectile applies its payload after the enemy can be gone.
 	projectile.position = game.player.position
 	game.player.stats.dodge_chance = 0.0
 	projectile._physics_process(0.0)
-	_check(game.player.status_effects.active.has(DentiStatus.Type.POISON), "actual projectile collision did not poison player")
+	check(game.player.status_effects.active.has(DentiStatus.Type.POISON), "actual projectile collision did not poison player")
 	game.player.hurt_time = 0.0
 	biter.position = game.player.position
 	biter.special_timer = 2.0
 	biter._physics_process(0.0)
-	_check(game.player.status_effects.active.has(DentiStatus.Type.BLEED), "actual biter contact did not bleed player")
+	check(game.player.status_effects.active.has(DentiStatus.Type.BLEED), "actual biter contact did not bleed player")
 	var traits := shooter.inflicted_statuses.duplicate(true)
 	var projectile_traits := (game.get_node("EnemyProjectiles").get_child(1) as AcidProjectile).inflicted_statuses.duplicate(true)
 	game._save_run()
 	var saved: Dictionary = session.load_run()
-	_check(saved["acid"].size() == 2, "snapshot saved an already consumed status projectile")
+	check(saved["acid"].size() == 2, "snapshot saved an already consumed status projectile")
 	game.free()
 	session.resume_requested = true
 	game = load("res://scenes/game/game.tscn").instantiate()
 	root.add_child(game)
 	current_scene = game
-	_check(game.get_node("Enemies").get_child_count() == 2, "resume omitted specialist enemies")
+	check(game.get_node("Enemies").get_child_count() == 2, "resume omitted specialist enemies")
 	shooter = game.get_node("Enemies").get_child(0)
 	biter = game.get_node("Enemies").get_child(1)
-	_check(shooter.inflicted_statuses == traits and biter.data == WaveController.GUM_BITER, "resume rerolled traits or changed specialist type")
-	_check((game.get_node("EnemyProjectiles").get_child(0) as AcidProjectile).inflicted_statuses == projectile_traits, "resume lost in-flight projectile ailments")
+	check(shooter.inflicted_statuses == traits and biter.data == WaveController.GUM_BITER, "resume rerolled traits or changed specialist type")
+	check((game.get_node("EnemyProjectiles").get_child(0) as AcidProjectile).inflicted_statuses == projectile_traits, "resume lost in-flight projectile ailments")
 	# Resume must preserve an intentionally trait-free old mob at a late wave.
 	for entry: Dictionary in saved["enemies"]:
 		entry["type"] = WaveController.PLAQUE.resource_path
@@ -116,11 +110,11 @@ func _run() -> void:
 	root.add_child(game)
 	current_scene = game
 	for enemy: Enemy in game.get_node("Enemies").get_children():
-		_check(enemy.inflicted_statuses.is_empty(), "legacy mob received a random trait on resume")
-	_check(game.player.status_effects.active.is_empty(), "legacy save gave player new status damage")
+		check(enemy.inflicted_statuses.is_empty(), "legacy mob received a random trait on resume")
+	check(game.player.status_effects.active.is_empty(), "legacy save gave player new status damage")
 	game.free()
 	paused = false
 	session.clear_run()
-	if failures == 0:
+	if failures.is_empty():
 		print("PASS status_enemy_distribution")
-	finish(0 if failures == 0 else 1)
+	finish_checks()

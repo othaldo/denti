@@ -1,7 +1,5 @@
 extends "res://tests/support/test_runtime.gd"
 
-var failures: Array[String] = []
-
 
 func _initialize() -> void:
 	call_deferred("_run")
@@ -32,18 +30,14 @@ func _run() -> void:
 	WeaponAttackShapes.hit(enemy, weapon.data, 4, 10, false, game.items, Vector2.RIGHT)
 	assert(enemy.health == 15 and weapon.evolution.marks.size() == 1)
 	WeaponAttackShapes.hit(enemy, weapon.data, 4, 10, false, game.items, Vector2.RIGHT)
-	_check(enemy.health == 0, "the detonation must still kill its source target")
-	_check(events.died == 1 and events.defeated == 1, "a nested lethal hit emitted death twice")
-	_check(game.telemetry.kills == 1, "a nested lethal hit counted two kills")
-	_check(game.get_node("Loot").get_child_count() == 2, "a nested lethal hit duplicated XP/coins")
-	_check(game.telemetry.total_damage == 25, "nested damage changed actual damage accounting")
+	check(enemy.health == 0, "the detonation must still kill its source target")
+	check(events.died == 1 and events.defeated == 1, "a nested lethal hit emitted death twice")
+	check(game.telemetry.kills == 1, "a nested lethal hit counted two kills")
+	check(game.get_node("Loot").get_child_count() == 2, "a nested lethal hit duplicated XP/coins")
+	check(game.telemetry.total_damage == 25, "nested damage changed actual damage accounting")
 	game.queue_free()
 	await process_frame
 	await process_frame
-	finish(0 if failures.is_empty() else 1)
+	finish_checks()
 
 
-func _check(condition: bool, message: String) -> void:
-	if not condition:
-		failures.append(message)
-		push_error(message)
