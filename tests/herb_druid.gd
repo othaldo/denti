@@ -33,6 +33,7 @@ func _run() -> void:
 	await _planting()
 	await _skills()
 	await _staffs()
+	await _element_shots()
 	await _combat()
 	await _caramel_heart()
 	_snapshot()
@@ -68,12 +69,23 @@ func _data() -> void:
 	check(AffixPresentation.effect_description(&"tempo", staff_data).contains("pflanzt schneller"), "tempo text does not explain the garden")
 	check(AffixPresentation.effect_description(&"fire", staff_data).begins_with("Salbeischüsse"), "fire text not about sage shots")
 	check(WeaponPresentation.pause_label(staff_data) == "Pflanztakt", "pause label not Pflanztakt")
-	for element in [&"fire", &"ice", &"poison", &"electric", &"bleed", &"wet"]:
+	var seed_textures := {}
+	for element in WeaponElementVisuals.ELEMENTS:
 		var form := WeaponSkins.with_element(staff_data, element)
 		check(form.element_skin == element and form.held_texture() != staff_data.held_texture(), "missing painted staff form: %s" % element)
 		check(form.grip_anchor == staff_data.grip_anchor and WeaponSkins.staff_material(form) == null, "painted staff form changed its grip or got a tint: %s" % element)
-	var fire: Array[Dictionary] = [WeaponUpgrades.next_entry({}, &"fire", staff_data, 1)]
-	check(ProjectileEnchantmentSkins.base_texture(staff_data, 1, fire) == ProjectileEnchantmentSkins.HERB_SEED, "an enchanted sage shot lost its seed shape")
+		var enchantment: Array[Dictionary] = [WeaponUpgrades.next_entry({}, element, staff_data, 1)]
+		var seed := ProjectileEnchantmentSkins.base_texture(staff_data, 1, enchantment)
+		check(seed != ProjectileEnchantmentSkins.HERB_SEED and seed.get_size() == HerbElementArt.CELL, "missing elemental seed for %s" % element)
+		check(ProjectileEnchantmentSkins.base_texture(form, 1) == seed, "staff skin and affix disagreed about the seed for %s" % element)
+		seed_textures[seed] = true
+		for kind in HerbSkills.Kind.size():
+			var cell := HerbElementArt.plant_region(element, kind)
+			check(cell.position == Vector2(kind, WeaponElementVisuals.ELEMENTS.find(element)) * HerbElementArt.CELL,
+				"bad plant art cell for %s, %d" % [element, kind])
+	check(seed_textures.size() == WeaponElementVisuals.ELEMENTS.size(), "different elements used the same seed")
+	check(ProjectileEnchantmentSkins.base_texture(staff_data, 1) == ProjectileEnchantmentSkins.HERB_SEED and
+		not HerbElementArt.plant_region(&"", HerbSkills.Kind.SAGE).has_area(), "neutral herbs lost their art")
 
 
 func _enemy(offset: Vector2, data: EnemyData = WaveController.PLAQUE) -> Enemy:
@@ -265,6 +277,33 @@ func _staffs() -> void:
 	loadout.restore([{"id": "planting_staff", "tier": 1, "uid": all[0].instance_uid}], false)
 	game.player.stats.talent_roots = 0
 	check(herbs.staff_of(fiery[0]) == herbs.staff(), "orphaned herb kept a missing staff")
+	await _clear()
+
+
+func _element_shots() -> void:
+	var staff := herbs.staff()
+	var old_affixes := staff.affixes.duplicate(true)
+	var pool := game.get_node("Projectiles") as PlayerProjectilePool
+	_enemy(Vector2(150, 0))
+	for element in WeaponElementVisuals.ELEMENTS:
+		staff.affixes.assign([WeaponUpgrades.next_entry({}, element, staff.data, 1)])
+		var kind := HerbSkills.Kind.SHRUB if element == &"ice" else HerbSkills.Kind.SAGE
+		herbs._add_plant(kind, game.player.global_position, staff)
+		herbs.plants[0].shot = 0.0
+		herbs.advance(HerbSkills.GROW_SECONDS + 0.01)
+		var expected := pool.skins.frames(HerbElementArt.seed(element), ProjectileEnchantmentSkins.mask(staff.affixes),
+			ProjectileEnchantmentSkins.visual_radius(staff.data, staff.tier))
+		var fired := 0
+		for node in pool.get_children():
+			var shot := node as WeaponProjectile
+			if shot == null or not shot.visible: continue
+			check(shot.source_uid == staff.instance_uid and shot.visual_element == element and expected.has(shot.body_sprite.texture),
+				"garden shot did not use the planting staff's elemental seed for %s" % element)
+			fired += 1
+			shot.retire()
+		check(fired == (HerbSkills.SHRUB_SHOTS if kind == HerbSkills.Kind.SHRUB else 1), "wrong elemental shot count for %s" % element)
+		herbs.reset_wave()
+	staff.affixes.assign(old_affixes)
 	await _clear()
 
 

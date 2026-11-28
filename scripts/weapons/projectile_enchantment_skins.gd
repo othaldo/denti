@@ -28,8 +28,8 @@ static func mask(values: Array[Dictionary]) -> int:
 
 static func base_texture(data: WeaponData, tier: int, affixes: Array[Dictionary] = []) -> Texture2D:
 	if data.projectile_shape == &"seed":
-		# Keep the plant shape while the usual affix frames add elemental particles.
-		return HERB_SEED
+		var seed := HerbElementArt.seed(WeaponElementVisuals.element(data, affixes))
+		return seed if seed != null else HERB_SEED
 	var elemental := WeaponElementVisuals.projectile(data, tier, affixes)
 	if elemental != null:
 		return elemental

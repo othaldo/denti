@@ -10,8 +10,8 @@ extends ClassSkillModule
 ## enchantments and crits of the staff that planted them. Skills add herbs to the
 ## planting rotation: Salbeistrauch (salvo bush), Kamillentotem (aura) and
 ## Nelkenknospe (numbing debuff). Enemies wear herbs down on contact, bosses
-## trample them. Herb art: assets/classes/herb_druid_plants.png (4 x 2), drawn
-## procedurally until it exists.
+## trample them. Neutral herbs have a separate young pose. Elemental herbs
+## grow into the painted form selected by the same staff as their shots.
 
 enum Kind { SAGE, SHRUB, TOTEM, CLOVE }
 
@@ -466,10 +466,14 @@ func _hold_snared(delta: float) -> void:
 func _draw() -> void:
 	if not active(): return
 	var radius := totem_radius()
-	var glows := {}
-	for weapon in staffs(): glows[weapon.instance_uid] = element_color(weapon)
+	var weapons := staffs()
+	var elements: Dictionary[String, StringName] = {}
+	for weapon in weapons:
+		elements[weapon.instance_uid] = WeaponElementVisuals.element(weapon.data, weapon.affixes)
+	# Match staff_of(): a plant whose staff was sold follows the first one.
+	var inherited_element: StringName = elements[weapons[0].instance_uid] if not weapons.is_empty() else &""
 	for entry in plants:
-		var glow: Color = glows.get(str(entry.get("staff", "")), Color.TRANSPARENT)
+		var element: StringName = elements.get(str(entry.get("staff", "")), inherited_element)
 		var at := to_local(entry.at)
 		var growth := 1.0 - float(entry.grow) / GROW_SECONDS
 		var fade := clampf(float(entry.life), 0.0, 1.0)
@@ -480,16 +484,14 @@ func _draw() -> void:
 			draw_arc(at, CLOVE_RADIUS, 0.0, TAU, 40, Color(CLOVE.lightened(0.3), 0.45 * fade), 2.0, true)
 		# Planting: the seed arcs from the staff head, then the soil bursts open.
 		if not grown(entry):
+			var glow := _element_color(element)
 			var elapsed := GROW_SECONDS - float(entry.grow)
 			var tip: Vector2 = entry.get("tip", Vector2.INF)
 			if tip.is_finite(): HerbPlanting.draw_seed(self, to_local(tip), at + Vector2(0, -6), elapsed / HerbPlanting.SEED_SECONDS, glow)
 			HerbPlanting.draw_sprout(self, at, (elapsed - HerbPlanting.SEED_SECONDS * 0.5) / (GROW_SECONDS - HerbPlanting.SEED_SECONDS * 0.5), glow, int(entry.get("seed", 0)))
-		# The staff's element shows on every herb as a soft ground glow.
-		if glow.a > 0.0 and grown(entry):
-			draw_circle(at + Vector2(0, -4), 13.0 * DRAW_SCALE, Color(glow, 0.22 * fade))
 		# The sprout appears once the seed has landed.
 		var in_flight: bool = Vector2(entry.get("tip", Vector2.INF)).is_finite() and GROW_SECONDS - float(entry.grow) < HerbPlanting.SEED_SECONDS * 0.8
-		if not in_flight: _draw_plant(at, int(entry.kind), growth, fade)
+		if not in_flight: _draw_plant(at, int(entry.kind), growth, fade, element)
 	if heal_pulse_left > 0.0: _draw_heal_pulse()
 	draw_effects()
 
@@ -517,16 +519,22 @@ func _draw_heal_pulse() -> void:
 func element_color(weapon: WeaponInstance = null) -> Color:
 	if weapon == null: weapon = staff()
 	if weapon == null: return Color.TRANSPARENT
-	var element: StringName = WeaponAffixes.element(weapon.affixes)
-	var definition := WeaponAffixes.by_id(element) if element != &"" else null
-	if definition == null or not definition.elemental: return Color.TRANSPARENT
-	return WeaponSkins.STAFF_WATER_COLOR if element == &"wet" else definition.color
+	return _element_color(WeaponElementVisuals.element(weapon.data, weapon.affixes))
 
-func _draw_plant(at: Vector2, kind: int, growth: float, fade: float) -> void:
+func _element_color(element: StringName) -> Color:
+	return WeaponSkins.STAFF_WATER_COLOR if element == &"wet" else WeaponElementVisuals.color(element, Color.TRANSPARENT)
+
+func _draw_plant(at: Vector2, kind: int, growth: float, fade: float, element: StringName) -> void:
+	var painted_size := (44.0 if kind == Kind.SHRUB else 36.0) * DRAW_SCALE
+	var elemental_cell := HerbElementArt.plant_region(element, kind)
+	if elemental_cell.has_area():
+		var size := Vector2.ONE * painted_size * lerpf(0.36, 1.0, growth)
+		draw_texture_rect_region(HerbElementArt.PLANTS, Rect2(at - Vector2(size.x * 0.5, size.y * 0.85), size), elemental_cell, Color(1, 1, 1, fade))
+		return
 	if plant_art != null:
 		var cell := Vector2(plant_art.get_size()) / Vector2(4, 2)
 		var row := 0 if growth >= 1.0 else 1
-		var size := Vector2.ONE * (44.0 if kind == Kind.SHRUB else 36.0) * DRAW_SCALE * lerpf(0.6, 1.0, growth)
+		var size := Vector2.ONE * painted_size * lerpf(0.6, 1.0, growth)
 		draw_texture_rect_region(plant_art, Rect2(at - Vector2(size.x * 0.5, size.y * 0.85), size), Rect2(Vector2(kind, row) * cell, cell), Color(1, 1, 1, fade))
 		return
 	# Procedural stand-in until the painted sheet exists.
