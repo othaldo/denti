@@ -23,6 +23,7 @@ const DASH_PULSE_RADIUS := 110.0
 var class_look: Texture2D
 static var used_rects: Dictionary = {}
 @onready var expressions: DentiExpressions = $Sprite2D/Expressions
+@onready var locomotion: DentiLocomotion = $Sprite2D/Locomotion
 @onready var status_effects: PlayerStatusEffects = $StatusEffects
 @onready var arena: DentiArena = get_node("../Arena")
 @onready var mobile_controls: MobileControls = get_node("../MobileControls/Root")
@@ -30,7 +31,6 @@ static var used_rects: Dictionary = {}
 
 var hurt_time: float = 0.0
 var dodge_time: float = 0.0
-var animation_time: float = 0.0
 var attack_time: float = 0.0
 var attack_direction: Vector2 = Vector2.RIGHT
 var is_moving: bool = false
@@ -103,31 +103,32 @@ func _ready() -> void:
 	add_child(dash_trail)
 
 
-## Shows the chosen class on the combat sprite. A class look is scaled so its
-## tooth matches the base body height and stands on the same foot line; the
-## face overlay is hidden because the class art carries its own face.
+## Fit each class look to the original body height and foot line. Classes
+## without directional art still use their existing combat portrait.
 func apply_class_look() -> void:
-	var look: Texture2D = stats.class_data.combat_sprite if stats.class_data != null else null
-	if look == class_look: return
+	var profile := stats.class_data
+	var id: StringName = profile.id if profile != null else &""
+	var look: Texture2D = profile.combat_sprite if profile != null else null
+	if look == class_look and id == locomotion.profile_id: return
 	class_look = look
+	var source := _used_rect(base_body_texture)
+	var height := float(source.size.y) * base_body_scale.y
+	var source_foot := Vector2(source.get_center().x, source.end.y) - Vector2(base_body_texture.get_size()) * 0.5
+	var foot := source_foot * base_body_scale
 	if look == null:
 		sprite.texture = base_body_texture
 		sprite.offset = Vector2.ZERO
 		sprite_base_scale = base_body_scale
-		expressions.visible = true
-		return
-	var source := _used_rect(base_body_texture)
-	var target := _used_rect(look)
-	var factor := float(source.size.y) / maxf(float(target.size.y), 1.0)
-	var new_scale := base_body_scale * factor
-	# Bottom centre of the visible pixels, relative to each texture's centre.
-	var source_foot := Vector2(source.get_center().x, source.end.y) - Vector2(base_body_texture.get_size()) * 0.5
-	var target_foot := Vector2(target.get_center().x, target.end.y) - Vector2(look.get_size()) * 0.5
-	sprite.texture = look
-	sprite.offset = source_foot * base_body_scale / new_scale - target_foot
-	sprite_base_scale = new_scale
-	sprite.scale = new_scale
-	expressions.visible = false
+	else:
+		var target := _used_rect(look)
+		var factor := float(source.size.y) / maxf(float(target.size.y), 1.0)
+		sprite_base_scale = base_body_scale * factor
+		var target_foot := Vector2(target.get_center().x, target.end.y) - Vector2(look.get_size()) * 0.5
+		sprite.texture = look
+		sprite.offset = foot / sprite_base_scale - target_foot
+	sprite.scale = sprite_base_scale
+	expressions.visible = look == null
+	locomotion.configure(id, sprite_base_scale, height, foot)
 
 static func _used_rect(texture: Texture2D) -> Rect2i:
 	var key := texture.resource_path
@@ -174,8 +175,9 @@ func _physics_process(delta: float) -> void:
 			_dash_pulse()
 			for module in skill_modules: module.on_dash_ended(dash_origin, motion_end)
 			dash_finished.emit()
-	is_moving = global_position.distance_squared_to(before_move) > 0.01
-	_animate_sprite(dash.direction if was_dashing else direction, delta)
+	var actual_motion := motion_end - motion_start
+	is_moving = actual_motion.length_squared() > 0.01
+	_animate_sprite(dash.direction if was_dashing else actual_motion, delta, actual_motion.length(), was_dashing)
 	hurt_time = maxf(hurt_time - delta, 0.0)
 	dodge_time = maxf(dodge_time - delta, 0.0)
 	sprite.modulate = Color(1.0, 0.55, 0.55) if hurt_time > 0.0 else (Color(0.72, 0.94, 1.0) if dodge_time > 0.0 else Color.WHITE)
@@ -326,19 +328,12 @@ func projectile_crosses(start: Vector2, end: Vector2, radius: float, delta: floa
 	return relative.length_squared() <= radius * radius or after.distance_squared_to(motion_end) <= radius * radius
 
 
-func _animate_sprite(direction: Vector2, delta: float) -> void:
-	var moving := direction.length_squared() > 0.01
-	animation_time += delta * (10.0 if moving else 3.0)
+func _animate_sprite(direction: Vector2, delta: float, distance: float = 0.0, dashing: bool = false) -> void:
 	attack_time = maxf(attack_time - delta, 0.0)
 	var attack_pulse := sin(attack_time / ATTACK_ANIMATION_DURATION * PI)
-	var sway := sin(animation_time)
-	var stretch := sway * (0.035 if moving else 0.012)
 	var necrodent := NecrodentSkills.for_player(self)
 	var cast_lift := NecrodentSummon.lift(necrodent.cast_left) if necrodent != null else 0.0
-	sprite.position.y = -2.0 - absf(sway) * (2.5 if moving else 1.4) - attack_pulse * 4.0 - cast_lift * 7.0
-	sprite.scale = sprite_base_scale * Vector2(1.0 + stretch + attack_pulse * 0.12 - cast_lift * 0.07, 1.0 - stretch - attack_pulse * 0.09 + cast_lift * 0.11)
-	var target_rotation := -direction.x * 0.08 + sway * 0.025 + attack_direction.x * attack_pulse * 0.14
-	sprite.rotation = lerp_angle(sprite.rotation, target_rotation, minf(delta * 14.0, 1.0))
+	locomotion.advance(direction, distance, dashing, delta, Vector2(attack_pulse, attack_direction.x * attack_pulse), cast_lift)
 
 
 func play_attack_animation(aim: Vector2, kind: StringName = &"brush") -> void:

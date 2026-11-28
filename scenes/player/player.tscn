@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://jajnm4mq2ods" path="res://scripts/weapons/weapon_loadout.gd" id="4"]
 [ext_resource type="Script" path="res://scripts/player/denti_expressions.gd" id="5"]
 [ext_resource type="Script" path="res://scripts/player/player_status_effects.gd" id="6"]
+[ext_resource type="Script" path="res://scripts/player/denti_locomotion.gd" id="7"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 35.014282
@@ -21,6 +22,13 @@ texture = ExtResource("3")
 
 [node name="Expressions" type="Node2D" parent="Sprite2D"]
 script = ExtResource("5")
+
+[node name="Locomotion" type="Sprite2D" parent="Sprite2D"]
+show_behind_parent = true
+texture_filter = 4
+hframes = 4
+vframes = 2
+script = ExtResource("7")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1699767847]
 position = Vector2(1, 4)

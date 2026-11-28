@@ -34,12 +34,14 @@ static func capture(game) -> Dictionary:
 		if projectile.is_queued_for_deletion():
 			continue
 		acid_data.append({"position": SnapshotValues.vector_data(projectile.position), "direction": SnapshotValues.vector_data(projectile.direction), "speed": projectile.speed, "damage": projectile.damage, "lifetime": projectile.lifetime, "color": projectile.projectile_color.to_html(), "hit_radius": projectile.hit_radius, "visual_radius": projectile.visual_radius, "inflicted_statuses": projectile.inflicted_statuses.duplicate(true)})
+	var presentation: Dictionary = game.player.expressions.save_data()
+	presentation["facing"] = game.player.locomotion.facing
 	var result := {
 		"base_victory": game.base_victory,
 		"weapon_mastery": game.weapon_mastery.save_data(),
 		"meta_progress": game.meta_progress.save_data(),
 		"new_fusion_discoveries": game.new_fusion_discoveries.duplicate(),
-		"player": {"position": SnapshotValues.vector_data(game.player.position), "stats": game.player.stats.to_save_data(), "class_state": game.player.stats.class_save_data(), "hurt_time": game.player.hurt_time, "dodge_time": game.player.dodge_time, "presentation": game.player.expressions.save_data(), "status_effects": game.player.status_effects.save_data()},
+		"player": {"position": SnapshotValues.vector_data(game.player.position), "stats": game.player.stats.to_save_data(), "class_state": game.player.stats.class_save_data(), "hurt_time": game.player.hurt_time, "dodge_time": game.player.dodge_time, "presentation": presentation, "status_effects": game.player.status_effects.save_data()},
 		"xp": game.xp, "xp_goal": game.xp_goal, "level": game.level, "coins": game.coins,
 		"weapons": game.player.loadout.save_data(), "starter_pending": game.starter_pending,
 		"starter_preview": str(game.choice_panel.starter_selection.selected_id) if game.starter_pending else "",
@@ -96,7 +98,9 @@ static func restore(game, saved: Dictionary) -> void:
 	player.dash.config = player.stats.class_data.dash_config()
 	player.hurt_time = maxf(float(player_data.get("hurt_time", 0.0)), 0.0)
 	player.dodge_time = clampf(float(player_data.get("dodge_time", 0.0)), 0.0, Player.DODGE_IFRAMES)
-	player.expressions.restore(player_data.get("presentation", {}))
+	var presentation: Dictionary = player_data.get("presentation", {})
+	player.expressions.restore(presentation)
+	player.locomotion.restore_facing(presentation.get("facing"))
 	player.status_effects.restore(player_data.get("status_effects", {}))
 	player.dash.restore(player_data.get("dash", {}))
 	game.xp = maxi(int(saved.get("xp", 0)), 0)

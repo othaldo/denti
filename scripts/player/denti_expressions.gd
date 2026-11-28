@@ -6,6 +6,8 @@ extends Node2D
 enum Face { NORMAL, BLINK, HURT, HEAL, LOW_HEALTH, BLOCK, CELEBRATE, DEAD, POISON, BLEED, DODGE, POISON_BLEED }
 enum Status { POISON, BLEED }
 
+signal face_changed
+
 const ATLAS: Texture2D = preload("res://assets/denti/expressions/denti_faces.png")
 const BODY: Texture2D = preload("res://assets/denti/expressions/denti_body.png")
 const DEFAULT_SETTINGS: DentiExpressionSettings = preload("res://data/player/denti_expressions.tres")
@@ -25,6 +27,8 @@ var blink_remaining := 0.0
 var next_blink := 4.0
 var elapsed := 0.0
 var rng := RandomNumberGenerator.new()
+var _face_mouth: Vector2
+var _face_size := Vector2.ONE
 
 func _ready() -> void:
 	var body := get_parent() as Sprite2D
@@ -38,8 +42,8 @@ func _ready() -> void:
 	face_sprite.texture = ATLAS
 	face_sprite.hframes = 4
 	face_sprite.vframes = 3
-	face_sprite.scale = settings.face_frame_size / Vector2(float(ATLAS.get_width()) / 4.0, float(ATLAS.get_height()) / 3.0)
 	add_child(face_sprite)
+	_face_mouth = settings.mouth_position
 	_set_face(Face.NORMAL)
 	rng.randomize()
 	_schedule_blink()
@@ -139,9 +143,25 @@ func _refresh_face() -> void:
 func _set_face(expression: Face) -> void:
 	current_face = expression
 	face_sprite.frame = expression
-	var cell_size := Vector2(float(ATLAS.get_width()) / 4.0, float(ATLAS.get_height()) / 3.0)
-	face_sprite.position = settings.mouth_position - (settings.face_anchors[expression] - cell_size / 2.0) * face_sprite.scale
+	_place_face()
 	queue_redraw()
+	face_changed.emit()
+
+func present_default_face() -> void:
+	present_face(settings.mouth_position, Vector2.ONE)
+
+func present_face(mouth: Vector2, size: Vector2) -> void:
+	_face_mouth = mouth
+	_face_size = size
+	_place_face()
+	face_sprite.show()
+
+func _place_face() -> void:
+	var cell_size := Vector2(float(ATLAS.get_width()) / 4.0, float(ATLAS.get_height()) / 3.0)
+	var projected_scale := settings.face_frame_size / cell_size * _face_size
+	face_sprite.scale = projected_scale.abs()
+	face_sprite.flip_h = projected_scale.x < 0.0
+	face_sprite.position = _face_mouth - (settings.face_anchors[current_face] - cell_size / 2.0) * projected_scale
 
 func _on_damage(amount: float) -> void:
 	if amount > 0.0:
