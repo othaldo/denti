@@ -272,6 +272,7 @@ func _show_starters(selected_id: StringName = &"") -> void:
 	choice_panel.starter_selection.class_profile = player.stats.class_data
 	choice_panel.show_starters(starters, selected_id)
 	get_tree().paused = true
+	_sync_music()
 	_save_run()
 
 
@@ -282,6 +283,7 @@ func _present_story(screen: StringName) -> void:
 	shop_panel.visible = false
 	hud.visible = false
 	get_tree().paused = true
+	_sync_music()
 
 
 func _show_story_line() -> void:
@@ -764,9 +766,14 @@ static func xp_goal_for_level(for_level: int) -> int:
 	return 5 + (maxi(for_level, 1) - 1) * 3
 
 
-func _show_level_choice() -> void:
+func _present_rewards() -> void:
 	get_node("/root/SceneTransitions").present(&"rewards")
 	run_flow.enter(RunFlow.Phase.REWARDS)
+	_sync_music()
+
+
+func _show_level_choice() -> void:
+	_present_rewards()
 	if talents.enabled:
 		talents.prepare(rewards.pending_levels, level - rewards.pending_levels + 1, player.stats.luck)
 		choice_panel.hide()
@@ -971,7 +978,6 @@ func _on_wave_finished(wave_number: int) -> void:
 			_save_run()
 			return
 	_clear_combat()
-	_sync_music()
 	_begin_loot_collection()
 
 
@@ -982,7 +988,6 @@ func _resolve_boss_wave() -> void:
 	boss_pending = false
 	wave.boss_rewards.deliver(self, player.global_position)
 	_clear_combat()
-	_sync_music()
 	_begin_loot_collection()
 
 
@@ -993,6 +998,7 @@ func _begin_loot_collection() -> void:
 	player.status_effects.clear()
 	player.expressions.celebrate()
 	rewards.begin_collection()
+	_sync_music()
 	player.velocity = Vector2.ZERO
 	player.set_physics_process(false)
 	wave_loot_remaining = 0
@@ -1032,9 +1038,8 @@ func _advance_post_wave_rewards() -> void:
 	if mastery_notice != null and rewards.step != PostWaveRewards.Step.END:
 		mastery_notice.present(weapon_mastery.starter_id, weapon_mastery.take_pending(), meta_progress.take_pending_unlocks())
 	var progress := rewards.choice_progress()
-	if rewards.step in [PostWaveRewards.Step.LEVELS, PostWaveRewards.Step.CHESTS, PostWaveRewards.Step.RELICS, PostWaveRewards.Step.WEAPONS]:
-		get_node("/root/SceneTransitions").present(&"rewards")
-		run_flow.enter(RunFlow.Phase.REWARDS)
+	if rewards.step in [PostWaveRewards.Step.CHESTS, PostWaveRewards.Step.RELICS, PostWaveRewards.Step.WEAPONS]:
+		_present_rewards()
 	match rewards.step:
 		PostWaveRewards.Step.LEVELS:
 			_show_level_choice()
@@ -1487,12 +1492,23 @@ func _restore_run(saved: Dictionary) -> void:
 
 
 func _sync_music() -> void:
-	if ended or starter_pending or story.dialogue_id == &"intro":
+	var chapter := StoryCatalog.chapter(story.chapter_index).id if story.enabled else &""
+	if run_flow.phase in [RunFlow.Phase.COLLECTING, RunFlow.Phase.REWARDS, RunFlow.Phase.SHOP]:
+		music.play_intermission()
+	elif story.dialogue_id == &"finale" or (ended and base_victory and not wave.endless_enabled):
+		music.play_cue(&"victory", story.dialogue_id == &"finale")
+	elif ended:
 		music.fade_out_and_stop()
-	elif boss_pending:
-		music.play_boss_overtime(wave.current_wave)
+	elif story.travel_target >= 0:
+		music.play_cue(StoryCatalog.chapter(story.travel_target).id, true)
+	elif story.dialogue_id != &"":
+		music.play_cue(chapter, true)
+	elif starter_pending and story.enabled:
+		music.play_cue(chapter)
+	elif run_flow.is_combat():
+		music.play_wave(wave.current_wave, chapter, boss_pending)
 	else:
-		music.play_wave(wave.current_wave)
+		music.play_intermission()
 
 
 func restore_intermission(saved: Dictionary) -> void:

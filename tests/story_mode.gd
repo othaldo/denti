@@ -26,11 +26,17 @@ func _run() -> void:
 	current_scene = game
 	if not _check(game.story_dialogue.visible and paused and not game.wave.active and not game.choice_panel.visible and game.story.revealed_chapters == 1, "intro must explain the summon before starter/combat"):
 		return
+	var intro_deck: AudioStreamPlayer = game.music.player
+	game.music._process(MusicController.FADE_DURATION)
+	if not _check(game.music.current_cue == &"pillow" and is_equal_approx(intro_deck.volume_db, MusicController.DIALOGUE_DB), "the story intro must play the chapter theme quietly"):
+		return
 	game.story_dialogue.next_button.pressed.emit()
 	if not _check(game.story.dialogue_line == 0 and not game.story_dialogue.revealing, "first click must reveal the sentence without skipping it"):
 		return
 	game.story_dialogue.next_button.pressed.emit()
 	game.story_dialogue.next_button.scale = Vector2.ONE
+	if not _check(game.music.player == intro_deck, "a new dialogue line restarted the chapter music"):
+		return
 	game = await _resume(game)
 	if not _check(game.story.dialogue_line == 1 and game.story_dialogue.speaker_label.text == "Zahnfee" and game.wave.current_wave == 0 and not game.starter_pending, "resume lost intro cursor or began at wave one"):
 		return
@@ -93,12 +99,16 @@ func _run() -> void:
 	game._on_story_advance()
 	if not _check(game.story_travel.visible and not game.story_dialogue.visible and paused, "departure must open the travel screen"):
 		return
+	if not _check(game.music.current_cue == &"sugar", "the portal should introduce the destination theme"):
+		return
 	game.story_travel.advance()
 	game.story_travel.advance()
 	if not _check(game.story.chapter_index == 1 and game.story.revealed_chapters == 2 and game.arena.floor_texture == StoryCatalog.chapter(1).floor_texture, "arrival did not reveal and apply sugar arena"):
 		return
 	game = await _resume(game)
 	if not _check(game.story.dialogue_line == 3 and game.story.chapter_index == 1 and game.story.revealed_chapters == 2, "mid-arrival resume lost reveal or cursor"):
+		return
+	if not _check(game.music.current_cue == &"sugar", "mid-arrival resume restored the wrong chapter theme"):
 		return
 	_finish_dialogue(game)
 	if not _check(game.in_shop and game.shop_panel.visible and not game.story_dialogue.visible, "transition must return to a usable shop"):

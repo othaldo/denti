@@ -64,7 +64,7 @@ script = ExtResource("4")
 [node name="ShopController" type="Node" parent="."]
 script = ExtResource("7")
 
-[node name="Music" type="AudioStreamPlayer" parent="."]
+[node name="Music" type="Node" parent="."]
 process_mode = 3
 script = ExtResource("10")
 

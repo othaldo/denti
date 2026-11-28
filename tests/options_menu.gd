@@ -121,7 +121,7 @@ func _run() -> void:
 	if game.hud.fps_panel.visible != selected_fps:
 		_fail("HUD did not apply saved FPS visibility")
 		return
-	if game.music.bus != &"Music":
+	if game.music.player.bus != &"Music" or game.music.outgoing.bus != &"Music":
 		_fail("background music is not routed to Music")
 		return
 	for voice: AudioStreamPlayer in game.sound.voices:

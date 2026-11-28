@@ -16,18 +16,13 @@ func _run() -> void:
 	if session.has_run() or menu.overlay:
 		_fail("main menu started with an unexpected save")
 		return
-	if menu.menu_music.current_cue != &"main_menu" or menu.menu_music.bus != &"Music" or menu.menu_music.stream != MusicController.MAIN_MENU or not menu.menu_music.playing:
+	var music := menu.menu_music
+	if music.current_cue != &"menu" or music.player.bus != &"Music" or not music.player.playing:
 		_fail("main menu theme did not start")
 		return
-	menu.menu_music._process(MusicController.FADE_DURATION)
-	menu.menu_music.seek(menu.menu_music.stream.get_length() - MusicController.FADE_DURATION * 0.5)
-	menu.menu_music._process(0.01)
-	if menu.menu_music.fade_state != MusicController.FadeState.FADING_OUT or menu.menu_music.queued_cue != &"main_menu":
-		_fail("main menu theme did not prepare its next loop")
-		return
-	menu.menu_music._process(MusicController.FADE_DURATION)
-	if menu.menu_music.current_cue != &"main_menu" or menu.menu_music.fade_state != MusicController.FadeState.FADING_IN:
-		_fail("main menu theme did not restart with a fade")
+	var theme := music.player.stream as AudioStreamOggVorbis
+	if theme == null or not theme.loop or theme.loop_offset <= 10.0 or theme.loop_offset >= theme.get_length():
+		_fail("main menu theme must loop after its opening motif")
 		return
 	if menu.home.primary_button != menu.actions[&"new_run"] or not menu.actions[&"new_run"].has_focus():
 		_fail("new game was not selected when no save exists")

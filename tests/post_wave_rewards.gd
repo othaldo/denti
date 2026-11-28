@@ -85,6 +85,9 @@ func _run() -> void:
 	if not paused or game.rewards.step != PostWaveRewards.Step.CHESTS or game.choice_panel.mode != &"chest" or game.choice_panel.chest_item.id != &"fluoride_gel" or game.items.count(&"metal_crown") != 1:
 		_fail("continue lost the pending chest decision")
 		return
+	if game.music.current_cue != &"intermission" or game.music.outgoing.playing:
+		_fail("continue did not restore quiet intermission music")
+		return
 	choose_panel(game.choice_panel, 1)
 	if not paused or not game.shop_panel.visible or game.coins != 7 or game.items.count(&"fluoride_gel") != 0 or game.telemetry.chests_found != 2 or game.telemetry.chests_kept != 1 or game.telemetry.chests_scrapped != 1:
 		_fail("SCRAP did not grant coins and finish the reward queue before shop")
